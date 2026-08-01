@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Utilisateur applicatif, lié à l'identité gérée par Supabase Auth (auth.users.id)
+model User {
+  id              String   @id @default(uuid())
+  supabaseAuthId  String   @unique
+  email           String   @unique
+  phoneWhatsapp   String?  @unique
+  consentRgpdAt   DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subscription      Subscription?
+  profile            Profile?
+  programmes         ProgrammeGenerated[]
+  seances            SeanceLog[]
+  mesures            Mesure[]
+  whatsappEvents     WhatsAppEvent[]
+
+  @@map("users")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(INCOMPLETE)
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+// Données d'entrée utilisées par l'IA pour générer les programmes
+model Profile {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objectifs           String?
+  niveau              String?
+  equipementDisponible String?
+  contraintesSante    String?
+  updatedAt           DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+enum Pilier {
+  ENTRAINEMENT
+  NUTRITION
+  RECUPERATION
+}
+
+// Historique des programmes générés dynamiquement par l'IA (pas de bibliothèque pré-construite)
+model ProgrammeGenerated {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pilier       Pilier
+  contenu      Json
+  generatedAt  DateTime @default(now())
+
+  @@index([userId, pilier, generatedAt])
+  @@map("programmes_generated")
+}
+
+model SeanceLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  exercices Json
+  ressenti  String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@map("seances_log")
+}
+
+model Mesure {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  poidsKg   Float?
+  tourTailleCm Float?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@map("mesures")
+}
+
+enum WhatsAppDirection {
+  INBOUND
+  OUTBOUND
+}
+
+// Trace des échanges pertinents avec l'assistant WhatsApp existant (Coaching 2.0)
+model WhatsAppEvent {
+  id        String            @id @default(uuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  direction WhatsAppDirection
+  payload   Json
+  createdAt DateTime          @default(now())
+
+  @@map("whatsapp_events")
+}
