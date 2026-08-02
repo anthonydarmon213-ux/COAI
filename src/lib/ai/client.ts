@@ -1,3 +1,5 @@
+import Anthropic from "@anthropic-ai/sdk";
+
 // Client IA pour la génération dynamique des programmes.
 // Aucune bibliothèque de programmes pré-construite : chaque appel régénère
 // le contenu à partir du profil utilisateur courant (cf. décisions actées).
@@ -9,14 +11,48 @@ export type ProfilUtilisateur = {
   contraintesSante?: string | null;
 };
 
-export async function generateWithAI(prompt: string): Promise<string> {
+let client: Anthropic | null = null;
+
+function getClient(): Anthropic {
   const apiKey = process.env.AI_API_KEY;
-  const model = process.env.AI_MODEL;
-
-  if (!apiKey || !model) {
-    throw new Error("AI_API_KEY / AI_MODEL manquants dans l'environnement");
+  if (!apiKey) {
+    throw new Error("AI_API_KEY manquant dans l'environnement");
   }
+  if (!client) {
+    client = new Anthropic({ apiKey });
+  }
+  return client;
+}
 
-  // TODO: brancher le SDK du fournisseur IA retenu (ex: Anthropic, OpenAI).
-  throw new Error("generateWithAI: intégration à implémenter");
+const JSON_INSTRUCTION =
+  "Réponds uniquement avec un objet JSON valide, sans texte avant ou après, sans balises markdown.";
+
+// Appelle le modèle et renvoie le JSON généré, parsé.
+export async function generateWithAI<T = unknown>(prompt: string): Promise<T> {
+  const model = process.env.AI_MODEL || "claude-sonnet-5";
+
+  const response = await getClient().messages.create({
+    model,
+    max_tokens: 4096,
+    messages: [{ role: "user", content: `${prompt}\n\n${JSON_INSTRUCTION}` }],
+  });
+
+  const text = response.content
+    .filter((block): block is Anthropic.TextBlock => block.type === "text")
+    .map((block) => block.text)
+    .join("");
+
+  return parseJsonResponse<T>(text);
+}
+
+function parseJsonResponse<T>(text: string): T {
+  const trimmed = text.trim();
+  const jsonMatch = trimmed.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+  const jsonText = jsonMatch ? jsonMatch[0] : trimmed;
+
+  try {
+    return JSON.parse(jsonText) as T;
+  } catch {
+    throw new Error("Réponse IA non-JSON reçue, génération à réessayer");
+  }
 }

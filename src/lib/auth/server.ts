@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/db/client";
 
 // Client Supabase Auth pour les Server Components / Route Handlers.
 export function createSupabaseServerClient() {
@@ -30,4 +31,17 @@ export async function getCurrentUser() {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
+}
+
+// Résout l'utilisateur applicatif (table `users`, via supabaseAuthId) à partir
+// de la session Supabase Auth courante. Retourne null si non authentifié ou si
+// l'enregistrement User n'a pas encore été créé (cf. /api/compte/register).
+export async function getCurrentAppUser() {
+  const authUser = await getCurrentUser();
+  if (!authUser) return null;
+
+  return prisma.user.findUnique({
+    where: { supabaseAuthId: authUser.id },
+    include: { profile: true, subscription: true },
+  });
 }
