@@ -33,9 +33,13 @@ export async function generateWithAI<T = unknown>(prompt: string): Promise<T> {
 
   const response = await getClient().messages.create({
     model,
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [{ role: "user", content: `${prompt}\n\n${JSON_INSTRUCTION}` }],
   });
+
+  if (response.stop_reason === "max_tokens") {
+    throw new Error("Réponse IA tronquée (max_tokens atteint), génération à réessayer");
+  }
 
   const text = response.content
     .filter((block): block is Anthropic.TextBlock => block.type === "text")
