@@ -28,6 +28,7 @@ export default function SignInPage() {
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
+      console.error("[sign-in]", err);
       setError(err instanceof Error ? err.message : "Identifiants invalides.");
     } finally {
       setLoading(false);
