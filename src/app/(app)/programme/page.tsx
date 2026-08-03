@@ -1,6 +1,7 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
+import { JsonView } from "@/components/programme/json-view";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import type { Pilier } from "@prisma/client";
@@ -48,9 +49,9 @@ export default async function ProgrammePage() {
           <Card key={pilier}>
             <SectionLabel>Pilier — {LABELS[pilier]}</SectionLabel>
             {programme ? (
-              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-sm text-graphite-200">
-                {JSON.stringify(programme.contenu, null, 2)}
-              </pre>
+              <div className="mt-2">
+                <JsonView data={programme.contenu} />
+              </div>
             ) : (
               <p className="mt-2 text-sm text-graphite-400">Pas encore généré.</p>
             )}
