@@ -8,6 +8,7 @@ const bodySchema = z.object({
   poidsKg: z.number().positive().max(500).optional(),
   tourTailleCm: z.number().positive().max(300).optional(),
   notes: z.string().max(2000).optional(),
+  photoPath: z.string().max(500).optional(),
 });
 
 export async function GET() {
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
       poidsKg: parsed.data.poidsKg,
       tourTailleCm: parsed.data.tourTailleCm,
       notes: parsed.data.notes,
+      photoPath: parsed.data.photoPath,
     },
   });
 

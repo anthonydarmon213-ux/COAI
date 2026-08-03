@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
+import { deleteAllProgressPhotos } from "@/lib/storage/progress-photos";
 
 // RGPD — droit à l'effacement : résilie l'abonnement Stripe, supprime le compte
 // et toutes les données liées (cascade Prisma), puis l'identité Supabase Auth.
@@ -26,6 +27,8 @@ export async function POST() {
       // déjà résiliée côté Stripe : on continue la suppression du compte
     });
   }
+
+  await deleteAllProgressPhotos(authUser.id);
 
   await prisma.user.delete({ where: { id: user.id } });
 

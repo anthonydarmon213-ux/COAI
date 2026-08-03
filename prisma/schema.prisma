@@ -103,6 +103,9 @@ model Mesure {
   poidsKg   Float?
   tourTailleCm Float?
   notes     String?
+  // Chemin dans le bucket Supabase Storage "progress-photos" (bucket privé,
+  // accès via URL signée générée à la demande) — pas l'URL elle-même.
+  photoPath String?
   createdAt DateTime @default(now())
 
   @@map("mesures")
