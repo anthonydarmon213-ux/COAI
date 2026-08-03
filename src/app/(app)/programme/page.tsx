@@ -1,6 +1,8 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
+import { Card } from "@/components/ui/card";
+import { SectionLabel } from "@/components/ui/section-label";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -26,7 +28,10 @@ export default async function ProgrammePage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Mon programme</h1>
+        <div className="flex flex-col gap-1">
+          <SectionLabel>Coaching</SectionLabel>
+          <h1 className="text-2xl font-semibold">Mon programme</h1>
+        </div>
         <RegenerateButton />
       </div>
 
@@ -40,16 +45,16 @@ export default async function ProgrammePage() {
       {piliers.map((pilier, i) => {
         const programme = derniersProgrammes[i];
         return (
-          <section key={pilier} className="rounded-lg border border-graphite-800 p-4">
-            <h2 className="mb-2 text-lg font-medium text-laiton-400">{LABELS[pilier]}</h2>
+          <Card key={pilier}>
+            <SectionLabel>Pilier — {LABELS[pilier]}</SectionLabel>
             {programme ? (
-              <pre className="overflow-x-auto whitespace-pre-wrap text-sm text-graphite-200">
+              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-sm text-graphite-200">
                 {JSON.stringify(programme.contenu, null, 2)}
               </pre>
             ) : (
-              <p className="text-sm text-graphite-400">Pas encore généré.</p>
+              <p className="mt-2 text-sm text-graphite-400">Pas encore généré.</p>
             )}
-          </section>
+          </Card>
         );
       })}
     </div>

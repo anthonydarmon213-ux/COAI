@@ -4,6 +4,10 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/field";
+import { Card } from "@/components/ui/card";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -45,41 +49,46 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-6">
-      <h1 className="text-xl font-semibold text-laiton-400">Créer un compte</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="email"
-          required
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-        />
-        <input
-          type="password"
-          required
-          minLength={8}
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-        />
-        <label className="flex items-start gap-2 text-sm text-graphite-200">
-          <input
-            type="checkbox"
-            checked={consentRgpd}
-            onChange={(e) => setConsentRgpd(e.target.checked)}
-            className="mt-1"
-          />
-          Je consens au traitement de mes données de santé pour la personnalisation de mon
-          coaching (RGPD).
-        </label>
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        <Button type="submit" disabled={loading}>
-          {loading ? "Création…" : "Créer mon compte"}
-        </Button>
-      </form>
+    <main className="bg-lab-grid flex min-h-screen items-center justify-center px-6">
+      <Card className="flex w-full max-w-sm flex-col gap-5">
+        <div className="flex flex-col gap-1">
+          <SectionLabel>Inscription</SectionLabel>
+          <h1 className="text-xl font-semibold text-graphite-50">Créer un compte</h1>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Field label="Email">
+            <Input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Field>
+          <Field label="Mot de passe">
+            <Input
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Field>
+          <label className="flex items-start gap-2 text-sm text-graphite-300">
+            <input
+              type="checkbox"
+              checked={consentRgpd}
+              onChange={(e) => setConsentRgpd(e.target.checked)}
+              className="mt-1"
+            />
+            Je consens au traitement de mes données de santé pour la personnalisation de mon
+            coaching (RGPD).
+          </label>
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          <Button type="submit" disabled={loading}>
+            {loading ? "Création…" : "Créer mon compte"}
+          </Button>
+        </form>
+      </Card>
     </main>
   );
 }

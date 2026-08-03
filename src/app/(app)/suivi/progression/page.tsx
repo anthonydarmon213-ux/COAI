@@ -1,5 +1,7 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { Card } from "@/components/ui/card";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export default async function ProgressionPage() {
   const user = await getCurrentAppUser();
@@ -25,16 +27,21 @@ export default async function ProgressionPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">Progression</h1>
-      {points.length > 1 ? (
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-lg text-laiton-400">
-          <path d={path} fill="none" stroke="currentColor" strokeWidth={2} />
-        </svg>
-      ) : (
-        <p className="text-graphite-400">
-          Pas encore assez de mesures pour afficher une courbe de progression.
-        </p>
-      )}
+      <div className="flex flex-col gap-1">
+        <SectionLabel>Suivi</SectionLabel>
+        <h1 className="text-2xl font-semibold">Progression</h1>
+      </div>
+      <Card>
+        {points.length > 1 ? (
+          <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-lg text-laiton-400">
+            <path d={path} fill="none" stroke="currentColor" strokeWidth={2} />
+          </svg>
+        ) : (
+          <p className="text-graphite-400">
+            Pas encore assez de mesures pour afficher une courbe de progression.
+          </p>
+        )}
+      </Card>
     </div>
   );
 }

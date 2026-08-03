@@ -3,6 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/field";
+import { Card } from "@/components/ui/card";
 
 export function MesureForm() {
   const router = useRouter();
@@ -36,25 +39,24 @@ export function MesureForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-lg border border-graphite-800 p-4">
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-      />
-      <input
-        type="number"
-        step="0.1"
-        placeholder="Poids (kg)"
-        value={poidsKg}
-        onChange={(e) => setPoidsKg(e.target.value)}
-        className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-      />
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      <Button type="submit" disabled={loading}>
-        {loading ? "Ajout…" : "Ajouter la mesure"}
-      </Button>
-    </form>
+    <Card>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Field label="Date">
+          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </Field>
+        <Field label="Poids (kg)">
+          <Input
+            type="number"
+            step="0.1"
+            value={poidsKg}
+            onChange={(e) => setPoidsKg(e.target.value)}
+          />
+        </Field>
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        <Button type="submit" disabled={loading}>
+          {loading ? "Ajout…" : "Ajouter la mesure"}
+        </Button>
+      </form>
+    </Card>
   );
 }

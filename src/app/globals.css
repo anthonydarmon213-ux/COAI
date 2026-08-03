@@ -4,8 +4,16 @@
 
 :root {
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
 body {
   @apply bg-graphite-950 text-graphite-50;
+}
+
+/* Repère visuel "labo de performance" : grille technique en fond, très subtile */
+.bg-lab-grid {
+  background-image: linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
 }

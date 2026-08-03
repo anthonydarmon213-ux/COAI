@@ -3,6 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/field";
+import { Card } from "@/components/ui/card";
 
 export function SeanceForm() {
   const router = useRouter();
@@ -39,31 +42,32 @@ export function SeanceForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-lg border border-graphite-800 p-4">
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-      />
-      <input
-        type="text"
-        placeholder="Exercice principal (ex: squat 5x5)"
-        value={exercice}
-        onChange={(e) => setExercice(e.target.value)}
-        className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-      />
-      <input
-        type="text"
-        placeholder="Ressenti"
-        value={ressenti}
-        onChange={(e) => setRessenti(e.target.value)}
-        className="rounded-md border border-graphite-700 bg-graphite-900 px-3 py-2 text-graphite-50"
-      />
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      <Button type="submit" disabled={loading}>
-        {loading ? "Ajout…" : "Ajouter la séance"}
-      </Button>
-    </form>
+    <Card>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Field label="Date">
+          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </Field>
+        <Field label="Exercice principal">
+          <Input
+            type="text"
+            placeholder="ex: squat 5x5"
+            value={exercice}
+            onChange={(e) => setExercice(e.target.value)}
+          />
+        </Field>
+        <Field label="Ressenti">
+          <Input
+            type="text"
+            placeholder="ex: bonne forme"
+            value={ressenti}
+            onChange={(e) => setRessenti(e.target.value)}
+          />
+        </Field>
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        <Button type="submit" disabled={loading}>
+          {loading ? "Ajout…" : "Ajouter la séance"}
+        </Button>
+      </form>
+    </Card>
   );
 }
