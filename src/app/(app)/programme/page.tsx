@@ -1,5 +1,6 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import Link from "next/link";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
 import { Card } from "@/components/ui/card";
@@ -36,10 +37,13 @@ export default async function ProgrammePage() {
         <RegenerateButton />
       </div>
 
-      {derniersProgrammes.every((p) => !p) && (
+      {!user.profile && (
         <p className="text-graphite-200">
-          Aucun programme généré pour le moment. Complète ton profil puis clique sur
-          « Régénérer mon programme ».
+          Aucun profil renseigné pour l&apos;instant — le programme généré reste générique.{" "}
+          <Link href="/compte/profil" className="text-laiton-400 underline">
+            Renseigner mon profil
+          </Link>
+          , puis clique sur « Régénérer mon programme ».
         </p>
       )}
 
