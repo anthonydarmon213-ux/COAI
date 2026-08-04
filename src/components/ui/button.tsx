@@ -2,16 +2,16 @@ import type { ButtonHTMLAttributes } from "react";
 
 type Variant = "primary" | "secondary" | "ghost";
 
+// Primaire brass / secondaire steel outline (spec design system v2).
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-laiton-500 text-graphite-950 hover:bg-laiton-400",
-  secondary:
-    "border border-graphite-700 bg-transparent text-graphite-50 hover:border-laiton-500 hover:text-laiton-400",
+  primary: "bg-brass text-ink hover:bg-brass/90",
+  secondary: "border border-steel bg-transparent text-steel hover:bg-steel/10",
   ghost: "bg-transparent text-graphite-200 hover:text-laiton-400",
 };
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
 
-// Composant de base du design system Holos (palette graphite/laiton).
+// Composant de base du design system Holos (palette graphite/laiton + brass/steel).
 export function Button({ className = "", variant = "primary", ...props }: ButtonProps) {
   return (
     <button

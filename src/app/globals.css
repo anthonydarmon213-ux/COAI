@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-}
-
 body {
   @apply bg-graphite-950 text-graphite-50;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-display;
 }
 
 /* Repère visuel "labo de performance" : grille technique en fond, très subtile */

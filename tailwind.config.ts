@@ -22,8 +22,20 @@ const config: Config = {
           400: "#c9a262",
           300: "#ddc191",
         },
+        // Tokens du design system v2 (spécification "Design System — Lab Coach").
+        // Additifs : graphite/laiton restent la base déjà en place, brass/steel
+        // sont les nouveaux accents (bouton primaire/secondaire), ink/paper/
+        // surface/muted/line sont disponibles pour les futurs écrans clairs.
+        ink: "#14181A",
+        paper: "#EEF1ED",
+        surface: "#E3E7E1",
+        muted: "#5E6862",
+        brass: "#A8763E",
+        steel: "#3A5A6B",
+        line: "rgba(20,24,26,0.12)",
       },
       fontFamily: {
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
