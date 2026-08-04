@@ -11,7 +11,7 @@ const VARIANTS: Record<Variant, string> = {
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
 
-// Composant de base du design system Holos (palette graphite/laiton + brass/steel).
+// Composant de base du design system (palette graphite/laiton + brass/steel).
 export function Button({ className = "", variant = "primary", ...props }: ButtonProps) {
   return (
     <button

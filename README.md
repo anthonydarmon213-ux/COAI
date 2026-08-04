@@ -1,4 +1,4 @@
-# Holos
+# Anthony Darmon — Coaching augmenté
 
 SaaS fitness/wellness — coach hybride, holistique. Coaching, Suivi, IA, supervisés par Anthony Darmon.
 

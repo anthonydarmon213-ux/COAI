@@ -1,5 +1,5 @@
 // Intégration avec l'assistant WhatsApp existant "Coaching 2.0" (Make.com + Twilio).
-// Holos ne réimplémente pas de chat : on échange uniquement des événements/contexte.
+// L'application ne réimplémente pas de chat : on échange uniquement des événements/contexte.
 
 type NotifyMakePayload = {
   userId: string;

@@ -10,23 +10,23 @@ datasource db {
 
 // Utilisateur applicatif, lié à l'identité gérée par Supabase Auth (auth.users.id)
 model User {
-  id              String   @id @default(uuid())
-  supabaseAuthId  String   @unique
-  email           String   @unique
-  phoneWhatsapp   String?  @unique
-  consentRgpdAt   DateTime?
+  id             String    @id @default(uuid())
+  supabaseAuthId String    @unique
+  email          String    @unique
+  phoneWhatsapp  String?   @unique
+  consentRgpdAt  DateTime?
   // Coach humain (Anthony Darmon) habilité à relire/valider les programmes
   // générés par l'IA avant qu'ils soient visibles par les abonnés.
-  isAdmin         Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isAdmin        Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  subscription      Subscription?
-  profile            Profile?
-  programmes         ProgrammeGenerated[]
-  seances            SeanceLog[]
-  mesures            Mesure[]
-  whatsappEvents     WhatsAppEvent[]
+  subscription   Subscription?
+  profile        Profile?
+  programmes     ProgrammeGenerated[]
+  seances        SeanceLog[]
+  mesures        Mesure[]
+  whatsappEvents WhatsAppEvent[]
 
   @@map("users")
 }
@@ -91,14 +91,14 @@ enum StatutProgramme {
 // (Anthony Darmon) ne l'a pas relue et validée — l'abonné ne voit que les
 // programmes VALIDE.
 model ProgrammeGenerated {
-  id           String          @id @default(uuid())
-  userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  pilier       Pilier
-  contenu      Json
-  statut       StatutProgramme @default(EN_ATTENTE)
-  valideAt     DateTime?
-  generatedAt  DateTime        @default(now())
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pilier      Pilier
+  contenu     Json
+  statut      StatutProgramme @default(EN_ATTENTE)
+  valideAt    DateTime?
+  generatedAt DateTime        @default(now())
 
   @@index([userId, pilier, generatedAt])
   @@index([statut, generatedAt])
@@ -122,20 +122,20 @@ model SeanceLog {
 // suivies dans le temps (contrairement au Profile) pour un vrai graphique
 // de progression.
 model Mesure {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date      DateTime
-  poidsKg   Float?
-  tourTailleCm Float?
-  masseGrassePourcent Float?
-  masseMusculaireKg   Float?
+  id                         String   @id @default(uuid())
+  userId                     String
+  user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date                       DateTime
+  poidsKg                    Float?
+  tourTailleCm               Float?
+  masseGrassePourcent        Float?
+  masseMusculaireKg          Float?
   frequenceCardiaqueReposBpm Int?
-  notes     String?
+  notes                      String?
   // Chemin dans le bucket Supabase Storage "progress-photos" (bucket privé,
   // accès via URL signée générée à la demande) — pas l'URL elle-même.
-  photoPath String?
-  createdAt DateTime @default(now())
+  photoPath                  String?
+  createdAt                  DateTime @default(now())
 
   @@map("mesures")
 }
@@ -155,4 +155,13 @@ model WhatsAppEvent {
   createdAt DateTime          @default(now())
 
   @@map("whatsapp_events")
+}
+
+model FounderWaitlistEntry {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  consentAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("founder_waitlist_entries")
 }

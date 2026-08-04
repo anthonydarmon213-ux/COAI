@@ -16,9 +16,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Holos",
+  title: "Anthony Darmon — Coaching augmenté",
   description:
-    "Holos — ton coach hybride, holistique. Coaching, suivi et IA, supervisés par Anthony Darmon.",
+    "Anthony Darmon — Coaching augmenté. L’expertise humaine augmentée par l’IA.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

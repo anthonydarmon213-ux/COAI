@@ -19,7 +19,9 @@ export function AppNav() {
 
   return (
     <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-graphite-800 px-6 py-4">
-      <span className="font-mono text-sm uppercase tracking-widest text-laiton-400">Holos</span>
+      <span className="font-mono text-sm uppercase tracking-widest text-laiton-400">
+        Anthony Darmon — Coaching augmenté
+      </span>
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
         {LINKS.map((link) => {
           const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);

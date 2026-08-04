@@ -1,7 +1,7 @@
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_COACH_NUMBER;
 
 const MESSAGE =
-  "Bonjour Anthony, je suis sur mon espace Holos et j'aimerais échanger en visio sur mon accompagnement.";
+  "Bonjour Anthony, je suis sur mon espace Coaching augmenté et j'aimerais échanger en visio sur mon accompagnement.";
 
 export function CoachingVisioCta() {
   if (!WHATSAPP_NUMBER) return null;

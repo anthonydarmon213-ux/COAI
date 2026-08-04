@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Palette de marque Holos : graphite / laiton — ton "labo de performance"
+// Palette de marque : graphite / laiton — ton "labo de performance"
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {

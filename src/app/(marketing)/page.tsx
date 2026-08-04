@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { FounderWaitlistForm } from "@/components/marketing/founder-waitlist-form";
 
 const FAQ = [
   {
@@ -18,7 +19,7 @@ const FAQ = [
   {
     question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
     reponse:
-      "Holos te donne un point de départ structuré et suivi, à 49€/mois. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Beaucoup démarrent sur Holos puis passent à THE METHOD quand ils veulent aller plus loin.",
+      "Le coaching augmenté te donne un point de départ structuré et suivi, à 49€/mois. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Tu peux commencer avec ce format, puis passer à THE METHOD quand tu veux aller plus loin.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -51,12 +52,16 @@ export default function LandingPage() {
       <section className="flex min-h-[85vh] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
         <SectionLabel>Coaching · Suivi · IA</SectionLabel>
         <h1 className="text-4xl font-semibold tracking-tight text-graphite-50 sm:text-5xl">
-          <span className="text-laiton-400">Holos</span>
+          Anthony Darmon
+          <span className="block text-laiton-400">— Coaching augmenté</span>
         </h1>
         <p className="max-w-md text-graphite-300">
           Ton coach hybride, holistique. La méthode d&apos;Anthony Darmon, plus de 17 ans
           d&apos;expérience, condensée dans un programme généré pour toi — et supervisé
           par un vrai coach.
+        </p>
+        <p className="font-display text-lg text-graphite-100">
+          L&apos;expertise humaine augmentée par l&apos;IA
         </p>
         <a href="#piliers">
           <Button variant="secondary">Voir comment ça marche</Button>
@@ -68,7 +73,7 @@ export default function LandingPage() {
         <SectionLabel>Le constat</SectionLabel>
         <p className="mt-3 text-lg text-graphite-200">
           Tu veux progresser sérieusement, mais tu n&apos;es pas encore prêt à investir
-          dans un coaching 1-to-1. Holos te donne un vrai point de départ :
+          dans un coaching 1-to-1. Le coaching augmenté te donne un vrai point de départ :
           un programme pensé pour toi, un suivi structuré, et un accompagnement
           disponible à tout moment — sans le prix ni l&apos;engagement d&apos;un coach
           personnel.
@@ -104,9 +109,24 @@ export default function LandingPage() {
         </div>
         <p className="max-w-sm text-sm text-graphite-400">
           THE METHOD by Anthony Darmon — expert en coaching sportif depuis plus de 17 ans,
-          spécialiste des dirigeants et entrepreneurs. Holos s&apos;appuie sur cette
-          méthode pour générer ton programme, sans attendre le coaching 1-to-1.
+          spécialiste des dirigeants et entrepreneurs. Le coaching augmenté s&apos;appuie
+          sur cette méthode pour générer ton programme, sans attendre le coaching 1-to-1.
         </p>
+      </section>
+
+      {/* Liste d'attente */}
+      <section
+        id="cercle-fondateur"
+        className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-6 py-16 text-center"
+      >
+        <SectionLabel>Accès en avant-première</SectionLabel>
+        <h2 className="text-3xl font-semibold text-graphite-50">Le Cercle Fondateur</h2>
+        <p className="max-w-lg text-graphite-300">
+          Rejoins les premiers membres qui contribueront à façonner cette nouvelle
+          expérience de coaching. Tu recevras les informations de lancement et un accès
+          prioritaire dès l&apos;ouverture.
+        </p>
+        <FounderWaitlistForm />
       </section>
 
       {/* FAQ */}
