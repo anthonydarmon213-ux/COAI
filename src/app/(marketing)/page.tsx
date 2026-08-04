@@ -4,6 +4,28 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+const FAQ = [
+  {
+    question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
+    reponse:
+      "Les deux : l'IA génère ton programme à partir de ton profil, mais rien n'apparaît chez toi sans être relu et validé par Anthony Darmon. Tu ne reçois jamais un contenu IA brut.",
+  },
+  {
+    question: "C'est adapté si je suis débutant ?",
+    reponse:
+      "Oui — ton niveau, ton équipement et tes contraintes de santé font partie du profil pris en compte pour générer et valider ton programme.",
+  },
+  {
+    question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
+    reponse:
+      "Holos te donne un point de départ structuré et suivi, à 49€/mois. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Beaucoup démarrent sur Holos puis passent à THE METHOD quand ils veulent aller plus loin.",
+  },
+  {
+    question: "Je peux résilier quand je veux ?",
+    reponse: "Oui, l'abonnement est sans engagement — tu résilies à tout moment depuis ton compte.",
+  },
+];
+
 const PILIERS = [
   {
     titre: "Coaching",
@@ -85,6 +107,25 @@ export default function LandingPage() {
           spécialiste des dirigeants et entrepreneurs. Holos s&apos;appuie sur cette
           méthode pour générer ton programme, sans attendre le coaching 1-to-1.
         </p>
+      </section>
+
+      {/* FAQ */}
+      <section className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-6 py-16">
+        <div className="text-center">
+          <SectionLabel>Questions fréquentes</SectionLabel>
+        </div>
+        <div className="flex flex-col gap-3">
+          {FAQ.map((item) => (
+            <Card key={item.question}>
+              <details>
+                <summary className="cursor-pointer list-none text-sm font-medium text-graphite-50 marker:content-none">
+                  {item.question}
+                </summary>
+                <p className="mt-3 text-sm text-graphite-300">{item.reponse}</p>
+              </details>
+            </Card>
+          ))}
+        </div>
       </section>
 
       {/* CTA final */}
