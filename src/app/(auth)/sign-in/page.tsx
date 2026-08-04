@@ -68,6 +68,12 @@ export default function SignInPage() {
         <Link href="/mot-de-passe-oublie" className="text-sm text-graphite-400 underline">
           Mot de passe oublié ?
         </Link>
+        <p className="text-sm text-graphite-400">
+          Pas encore de compte ?{" "}
+          <Link href="/sign-up" className="underline">
+            S&apos;inscrire
+          </Link>
+        </p>
       </Card>
     </main>
   );

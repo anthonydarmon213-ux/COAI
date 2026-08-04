@@ -54,7 +54,7 @@ export default function LandingPage() {
           <span className="text-laiton-400">Holos</span>
         </h1>
         <p className="max-w-md text-graphite-300">
-          Ton coach hybride, holistique. La méthode d&apos;Anthony Darmon, 16 ans
+          Ton coach hybride, holistique. La méthode d&apos;Anthony Darmon, plus de 17 ans
           d&apos;expérience, condensée dans un programme généré pour toi — et supervisé
           par un vrai coach.
         </p>
@@ -103,7 +103,7 @@ export default function LandingPage() {
           />
         </div>
         <p className="max-w-sm text-sm text-graphite-400">
-          THE METHOD by Anthony Darmon — expert en coaching sportif depuis 17 ans,
+          THE METHOD by Anthony Darmon — expert en coaching sportif depuis plus de 17 ans,
           spécialiste des dirigeants et entrepreneurs. Holos s&apos;appuie sur cette
           méthode pour générer ton programme, sans attendre le coaching 1-to-1.
         </p>

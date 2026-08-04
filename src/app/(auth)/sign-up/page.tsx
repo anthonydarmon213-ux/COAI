@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import Link from "next/link";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -89,6 +90,12 @@ export default function SignUpPage() {
             {loading ? "Création…" : "Créer mon compte"}
           </Button>
         </form>
+        <p className="text-sm text-graphite-400">
+          Déjà un compte ?{" "}
+          <Link href="/sign-in" className="underline">
+            Se connecter
+          </Link>
+        </p>
       </Card>
     </main>
   );
