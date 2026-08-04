@@ -29,11 +29,12 @@ export default function LandingPage() {
       <section className="flex min-h-[85vh] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
         <SectionLabel>Coaching · Suivi · IA</SectionLabel>
         <h1 className="text-4xl font-semibold tracking-tight text-graphite-50 sm:text-5xl">
-          Lab <span className="text-laiton-400">Coach</span>
+          <span className="text-laiton-400">Holos</span>
         </h1>
         <p className="max-w-md text-graphite-300">
-          La méthode d&apos;Anthony Darmon, 16 ans d&apos;expérience, condensée dans un
-          programme généré pour toi.
+          Ton coach hybride, holistique. La méthode d&apos;Anthony Darmon, 16 ans
+          d&apos;expérience, condensée dans un programme généré pour toi — et supervisé
+          par un vrai coach.
         </p>
         <a href="#piliers">
           <Button variant="secondary">Voir comment ça marche</Button>
@@ -45,7 +46,7 @@ export default function LandingPage() {
         <SectionLabel>Le constat</SectionLabel>
         <p className="mt-3 text-lg text-graphite-200">
           Tu veux progresser sérieusement, mais tu n&apos;es pas encore prêt à investir
-          dans un coaching 1-to-1. Lab Coach te donne un vrai point de départ :
+          dans un coaching 1-to-1. Holos te donne un vrai point de départ :
           un programme pensé pour toi, un suivi structuré, et un accompagnement
           disponible à tout moment — sans le prix ni l&apos;engagement d&apos;un coach
           personnel.
@@ -81,7 +82,7 @@ export default function LandingPage() {
         </div>
         <p className="max-w-sm text-sm text-graphite-400">
           THE METHOD by Anthony Darmon — expert en coaching sportif depuis 17 ans,
-          spécialiste des dirigeants et entrepreneurs. Lab Coach s&apos;appuie sur cette
+          spécialiste des dirigeants et entrepreneurs. Holos s&apos;appuie sur cette
           méthode pour générer ton programme, sans attendre le coaching 1-to-1.
         </p>
       </section>

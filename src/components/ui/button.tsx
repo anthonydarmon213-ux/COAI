@@ -11,7 +11,7 @@ const VARIANTS: Record<Variant, string> = {
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
 
-// Composant de base du design system Lab Coach (palette graphite/laiton).
+// Composant de base du design system Holos (palette graphite/laiton).
 export function Button({ className = "", variant = "primary", ...props }: ButtonProps) {
   return (
     <button

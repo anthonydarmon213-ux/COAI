@@ -1,6 +1,6 @@
-# Lab Coach
+# Holos
 
-SaaS fitness/wellness — Coaching, Suivi, IA. Fondé sur la méthode d'Anthony Darmon.
+SaaS fitness/wellness — coach hybride, holistique. Coaching, Suivi, IA, supervisés par Anthony Darmon.
 
 ## Stack
 
