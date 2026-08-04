@@ -9,6 +9,13 @@ export type ProfilUtilisateur = {
   niveau?: string | null;
   equipementDisponible?: string | null;
   contraintesSante?: string | null;
+  tailleCm?: number | null;
+  morphologie?: string | null;
+  entrainementActuel?: string | null;
+  habitudesAlimentaires?: string | null;
+  consommationCafe?: string | null;
+  consommationAlcool?: string | null;
+  qualiteSommeil?: string | null;
 };
 
 let client: Anthropic | null = null;

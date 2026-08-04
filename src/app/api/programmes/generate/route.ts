@@ -35,6 +35,13 @@ export async function POST() {
     niveau: user.profile?.niveau,
     equipementDisponible: user.profile?.equipementDisponible,
     contraintesSante: user.profile?.contraintesSante,
+    tailleCm: user.profile?.tailleCm,
+    morphologie: user.profile?.morphologie,
+    entrainementActuel: user.profile?.entrainementActuel,
+    habitudesAlimentaires: user.profile?.habitudesAlimentaires,
+    consommationCafe: user.profile?.consommationCafe,
+    consommationAlcool: user.profile?.consommationAlcool,
+    qualiteSommeil: user.profile?.qualiteSommeil,
   };
 
   const piliers = Object.keys(PROMPT_BUILDERS) as Pilier[];

@@ -90,7 +90,10 @@ export default function LandingPage() {
       {/* CTA final */}
       <section className="flex flex-col items-center gap-4 px-6 py-20 text-center">
         <h2 className="text-2xl font-semibold text-graphite-50">Prêt à commencer ?</h2>
-        <p className="text-graphite-300">49€/mois, sans engagement.</p>
+        <p className="text-graphite-300">
+          Offre de lancement : <span className="line-through text-graphite-500">89€</span>{" "}
+          49€/mois, sans engagement.
+        </p>
         <Link href="/pricing">
           <Button>Découvrir l&apos;offre</Button>
         </Link>
