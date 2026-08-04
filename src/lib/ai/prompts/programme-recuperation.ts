@@ -1,7 +1,7 @@
 import type { ProfilUtilisateur } from "@/lib/ai/client";
 
 export function buildProgrammeRecuperationPrompt(profil: ProfilUtilisateur): string {
-  return `Tu es le coach IA d'Anthony Darmon — Coaching augmenté.
+  return `Tu es le coach IA de YUMAI, fondé sur la méthode d'Anthony Darmon.
 Génère des recommandations de RÉCUPÉRATION personnalisées pour cet utilisateur.
 
 Objectifs : ${profil.objectifs ?? "non renseignés"}

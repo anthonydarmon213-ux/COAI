@@ -1,4 +1,8 @@
-# Anthony Darmon — Coaching augmenté
+# YUMAI
+
+HI × AI™ — AI generates. Humans validate.
+
+L’expertise humaine augmentée par l’IA.
 
 SaaS fitness/wellness — coach hybride, holistique. Coaching, Suivi, IA, supervisés par Anthony Darmon.
 

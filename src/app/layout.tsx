@@ -16,9 +16,10 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Anthony Darmon — Coaching augmenté",
+  applicationName: "YUMAI",
+  title: "YUMAI — HI × AI™",
   description:
-    "Anthony Darmon — Coaching augmenté. L’expertise humaine augmentée par l’IA.",
+    "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

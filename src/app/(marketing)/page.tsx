@@ -52,16 +52,21 @@ export default function LandingPage() {
       <section className="flex min-h-[85vh] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
         <SectionLabel>Coaching · Suivi · IA</SectionLabel>
         <h1 className="text-4xl font-semibold tracking-tight text-graphite-50 sm:text-5xl">
-          Anthony Darmon
-          <span className="block text-laiton-400">— Coaching augmenté</span>
+          YUMAI
         </h1>
+        <p className="font-mono text-sm uppercase tracking-[0.3em] text-laiton-400">
+          HI × AI™
+        </p>
+        <p className="font-display text-xl text-graphite-100">
+          AI generates. Humans validate.
+        </p>
+        <p className="font-display text-lg text-graphite-100">
+          L&apos;expertise humaine augmentée par l&apos;IA
+        </p>
         <p className="max-w-md text-graphite-300">
           Ton coach hybride, holistique. La méthode d&apos;Anthony Darmon, plus de 17 ans
           d&apos;expérience, condensée dans un programme généré pour toi — et supervisé
           par un vrai coach.
-        </p>
-        <p className="font-display text-lg text-graphite-100">
-          L&apos;expertise humaine augmentée par l&apos;IA
         </p>
         <a href="#piliers">
           <Button variant="secondary">Voir comment ça marche</Button>
