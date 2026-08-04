@@ -8,29 +8,40 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
-import Link from "next/link";
 
-export default function SignInPage() {
+// Le lien reçu par email (via /mot-de-passe-oublie) ouvre cette page avec une
+// session temporaire déjà établie par le client Supabase (détectée dans l'URL).
+export default function ReinitialiserMotDePassePage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (password !== confirmation) {
+      setError("Les deux mots de passe ne correspondent pas.");
+      return;
+    }
+
     setLoading(true);
     try {
       const supabase = createSupabaseBrowserClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      if (signInError) throw signInError;
+      const { error: updateError } = await supabase.auth.updateUser({ password });
+      if (updateError) throw updateError;
 
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      console.error("[sign-in]", err);
-      setError(err instanceof Error ? err.message : "Identifiants invalides.");
+      console.error("[reinitialiser-mot-de-passe]", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible de mettre à jour le mot de passe. Le lien a peut-être expiré."
+      );
     } finally {
       setLoading(false);
     }
@@ -40,34 +51,33 @@ export default function SignInPage() {
     <main className="bg-lab-grid flex min-h-screen items-center justify-center px-6">
       <Card className="flex w-full max-w-sm flex-col gap-5">
         <div className="flex flex-col gap-1">
-          <SectionLabel>Connexion</SectionLabel>
-          <h1 className="text-xl font-semibold text-graphite-50">Se connecter</h1>
+          <SectionLabel>Compte</SectionLabel>
+          <h1 className="text-xl font-semibold text-graphite-50">Nouveau mot de passe</h1>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field label="Email">
-            <Input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Field>
-          <Field label="Mot de passe">
+          <Field label="Nouveau mot de passe">
             <Input
               type="password"
               required
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </Field>
+          <Field label="Confirmer le mot de passe">
+            <Input
+              type="password"
+              required
+              minLength={8}
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+            />
+          </Field>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading ? "Connexion…" : "Se connecter"}
+            {loading ? "Mise à jour…" : "Mettre à jour le mot de passe"}
           </Button>
         </form>
-        <Link href="/mot-de-passe-oublie" className="text-sm text-graphite-400 underline">
-          Mot de passe oublié ?
-        </Link>
       </Card>
     </main>
   );
