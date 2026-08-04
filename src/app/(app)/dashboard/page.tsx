@@ -2,6 +2,7 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 
 export default async function DashboardPage() {
   const user = await getCurrentAppUser();
@@ -39,6 +40,7 @@ export default async function DashboardPage() {
       <a href="/programme" className="text-laiton-400 underline">
         Voir mon programme
       </a>
+      <CoachingVisioCta />
     </div>
   );
 }

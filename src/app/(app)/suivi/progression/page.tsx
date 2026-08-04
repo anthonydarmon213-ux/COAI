@@ -2,6 +2,8 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Sparkline } from "@/components/suivi/sparkline";
+import { MetricRing } from "@/components/suivi/metric-ring";
+import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 
 type Metrique = {
   label: string;
@@ -38,7 +40,7 @@ export default async function ProgressionPage() {
   })).filter((g) => g.points.length > 0);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <SectionLabel>Suivi</SectionLabel>
         <h1 className="text-2xl font-semibold">Progression</h1>
@@ -50,11 +52,41 @@ export default async function ProgressionPage() {
           l&apos;onglet « Mesures ».
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {graphiques.map((g) => (
-            <Sparkline key={g.label} label={g.label} unite={g.unite} points={g.points} />
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-3">
+            <SectionLabel>Aujourd&apos;hui</SectionLabel>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {graphiques.map((g) => {
+                const points = g.points;
+                const valeur = points.at(-1);
+                const precedente = points.length > 1 ? points.at(-2)! : null;
+                if (valeur === undefined) return null;
+                return (
+                  <MetricRing
+                    key={g.label}
+                    label={g.label}
+                    unite={g.unite}
+                    valeur={valeur}
+                    min={Math.min(...points)}
+                    max={Math.max(...points)}
+                    precedente={precedente}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <SectionLabel>Tendance</SectionLabel>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {graphiques.map((g) => (
+                <Sparkline key={g.label} label={g.label} unite={g.unite} points={g.points} />
+              ))}
+            </div>
+          </div>
+
+          <CoachingVisioCta />
+        </>
       )}
     </div>
   );
