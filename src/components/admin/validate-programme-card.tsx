@@ -52,6 +52,22 @@ export function ValidateProgrammeCard({
     }
   }
 
+  async function rejeter() {
+    if (!window.confirm("Rejeter cette génération ? Elle sera supprimée définitivement.")) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/programmes/${id}/rejeter`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec du rejet.");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function validerAvecModifications() {
     try {
       const parsed = JSON.parse(draft);
@@ -100,6 +116,14 @@ export function ValidateProgrammeCard({
             {loading ? "Validation…" : "Valider tel quel"}
           </Button>
         )}
+        <Button
+          variant="ghost"
+          className="text-red-400 hover:text-red-300"
+          onClick={rejeter}
+          disabled={loading}
+        >
+          Rejeter
+        </Button>
       </div>
     </Card>
   );
