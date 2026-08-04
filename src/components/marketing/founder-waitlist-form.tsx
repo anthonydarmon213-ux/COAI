@@ -3,15 +3,22 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 export function FounderWaitlistForm() {
+  const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(false);
+  const [profile, setProfile] = useState("");
+  const [objective, setObjective] = useState("");
+  const [consentRgpd, setConsentRgpd] = useState(false);
+  const [startedAt] = useState(() => Date.now());
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     setStatus("loading");
     setMessage("");
 
@@ -19,7 +26,15 @@ export function FounderWaitlistForm() {
       const response = await fetch("/api/liste-attente", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, consent }),
+        body: JSON.stringify({
+          firstName,
+          email,
+          profile,
+          objective,
+          consentRgpd,
+          website: String(formData.get("website") ?? ""),
+          elapsedMs: Date.now() - startedAt,
+        }),
       });
       const result = (await response.json()) as { error?: string };
 
@@ -28,9 +43,9 @@ export function FounderWaitlistForm() {
       }
 
       setStatus("success");
-      setMessage("Bienvenue dans le Cercle Fondateur. Nous te tiendrons informé en priorité.");
-      setEmail("");
-      setConsent(false);
+      setMessage(
+        `Merci ${firstName}, ta demande est confirmée. Bienvenue parmi les membres fondateurs YUMAI.`
+      );
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Une erreur est survenue.");
@@ -39,6 +54,20 @@ export function FounderWaitlistForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-md flex-col gap-3 text-left">
+      <label htmlFor="founder-first-name" className="text-sm font-medium text-graphite-200">
+        Prénom
+      </label>
+      <Input
+        id="founder-first-name"
+        name="firstName"
+        autoComplete="given-name"
+        required
+        minLength={2}
+        maxLength={80}
+        value={firstName}
+        onChange={(event) => setFirstName(event.target.value)}
+        placeholder="Ton prénom"
+      />
       <label htmlFor="founder-email" className="text-sm font-medium text-graphite-200">
         Ton adresse e-mail
       </label>
@@ -51,18 +80,67 @@ export function FounderWaitlistForm() {
         onChange={(event) => setEmail(event.target.value)}
         placeholder="toi@exemple.fr"
       />
+      <label htmlFor="founder-profile" className="text-sm font-medium text-graphite-200">
+        Ton profil
+      </label>
+      <Select
+        id="founder-profile"
+        name="profile"
+        required
+        value={profile}
+        onChange={(event) => setProfile(event.target.value)}
+      >
+        <option value="" disabled>
+          Sélectionne ton profil
+        </option>
+        <option value="dirigeant">Dirigeant ou entrepreneur</option>
+        <option value="independant">Indépendant ou profession libérale</option>
+        <option value="cadre">Cadre ou manager</option>
+        <option value="sportif">Sportif régulier</option>
+        <option value="reprise">Reprise ou débutant</option>
+        <option value="autre">Autre profil</option>
+      </Select>
+      <label htmlFor="founder-objective" className="text-sm font-medium text-graphite-200">
+        Ton objectif prioritaire
+      </label>
+      <Textarea
+        id="founder-objective"
+        name="objective"
+        required
+        minLength={10}
+        maxLength={1000}
+        rows={4}
+        value={objective}
+        onChange={(event) => setObjective(event.target.value)}
+        placeholder="Ex. retrouver de l'énergie, progresser durablement, reprendre une routine…"
+      />
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="founder-website">Site internet</label>
+        <input
+          id="founder-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <label className="flex items-start gap-2 text-xs text-graphite-400">
         <input
           type="checkbox"
           required
-          checked={consent}
-          onChange={(event) => setConsent(event.target.checked)}
+          checked={consentRgpd}
+          onChange={(event) => setConsentRgpd(event.target.checked)}
           className="mt-0.5"
         />
-        J&apos;accepte de recevoir par e-mail les informations de lancement et d&apos;accès
-        prioritaire. Je pourrai retirer mon consentement à tout moment.
+        J&apos;accepte que YUMAI traite ces informations pour gérer ma demande et
+        m&apos;envoyer les actualités liées au lancement. Je pourrai retirer mon
+        consentement à tout moment.
       </label>
-      <Button type="submit" disabled={status === "loading"} className="w-full">
+      <Button
+        type="submit"
+        disabled={status === "loading" || status === "success"}
+        className="w-full"
+      >
         {status === "loading" ? "Inscription…" : "Rejoindre la liste prioritaire"}
       </Button>
       {message ? (

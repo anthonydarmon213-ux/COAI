@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -68,8 +67,8 @@ export default function LandingPage() {
           d&apos;expérience, condensée dans un programme généré pour toi — et supervisé
           par un vrai coach.
         </p>
-        <a href="#piliers">
-          <Button variant="secondary">Voir comment ça marche</Button>
+        <a href="#membres-fondateurs">
+          <Button>Rejoindre la liste prioritaire</Button>
         </a>
       </section>
 
@@ -121,11 +120,13 @@ export default function LandingPage() {
 
       {/* Liste d'attente */}
       <section
-        id="cercle-fondateur"
+        id="membres-fondateurs"
         className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-6 py-16 text-center"
       >
         <SectionLabel>Accès en avant-première</SectionLabel>
-        <h2 className="text-3xl font-semibold text-graphite-50">Le Cercle Fondateur</h2>
+        <h2 className="text-3xl font-semibold text-graphite-50">
+          Membres fondateurs YUMAI
+        </h2>
         <p className="max-w-lg text-graphite-300">
           Rejoins les premiers membres qui contribueront à façonner cette nouvelle
           expérience de coaching. Tu recevras les informations de lancement et un accès
@@ -160,9 +161,9 @@ export default function LandingPage() {
           Offre de lancement : <span className="line-through text-graphite-500">89€</span>{" "}
           49€/mois, sans engagement.
         </p>
-        <Link href="/pricing">
-          <Button>Découvrir l&apos;offre</Button>
-        </Link>
+        <a href="#membres-fondateurs">
+          <Button>Rejoindre la liste prioritaire</Button>
+        </a>
       </section>
     </main>
   );

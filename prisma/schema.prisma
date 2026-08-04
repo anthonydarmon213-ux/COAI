@@ -159,7 +159,10 @@ model WhatsAppEvent {
 
 model FounderWaitlistEntry {
   id        String   @id @default(uuid())
+  firstName String?
   email     String   @unique
+  profile   String?
+  objective String?
   consentAt DateTime
   createdAt DateTime @default(now())
 
