@@ -1,29 +1,41 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { Sparkline } from "@/components/suivi/sparkline";
+
+type Metrique = {
+  label: string;
+  unite: string;
+  valeurs: (m: {
+    poidsKg: number | null;
+    tourTailleCm: number | null;
+    masseGrassePourcent: number | null;
+    masseMusculaireKg: number | null;
+    frequenceCardiaqueReposBpm: number | null;
+  }) => number | null;
+};
+
+const METRIQUES: Metrique[] = [
+  { label: "Poids", unite: "kg", valeurs: (m) => m.poidsKg },
+  { label: "Masse grasse", unite: "%", valeurs: (m) => m.masseGrassePourcent },
+  { label: "Masse musculaire", unite: "kg", valeurs: (m) => m.masseMusculaireKg },
+  { label: "Tour de taille", unite: "cm", valeurs: (m) => m.tourTailleCm },
+  { label: "Fréquence cardiaque de repos", unite: "bpm", valeurs: (m) => m.frequenceCardiaqueReposBpm },
+];
 
 export default async function ProgressionPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
   const mesures = await prisma.mesure.findMany({
-    where: { userId: user.id, poidsKg: { not: null } },
+    where: { userId: user.id },
     orderBy: { date: "asc" },
   });
 
-  const points = mesures.map((m) => m.poidsKg as number);
-  const min = Math.min(...points, 0);
-  const max = Math.max(...points, 1);
-  const width = 400;
-  const height = 120;
-  const path = points
-    .map((p, i) => {
-      const x = points.length > 1 ? (i / (points.length - 1)) * width : width / 2;
-      const y = height - ((p - min) / (max - min || 1)) * height;
-      return `${i === 0 ? "M" : "L"}${x},${y}`;
-    })
-    .join(" ");
+  const graphiques = METRIQUES.map((metrique) => ({
+    ...metrique,
+    points: mesures.map(metrique.valeurs).filter((v): v is number => v !== null),
+  })).filter((g) => g.points.length > 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,17 +43,19 @@ export default async function ProgressionPage() {
         <SectionLabel>Suivi</SectionLabel>
         <h1 className="text-2xl font-semibold">Progression</h1>
       </div>
-      <Card>
-        {points.length > 1 ? (
-          <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-lg text-laiton-400">
-            <path d={path} fill="none" stroke="currentColor" strokeWidth={2} />
-          </svg>
-        ) : (
-          <p className="text-graphite-400">
-            Pas encore assez de mesures pour afficher une courbe de progression.
-          </p>
-        )}
-      </Card>
+
+      {graphiques.length === 0 ? (
+        <p className="text-graphite-400">
+          Pas encore assez de mesures pour afficher une progression. Ajoute des mesures dans
+          l&apos;onglet « Mesures ».
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {graphiques.map((g) => (
+            <Sparkline key={g.label} label={g.label} unite={g.unite} points={g.points} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

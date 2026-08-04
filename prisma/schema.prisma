@@ -15,6 +15,9 @@ model User {
   email           String   @unique
   phoneWhatsapp   String?  @unique
   consentRgpdAt   DateTime?
+  // Coach humain (Anthony Darmon) habilité à relire/valider les programmes
+  // générés par l'IA avant qu'ils soient visibles par les abonnés.
+  isAdmin         Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -49,16 +52,25 @@ model Subscription {
   @@map("subscriptions")
 }
 
-// Données d'entrée utilisées par l'IA pour générer les programmes
+// Données d'entrée utilisées par l'IA pour générer les programmes.
+// Informations relativement stables (contrairement aux Mesure, qui suivent
+// leur évolution dans le temps).
 model Profile {
-  id                  String   @id @default(uuid())
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  objectifs           String?
-  niveau              String?
-  equipementDisponible String?
-  contraintesSante    String?
-  updatedAt           DateTime @updatedAt
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objectifs             String?
+  niveau                String?
+  equipementDisponible  String?
+  contraintesSante      String?
+  tailleCm              Float?
+  morphologie           String?
+  entrainementActuel    String?
+  habitudesAlimentaires String?
+  consommationCafe      String?
+  consommationAlcool    String?
+  qualiteSommeil        String?
+  updatedAt             DateTime @updatedAt
 
   @@map("profiles")
 }
@@ -69,16 +81,27 @@ enum Pilier {
   RECUPERATION
 }
 
-// Historique des programmes générés dynamiquement par l'IA (pas de bibliothèque pré-construite)
+enum StatutProgramme {
+  EN_ATTENTE
+  VALIDE
+}
+
+// Historique des programmes générés dynamiquement par l'IA (pas de bibliothèque
+// pré-construite). Chaque génération reste EN_ATTENTE tant que le coach humain
+// (Anthony Darmon) ne l'a pas relue et validée — l'abonné ne voit que les
+// programmes VALIDE.
 model ProgrammeGenerated {
-  id           String   @id @default(uuid())
+  id           String          @id @default(uuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   pilier       Pilier
   contenu      Json
-  generatedAt  DateTime @default(now())
+  statut       StatutProgramme @default(EN_ATTENTE)
+  valideAt     DateTime?
+  generatedAt  DateTime        @default(now())
 
   @@index([userId, pilier, generatedAt])
+  @@index([statut, generatedAt])
   @@map("programmes_generated")
 }
 
@@ -95,6 +118,9 @@ model SeanceLog {
   @@map("seances_log")
 }
 
+// Données de composition corporelle inspirées d'une balance type InBody —
+// suivies dans le temps (contrairement au Profile) pour un vrai graphique
+// de progression.
 model Mesure {
   id        String   @id @default(uuid())
   userId    String
@@ -102,6 +128,9 @@ model Mesure {
   date      DateTime
   poidsKg   Float?
   tourTailleCm Float?
+  masseGrassePourcent Float?
+  masseMusculaireKg   Float?
+  frequenceCardiaqueReposBpm Int?
   notes     String?
   // Chemin dans le bucket Supabase Storage "progress-photos" (bucket privé,
   // accès via URL signée générée à la demande) — pas l'URL elle-même.

@@ -6,11 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export function MesureForm() {
   const router = useRouter();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [poidsKg, setPoidsKg] = useState("");
+  const [tourTailleCm, setTourTailleCm] = useState("");
+  const [masseGrassePourcent, setMasseGrassePourcent] = useState("");
+  const [masseMusculaireKg, setMasseMusculaireKg] = useState("");
+  const [frequenceCardiaqueReposBpm, setFrequenceCardiaqueReposBpm] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +42,22 @@ export function MesureForm() {
         body: JSON.stringify({
           date,
           poidsKg: poidsKg ? Number(poidsKg) : undefined,
+          tourTailleCm: tourTailleCm ? Number(tourTailleCm) : undefined,
+          masseGrassePourcent: masseGrassePourcent ? Number(masseGrassePourcent) : undefined,
+          masseMusculaireKg: masseMusculaireKg ? Number(masseMusculaireKg) : undefined,
+          frequenceCardiaqueReposBpm: frequenceCardiaqueReposBpm
+            ? Number(frequenceCardiaqueReposBpm)
+            : undefined,
           photoPath,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
       setPoidsKg("");
+      setTourTailleCm("");
+      setMasseGrassePourcent("");
+      setMasseMusculaireKg("");
+      setFrequenceCardiaqueReposBpm("");
       setPhoto(null);
       router.refresh();
     } catch (err) {
@@ -66,6 +81,40 @@ export function MesureForm() {
             onChange={(e) => setPoidsKg(e.target.value)}
           />
         </Field>
+        <Field label="Tour de taille (cm)">
+          <Input
+            type="number"
+            step="0.1"
+            value={tourTailleCm}
+            onChange={(e) => setTourTailleCm(e.target.value)}
+          />
+        </Field>
+
+        <SectionLabel>Composition corporelle (type InBody, optionnel)</SectionLabel>
+        <Field label="Masse grasse (%)">
+          <Input
+            type="number"
+            step="0.1"
+            value={masseGrassePourcent}
+            onChange={(e) => setMasseGrassePourcent(e.target.value)}
+          />
+        </Field>
+        <Field label="Masse musculaire (kg)">
+          <Input
+            type="number"
+            step="0.1"
+            value={masseMusculaireKg}
+            onChange={(e) => setMasseMusculaireKg(e.target.value)}
+          />
+        </Field>
+        <Field label="Fréquence cardiaque de repos (bpm)">
+          <Input
+            type="number"
+            value={frequenceCardiaqueReposBpm}
+            onChange={(e) => setFrequenceCardiaqueReposBpm(e.target.value)}
+          />
+        </Field>
+
         <Field label="Photo de progression (optionnel)">
           <input
             type="file"

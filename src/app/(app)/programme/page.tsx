@@ -4,6 +4,7 @@ import Link from "next/link";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import type { Pilier } from "@prisma/client";
 
@@ -18,14 +19,24 @@ export default async function ProgrammePage() {
   if (!user) return null;
 
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
-  const derniersProgrammes = await Promise.all(
-    piliers.map((pilier) =>
-      prisma.programmeGenerated.findFirst({
-        where: { userId: user.id, pilier },
-        orderBy: { generatedAt: "desc" },
-      })
-    )
-  );
+  const [derniersValides, dernieresGenerations] = await Promise.all([
+    Promise.all(
+      piliers.map((pilier) =>
+        prisma.programmeGenerated.findFirst({
+          where: { userId: user.id, pilier, statut: "VALIDE" },
+          orderBy: { generatedAt: "desc" },
+        })
+      )
+    ),
+    Promise.all(
+      piliers.map((pilier) =>
+        prisma.programmeGenerated.findFirst({
+          where: { userId: user.id, pilier },
+          orderBy: { generatedAt: "desc" },
+        })
+      )
+    ),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -48,16 +59,30 @@ export default async function ProgrammePage() {
       )}
 
       {piliers.map((pilier, i) => {
-        const programme = derniersProgrammes[i];
+        const valide = derniersValides[i];
+        const dernier = dernieresGenerations[i];
+        const enAttente = dernier && dernier.statut === "EN_ATTENTE";
+
         return (
-          <Card key={pilier}>
-            <SectionLabel>Pilier — {LABELS[pilier]}</SectionLabel>
-            {programme ? (
-              <div className="mt-2">
-                <JsonView data={programme.contenu} />
-              </div>
+          <Card key={pilier} className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <SectionLabel>Pilier — {LABELS[pilier]}</SectionLabel>
+              {valide && <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>}
+            </div>
+
+            {enAttente && (
+              <p className="text-sm text-laiton-400">
+                Un nouveau programme est en cours de relecture par ton coach — il apparaîtra
+                ici une fois validé.
+              </p>
+            )}
+
+            {valide ? (
+              <JsonView data={valide.contenu} />
             ) : (
-              <p className="mt-2 text-sm text-graphite-400">Pas encore généré.</p>
+              <p className="text-sm text-graphite-400">
+                {enAttente ? "Aucun programme validé pour l'instant." : "Pas encore généré."}
+              </p>
             )}
           </Card>
         );
