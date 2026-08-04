@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { notifyMakeScenario } from "@/lib/whatsapp/client";
 
 const bodySchema = z.object({
   contenu: z.unknown().optional(),
@@ -30,7 +31,21 @@ export async function POST(request: Request, { params }: { params: { id: string 
       valideAt: new Date(),
       ...(parsed.data.contenu !== undefined ? { contenu: parsed.data.contenu as object } : {}),
     },
+    include: { user: true },
   });
 
-  return NextResponse.json(programme);
+  if (programme.user.phoneWhatsapp) {
+    await notifyMakeScenario({
+      userId: programme.userId,
+      event: "programme_generated",
+      data: {
+        phoneWhatsapp: programme.user.phoneWhatsapp,
+        pilier: programme.pilier,
+        contenu: programme.contenu,
+      },
+    });
+  }
+
+  const { user: _user, ...programmeSansUser } = programme;
+  return NextResponse.json(programmeSansUser);
 }

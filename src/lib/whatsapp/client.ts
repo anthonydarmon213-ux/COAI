@@ -9,17 +9,24 @@ type NotifyMakePayload = {
 
 // Notifie le scénario Make.com pour que l'IA WhatsApp dispose du contexte à jour
 // (objectifs, dernier programme) lors de la prochaine conversation.
+// Best-effort : ne bloque jamais le flux principal (sauvegarde profil, validation
+// coach...) si Make.com n'est pas configuré ou temporairement indisponible.
 export async function notifyMakeScenario(payload: NotifyMakePayload): Promise<void> {
   const url = process.env.MAKE_OUTGOING_WEBHOOK_URL;
   if (!url) {
-    throw new Error("MAKE_OUTGOING_WEBHOOK_URL manquant dans l'environnement");
+    console.warn("[whatsapp] MAKE_OUTGOING_WEBHOOK_URL non configuré, notification ignorée");
+    return;
   }
 
-  await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    console.error("[whatsapp] Échec de la notification Make.com", err);
+  }
 }
 
 // Valide la provenance d'un appel entrant depuis Make.com (webhook secret partagé).

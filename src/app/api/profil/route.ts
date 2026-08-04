@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { notifyMakeScenario } from "@/lib/whatsapp/client";
 
 const bodySchema = z.object({
   objectifs: z.string().max(1000).optional(),
@@ -38,6 +39,14 @@ export async function PUT(request: Request) {
     update: parsed.data,
     create: { userId: user.id, ...parsed.data },
   });
+
+  if (user.phoneWhatsapp) {
+    await notifyMakeScenario({
+      userId: user.id,
+      event: "profile_updated",
+      data: { phoneWhatsapp: user.phoneWhatsapp, ...parsed.data },
+    });
+  }
 
   return NextResponse.json(profile);
 }
