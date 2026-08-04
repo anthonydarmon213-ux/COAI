@@ -38,7 +38,7 @@ export default async function AbonnementPage() {
           <PortalButton />
         ) : (
           <a href="/pricing" className="text-laiton-400 underline">
-            S&apos;abonner pour 49€/mois
+            S&apos;abonner — offre de lancement à 49€/mois
           </a>
         )}
       </Card>

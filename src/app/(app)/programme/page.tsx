@@ -38,6 +38,8 @@ export default async function ProgrammePage() {
     ),
   ]);
 
+  const hasExisting = dernieresGenerations.some(Boolean);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -45,7 +47,7 @@ export default async function ProgrammePage() {
           <SectionLabel>Coaching</SectionLabel>
           <h1 className="text-2xl font-semibold">Mon programme</h1>
         </div>
-        <RegenerateButton />
+        <RegenerateButton hasExisting={hasExisting} />
       </div>
 
       {!user.profile && (
