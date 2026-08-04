@@ -2,37 +2,98 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
+const PILIERS = [
+  {
+    titre: "Coaching",
+    description:
+      "Un programme généré spécifiquement pour toi à partir de ton profil (objectifs, niveau, équipement, contraintes) — entraînement, nutrition, récupération. Jamais un programme générique recyclé.",
+  },
+  {
+    titre: "Suivi",
+    description:
+      "Journal de séances, mesures corporelles et photos de progression, avec des graphiques pour voir concrètement ton évolution dans le temps.",
+  },
+  {
+    titre: "IA",
+    description:
+      "Un assistant disponible 24/7 sur WhatsApp pour répondre à tes questions et t'accompagner au quotidien, entre deux séances.",
+  },
+];
 
 export default function LandingPage() {
   return (
-    <main className="bg-lab-grid flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-16 text-center">
-      <SectionLabel>Coaching · Suivi · IA</SectionLabel>
-      <h1 className="text-4xl font-semibold tracking-tight text-graphite-50 sm:text-5xl">
-        Lab <span className="text-laiton-400">Coach</span>
-      </h1>
-      <p className="max-w-md text-graphite-300">
-        La méthode d&apos;Anthony Darmon, 16 ans d&apos;expérience, condensée dans un
-        programme généré pour toi — entraînement, nutrition, récupération.
-      </p>
-      <Link href="/pricing">
-        <Button>Découvrir l&apos;offre</Button>
-      </Link>
+    <main className="bg-lab-grid flex flex-col">
+      {/* Hero */}
+      <section className="flex min-h-[85vh] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+        <SectionLabel>Coaching · Suivi · IA</SectionLabel>
+        <h1 className="text-4xl font-semibold tracking-tight text-graphite-50 sm:text-5xl">
+          Lab <span className="text-laiton-400">Coach</span>
+        </h1>
+        <p className="max-w-md text-graphite-300">
+          La méthode d&apos;Anthony Darmon, 16 ans d&apos;expérience, condensée dans un
+          programme généré pour toi.
+        </p>
+        <a href="#piliers">
+          <Button variant="secondary">Voir comment ça marche</Button>
+        </a>
+      </section>
 
-      <div className="mt-6 flex flex-col items-center gap-3">
+      {/* Positionnement */}
+      <section className="mx-auto max-w-2xl px-6 py-16 text-center">
+        <SectionLabel>Le constat</SectionLabel>
+        <p className="mt-3 text-lg text-graphite-200">
+          Tu veux progresser sérieusement, mais tu n&apos;es pas encore prêt à investir
+          dans un coaching 1-to-1. Lab Coach te donne un vrai point de départ :
+          un programme pensé pour toi, un suivi structuré, et un accompagnement
+          disponible à tout moment — sans le prix ni l&apos;engagement d&apos;un coach
+          personnel.
+        </p>
+      </section>
+
+      {/* Les 3 piliers */}
+      <section id="piliers" className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-16">
+        <div className="text-center">
+          <SectionLabel>Ce que tu obtiens</SectionLabel>
+          <h2 className="mt-2 text-2xl font-semibold text-graphite-50">Trois piliers, un seul objectif</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {PILIERS.map((pilier) => (
+            <Card key={pilier.titre} className="flex flex-col gap-2">
+              <SectionLabel>{pilier.titre}</SectionLabel>
+              <p className="text-sm text-graphite-300">{pilier.description}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Crédibilité */}
+      <section className="mx-auto flex w-full max-w-2xl flex-col items-center gap-4 px-6 py-16 text-center">
+        <SectionLabel>La méthode</SectionLabel>
         <div className="relative h-64 w-64 overflow-hidden rounded-lg border border-graphite-800 sm:h-72 sm:w-72">
           <Image
             src="/anthony-darmon.jpg"
             alt="Anthony Darmon — THE METHOD"
             fill
             className="object-cover"
-            priority
           />
         </div>
         <p className="max-w-sm text-sm text-graphite-400">
-          THE METHOD by Anthony Darmon — expert en coaching sportif depuis 17 ans. Lab
-          Coach s&apos;appuie sur cette méthode pour générer ton programme.
+          THE METHOD by Anthony Darmon — expert en coaching sportif depuis 17 ans,
+          spécialiste des dirigeants et entrepreneurs. Lab Coach s&apos;appuie sur cette
+          méthode pour générer ton programme, sans attendre le coaching 1-to-1.
         </p>
-      </div>
+      </section>
+
+      {/* CTA final */}
+      <section className="flex flex-col items-center gap-4 px-6 py-20 text-center">
+        <h2 className="text-2xl font-semibold text-graphite-50">Prêt à commencer ?</h2>
+        <p className="text-graphite-300">49€/mois, sans engagement.</p>
+        <Link href="/pricing">
+          <Button>Découvrir l&apos;offre</Button>
+        </Link>
+      </section>
     </main>
   );
 }
