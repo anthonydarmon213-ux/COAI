@@ -19,5 +19,8 @@ Tiens compte des habitudes actuelles pour proposer des ajustements réalistes pl
 qu'un régime générique, adapte tes conseils café/alcool à la consommation déclarée,
 et donne un objectif d'hydratation concret adapté à la situation actuelle déclarée.
 
-Réponds au format JSON structuré (grands principes, repères par repas, conseils pratiques).`;
+Réponds au format JSON structuré (grands principes, repères par repas, conseils pratiques).
+Pour chaque repère de repas ou idée de plat, inclus un champ "nom" avec un nom de plat
+concret et court (ex: "Bowl poulet-quinoa-avocat"), pas juste une catégorie générique
+comme "déjeuner" — ça sert à générer un lien de recherche photo pertinent.`;
 }

@@ -5,6 +5,7 @@ import { JsonView } from "@/components/programme/json-view";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
+import { FicheMacros } from "@/components/programme/fiche-macros";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -15,6 +16,11 @@ const LABELS: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
   NUTRITION: "Nutrition",
   RECUPERATION: "Récupération",
+};
+
+const TYPE_MEDIA: Partial<Record<Pilier, "exercice" | "repas">> = {
+  ENTRAINEMENT: "exercice",
+  NUTRITION: "repas",
 };
 
 export default async function ProgrammePage() {
@@ -79,6 +85,15 @@ export default async function ProgrammePage() {
         </Card>
       </div>
 
+      {/* Séparateur intuitif entre le formulaire et le résultat généré */}
+      <div className="flex items-center gap-4">
+        <div className="h-px flex-1 bg-graphite-800" />
+        <span className="whitespace-nowrap font-mono text-xs uppercase tracking-widest text-laiton-400">
+          ↓ Généré à partir de ce profil
+        </span>
+        <div className="h-px flex-1 bg-graphite-800" />
+      </div>
+
       {/* Programme */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
@@ -110,12 +125,14 @@ export default async function ProgrammePage() {
                 )}
 
                 {valide ? (
-                  <JsonView data={valide.contenu} avecLiensExercices={pilier === "ENTRAINEMENT"} />
+                  <JsonView data={valide.contenu} typeMedia={TYPE_MEDIA[pilier]} />
                 ) : enAttente ? (
-                  <JsonView data={dernier.contenu} avecLiensExercices={pilier === "ENTRAINEMENT"} />
+                  <JsonView data={dernier.contenu} typeMedia={TYPE_MEDIA[pilier]} />
                 ) : (
                   <p className="text-sm text-graphite-400">Pas encore généré.</p>
                 )}
+
+                {pilier === "NUTRITION" && <FicheMacros />}
               </div>
             );
           })}

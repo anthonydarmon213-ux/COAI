@@ -11,20 +11,33 @@ function humanizeKey(key: string): string {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-// Pas de bibliothèque de vidéos maison (programmes générés dynamiquement,
-// jamais de contenu pré-construit — décision actée). À la place, un lien de
-// recherche YouTube ciblé sur le nom exact de l'exercice généré.
-function youtubeSearchUrl(nomExercice: string): string {
-  const query = encodeURIComponent(`${nomExercice} technique musculation`);
-  return `https://www.youtube.com/results?search_query=${query}`;
-}
+type TypeMedia = "exercice" | "repas";
+
+// Pas de bibliothèque de photos/vidéos maison (programmes générés
+// dynamiquement, jamais de contenu pré-construit — décision actée). À la
+// place, un lien de recherche ciblé sur le nom exact généré par l'IA.
+const MEDIA_CONFIG: Record<
+  TypeMedia,
+  { label: string; searchUrl: (nom: string) => string }
+> = {
+  exercice: {
+    label: "▶ Voir la technique",
+    searchUrl: (nom) =>
+      `https://www.youtube.com/results?search_query=${encodeURIComponent(`${nom} technique musculation`)}`,
+  },
+  repas: {
+    label: "📷 Voir en photo",
+    searchUrl: (nom) =>
+      `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${nom} recette`)}`,
+  },
+};
 
 export function JsonView({
   data,
-  avecLiensExercices = false,
+  typeMedia,
 }: {
   data: unknown;
-  avecLiensExercices?: boolean;
+  typeMedia?: TypeMedia;
 }) {
   if (data === null || data === undefined || data === "") return null;
 
@@ -45,7 +58,7 @@ export function JsonView({
       <div className="flex flex-col gap-3">
         {data.map((item, i) => (
           <div key={i} className="rounded-md border border-graphite-800 p-3">
-            <JsonView data={item} avecLiensExercices={avecLiensExercices} />
+            <JsonView data={item} typeMedia={typeMedia} />
           </div>
         ))}
       </div>
@@ -66,27 +79,29 @@ export function JsonView({
                   {label}
                 </span>
                 <div className="pl-2">
-                  <JsonView data={value} avecLiensExercices={avecLiensExercices} />
+                  <JsonView data={value} typeMedia={typeMedia} />
                 </div>
               </div>
             );
           }
 
-          const estNomExercice =
-            avecLiensExercices && key.toLowerCase() === "nom" && typeof value === "string";
+          const media =
+            typeMedia && key.toLowerCase() === "nom" && typeof value === "string"
+              ? MEDIA_CONFIG[typeMedia]
+              : null;
 
           return (
             <div key={key} className="flex flex-wrap items-center gap-1.5 text-sm">
               <span className="text-graphite-400">{label} :</span>
               <span className="text-graphite-50">{String(value)}</span>
-              {estNomExercice && (
+              {media && (
                 <a
-                  href={youtubeSearchUrl(value as string)}
+                  href={media.searchUrl(value as string)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-laiton-400 underline hover:text-laiton-300"
                 >
-                  ▶ Voir la technique
+                  {media.label}
                 </a>
               )}
             </div>
