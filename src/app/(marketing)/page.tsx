@@ -92,9 +92,16 @@ export default function LandingPage() {
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {PILIERS.map((pilier) => (
-            <Card key={pilier.titre} className="flex min-h-56 flex-col justify-between gap-8">
-              <SectionLabel>{pilier.titre}</SectionLabel>
-              <p className="text-sm leading-6 text-graphite-300">{pilier.description}</p>
+            <Card
+              key={pilier.titre}
+              className="flex min-h-56 flex-col items-center justify-center gap-5 px-8 text-center"
+            >
+              <h3 className="text-xl font-bold tracking-wide text-laiton-400 sm:text-2xl">
+                {pilier.titre}
+              </h3>
+              <p className="max-w-xs text-base leading-7 text-graphite-300">
+                {pilier.description}
+              </p>
             </Card>
           ))}
         </div>
