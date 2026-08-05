@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db/client";
 
 const PROFILE_VALUES = [
   "dirigeant",
@@ -81,22 +80,66 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  await prisma.founderWaitlistEntry.upsert({
-    where: { email: parsed.data.email },
-    update: {
-      firstName: parsed.data.firstName,
-      profile: parsed.data.profile,
-      objective: parsed.data.objective,
-      consentAt: new Date(),
-    },
-    create: {
-      firstName: parsed.data.firstName,
-      email: parsed.data.email,
-      profile: parsed.data.profile,
-      objective: parsed.data.objective,
-      consentAt: new Date(),
-    },
-  });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  return NextResponse.json({ success: true }, { status: 201 });
+  if (!supabaseUrl || !supabasePublishableKey) {
+    console.error("Configuration Supabase publique manquante.");
+    return NextResponse.json(
+      { error: "Le service est momentanément indisponible. Réessaie plus tard." },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/founder_waitlist_entries`,
+      {
+        method: "POST",
+        headers: {
+          apikey: supabasePublishableKey,
+          Authorization: `Bearer ${supabasePublishableKey}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          id: crypto.randomUUID(),
+          firstName: parsed.data.firstName,
+          email: parsed.data.email,
+          profile: parsed.data.profile,
+          objective: parsed.data.objective,
+          consentAt: new Date().toISOString(),
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const databaseError = await response.text();
+
+      if (
+        response.status === 409 &&
+        (databaseError.includes("23505") ||
+          databaseError.includes("founder_waitlist_entries_email_key"))
+      ) {
+        return NextResponse.json({ success: true }, { status: 200 });
+      }
+
+      console.error("Échec de l'inscription à la liste d'attente.", {
+        status: response.status,
+        databaseError,
+      });
+      return NextResponse.json(
+        { error: "Impossible d'enregistrer la demande. Réessaie dans un instant." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true }, { status: 201 });
+  } catch (error) {
+    console.error("Erreur inattendue pendant l'inscription à la liste d'attente.", error);
+    return NextResponse.json(
+      { error: "Impossible d'enregistrer la demande. Réessaie dans un instant." },
+      { status: 500 }
+    );
+  }
 }
