@@ -9,9 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 export function FounderWaitlistForm() {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [profile, setProfile] = useState("");
   const [objective, setObjective] = useState("");
   const [consentRgpd, setConsentRgpd] = useState(false);
+  const [contactConsent, setContactConsent] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -29,9 +31,11 @@ export function FounderWaitlistForm() {
         body: JSON.stringify({
           firstName,
           email,
+          phone,
           profile,
           objective,
           consentRgpd,
+          contactConsent,
           website: String(formData.get("website") ?? ""),
           elapsedMs: Date.now() - startedAt,
         }),
@@ -79,6 +83,20 @@ export function FounderWaitlistForm() {
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         placeholder="toi@exemple.fr"
+      />
+      <label htmlFor="founder-phone" className="text-sm font-medium text-graphite-200">
+        Téléphone / WhatsApp <span className="font-normal text-graphite-400">(facultatif)</span>
+      </label>
+      <Input
+        id="founder-phone"
+        name="phone"
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        maxLength={30}
+        value={phone}
+        onChange={(event) => setPhone(event.target.value)}
+        placeholder="Ex. +33 6 12 34 56 78"
       />
       <label htmlFor="founder-profile" className="text-sm font-medium text-graphite-200">
         Ton profil
@@ -135,6 +153,17 @@ export function FounderWaitlistForm() {
         J&apos;accepte que YUMAI traite ces informations pour gérer ma demande et
         m&apos;envoyer les actualités liées au lancement. Je pourrai retirer mon
         consentement à tout moment.
+      </label>
+      <label className="flex items-start gap-2 text-xs text-graphite-400">
+        <input
+          type="checkbox"
+          required={phone.trim().length > 0}
+          checked={contactConsent}
+          onChange={(event) => setContactConsent(event.target.checked)}
+          className="mt-0.5"
+        />
+        J&apos;accepte d&apos;être contacté par téléphone ou WhatsApp au sujet de ma demande.
+        Cette autorisation est requise uniquement si je renseigne un numéro.
       </label>
       <Button
         type="submit"

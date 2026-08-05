@@ -10,19 +10,38 @@ const PROFILE_VALUES = [
   "autre",
 ] as const;
 
-const bodySchema = z.object({
-  firstName: z.string().trim().min(2, "Prénom trop court.").max(80, "Prénom trop long."),
-  email: z.string().trim().email("Adresse e-mail invalide.").transform((email) => email.toLowerCase()),
-  profile: z.enum(PROFILE_VALUES, {
-    errorMap: () => ({ message: "Sélectionne ton profil." }),
-  }),
-  objective: z.string().trim().min(10, "Précise un peu plus ton objectif.").max(1000, "Objectif trop long."),
-  consentRgpd: z.literal(true, {
-    errorMap: () => ({ message: "Le consentement est requis." }),
-  }),
-  website: z.string().max(0).optional(),
-  elapsedMs: z.number().int().min(1500).max(86_400_000),
-});
+const bodySchema = z
+  .object({
+    firstName: z.string().trim().min(2, "Prénom trop court.").max(80, "Prénom trop long."),
+    email: z.string().trim().email("Adresse e-mail invalide.").transform((email) => email.toLowerCase()),
+    phone: z
+      .string()
+      .trim()
+      .max(30, "Numéro de téléphone trop long.")
+      .refine(
+        (phone) => phone.length === 0 || /^[+\d][\d\s().-]{5,29}$/.test(phone),
+        "Numéro de téléphone invalide."
+      ),
+    profile: z.enum(PROFILE_VALUES, {
+      errorMap: () => ({ message: "Sélectionne ton profil." }),
+    }),
+    objective: z.string().trim().min(10, "Précise un peu plus ton objectif.").max(1000, "Objectif trop long."),
+    consentRgpd: z.literal(true, {
+      errorMap: () => ({ message: "Le consentement est requis." }),
+    }),
+    contactConsent: z.boolean(),
+    website: z.string().max(0).optional(),
+    elapsedMs: z.number().int().min(1500).max(86_400_000),
+  })
+  .superRefine((data, context) => {
+    if (data.phone.length > 0 && !data.contactConsent) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["contactConsent"],
+        message: "Autorise le contact par téléphone ou WhatsApp pour renseigner un numéro.",
+      });
+    }
+  });
 
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
@@ -106,9 +125,12 @@ export async function POST(request: Request) {
           id: crypto.randomUUID(),
           firstName: parsed.data.firstName,
           email: parsed.data.email,
+          phone: parsed.data.phone || null,
           profile: parsed.data.profile,
           objective: parsed.data.objective,
           consentAt: new Date().toISOString(),
+          contactConsentAt:
+            parsed.data.phone && parsed.data.contactConsent ? new Date().toISOString() : null,
         }),
       }
     );
