@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { createSupabaseBrowserClient } from "@/lib/auth/client";
+import { createSupabaseRecoveryClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -19,7 +19,7 @@ export default function MotDePasseOubliePage() {
     setError(null);
     setLoading(true);
     try {
-      const supabase = createSupabaseBrowserClient();
+      const supabase = createSupabaseRecoveryClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reinitialiser-mot-de-passe`,
       });

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { createSupabaseBrowserClient } from "@/lib/auth/client";
+import { createSupabaseRecoveryClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -13,10 +13,44 @@ import { SectionLabel } from "@/components/ui/section-label";
 // session temporaire déjà établie par le client Supabase (détectée dans l'URL).
 export default function ReinitialiserMotDePassePage() {
   const router = useRouter();
+  const [supabase] = useState(() => createSupabaseRecoveryClient());
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
+      if (event === "PASSWORD_RECOVERY" && session) {
+        setSessionReady(true);
+        setCheckingSession(false);
+        setError(null);
+      }
+    });
+
+    void supabase.auth.getSession().then(({ data, error: sessionError }) => {
+      if (!active) return;
+      setCheckingSession(false);
+
+      if (sessionError || !data.session) {
+        setError("Ce lien est invalide ou a expiré. Demande un nouveau lien de réinitialisation.");
+        return;
+      }
+
+      setSessionReady(true);
+      setError(null);
+    });
+
+    return () => {
+      active = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -29,11 +63,11 @@ export default function ReinitialiserMotDePassePage() {
 
     setLoading(true);
     try {
-      const supabase = createSupabaseBrowserClient();
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
 
-      router.push("/dashboard");
+      await supabase.auth.signOut();
+      router.push("/sign-in?password_reset=success");
       router.refresh();
     } catch (err) {
       console.error("[reinitialiser-mot-de-passe]", err);
@@ -54,30 +88,41 @@ export default function ReinitialiserMotDePassePage() {
           <SectionLabel>Compte</SectionLabel>
           <h1 className="text-xl font-semibold text-graphite-50">Nouveau mot de passe</h1>
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field label="Nouveau mot de passe">
-            <Input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Field>
-          <Field label="Confirmer le mot de passe">
-            <Input
-              type="password"
-              required
-              minLength={8}
-              value={confirmation}
-              onChange={(e) => setConfirmation(e.target.value)}
-            />
-          </Field>
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit" disabled={loading}>
-            {loading ? "Mise à jour…" : "Mettre à jour le mot de passe"}
-          </Button>
-        </form>
+        {checkingSession ? (
+          <p className="text-sm text-graphite-200">Vérification du lien sécurisé…</p>
+        ) : sessionReady ? (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Field label="Nouveau mot de passe">
+              <Input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Field>
+            <Field label="Confirmer le mot de passe">
+              <Input
+                type="password"
+                required
+                minLength={8}
+                value={confirmation}
+                onChange={(e) => setConfirmation(e.target.value)}
+              />
+            </Field>
+            {error && <p className="text-sm text-red-400">{error}</p>}
+            <Button type="submit" disabled={loading}>
+              {loading ? "Mise à jour…" : "Mettre à jour le mot de passe"}
+            </Button>
+          </form>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {error && <p className="text-sm text-red-400">{error}</p>}
+            <a href="/mot-de-passe-oublie" className="text-sm text-laiton-400 underline">
+              Demander un nouveau lien
+            </a>
+          </div>
+        )}
       </Card>
     </main>
   );
