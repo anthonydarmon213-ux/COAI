@@ -1,11 +1,13 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import Link from "next/link";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
+import { ProfilForm } from "@/components/compte/profil-form";
+import { ProfilCompletion } from "@/components/compte/profil-completion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
+import { computeProfilCompletion } from "@/lib/profil/completion";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -39,57 +41,85 @@ export default async function ProgrammePage() {
   ]);
 
   const hasExisting = dernieresGenerations.some(Boolean);
+  const { remplis, total } = computeProfilCompletion(user.profile);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <SectionLabel>Coaching</SectionLabel>
-          <h1 className="text-2xl font-semibold">Mon programme</h1>
-        </div>
-        <RegenerateButton hasExisting={hasExisting} />
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-1">
+        <SectionLabel>Coaching</SectionLabel>
+        <h1 className="text-2xl font-semibold">Mon profil & mon programme</h1>
       </div>
 
-      {!user.profile && (
-        <p className="text-graphite-200">
-          Aucun profil renseigné pour l&apos;instant — le programme généré reste générique.{" "}
-          <Link href="/compte/profil" className="text-laiton-400 underline">
-            Renseigner mon profil
-          </Link>
-          , puis clique sur « Régénérer mon programme ».
-        </p>
-      )}
+      {/* Profil */}
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Mon profil</SectionLabel>
+        <Card className="flex flex-col gap-4">
+          <ProfilCompletion remplis={remplis} total={total} />
+          <ProfilForm
+            profil={{
+              objectifs: user.profile?.objectifs,
+              niveau: user.profile?.niveau,
+              equipementDisponible: user.profile?.equipementDisponible,
+              contraintesSante: user.profile?.contraintesSante,
+              antecedentsMedicaux: user.profile?.antecedentsMedicaux,
+              tailleCm: user.profile?.tailleCm,
+              age: user.profile?.age,
+              morphologie: user.profile?.morphologie,
+              frequenceEntrainement: user.profile?.frequenceEntrainement,
+              sportsPratiques: user.profile?.sportsPratiques,
+              habitudesAlimentaires: user.profile?.habitudesAlimentaires,
+              repasParJour: user.profile?.repasParJour,
+              hydratation: user.profile?.hydratation,
+              consommationCafe: user.profile?.consommationCafe,
+              consommationAlcool: user.profile?.consommationAlcool,
+              qualiteSommeil: user.profile?.qualiteSommeil,
+            }}
+          />
+        </Card>
+      </div>
 
-      {piliers.map((pilier, i) => {
-        const valide = derniersValides[i];
-        const dernier = dernieresGenerations[i];
-        const enAttente = dernier && dernier.statut === "EN_ATTENTE";
+      {/* Programme */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <SectionLabel>Mon programme</SectionLabel>
+          <RegenerateButton hasExisting={hasExisting} />
+        </div>
 
-        return (
-          <Card key={pilier} className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <SectionLabel>Pilier — {LABELS[pilier]}</SectionLabel>
-              {valide && <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>}
-              {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
-            </div>
+        <Card className="flex flex-col gap-8">
+          {piliers.map((pilier, i) => {
+            const valide = derniersValides[i];
+            const dernier = dernieresGenerations[i];
+            const enAttente = dernier && dernier.statut === "EN_ATTENTE";
 
-            {enAttente && (
-              <p className="text-sm text-laiton-400">
-                Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
-                détails peuvent encore être ajustés.
-              </p>
-            )}
+            return (
+              <div key={pilier} className="flex flex-col gap-3 border-t border-graphite-800 pt-6 first:border-t-0 first:pt-0">
+                <div className="flex items-center justify-between">
+                  <SectionLabel>{LABELS[pilier]}</SectionLabel>
+                  {valide && (
+                    <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
+                  )}
+                  {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
+                </div>
 
-            {valide ? (
-              <JsonView data={valide.contenu} />
-            ) : enAttente ? (
-              <JsonView data={dernier.contenu} />
-            ) : (
-              <p className="text-sm text-graphite-400">Pas encore généré.</p>
-            )}
-          </Card>
-        );
-      })}
+                {enAttente && (
+                  <p className="text-sm text-laiton-400">
+                    Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
+                    détails peuvent encore être ajustés.
+                  </p>
+                )}
+
+                {valide ? (
+                  <JsonView data={valide.contenu} />
+                ) : enAttente ? (
+                  <JsonView data={dernier.contenu} />
+                ) : (
+                  <p className="text-sm text-graphite-400">Pas encore généré.</p>
+                )}
+              </div>
+            );
+          })}
+        </Card>
+      </div>
     </div>
   );
 }

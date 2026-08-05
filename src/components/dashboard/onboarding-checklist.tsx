@@ -20,10 +20,10 @@ export function OnboardingChecklist({
             {hasProfile ? "✓" : "1."}
           </span>
           {hasProfile ? (
-            <span className="text-graphite-400 line-through">Renseigner mon profil</span>
+            <span className="text-graphite-400 line-through">Compléter mon profil</span>
           ) : (
-            <Link href="/compte/profil" className="text-laiton-300 underline">
-              Renseigner mon profil (objectifs, niveau, équipement, mesures)
+            <Link href="/programme" className="text-laiton-300 underline">
+              Compléter mon profil (objectifs, niveau, équipement, mesures)
             </Link>
           )}
         </li>
@@ -33,12 +33,10 @@ export function OnboardingChecklist({
           </span>
           {hasProgramme ? (
             <span className="text-graphite-400 line-through">Générer mon programme</span>
-          ) : hasProfile ? (
+          ) : (
             <Link href="/programme" className="text-laiton-300 underline">
               Générer mon programme
             </Link>
-          ) : (
-            <span className="text-graphite-500">Générer mon programme</span>
           )}
         </li>
       </ol>

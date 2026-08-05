@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 
 const LINKS = [
   { href: "/dashboard", label: "Tableau de bord" },
-  { href: "/compte/profil", label: "Mon profil" },
-  { href: "/programme", label: "Programme" },
+  { href: "/programme", label: "Mon profil & programme" },
   { href: "/suivi/seances", label: "Séances" },
   { href: "/suivi/mesures", label: "Mesures" },
   { href: "/suivi/progression", label: "Progression" },
