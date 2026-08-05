@@ -13,10 +13,12 @@ Taille : ${profil.tailleCm ? `${profil.tailleCm} cm` : "non renseignée"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
 Fréquence d'entraînement actuelle : ${profil.frequenceEntrainement ?? "non renseignée"}
+Sport(s) déjà pratiqué(s) : ${profil.sportsPratiques ?? "non renseigné"}
 
 Adapte le volume, l'intensité et le choix des exercices à la morphologie, à l'âge et à
 la fréquence d'entraînement actuelle de l'utilisateur (ne pas repartir de zéro s'il
-s'entraîne déjà, et tenir compte de la récupération nécessaire selon l'âge). Adapte
+s'entraîne déjà, et tenir compte de la récupération nécessaire selon l'âge). Complète les
+sports déjà pratiqués plutôt que de les dupliquer inutilement dans le programme. Adapte
 aussi et surtout les exercices pour éviter d'aggraver les antécédents médicaux listés
 (ex: éviter les mouvements à fort impact sur les genoux en cas de douleurs articulaires).
 

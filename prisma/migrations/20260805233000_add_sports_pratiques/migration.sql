@@ -1,0 +1,3 @@
+ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "sportsPratiques" TEXT;
+ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "repasParJour" TEXT;
+ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "hydratation" TEXT;

@@ -68,7 +68,10 @@ model Profile {
   age                   Int?
   morphologie           String?
   frequenceEntrainement String?
+  sportsPratiques       String?
   habitudesAlimentaires String?
+  repasParJour          String?
+  hydratation           String?
   consommationCafe      String?
   consommationAlcool    String?
   qualiteSommeil        String?

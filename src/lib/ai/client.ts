@@ -14,7 +14,10 @@ export type ProfilUtilisateur = {
   age?: number | null;
   morphologie?: string | null;
   frequenceEntrainement?: string | null;
+  sportsPratiques?: string | null;
   habitudesAlimentaires?: string | null;
+  repasParJour?: string | null;
+  hydratation?: string | null;
   consommationCafe?: string | null;
   consommationAlcool?: string | null;
   qualiteSommeil?: string | null;

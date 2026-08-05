@@ -53,6 +53,38 @@ const QUALITES_SOMMEIL = [
   "Excellente (8h ou plus, réparateur)",
 ];
 
+const SPORTS_PRATIQUES = [
+  "Musculation / Fitness",
+  "Course à pied",
+  "Football",
+  "Basketball",
+  "Natation",
+  "Cyclisme",
+  "Boxe / Arts martiaux",
+  "Tennis / Sports de raquette",
+  "Yoga / Pilates",
+  "CrossFit",
+  "Randonnée",
+  "Breathwork / Méditation",
+  "Aucun actuellement",
+];
+
+const REPAS_PAR_JOUR = [
+  "1 repas par jour",
+  "2 repas par jour",
+  "3 repas par jour",
+  "4 repas par jour",
+  "5 repas ou plus par jour",
+  "Repas irréguliers / pas de structure fixe",
+];
+
+const HYDRATATIONS = [
+  "Moins d'1L par jour",
+  "1 à 1,5L par jour",
+  "1,5 à 2L par jour",
+  "2L ou plus par jour",
+];
+
 const ANTECEDENTS_MEDICAUX = [
   "Douleurs / problèmes de dos",
   "Douleurs / problèmes de genoux",
@@ -64,6 +96,7 @@ const ANTECEDENTS_MEDICAUX = [
   "Blessure en cours de rééducation",
   "Grossesse / post-partum",
   "Chirurgie récente",
+  "Apnée du sommeil",
 ];
 
 type Profil = {
@@ -76,13 +109,16 @@ type Profil = {
   age?: number | null;
   morphologie?: string | null;
   frequenceEntrainement?: string | null;
+  sportsPratiques?: string | null;
   habitudesAlimentaires?: string | null;
+  repasParJour?: string | null;
+  hydratation?: string | null;
   consommationCafe?: string | null;
   consommationAlcool?: string | null;
   qualiteSommeil?: string | null;
 };
 
-function parseAntecedents(value?: string | null): string[] {
+function parseMultiSelect(value?: string | null): string[] {
   if (!value) return [];
   return value.split(",").map((v) => v.trim()).filter(Boolean);
 }
@@ -96,7 +132,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   );
   const [contraintesSante, setContraintesSante] = useState(profil.contraintesSante ?? "");
   const [antecedentsMedicaux, setAntecedentsMedicaux] = useState<string[]>(
-    parseAntecedents(profil.antecedentsMedicaux)
+    parseMultiSelect(profil.antecedentsMedicaux)
   );
   const [tailleCm, setTailleCm] = useState(profil.tailleCm ? String(profil.tailleCm) : "");
   const [age, setAge] = useState(profil.age ? String(profil.age) : "");
@@ -104,9 +140,14 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   const [frequenceEntrainement, setFrequenceEntrainement] = useState(
     profil.frequenceEntrainement ?? ""
   );
+  const [sportsPratiques, setSportsPratiques] = useState<string[]>(
+    parseMultiSelect(profil.sportsPratiques)
+  );
   const [habitudesAlimentaires, setHabitudesAlimentaires] = useState(
     profil.habitudesAlimentaires ?? ""
   );
+  const [repasParJour, setRepasParJour] = useState(profil.repasParJour ?? "");
+  const [hydratation, setHydratation] = useState(profil.hydratation ?? "");
   const [consommationCafe, setConsommationCafe] = useState(profil.consommationCafe ?? "");
   const [consommationAlcool, setConsommationAlcool] = useState(profil.consommationAlcool ?? "");
   const [qualiteSommeil, setQualiteSommeil] = useState(profil.qualiteSommeil ?? "");
@@ -116,6 +157,12 @@ export function ProfilForm({ profil }: { profil: Profil }) {
 
   function toggleAntecedent(item: string) {
     setAntecedentsMedicaux((prev) =>
+      prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
+    );
+  }
+
+  function toggleSport(item: string) {
+    setSportsPratiques((prev) =>
       prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
     );
   }
@@ -139,7 +186,10 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           age: age ? Number(age) : undefined,
           morphologie,
           frequenceEntrainement: frequenceEntrainement || undefined,
+          sportsPratiques: sportsPratiques.length ? sportsPratiques.join(", ") : undefined,
           habitudesAlimentaires: habitudesAlimentaires || undefined,
+          repasParJour: repasParJour || undefined,
+          hydratation: hydratation || undefined,
           consommationCafe: consommationCafe || undefined,
           consommationAlcool: consommationAlcool || undefined,
           qualiteSommeil: qualiteSommeil || undefined,
@@ -188,6 +238,20 @@ export function ProfilForm({ profil }: { profil: Profil }) {
               </option>
             ))}
           </Select>
+        </Field>
+        <Field label="Sport(s) pratiqué(s) (coche tout ce qui s'applique)">
+          <div className="flex flex-col gap-1.5 rounded-md border border-graphite-700 bg-graphite-900 p-3">
+            {SPORTS_PRATIQUES.map((item) => (
+              <label key={item} className="flex items-center gap-2 text-sm text-graphite-200">
+                <input
+                  type="checkbox"
+                  checked={sportsPratiques.includes(item)}
+                  onChange={() => toggleSport(item)}
+                />
+                {item}
+              </label>
+            ))}
+          </div>
         </Field>
         <Field label="Équipement disponible">
           <Select value={equipementDisponible} onChange={(e) => setEquipementDisponible(e.target.value)}>
@@ -248,6 +312,26 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <Select value={habitudesAlimentaires} onChange={(e) => setHabitudesAlimentaires(e.target.value)}>
             <option value="">Non renseigné</option>
             {HABITUDES_ALIMENTAIRES.map((h) => (
+              <option key={h} value={h}>
+                {h}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Repas par jour">
+          <Select value={repasParJour} onChange={(e) => setRepasParJour(e.target.value)}>
+            <option value="">Non renseigné</option>
+            {REPAS_PAR_JOUR.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Hydratation">
+          <Select value={hydratation} onChange={(e) => setHydratation(e.target.value)}>
+            <option value="">Non renseigné</option>
+            {HYDRATATIONS.map((h) => (
               <option key={h} value={h}>
                 {h}
               </option>
