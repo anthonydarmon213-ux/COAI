@@ -63,9 +63,9 @@ export default function LandingPage() {
           L&apos;expertise humaine augmentée par l&apos;IA
         </p>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Ton coach hybride, holistique. La méthode d&apos;Anthony Darmon, plus de 17 ans
-          d&apos;expérience, condensée dans un programme généré pour toi — et supervisé
-          par un vrai coach.
+          Un coaching augmenté par l&apos;IA, supervisé par un vrai coach avec 17 ans
+          d&apos;expérience. L&apos;IA génère, l&apos;humain valide — rien ne t&apos;est
+          envoyé sans passer par moi.
         </p>
         <a href="#membres-fondateurs">
           <Button>Rejoindre la liste prioritaire</Button>
