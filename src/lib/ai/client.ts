@@ -9,6 +9,7 @@ export type ProfilUtilisateur = {
   niveau?: string | null;
   equipementDisponible?: string | null;
   contraintesSante?: string | null;
+  antecedentsMedicaux?: string | null;
   tailleCm?: number | null;
   age?: number | null;
   morphologie?: string | null;

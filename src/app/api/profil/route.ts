@@ -9,6 +9,7 @@ const bodySchema = z.object({
   niveau: z.string().max(100).optional(),
   equipementDisponible: z.string().max(1000).optional(),
   contraintesSante: z.string().max(1000).optional(),
+  antecedentsMedicaux: z.string().max(2000).optional(),
   tailleCm: z.number().positive().max(300).optional(),
   age: z.number().int().positive().max(120).optional(),
   morphologie: z.string().max(50).optional(),

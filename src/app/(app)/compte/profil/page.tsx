@@ -21,6 +21,7 @@ export default async function ProfilPage() {
           niveau: user.profile?.niveau,
           equipementDisponible: user.profile?.equipementDisponible,
           contraintesSante: user.profile?.contraintesSante,
+          antecedentsMedicaux: user.profile?.antecedentsMedicaux,
           tailleCm: user.profile?.tailleCm,
           age: user.profile?.age,
           morphologie: user.profile?.morphologie,

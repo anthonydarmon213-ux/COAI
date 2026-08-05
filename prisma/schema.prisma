@@ -63,6 +63,7 @@ model Profile {
   niveau                String?
   equipementDisponible  String?
   contraintesSante      String?
+  antecedentsMedicaux   String?
   tailleCm              Float?
   age                   Int?
   morphologie           String?

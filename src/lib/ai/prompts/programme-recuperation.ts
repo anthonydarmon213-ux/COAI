@@ -7,6 +7,7 @@ Génère des recommandations de RÉCUPÉRATION personnalisées pour cet utilisat
 Objectifs : ${profil.objectifs ?? "non renseignés"}
 Niveau : ${profil.niveau ?? "non renseigné"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
+Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Fréquence d'entraînement actuelle : ${profil.frequenceEntrainement ?? "non renseignée"}
 Qualité de sommeil actuelle : ${profil.qualiteSommeil ?? "non renseignée"}
