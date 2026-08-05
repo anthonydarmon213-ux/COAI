@@ -42,3 +42,16 @@ h3 {
 html {
   scroll-behavior: smooth;
 }
+
+@keyframes progress-indeterminate {
+  0% {
+    left: -35%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.animate-progress-indeterminate {
+  animation: progress-indeterminate 1.4s ease-in-out infinite;
+}

@@ -38,6 +38,17 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
             ? "Régénérer mon programme"
             : "Générer mon programme"}
       </Button>
+      {loading && (
+        <div className="flex w-56 flex-col gap-1.5">
+          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-graphite-800">
+            <div className="animate-progress-indeterminate absolute top-0 h-full w-1/3 rounded-full bg-laiton-400" />
+          </div>
+          <p className="text-xs text-graphite-400">
+            Ça peut prendre jusqu&apos;à une minute — l&apos;IA génère les 3 piliers en
+            parallèle.
+          </p>
+        </div>
+      )}
       {error && <p className="text-sm text-red-400">{error}</p>}
     </div>
   );

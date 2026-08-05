@@ -70,21 +70,22 @@ export default async function ProgrammePage() {
             <div className="flex items-center justify-between">
               <SectionLabel>Pilier — {LABELS[pilier]}</SectionLabel>
               {valide && <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>}
+              {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
             </div>
 
             {enAttente && (
               <p className="text-sm text-laiton-400">
-                Un nouveau programme est en cours de relecture par ton coach — il apparaîtra
-                ici une fois validé.
+                Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
+                détails peuvent encore être ajustés.
               </p>
             )}
 
             {valide ? (
               <JsonView data={valide.contenu} />
+            ) : enAttente ? (
+              <JsonView data={dernier.contenu} />
             ) : (
-              <p className="text-sm text-graphite-400">
-                {enAttente ? "Aucun programme validé pour l'instant." : "Pas encore généré."}
-              </p>
+              <p className="text-sm text-graphite-400">Pas encore généré.</p>
             )}
           </Card>
         );
