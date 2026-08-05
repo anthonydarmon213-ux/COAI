@@ -1,6 +1,7 @@
-// Petit repère typographique façon étiquette de labo (ex: "PILIER 01 — ENTRAÎNEMENT").
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="font-mono text-xs uppercase tracking-widest text-laiton-500">{children}</span>
+    <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-laiton-400 before:h-px before:w-5 before:bg-laiton-400/60">
+      {children}
+    </span>
   );
 }

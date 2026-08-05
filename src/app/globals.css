@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 body {
-  @apply bg-graphite-950 text-graphite-50;
+  @apply bg-graphite-950 text-graphite-50 antialiased;
+  background-color: #090a0b;
 }
 
 h1,
@@ -12,9 +13,32 @@ h3 {
   @apply font-display;
 }
 
-/* Repère visuel "labo de performance" : grille technique en fond, très subtile */
+::selection {
+  background: rgb(201 162 98 / 0.3);
+  color: #fff;
+}
+
+/* Fond éditorial premium : lumière diffuse, sans grille ni motif répétitif. */
 .bg-lab-grid {
-  background-image: linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 8%, rgb(201 162 98 / 0.13), transparent 30rem),
+    radial-gradient(circle at 88% 32%, rgb(58 90 107 / 0.12), transparent 34rem),
+    linear-gradient(180deg, #090a0b 0%, #0d0e10 46%, #090a0b 100%);
+}
+
+.bg-lab-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.025), transparent);
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+html {
+  scroll-behavior: smooth;
 }
