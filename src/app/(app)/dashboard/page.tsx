@@ -51,7 +51,9 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <SectionLabel>Vue d&apos;ensemble</SectionLabel>
-        <h1 className="text-2xl font-semibold">Tableau de bord</h1>
+        <h1 className="text-2xl font-semibold">
+          {user.prenom ? `Bonjour ${user.prenom}` : "Tableau de bord"}
+        </h1>
       </div>
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />

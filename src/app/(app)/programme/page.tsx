@@ -4,6 +4,7 @@ import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
+import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -109,9 +110,9 @@ export default async function ProgrammePage() {
                 )}
 
                 {valide ? (
-                  <JsonView data={valide.contenu} />
+                  <JsonView data={valide.contenu} avecLiensExercices={pilier === "ENTRAINEMENT"} />
                 ) : enAttente ? (
-                  <JsonView data={dernier.contenu} />
+                  <JsonView data={dernier.contenu} avecLiensExercices={pilier === "ENTRAINEMENT"} />
                 ) : (
                   <p className="text-sm text-graphite-400">Pas encore généré.</p>
                 )}
@@ -120,6 +121,8 @@ export default async function ProgrammePage() {
           })}
         </Card>
       </div>
+
+      <CoachingVisioCta />
     </div>
   );
 }

@@ -13,6 +13,7 @@ model User {
   id             String    @id @default(uuid())
   supabaseAuthId String    @unique
   email          String    @unique
+  prenom         String?
   phoneWhatsapp  String?   @unique
   consentRgpdAt  DateTime?
   // Coach humain (Anthony Darmon) habilité à relire/valider les programmes

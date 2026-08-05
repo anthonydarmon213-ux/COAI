@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/client";
 
 const bodySchema = z.object({
   consentRgpd: z.boolean(),
+  prenom: z.string().max(100).optional(),
 });
 
 // Appelée par le client juste après un signUp() Supabase Auth réussi :
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
     create: {
       supabaseAuthId: authUser.id,
       email: authUser.email,
+      prenom: parsed.data.prenom || undefined,
       consentRgpdAt: new Date(),
     },
   });

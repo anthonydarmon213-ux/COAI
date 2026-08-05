@@ -11,7 +11,21 @@ function humanizeKey(key: string): string {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-export function JsonView({ data }: { data: unknown }) {
+// Pas de bibliothèque de vidéos maison (programmes générés dynamiquement,
+// jamais de contenu pré-construit — décision actée). À la place, un lien de
+// recherche YouTube ciblé sur le nom exact de l'exercice généré.
+function youtubeSearchUrl(nomExercice: string): string {
+  const query = encodeURIComponent(`${nomExercice} technique musculation`);
+  return `https://www.youtube.com/results?search_query=${query}`;
+}
+
+export function JsonView({
+  data,
+  avecLiensExercices = false,
+}: {
+  data: unknown;
+  avecLiensExercices?: boolean;
+}) {
   if (data === null || data === undefined || data === "") return null;
 
   if (Array.isArray(data)) {
@@ -31,7 +45,7 @@ export function JsonView({ data }: { data: unknown }) {
       <div className="flex flex-col gap-3">
         {data.map((item, i) => (
           <div key={i} className="rounded-md border border-graphite-800 p-3">
-            <JsonView data={item} />
+            <JsonView data={item} avecLiensExercices={avecLiensExercices} />
           </div>
         ))}
       </div>
@@ -52,16 +66,29 @@ export function JsonView({ data }: { data: unknown }) {
                   {label}
                 </span>
                 <div className="pl-2">
-                  <JsonView data={value} />
+                  <JsonView data={value} avecLiensExercices={avecLiensExercices} />
                 </div>
               </div>
             );
           }
 
+          const estNomExercice =
+            avecLiensExercices && key.toLowerCase() === "nom" && typeof value === "string";
+
           return (
-            <div key={key} className="flex flex-wrap gap-1.5 text-sm">
+            <div key={key} className="flex flex-wrap items-center gap-1.5 text-sm">
               <span className="text-graphite-400">{label} :</span>
               <span className="text-graphite-50">{String(value)}</span>
+              {estNomExercice && (
+                <a
+                  href={youtubeSearchUrl(value as string)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-laiton-400 underline hover:text-laiton-300"
+                >
+                  ▶ Voir la technique
+                </a>
+              )}
             </div>
           );
         })}

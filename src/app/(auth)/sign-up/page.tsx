@@ -12,6 +12,7 @@ import Link from "next/link";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [consentRgpd, setConsentRgpd] = useState(false);
@@ -36,7 +37,7 @@ export default function SignUpPage() {
       const res = await fetch("/api/compte/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ consentRgpd }),
+        body: JSON.stringify({ consentRgpd, prenom: prenom || undefined }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
 
@@ -58,6 +59,9 @@ export default function SignUpPage() {
           <h1 className="text-xl font-semibold text-graphite-50">Créer un compte</h1>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Field label="Prénom">
+            <Input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
+          </Field>
           <Field label="Email">
             <Input
               type="email"
