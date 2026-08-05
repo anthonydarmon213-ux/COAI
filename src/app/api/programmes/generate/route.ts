@@ -13,6 +13,11 @@ const PROMPT_BUILDERS: Record<Pilier, typeof buildProgrammeEntrainementPrompt> =
   RECUPERATION: buildProgrammeRecuperationPrompt,
 };
 
+// Les 3 piliers sont générés en parallèle par l'IA (appels Claude avec un
+// max_tokens élevé) : ça peut dépasser la limite par défaut des fonctions
+// Vercel (10s). On étend explicitement le délai autorisé.
+export const maxDuration = 60;
+
 // Génère dynamiquement les 3 piliers du programme (pas de bibliothèque
 // pré-construite — décision actée) à partir du Profile courant de l'utilisateur.
 export async function POST() {
@@ -36,8 +41,9 @@ export async function POST() {
     equipementDisponible: user.profile?.equipementDisponible,
     contraintesSante: user.profile?.contraintesSante,
     tailleCm: user.profile?.tailleCm,
+    age: user.profile?.age,
     morphologie: user.profile?.morphologie,
-    entrainementActuel: user.profile?.entrainementActuel,
+    frequenceEntrainement: user.profile?.frequenceEntrainement,
     habitudesAlimentaires: user.profile?.habitudesAlimentaires,
     consommationCafe: user.profile?.consommationCafe,
     consommationAlcool: user.profile?.consommationAlcool,
@@ -55,6 +61,12 @@ export async function POST() {
       });
     })
   );
+
+  resultats.forEach((r, i) => {
+    if (r.status === "rejected") {
+      console.error(`[programmes/generate] pilier ${piliers[i]} :`, r.reason);
+    }
+  });
 
   const echecs = resultats.filter((r): r is PromiseRejectedResult => r.status === "rejected");
   if (echecs.length === piliers.length) {

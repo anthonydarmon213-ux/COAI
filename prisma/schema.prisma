@@ -64,8 +64,9 @@ model Profile {
   equipementDisponible  String?
   contraintesSante      String?
   tailleCm              Float?
+  age                   Int?
   morphologie           String?
-  entrainementActuel    String?
+  frequenceEntrainement String?
   habitudesAlimentaires String?
   consommationCafe      String?
   consommationAlcool    String?

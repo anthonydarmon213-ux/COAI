@@ -10,14 +10,24 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Select } from "@/components/ui/select";
 
+const FREQUENCES_ENTRAINEMENT = [
+  "Jamais",
+  "1 fois par semaine",
+  "2 fois par semaine",
+  "3 fois par semaine",
+  "4 fois par semaine",
+  "5 fois ou plus par semaine",
+];
+
 type Profil = {
   objectifs?: string | null;
   niveau?: string | null;
   equipementDisponible?: string | null;
   contraintesSante?: string | null;
   tailleCm?: number | null;
+  age?: number | null;
   morphologie?: string | null;
-  entrainementActuel?: string | null;
+  frequenceEntrainement?: string | null;
   habitudesAlimentaires?: string | null;
   consommationCafe?: string | null;
   consommationAlcool?: string | null;
@@ -33,8 +43,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   );
   const [contraintesSante, setContraintesSante] = useState(profil.contraintesSante ?? "");
   const [tailleCm, setTailleCm] = useState(profil.tailleCm ? String(profil.tailleCm) : "");
+  const [age, setAge] = useState(profil.age ? String(profil.age) : "");
   const [morphologie, setMorphologie] = useState(profil.morphologie ?? "");
-  const [entrainementActuel, setEntrainementActuel] = useState(profil.entrainementActuel ?? "");
+  const [frequenceEntrainement, setFrequenceEntrainement] = useState(
+    profil.frequenceEntrainement ?? ""
+  );
   const [habitudesAlimentaires, setHabitudesAlimentaires] = useState(
     profil.habitudesAlimentaires ?? ""
   );
@@ -60,8 +73,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           equipementDisponible,
           contraintesSante,
           tailleCm: tailleCm ? Number(tailleCm) : undefined,
+          age: age ? Number(age) : undefined,
           morphologie,
-          entrainementActuel,
+          frequenceEntrainement: frequenceEntrainement || undefined,
           habitudesAlimentaires,
           consommationCafe,
           consommationAlcool,
@@ -96,12 +110,18 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             onChange={(e) => setNiveau(e.target.value)}
           />
         </Field>
-        <Field label="Entraînement actuel">
-          <Textarea
-            placeholder="ex: 2 séances de musculation par semaine, aucun sport actuellement..."
-            value={entrainementActuel}
-            onChange={(e) => setEntrainementActuel(e.target.value)}
-          />
+        <Field label="Fréquence d'entraînement">
+          <Select
+            value={frequenceEntrainement}
+            onChange={(e) => setFrequenceEntrainement(e.target.value)}
+          >
+            <option value="">Non renseigné</option>
+            {FREQUENCES_ENTRAINEMENT.map((freq) => (
+              <option key={freq} value={freq}>
+                {freq}
+              </option>
+            ))}
+          </Select>
         </Field>
         <Field label="Équipement disponible">
           <Textarea
@@ -119,6 +139,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             value={tailleCm}
             onChange={(e) => setTailleCm(e.target.value)}
           />
+        </Field>
+        <Field label="Âge">
+          <Input type="number" step="1" value={age} onChange={(e) => setAge(e.target.value)} />
         </Field>
         <Field label="Morphologie">
           <Select value={morphologie} onChange={(e) => setMorphologie(e.target.value)}>

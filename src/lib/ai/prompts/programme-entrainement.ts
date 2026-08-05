@@ -9,11 +9,13 @@ Niveau : ${profil.niveau ?? "non renseigné"}
 Équipement disponible : ${profil.equipementDisponible ?? "non renseigné"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Taille : ${profil.tailleCm ? `${profil.tailleCm} cm` : "non renseignée"}
+Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
-Entraînement actuel : ${profil.entrainementActuel ?? "non renseigné"}
+Fréquence d'entraînement actuelle : ${profil.frequenceEntrainement ?? "non renseignée"}
 
-Adapte le volume, l'intensité et le choix des exercices à la morphologie et à
-l'entraînement actuel de l'utilisateur (ne pas repartir de zéro s'il a déjà une pratique).
+Adapte le volume, l'intensité et le choix des exercices à la morphologie, à l'âge et à
+la fréquence d'entraînement actuelle de l'utilisateur (ne pas repartir de zéro s'il
+s'entraîne déjà, et tenir compte de la récupération nécessaire selon l'âge).
 
 Réponds au format JSON structuré (séances de la semaine, exercices, séries/répétitions, notes).`;
 }

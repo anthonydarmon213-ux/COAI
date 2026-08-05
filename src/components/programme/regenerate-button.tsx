@@ -15,7 +15,12 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
     try {
       const res = await fetch("/api/programmes/generate", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Échec de la génération.");
+      if (!res.ok) {
+        const detail = Array.isArray(data.details) ? data.details.join(" · ") : null;
+        throw new Error(
+          detail ? `${data.error ?? "Échec de la génération."} (${detail})` : data.error ?? "Échec de la génération."
+        );
+      }
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");

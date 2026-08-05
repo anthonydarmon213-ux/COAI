@@ -7,6 +7,7 @@ Génère des recommandations NUTRITION personnalisées pour cet utilisateur (pas
 Objectifs : ${profil.objectifs ?? "non renseignés"}
 Niveau : ${profil.niveau ?? "non renseigné"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
+Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
 Habitudes alimentaires actuelles : ${profil.habitudesAlimentaires ?? "non renseignées"}
 Consommation de café : ${profil.consommationCafe ?? "non renseignée"}

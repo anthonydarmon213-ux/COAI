@@ -10,8 +10,9 @@ export type ProfilUtilisateur = {
   equipementDisponible?: string | null;
   contraintesSante?: string | null;
   tailleCm?: number | null;
+  age?: number | null;
   morphologie?: string | null;
-  entrainementActuel?: string | null;
+  frequenceEntrainement?: string | null;
   habitudesAlimentaires?: string | null;
   consommationCafe?: string | null;
   consommationAlcool?: string | null;
