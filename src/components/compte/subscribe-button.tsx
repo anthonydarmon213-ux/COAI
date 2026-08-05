@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export function SubscribeButton() {
+export function SubscribeButton({
+  plan,
+  label,
+}: {
+  plan: "STANDARD" | "PREMIUM";
+  label: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,7 +17,11 @@ export function SubscribeButton() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
       if (res.status === 401) {
         window.location.href = "/sign-up";
         return;
@@ -28,7 +38,7 @@ export function SubscribeButton() {
   return (
     <div className="flex flex-col items-center gap-2">
       <Button onClick={handleClick} disabled={loading}>
-        {loading ? "Redirection…" : "S'abonner — 49€/mois"}
+        {loading ? "Redirection…" : label}
       </Button>
       {error && <p className="text-sm text-red-400">{error}</p>}
     </div>

@@ -4,12 +4,15 @@ import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
+import Link from "next/link";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { FicheMacros } from "@/components/programme/fiche-macros";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { computeProfilCompletion } from "@/lib/profil/completion";
+import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -49,6 +52,7 @@ export default async function ProgrammePage() {
 
   const hasExisting = dernieresGenerations.some(Boolean);
   const { remplis, total } = computeProfilCompletion(user.profile);
+  const plan = getEffectivePlan(user.subscription);
 
   return (
     <div className="flex flex-col gap-10">
@@ -98,9 +102,22 @@ export default async function ProgrammePage() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <SectionLabel>Mon programme</SectionLabel>
-          <RegenerateButton hasExisting={hasExisting} />
+          {plan !== "GRATUIT" && <RegenerateButton hasExisting={hasExisting} />}
         </div>
 
+        {plan === "GRATUIT" ? (
+          <Card className="flex flex-col items-start gap-3">
+            <Badge tone="warning">Réservé aux offres Standard et Premium</Badge>
+            <p className="text-sm text-graphite-300">
+              Ton profil est prêt. Passe à l&apos;offre Standard (49€/mois) pour générer ton
+              programme IA — entraînement, nutrition, récupération — relu et validé par Anthony
+              Darmon.
+            </p>
+            <Link href="/pricing">
+              <Button>Voir les offres</Button>
+            </Link>
+          </Card>
+        ) : (
         <Card className="flex flex-col gap-8">
           {piliers.map((pilier, i) => {
             const valide = derniersValides[i];
@@ -137,9 +154,10 @@ export default async function ProgrammePage() {
             );
           })}
         </Card>
+        )}
       </div>
 
-      <CoachingVisioCta />
+      <CoachingVisioCta plan={plan} />
     </div>
   );
 }

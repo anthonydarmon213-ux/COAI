@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
-import type { SubscriptionStatus } from "@prisma/client";
+import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
   switch (status) {
@@ -19,15 +19,25 @@ function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus
   }
 }
 
+// Déduit le palier (STANDARD/PREMIUM) à partir du price Stripe de la ligne
+// d'abonnement, en comparant aux ids configurés en env.
+function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
+  const priceId = subscription.items.data[0]?.price.id;
+  if (priceId && priceId === process.env.STRIPE_PRICE_ID_PREMIUM) return "PREMIUM";
+  return "STANDARD";
+}
+
 async function upsertFromSubscription(subscription: Stripe.Subscription, userId?: string) {
   const customerId =
     typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
+  const plan = mapStripePlan(subscription);
 
   await prisma.subscription.upsert({
     where: { stripeCustomerId: customerId },
     update: {
       stripeSubscriptionId: subscription.id,
       status: mapStripeStatus(subscription.status),
+      plan,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
     },
     create: {
@@ -35,12 +45,14 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscription.id,
       status: mapStripeStatus(subscription.status),
+      plan,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
     },
   });
 }
 
-// Webhook Stripe : synchronise le statut d'abonnement avec le modèle Subscription.
+// Webhook Stripe : synchronise le statut et le palier d'abonnement avec le
+// modèle Subscription.
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   const body = await request.text();

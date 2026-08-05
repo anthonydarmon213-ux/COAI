@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
 import { PortalButton } from "@/components/compte/portal-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,7 @@ export default async function AbonnementPage() {
   if (!user) return null;
 
   const statut = user.subscription?.status;
+  const plan = getEffectivePlan(user.subscription);
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,14 +33,15 @@ export default async function AbonnementPage() {
         <h1 className="text-2xl font-semibold">Mon abonnement</h1>
       </div>
       <Card className="flex flex-col items-start gap-4">
-        <Badge tone={statut ? STATUT_TONES[statut] : "neutral"}>
-          {statut ? STATUT_LABELS[statut] : "Aucun abonnement actif"}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
+          {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
+        </div>
         {statut ? (
           <PortalButton />
         ) : (
           <a href="/pricing" className="text-laiton-400 underline">
-            S&apos;abonner — offre de lancement à 49€/mois
+            Voir les offres — à partir de 49€/mois
           </a>
         )}
       </Card>

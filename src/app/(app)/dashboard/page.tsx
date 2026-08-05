@@ -5,6 +5,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Gauge } from "@/components/ui/gauge";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
+import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 const PILIER_LABELS: Record<Pilier, string> = {
@@ -98,7 +99,7 @@ export default async function DashboardPage() {
       <a href="/programme" className="text-laiton-400 underline">
         Voir mon programme
       </a>
-      <CoachingVisioCta />
+      <CoachingVisioCta plan={getEffectivePlan(user.subscription)} />
     </div>
   );
 }

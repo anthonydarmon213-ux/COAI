@@ -4,6 +4,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Sparkline } from "@/components/suivi/sparkline";
 import { MetricRing } from "@/components/suivi/metric-ring";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
+import { getEffectivePlan } from "@/lib/subscription/plan";
 
 type Metrique = {
   label: string;
@@ -85,7 +86,7 @@ export default async function ProgressionPage() {
             </div>
           </div>
 
-          <CoachingVisioCta />
+          <CoachingVisioCta plan={getEffectivePlan(user.subscription)} />
         </>
       )}
     </div>
