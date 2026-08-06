@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
+import "../../sentry.client.config";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -16,6 +17,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   applicationName: "YUMAI",
   title: "YUMAI — HI × AI™",
   description:
