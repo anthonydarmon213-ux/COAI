@@ -14,6 +14,8 @@ const KNOWN_LABELS: Record<string, string> = {
   frequenceParSemaine: "Fréquence par semaine",
   vueEnsemble: "Vue d'ensemble",
   dureeProgramme: "Durée du programme",
+  objectifsJournaliers: "Objectifs journaliers",
+  quantite: "Quantité",
 };
 
 function humanizeKey(key: string): string {
