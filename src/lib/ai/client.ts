@@ -12,6 +12,7 @@ export type ProfilUtilisateur = {
   antecedentsMedicaux?: string | null;
   tailleCm?: number | null;
   age?: number | null;
+  sexe?: string | null;
   morphologie?: string | null;
   frequenceEntrainement?: string | null;
   sportsPratiques?: string | null;

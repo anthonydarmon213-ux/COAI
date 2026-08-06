@@ -12,6 +12,7 @@ const bodySchema = z.object({
   antecedentsMedicaux: z.string().max(2000).optional(),
   tailleCm: z.number().positive().max(300).optional(),
   age: z.number().int().positive().max(120).optional(),
+  sexe: z.enum(["Homme", "Femme", "Préfère ne pas dire"]).optional(),
   morphologie: z.string().max(50).optional(),
   frequenceEntrainement: z.enum([
     "Jamais",

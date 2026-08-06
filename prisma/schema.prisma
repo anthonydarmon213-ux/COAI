@@ -81,6 +81,7 @@ model Profile {
   antecedentsMedicaux   String?
   tailleCm              Float?
   age                   Int?
+  sexe                  String?
   morphologie           String?
   frequenceEntrainement String?
   sportsPratiques       String?

@@ -107,6 +107,7 @@ type Profil = {
   antecedentsMedicaux?: string | null;
   tailleCm?: number | null;
   age?: number | null;
+  sexe?: string | null;
   morphologie?: string | null;
   frequenceEntrainement?: string | null;
   sportsPratiques?: string | null;
@@ -136,6 +137,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   );
   const [tailleCm, setTailleCm] = useState(profil.tailleCm ? String(profil.tailleCm) : "");
   const [age, setAge] = useState(profil.age ? String(profil.age) : "");
+  const [sexe, setSexe] = useState(profil.sexe ?? "");
   const [morphologie, setMorphologie] = useState(profil.morphologie ?? "");
   const [frequenceEntrainement, setFrequenceEntrainement] = useState(
     profil.frequenceEntrainement ?? ""
@@ -184,6 +186,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           antecedentsMedicaux: antecedentsMedicaux.length ? antecedentsMedicaux.join(", ") : undefined,
           tailleCm: tailleCm ? Number(tailleCm) : undefined,
           age: age ? Number(age) : undefined,
+          sexe: sexe || undefined,
           morphologie,
           frequenceEntrainement: frequenceEntrainement || undefined,
           sportsPratiques: sportsPratiques.length ? sportsPratiques.join(", ") : undefined,
@@ -275,6 +278,14 @@ export function ProfilForm({ profil }: { profil: Profil }) {
         </Field>
         <Field label="Âge">
           <Input type="number" step="1" value={age} onChange={(e) => setAge(e.target.value)} />
+        </Field>
+        <Field label="Sexe (optionnel)">
+          <Select value={sexe} onChange={(e) => setSexe(e.target.value)}>
+            <option value="">Non renseigné</option>
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+            <option value="Préfère ne pas dire">Préfère ne pas dire</option>
+          </Select>
         </Field>
         <Field label="Morphologie">
           <Select value={morphologie} onChange={(e) => setMorphologie(e.target.value)}>

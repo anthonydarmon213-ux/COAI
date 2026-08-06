@@ -84,6 +84,7 @@ export default async function ProgrammePage() {
               antecedentsMedicaux: user.profile?.antecedentsMedicaux,
               tailleCm: user.profile?.tailleCm,
               age: user.profile?.age,
+              sexe: user.profile?.sexe,
               morphologie: user.profile?.morphologie,
               frequenceEntrainement: user.profile?.frequenceEntrainement,
               sportsPratiques: user.profile?.sportsPratiques,
