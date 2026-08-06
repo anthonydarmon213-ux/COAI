@@ -3,7 +3,6 @@ import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FounderWaitlistForm } from "@/components/marketing/founder-waitlist-form";
 import { HeroOrb } from "@/components/marketing/hero-orb";
 
 const FAQ = [
@@ -135,7 +134,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Liste d'attente */}
+      {/* Early adopters */}
       <section
         id="membres-fondateurs"
         className="mx-auto my-16 flex w-[calc(100%-3rem)] max-w-3xl flex-col items-center gap-6 rounded-[2rem] border border-laiton-400/20 bg-white/[0.035] px-6 py-12 text-center shadow-[0_40px_120px_-60px_rgba(201,162,98,0.35)] backdrop-blur sm:px-12 sm:py-16"
@@ -145,11 +144,13 @@ export default function LandingPage() {
           Membres fondateurs YUMAI
         </h2>
         <p className="max-w-lg text-graphite-300">
-          Rejoins les premiers membres qui contribueront à façonner cette nouvelle
-          expérience de coaching. Tu recevras les informations de lancement et un accès
-          prioritaire dès l&apos;ouverture.
+          Rejoins les premiers membres de YUMAI : ton tarif de lancement à 49€/mois reste
+          garanti tant que ton abonnement est actif, même quand les prix évolueront pour les
+          nouveaux inscrits.
         </p>
-        <FounderWaitlistForm />
+        <Link href="/sign-up">
+          <Button>Devenir membre fondateur</Button>
+        </Link>
       </section>
 
       {/* FAQ */}
