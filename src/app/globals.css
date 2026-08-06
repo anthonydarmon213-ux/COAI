@@ -13,6 +13,19 @@ h1,
 h2,
 h3 {
   @apply font-display;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.yumai-gradient-text {
+  color: #ddc191;
+  background: linear-gradient(105deg, #f0dcc0 5%, #c9a262 48%, #9274c8 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 ::selection {
@@ -72,10 +85,7 @@ h3 {
 
 html {
   scroll-behavior: smooth;
-  /* Légère augmentation de la taille de base : tous les text-sm/base/lg
-     Tailwind (en rem) suivent proportionnellement, sans toucher chaque
-     composant un par un. */
-  font-size: 17.5px;
+  font-size: 16px;
 }
 
 @keyframes progress-indeterminate {
