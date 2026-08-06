@@ -12,9 +12,10 @@ export default function ConfidentialitePage() {
       <section>
         <h2>1. Responsable de traitement</h2>
         <p>
-          Le responsable du traitement des données est [raison sociale / nom et statut juridique à
-          compléter], édité par Anthony Darmon. Pour toute question relative à tes données
-          personnelles : [email de contact à compléter].
+          Le responsable du traitement des données est Anthony Darmon, auto-entrepreneur (SIRET
+          5343854140030), 27 rue de Cîteaux, 75012 Paris. Pour toute question relative à tes
+          données personnelles :{" "}
+          <a href="mailto:anthonydarmon213@hotmail.com">anthonydarmon213@hotmail.com</a>.
         </p>
       </section>
 

@@ -10,14 +10,14 @@ export default function MentionsLegalesPage() {
         <p>
           Le site YUMAI (accessible à l&apos;adresse de ce nom de domaine) est édité par :
           <br />
-          <strong>[Raison sociale / nom et statut juridique à compléter — ex. Anthony Darmon,
-          auto-entrepreneur]</strong>
+          <strong>Anthony Darmon, auto-entrepreneur</strong>
           <br />
-          SIRET : [à compléter]
+          SIRET : 5343854140030
           <br />
-          Adresse : [adresse du siège à compléter]
+          Adresse : 27 rue de Cîteaux, 75012 Paris
           <br />
-          Email de contact : [email de contact professionnel à compléter]
+          Email de contact :{" "}
+          <a href="mailto:anthonydarmon213@hotmail.com">anthonydarmon213@hotmail.com</a>
         </p>
         <p>Directeur de la publication : Anthony Darmon.</p>
       </section>
@@ -60,7 +60,10 @@ export default function MentionsLegalesPage() {
 
       <section>
         <h2>Contact</h2>
-        <p>Pour toute question relative au site ou à l&apos;application : [email de contact].</p>
+        <p>
+          Pour toute question relative au site ou à l&apos;application :{" "}
+          <a href="mailto:anthonydarmon213@hotmail.com">anthonydarmon213@hotmail.com</a>.
+        </p>
       </section>
     </LegalPage>
   );
