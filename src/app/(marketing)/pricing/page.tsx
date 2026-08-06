@@ -59,7 +59,7 @@ export default function PricingPage() {
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-10 px-6 py-24">
       <div className="text-center">
         <SectionLabel>Tarifs</SectionLabel>
-        <h1 className="mt-4 font-editorial text-4xl font-normal tracking-tight text-graphite-50 sm:text-6xl">
+        <h1 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
           Choisis ton niveau d&apos;accompagnement
         </h1>
       </div>
@@ -77,9 +77,9 @@ export default function PricingPage() {
                 Le plus choisi
               </span>
             )}
-            <h2 className="font-editorial text-2xl font-normal text-graphite-50">{tier.nom}</h2>
+            <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{tier.nom}</h2>
             <div className="flex items-baseline gap-1">
-              <p className="font-editorial text-5xl text-graphite-50">{tier.prix}</p>
+              <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
               <span className="text-sm text-graphite-400">{tier.suffixe}</span>
             </div>
             <p className="text-sm text-graphite-300">{tier.description}</p>
