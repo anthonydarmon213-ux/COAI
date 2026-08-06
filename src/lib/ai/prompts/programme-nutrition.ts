@@ -36,5 +36,9 @@ Pour chaque repère de repas ou idée de plat, inclus obligatoirement :
 - "quantite" : la quantité exacte recommandée pour chaque aliment du plat, chiffrée en grammes
   ou en unité concrète (ex: "150g de blanc de poulet, 100g de riz basmati cuit, 1/2 avocat, 1
   càs d'huile d'olive"). Ne laisse jamais ce champ vague ou absent — toujours des quantités
-  précises, jamais "une portion" ou "au choix".`;
+  précises, jamais "une portion" ou "au choix".
+Pour chaque conseil pratique sur une habitude déclarée (café, alcool, hydratation...), respecte
+TOUJOURS cet ordre de champs : d'abord "constatActuel" (la situation actuelle déclarée par
+l'utilisateur, factuelle), puis "conseil" (la recommandation qui en découle) — jamais l'inverse,
+le constat doit toujours précéder le conseil qui s'y rapporte.`;
 }
