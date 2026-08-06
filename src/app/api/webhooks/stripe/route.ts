@@ -30,25 +30,28 @@ function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
 async function upsertFromSubscription(subscription: Stripe.Subscription, userId?: string) {
   const customerId =
     typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
-  const plan = mapStripePlan(subscription);
+  const data = {
+    stripeSubscriptionId: subscription.id,
+    status: mapStripeStatus(subscription.status),
+    plan: mapStripePlan(subscription),
+    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+  };
 
-  await prisma.subscription.upsert({
-    where: { stripeCustomerId: customerId },
-    update: {
-      stripeSubscriptionId: subscription.id,
-      status: mapStripeStatus(subscription.status),
-      plan,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-    create: {
-      userId: userId!,
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscription.id,
-      status: mapStripeStatus(subscription.status),
-      plan,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-  });
+  if (userId) {
+    await prisma.subscription.upsert({
+      where: { stripeCustomerId: customerId },
+      update: data,
+      create: { userId, stripeCustomerId: customerId, ...data },
+    });
+    return;
+  }
+
+  // customer.subscription.updated/deleted ne porte pas de userId. Stripe ne
+  // garantit pas l'ordre des événements : si celui-ci arrive avant
+  // checkout.session.completed, la ligne n'existe pas encore — on l'ignore
+  // silencieusement (pas d'erreur, updateMany ne matche simplement rien) et
+  // checkout.session.completed créera la ligne avec le statut déjà à jour.
+  await prisma.subscription.updateMany({ where: { stripeCustomerId: customerId }, data });
 }
 
 // Webhook Stripe : synchronise le statut et le palier d'abonnement avec le
