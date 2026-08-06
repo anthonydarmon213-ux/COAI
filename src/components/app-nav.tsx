@@ -19,7 +19,14 @@ export function AppNav() {
   return (
     <aside className="z-20 shrink-0 border-b border-white/[0.07] bg-[#0b0c0e]/95 px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-b-0 md:border-r md:px-6 md:py-8">
       <div className="flex items-center justify-between md:block">
-        <div><span className="font-display text-xl font-semibold tracking-[0.18em] text-white">YUMAI</span><p className="mt-1 hidden font-mono text-[0.55rem] uppercase tracking-[0.2em] text-laiton-400 md:block">Human intelligence × AI</p></div>
+        <div>
+          <span className="font-display text-xl font-semibold tracking-[0.18em] text-white">
+            YUMAI
+            <span className="ml-2 font-mono text-[0.55rem] font-normal tracking-[0.2em] text-laiton-400">
+              HI × AI™
+            </span>
+          </span>
+        </div>
         <span className="rounded-full border border-laiton-400/20 bg-laiton-400/[0.06] px-2.5 py-1 font-mono text-[0.58rem] uppercase tracking-wider text-laiton-300 md:mt-5 md:inline-block">Beta</span>
       </div>
       <nav aria-label="Navigation principale" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-10 md:flex-1 md:flex-col md:overflow-visible">
