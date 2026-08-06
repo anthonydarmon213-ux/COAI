@@ -25,7 +25,7 @@ export default function Icon() {
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          Y
+          C
         </span>
       </div>
     ),
