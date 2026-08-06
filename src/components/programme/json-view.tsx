@@ -6,7 +6,18 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+// Les clés générées par l'IA sont en camelCase sans accents (JSON) — pour les
+// champs qu'on impose nous-mêmes dans les prompts, on connaît le libellé
+// français correct. Le reste (clés libres générées par l'IA) passe par
+// l'humanisation générique ci-dessous.
+const KNOWN_LABELS: Record<string, string> = {
+  frequenceParSemaine: "Fréquence par semaine",
+  vueEnsemble: "Vue d'ensemble",
+  dureeProgramme: "Durée du programme",
+};
+
 function humanizeKey(key: string): string {
+  if (KNOWN_LABELS[key]) return KNOWN_LABELS[key];
   const spaced = key.replace(/_/g, " ").replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
@@ -46,7 +57,7 @@ export function JsonView({
 
     if (allPrimitive) {
       return (
-        <ul className="list-inside list-disc space-y-0.5 text-sm text-graphite-200">
+        <ul className="list-inside list-disc space-y-1 text-base leading-relaxed text-graphite-200">
           {data.map((item, i) => (
             <li key={i}>{String(item)}</li>
           ))}
@@ -91,7 +102,7 @@ export function JsonView({
               : null;
 
           return (
-            <div key={key} className="flex flex-wrap items-center gap-1.5 text-sm">
+            <div key={key} className="flex flex-wrap items-center gap-2 text-base leading-relaxed">
               <span className="font-medium text-graphite-200">{label} :</span>
               <span className="text-graphite-50">{String(value)}</span>
               {media && (
@@ -111,5 +122,5 @@ export function JsonView({
     );
   }
 
-  return <span className="text-sm text-graphite-50">{String(data)}</span>;
+  return <span className="text-base text-graphite-50">{String(data)}</span>;
 }
