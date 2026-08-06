@@ -20,6 +20,16 @@ export const metadata: Metadata = {
   title: "YUMAI — HI × AI™",
   description:
     "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
+  openGraph: {
+    title: "YUMAI — HI × AI™",
+    description: "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "YUMAI — HI × AI™",
+    description: "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
