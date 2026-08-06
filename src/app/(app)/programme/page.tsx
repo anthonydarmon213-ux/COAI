@@ -62,6 +62,14 @@ export default async function ProgrammePage() {
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">Votre profil nourrit trois dimensions coordonnées par l’IA, relues et validées par votre coach.</p>
       </div>
 
+      <p className="rounded-lg border border-graphite-800 bg-graphite-900/40 p-4 text-xs leading-5 text-graphite-400">
+        ⚠️ Avant de démarrer un programme sur YUMAI, nous te recommandons fortement de faire un
+        bilan médical complet auprès de ton médecin, en particulier en cas d&apos;antécédent ou de
+        doute sur ta condition physique. Les programmes générés et validés sur YUMAI sont des
+        recommandations sportives, pas un avis médical : tu restes seul responsable de ta pratique
+        et de son adéquation avec ton état de santé, y compris en cas de blessure.
+      </p>
+
       {/* Profil */}
       <div className="flex flex-col gap-3">
         <SectionLabel>Mon profil</SectionLabel>
