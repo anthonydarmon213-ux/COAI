@@ -3,6 +3,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FounderWaitlistForm } from "@/components/marketing/founder-waitlist-form";
+import { HeroOrb } from "@/components/marketing/hero-orb";
 
 const FAQ = [
   {
@@ -49,27 +50,30 @@ export default function LandingPage() {
     <main className="bg-lab-grid flex flex-col">
       {/* Hero */}
       <section className="relative flex min-h-[88vh] flex-col items-center justify-center gap-6 px-6 py-20 text-center">
-        <SectionLabel>Coaching · Suivi · IA</SectionLabel>
-        <h1 className="text-6xl font-semibold tracking-[-0.06em] text-graphite-50 sm:text-8xl">
-          YUMAI
-        </h1>
-        <p className="font-mono text-xs uppercase tracking-[0.4em] text-laiton-400">
-          HI × AI™
-        </p>
-        <p className="max-w-2xl font-display text-2xl leading-tight text-graphite-100 sm:text-4xl">
-          AI generates. Humans validate.
-        </p>
-        <p className="text-sm uppercase tracking-[0.18em] text-graphite-400">
-          L&apos;expertise humaine augmentée par l&apos;IA
-        </p>
-        <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Un coaching augmenté par l&apos;IA, supervisé par un vrai coach avec 17 ans
-          d&apos;expérience. L&apos;IA génère, l&apos;humain valide — rien ne t&apos;est
-          envoyé sans passer par moi.
-        </p>
-        <a href="#membres-fondateurs">
-          <Button>Rejoindre la liste prioritaire</Button>
-        </a>
+        <HeroOrb />
+        <div className="relative z-10 flex flex-col items-center gap-6">
+          <SectionLabel>Coaching · Suivi · IA</SectionLabel>
+          <h1 className="text-6xl font-semibold tracking-[-0.06em] text-graphite-50 sm:text-8xl">
+            YUMAI
+          </h1>
+          <p className="font-mono text-xs uppercase tracking-[0.4em] text-laiton-400">
+            HI × AI™
+          </p>
+          <p className="max-w-2xl font-display text-2xl leading-tight text-graphite-100 sm:text-4xl">
+            AI generates. Humans validate.
+          </p>
+          <p className="text-sm uppercase tracking-[0.18em] text-graphite-400">
+            L&apos;expertise humaine augmentée par l&apos;IA
+          </p>
+          <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
+            Un coaching augmenté par l&apos;IA, supervisé par un vrai coach avec 17 ans
+            d&apos;expérience. L&apos;IA génère, l&apos;humain valide — rien ne t&apos;est
+            envoyé sans passer par moi.
+          </p>
+          <a href="#membres-fondateurs">
+            <Button>Rejoindre la liste prioritaire</Button>
+          </a>
+        </div>
       </section>
 
       {/* Positionnement */}

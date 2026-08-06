@@ -59,3 +59,31 @@ html {
 .animate-progress-indeterminate {
   animation: progress-indeterminate 1.4s ease-in-out infinite;
 }
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
+}
+
+/* Halo animé du hero : désactivé si l'utilisateur préfère moins d'animations. */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-spin-slow {
+    animation: spin-slow 50s linear infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 5s ease-in-out infinite;
+  }
+}
