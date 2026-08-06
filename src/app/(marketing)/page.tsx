@@ -57,22 +57,46 @@ export default function LandingPage() {
     <main className="bg-lab-grid flex flex-col">
       <section className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
         <div className="relative z-10 max-w-3xl">
-          <SectionLabel>Le coaching humain, augmenté</SectionLabel>
-          <h1 className="mt-7 max-w-4xl font-display text-[clamp(3rem,6.4vw,6.4rem)] font-semibold leading-[0.96] tracking-[-0.055em] text-white">
-            Comprendre.<br />Progresser. <span className="yumai-gradient-text">Durer.</span>
+          <SectionLabel>Entraînement · Nutrition · Sommeil</SectionLabel>
+          <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">
+            Ton programme personnalisé par l&apos;IA.
+            <span className="mt-2 block text-laiton-300">Validé par un coach diplômé d&apos;État.</span>
           </h1>
-          <p className="mt-8 max-w-xl text-base leading-7 text-graphite-200 sm:text-lg">Ton coaching personnalisé par l’IA, construit sur 17 ans d’expertise humaine.</p>
+          <p className="mt-8 max-w-xl text-base leading-7 text-graphite-200 sm:text-lg">
+            YUMAI crée ton entraînement, ton plan nutritionnel et tes recommandations de sommeil
+            selon ton niveau, tes objectifs et ton quotidien. Anthony contrôle et valide ton programme avant que tu le reçoives.
+          </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Créer mon espace gratuit</Button></Link>
             <a href="#piliers"><Button variant="secondary" className="px-7 py-3">Découvrir la méthode</Button></a>
           </div>
-          <p className="mt-6 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />IA disponible maintenant · validation humaine incluse</p>
+          <p className="mt-6 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />La précision de l&apos;IA · L&apos;expérience du coach</p>
         </div>
         <div className="relative flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
           <div className="yumai-orb" aria-hidden="true" />
-          <div className="absolute bottom-8 left-1/2 w-[min(92%,28rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/60 p-4 shadow-2xl backdrop-blur-xl lg:bottom-10 lg:left-0 lg:translate-x-0">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-laiton-400">Programme adaptatif</p><p className="mt-1.5 text-sm font-medium text-white">Semaine optimisée par YUMAI</p></div><span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-xs font-medium text-laiton-300">Validé</span></div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">{[["4","séances"],["82%","récupération"],["+12","progression"]].map(([value,label]) => <div key={label} className="rounded-xl bg-white/[0.04] p-3"><p className="text-xl font-semibold text-white">{value}</p><p className="mt-1 text-[0.65rem] font-medium uppercase tracking-wide text-graphite-400">{label}</p></div>)}</div>
+          <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-10 lg:left-0 lg:translate-x-0">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-laiton-400">Comment ça marche ?</p>
+                <p className="mt-1.5 text-base font-semibold text-white">Simplement, en trois étapes.</p>
+              </div>
+              <span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-xs font-medium text-laiton-300">YUMAI</span>
+            </div>
+            <ol className="mt-5 flex flex-col gap-4">
+              {[
+                ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
+                ["2", "L’IA personnalise ton programme", "Entraînement, nutrition et sommeil adaptés à toi."],
+                ["3", "Ton coach vérifie et valide", "Tu reçois un programme fiable, clair et prêt à suivre."],
+              ].map(([numero, titre, description]) => (
+                <li key={numero} className="grid grid-cols-[2rem_1fr] gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-sm font-semibold text-laiton-300">{numero}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{titre}</p>
+                    <p className="mt-1 text-sm leading-5 text-graphite-400">{description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </section>
@@ -98,15 +122,25 @@ export default function LandingPage() {
           {PILIERS.map((pilier) => (
             <Card
               key={pilier.titre}
-            className="flex min-h-72 flex-col items-start justify-between gap-8 px-7 py-8 text-left"
+              className="flex min-h-72 flex-col items-center justify-center gap-6 px-7 py-8 text-center"
             >
               <span className="text-sm font-semibold text-laiton-400">{pilier.numero}</span>
-              <div>
+              <div className="flex flex-col items-center">
                 <h3 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-white">{pilier.titre}</h3>
-                <p className="mt-4 text-base leading-7 text-graphite-300">{pilier.description}</p>
+                <p className="mt-4 max-w-xs text-base leading-7 text-graphite-300">{pilier.description}</p>
               </div>
             </Card>
           ))}
+        </div>
+        <div className="mx-auto max-w-3xl border-t border-white/[0.08] pt-10 text-center">
+          <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
+            Ton entraînement, ta nutrition et ton sommeil,
+            <span className="text-laiton-300"> personnalisés par l&apos;IA et validés par un coach diplômé d&apos;État.</span>
+          </p>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+            Parce que deux coachs valent mieux qu&apos;un, YUMAI réunit l&apos;intelligence artificielle
+            et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
+          </p>
         </div>
       </section>
 
