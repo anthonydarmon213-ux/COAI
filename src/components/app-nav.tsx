@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CoaiMark } from "@/components/brand/coai-mark";
 
 const LINKS = [
   { href: "/dashboard", label: "Tableau de bord" },
@@ -19,7 +20,8 @@ export function AppNav() {
   return (
     <aside className="z-20 shrink-0 border-b border-white/[0.07] bg-[#0b0c0e]/95 px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-b-0 md:border-r md:px-6 md:py-8">
       <div className="flex items-center justify-between md:block">
-        <div>
+        <div className="flex items-center gap-2.5">
+          <CoaiMark size={26} />
           <span className="font-display text-xl font-semibold tracking-[0.18em] text-white">
             COAI
             <span className="ml-2 font-mono text-[0.55rem] font-normal tracking-[0.2em] text-laiton-400">

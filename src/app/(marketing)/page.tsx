@@ -70,7 +70,7 @@ export default function LandingPage() {
             <Link href="/sign-up"><Button className="px-7 py-3">Créer mon espace gratuit</Button></Link>
             <a href="#piliers"><Button variant="secondary" className="px-7 py-3">Découvrir la méthode</Button></a>
           </div>
-          <p className="mt-6 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />La précision de l&apos;IA · L&apos;expérience du coach</p>
+          <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
         </div>
         <div className="relative flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
           <div className="coai-orb" aria-hidden="true" />
@@ -98,6 +98,31 @@ export default function LandingPage() {
               ))}
             </ol>
           </div>
+        </div>
+      </section>
+
+      {/* L'histoire */}
+      <section className="mx-auto w-full max-w-3xl px-6 py-24 sm:py-28">
+        <SectionLabel>L&apos;histoire</SectionLabel>
+        <h2 className="mt-6 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+          Pourquoi COAI existe.
+        </h2>
+        <div className="mt-8 font-editorial text-lg leading-8 text-graphite-200 sm:text-xl sm:leading-9">
+          <p>
+            Anthony Darmon a passé dix-sept ans sur le terrain — en salle, en visio, à corriger
+            un mouvement, ajuster un macro, entendre ce qu&apos;un chiffre sur la balance ne dit
+            jamais. De cette expérience est né THE METHOD : un accompagnement 1-to-1 exigeant,
+            réservé à ceux qui peuvent y consacrer 490 à 800€ par mois.
+          </p>
+          <p className="mt-7 border-l-2 border-laiton-400 pl-6 italic text-white">
+            Mais l&apos;expertise ne devrait pas être un luxe. Et un algorithme seul ne devrait
+            jamais avoir le dernier mot sur un corps.
+          </p>
+          <p className="mt-7">
+            COAI est né de cette tension. Un programme aussi précis qu&apos;une consultation
+            privée, généré en quelques secondes par l&apos;IA — mais jamais livré sans qu&apos;Anthony,
+            ou un coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé.
+          </p>
         </div>
       </section>
 
