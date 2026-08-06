@@ -17,9 +17,14 @@ const FAQ = [
       "Oui — ton niveau, ton équipement et tes contraintes de santé font partie du profil pris en compte pour générer et valider ton programme.",
   },
   {
+    question: "C'est payant dès le départ ?",
+    reponse:
+      "Non — la création de compte et le suivi (séances, mesures, progression) sont gratuits. Le programme généré par IA et validé par un coach diplômé d'État démarre à 49€/mois, sans engagement, quand tu es prêt.",
+  },
+  {
     question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
     reponse:
-      "Le coaching augmenté te donne un point de départ structuré et suivi, à 49€/mois. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Tu peux commencer avec ce format, puis passer à THE METHOD quand tu veux aller plus loin.",
+      "Le coaching augmenté te donne un point de départ structuré et suivi, gratuit puis à partir de 49€/mois pour le programme généré par IA. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Tu peux commencer avec ce format, puis passer à THE METHOD quand tu veux aller plus loin.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -184,8 +189,9 @@ export default function LandingPage() {
       <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 py-24 text-center">
         <h2 className="text-2xl font-semibold text-graphite-50">Prêt à commencer ?</h2>
         <p className="text-graphite-300">
-          Offre de lancement : <span className="line-through text-graphite-500">89€</span>{" "}
-          49€/mois, sans engagement.
+          Crée ton compte gratuitement, puis passe à ton rythme au programme généré par IA à
+          partir de <span className="line-through text-graphite-500">89€</span> 49€/mois, sans
+          engagement.
         </p>
         <Link href="/sign-up">
           <Button>Commencer</Button>
