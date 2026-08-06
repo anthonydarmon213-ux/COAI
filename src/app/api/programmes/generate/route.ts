@@ -5,6 +5,7 @@ import { buildProgrammeEntrainementPrompt } from "@/lib/ai/prompts/programme-ent
 import { buildProgrammeNutritionPrompt } from "@/lib/ai/prompts/programme-nutrition";
 import { buildProgrammeRecuperationPrompt } from "@/lib/ai/prompts/programme-recuperation";
 import { prisma } from "@/lib/db/client";
+import { sendAdminNotification } from "@/lib/email/client";
 import type { Pilier } from "@prisma/client";
 
 const PROMPT_BUILDERS: Record<Pilier, typeof buildProgrammeEntrainementPrompt> = {
@@ -83,6 +84,14 @@ export async function POST() {
   const programmes = resultats
     .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof prisma.programmeGenerated.create>>> => r.status === "fulfilled")
     .map((r) => r.value);
+
+  if (programmes.length > 0) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    await sendAdminNotification(
+      "Nouveau programme à valider",
+      `${user.prenom ?? user.email} vient de générer ${programmes.length} pilier(s) de programme, en attente de ta validation.\n\n${appUrl}/admin/programmes`
+    );
+  }
 
   return NextResponse.json({ programmes, echecs: echecs.length }, { status: 201 });
 }
