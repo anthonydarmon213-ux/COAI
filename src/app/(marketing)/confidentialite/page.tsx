@@ -61,6 +61,11 @@ export default function ConfidentialitePage() {
           <li>Stripe (traitement des paiements)</li>
           <li>Anthropic (génération des programmes par intelligence artificielle — les données de profil sportif et de santé sont transmises pour cette seule finalité, sans être utilisées pour entraîner leurs modèles)</li>
           <li>
+            Sentry (suivi technique des erreurs de l&apos;application, UE) — reçoit uniquement des
+            informations techniques (message d&apos;erreur, page concernée), jamais tes données de
+            profil ou de santé.
+          </li>
+          <li>
             Le cas échéant, WhatsApp/Twilio si tu actives l&apos;assistant WhatsApp (numéro de
             téléphone uniquement).
           </li>
