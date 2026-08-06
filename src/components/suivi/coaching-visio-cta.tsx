@@ -4,7 +4,7 @@ import type { EffectivePlan } from "@/lib/subscription/plan";
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_COACH_NUMBER;
 
 const MESSAGE =
-  "Bonjour Anthony, je suis sur mon espace YUMAI et j'aimerais échanger en visio sur mon accompagnement.";
+  "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais échanger en visio sur mon accompagnement.";
 
 export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
   if (!WHATSAPP_NUMBER) return null;

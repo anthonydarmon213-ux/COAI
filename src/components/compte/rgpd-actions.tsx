@@ -15,7 +15,7 @@ export function RgpdActions() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "yumai-mes-donnees.json";
+    a.download = "coai-mes-donnees.json";
     a.click();
     URL.revokeObjectURL(url);
   }

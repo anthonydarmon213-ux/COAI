@@ -63,7 +63,7 @@ export default function LandingPage() {
             <span className="mt-2 block text-laiton-300">Validé par un coach diplômé d&apos;État.</span>
           </h1>
           <p className="mt-8 max-w-xl text-base leading-7 text-graphite-200 sm:text-lg">
-            YUMAI crée ton entraînement, ton plan nutritionnel et tes recommandations de sommeil
+            COAI crée ton entraînement, ton plan nutritionnel et tes recommandations de sommeil
             selon ton niveau, tes objectifs et ton quotidien. Anthony contrôle et valide ton programme avant que tu le reçoives.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
@@ -73,14 +73,14 @@ export default function LandingPage() {
           <p className="mt-6 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />La précision de l&apos;IA · L&apos;expérience du coach</p>
         </div>
         <div className="relative flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
-          <div className="yumai-orb" aria-hidden="true" />
+          <div className="coai-orb" aria-hidden="true" />
           <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-10 lg:left-0 lg:translate-x-0">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-laiton-400">Comment ça marche ?</p>
                 <p className="mt-1.5 text-base font-semibold text-white">Simplement, en trois étapes.</p>
               </div>
-              <span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-xs font-medium text-laiton-300">YUMAI</span>
+              <span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-xs font-medium text-laiton-300">COAI</span>
             </div>
             <ol className="mt-5 flex flex-col gap-4">
               {[
@@ -138,7 +138,7 @@ export default function LandingPage() {
             <span className="text-laiton-300"> personnalisés par l&apos;IA et validés par un coach diplômé d&apos;État.</span>
           </p>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
-            Parce que deux coachs valent mieux qu&apos;un, YUMAI réunit l&apos;intelligence artificielle
+            Parce que deux coachs valent mieux qu&apos;un, COAI réunit l&apos;intelligence artificielle
             et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
           </p>
         </div>

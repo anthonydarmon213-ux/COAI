@@ -17,7 +17,7 @@ export async function sendAdminNotification(subject: string, text: string): Prom
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL ?? "YUMAI <onboarding@resend.dev>",
+        from: process.env.RESEND_FROM_EMAIL ?? "COAI <onboarding@resend.dev>",
         to,
         subject,
         text,

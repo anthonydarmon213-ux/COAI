@@ -9,7 +9,7 @@ export function buildProgrammeRecuperationJourPrompt(
   profil: ProfilUtilisateur,
   jour: JourRecuperation
 ): string {
-  return `Tu es le coach IA de YUMAI, fondé sur la méthode d'Anthony Darmon.
+  return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon.
 Génère le détail des recommandations de récupération du ${jour.jour} (${jour.type}) pour cet
 utilisateur.
 

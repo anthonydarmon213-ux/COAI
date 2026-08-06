@@ -55,7 +55,7 @@ export default async function DashboardPage() {
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
           {user.prenom ? `Bonjour ${user.prenom}.` : "Votre progression commence ici."}
         </h1>
-        <p className="max-w-2xl text-sm leading-6 text-graphite-400">YUMAI réunit vos programmes, votre suivi et les recommandations validées par Anthony.</p>
+        <p className="max-w-2xl text-sm leading-6 text-graphite-400">COAI réunit vos programmes, votre suivi et les recommandations validées par Anthony.</p>
       </div>
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />

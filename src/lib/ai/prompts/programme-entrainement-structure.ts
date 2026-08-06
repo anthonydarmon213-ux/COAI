@@ -18,7 +18,7 @@ export type StructureEntrainement = {
 // de la semaine (rapide), le détail de chaque séance étant généré séparément
 // ensuite (étape 2) pour rester sous la limite de temps d'une fonction Vercel.
 export function buildProgrammeEntrainementStructurePrompt(profil: ProfilUtilisateur): string {
-  return `Tu es le coach IA de YUMAI, fondé sur la méthode d'Anthony Darmon et plus de 17 ans d'expérience.
+  return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon et plus de 17 ans d'expérience.
 Détermine la STRUCTURE d'un programme d'ENTRAÎNEMENT personnalisé pour cet utilisateur (le détail
 de chaque séance sera généré séparément ensuite, ne le fais pas ici).
 

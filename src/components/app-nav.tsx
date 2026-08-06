@@ -21,7 +21,7 @@ export function AppNav() {
       <div className="flex items-center justify-between md:block">
         <div>
           <span className="font-display text-xl font-semibold tracking-[0.18em] text-white">
-            YUMAI
+            COAI
             <span className="ml-2 font-mono text-[0.55rem] font-normal tracking-[0.2em] text-laiton-400">
               HI × AI™
             </span>

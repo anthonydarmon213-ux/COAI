@@ -9,7 +9,7 @@ export function buildProgrammeNutritionJourPrompt(
   profil: ProfilUtilisateur,
   jour: JourNutrition
 ): string {
-  return `Tu es le coach IA de YUMAI, fondé sur la méthode d'Anthony Darmon.
+  return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon.
 Génère le détail des repas du ${jour.jour} d'un plan nutrition personnalisé pour cet utilisateur,
 avec des quantités précises (pas de généralités type "une portion de protéines").
 

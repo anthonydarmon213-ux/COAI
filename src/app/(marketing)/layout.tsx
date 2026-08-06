@@ -11,7 +11,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <div className="mx-auto flex max-w-7xl items-start justify-between px-6 py-6 sm:px-10">
           <Link href="/" className="group flex flex-col">
             <span className="font-display text-lg font-semibold tracking-[0.2em] text-white">
-              YUMAI
+              COAI
               <span className="ml-2 font-mono text-[0.55rem] font-normal tracking-[0.2em] text-laiton-400">
                 HI × AI™
               </span>

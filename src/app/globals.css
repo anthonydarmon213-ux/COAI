@@ -20,7 +20,7 @@ p {
   text-wrap: pretty;
 }
 
-.yumai-gradient-text {
+.coai-gradient-text {
   color: #ddc191;
   background: linear-gradient(105deg, #f0dcc0 5%, #c9a262 48%, #9274c8 100%);
   background-clip: text;
@@ -56,7 +56,7 @@ p {
   opacity: 0.15;
 }
 
-.yumai-orb {
+.coai-orb {
   position: relative;
   width: min(64vw, 27rem);
   aspect-ratio: 1;
@@ -67,8 +67,8 @@ p {
   box-shadow: inset -2.5rem -3rem 5rem rgba(0,0,0,.82), inset 1.5rem 1.5rem 4rem rgba(255,255,255,.08), 0 0 7rem rgba(201,162,98,.17);
 }
 
-.yumai-orb::before,
-.yumai-orb::after {
+.coai-orb::before,
+.coai-orb::after {
   position: absolute;
   inset: -7%;
   content: "";
@@ -77,7 +77,7 @@ p {
   transform: rotate(-18deg) scaleY(.36);
 }
 
-.yumai-orb::after {
+.coai-orb::after {
   inset: -13%;
   border-color: rgba(255,255,255,.08);
   transform: rotate(24deg) scaleY(.62);

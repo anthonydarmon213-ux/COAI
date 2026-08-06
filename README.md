@@ -1,4 +1,4 @@
-# YUMAI
+# COAI
 
 HI × AI™ — AI generates. Humans validate.
 
