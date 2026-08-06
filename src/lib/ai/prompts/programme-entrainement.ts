@@ -29,11 +29,12 @@ boxes pas cette semaine : 30 min de cardio libre + gainage"). Ne jamais laisser 
 
 Réponds au format JSON structuré (séances de la semaine, exercices, séries/répétitions, notes).
 Pour CHAQUE séance, inclus obligatoirement un champ "echauffement" décrivant un échauffement
-avant d'attaquer la charge de travail : quelques minutes de cardio léger/mobilité articulaire,
-puis pour le premier exercice de force de la séance une gamme montante (séries d'approche à
-charge croissante avant les séries de travail, ex: "50% x10, 70% x6, 85% x3" avant la première
-série au poids de travail). Ne jamais faire démarrer une séance directement à la charge de
-travail sans échauffement.
+en 3 temps avant d'attaquer la charge de travail : (1) quelques minutes de cardio léger pour
+augmenter la température corporelle et le rythme cardiaque, (2) mobilité articulaire ciblée sur
+les zones sollicitées par la séance, (3) pour le premier exercice de force, une gamme montante
+(séries d'approche à charge croissante avant les séries de travail, ex: "50% x10, 70% x6, 85%
+x3" avant la première série au poids de travail). Ne jamais faire démarrer une séance
+directement à la charge de travail sans que le muscle soit préparé.
 Pour CHAQUE exercice, inclus obligatoirement un champ "repos" avec le temps de récupération
 conseillé entre les séries (ex: "90 sec", "2 min"), adapté à l'objectif (repos plus court en
 endurance/perte de poids, plus long en force). Ne laisse jamais ce champ absent.
