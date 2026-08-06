@@ -32,7 +32,8 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/programme") ||
     request.nextUrl.pathname.startsWith("/suivi") ||
     request.nextUrl.pathname.startsWith("/compte") ||
-    request.nextUrl.pathname.startsWith("/admin");
+    request.nextUrl.pathname.startsWith("/admin") ||
+    request.nextUrl.pathname.startsWith("/bienvenue");
 
   if (isProtectedRoute && !user) {
     const redirectUrl = new URL("/sign-in", request.url);
@@ -44,5 +45,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/programme/:path*", "/suivi/:path*", "/compte/:path*", "/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/programme/:path*", "/suivi/:path*", "/compte/:path*", "/admin/:path*", "/bienvenue/:path*"],
 };
