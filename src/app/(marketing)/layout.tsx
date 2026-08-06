@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/marketing/footer";
 
 // Barre minimale pour les pages publiques (accueil, pricing) : les pages
 // marketing n'ont pas de nav applicative (AppNav), mais un client existant
@@ -13,6 +14,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         Se connecter
       </Link>
       {children}
+      <Footer />
     </div>
   );
 }

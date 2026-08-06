@@ -105,7 +105,11 @@ export default function PricingPage() {
       <p className="max-w-xl text-center text-xs text-graphite-500">
         Tous les abonnements sont sans engagement, résiliables à tout moment depuis ton compte.
         THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible séparément
-        pour qui veut aller plus loin que le palier Premium.
+        pour qui veut aller plus loin que le palier Premium. En t&apos;abonnant, tu acceptes nos{" "}
+        <Link href="/cgv" className="underline hover:text-laiton-400">
+          CGV
+        </Link>
+        .
       </p>
     </main>
   );

@@ -86,7 +86,11 @@ export default function SignUpPage() {
               onChange={(e) => setConsentRgpd(e.target.checked)}
               className="mt-1"
             />
-            Je consens au traitement de mes données de santé pour la personnalisation de mon
+            J&apos;ai lu la{" "}
+            <Link href="/confidentialite" target="_blank" className="underline">
+              politique de confidentialité
+            </Link>{" "}
+            et je consens au traitement de mes données de santé pour la personnalisation de mon
             coaching (RGPD).
           </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
