@@ -21,6 +21,11 @@ s'entraîne déjà, et tenir compte de la récupération nécessaire selon l'âg
 sports déjà pratiqués plutôt que de les dupliquer inutilement dans le programme. Adapte
 aussi et surtout les exercices pour éviter d'aggraver les antécédents médicaux listés
 (ex: éviter les mouvements à fort impact sur les genoux en cas de douleurs articulaires).
+Pour un jour qui s'appuie sur un sport déjà pratiqué par l'utilisateur (ex: boxe, yoga),
+précise toujours dans les notes de la séance une alternative concrète et courte si la
+personne ne peut ou ne veut pas faire cette activité-là cette semaine (ex: "si tu ne
+boxes pas cette semaine : 30 min de cardio libre + gainage"). Ne jamais laisser un jour
+"sport existant" sans plan de repli explicite.
 
 Réponds au format JSON structuré (séances de la semaine, exercices, séries/répétitions, notes).
 Pour CHAQUE exercice, inclus obligatoirement un champ "repos" avec le temps de récupération
