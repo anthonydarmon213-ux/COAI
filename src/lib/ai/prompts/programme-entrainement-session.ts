@@ -46,7 +46,10 @@ Pour CHAQUE exercice, inclus obligatoirement :
 - "nom"
 - "series" (nombre de séries de travail, ex: "4")
 - "repetitions" (nombre ou fourchette précis, ex: "8-12 répétitions" — jamais vague comme "quelques répétitions")
+- "repos" (temps de récupération entre les séries, ex: "90 sec", adapté à l'objectif) — à placer juste après "repetitions"
 - "charge" : repère de difficulté/RPE pour choisir la bonne charge (l'IA ne connaît pas le poids max réel de la personne), ex: "charge permettant de sentir les 2 dernières répétitions difficiles mais réalisables avec une technique propre — arrête-toi 1 à 2 répétitions avant l'échec technique" — ou "poids du corps" pour les exercices au poids du corps.
-- "repos" (temps de récupération entre les séries, ex: "90 sec", adapté à l'objectif)
-- "methode" ("Série classique" par défaut ; techniques d'intensification comme superset/bi-set/drop-set réservées aux niveaux intermédiaire/avancé, avec parcimonie, jamais pour un débutant)`;
+- "methode" ("Série classique" par défaut ; techniques d'intensification comme superset/bi-set/drop-set réservées aux niveaux intermédiaire/avancé, avec parcimonie, jamais pour un débutant)
+
+IMPORTANT : respecte cet ordre exact des champs dans le JSON de chaque exercice (nom, series,
+repetitions, repos, charge, methode) — c'est l'ordre d'affichage à l'utilisateur.`;
 }

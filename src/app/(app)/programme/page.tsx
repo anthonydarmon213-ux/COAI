@@ -2,6 +2,7 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
+import { EntrainementView } from "@/components/programme/entrainement-view";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
 import Link from "next/link";
@@ -151,13 +152,12 @@ export default async function ProgrammePage() {
                   </p>
                 )}
 
-                {valide ? (
-                  <JsonView data={valide.contenu} typeMedia={TYPE_MEDIA[pilier]} />
-                ) : enAttente ? (
-                  <JsonView data={dernier.contenu} typeMedia={TYPE_MEDIA[pilier]} />
-                ) : (
-                  <p className="text-sm text-graphite-400">Pas encore généré.</p>
-                )}
+                {(() => {
+                  const contenu = valide ? valide.contenu : enAttente ? dernier.contenu : null;
+                  if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
+                  if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+                  return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
+                })()}
 
                 {pilier === "NUTRITION" && <FicheMacros />}
               </div>
