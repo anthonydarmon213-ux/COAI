@@ -12,7 +12,7 @@ export default function MentionsLegalesPage() {
           <br />
           <strong>Anthony Darmon, auto-entrepreneur</strong>
           <br />
-          SIRET : 5343854140030
+          SIRET : 53438541400030
           <br />
           Adresse : 27 rue de Cîteaux, 75012 Paris
           <br />

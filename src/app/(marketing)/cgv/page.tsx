@@ -13,7 +13,7 @@ export default function CgvPage() {
         <h2>1. Objet</h2>
         <p>
           Les présentes conditions générales de vente (CGV) régissent l&apos;abonnement aux
-          services proposés sur YUMAI par Anthony Darmon, auto-entrepreneur (SIRET 5343854140030).
+          services proposés sur YUMAI par Anthony Darmon, auto-entrepreneur (SIRET 53438541400030).
           Toute souscription à un abonnement payant implique l&apos;acceptation pleine et entière
           des présentes CGV.
         </p>
