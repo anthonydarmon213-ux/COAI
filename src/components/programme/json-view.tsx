@@ -92,7 +92,7 @@ export function JsonView({
 
           return (
             <div key={key} className="flex flex-wrap items-center gap-1.5 text-sm">
-              <span className="text-graphite-400">{label} :</span>
+              <span className="font-medium text-graphite-200">{label} :</span>
               <span className="text-graphite-50">{String(value)}</span>
               {media && (
                 <a

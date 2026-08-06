@@ -22,5 +22,10 @@ sports déjà pratiqués plutôt que de les dupliquer inutilement dans le progra
 aussi et surtout les exercices pour éviter d'aggraver les antécédents médicaux listés
 (ex: éviter les mouvements à fort impact sur les genoux en cas de douleurs articulaires).
 
-Réponds au format JSON structuré (séances de la semaine, exercices, séries/répétitions, notes).`;
+Réponds au format JSON structuré (séances de la semaine, exercices, séries/répétitions, notes).
+Inclus obligatoirement, en tout début de JSON et dans cet ordre :
+- "titre" : un titre court qui mentionne explicitement la fréquence hebdomadaire (ex: "Full Body — 4 séances/semaine").
+- "frequenceParSemaine" : la fréquence retenue, en toutes lettres (ex: "4 séances par semaine").
+- "vueEnsemble" : un court récapitulatif de la répartition sur la semaine, jour par jour ou séance par séance (ex: "Lundi : Haut du corps — Mercredi : Bas du corps — Vendredi : Full body — reste de la semaine : repos ou activité légère"), pour donner une vue d'ensemble avant le détail des séances.
+- "dureeProgramme" : "3 semaines, à réévaluer et ajuster ensuite selon la progression" (ce programme est prévu pour une durée de 3 semaines avant réajustement, pas plus).`;
 }
