@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/client";
 
 const bodySchema = z.object({
   consentRgpd: z.boolean(),
+  consentSante: z.boolean(),
   prenom: z.string().max(100).optional(),
 });
 
@@ -25,6 +26,9 @@ export async function POST(request: Request) {
   if (!parsed.data.consentRgpd) {
     return NextResponse.json({ error: "Consentement RGPD requis" }, { status: 400 });
   }
+  if (!parsed.data.consentSante) {
+    return NextResponse.json({ error: "Certification d'aptitude sportive requise" }, { status: 400 });
+  }
 
   const user = await prisma.user.upsert({
     where: { supabaseAuthId: authUser.id },
@@ -34,6 +38,7 @@ export async function POST(request: Request) {
       email: authUser.email,
       prenom: parsed.data.prenom || undefined,
       consentRgpdAt: new Date(),
+      consentSanteAt: new Date(),
     },
   });
 

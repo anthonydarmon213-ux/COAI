@@ -16,6 +16,9 @@ model User {
   prenom         String?
   phoneWhatsapp  String?   @unique
   consentRgpdAt  DateTime?
+  // Certification santé recueillie à l'inscription : l'utilisateur déclare
+  // être apte à la pratique sportive ou avoir consulté un médecin.
+  consentSanteAt DateTime?
   // Coach humain (Anthony Darmon) habilité à relire/valider les programmes
   // générés par l'IA avant qu'ils soient visibles par les abonnés.
   isAdmin        Boolean   @default(false)
