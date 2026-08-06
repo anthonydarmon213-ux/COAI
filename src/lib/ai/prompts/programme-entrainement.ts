@@ -38,6 +38,17 @@ les zones sollicitées par la séance, (3) pour le premier exercice de force, un
 (séries d'approche à charge croissante avant les séries de travail, ex: "50% x10, 70% x6, 85%
 x3" avant la première série au poids de travail). Ne jamais faire démarrer une séance
 directement à la charge de travail sans que le muscle soit préparé.
+Pour CHAQUE exercice, inclus obligatoirement un champ "series" (nombre de séries de travail,
+ex: "4") et un champ "repetitions" avec le nombre de répétitions ou la fourchette (ex: "8-12
+répétitions", "5 répétitions", "AMRAP"). Ne laisse jamais ces champs absents ou vagues (jamais
+juste "quelques répétitions").
+Pour CHAQUE exercice, inclus obligatoirement un champ "charge" donnant un repère concret pour
+choisir la bonne charge de travail, puisque le poids exact dépend du niveau réel de la personne
+que l'IA ne connaît pas : exprime-le en repère de difficulté/RPE (ex: "charge permettant de
+sentir les 2 dernières répétitions difficiles mais réalisables avec une technique propre — arrête-
+toi 1 à 2 répétitions avant l'échec technique") plutôt qu'en poids absolu, sauf pour les exercices
+au poids du corps où "charge" peut valoir "poids du corps" ou indiquer une variante plus/moins
+difficile.
 Pour CHAQUE exercice, inclus obligatoirement un champ "repos" avec le temps de récupération
 conseillé entre les séries (ex: "90 sec", "2 min"), adapté à l'objectif (repos plus court en
 endurance/perte de poids, plus long en force). Ne laisse jamais ce champ absent.
