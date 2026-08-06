@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -62,6 +63,12 @@ export default function SignUpPage() {
         <div className="flex flex-col gap-1">
           <SectionLabel>Inscription</SectionLabel>
           <h1 className="text-xl font-semibold text-graphite-50">Créer un compte</h1>
+        </div>
+        <GoogleSignInButton />
+        <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
+          <div className="h-px flex-1 bg-graphite-800" />
+          ou
+          <div className="h-px flex-1 bg-graphite-800" />
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Field label="Prénom">
