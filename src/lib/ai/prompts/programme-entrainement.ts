@@ -26,6 +26,11 @@ Réponds au format JSON structuré (séances de la semaine, exercices, séries/r
 Pour CHAQUE exercice, inclus obligatoirement un champ "repos" avec le temps de récupération
 conseillé entre les séries (ex: "90 sec", "2 min"), adapté à l'objectif (repos plus court en
 endurance/perte de poids, plus long en force). Ne laisse jamais ce champ absent.
+Pour CHAQUE exercice, inclus aussi un champ "methode" précisant la méthode de musculation
+utilisée (ex: "Série classique", "Superset avec l'exercice suivant", "Bi-set", "Drop-set",
+"Rest-pause", "Tri-set"). Utilise "Série classique" par défaut et réserve les techniques
+d'intensification (superset, bi-set, drop-set...) aux profils niveau intermédiaire/avancé et
+avec parcimonie, jamais pour un débutant.
 Inclus obligatoirement, en tout début de JSON et dans cet ordre :
 - "titre" : un titre court qui mentionne explicitement la fréquence hebdomadaire (ex: "Full Body — 4 séances/semaine").
 - "frequenceParSemaine" : la fréquence retenue, en toutes lettres (ex: "4 séances par semaine").
