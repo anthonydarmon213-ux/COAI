@@ -1,23 +1,59 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
-import { generateWithAI } from "@/lib/ai/client";
-import { buildProgrammeEntrainementPrompt } from "@/lib/ai/prompts/programme-entrainement";
+import { generateWithAI, type ProfilUtilisateur } from "@/lib/ai/client";
+import {
+  buildProgrammeEntrainementStructurePrompt,
+  type StructureEntrainement,
+} from "@/lib/ai/prompts/programme-entrainement-structure";
+import { buildProgrammeEntrainementSessionPrompt } from "@/lib/ai/prompts/programme-entrainement-session";
 import { buildProgrammeNutritionPrompt } from "@/lib/ai/prompts/programme-nutrition";
 import { buildProgrammeRecuperationPrompt } from "@/lib/ai/prompts/programme-recuperation";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
 import type { Pilier } from "@prisma/client";
 
-const PROMPT_BUILDERS: Record<Pilier, typeof buildProgrammeEntrainementPrompt> = {
-  ENTRAINEMENT: buildProgrammeEntrainementPrompt,
-  NUTRITION: buildProgrammeNutritionPrompt,
-  RECUPERATION: buildProgrammeRecuperationPrompt,
-};
-
-// Les 3 piliers sont générés en parallèle par l'IA (appels Claude avec un
+// Les piliers sont générés en parallèle par l'IA (appels Claude avec un
 // max_tokens élevé) : ça peut dépasser la limite par défaut des fonctions
-// Vercel (10s). On étend explicitement le délai autorisé.
+// Vercel (10s). On étend explicitement le délai autorisé (60s, plafond du
+// plan Hobby).
 export const maxDuration = 60;
+
+// ENTRAÎNEMENT est généré en 2 étapes (structure rapide, puis le détail de
+// chaque séance en parallèle) au lieu d'un seul gros appel : avec tout le
+// niveau de détail demandé par séance (échauffement, méthode, répétitions,
+// charge...), un appel unique dépassait 60s (mesuré ~76s) et provoquait un
+// timeout Vercel. NUTRITION et RÉCUPÉRATION restent des appels simples,
+// nettement plus courts (~34s mesuré pour NUTRITION).
+async function genererEntrainement(profil: ProfilUtilisateur) {
+  const structure = await generateWithAI<StructureEntrainement>(
+    buildProgrammeEntrainementStructurePrompt(profil)
+  );
+
+  const seances = await Promise.all(
+    structure.jours.map((jour) =>
+      generateWithAI(buildProgrammeEntrainementSessionPrompt(profil, jour))
+    )
+  );
+
+  return {
+    titre: structure.titre,
+    frequenceParSemaine: structure.frequenceParSemaine,
+    vueEnsemble: structure.vueEnsemble,
+    dureeProgramme: structure.dureeProgramme,
+    seances,
+  };
+}
+
+async function genererPilier(pilier: Pilier, profil: ProfilUtilisateur) {
+  switch (pilier) {
+    case "ENTRAINEMENT":
+      return genererEntrainement(profil);
+    case "NUTRITION":
+      return generateWithAI(buildProgrammeNutritionPrompt(profil));
+    case "RECUPERATION":
+      return generateWithAI(buildProgrammeRecuperationPrompt(profil));
+  }
+}
 
 // Génère dynamiquement les 3 piliers du programme (pas de bibliothèque
 // pré-construite — décision actée) à partir du Profile courant de l'utilisateur.
@@ -56,12 +92,11 @@ export async function POST() {
     qualiteSommeil: user.profile?.qualiteSommeil,
   };
 
-  const piliers = Object.keys(PROMPT_BUILDERS) as Pilier[];
+  const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
 
   const resultats = await Promise.allSettled(
     piliers.map(async (pilier) => {
-      const prompt = PROMPT_BUILDERS[pilier](profil);
-      const contenu = await generateWithAI(prompt);
+      const contenu = await genererPilier(pilier, profil);
       return prisma.programmeGenerated.create({
         data: { userId: user.id, pilier, contenu: contenu as object },
       });
