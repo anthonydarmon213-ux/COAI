@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -68,11 +69,11 @@ export default function LandingPage() {
           <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
             Un coaching augmenté par l&apos;IA, supervisé par un vrai coach avec 17 ans
             d&apos;expérience. L&apos;IA génère, l&apos;humain valide — rien ne t&apos;est
-            envoyé sans passer par moi.
+            envoyé sans passer par moi. Disponible dès aujourd&apos;hui.
           </p>
-          <a href="#membres-fondateurs">
-            <Button>Rejoindre la liste prioritaire</Button>
-          </a>
+          <Link href="/sign-up">
+            <Button>Commencer</Button>
+          </Link>
         </div>
       </section>
 
@@ -177,9 +178,9 @@ export default function LandingPage() {
           Offre de lancement : <span className="line-through text-graphite-500">89€</span>{" "}
           49€/mois, sans engagement.
         </p>
-        <a href="#membres-fondateurs">
-          <Button>Rejoindre la liste prioritaire</Button>
-        </a>
+        <Link href="/sign-up">
+          <Button>Commencer</Button>
+        </Link>
       </section>
     </main>
   );
