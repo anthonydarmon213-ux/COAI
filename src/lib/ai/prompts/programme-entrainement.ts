@@ -23,6 +23,9 @@ aussi et surtout les exercices pour éviter d'aggraver les antécédents médica
 (ex: éviter les mouvements à fort impact sur les genoux en cas de douleurs articulaires).
 
 Réponds au format JSON structuré (séances de la semaine, exercices, séries/répétitions, notes).
+Pour CHAQUE exercice, inclus obligatoirement un champ "repos" avec le temps de récupération
+conseillé entre les séries (ex: "90 sec", "2 min"), adapté à l'objectif (repos plus court en
+endurance/perte de poids, plus long en force). Ne laisse jamais ce champ absent.
 Inclus obligatoirement, en tout début de JSON et dans cet ordre :
 - "titre" : un titre court qui mentionne explicitement la fréquence hebdomadaire (ex: "Full Body — 4 séances/semaine").
 - "frequenceParSemaine" : la fréquence retenue, en toutes lettres (ex: "4 séances par semaine").
