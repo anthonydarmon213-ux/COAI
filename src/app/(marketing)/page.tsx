@@ -33,56 +33,58 @@ const FAQ = [
 
 const PILIERS = [
   {
-    titre: "Coaching",
+    numero: "01",
+    titre: "Un programme vraiment personnel",
     description:
-      "Un programme généré spécifiquement pour toi à partir de ton profil (objectifs, niveau, équipement, contraintes) — entraînement, nutrition, récupération. Jamais un programme générique recyclé.",
+      "Entraînement, nutrition et récupération construits autour de ton niveau, de tes objectifs et de tes contraintes.",
   },
   {
-    titre: "Suivi",
+    numero: "02",
+    titre: "Une progression visible",
     description:
-      "Journal de séances, mesures corporelles et photos de progression, avec des graphiques pour voir concrètement ton évolution dans le temps.",
+      "Tes séances, tes mesures et tes progrès réunis dans un suivi simple qui évolue avec toi.",
   },
   {
-    titre: "IA",
+    numero: "03",
+    titre: "Une présence au quotidien",
     description:
-      "Un assistant disponible 24/7 sur WhatsApp pour répondre à tes questions et t'accompagner au quotidien, entre deux séances.",
+      "L’IA t’accompagne à tout moment. Anthony supervise la méthode et valide ce qui compte.",
   },
 ];
 
 export default function LandingPage() {
   return (
     <main className="bg-lab-grid flex flex-col">
-      <section className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-24 sm:px-10 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
+      <section className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
         <div className="relative z-10 max-w-3xl">
           <SectionLabel>Le coaching humain, augmenté</SectionLabel>
-          <h1 className="mt-6 font-editorial text-[clamp(3.4rem,7vw,7rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white">
-            Votre coaching.<br /><span className="italic text-laiton-300">Augmenté</span> par<br className="hidden sm:block" /> l’intelligence.
+          <h1 className="mt-7 max-w-4xl font-display text-[clamp(3rem,6.4vw,6.4rem)] font-semibold leading-[0.96] tracking-[-0.055em] text-white">
+            Comprendre.<br />Progresser. <span className="yumai-gradient-text">Durer.</span>
           </h1>
-          <p className="mt-8 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">Entraînement, nutrition, récupération et suivi réunis dans une expérience conçue par Anthony Darmon et personnalisée par l’IA.</p>
+          <p className="mt-8 max-w-xl text-base leading-7 text-graphite-200 sm:text-lg">Ton coaching personnalisé par l’IA, construit sur 17 ans d’expertise humaine.</p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Créer mon espace gratuit</Button></Link>
             <a href="#piliers"><Button variant="secondary" className="px-7 py-3">Découvrir la méthode</Button></a>
           </div>
-          <p className="mt-6 flex items-center gap-2 text-xs text-graphite-500"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />IA disponible maintenant · validation humaine incluse</p>
+          <p className="mt-6 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />IA disponible maintenant · validation humaine incluse</p>
         </div>
         <div className="relative flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
           <div className="yumai-orb" aria-hidden="true" />
           <div className="absolute bottom-8 left-1/2 w-[min(92%,28rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/60 p-4 shadow-2xl backdrop-blur-xl lg:bottom-10 lg:left-0 lg:translate-x-0">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3"><div><p className="font-mono text-[0.58rem] uppercase tracking-widest text-laiton-400">Programme adaptatif</p><p className="mt-1 text-sm text-white">Semaine optimisée par YUMAI</p></div><span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-[0.65rem] text-laiton-300">Validé</span></div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">{[["4","séances"],["82%","récupération"],["+12","progression"]].map(([value,label]) => <div key={label} className="rounded-xl bg-white/[0.04] p-3"><p className="font-editorial text-xl text-white">{value}</p><p className="mt-1 text-[0.58rem] uppercase tracking-wide text-graphite-500">{label}</p></div>)}</div>
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-laiton-400">Programme adaptatif</p><p className="mt-1.5 text-sm font-medium text-white">Semaine optimisée par YUMAI</p></div><span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-xs font-medium text-laiton-300">Validé</span></div>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center">{[["4","séances"],["82%","récupération"],["+12","progression"]].map(([value,label]) => <div key={label} className="rounded-xl bg-white/[0.04] p-3"><p className="text-xl font-semibold text-white">{value}</p><p className="mt-1 text-[0.65rem] font-medium uppercase tracking-wide text-graphite-400">{label}</p></div>)}</div>
           </div>
         </div>
       </section>
 
       {/* Positionnement */}
-      <section className="mx-auto max-w-3xl border-y border-white/[0.07] px-6 py-20 text-center">
+      <section className="mx-auto w-full max-w-5xl border-y border-white/[0.07] px-6 py-20 text-center sm:py-24">
         <SectionLabel>Le constat</SectionLabel>
-        <p className="mt-3 text-lg text-graphite-200">
-          Tu veux progresser sérieusement, mais tu n&apos;es pas encore prêt à investir
-          dans un coaching 1-to-1. Le coaching augmenté te donne un vrai point de départ :
-          un programme pensé pour toi, un suivi structuré, et un accompagnement
-          disponible à tout moment — sans le prix ni l&apos;engagement d&apos;un coach
-          personnel.
+        <h2 className="mx-auto mt-6 max-w-4xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+          Un accompagnement sérieux, sans la complexité ni le prix du coaching individuel.
+        </h2>
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+          Un programme clair, un suivi structuré et des réponses quand tu en as besoin.
         </p>
       </section>
 
@@ -90,20 +92,19 @@ export default function LandingPage() {
       <section id="piliers" className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-6 py-24">
         <div className="text-center">
           <SectionLabel>Ce que tu obtiens</SectionLabel>
-          <h2 className="mt-4 font-editorial text-4xl font-normal tracking-tight text-graphite-50 sm:text-6xl">Tout ce qui compte pour progresser, enfin réuni.</h2>
+          <h2 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">Tout ce qui compte pour progresser, enfin réuni.</h2>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {PILIERS.map((pilier) => (
             <Card
               key={pilier.titre}
-            className="flex min-h-64 flex-col items-center justify-center gap-5 px-8 text-center"
+            className="flex min-h-72 flex-col items-start justify-between gap-8 px-7 py-8 text-left"
             >
-              <h3 className="font-editorial text-3xl font-normal tracking-wide text-laiton-300">
-                {pilier.titre}
-              </h3>
-              <p className="max-w-xs text-base leading-7 text-graphite-300">
-                {pilier.description}
-              </p>
+              <span className="text-sm font-semibold text-laiton-400">{pilier.numero}</span>
+              <div>
+                <h3 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-white">{pilier.titre}</h3>
+                <p className="mt-4 text-base leading-7 text-graphite-300">{pilier.description}</p>
+              </div>
             </Card>
           ))}
         </div>
@@ -121,7 +122,7 @@ export default function LandingPage() {
         </div>
         <div className="flex flex-col items-center gap-5 md:items-start">
           <SectionLabel>La méthode</SectionLabel>
-          <h2 className="font-editorial text-4xl font-normal tracking-tight text-graphite-50 sm:text-6xl">
+          <h2 className="font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
             L&apos;IA ne remplace pas l&apos;expertise. Elle l&apos;amplifie.
           </h2>
           <p className="max-w-md text-base leading-7 text-graphite-300">
@@ -140,22 +141,21 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Early adopters */}
+      {/* Accès aux offres */}
       <section
-        id="membres-fondateurs"
+        id="offres"
         className="mx-auto my-16 flex w-[calc(100%-3rem)] max-w-3xl flex-col items-center gap-6 rounded-[2rem] border border-laiton-400/20 bg-white/[0.035] px-6 py-12 text-center shadow-[0_40px_120px_-60px_rgba(201,162,98,0.35)] backdrop-blur sm:px-12 sm:py-16"
       >
-        <SectionLabel>Accès en avant-première</SectionLabel>
-        <h2 className="font-editorial text-4xl font-normal tracking-tight text-graphite-50 sm:text-5xl">
-          Membres fondateurs YUMAI
+        <SectionLabel>Choisis ton accompagnement</SectionLabel>
+        <h2 className="font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">
+          Commence à ton rythme.
         </h2>
-        <p className="max-w-lg text-graphite-300">
-          Rejoins les premiers membres de YUMAI : ton tarif de lancement à 49€/mois reste
-          garanti tant que ton abonnement est actif, même quand les prix évolueront pour les
-          nouveaux inscrits.
+        <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
+          Crée gratuitement ton espace et ton suivi. Quand tu es prêt, active ton programme
+          personnalisé par l&apos;IA et validé par Anthony, à partir de 49€/mois sans engagement.
         </p>
-        <Link href="/sign-up">
-          <Button>Devenir membre fondateur</Button>
+        <Link href="/pricing">
+          <Button>Découvrir les offres</Button>
         </Link>
       </section>
 
@@ -169,7 +169,7 @@ export default function LandingPage() {
             <Card key={item.question}>
               <details>
                 <summary className="cursor-pointer list-none text-sm font-medium text-graphite-50 marker:content-none">
-                  {item.question}
+                  <span className="text-base font-semibold">{item.question}</span>
                 </summary>
                 <p className="mt-3 text-sm text-graphite-300">{item.reponse}</p>
               </details>
@@ -180,11 +180,10 @@ export default function LandingPage() {
 
       {/* CTA final */}
       <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 py-24 text-center">
-        <h2 className="font-editorial text-4xl font-normal text-graphite-50 sm:text-5xl">Prêt à commencer ?</h2>
+        <h2 className="font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Prêt à commencer ?</h2>
         <p className="text-graphite-300">
-          Crée ton compte gratuitement, puis passe à ton rythme au programme généré par IA à
-          partir de <span className="line-through text-graphite-500">89€</span> 49€/mois, sans
-          engagement.
+          Crée ton compte gratuitement, puis active ton programme personnalisé à partir de
+          49€/mois, sans engagement.
         </p>
         <Link href="/sign-up">
           <Button>Commencer</Button>
