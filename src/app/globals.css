@@ -4,7 +4,9 @@
 
 body {
   @apply bg-graphite-950 text-graphite-50 antialiased;
-  background-color: #090a0b;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(201, 162, 98, 0.1), transparent 38rem),
+    #090a0b;
 }
 
 h1,
@@ -35,8 +37,37 @@ h3 {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.025), transparent);
-  mask-image: linear-gradient(to bottom, black, transparent 78%);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.14) 0.5px, transparent 0.5px);
+  background-size: 20px 20px;
+  mask-image: linear-gradient(to bottom, black, transparent 60%);
+  opacity: 0.15;
+}
+
+.yumai-orb {
+  position: relative;
+  width: min(64vw, 27rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.92), rgba(221,193,145,.5) 5%, transparent 14%),
+    radial-gradient(circle at 65% 62%, #c9a262 0%, #7e5b2c 24%, #202126 58%, #090a0b 74%);
+  box-shadow: inset -2.5rem -3rem 5rem rgba(0,0,0,.82), inset 1.5rem 1.5rem 4rem rgba(255,255,255,.08), 0 0 7rem rgba(201,162,98,.17);
+}
+
+.yumai-orb::before,
+.yumai-orb::after {
+  position: absolute;
+  inset: -7%;
+  content: "";
+  border: 1px solid rgba(221, 193, 145, 0.22);
+  border-radius: 50%;
+  transform: rotate(-18deg) scaleY(.36);
+}
+
+.yumai-orb::after {
+  inset: -13%;
+  border-color: rgba(255,255,255,.08);
+  transform: rotate(24deg) scaleY(.62);
 }
 
 html {

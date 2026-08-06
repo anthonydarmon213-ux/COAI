@@ -4,9 +4,9 @@ import { AppNav } from "@/components/app-nav";
 // est assurée par src/middleware.ts.
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-graphite-950 text-graphite-50 md:flex-row">
+    <div className="flex min-h-screen flex-col bg-[#090a0b] text-graphite-50 md:flex-row">
       <AppNav />
-      <div className="mx-auto w-full max-w-3xl px-6 py-10">{children}</div>
+      <main className="relative min-w-0 flex-1 overflow-hidden"><div className="pointer-events-none absolute -right-40 -top-48 h-[32rem] w-[32rem] rounded-full bg-laiton-400/[0.06] blur-3xl" /><div className="relative mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 sm:py-12 lg:px-12">{children}</div></main>
     </div>
   );
 }

@@ -49,19 +49,20 @@ export default async function DashboardPage() {
   const programmeCount = dernieresGenerations.filter(Boolean).length;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-2 border-b border-white/[0.07] pb-7">
         <SectionLabel>Vue d&apos;ensemble</SectionLabel>
-        <h1 className="text-2xl font-semibold">
-          {user.prenom ? `Bonjour ${user.prenom}` : "Tableau de bord"}
+        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
+          {user.prenom ? `Bonjour ${user.prenom}.` : "Votre progression commence ici."}
         </h1>
+        <p className="max-w-2xl text-sm leading-6 text-graphite-400">YUMAI réunit vos programmes, votre suivi et les recommandations validées par Anthony.</p>
       </div>
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 
       <div className="flex flex-col gap-3">
         <SectionLabel>Vue du jour</SectionLabel>
-        <Card className="flex flex-wrap justify-around gap-6 py-6">
+        <Card className="flex flex-wrap justify-around gap-8 py-8">
           {piliers.map((pilier, i) => {
             const { percent, sublabel } = statutVersPourcent(
               dernieresGenerations[i]?.statut ?? null
@@ -79,25 +80,25 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card>
+        <Card className="min-h-32">
           <h2 className="font-mono text-xs uppercase tracking-wider text-graphite-400">
             Dernière séance
           </h2>
-          <p className="mt-1 text-laiton-400">
+          <p className="mt-5 font-editorial text-2xl text-graphite-50">
             {derniereSeance ? derniereSeance.date.toISOString().slice(0, 10) : "Aucune séance loguée"}
           </p>
         </Card>
-        <Card>
+        <Card className="min-h-32">
           <h2 className="font-mono text-xs uppercase tracking-wider text-graphite-400">
             Dernière mesure
           </h2>
-          <p className="mt-1 text-laiton-400">
+          <p className="mt-5 font-editorial text-2xl text-graphite-50">
             {derniereMesure?.poidsKg ? `${derniereMesure.poidsKg} kg` : "Aucune mesure enregistrée"}
           </p>
         </Card>
       </div>
-      <a href="/programme" className="text-laiton-400 underline">
-        Voir mon programme
+      <a href="/programme" className="group flex items-center justify-between rounded-2xl border border-laiton-400/20 bg-laiton-400/[0.06] px-6 py-5 text-sm text-laiton-300 transition hover:bg-laiton-400/[0.1]">
+        <span>Voir mon profil et mon programme personnalisé</span><span className="transition group-hover:translate-x-1">→</span>
       </a>
       <CoachingVisioCta plan={getEffectivePlan(user.subscription)} />
     </div>
