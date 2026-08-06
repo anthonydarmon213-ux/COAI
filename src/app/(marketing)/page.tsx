@@ -131,6 +131,14 @@ export default function LandingPage() {
             spécialiste des dirigeants et entrepreneurs. Le coaching augmenté s&apos;appuie
             sur cette méthode pour générer ton programme, sans attendre le coaching 1-to-1.
           </p>
+          <a
+            href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-laiton-400 underline hover:text-laiton-300"
+          >
+            Découvrir THE METHOD (coaching 1-to-1 en présentiel ou à distance) →
+          </a>
         </div>
       </section>
 
