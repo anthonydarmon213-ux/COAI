@@ -16,6 +16,11 @@ const KNOWN_LABELS: Record<string, string> = {
   dureeProgramme: "Durée du programme",
   objectifsJournaliers: "Objectifs journaliers",
   quantite: "Quantité",
+  mobiliteEtirements: "Mobilité / étirements",
+  gestionFatigue: "Gestion de la fatigue",
+  constatActuel: "Constat actuel",
+  proteines: "Protéines",
+  lipides: "Lipides",
 };
 
 function humanizeKey(key: string): string {

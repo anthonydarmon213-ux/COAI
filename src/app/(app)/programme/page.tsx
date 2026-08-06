@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { JsonView } from "@/components/programme/json-view";
 import { EntrainementView } from "@/components/programme/entrainement-view";
+import { NutritionView } from "@/components/programme/nutrition-view";
+import { RecuperationView } from "@/components/programme/recuperation-view";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
 import Link from "next/link";
@@ -156,6 +158,8 @@ export default async function ProgrammePage() {
                   const contenu = valide ? valide.contenu : enAttente ? dernier.contenu : null;
                   if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
                   if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+                  if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
+                  if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
                   return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
                 })()}
 

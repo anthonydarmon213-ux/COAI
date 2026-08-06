@@ -6,8 +6,16 @@ import {
   type StructureEntrainement,
 } from "@/lib/ai/prompts/programme-entrainement-structure";
 import { buildProgrammeEntrainementSessionPrompt } from "@/lib/ai/prompts/programme-entrainement-session";
-import { buildProgrammeNutritionPrompt } from "@/lib/ai/prompts/programme-nutrition";
-import { buildProgrammeRecuperationPrompt } from "@/lib/ai/prompts/programme-recuperation";
+import {
+  buildProgrammeNutritionStructurePrompt,
+  type StructureNutrition,
+} from "@/lib/ai/prompts/programme-nutrition-structure";
+import { buildProgrammeNutritionJourPrompt } from "@/lib/ai/prompts/programme-nutrition-jour";
+import {
+  buildProgrammeRecuperationStructurePrompt,
+  type StructureRecuperation,
+} from "@/lib/ai/prompts/programme-recuperation-structure";
+import { buildProgrammeRecuperationJourPrompt } from "@/lib/ai/prompts/programme-recuperation-jour";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
 import type { Pilier } from "@prisma/client";
@@ -18,12 +26,14 @@ import type { Pilier } from "@prisma/client";
 // plan Hobby).
 export const maxDuration = 60;
 
-// ENTRAÎNEMENT est généré en 2 étapes (structure rapide, puis le détail de
-// chaque séance en parallèle) au lieu d'un seul gros appel : avec tout le
-// niveau de détail demandé par séance (échauffement, méthode, répétitions,
-// charge...), un appel unique dépassait 60s (mesuré ~76s) et provoquait un
-// timeout Vercel. NUTRITION et RÉCUPÉRATION restent des appels simples,
-// nettement plus courts (~34s mesuré pour NUTRITION).
+// Les 3 piliers sont générés en 2 étapes (structure rapide, puis le détail
+// de chaque jour en parallèle) au lieu d'un seul gros appel par pilier :
+// avec le niveau de détail demandé par jour, un appel unique par pilier
+// dépassait 60s (mesuré ~76s pour ENTRAÎNEMENT) et provoquait un timeout
+// Vercel. Les appels "détail d'un jour" restent, eux, individuellement
+// courts (mesuré ~34s pour un appel nutrition équivalent) et tournent en
+// parallèle via Promise.all — la latence totale reste bornée par le plus
+// lent des appels du jour, pas par leur somme.
 async function genererEntrainement(profil: ProfilUtilisateur) {
   const structure = await generateWithAI<StructureEntrainement>(
     buildProgrammeEntrainementStructurePrompt(profil)
@@ -44,14 +54,50 @@ async function genererEntrainement(profil: ProfilUtilisateur) {
   };
 }
 
+async function genererNutrition(profil: ProfilUtilisateur) {
+  const structure = await generateWithAI<StructureNutrition>(
+    buildProgrammeNutritionStructurePrompt(profil)
+  );
+
+  const jours = await Promise.all(
+    structure.jours.map((jour) => generateWithAI(buildProgrammeNutritionJourPrompt(profil, jour)))
+  );
+
+  return {
+    titre: structure.titre,
+    vueEnsemble: structure.vueEnsemble,
+    objectifsJournaliers: structure.objectifsJournaliers,
+    conseilsHabitudes: structure.conseilsHabitudes,
+    jours,
+  };
+}
+
+async function genererRecuperation(profil: ProfilUtilisateur) {
+  const structure = await generateWithAI<StructureRecuperation>(
+    buildProgrammeRecuperationStructurePrompt(profil)
+  );
+
+  const jours = await Promise.all(
+    structure.jours.map((jour) =>
+      generateWithAI(buildProgrammeRecuperationJourPrompt(profil, jour))
+    )
+  );
+
+  return {
+    titre: structure.titre,
+    vueEnsemble: structure.vueEnsemble,
+    jours,
+  };
+}
+
 async function genererPilier(pilier: Pilier, profil: ProfilUtilisateur) {
   switch (pilier) {
     case "ENTRAINEMENT":
       return genererEntrainement(profil);
     case "NUTRITION":
-      return generateWithAI(buildProgrammeNutritionPrompt(profil));
+      return genererNutrition(profil);
     case "RECUPERATION":
-      return generateWithAI(buildProgrammeRecuperationPrompt(profil));
+      return genererRecuperation(profil);
   }
 }
 
