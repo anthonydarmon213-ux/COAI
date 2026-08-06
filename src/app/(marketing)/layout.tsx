@@ -16,7 +16,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                 HI × AI™
               </span>
             </span>
-            <span className="mt-1.5 font-editorial text-sm italic tracking-wide text-graphite-200 transition group-hover:text-white sm:text-base">
+            <span className="mt-1.5 text-xs font-medium tracking-wide text-graphite-200 transition group-hover:text-white sm:text-sm">
               AI generates. Humans validate.
             </span>
             <span className="mt-0.5 hidden text-[0.6rem] tracking-wide text-graphite-500 sm:block">
