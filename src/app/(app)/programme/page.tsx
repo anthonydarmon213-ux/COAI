@@ -73,66 +73,58 @@ export default async function ProgrammePage() {
         et de son adéquation avec ton état de santé, y compris en cas de blessure.
       </p>
 
-      {/* Profil */}
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Mon profil</SectionLabel>
-        <Card className="flex flex-col gap-5 p-6 sm:p-8">
-          <ProfilCompletion remplis={remplis} total={total} />
-          <ProfilForm
-            profil={{
-              objectifs: user.profile?.objectifs,
-              niveau: user.profile?.niveau,
-              equipementDisponible: user.profile?.equipementDisponible,
-              contraintesSante: user.profile?.contraintesSante,
-              antecedentsMedicaux: user.profile?.antecedentsMedicaux,
-              tailleCm: user.profile?.tailleCm,
-              age: user.profile?.age,
-              sexe: user.profile?.sexe,
-              morphologie: user.profile?.morphologie,
-              frequenceEntrainement: user.profile?.frequenceEntrainement,
-              sportsPratiques: user.profile?.sportsPratiques,
-              habitudesAlimentaires: user.profile?.habitudesAlimentaires,
-              repasParJour: user.profile?.repasParJour,
-              hydratation: user.profile?.hydratation,
-              consommationCafe: user.profile?.consommationCafe,
-              consommationAlcool: user.profile?.consommationAlcool,
-              qualiteSommeil: user.profile?.qualiteSommeil,
-            }}
-          />
-        </Card>
-      </div>
-
-      {/* Séparateur intuitif entre le formulaire et le résultat généré */}
-      <div className="flex items-center gap-4">
-        <div className="h-px flex-1 bg-graphite-800" />
-        <span className="whitespace-nowrap font-mono text-xs uppercase tracking-widest text-laiton-400">
-          ↓ Généré à partir de ce profil
-        </span>
-        <div className="h-px flex-1 bg-graphite-800" />
-      </div>
-
-      {/* Programme */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <SectionLabel>Mon programme</SectionLabel>
-          {plan !== "GRATUIT" && <RegenerateButton hasExisting={hasExisting} />}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
+        {/* Profil */}
+        <div className="flex flex-col gap-3">
+          <SectionLabel>Votre profil</SectionLabel>
+          <Card className="flex flex-col gap-5 p-6 sm:p-8">
+            <ProfilCompletion remplis={remplis} total={total} />
+            <ProfilForm
+              profil={{
+                objectifs: user.profile?.objectifs,
+                niveau: user.profile?.niveau,
+                equipementDisponible: user.profile?.equipementDisponible,
+                contraintesSante: user.profile?.contraintesSante,
+                antecedentsMedicaux: user.profile?.antecedentsMedicaux,
+                tailleCm: user.profile?.tailleCm,
+                age: user.profile?.age,
+                sexe: user.profile?.sexe,
+                morphologie: user.profile?.morphologie,
+                frequenceEntrainement: user.profile?.frequenceEntrainement,
+                sportsPratiques: user.profile?.sportsPratiques,
+                habitudesAlimentaires: user.profile?.habitudesAlimentaires,
+                repasParJour: user.profile?.repasParJour,
+                hydratation: user.profile?.hydratation,
+                consommationCafe: user.profile?.consommationCafe,
+                consommationAlcool: user.profile?.consommationAlcool,
+                qualiteSommeil: user.profile?.qualiteSommeil,
+              }}
+            />
+          </Card>
         </div>
 
-        {plan === "GRATUIT" ? (
-          <Card className="flex flex-col items-start gap-3">
-            <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
-            <p className="text-sm text-graphite-300">
-              Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
-              programme IA — entraînement, nutrition, récupération — relu et validé par Anthony
-              Darmon.
-            </p>
-            <Link href="/pricing">
-              <Button>Voir les offres</Button>
-            </Link>
-          </Card>
-        ) : (
-        <Card className="flex flex-col gap-8 p-6 sm:p-8">
-          {piliers.map((pilier, i) => {
+        {/* Programme */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <SectionLabel>Votre programme</SectionLabel>
+            {plan !== "GRATUIT" && <RegenerateButton hasExisting={hasExisting} />}
+          </div>
+
+          {plan === "GRATUIT" ? (
+            <Card className="flex flex-col items-start gap-3">
+              <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
+              <p className="text-sm text-graphite-300">
+                Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
+                programme IA — entraînement, nutrition, récupération — relu et validé par Anthony
+                Darmon.
+              </p>
+              <Link href="/pricing">
+                <Button>Voir les offres</Button>
+              </Link>
+            </Card>
+          ) : (
+          <Card className="flex flex-col gap-8 p-6 sm:p-8">
+            {piliers.map((pilier, i) => {
             const valide = derniersValides[i];
             const dernier = dernieresGenerations[i];
             const enAttente = dernier && dernier.statut === "EN_ATTENTE";
@@ -180,8 +172,9 @@ export default async function ProgrammePage() {
               </div>
             );
           })}
-        </Card>
-        )}
+          </Card>
+          )}
+        </div>
       </div>
 
       <CoachingVisioCta plan={plan} />

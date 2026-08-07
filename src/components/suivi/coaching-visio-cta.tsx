@@ -16,7 +16,7 @@ export function CoachingVisioCta({ plan: _plan }: { plan?: EffectivePlan } = {})
     <div className="group relative flex flex-col gap-2 overflow-hidden rounded-lg border border-graphite-800 bg-graphite-900/40 p-5">
       <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-laiton-500/10 blur-2xl transition group-hover:bg-laiton-500/20" />
       <span className="font-mono text-xs uppercase tracking-widest text-laiton-400">
-        Coaching VIP · Présentiel ou visio
+        Coaching VIP · Places limitées
       </span>
       <p className="text-sm text-graphite-200">
         Un besoin plus poussé que ce que le programme couvre ? Réserve une séance individuelle

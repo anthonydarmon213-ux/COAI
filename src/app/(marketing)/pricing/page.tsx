@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
@@ -17,6 +18,7 @@ type Tier = {
   // Palier VIP : tarifs à la séance plutôt qu'un abonnement mensuel — pas
   // de bouton d'abonnement Stripe, juste une réservation via WhatsApp.
   sessions?: { label: string; prix: string }[];
+  limitedSpots?: boolean;
 };
 
 const VIP_MESSAGE =
@@ -66,6 +68,7 @@ const TIERS: Tier[] = [
       { label: "Présentiel — Paris centre (1h)", prix: "200€" },
       { label: "Visio (1h)", prix: "100€" },
     ],
+    limitedSpots: true,
   },
 ];
 
@@ -97,6 +100,7 @@ export default function PricingPage() {
                 Le plus choisi
               </span>
             )}
+            {tier.limitedSpots && <Badge tone="warning">Places limitées</Badge>}
             <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{tier.nom}</h2>
             {tier.sessions ? (
               <p className="text-lg font-semibold text-white">{tier.prix}</p>

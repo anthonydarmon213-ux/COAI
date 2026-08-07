@@ -65,9 +65,12 @@ export default async function AbonnementPage() {
       </Card>
 
       <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
-          Aller plus loin
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
+            Aller plus loin
+          </span>
+          <Badge tone="warning">Places limitées</Badge>
+        </div>
         <h2 className="text-lg font-semibold text-graphite-50">Coaching VIP avec Anthony Darmon</h2>
         <p className="text-sm text-graphite-300">
           Une séance individuelle avec Anthony, en plus de ton programme — présentiel à Paris
