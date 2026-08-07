@@ -5,8 +5,6 @@ import { JsonView } from "@/components/programme/json-view";
 import { EntrainementView } from "@/components/programme/entrainement-view";
 import { NutritionView } from "@/components/programme/nutrition-view";
 import { RecuperationView } from "@/components/programme/recuperation-view";
-import { ProfilForm } from "@/components/compte/profil-form";
-import { ProfilCompletion } from "@/components/compte/profil-completion";
 import Link from "next/link";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { FicheMacros } from "@/components/programme/fiche-macros";
@@ -14,7 +12,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
-import { computeProfilCompletion } from "@/lib/profil/completion";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
@@ -54,7 +51,6 @@ export default async function ProgrammePage() {
   ]);
 
   const hasExisting = dernieresGenerations.some(Boolean);
-  const { remplis, total } = computeProfilCompletion(user.profile);
   const plan = getEffectivePlan(user.subscription);
 
   return (
@@ -73,117 +69,89 @@ export default async function ProgrammePage() {
         et de son adéquation avec ton état de santé, y compris en cas de blessure.
       </p>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start md:divide-x md:divide-graphite-700">
-        {/* Profil */}
-        <div id="profil" className="flex flex-col gap-3 scroll-mt-24">
-          <SectionLabel>Votre profil</SectionLabel>
-          <Card className="flex flex-col gap-5 p-6 sm:p-8">
-            <ProfilCompletion remplis={remplis} total={total} />
-            <ProfilForm
-              profil={{
-                objectifs: user.profile?.objectifs,
-                niveau: user.profile?.niveau,
-                equipementDisponible: user.profile?.equipementDisponible,
-                contraintesSante: user.profile?.contraintesSante,
-                antecedentsMedicaux: user.profile?.antecedentsMedicaux,
-                tailleCm: user.profile?.tailleCm,
-                age: user.profile?.age,
-                sexe: user.profile?.sexe,
-                morphologie: user.profile?.morphologie,
-                frequenceEntrainement: user.profile?.frequenceEntrainement,
-                sportsPratiques: user.profile?.sportsPratiques,
-                habitudesAlimentaires: user.profile?.habitudesAlimentaires,
-                repasParJour: user.profile?.repasParJour,
-                hydratation: user.profile?.hydratation,
-                consommationCafe: user.profile?.consommationCafe,
-                consommationAlcool: user.profile?.consommationAlcool,
-                qualiteSommeil: user.profile?.qualiteSommeil,
-              }}
-            />
-          </Card>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <SectionLabel>Votre programme</SectionLabel>
+          {plan !== "GRATUIT" && <RegenerateButton hasExisting={hasExisting} />}
         </div>
 
-        {/* Programme */}
-        <div id="programme" className="flex flex-col gap-3 scroll-mt-24 md:pl-8">
-          <div className="flex items-center justify-between">
-            <SectionLabel>Votre programme</SectionLabel>
-            {plan !== "GRATUIT" && <RegenerateButton hasExisting={hasExisting} />}
-          </div>
-
-          {plan === "GRATUIT" ? (
-            <Card className="flex flex-col gap-8 p-6 sm:p-8">
-              <div className="flex flex-col items-start gap-3">
-                <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
-                <p className="text-sm text-graphite-300">
-                  Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
-                  programme IA — trois sections coordonnées, relues et validées par Anthony
-                  Darmon.
-                </p>
-                <Link href="/pricing">
-                  <Button>Voir les offres</Button>
-                </Link>
-              </div>
-
-              {piliers.map((pilier) => (
-                <div key={pilier} className="flex flex-col gap-2 border-t border-graphite-800 pt-6">
-                  <SectionLabel>{LABELS[pilier]}</SectionLabel>
-                  <p className="text-sm text-graphite-400">Disponible avec l&apos;offre Premium.</p>
-                </div>
-              ))}
-            </Card>
-          ) : (
+        {plan === "GRATUIT" ? (
           <Card className="flex flex-col gap-8 p-6 sm:p-8">
-            {piliers.map((pilier, i) => {
-            const valide = derniersValides[i];
-            const dernier = dernieresGenerations[i];
-            const enAttente = dernier && dernier.statut === "EN_ATTENTE";
+            <div className="flex flex-col items-start gap-3">
+              <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
+              <p className="text-sm text-graphite-300">
+                Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
+                programme IA — trois sections coordonnées, relues et validées par Anthony
+                Darmon.
+              </p>
+              <Link href="/pricing">
+                <Button>Voir les offres</Button>
+              </Link>
+            </div>
 
-            const affiche = valide ? valide : enAttente ? dernier : null;
-
-            return (
-              <div key={pilier} className="flex flex-col gap-3 border-t border-graphite-800 pt-6 first:border-t-0 first:pt-0">
-                <div className="flex items-center justify-between">
-                  <SectionLabel>{LABELS[pilier]}</SectionLabel>
-                  {valide && (
-                    <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
-                  )}
-                  {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
-                </div>
-
-                {affiche && (
-                  <p className="text-xs text-graphite-500">
-                    Généré le{" "}
-                    {affiche.generatedAt.toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                )}
-
-                {enAttente && (
-                  <p className="text-sm text-laiton-400">
-                    Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
-                    détails peuvent encore être ajustés.
-                  </p>
-                )}
-
-                {(() => {
-                  const contenu = valide ? valide.contenu : enAttente ? dernier.contenu : null;
-                  if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                  if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
-                  if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
-                  if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
-                  return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
-                })()}
-
-                {pilier === "NUTRITION" && <FicheMacros />}
+            {piliers.map((pilier) => (
+              <div key={pilier} className="flex flex-col gap-2 border-t border-graphite-800 pt-6">
+                <SectionLabel>{LABELS[pilier]}</SectionLabel>
+                <p className="text-sm text-graphite-400">Disponible avec l&apos;offre Premium.</p>
               </div>
-            );
-          })}
+            ))}
           </Card>
-          )}
-        </div>
+        ) : (
+        <Card className="flex flex-col gap-8 p-6 sm:p-8">
+          {piliers.map((pilier, i) => {
+          const valide = derniersValides[i];
+          const dernier = dernieresGenerations[i];
+          const enAttente = dernier && dernier.statut === "EN_ATTENTE";
+
+          const affiche = valide ? valide : enAttente ? dernier : null;
+
+          return (
+            <div key={pilier} className="flex flex-col gap-3 border-t border-graphite-800 pt-6 first:border-t-0 first:pt-0">
+              <div className="flex items-center justify-between">
+                <SectionLabel>{LABELS[pilier]}</SectionLabel>
+                {valide && (
+                  <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
+                )}
+                {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
+              </div>
+
+              {affiche && (
+                <p className="text-xs text-graphite-500">
+                  Généré le{" "}
+                  {affiche.generatedAt.toLocaleDateString("fr-FR", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+              )}
+
+              {enAttente && (
+                <p className="text-sm text-laiton-400">
+                  Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
+                  détails peuvent encore être ajustés.
+                </p>
+              )}
+
+              {(() => {
+                const contenu = valide ? valide.contenu : enAttente ? dernier.contenu : null;
+                if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+                if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
+                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
+                return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
+              })()}
+
+              {pilier === "NUTRITION" && <FicheMacros />}
+            </div>
+          );
+        })}
+        </Card>
+        )}
+
+        <Link href="/compte/profil" className="text-sm text-laiton-400 underline">
+          Modifier votre profil →
+        </Link>
       </div>
 
       <CoachingVisioCta plan={plan} />

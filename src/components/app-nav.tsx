@@ -19,8 +19,8 @@ function isGroup(item: NavItem): item is NavGroup {
 // par leur préfixe d'URL — évite un menu à 9 entrées à plat.
 const LINKS: NavItem[] = [
   { href: "/dashboard", label: "Tableau de bord" },
-  { href: "/programme#profil", label: "Votre profil" },
-  { href: "/programme#programme", label: "Votre programme" },
+  { href: "/compte/profil", label: "Votre profil" },
+  { href: "/programme", label: "Votre programme" },
   { href: "/coach", label: "Votre coach IA" },
   { href: "/videos", label: "Streaming" },
   {
