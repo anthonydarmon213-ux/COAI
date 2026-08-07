@@ -25,6 +25,7 @@ export default async function AbonnementPage() {
 
   const statut = user.subscription?.status;
   const plan = getEffectivePlan(user.subscription);
+  const finProgrammee = user.subscription?.cancelAtPeriodEnd && user.subscription.currentPeriodEnd;
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,6 +38,17 @@ export default async function AbonnementPage() {
           <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
           {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
         </div>
+        {finProgrammee && (
+          <p className="text-sm text-laiton-400">
+            Résiliation programmée — ton accès se termine le{" "}
+            {user.subscription!.currentPeriodEnd!.toLocaleDateString("fr-FR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+            .
+          </p>
+        )}
         {statut ? (
           <PortalButton />
         ) : (

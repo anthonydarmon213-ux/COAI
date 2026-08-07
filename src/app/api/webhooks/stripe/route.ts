@@ -35,6 +35,7 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
     status: mapStripeStatus(subscription.status),
     plan: mapStripePlan(subscription),
     currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end,
   };
 
   if (userId) {
