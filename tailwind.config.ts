@@ -47,8 +47,8 @@ const config: Config = {
         line: "rgba(20,24,26,0.12)",
       },
       fontFamily: {
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
-        editorial: ["Georgia", "Times New Roman", "serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        editorial: ["var(--font-display)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
