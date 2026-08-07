@@ -27,13 +27,15 @@ export default function CgvPage() {
             graphiques de progression, sans frais et sans engagement.
           </li>
           <li>
-            <strong>Standard (49€/mois)</strong> — inclut le palier Gratuit, ainsi que la
+            <strong>Premium (49€/mois)</strong> — inclut le palier Gratuit, ainsi que la
             génération d&apos;un programme d&apos;entraînement, de nutrition et de récupération par
             intelligence artificielle, relu et validé par un coach diplômé d&apos;État.
           </li>
           <li>
-            <strong>Premium (199€/mois)</strong> — inclut le palier Standard, ainsi qu&apos;une
-            séance mensuelle en présentiel (Paris) ou en visioconférence avec Anthony Darmon.
+            <strong>VIP (à la séance)</strong> — coaching individuel avec Anthony Darmon,
+            réservé et payé séance par séance, sans abonnement ni engagement : 200€ en présentiel
+            (Paris centre, 1h) ou 100€ en visioconférence (1h). Accessible quel que soit le palier
+            d&apos;abonnement de l&apos;utilisateur, y compris Gratuit.
           </li>
         </ul>
         <p>
@@ -45,21 +47,24 @@ export default function CgvPage() {
       <section>
         <h2>3. Prix et paiement</h2>
         <p>
-          Les prix sont indiqués en euros, toutes taxes comprises. Le paiement s&apos;effectue par
-          carte bancaire via notre prestataire Stripe, de manière récurrente et automatique chaque
-          mois à la date anniversaire de la souscription. COAI ne stocke aucune donnée bancaire :
-          celles-ci sont traitées directement par Stripe.
+          Les prix sont indiqués en euros, toutes taxes comprises. L&apos;abonnement Premium est
+          payé par carte bancaire via notre prestataire Stripe, de manière récurrente et
+          automatique chaque mois à la date anniversaire de la souscription. COAI ne stocke aucune
+          donnée bancaire : celles-ci sont traitées directement par Stripe. Les séances VIP sont
+          réservées directement auprès d&apos;Anthony Darmon et réglées séance par séance, selon
+          les modalités communiquées lors de la réservation.
         </p>
       </section>
 
       <section>
         <h2>4. Durée et résiliation</h2>
         <p>
-          Les abonnements Standard et Premium sont sans engagement de durée et se renouvellent
-          automatiquement chaque mois. L&apos;utilisateur peut résilier à tout moment depuis son
-          espace personnel (Mon abonnement → Gérer mon abonnement). La résiliation prend effet à la
-          fin de la période déjà payée ; aucun remboursement au prorata n&apos;est effectué pour le
-          mois en cours, sauf disposition légale contraire.
+          L&apos;abonnement Premium est sans engagement de durée et se renouvelle automatiquement
+          chaque mois. L&apos;utilisateur peut résilier à tout moment depuis son espace personnel
+          (Mon accompagnement → Gérer mon abonnement). La résiliation prend effet à la fin de la
+          période déjà payée ; aucun remboursement au prorata n&apos;est effectué pour le mois en
+          cours, sauf disposition légale contraire. Les séances VIP, payées à l&apos;acte, ne sont
+          pas concernées par cette clause.
         </p>
       </section>
 

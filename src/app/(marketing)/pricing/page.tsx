@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 type Tier = {
   nom: string;
@@ -13,7 +14,13 @@ type Tier = {
   features: string[];
   plan?: "STANDARD" | "PREMIUM";
   mostPopular?: boolean;
+  // Palier VIP : tarifs à la séance plutôt qu'un abonnement mensuel — pas
+  // de bouton d'abonnement Stripe, juste une réservation via WhatsApp.
+  sessions?: { label: string; prix: string }[];
 };
+
+const VIP_MESSAGE =
+  "Bonjour Anthony, je suis sur COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
 
 const TIERS: Tier[] = [
   {
@@ -29,15 +36,16 @@ const TIERS: Tier[] = [
     ],
   },
   {
-    nom: "Standard",
+    nom: "Premium",
     prix: "49€",
     suffixe: "/mois",
-    description: "Le programme complet généré par IA, validé par un coach diplômé d'État.",
+    description: "Ton programme personnalisé généré par IA, validé par un vrai coach.",
     features: [
-      "Tout le palier Gratuit",
-      "Programme entraînement + nutrition + récupération généré par IA",
-      "Relu et validé par Anthony Darmon, coach diplômé d'État",
-      "Coach IA illimité",
+      "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
+      "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
+      "Suivi de progression — dashboard avec ton évolution",
+      "Chat IA illimité — pour ajuster ta routine à tout moment",
+      "Ajustements continus — le programme évolue selon tes retours",
       "Bibliothèque vidéo (yoga, mobilité, récupération…)",
       "Assistant WhatsApp 24/7",
     ],
@@ -45,20 +53,25 @@ const TIERS: Tier[] = [
     mostPopular: true,
   },
   {
-    nom: "Premium",
-    prix: "199€",
-    suffixe: "/mois",
-    description: "Une version light de THE METHOD : le programme IA, plus du présentiel avec Anthony.",
+    nom: "VIP",
+    prix: "Sur réservation",
+    suffixe: "",
+    description: "Coaching individuel avec Anthony Darmon, à la séance — sans abonnement.",
     features: [
-      "Tout le palier Standard",
-      "1 séance par mois en présentiel (Paris) ou en visio",
-      "Accès prioritaire pour évoluer vers THE METHOD",
+      "Coaching 1-to-1 avec Anthony Darmon",
+      "Réservation flexible, sans engagement ni abonnement",
+      "Accessible à tous, quel que soit ton palier",
     ],
-    plan: "PREMIUM" as const,
+    sessions: [
+      { label: "Présentiel — Paris centre (1h)", prix: "200€" },
+      { label: "Visio (1h)", prix: "100€" },
+    ],
   },
 ];
 
 export default function PricingPage() {
+  const vipHref = buildWhatsAppLink(VIP_MESSAGE);
+
   return (
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-10 px-6 py-24">
       <div className="w-full max-w-5xl pt-8">
@@ -85,10 +98,14 @@ export default function PricingPage() {
               </span>
             )}
             <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{tier.nom}</h2>
-            <div className="flex items-baseline gap-1">
-              <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
-              <span className="text-sm text-graphite-400">{tier.suffixe}</span>
-            </div>
+            {tier.sessions ? (
+              <p className="text-lg font-semibold text-white">{tier.prix}</p>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
+                <span className="text-sm text-graphite-400">{tier.suffixe}</span>
+              </div>
+            )}
             <p className="text-sm text-graphite-300">{tier.description}</p>
             <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
               {tier.features.map((feature) => (
@@ -98,7 +115,27 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            {tier.plan ? (
+
+            {tier.sessions && (
+              <ul className="flex w-full flex-col gap-2 rounded-lg border border-graphite-800 bg-graphite-900/40 p-3 text-left text-sm">
+                {tier.sessions.map((session) => (
+                  <li key={session.label} className="flex items-center justify-between gap-3">
+                    <span className="text-graphite-300">{session.label}</span>
+                    <span className="font-semibold text-white">{session.prix}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {tier.sessions ? (
+              vipHref ? (
+                <a href={vipHref} target="_blank" rel="noopener noreferrer">
+                  <Button>Réserver via WhatsApp</Button>
+                </a>
+              ) : (
+                <p className="text-sm text-graphite-400">Contacte ton coach pour réserver.</p>
+              )
+            ) : tier.plan ? (
               <SubscribeButton plan={tier.plan} label={`S'abonner — ${tier.prix}${tier.suffixe}`} />
             ) : (
               <Link href="/sign-up">
@@ -110,9 +147,10 @@ export default function PricingPage() {
       </div>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        Tous les abonnements sont sans engagement, résiliables à tout moment depuis ton compte.
-        THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible séparément
-        pour qui veut aller plus loin que le palier Premium. En t&apos;abonnant, tu acceptes nos{" "}
+        L&apos;offre Gratuite et l&apos;offre Premium sont sans engagement, résiliables à tout
+        moment depuis ton compte. Les séances VIP sont réservées et payées à la séance, hors
+        abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
+        séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">
           CGV
         </Link>

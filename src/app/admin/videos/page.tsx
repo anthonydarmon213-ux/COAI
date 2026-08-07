@@ -20,7 +20,7 @@ export default async function AdminVideosPage() {
           <SectionLabel>Espace coach</SectionLabel>
           <h1 className="text-2xl font-semibold text-graphite-50">Bibliothèque vidéo</h1>
           <p className="text-sm text-graphite-400">
-            Vidéos YouTube non répertoriées, visibles par les abonnés Standard et Premium.
+            Vidéos YouTube non répertoriées, visibles par les abonnés Premium.
           </p>
         </div>
 

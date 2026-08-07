@@ -4,29 +4,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 
-const PLAN_MESSAGES: Record<"STANDARD" | "PREMIUM", { titre: string; description: string }> = {
-  PREMIUM: {
-    titre: "Bienvenue dans l'offre Premium",
-    description:
-      "Ton programme IA va être généré et relu par Anthony, et ta séance mensuelle en présentiel ou en visio est incluse — tu peux la réserver dès que tu veux depuis ton programme.",
-  },
-  STANDARD: {
-    titre: "Bienvenue dans l'offre Standard",
-    description:
-      "Ton abonnement est actif. Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — il sera relu et validé par Anthony Darmon avant de t'être présenté comme définitif.",
-  },
-};
+// Premium (ex-Standard) est désormais le seul abonnement auto-souscriptible
+// depuis /pricing — les séances individuelles (VIP) se réservent à la
+// séance via WhatsApp, plus via un palier d'abonnement dédié.
+const TITRE = "Bienvenue dans l'offre Premium";
+const DESCRIPTION =
+  "Ton abonnement est actif. Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — il sera relu et validé par Anthony Darmon avant de t'être présenté comme définitif.";
 
-export default async function BienvenuePage({
-  searchParams,
-}: {
-  searchParams: { plan?: string };
-}) {
+export default async function BienvenuePage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
-
-  const plan = searchParams.plan === "PREMIUM" ? "PREMIUM" : "STANDARD";
-  const { titre, description } = PLAN_MESSAGES[plan];
 
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center gap-6 py-16 text-center">
@@ -38,8 +25,8 @@ export default async function BienvenuePage({
         Merci{user.prenom ? ` ${user.prenom}` : ""} !
       </h1>
       <Card className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-graphite-50">{titre}</h2>
-        <p className="text-sm leading-6 text-graphite-300">{description}</p>
+        <h2 className="text-lg font-semibold text-graphite-50">{TITRE}</h2>
+        <p className="text-sm leading-6 text-graphite-300">{DESCRIPTION}</p>
       </Card>
       <Link href="/programme">
         <Button>Voir mon profil & mon programme</Button>

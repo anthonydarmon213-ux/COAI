@@ -8,8 +8,11 @@ const PRICE_ENV_BY_PLAN = {
   PREMIUM: "STRIPE_PRICE_ID_PREMIUM",
 } as const;
 
-// Crée une session Stripe Checkout pour l'abonnement STANDARD (49€/mois) ou
-// PREMIUM (199€/mois), sans engagement.
+// Crée une session Stripe Checkout pour l'abonnement STANDARD (affiché
+// "Premium", 49€/mois), sans engagement. PREMIUM (ancienne offre 199€/mois)
+// n'est plus exposé sur /pricing — le coaching individuel se réserve
+// désormais à la séance (VIP, hors abonnement) — mais reste géré ici pour
+// d'éventuels abonnés existants.
 // client_reference_id porte l'id User applicatif, utilisé par le webhook pour
 // relier la subscription Stripe à l'utilisateur.
 export async function POST(request: Request) {

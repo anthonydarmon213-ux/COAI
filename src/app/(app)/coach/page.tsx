@@ -23,7 +23,7 @@ export default async function CoachPage() {
           direct avec ton coach reste la meilleure option.
         </p>
         {plan === "GRATUIT" && (
-          <Badge tone="warning">4 questions/mois en offre Gratuite · illimité en Standard</Badge>
+          <Badge tone="warning">4 questions/mois en offre Gratuite · illimité en Premium</Badge>
         )}
       </div>
 

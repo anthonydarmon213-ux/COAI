@@ -3,7 +3,12 @@ import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
 import { PortalButton } from "@/components/compte/portal-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
+
+const VIP_MESSAGE =
+  "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
 
 const STATUT_LABELS: Record<string, string> = {
   ACTIVE: "Actif",
@@ -26,6 +31,7 @@ export default async function AbonnementPage() {
   const statut = user.subscription?.status;
   const plan = getEffectivePlan(user.subscription);
   const finProgrammee = user.subscription?.cancelAtPeriodEnd && user.subscription.currentPeriodEnd;
+  const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,22 +64,23 @@ export default async function AbonnementPage() {
         )}
       </Card>
 
-      {plan === "STANDARD" && (
-        <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
-            Aller plus loin
-          </span>
-          <h2 className="text-lg font-semibold text-graphite-50">
-            Passe à Premium — 199€/mois
-          </h2>
-          <p className="text-sm text-graphite-300">
-            En plus de ton programme IA validé par Anthony, débloque 1 séance de coaching par
-            mois en présentiel à Paris ou en visio — une version light de THE METHOD, sans
-            attendre l&apos;accompagnement 1-to-1 complet.
-          </p>
-          <PortalButton label="Passer à Premium" />
-        </Card>
-      )}
+      <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
+          Aller plus loin
+        </span>
+        <h2 className="text-lg font-semibold text-graphite-50">Coaching VIP avec Anthony Darmon</h2>
+        <p className="text-sm text-graphite-300">
+          Une séance individuelle avec Anthony, en plus de ton programme — présentiel à Paris
+          centre (200€/1h) ou en visio (100€/1h). Réservation à la séance, sans abonnement.
+        </p>
+        {vipHref ? (
+          <a href={vipHref} target="_blank" rel="noopener noreferrer">
+            <Button>Réserver via WhatsApp</Button>
+          </a>
+        ) : (
+          <p className="text-sm text-graphite-400">Contacte ton coach pour réserver.</p>
+        )}
+      </Card>
     </div>
   );
 }

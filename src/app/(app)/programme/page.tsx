@@ -120,9 +120,9 @@ export default async function ProgrammePage() {
 
         {plan === "GRATUIT" ? (
           <Card className="flex flex-col items-start gap-3">
-            <Badge tone="warning">Réservé aux offres Standard et Premium</Badge>
+            <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
             <p className="text-sm text-graphite-300">
-              Ton profil est prêt. Passe à l&apos;offre Standard (49€/mois) pour générer ton
+              Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
               programme IA — entraînement, nutrition, récupération — relu et validé par Anthony
               Darmon.
             </p>

@@ -11,8 +11,12 @@ export function getEffectivePlan(subscription?: Subscription | null): EffectiveP
   return subscription.plan;
 }
 
+// STANDARD (renommé "Premium" côté affichage) reste le seul abonnement
+// auto-souscriptible depuis /pricing. PREMIUM ("VIP" à la séance depuis ce
+// renommage) n'est plus vendu comme abonnement — ce label ne concerne que
+// d'éventuels abonnés déjà sur l'ancienne offre.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
   GRATUIT: "Gratuit",
-  STANDARD: "Standard — 49€/mois",
-  PREMIUM: "Premium — 199€/mois",
+  STANDARD: "Premium — 49€/mois",
+  PREMIUM: "Ancien Premium — 199€/mois",
 };

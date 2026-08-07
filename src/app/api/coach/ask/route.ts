@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { z } from "zod";
 
-// Le Q&A "coach IA" est illimité en Standard/Premium (cohérent avec
+// Le Q&A "coach IA" est illimité dès l'offre Premium (49€/mois — cohérent avec
 // l'assistant WhatsApp déjà positionné comme avantage payant), et accessible
 // en Gratuit avec un quota (fenêtre glissante de 30 jours) — un aperçu qui
 // donne envie de passer à l'offre payante plutôt qu'un mur complet.
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     if (questionsUtilisees >= QUOTA_GRATUIT) {
       return NextResponse.json(
         {
-          error: `Limite de ${QUOTA_GRATUIT} questions/mois atteinte en offre Gratuite — passe à Standard pour un accès illimité.`,
+          error: `Limite de ${QUOTA_GRATUIT} questions/mois atteinte en offre Gratuite — passe à Premium pour un accès illimité.`,
         },
         { status: 429 }
       );
