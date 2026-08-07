@@ -15,7 +15,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant
 export function Button({ className = "", variant = "primary", ...props }: ButtonProps) {
   return (
     <button
-      className={`rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 ${VARIANTS[variant]} ${className}`}
+      className={`rounded-full px-6 py-3 text-sm font-semibold tracking-wide outline-none transition duration-300 hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-acier/40 active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 ${VARIANTS[variant]} ${className}`}
       {...props}
     />
   );
