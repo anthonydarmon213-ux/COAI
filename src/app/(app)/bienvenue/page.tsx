@@ -3,6 +3,7 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
+import { TrackConversion } from "@/components/analytics/track-conversion";
 
 // Premium (ex-Standard) est désormais le seul abonnement auto-souscriptible
 // depuis /pricing — les séances individuelles (VIP) se réservent à la
@@ -17,6 +18,7 @@ export default async function BienvenuePage() {
 
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center gap-6 py-16 text-center">
+      <TrackConversion name="subscription_started" params={{ plan: "PREMIUM" }} />
       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-laiton-400/15 text-3xl text-laiton-400">
         ✓
       </span>

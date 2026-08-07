@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter, IBM_Plex_Mono } from "next/font/google";
 import "../../sentry.client.config";
 import "./globals.css";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -43,7 +44,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${playfairDisplay.variable} ${inter.variable} ${plexMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GoogleAnalytics />
+      </body>
     </html>
   );
 }
