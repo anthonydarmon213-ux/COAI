@@ -61,7 +61,7 @@ export default async function AbonnementPage() {
       {plan === "STANDARD" && (
         <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
           <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
-            Passer plus loin
+            Aller plus loin
           </span>
           <h2 className="text-lg font-semibold text-graphite-50">
             Passe à Premium — 199€/mois
