@@ -20,7 +20,7 @@ export default async function AdminProgrammesPage() {
   return (
     <main className="bg-lab-grid min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 border-b border-acier/25 pb-7">
           <SectionLabel>Espace coach</SectionLabel>
           <h1 className="text-2xl font-semibold text-graphite-50">
             Programmes en attente de validation

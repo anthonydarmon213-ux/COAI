@@ -33,8 +33,16 @@ export function Sparkline({
         </span>
       </div>
       {points.length > 1 ? (
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full text-laiton-400">
-          <path d={path} fill="none" stroke="currentColor" strokeWidth={2} />
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full overflow-visible text-laiton-400">
+          <path
+            d={path}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="drop-shadow-[0_0_5px_rgba(201,162,98,0.5)]"
+          />
         </svg>
       ) : (
         <p className="text-sm text-graphite-400">Pas encore assez de données.</p>
