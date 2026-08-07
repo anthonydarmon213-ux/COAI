@@ -19,9 +19,9 @@ export default async function VideosPage() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
         <SectionLabel>Bibliothèque</SectionLabel>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Vidéos.</h1>
+        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Streaming.</h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">
-          Cours en vidéo — yoga, mobilité, récupération — enregistrés par votre coach Anthony.
+          Cours en streaming — yoga, mobilité, récupération — enregistrés par votre coach Anthony.
         </p>
       </div>
 
@@ -29,7 +29,7 @@ export default async function VideosPage() {
         <Card className="flex flex-col items-start gap-3">
           <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
           <p className="text-sm text-graphite-300">
-            Passe à l&apos;offre Premium (49€/mois) pour accéder à la bibliothèque de vidéos.
+            Passe à l&apos;offre Premium (49€/mois) pour accéder à la bibliothèque de streaming.
           </p>
           <Link href="/pricing">
             <Button>Voir les offres</Button>

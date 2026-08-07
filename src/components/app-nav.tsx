@@ -21,7 +21,7 @@ const LINKS: NavItem[] = [
   { href: "/dashboard", label: "Tableau de bord" },
   { href: "/programme", label: "Votre profil et programme" },
   { href: "/coach", label: "Votre coach IA" },
-  { href: "/videos", label: "Vidéos" },
+  { href: "/videos", label: "Streaming" },
   {
     label: "Suivi",
     children: [

@@ -18,7 +18,7 @@ export default async function AdminVideosPage() {
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <div className="flex flex-col gap-1">
           <SectionLabel>Espace coach</SectionLabel>
-          <h1 className="text-2xl font-semibold text-graphite-50">Bibliothèque vidéo</h1>
+          <h1 className="text-2xl font-semibold text-graphite-50">Bibliothèque de streaming</h1>
           <p className="text-sm text-graphite-400">
             Vidéos YouTube non répertoriées, visibles par les abonnés Premium.
           </p>
