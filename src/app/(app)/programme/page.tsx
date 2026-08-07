@@ -20,7 +20,7 @@ import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
-  NUTRITION: "Nutrition",
+  NUTRITION: "Alimentation",
   RECUPERATION: "Récupération",
 };
 
@@ -73,7 +73,7 @@ export default async function ProgrammePage() {
         et de son adéquation avec ton état de santé, y compris en cas de blessure.
       </p>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start">
         {/* Profil */}
         <div className="flex flex-col gap-3">
           <SectionLabel>Votre profil</SectionLabel>
@@ -111,23 +111,25 @@ export default async function ProgrammePage() {
           </div>
 
           {plan === "GRATUIT" ? (
-            <Card className="flex flex-col items-start gap-4">
-              <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
-              <p className="text-sm text-graphite-300">
-                Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
-                programme IA, relu et validé par Anthony Darmon.
-              </p>
-              <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
-                {["Entraînement", "Alimentation", "Récupération"].map((sousPartie) => (
-                  <li key={sousPartie} className="flex items-center gap-2 rounded-lg border border-graphite-800 bg-graphite-900/40 px-3 py-2">
-                    <span className="text-laiton-400">✓</span>
-                    <span>{sousPartie}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/pricing">
-                <Button>Voir les offres</Button>
-              </Link>
+            <Card className="flex flex-col gap-8 p-6 sm:p-8">
+              <div className="flex flex-col items-start gap-3">
+                <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
+                <p className="text-sm text-graphite-300">
+                  Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
+                  programme IA — trois sections coordonnées, relues et validées par Anthony
+                  Darmon.
+                </p>
+                <Link href="/pricing">
+                  <Button>Voir les offres</Button>
+                </Link>
+              </div>
+
+              {piliers.map((pilier) => (
+                <div key={pilier} className="flex flex-col gap-2 border-t border-graphite-800 pt-6">
+                  <SectionLabel>{LABELS[pilier]}</SectionLabel>
+                  <p className="text-sm text-graphite-400">Disponible avec l&apos;offre Premium.</p>
+                </div>
+              ))}
             </Card>
           ) : (
           <Card className="flex flex-col gap-8 p-6 sm:p-8">
