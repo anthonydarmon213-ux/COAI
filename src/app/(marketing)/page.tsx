@@ -58,7 +58,7 @@ export default function LandingPage() {
     <main className="bg-lab-grid flex flex-col">
       <CoaiIntro />
 
-      <section className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
+      <section id="hero" className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
         <div className="relative z-10 max-w-3xl">
           <SectionLabel>Entraînement · Nutrition · Sommeil</SectionLabel>
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">

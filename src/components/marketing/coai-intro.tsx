@@ -71,9 +71,13 @@ export function CoaiIntro() {
         « L&apos;IA génère. Ton coach valide. »
       </p>
 
-      <span className="relative z-10 mt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-graphite-500">
-        Découvrir ↓
-      </span>
+      <a
+        href="#hero"
+        className="relative z-10 mt-6 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.22em] text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+      >
+        Découvrir
+        <span aria-hidden="true">↓</span>
+      </a>
     </section>
   );
 }
