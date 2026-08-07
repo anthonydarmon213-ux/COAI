@@ -119,6 +119,12 @@ html {
   }
 }
 
+@keyframes spin-loader {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Halo animé du hero : désactivé si l'utilisateur préfère moins d'animations. */
 @media (prefers-reduced-motion: no-preference) {
   .animate-spin-slow {
@@ -126,6 +132,10 @@ html {
   }
   .animate-pulse-glow {
     animation: pulse-glow 5s ease-in-out infinite;
+  }
+  .coai-loader-arc {
+    animation: spin-loader 1.6s linear infinite;
+    transform-origin: 60px 60px;
   }
 }
 
