@@ -94,7 +94,7 @@ export function Select({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        className={`flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-graphite-900 px-4 py-3 text-left text-graphite-50 outline-none transition focus:border-laiton-400/70 focus:ring-4 focus:ring-laiton-400/10 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+        className={`flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-graphite-900 px-4 py-3 text-left text-graphite-50 outline-none transition hover:border-white/20 focus:border-laiton-400/70 focus:ring-4 focus:ring-laiton-400/10 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
         <span className={selected?.value ? "" : "text-graphite-400"}>
           {selected?.label ?? "Sélectionner…"}
