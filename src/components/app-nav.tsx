@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CoaiMark } from "@/components/brand/coai-mark";
+import { SignOutButton } from "@/components/compte/sign-out-button";
 
 const LINKS = [
   { href: "/dashboard", label: "Tableau de bord" },
@@ -30,7 +31,10 @@ export function AppNav() {
             </span>
           </span>
         </div>
-        <span className="rounded-full border border-laiton-400/20 bg-laiton-400/[0.06] px-2.5 py-1 font-mono text-[0.58rem] uppercase tracking-wider text-laiton-300 md:mt-5 md:inline-block">Beta</span>
+        <div className="flex items-center gap-2 md:mt-5">
+          <span className="rounded-full border border-laiton-400/20 bg-laiton-400/[0.06] px-2.5 py-1 font-mono text-[0.58rem] uppercase tracking-wider text-laiton-300">Beta</span>
+          <SignOutButton variant="icon" />
+        </div>
       </div>
       <nav aria-label="Navigation principale" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-10 md:flex-1 md:flex-col md:overflow-visible">
         {LINKS.map((link) => {
