@@ -31,7 +31,7 @@ export default async function AbonnementPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <SectionLabel>Compte</SectionLabel>
-        <h1 className="text-2xl font-semibold">Mon abonnement</h1>
+        <h1 className="text-2xl font-semibold">Mon accompagnement</h1>
       </div>
       <Card className="flex flex-col items-start gap-4">
         <div className="flex items-center gap-3">
@@ -57,6 +57,23 @@ export default async function AbonnementPage() {
           </a>
         )}
       </Card>
+
+      {plan === "STANDARD" && (
+        <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
+            Passer plus loin
+          </span>
+          <h2 className="text-lg font-semibold text-graphite-50">
+            Passe à Premium — 199€/mois
+          </h2>
+          <p className="text-sm text-graphite-300">
+            En plus de ton programme IA validé par Anthony, débloque 1 séance de coaching par
+            mois en présentiel à Paris ou en visio — une version light de THE METHOD, sans
+            attendre l&apos;accompagnement 1-to-1 complet.
+          </p>
+          <PortalButton label="Passer à Premium" />
+        </Card>
+      )}
     </div>
   );
 }

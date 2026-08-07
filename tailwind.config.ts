@@ -12,7 +12,7 @@ const config: Config = {
           800: "#212328",
           700: "#2e3138",
           600: "#41454e",
-          400: "#6b7078",
+          400: "#8b909a",
           200: "#c7cad0",
           50: "#f5f6f7",
         },
@@ -22,6 +22,9 @@ const config: Config = {
           400: "#c9a262",
           300: "#ddc191",
         },
+        // Bleu-acier du point central du logomark (le repère "IA" du duo
+        // humain/IA) — touche d'accent secondaire, utilisée avec parcimonie.
+        acier: "#5b8296",
         // Tokens du design system v2 (spécification "Design System — Lab Coach").
         // Additifs : graphite/laiton restent la base déjà en place, brass/steel
         // sont les nouveaux accents (bouton primaire/secondaire), ink/paper/

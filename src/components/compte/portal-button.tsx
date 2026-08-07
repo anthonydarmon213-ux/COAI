@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export function PortalButton() {
+export function PortalButton({ label = "Gérer mon abonnement" }: { label?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ export function PortalButton() {
   return (
     <div className="flex flex-col items-start gap-2">
       <Button onClick={handleClick} disabled={loading}>
-        {loading ? "Ouverture…" : "Gérer mon abonnement"}
+        {loading ? "Ouverture…" : label}
       </Button>
       {error && <p className="text-sm text-red-400">{error}</p>}
     </div>

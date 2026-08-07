@@ -10,7 +10,7 @@ const LINKS = [
   { href: "/suivi/seances", label: "Séances" },
   { href: "/suivi/mesures", label: "Mesures" },
   { href: "/suivi/progression", label: "Progression" },
-  { href: "/compte/abonnement", label: "Abonnement" },
+  { href: "/compte/abonnement", label: "Accompagnement" },
   { href: "/compte/parametres", label: "Paramètres" },
 ];
 
