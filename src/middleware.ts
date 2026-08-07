@@ -31,6 +31,7 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/programme") ||
     request.nextUrl.pathname.startsWith("/coach") ||
+    request.nextUrl.pathname.startsWith("/videos") ||
     request.nextUrl.pathname.startsWith("/suivi") ||
     request.nextUrl.pathname.startsWith("/compte") ||
     request.nextUrl.pathname.startsWith("/admin") ||
@@ -47,5 +48,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/programme/:path*", "/coach/:path*", "/suivi/:path*", "/compte/:path*", "/admin/:path*", "/bienvenue/:path*", "/completer-inscription/:path*"],
+  matcher: ["/dashboard/:path*", "/programme/:path*", "/coach/:path*", "/videos/:path*", "/suivi/:path*", "/compte/:path*", "/admin/:path*", "/bienvenue/:path*", "/completer-inscription/:path*"],
 };

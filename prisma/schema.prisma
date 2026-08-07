@@ -184,6 +184,22 @@ model WhatsAppEvent {
   @@map("whatsapp_events")
 }
 
+// Bibliothèque de vidéos de coaching (yoga, mobilité, récupération…),
+// hébergées en non répertorié sur YouTube. Accessible aux abonnés
+// Standard/Premium uniquement (cf. getEffectivePlan) ; gérée par le coach
+// depuis /admin/videos. Le paywall est côté COAI, pas côté YouTube — le
+// lien "non répertorié" reste techniquement accessible s'il est partagé.
+model Video {
+  id          String   @id @default(uuid())
+  titre       String
+  description String?
+  youtubeId   String
+  categorie   String?
+  createdAt   DateTime @default(now())
+
+  @@map("videos")
+}
+
 model FounderWaitlistEntry {
   id               String    @id @default(uuid())
   firstName        String?
