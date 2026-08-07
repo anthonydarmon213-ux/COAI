@@ -22,12 +22,24 @@ export default async function SeancesPage() {
       </div>
       <SeanceForm />
       <div className="flex flex-col gap-2">
-        {seances.map((s) => (
-          <Card key={s.id} className="p-3 text-sm">
-            <span className="font-mono text-laiton-400">{s.date.toISOString().slice(0, 10)}</span>
-            {s.ressenti ? ` — ${s.ressenti}` : ""}
-          </Card>
-        ))}
+        {seances.map((s) => {
+          const exercices = Array.isArray(s.exercices)
+            ? (s.exercices as { nom?: string; chargeKg?: number }[])
+            : [];
+          return (
+            <Card key={s.id} className="p-3 text-sm">
+              <span className="font-mono text-laiton-400">{s.date.toISOString().slice(0, 10)}</span>
+              {exercices.map((ex, i) => (
+                <span key={i}>
+                  {" — "}
+                  {ex.nom}
+                  {typeof ex.chargeKg === "number" ? ` (${ex.chargeKg} kg)` : ""}
+                </span>
+              ))}
+              {s.ressenti ? ` — ${s.ressenti}` : ""}
+            </Card>
+          );
+        })}
         {seances.length === 0 && <p className="text-graphite-400">Aucune séance loguée.</p>}
       </div>
     </div>

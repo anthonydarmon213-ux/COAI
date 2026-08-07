@@ -11,6 +11,7 @@ export function SeanceForm() {
   const router = useRouter();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [exercice, setExercice] = useState("");
+  const [charge, setCharge] = useState("");
   const [ressenti, setRessenti] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,13 +26,16 @@ export function SeanceForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
-          exercices: exercice ? [{ nom: exercice }] : [],
+          exercices: exercice
+            ? [{ nom: exercice, chargeKg: charge ? Number(charge) : undefined }]
+            : [],
           ressenti: ressenti || undefined,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
       setExercice("");
+      setCharge("");
       setRessenti("");
       router.refresh();
     } catch (err) {
@@ -53,6 +57,16 @@ export function SeanceForm() {
             placeholder="ex: squat 5x5"
             value={exercice}
             onChange={(e) => setExercice(e.target.value)}
+          />
+        </Field>
+        <Field label="Charge (kg)">
+          <Input
+            type="number"
+            min="0"
+            step="0.5"
+            placeholder="ex: 80"
+            value={charge}
+            onChange={(e) => setCharge(e.target.value)}
           />
         </Field>
         <Field label="Ressenti">
