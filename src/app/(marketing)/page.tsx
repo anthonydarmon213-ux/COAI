@@ -62,12 +62,13 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-3xl">
           <SectionLabel>Entraînement · Nutrition · Sommeil</SectionLabel>
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">
-            Ton programme personnalisé par l&apos;IA.
-            <span className="mt-2 block text-laiton-300">Validé par un coach diplômé d&apos;État.</span>
+            Générer. Valider.
+            <span className="mt-2 block text-laiton-300">Progresser.</span>
           </h1>
-          <p className="mt-8 max-w-xl text-base leading-7 text-graphite-200 sm:text-lg">
-            COAI crée ton entraînement, ton plan nutritionnel et tes recommandations de sommeil
-            selon ton niveau, tes objectifs et ton quotidien. Anthony contrôle et valide ton programme avant que tu le reçoives.
+          <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
+            COAI est l&apos;app qui génère ton programme d&apos;entraînement, de nutrition et de
+            récupération par IA — et le fait toujours valider par un vrai coach avant de te
+            l&apos;envoyer.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Créer mon espace gratuit</Button></Link>
