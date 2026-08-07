@@ -7,6 +7,7 @@ import { CoaiMark } from "@/components/brand/coai-mark";
 const LINKS = [
   { href: "/dashboard", label: "Tableau de bord" },
   { href: "/programme", label: "Mon profil & programme" },
+  { href: "/coach", label: "Poser une question" },
   { href: "/suivi/seances", label: "Séances" },
   { href: "/suivi/mesures", label: "Mesures" },
   { href: "/suivi/progression", label: "Progression" },

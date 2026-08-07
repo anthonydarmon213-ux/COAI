@@ -62,6 +62,25 @@ export async function generateWithAI<T = unknown>(prompt: string): Promise<T> {
   return parseJsonResponse<T>(text);
 }
 
+// Appelle le modèle et renvoie une réponse en texte libre (pas de JSON) —
+// utilisé pour les réponses conversationnelles (ex: question au coach IA),
+// à la différence de generateWithAI qui structure toujours un programme.
+export async function generateTextWithAI(prompt: string): Promise<string> {
+  const model = process.env.AI_MODEL || "claude-sonnet-5";
+
+  const response = await getClient().messages.create({
+    model,
+    max_tokens: 1024,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  return response.content
+    .filter((block): block is Anthropic.TextBlock => block.type === "text")
+    .map((block) => block.text)
+    .join("")
+    .trim();
+}
+
 function parseJsonResponse<T>(text: string): T {
   const trimmed = text.trim();
   const jsonMatch = trimmed.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
