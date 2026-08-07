@@ -35,10 +35,31 @@ export default async function AbonnementPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 border-b border-acier/25 pb-7">
         <SectionLabel>Compte</SectionLabel>
-        <h1 className="text-2xl font-semibold">Mon accompagnement</h1>
+        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
+          Votre coach humain.
+        </h1>
       </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Mon histoire</SectionLabel>
+        <Card className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
+          <p className="text-sm leading-6 text-graphite-300">
+            Coach diplômé d&apos;État, titulaire de la carte professionnelle d&apos;éducateur
+            sportif. Dix-sept ans d&apos;expérience sur le terrain — en salle, en visio, à
+            corriger un mouvement, ajuster un macro, entendre ce qu&apos;un chiffre sur la balance
+            ne dit jamais.
+          </p>
+          <p className="text-sm leading-6 text-graphite-300">
+            Chaque programme généré par l&apos;IA sur COAI est relu et validé par lui, ou par un
+            coach qu&apos;il a formé, avant de t&apos;arriver — l&apos;expérience du terrain,
+            appliquée à chaque profil.
+          </p>
+        </Card>
+      </div>
+
       <Card className="flex flex-col items-start gap-4">
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>

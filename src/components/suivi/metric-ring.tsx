@@ -51,7 +51,7 @@ export function MetricRing({
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className="text-laiton-400 transition-all drop-shadow-[0_0_6px_rgba(201,162,98,0.55)]"
+            className="text-laiton-400 transition-all drop-shadow-[0_0_4px_rgba(201,162,98,0.25)]"
           />
         </svg>
         <div className="absolute flex flex-col items-center">

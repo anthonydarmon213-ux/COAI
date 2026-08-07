@@ -28,23 +28,18 @@ const LINKS: NavItem[] = [
       { href: "/programme/recuperation", label: "Récupération" },
     ],
   },
-  { href: "/coach", label: "Votre coach IA" },
-  { href: "/videos", label: "Streaming" },
   {
-    label: "Suivi",
+    label: "Votre suivi",
     children: [
       { href: "/suivi/seances", label: "Séances" },
       { href: "/suivi/mesures", label: "Mesures" },
       { href: "/suivi/progression", label: "Progression" },
     ],
   },
-  {
-    label: "Compte",
-    children: [
-      { href: "/compte/abonnement", label: "Accompagnement" },
-      { href: "/compte/parametres", label: "Paramètres" },
-    ],
-  },
+  { href: "/coach", label: "Votre coach IA" },
+  { href: "/compte/abonnement", label: "Votre coach humain" },
+  { href: "/videos", label: "Streaming" },
+  { href: "/compte/parametres", label: "Paramètres" },
 ];
 
 const ACTIVE_CLASS =

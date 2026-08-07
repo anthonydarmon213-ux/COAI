@@ -41,7 +41,7 @@ export function Gauge({
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className="text-brass transition-all drop-shadow-[0_0_6px_rgba(168,118,62,0.6)]"
+            className="text-brass transition-all drop-shadow-[0_0_4px_rgba(168,118,62,0.28)]"
             style={{ opacity: intensity }}
           />
         </svg>

@@ -41,7 +41,7 @@ export function Sparkline({
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="drop-shadow-[0_0_5px_rgba(201,162,98,0.5)]"
+            className="drop-shadow-[0_0_3px_rgba(201,162,98,0.25)]"
           />
         </svg>
       ) : (
