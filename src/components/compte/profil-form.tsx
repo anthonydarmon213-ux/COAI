@@ -87,6 +87,7 @@ const HYDRATATIONS = [
 ];
 
 const ANTECEDENTS_MEDICAUX = [
+  "Scoliose",
   "Douleurs / problèmes de dos",
   "Douleurs / problèmes de genoux",
   "Problèmes d'épaule",
@@ -98,6 +99,7 @@ const ANTECEDENTS_MEDICAUX = [
   "Grossesse / post-partum",
   "Chirurgie récente",
   "Apnée du sommeil",
+  "Autre",
 ];
 
 type Profil = {
@@ -107,6 +109,7 @@ type Profil = {
   contraintesSante?: string | null;
   antecedentsMedicaux?: string | null;
   tailleCm?: number | null;
+  poidsKg?: number | null;
   age?: number | null;
   sexe?: string | null;
   morphologie?: string | null;
@@ -137,6 +140,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     parseMultiSelect(profil.antecedentsMedicaux)
   );
   const [tailleCm, setTailleCm] = useState(profil.tailleCm ? String(profil.tailleCm) : "");
+  const [poidsKg, setPoidsKg] = useState(profil.poidsKg ? String(profil.poidsKg) : "");
   const [age, setAge] = useState(profil.age ? String(profil.age) : "");
   const [sexe, setSexe] = useState(profil.sexe ?? "");
   const [morphologie, setMorphologie] = useState(profil.morphologie ?? "");
@@ -186,6 +190,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           contraintesSante,
           antecedentsMedicaux: antecedentsMedicaux.length ? antecedentsMedicaux.join(", ") : undefined,
           tailleCm: tailleCm ? Number(tailleCm) : undefined,
+          poidsKg: poidsKg ? Number(poidsKg) : undefined,
           age: age ? Number(age) : undefined,
           sexe: sexe || undefined,
           morphologie,
@@ -277,6 +282,14 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             onChange={(e) => setTailleCm(e.target.value)}
           />
         </Field>
+        <Field label="Poids (kg)">
+          <Input
+            type="number"
+            step="0.1"
+            value={poidsKg}
+            onChange={(e) => setPoidsKg(e.target.value)}
+          />
+        </Field>
         <Field label="Âge">
           <Input type="number" step="1" value={age} onChange={(e) => setAge(e.target.value)} />
         </Field>
@@ -297,7 +310,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             <option value="Mixte">Mixte / je ne sais pas</option>
           </Select>
         </Field>
-        <Field label="Antécédents médicaux (coche tout ce qui s'applique)">
+        <Field label="Pathologies (coche tout ce qui s'applique)">
           <div className="flex flex-col gap-1.5 rounded-md border border-graphite-700 bg-graphite-900 p-3">
             {ANTECEDENTS_MEDICAUX.map((item) => (
               <label key={item} className="flex items-center gap-2 text-sm text-graphite-200">

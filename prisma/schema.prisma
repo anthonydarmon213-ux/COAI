@@ -87,6 +87,7 @@ model Profile {
   contraintesSante      String?
   antecedentsMedicaux   String?
   tailleCm              Float?
+  poidsKg               Float?
   age                   Int?
   sexe                  String?
   morphologie           String?

@@ -20,7 +20,14 @@ function isGroup(item: NavItem): item is NavGroup {
 const LINKS: NavItem[] = [
   { href: "/dashboard", label: "Tableau de bord" },
   { href: "/compte/profil", label: "Votre profil" },
-  { href: "/programme", label: "Votre programme" },
+  {
+    label: "Votre programme",
+    children: [
+      { href: "/programme/entrainement", label: "Entraînement" },
+      { href: "/programme/alimentation", label: "Alimentation" },
+      { href: "/programme/recuperation", label: "Récupération" },
+    ],
+  },
   { href: "/coach", label: "Votre coach IA" },
   { href: "/videos", label: "Streaming" },
   {
