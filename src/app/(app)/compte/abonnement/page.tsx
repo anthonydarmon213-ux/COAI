@@ -66,10 +66,10 @@ export default async function AbonnementPage() {
               terrain — en salle, en visio, à corriger un mouvement, ajuster un macro, entendre ce
               qu&apos;un chiffre sur la balance ne dit jamais. Formé dans les clubs premium
               parisiens, il a fait évoluer sa pratique avec son temps — coaching à distance
-              développé dès le Covid, à domicile, en entreprise. Il a accompagné des personnes
-              très différentes — entrepreneurs, VIP, politiques, acteurs, Miss France — mais
-              toutes réunies par la même chose : passer à l&apos;action. Lui-même Bélier, il
-              fonce.
+              développé dès le Covid, à domicile, en entreprise. Il coache aujourd&apos;hui à la
+              Montgolfière Paris et au Club RITM Saint-Germain. Il a accompagné des personnes très
+              différentes — entrepreneurs, VIP, politiques, acteurs, Miss France — mais toutes
+              réunies par la même chose : passer à l&apos;action. Lui-même Bélier, il fonce.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               Son objectif : mettre les gens en mouvement, améliorer leur santé et leur longévité —
