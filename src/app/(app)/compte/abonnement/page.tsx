@@ -44,19 +44,45 @@ export default async function AbonnementPage() {
 
       <div className="flex flex-col gap-3">
         <SectionLabel>Mon histoire</SectionLabel>
-        <Card className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
-          <p className="text-sm leading-6 text-graphite-300">
-            Coach diplômé d&apos;État, titulaire de la carte professionnelle d&apos;éducateur
-            sportif. Dix-sept ans d&apos;expérience sur le terrain — en salle, en visio, à
-            corriger un mouvement, ajuster un macro, entendre ce qu&apos;un chiffre sur la balance
-            ne dit jamais.
-          </p>
-          <p className="text-sm leading-6 text-graphite-300">
-            Chaque programme généré par l&apos;IA sur COAI est relu et validé par lui, ou par un
-            coach qu&apos;il a formé, avant de t&apos;arriver — l&apos;expérience du terrain,
-            appliquée à chaque profil.
-          </p>
+        <Card className="flex flex-col gap-5 sm:flex-row sm:items-start">
+          <img
+            src="/anthony-darmon-portrait.jpg"
+            alt="Anthony Darmon"
+            className="h-40 w-32 shrink-0 rounded-xl object-cover sm:h-48 sm:w-36"
+          />
+          <div className="flex flex-col gap-3">
+            <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
+            <p className="text-sm leading-6 text-graphite-300">
+              Passionné par le mouvement du corps, sportif depuis toujours. Quinze ans de karaté,
+              jusqu&apos;à la ceinture noire — obtenue après un séjour au Japon pour se former
+              directement à la source. Une recherche du même genre l&apos;a mené en Inde, où
+              il s&apos;est certifié au yoga. Également adepte de philosophie, il est fasciné par
+              la puissance du mental — la même exigence qu&apos;il applique au corps.
+            </p>
+            <p className="text-sm leading-6 text-graphite-300">
+              De ce parcours est né un métier : coach diplômé d&apos;État, titulaire de la carte
+              professionnelle d&apos;éducateur sportif. Dix-sept ans d&apos;expérience sur le
+              terrain — en salle, en visio, à corriger un mouvement, ajuster un macro, entendre ce
+              qu&apos;un chiffre sur la balance ne dit jamais. Formé dans les clubs premium
+              parisiens, il a fait évoluer sa pratique avec son temps — coaching à distance
+              développé dès le Covid, à domicile, en entreprise. Il a accompagné des personnes
+              très différentes — entrepreneurs, VIP, politiques, acteurs, Miss France — mais
+              toutes réunies par la même chose : passer à l&apos;action. Lui-même Bélier, il
+              fonce.
+            </p>
+            <p className="text-sm leading-6 text-graphite-300">
+              Son objectif : mettre les gens en mouvement, améliorer leur santé et leur longévité —
+              un corps sans douleur, fonctionnel, fort, endurant, souple : toutes les qualités
+              physiques. Convaincu que le mouvement est la clé d&apos;une meilleure santé —
+              surtout quand on reste assis toute la journée, c&apos;est vital — il veut
+              aujourd&apos;hui impacter le plus grand nombre. C&apos;est pour ça que COAI existe.
+            </p>
+            <p className="text-sm leading-6 text-graphite-300">
+              Chaque programme généré par l&apos;IA sur COAI est relu et validé par lui, ou par un
+              coach qu&apos;il a formé, avant de t&apos;arriver — l&apos;expérience du terrain,
+              appliquée à chaque profil.
+            </p>
+          </div>
         </Card>
       </div>
 
