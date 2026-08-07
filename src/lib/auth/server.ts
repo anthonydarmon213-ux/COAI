@@ -15,10 +15,20 @@ export function createSupabaseServerClient() {
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch {
+            // Appelé depuis un Server Component (pas une Server Action /
+            // Route Handler) — le rafraîchissement du token est déjà pris
+            // en charge par le middleware, cet appel peut être ignoré.
+          }
         },
         remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options });
+          try {
+            cookieStore.set({ name, value: "", ...options });
+          } catch {
+            // idem
+          }
         },
       },
     }
