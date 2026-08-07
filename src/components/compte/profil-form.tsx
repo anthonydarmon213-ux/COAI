@@ -10,6 +10,39 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Select } from "@/components/ui/select";
 
+function ToggleChips({
+  options,
+  selected,
+  onToggle,
+}: {
+  options: string[];
+  selected: string[];
+  onToggle: (item: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((item) => {
+        const isSelected = selected.includes(item);
+        return (
+          <button
+            key={item}
+            type="button"
+            onClick={() => onToggle(item)}
+            aria-pressed={isSelected}
+            className={
+              isSelected
+                ? "rounded-full border border-laiton-400/40 bg-laiton-400/[0.12] px-3 py-1.5 text-sm text-laiton-300 transition"
+                : "rounded-full border border-graphite-700 bg-graphite-900 px-3 py-1.5 text-sm text-graphite-300 transition hover:border-graphite-600 hover:text-white"
+            }
+          >
+            {item}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 const NIVEAUX = ["Débutant", "Intermédiaire", "Avancé"];
 
 const FREQUENCES_ENTRAINEMENT = [
@@ -249,18 +282,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           </Select>
         </Field>
         <Field label="Sport(s) pratiqué(s) (coche tout ce qui s'applique)">
-          <div className="flex flex-col gap-1.5 rounded-md border border-graphite-700 bg-graphite-900 p-3">
-            {SPORTS_PRATIQUES.map((item) => (
-              <label key={item} className="flex items-center gap-2 text-sm text-graphite-200">
-                <input
-                  type="checkbox"
-                  checked={sportsPratiques.includes(item)}
-                  onChange={() => toggleSport(item)}
-                />
-                {item}
-              </label>
-            ))}
-          </div>
+          <ToggleChips options={SPORTS_PRATIQUES} selected={sportsPratiques} onToggle={toggleSport} />
         </Field>
         <Field label="Équipement disponible">
           <Select value={equipementDisponible} onChange={(e) => setEquipementDisponible(e.target.value)}>
@@ -311,18 +333,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           </Select>
         </Field>
         <Field label="Pathologies (coche tout ce qui s'applique)">
-          <div className="flex flex-col gap-1.5 rounded-md border border-graphite-700 bg-graphite-900 p-3">
-            {ANTECEDENTS_MEDICAUX.map((item) => (
-              <label key={item} className="flex items-center gap-2 text-sm text-graphite-200">
-                <input
-                  type="checkbox"
-                  checked={antecedentsMedicaux.includes(item)}
-                  onChange={() => toggleAntecedent(item)}
-                />
-                {item}
-              </label>
-            ))}
-          </div>
+          <ToggleChips
+            options={ANTECEDENTS_MEDICAUX}
+            selected={antecedentsMedicaux}
+            onToggle={toggleAntecedent}
+          />
         </Field>
         <Field label="Contraintes de santé (précisions)">
           <Textarea
