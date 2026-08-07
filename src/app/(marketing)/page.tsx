@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CoaiIntro } from "@/components/marketing/coai-intro";
 
 const FAQ = [
   {
@@ -55,6 +56,8 @@ const PILIERS = [
 export default function LandingPage() {
   return (
     <main className="bg-lab-grid flex flex-col">
+      <CoaiIntro />
+
       <section className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
         <div className="relative z-10 max-w-3xl">
           <SectionLabel>Entraînement · Nutrition · Sommeil</SectionLabel>
