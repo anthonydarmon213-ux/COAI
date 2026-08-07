@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import { Fraunces, Plus_Jakarta_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Playfair_Display, Inter, IBM_Plex_Mono } from "next/font/google";
 import "../../sentry.client.config";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   style: ["normal", "italic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
-const plusJakartaSans = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -43,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${fraunces.variable} ${plusJakartaSans.variable} ${plexMono.variable}`}>
+    <html lang="fr" className={`${playfairDisplay.variable} ${inter.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );
