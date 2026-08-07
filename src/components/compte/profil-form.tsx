@@ -64,6 +64,7 @@ const SPORTS_PRATIQUES = [
   "Tennis / Sports de raquette",
   "Yoga / Pilates",
   "CrossFit",
+  "Hyrox",
   "Randonnée",
   "Breathwork / Méditation",
   "Aucun actuellement",
