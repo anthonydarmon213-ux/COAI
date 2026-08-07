@@ -85,6 +85,9 @@ export default async function AbonnementPage() {
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
               <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-acier">
+                Fondateur de COAI
+              </p>
               <p className="font-editorial text-sm italic text-laiton-300">
                 « Le mouvement est la clé de tout. »
               </p>
