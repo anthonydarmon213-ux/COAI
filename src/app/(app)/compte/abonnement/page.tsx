@@ -56,8 +56,9 @@ export default async function AbonnementPage() {
               Passionné par le mouvement du corps, sportif depuis toujours. Quinze ans de karaté,
               jusqu&apos;à la ceinture noire — obtenue après un séjour au Japon pour se former
               directement à la source. Une recherche du même genre l&apos;a mené en Inde, où
-              il s&apos;est certifié au yoga. Également adepte de philosophie, il est fasciné par
-              la puissance du mental — la même exigence qu&apos;il applique au corps.
+              il s&apos;est certifié au yoga, et en Thaïlande, où il s&apos;est formé au muay
+              thaï. Également adepte de philosophie, il est fasciné par la puissance du mental —
+              la même exigence qu&apos;il applique au corps.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               De ce parcours est né un métier : coach diplômé d&apos;État, titulaire de la carte
