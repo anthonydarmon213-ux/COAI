@@ -137,6 +137,8 @@ export default async function ProgrammePage() {
             const dernier = dernieresGenerations[i];
             const enAttente = dernier && dernier.statut === "EN_ATTENTE";
 
+            const affiche = valide ? valide : enAttente ? dernier : null;
+
             return (
               <div key={pilier} className="flex flex-col gap-3 border-t border-graphite-800 pt-6 first:border-t-0 first:pt-0">
                 <div className="flex items-center justify-between">
@@ -146,6 +148,17 @@ export default async function ProgrammePage() {
                   )}
                   {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
                 </div>
+
+                {affiche && (
+                  <p className="text-xs text-graphite-500">
+                    Généré le{" "}
+                    {affiche.generatedAt.toLocaleDateString("fr-FR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                )}
 
                 {enAttente && (
                   <p className="text-sm text-laiton-400">
