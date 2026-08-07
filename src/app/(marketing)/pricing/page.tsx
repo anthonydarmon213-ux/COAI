@@ -25,6 +25,7 @@ const TIERS: Tier[] = [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
       "Graphiques de progression",
+      "Coach IA — 4 questions/mois",
     ],
   },
   {
@@ -36,6 +37,8 @@ const TIERS: Tier[] = [
       "Tout le palier Gratuit",
       "Programme entraînement + nutrition + récupération généré par IA",
       "Relu et validé par Anthony Darmon, coach diplômé d'État",
+      "Coach IA illimité",
+      "Bibliothèque vidéo (yoga, mobilité, récupération…)",
       "Assistant WhatsApp 24/7",
     ],
     plan: "STANDARD" as const,

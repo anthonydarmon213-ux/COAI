@@ -106,7 +106,7 @@ export function AskCoach() {
             placeholder="Ex : Je peux remplacer le squat par quoi si je n'ai pas de barre ?"
             rows={3}
             maxLength={1000}
-            className="w-full resize-none rounded-lg border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-600 focus:border-laiton-400/50 focus:outline-none"
+            className="w-full resize-none rounded-lg border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-500 focus:border-laiton-400/50 focus:outline-none"
           />
           <Button type="submit" disabled={loading || !question.trim()} className="self-center px-7">
             {loading ? "Envoi…" : "Poser la question"}

@@ -6,14 +6,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // 100/300/500 étaient absents jusqu'ici : les classes text-graphite-*
+        // correspondantes ne généraient aucun CSS et le texte héritait d'une
+        // couleur imprévisible selon le contexte (cause probable des soucis
+        // de lisibilité). Valeurs choisies pour un contraste ≥ 4.5:1 sur le
+        // fond quasi-noir (#090a0b) de l'app.
         graphite: {
           950: "#0d0e10",
           900: "#16181b",
           800: "#212328",
           700: "#2e3138",
           600: "#41454e",
+          500: "#767c86",
           400: "#8b909a",
+          300: "#a9adb5",
           200: "#c7cad0",
+          100: "#dee0e4",
           50: "#f5f6f7",
         },
         laiton: {

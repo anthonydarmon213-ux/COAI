@@ -106,7 +106,7 @@ export function AdminVideosManager({ videos }: { videos: Video[] }) {
               </button>
             </div>
             {video.description && <p className="text-sm text-graphite-400">{video.description}</p>}
-            <p className="font-mono text-xs text-graphite-600">ID YouTube : {video.youtubeId}</p>
+            <p className="font-mono text-xs text-graphite-500">ID YouTube : {video.youtubeId}</p>
           </Card>
         ))}
       </div>
