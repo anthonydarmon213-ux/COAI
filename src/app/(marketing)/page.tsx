@@ -172,25 +172,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Crédibilité */}
+      {/* Crédibilité / Fondateur */}
       <section className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
-        <div className="relative mx-auto h-72 w-64 overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl sm:h-96 sm:w-80 md:order-first">
+        <div className="relative mx-auto h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80 md:order-first">
           <Image
-            src="/anthony-darmon.jpg"
-            alt="Anthony Darmon — THE METHOD"
+            src="/anthony-darmon-portrait.jpg"
+            alt="Anthony Darmon, fondateur de COAI"
             fill
             className="object-cover"
           />
         </div>
         <div className="flex flex-col items-center gap-5 md:items-start">
-          <SectionLabel>La méthode</SectionLabel>
+          <SectionLabel>Fondateur</SectionLabel>
           <h2 className="font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-            L&apos;IA ne remplace pas l&apos;expertise. Elle l&apos;amplifie.
+            Anthony Darmon.
           </h2>
+          <p className="font-editorial text-xl italic text-laiton-300">
+            « Le mouvement est la clé de tout. »
+          </p>
           <p className="max-w-md text-base leading-7 text-graphite-300">
-            THE METHOD by Anthony Darmon — expert en coaching sportif depuis plus de 17 ans,
-            spécialiste des dirigeants et entrepreneurs. Le coaching augmenté s&apos;appuie
-            sur cette méthode pour générer ton programme, sans attendre le coaching 1-to-1.
+            Coach diplômé d&apos;État, expert en coaching sportif depuis plus de 17 ans,
+            spécialiste des dirigeants et entrepreneurs. De cette expérience est né THE METHOD,
+            puis COAI — pour rendre cette expertise accessible à tous, sans attendre le
+            coaching 1-to-1.
           </p>
           <a
             href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
