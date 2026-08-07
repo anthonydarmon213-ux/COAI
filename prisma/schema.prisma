@@ -14,6 +14,7 @@ model User {
   supabaseAuthId String    @unique
   email          String    @unique
   prenom         String?
+  nom            String?
   phoneWhatsapp  String?   @unique
   consentRgpdAt  DateTime?
   // Certification santé recueillie à l'inscription : l'utilisateur déclare

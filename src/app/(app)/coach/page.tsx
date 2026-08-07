@@ -12,7 +12,7 @@ export default async function CoachPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2 border-b border-white/[0.07] pb-7">
+      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
         <SectionLabel>Coach IA</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
           Posez votre question.

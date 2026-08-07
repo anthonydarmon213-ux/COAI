@@ -18,7 +18,7 @@ export default async function ParametresPage() {
       </div>
       <Card className="flex flex-col gap-2">
         <SectionLabel>Identité</SectionLabel>
-        <PrenomForm prenom={user.prenom} />
+        <PrenomForm prenom={user.prenom} nom={user.nom} />
       </Card>
       <Card className="flex flex-col gap-2">
         <SectionLabel>Assistant WhatsApp</SectionLabel>

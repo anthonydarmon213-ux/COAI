@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 
-export function PrenomForm({ prenom }: { prenom: string | null }) {
+export function PrenomForm({ prenom, nom }: { prenom: string | null; nom: string | null }) {
   const router = useRouter();
-  const [value, setValue] = useState(prenom ?? "");
+  const [prenomValue, setPrenomValue] = useState(prenom ?? "");
+  const [nomValue, setNomValue] = useState(nom ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -22,7 +23,10 @@ export function PrenomForm({ prenom }: { prenom: string | null }) {
       const res = await fetch("/api/compte/prenom", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prenom: value.trim() || null }),
+        body: JSON.stringify({
+          prenom: prenomValue.trim() || null,
+          nom: nomValue.trim() || null,
+        }),
       });
       if (!res.ok) throw new Error("Échec de l'enregistrement.");
       setSaved(true);
@@ -36,10 +40,13 @@ export function PrenomForm({ prenom }: { prenom: string | null }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <Field label="Prénom" error={error}>
-        <Input type="text" value={value} onChange={(e) => setValue(e.target.value)} />
+      <Field label="Prénom">
+        <Input type="text" value={prenomValue} onChange={(e) => setPrenomValue(e.target.value)} />
       </Field>
-      {saved && !error && <p className="text-sm text-laiton-400">Prénom enregistré.</p>}
+      <Field label="Nom" error={error}>
+        <Input type="text" value={nomValue} onChange={(e) => setNomValue(e.target.value)} />
+      </Field>
+      {saved && !error && <p className="text-sm text-laiton-400">Identité enregistrée.</p>}
       <Button type="submit" disabled={loading} className="self-start">
         {loading ? "Enregistrement…" : "Enregistrer"}
       </Button>

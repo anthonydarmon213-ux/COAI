@@ -50,7 +50,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2 border-b border-white/[0.07] pb-7">
+      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
         <SectionLabel>Vue d&apos;ensemble</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
           {user.prenom ? `Bonjour ${user.prenom}.` : "Votre progression commence ici."}

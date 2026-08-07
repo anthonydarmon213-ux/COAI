@@ -59,7 +59,7 @@ export default async function ProgrammePage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-2 border-b border-white/[0.07] pb-7">
+      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
         <SectionLabel>Coaching</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Votre programme intelligent.</h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">Votre profil nourrit trois dimensions coordonnées par l’IA, relues et validées par votre coach.</p>

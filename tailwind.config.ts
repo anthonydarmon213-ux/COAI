@@ -6,11 +6,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // 100/300/500 étaient absents jusqu'ici : les classes text-graphite-*
-        // correspondantes ne généraient aucun CSS et le texte héritait d'une
-        // couleur imprévisible selon le contexte (cause probable des soucis
-        // de lisibilité). Valeurs choisies pour un contraste ≥ 4.5:1 sur le
-        // fond quasi-noir (#090a0b) de l'app.
+        // 300/400 rapprochés du blanc (au lieu de gris moyen) : ce sont les
+        // deux teintes les plus utilisées pour le texte de corps/description
+        // dans toute l'app — feedback répété sur la lisibilité du gris sur
+        // fond noir. 500 et en dessous restent des gris plus soutenus, pour
+        // garder un peu de hiérarchie sur les éléments vraiment secondaires
+        // (légendes, mentions).
         graphite: {
           950: "#0d0e10",
           900: "#16181b",
@@ -18,8 +19,8 @@ const config: Config = {
           700: "#2e3138",
           600: "#41454e",
           500: "#767c86",
-          400: "#8b909a",
-          300: "#a9adb5",
+          400: "#e4e6e8",
+          300: "#eef0f1",
           200: "#c7cad0",
           100: "#dee0e4",
           50: "#f5f6f7",

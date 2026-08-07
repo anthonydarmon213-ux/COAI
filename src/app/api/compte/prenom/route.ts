@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/client";
 
 const bodySchema = z.object({
   prenom: z.string().max(100).nullable(),
+  nom: z.string().max(100).nullable(),
 });
 
 export async function PUT(request: Request) {
@@ -20,8 +21,8 @@ export async function PUT(request: Request) {
 
   const user = await prisma.user.update({
     where: { supabaseAuthId: authUser.id },
-    data: { prenom: parsed.data.prenom },
+    data: { prenom: parsed.data.prenom, nom: parsed.data.nom },
   });
 
-  return NextResponse.json({ prenom: user.prenom });
+  return NextResponse.json({ prenom: user.prenom, nom: user.nom });
 }
