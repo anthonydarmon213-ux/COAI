@@ -140,7 +140,7 @@ export function AppNav() {
   return (
     <aside className="z-20 shrink-0 border-b border-white/[0.07] bg-[#0b0c0e]/95 px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-b-0 md:border-r md:px-6 md:py-8">
       <div className="flex items-center justify-between md:block">
-        <div className="flex flex-col gap-1">
+        <Link href="/dashboard" className="flex flex-col gap-1">
           <div className="flex items-center gap-2.5">
             <CoaiMark size={26} />
             <span className="font-display text-xl font-semibold tracking-[0.18em] text-white">
@@ -153,7 +153,7 @@ export function AppNav() {
           <span className="text-[0.65rem] font-medium tracking-wide text-graphite-300">
             AI generates. Humans validate.
           </span>
-        </div>
+        </Link>
         <div className="flex items-center gap-2 md:mt-5">
           <span className="rounded-full border border-laiton-400/20 bg-laiton-400/[0.06] px-2.5 py-1 font-mono text-[0.58rem] uppercase tracking-wider text-laiton-300">Beta</span>
           <SignOutButton variant="icon" />

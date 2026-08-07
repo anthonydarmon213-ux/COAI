@@ -111,13 +111,20 @@ export default async function ProgrammePage() {
           </div>
 
           {plan === "GRATUIT" ? (
-            <Card className="flex flex-col items-start gap-3">
+            <Card className="flex flex-col items-start gap-4">
               <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
               <p className="text-sm text-graphite-300">
                 Ton profil est prêt. Passe à l&apos;offre Premium (49€/mois) pour générer ton
-                programme IA — entraînement, nutrition, récupération — relu et validé par Anthony
-                Darmon.
+                programme IA, relu et validé par Anthony Darmon.
               </p>
+              <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
+                {["Entraînement", "Alimentation", "Récupération"].map((sousPartie) => (
+                  <li key={sousPartie} className="flex items-center gap-2 rounded-lg border border-graphite-800 bg-graphite-900/40 px-3 py-2">
+                    <span className="text-laiton-400">✓</span>
+                    <span>{sousPartie}</span>
+                  </li>
+                ))}
+              </ul>
               <Link href="/pricing">
                 <Button>Voir les offres</Button>
               </Link>
