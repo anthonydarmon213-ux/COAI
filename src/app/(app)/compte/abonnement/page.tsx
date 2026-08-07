@@ -82,6 +82,24 @@ export default async function AbonnementPage() {
               coach qu&apos;il a formé, avant de t&apos;arriver — l&apos;expérience du terrain,
               appliquée à chaque profil.
             </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <a
+                href="https://instagram.com/anthonydarmoncoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-graphite-700 px-4 py-1.5 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+              >
+                Instagram
+              </a>
+              <a
+                href="https://youtube.com/@anthonydarmoncoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-graphite-700 px-4 py-1.5 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+              >
+                YouTube
+              </a>
+            </div>
           </div>
         </Card>
       </div>
