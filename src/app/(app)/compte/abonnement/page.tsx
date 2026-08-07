@@ -99,6 +99,14 @@ export default async function AbonnementPage() {
               >
                 YouTube
               </a>
+              <a
+                href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-graphite-700 px-4 py-1.5 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+              >
+                LinkedIn
+              </a>
             </div>
           </div>
         </Card>
