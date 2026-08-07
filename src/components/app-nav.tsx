@@ -8,7 +8,7 @@ import { SignOutButton } from "@/components/compte/sign-out-button";
 const LINKS = [
   { href: "/dashboard", label: "Tableau de bord" },
   { href: "/programme", label: "Mon profil & programme" },
-  { href: "/coach", label: "Poser une question" },
+  { href: "/coach", label: "Votre coach IA" },
   { href: "/videos", label: "Vidéos" },
   { href: "/suivi/seances", label: "Séances" },
   { href: "/suivi/mesures", label: "Mesures" },
