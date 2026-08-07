@@ -39,11 +39,18 @@ export const metadata: Metadata = {
     title: "COAI — HI × AI™",
     description: "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
   },
+  other: {
+    google: "notranslate",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${playfairDisplay.variable} ${inter.variable} ${plexMono.variable}`}>
+    <html
+      lang="fr"
+      translate="no"
+      className={`notranslate ${playfairDisplay.variable} ${inter.variable} ${plexMono.variable}`}
+    >
       <body>
         {children}
         <GoogleAnalytics />
