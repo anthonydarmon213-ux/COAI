@@ -151,7 +151,7 @@ export default function LandingPage() {
           {PILIERS.map((pilier) => (
             <Card
               key={pilier.titre}
-              className="flex min-h-72 flex-col items-center justify-center gap-6 px-7 py-8 text-center"
+              className="flex min-h-72 flex-col items-center justify-start gap-6 px-7 py-8 text-center"
             >
               <span className="text-sm font-semibold text-laiton-400">{pilier.numero}</span>
               <div className="flex flex-col items-center">
