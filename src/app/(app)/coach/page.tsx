@@ -1,11 +1,8 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { AskCoach } from "@/components/coach/ask-coach";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
-import Link from "next/link";
 
 export default async function CoachPage() {
   const user = await getCurrentAppUser();
@@ -25,22 +22,12 @@ export default async function CoachPage() {
           Darmon. Pour un suivi médical ou un ajustement personnalisé approfondi, un échange
           direct avec ton coach reste la meilleure option.
         </p>
+        {plan === "GRATUIT" && (
+          <Badge tone="warning">3 questions/semaine en offre Gratuite · illimité en Standard</Badge>
+        )}
       </div>
 
-      {plan === "GRATUIT" ? (
-        <Card className="flex flex-col items-start gap-3">
-          <Badge tone="warning">Réservé aux offres Standard et Premium</Badge>
-          <p className="text-sm text-graphite-300">
-            Passe à l&apos;offre Standard (49€/mois) pour poser tes questions à ton coach IA à
-            tout moment.
-          </p>
-          <Link href="/pricing">
-            <Button>Voir les offres</Button>
-          </Link>
-        </Card>
-      ) : (
-        <AskCoach />
-      )}
+      <AskCoach />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -28,6 +29,7 @@ export function AskCoach() {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [quotaAtteint, setQuotaAtteint] = useState(false);
   const [historique, setHistorique] = useState<Echange[]>([]);
   const [progress, setProgress] = useSimulatedProgress(loading);
 
@@ -41,6 +43,7 @@ export function AskCoach() {
 
     setLoading(true);
     setError(null);
+    setQuotaAtteint(false);
     try {
       const res = await fetch("/api/coach/ask", {
         method: "POST",
@@ -48,7 +51,10 @@ export function AskCoach() {
         body: JSON.stringify({ question: q }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Impossible d'obtenir une réponse.");
+      if (!res.ok) {
+        if (res.status === 429) setQuotaAtteint(true);
+        throw new Error(data.error ?? "Impossible d'obtenir une réponse.");
+      }
       setProgress(100);
       await new Promise((resolve) => setTimeout(resolve, 350));
       setHistorique((prev) => [...prev, { question: q, reponse: data.answer }]);
@@ -106,7 +112,18 @@ export function AskCoach() {
             {loading ? "Envoi…" : "Poser la question"}
           </Button>
         </form>
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm text-red-400">{error}</p>
+            {quotaAtteint && (
+              <Link href="/pricing">
+                <Button variant="secondary" className="px-6">
+                  Voir les offres
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
       </Card>
 
       {historique.length > 0 && (

@@ -6,9 +6,14 @@ import { prisma } from "@/lib/db/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { z } from "zod";
 
-// Le Q&A "coach IA" est réservé aux paliers payants (Standard/Premium),
-// cohérent avec l'assistant WhatsApp déjà positionné comme avantage Standard.
+// Le Q&A "coach IA" est illimité en Standard/Premium (cohérent avec
+// l'assistant WhatsApp déjà positionné comme avantage payant), et accessible
+// en Gratuit avec un quota (fenêtre glissante de 7 jours) — un aperçu qui
+// donne envie de passer à l'offre payante plutôt qu'un mur complet.
 export const maxDuration = 30;
+
+const QUOTA_GRATUIT = 3;
+const QUOTA_FENETRE_MS = 7 * 24 * 60 * 60 * 1000;
 
 const bodySchema = z.object({
   question: z.string().trim().min(1).max(1000),
@@ -28,11 +33,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  if (getEffectivePlan(user.subscription) === "GRATUIT") {
-    return NextResponse.json(
-      { error: "Réservé aux offres Standard et Premium" },
-      { status: 403 }
-    );
+  const estGratuit = getEffectivePlan(user.subscription) === "GRATUIT";
+
+  if (estGratuit) {
+    const fenetreExpiree =
+      !user.coachQuestionsResetAt ||
+      Date.now() - user.coachQuestionsResetAt.getTime() >= QUOTA_FENETRE_MS;
+    const questionsUtilisees = fenetreExpiree ? 0 : user.coachQuestionsUsed;
+
+    if (questionsUtilisees >= QUOTA_GRATUIT) {
+      return NextResponse.json(
+        {
+          error: `Limite de ${QUOTA_GRATUIT} questions/semaine atteinte en offre Gratuite — passe à Standard pour un accès illimité.`,
+        },
+        { status: 429 }
+      );
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        coachQuestionsUsed: questionsUtilisees + 1,
+        ...(fenetreExpiree ? { coachQuestionsResetAt: new Date() } : {}),
+      },
+    });
   }
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));
