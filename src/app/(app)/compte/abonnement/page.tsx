@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { InstagramIcon, YoutubeIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
 const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
@@ -45,11 +46,42 @@ export default async function AbonnementPage() {
       <div className="flex flex-col gap-3">
         <SectionLabel>Mon histoire</SectionLabel>
         <Card className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <img
-            src="/anthony-darmon-portrait.jpg"
-            alt="Anthony Darmon"
-            className="h-40 w-32 shrink-0 rounded-xl object-cover sm:h-48 sm:w-36"
-          />
+          <div className="flex shrink-0 flex-col items-center gap-3 sm:items-stretch">
+            <img
+              src="/anthony-darmon-portrait.jpg"
+              alt="Anthony Darmon"
+              className="h-40 w-32 rounded-xl object-cover sm:h-48 sm:w-36"
+            />
+            <div className="flex items-center justify-center gap-2.5">
+              <a
+                href="https://instagram.com/anthonydarmoncoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+              >
+                <InstagramIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://youtube.com/@anthonydarmoncoach"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+              >
+                <YoutubeIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+              >
+                <LinkedinIcon className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
           <div className="flex flex-col gap-3">
             <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
             <p className="text-sm leading-6 text-graphite-300">
@@ -83,32 +115,6 @@ export default async function AbonnementPage() {
               coach qu&apos;il a formé, avant de t&apos;arriver — l&apos;expérience du terrain,
               appliquée à chaque profil.
             </p>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <a
-                href="https://instagram.com/anthonydarmoncoach"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-graphite-700 px-4 py-1.5 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-              >
-                Instagram
-              </a>
-              <a
-                href="https://youtube.com/@anthonydarmoncoach"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-graphite-700 px-4 py-1.5 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-              >
-                YouTube
-              </a>
-              <a
-                href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-graphite-700 px-4 py-1.5 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-              >
-                LinkedIn
-              </a>
-            </div>
           </div>
         </Card>
       </div>

@@ -90,6 +90,23 @@ export async function POST(request: Request) {
       await upsertFromSubscription(subscription);
       break;
     }
+    // Un remboursement n'annule pas l'abonnement côté Stripe par défaut —
+    // on force l'annulation immédiate dès qu'un paiement lié est remboursé,
+    // pour éviter un accès qui continue après remboursement.
+    case "charge.refunded": {
+      const charge = event.data.object as Stripe.Charge;
+      const invoiceId = typeof charge.invoice === "string" ? charge.invoice : charge.invoice?.id;
+      if (invoiceId) {
+        const invoice = await stripe.invoices.retrieve(invoiceId);
+        const subscriptionId =
+          typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id;
+        if (subscriptionId) {
+          const canceled = await stripe.subscriptions.cancel(subscriptionId);
+          await upsertFromSubscription(canceled);
+        }
+      }
+      break;
+    }
     default:
       break;
   }
