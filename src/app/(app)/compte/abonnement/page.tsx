@@ -83,11 +83,17 @@ export default async function AbonnementPage() {
             </div>
           </div>
           <div className="flex flex-col gap-3">
-            <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-lg font-semibold text-graphite-50">Anthony Darmon</h2>
+              <p className="font-editorial text-sm italic text-laiton-300">
+                « Le mouvement est la clé de tout. »
+              </p>
+            </div>
             <p className="text-sm leading-6 text-graphite-300">
               Passionné par le mouvement du corps, sportif depuis toujours. Quinze ans de karaté,
-              jusqu&apos;à la ceinture noire — obtenue après un séjour au Japon pour se former
-              directement à la source. Une recherche du même genre l&apos;a mené en Inde, où
+              jusqu&apos;à la ceinture noire, deuxième dan obtenu à Paris — après un voyage au
+              Japon pour pratiquer directement auprès des grands maîtres. Une recherche du même
+              genre l&apos;a mené en Inde, où
               il s&apos;est certifié au yoga, et en Thaïlande, où il s&apos;est formé au muay
               thaï. Également adepte de philosophie, il est fasciné par la puissance du mental —
               la même exigence qu&apos;il applique au corps.
