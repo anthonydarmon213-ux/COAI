@@ -8,12 +8,12 @@ import { z } from "zod";
 
 // Le Q&A "coach IA" est illimité en Standard/Premium (cohérent avec
 // l'assistant WhatsApp déjà positionné comme avantage payant), et accessible
-// en Gratuit avec un quota (fenêtre glissante de 7 jours) — un aperçu qui
+// en Gratuit avec un quota (fenêtre glissante de 30 jours) — un aperçu qui
 // donne envie de passer à l'offre payante plutôt qu'un mur complet.
 export const maxDuration = 30;
 
-const QUOTA_GRATUIT = 3;
-const QUOTA_FENETRE_MS = 7 * 24 * 60 * 60 * 1000;
+const QUOTA_GRATUIT = 4;
+const QUOTA_FENETRE_MS = 30 * 24 * 60 * 60 * 1000;
 
 const bodySchema = z.object({
   question: z.string().trim().min(1).max(1000),
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     if (questionsUtilisees >= QUOTA_GRATUIT) {
       return NextResponse.json(
         {
-          error: `Limite de ${QUOTA_GRATUIT} questions/semaine atteinte en offre Gratuite — passe à Standard pour un accès illimité.`,
+          error: `Limite de ${QUOTA_GRATUIT} questions/mois atteinte en offre Gratuite — passe à Standard pour un accès illimité.`,
         },
         { status: 429 }
       );

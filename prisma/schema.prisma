@@ -22,8 +22,8 @@ model User {
   // Coach humain (Anthony Darmon) habilité à relire/valider les programmes
   // générés par l'IA avant qu'ils soient visibles par les abonnés.
   isAdmin        Boolean   @default(false)
-  // Quota "coach IA" en palier Gratuit (3 questions/semaine) — non utilisé
-  // pour Standard/Premium (accès illimité). Fenêtre glissante de 7 jours
+  // Quota "coach IA" en palier Gratuit (4 questions/mois) — non utilisé
+  // pour Standard/Premium (accès illimité). Fenêtre glissante de 30 jours
   // depuis coachQuestionsResetAt, pas un calendrier fixe.
   coachQuestionsUsed    Int       @default(0)
   coachQuestionsResetAt DateTime?
