@@ -3,6 +3,7 @@ import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
+import { BackLink } from "@/components/marketing/back-link";
 
 type Tier = {
   nom: string;
@@ -57,6 +58,9 @@ const TIERS: Tier[] = [
 export default function PricingPage() {
   return (
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-10 px-6 py-24">
+      <div className="w-full max-w-5xl pt-8">
+        <BackLink />
+      </div>
       <div className="text-center">
         <SectionLabel>Tarifs</SectionLabel>
         <h1 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
