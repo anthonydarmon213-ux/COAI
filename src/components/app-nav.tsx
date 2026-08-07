@@ -19,7 +19,8 @@ function isGroup(item: NavItem): item is NavGroup {
 // par leur préfixe d'URL — évite un menu à 9 entrées à plat.
 const LINKS: NavItem[] = [
   { href: "/dashboard", label: "Tableau de bord" },
-  { href: "/programme", label: "Votre profil et programme" },
+  { href: "/programme#profil", label: "Votre profil" },
+  { href: "/programme#programme", label: "Votre programme" },
   { href: "/coach", label: "Votre coach IA" },
   { href: "/videos", label: "Streaming" },
   {
@@ -48,7 +49,8 @@ const CHILD_INACTIVE_CLASS =
   "rounded-lg px-3 py-2 text-sm text-graphite-300 transition hover:bg-white/[0.06] hover:text-white";
 
 function isActive(pathname: string | null, href: string) {
-  return pathname === href || (pathname?.startsWith(`${href}/`) ?? false);
+  const path = href.split("#")[0];
+  return pathname === path || (pathname?.startsWith(`${path}/`) ?? false);
 }
 
 // Menu déroulant flottant (portalé sur document.body, position fixed) : sur

@@ -75,7 +75,7 @@ export default async function ProgrammePage() {
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start md:divide-x md:divide-graphite-700">
         {/* Profil */}
-        <div className="flex flex-col gap-3">
+        <div id="profil" className="flex flex-col gap-3 scroll-mt-24">
           <SectionLabel>Votre profil</SectionLabel>
           <Card className="flex flex-col gap-5 p-6 sm:p-8">
             <ProfilCompletion remplis={remplis} total={total} />
@@ -104,7 +104,7 @@ export default async function ProgrammePage() {
         </div>
 
         {/* Programme */}
-        <div className="flex flex-col gap-3 md:pl-8">
+        <div id="programme" className="flex flex-col gap-3 scroll-mt-24 md:pl-8">
           <div className="flex items-center justify-between">
             <SectionLabel>Votre programme</SectionLabel>
             {plan !== "GRATUIT" && <RegenerateButton hasExisting={hasExisting} />}
