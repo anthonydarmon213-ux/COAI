@@ -39,7 +39,7 @@ export function MetricRing({
             fill="none"
             stroke="currentColor"
             strokeWidth={stroke}
-            className="text-graphite-800"
+            className="text-acier/50"
           />
           <circle
             cx={size / 2}
@@ -55,8 +55,8 @@ export function MetricRing({
           />
         </svg>
         <div className="absolute flex flex-col items-center">
-          <span className="text-2xl font-semibold text-graphite-50">{valeur}</span>
-          <span className="text-xs text-graphite-400">{unite}</span>
+          <span className="font-mono text-2xl font-semibold text-graphite-50">{valeur}</span>
+          <span className="font-mono text-xs text-graphite-400">{unite}</span>
         </div>
       </div>
       {delta !== null && (

@@ -29,7 +29,7 @@ export function Gauge({
             fill="none"
             stroke="currentColor"
             strokeWidth={stroke}
-            className="text-graphite-800"
+            className="text-acier/50"
           />
           <circle
             cx={size / 2}
@@ -46,7 +46,7 @@ export function Gauge({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-xl font-semibold text-graphite-50">
+          <span className="font-mono text-xl font-semibold text-graphite-50">
             {Math.round(clamped)}%
           </span>
         </div>
