@@ -84,29 +84,25 @@ export default async function AbonnementPage() {
               </p>
             </div>
             <p className="text-sm leading-6 text-graphite-300">
-              Anthony a 40 ans à peine, et un corps qui n&apos;a pas l&apos;air d&apos;être au
-              courant — âge métabolique 24 ans. Ce n&apos;est pas un chiffre pour épater :
-              c&apos;est ce qui arrive quand on refuse, depuis l&apos;enfance, de rester
-              immobile. Musculation, callisthénie — le handstand est devenu sa signature —,
-              quinze ans de karaté qui lui ont appris la rigueur jusqu&apos;à l&apos;envoyer
-              s&apos;entraîner au Japon, un détour par l&apos;Inde pour apprendre à respirer, un
-              autre par la Thaïlande pour apprendre à encaisser. Chez lui, le mouvement
-              n&apos;est pas une discipline qu&apos;on coche. C&apos;est une façon d&apos;être
-              vivant.
+              Anthony affiche aujourd&apos;hui un âge métabolique de 24 ans, à bientôt 40 ans —
+              la preuve concrète de ce qu&apos;il enseigne. Sportif depuis l&apos;enfance :
+              musculation, callisthénie (le handstand est sa signature), quinze ans de karaté qui
+              l&apos;ont mené jusqu&apos;au Japon pour se former auprès de grands maîtres, un
+              séjour en Inde pour se certifier au yoga, un autre en Thaïlande pour pratiquer le
+              muay thaï en stage.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              De cette exigence-là est né un métier. Dix-sept ans à corriger un mouvement, à
-              entendre ce qu&apos;un chiffre sur la balance ne dira jamais. Formé dans les clubs
-              premium parisiens, il a trouvé sa place au Club Montgolfière Paris et au Club RITM
-              Saint-Germain, sans jamais cesser d&apos;aller vers ceux qui en avaient besoin — en
-              entreprise, à domicile, à distance depuis le Covid. Des centaines
-              d&apos;entrepreneurs sont passés entre ses mains, des VIP, des politiques, des
-              acteurs, une Miss France.
+              Coach diplômé d&apos;État, titulaire de la carte professionnelle
+              d&apos;éducateur sportif, il cumule dix-sept ans d&apos;expérience terrain. Formé
+              dans les clubs premium parisiens, il exerce aujourd&apos;hui au Club Montgolfière
+              Paris et au Club RITM Saint-Germain, intervient en entreprise et accompagne à
+              distance depuis 2020. Il a suivi des centaines d&apos;entrepreneurs, VIP,
+              politiques, acteurs et une Miss France.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Ce qu&apos;il veut, aujourd&apos;hui, c&apos;est simple : que le plus grand nombre
-              connaisse ce qu&apos;il vit lui-même chaque jour — un corps qui ne fait pas mal,
-              qui tient dans le temps, qui reste jeune. C&apos;est pour ça que COAI existe.
+              Sa mission : transmettre son expertise au plus grand nombre — pour un corps sans
+              douleur, fonctionnel, qui reste jeune plus longtemps. C&apos;est pour ça que COAI
+              existe.
             </p>
           </div>
         </Card>
