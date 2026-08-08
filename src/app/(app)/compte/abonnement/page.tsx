@@ -89,10 +89,11 @@ export default async function AbonnementPage() {
               Sportif depuis toujours, passionné par le mouvement sous toutes ses formes —
               musculation, callisthénie (le handstand est sa signature), quinze ans de karaté
               jusqu&apos;à la ceinture noire, deuxième dan obtenu à Paris après un voyage au Japon
-              pour s&apos;entraîner aux côtés des grands maîtres. La même quête l&apos;a mené en
-              Inde, où il s&apos;est certifié au yoga, puis en Thaïlande, en stage dans des camps
-              de muay thaï. Adepte de philosophie, il reste fasciné par la puissance du mental —
-              la même exigence qu&apos;il impose à son corps.
+              pour s&apos;entraîner aux côtés des grands maîtres. Il a aussi voyagé jusqu&apos;en
+              Inde, où il s&apos;est certifié au yoga vinyasa, et jusqu&apos;en Thaïlande, où il a
+              pratiqué le muay thaï en stage dans des camps locaux. Adepte de philosophie, il
+              reste fasciné par la puissance du mental — la même exigence qu&apos;il impose à son
+              corps.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               De cette discipline personnelle est né un métier : coach diplômé d&apos;État,
@@ -101,7 +102,8 @@ export default async function AbonnementPage() {
               chiffre sur la balance ne dit jamais. Formé dans les clubs premium parisiens, il
               exerce aujourd&apos;hui à la Montgolfière Paris et au Club RITM Saint-Germain, après
               avoir été parmi les premiers à développer le coaching à distance dès le Covid —
-              visio, domicile, entreprise. Il a accompagné des centaines d&apos;entrepreneurs,
+              visio, domicile — et intervient aussi directement en entreprise. Il a accompagné
+              des centaines d&apos;entrepreneurs,
               ainsi que des VIP, politiques, acteurs, Miss France — des profils très différents,
               tous réunis par la même chose : passer à l&apos;action. Lui-même Bélier, il fonce.
             </p>
