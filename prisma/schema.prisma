@@ -223,11 +223,19 @@ model Mesure {
   @@map("mesures")
 }
 
+// Un test par qualité physique (pas seulement la force) : DEVELOPPE_COUCHE/
+// SQUAT/SOULEVE_DE_TERRE/TRACTION pour la force, SOUPLESSE (flexion
+// antérieure), EQUILIBRE (appui unipodal yeux fermés), ENDURANCE (test de
+// Cooper, distance en 12 min). Pas de test coordination pour l'instant
+// (aucun protocole standard retenu).
 enum ExerciceMaxi {
   DEVELOPPE_COUCHE
   SQUAT
   SOULEVE_DE_TERRE
   TRACTION
+  SOUPLESSE
+  EQUILIBRE
+  ENDURANCE
 }
 
 // Tests de charge maximale (1RM) — distinct de Mesure (poids/mensurations)

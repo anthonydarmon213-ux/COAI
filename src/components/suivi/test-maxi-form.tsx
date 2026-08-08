@@ -9,10 +9,13 @@ import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 
 const EXERCICES = [
-  { value: "DEVELOPPE_COUCHE", label: "Développé couché", unite: "kg" },
-  { value: "SQUAT", label: "Squat", unite: "kg" },
-  { value: "SOULEVE_DE_TERRE", label: "Soulevé de terre", unite: "kg" },
-  { value: "TRACTION", label: "Traction", unite: "reps" },
+  { value: "DEVELOPPE_COUCHE", label: "Développé couché", unite: "kg", qualite: "Force" },
+  { value: "SQUAT", label: "Squat", unite: "kg", qualite: "Force" },
+  { value: "SOULEVE_DE_TERRE", label: "Soulevé de terre", unite: "kg", qualite: "Force" },
+  { value: "TRACTION", label: "Traction", unite: "reps", qualite: "Force" },
+  { value: "SOUPLESSE", label: "Flexion antérieure", unite: "cm", qualite: "Souplesse" },
+  { value: "EQUILIBRE", label: "Appui unipodal (yeux fermés)", unite: "secondes", qualite: "Équilibre" },
+  { value: "ENDURANCE", label: "Test de Cooper (12 min)", unite: "m", qualite: "Endurance" },
 ] as const;
 
 export function TestMaxiForm() {
@@ -56,11 +59,11 @@ export function TestMaxiForm() {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Field label="Exercice">
+        <Field label="Test">
           <Select value={exercice} onChange={(e) => setExercice(e.target.value as typeof exercice)}>
             {EXERCICES.map((ex) => (
               <option key={ex.value} value={ex.value}>
-                {ex.label}
+                {ex.qualite} — {ex.label}
               </option>
             ))}
           </Select>
@@ -68,7 +71,7 @@ export function TestMaxiForm() {
         <Field label="Date">
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
-        <Field label={`Charge maxi (${uniteActuelle})`}>
+        <Field label={`Résultat (${uniteActuelle})`}>
           <Input
             type="number"
             step="0.5"

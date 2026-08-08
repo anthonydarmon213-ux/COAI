@@ -5,7 +5,12 @@ import { Sparkline } from "@/components/suivi/sparkline";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { LABEL_PAR_EXERCICE, ORDRE_EXERCICES } from "@/lib/tests-maxi/labels";
+import {
+  LABEL_PAR_EXERCICE,
+  ORDRE_EXERCICES,
+  ORDRE_QUALITES,
+  QUALITE_PAR_EXERCICE,
+} from "@/lib/tests-maxi/labels";
 
 export default async function TestsMaxiPage() {
   const user = await getCurrentAppUser();
@@ -29,10 +34,10 @@ export default async function TestsMaxiPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <SectionLabel>Suivi</SectionLabel>
-        <h1 className="text-2xl font-semibold">Tests maxi</h1>
+        <h1 className="text-2xl font-semibold">Tests physiques</h1>
         <p className="text-sm text-graphite-400">
-          Développé couché, squat, soulevé de terre, traction — enregistre ta charge maxi pour
-          voir ta progression sur les mouvements de référence.
+          Force, souplesse, équilibre, endurance — enregistre tes résultats pour voir ta
+          progression sur les qualités physiques de référence.
         </p>
       </div>
 
@@ -49,18 +54,31 @@ export default async function TestsMaxiPage() {
       <TestMaxiForm />
 
       {graphiques.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-6">
           <SectionLabel>Évolution</SectionLabel>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {graphiques.map((g) => (
-              <Sparkline
-                key={g.exercice}
-                label={LABEL_PAR_EXERCICE[g.exercice]}
-                unite={g.unite}
-                points={g.points}
-              />
-            ))}
-          </div>
+          {ORDRE_QUALITES.map((qualite) => {
+            const graphiquesQualite = graphiques.filter(
+              (g) => QUALITE_PAR_EXERCICE[g.exercice] === qualite
+            );
+            if (graphiquesQualite.length === 0) return null;
+            return (
+              <div key={qualite} className="flex flex-col gap-3">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-graphite-500">
+                  {qualite}
+                </span>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {graphiquesQualite.map((g) => (
+                    <Sparkline
+                      key={g.exercice}
+                      label={LABEL_PAR_EXERCICE[g.exercice]}
+                      unite={g.unite}
+                      points={g.points}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 

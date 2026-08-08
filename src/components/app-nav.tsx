@@ -33,7 +33,7 @@ const LINKS: NavItem[] = [
     children: [
       { href: "/suivi/seances", label: "Séances" },
       { href: "/suivi/mesures", label: "Mesures" },
-      { href: "/suivi/tests-maxi", label: "Tests maxi" },
+      { href: "/suivi/tests-maxi", label: "Tests physiques" },
       { href: "/suivi/progression", label: "Progression" },
     ],
   },

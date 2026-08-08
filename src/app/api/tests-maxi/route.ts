@@ -6,20 +6,39 @@ import type { ExerciceMaxi } from "@prisma/client";
 
 // L'unité est déduite de l'exercice côté serveur (jamais confiée au
 // client) : kg pour les mouvements de force, reps pour la traction au
-// poids du corps.
+// poids du corps, cm pour la souplesse, secondes pour l'équilibre, mètres
+// pour l'endurance (test de Cooper, distance en 12 min).
 const UNITE_PAR_EXERCICE: Record<ExerciceMaxi, string> = {
   DEVELOPPE_COUCHE: "kg",
   SQUAT: "kg",
   SOULEVE_DE_TERRE: "kg",
   TRACTION: "reps",
+  SOUPLESSE: "cm",
+  EQUILIBRE: "secondes",
+  ENDURANCE: "m",
 };
 
-const bodySchema = z.object({
-  exercice: z.enum(["DEVELOPPE_COUCHE", "SQUAT", "SOULEVE_DE_TERRE", "TRACTION"]),
-  date: z.coerce.date(),
-  valeur: z.number().positive().max(1000),
-  notes: z.string().max(1000).optional(),
-});
+const bodySchema = z
+  .object({
+    exercice: z.enum([
+      "DEVELOPPE_COUCHE",
+      "SQUAT",
+      "SOULEVE_DE_TERRE",
+      "TRACTION",
+      "SOUPLESSE",
+      "EQUILIBRE",
+      "ENDURANCE",
+    ]),
+    date: z.coerce.date(),
+    // La souplesse (flexion antérieure) se mesure parfois en négatif — ne
+    // pas atteindre ses pieds — les autres qualités n'ont pas de sens sous 0.
+    valeur: z.number().min(-50).max(10000),
+    notes: z.string().max(1000).optional(),
+  })
+  .refine((data) => data.exercice === "SOUPLESSE" || data.valeur > 0, {
+    message: "La valeur doit être positive pour cet exercice",
+    path: ["valeur"],
+  });
 
 export async function GET() {
   const authUser = await getCurrentUser();
