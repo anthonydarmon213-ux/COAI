@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/client";
 import { TestMaxiForm } from "@/components/suivi/test-maxi-form";
 import { Sparkline } from "@/components/suivi/sparkline";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import type { ExerciceMaxi } from "@prisma/client";
 
@@ -42,6 +43,16 @@ export default async function TestsMaxiPage() {
           voir ta progression sur les mouvements de référence.
         </p>
       </div>
+
+      <Card className="flex flex-col items-start gap-2 border-laiton-400/30">
+        <Badge tone="warning">Sécurité</Badge>
+        <p className="text-sm text-graphite-300">
+          Pour un test maxi en charge libre (développé couché, squat, soulevé de terre), veille à
+          être accompagné par un coach pour t&apos;assurer. Pas de coach disponible ? Privilégie
+          les machines guidées. Pas de machine non plus ? Teste plutôt au poids du corps (max
+          pompes, max tractions, max squat pistol...).
+        </p>
+      </Card>
 
       <TestMaxiForm />
 
