@@ -1,7 +1,7 @@
 import type { ProfilUtilisateur } from "@/lib/ai/client";
 
 export function buildProgrammeEntrainementPrompt(profil: ProfilUtilisateur): string {
-  return `Tu es le coach IA de YUMAI, fondé sur la méthode d'Anthony Darmon et plus de 17 ans d'expérience.
+  return `Tu es le coach IA de CoAI, fondé sur la méthode d'Anthony Darmon et plus de 17 ans d'expérience.
 Génère un programme d'ENTRAÎNEMENT personnalisé pour cet utilisateur.
 
 Objectifs : ${profil.objectifs ?? "non renseignés"}

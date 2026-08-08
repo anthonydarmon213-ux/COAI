@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/marketing/legal-page";
 
-export const metadata = { title: "Politique de confidentialité — YUMAI" };
+export const metadata = { title: "Politique de confidentialité — CoAI" };
 
 export default function ConfidentialitePage() {
   return (
@@ -36,7 +36,7 @@ export default function ConfidentialitePage() {
             Données de suivi : séances loguées, mesures corporelles, photos de progression que tu
             choisis d&apos;ajouter.
           </li>
-          <li>Données de paiement : gérées directement par Stripe, jamais stockées par YUMAI.</li>
+          <li>Données de paiement : gérées directement par Stripe, jamais stockées par CoAI.</li>
         </ul>
       </section>
 
@@ -106,7 +106,7 @@ export default function ConfidentialitePage() {
       <section>
         <h2>8. Cookies</h2>
         <p>
-          YUMAI utilise uniquement des cookies techniques nécessaires à l&apos;authentification
+          CoAI utilise uniquement des cookies techniques nécessaires à l&apos;authentification
           (session utilisateur). Aucun cookie publicitaire ou de tracking tiers n&apos;est déposé.
         </p>
       </section>

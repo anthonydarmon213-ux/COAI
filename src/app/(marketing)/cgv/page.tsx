@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/marketing/legal-page";
 
-export const metadata = { title: "Conditions générales de vente — YUMAI" };
+export const metadata = { title: "Conditions générales de vente — CoAI" };
 
 export default function CgvPage() {
   return (
@@ -13,7 +13,7 @@ export default function CgvPage() {
         <h2>1. Objet</h2>
         <p>
           Les présentes conditions générales de vente (CGV) régissent l&apos;abonnement aux
-          services proposés sur YUMAI par Anthony Darmon, auto-entrepreneur (SIRET 53438541400030).
+          services proposés sur CoAI par Anthony Darmon, auto-entrepreneur (SIRET 53438541400030).
           Toute souscription à un abonnement payant implique l&apos;acceptation pleine et entière
           des présentes CGV.
         </p>
@@ -47,7 +47,7 @@ export default function CgvPage() {
         <p>
           Les prix sont indiqués en euros, toutes taxes comprises. Le paiement s&apos;effectue par
           carte bancaire via notre prestataire Stripe, de manière récurrente et automatique chaque
-          mois à la date anniversaire de la souscription. YUMAI ne stocke aucune donnée bancaire :
+          mois à la date anniversaire de la souscription. CoAI ne stocke aucune donnée bancaire :
           celles-ci sont traitées directement par Stripe.
         </p>
       </section>
@@ -92,7 +92,7 @@ export default function CgvPage() {
       <section>
         <h2>7. Responsabilité</h2>
         <p>
-          YUMAI met en œuvre les moyens raisonnables pour assurer la disponibilité et la fiabilité
+          CoAI met en œuvre les moyens raisonnables pour assurer la disponibilité et la fiabilité
           du service, sans garantie de résultat sportif. La responsabilité de l&apos;éditeur ne
           saurait être engagée en cas d&apos;usage inapproprié du service par l&apos;utilisateur ou
           de non-respect des recommandations de prudence usuelles en matière d&apos;activité

@@ -19,7 +19,7 @@ export function AppNav() {
   return (
     <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-graphite-800 px-6 py-4">
       <span className="flex items-baseline gap-2 font-mono uppercase text-laiton-400">
-        <span className="text-sm tracking-widest">YUMAI</span>
+        <span className="text-sm tracking-widest">CoAI</span>
         <span className="text-[10px] tracking-[0.15em] text-graphite-400">
           by Anthony Darmon · HI × AI™
         </span>

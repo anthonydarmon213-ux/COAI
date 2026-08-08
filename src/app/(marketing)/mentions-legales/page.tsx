@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/marketing/legal-page";
 
-export const metadata = { title: "Mentions légales — YUMAI" };
+export const metadata = { title: "Mentions légales — CoAI" };
 
 export default function MentionsLegalesPage() {
   return (
@@ -8,7 +8,7 @@ export default function MentionsLegalesPage() {
       <section>
         <h2>Éditeur du site</h2>
         <p>
-          Le site YUMAI (accessible à l&apos;adresse de ce nom de domaine) est édité par :
+          Le site CoAI (accessible à l&apos;adresse de ce nom de domaine) est édité par :
           <br />
           <strong>Anthony Darmon, auto-entrepreneur</strong>
           <br />
@@ -40,7 +40,7 @@ export default function MentionsLegalesPage() {
       <section>
         <h2>Propriété intellectuelle</h2>
         <p>
-          L&apos;ensemble des contenus présents sur ce site (textes, marque YUMAI, logo,
+          L&apos;ensemble des contenus présents sur ce site (textes, marque CoAI, logo,
           méthodologie THE METHOD) sont la propriété d&apos;Anthony Darmon, sauf mention contraire.
           Toute reproduction sans autorisation préalable est interdite.
         </p>
@@ -49,7 +49,7 @@ export default function MentionsLegalesPage() {
       <section>
         <h2>Programmes générés par intelligence artificielle</h2>
         <p>
-          Les programmes d&apos;entraînement, de nutrition et de récupération proposés sur YUMAI
+          Les programmes d&apos;entraînement, de nutrition et de récupération proposés sur CoAI
           sont générés par un système d&apos;intelligence artificielle puis relus et validés par
           Anthony Darmon, coach diplômé d&apos;État, avant d&apos;être présentés comme définitifs à
           l&apos;utilisateur. Ils ne remplacent pas un avis médical : en cas de doute ou de

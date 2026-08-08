@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { HeroOrb } from "@/components/marketing/hero-orb";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 
-export const metadata = { title: "Le test de hanche de 10 secondes — YUMAI" };
+export const metadata = { title: "Le test de hanche de 10 secondes — CoAI" };
 
 const MECANISME = [
   {
@@ -44,11 +44,11 @@ export default function MobilitePage() {
           <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.03em] text-graphite-50 sm:text-6xl">
             Ce guide traite le symptôme.
             <br />
-            <span className="text-laiton-400">YUMAI construit la solution sur mesure.</span>
+            <span className="text-laiton-400">CoAI construit la solution sur mesure.</span>
           </h1>
           <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
             Les 5 exercices que tu viens de recevoir soulagent — mais ta posture, ton niveau
-            et tes objectifs sont uniques. YUMAI génère un programme personnalisé par IA,
+            et tes objectifs sont uniques. CoAI génère un programme personnalisé par IA,
             validé par Anthony Darmon, coach diplômé d&apos;État.
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function MobilitePage() {
       {/* Crédibilité */}
       <section className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
         <div className="relative mx-auto h-72 w-64 overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl sm:h-96 sm:w-80 md:order-first">
-          <Image src="/anthony-darmon.jpg" alt="Anthony Darmon — YUMAI" fill className="object-cover" />
+          <Image src="/anthony-darmon.jpg" alt="Anthony Darmon — CoAI" fill className="object-cover" />
         </div>
         <div className="flex flex-col items-center gap-5 md:items-start">
           <SectionLabel>Ton coach</SectionLabel>
@@ -126,7 +126,7 @@ export default function MobilitePage() {
       <section className="mx-auto my-16 flex w-[calc(100%-3rem)] max-w-2xl flex-col items-center gap-6 rounded-[2rem] border border-laiton-400/20 bg-white/[0.035] px-6 py-12 text-center shadow-[0_40px_120px_-60px_rgba(201,162,98,0.35)] backdrop-blur sm:px-12 sm:py-16">
         <SectionLabel>L&apos;offre</SectionLabel>
         <h2 className="text-3xl font-semibold tracking-tight text-graphite-50 sm:text-4xl">
-          YUMAI Standard
+          CoAI Standard
         </h2>
         <div className="flex items-baseline gap-1">
           <p className="text-5xl font-semibold text-graphite-50">49€</p>
@@ -140,7 +140,7 @@ export default function MobilitePage() {
             </li>
           ))}
         </ul>
-        <SubscribeButton plan="STANDARD" label="Découvrir YUMAI Standard" />
+        <SubscribeButton plan="STANDARD" label="Découvrir CoAI Standard" />
       </section>
 
       {/* CTA final */}

@@ -18,18 +18,18 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  applicationName: "YUMAI",
-  title: "YUMAI — HI × AI™",
+  applicationName: "CoAI",
+  title: "CoAI — HI × AI™",
   description:
     "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
   openGraph: {
-    title: "YUMAI — HI × AI™",
+    title: "CoAI — HI × AI™",
     description: "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "YUMAI — HI × AI™",
+    title: "CoAI — HI × AI™",
     description: "AI generates. Humans validate. L’expertise humaine augmentée par l’IA.",
   },
 };

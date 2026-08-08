@@ -54,7 +54,7 @@ export default function LandingPage() {
         <div className="relative z-10 flex flex-col items-center gap-6">
           <SectionLabel>Coaching · Suivi · IA</SectionLabel>
           <h1 className="text-6xl font-semibold tracking-[-0.06em] text-graphite-50 sm:text-8xl">
-            YUMAI
+            CoAI
           </h1>
           <p className="font-mono text-xs uppercase tracking-[0.4em] text-laiton-400">
             HI × AI™
@@ -149,10 +149,10 @@ export default function LandingPage() {
       >
         <SectionLabel>Accès en avant-première</SectionLabel>
         <h2 className="text-3xl font-semibold tracking-tight text-graphite-50 sm:text-4xl">
-          Membres fondateurs YUMAI
+          Membres fondateurs CoAI
         </h2>
         <p className="max-w-lg text-graphite-300">
-          Rejoins les premiers membres de YUMAI : ton tarif de lancement à 49€/mois reste
+          Rejoins les premiers membres de CoAI : ton tarif de lancement à 49€/mois reste
           garanti tant que ton abonnement est actif, même quand les prix évolueront pour les
           nouveaux inscrits.
         </p>

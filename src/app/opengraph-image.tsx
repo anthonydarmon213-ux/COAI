@@ -31,7 +31,7 @@ export default function OpengraphImage() {
           Coaching · Suivi · IA
         </span>
         <span style={{ fontSize: 140, fontWeight: 700, color: "#f5f6f7", letterSpacing: -4 }}>
-          YUMAI
+          CoAI
         </span>
         <span
           style={{
