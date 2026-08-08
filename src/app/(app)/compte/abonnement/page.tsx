@@ -86,23 +86,25 @@ export default async function AbonnementPage() {
             <p className="text-sm leading-6 text-graphite-300">
               Anthony affiche aujourd&apos;hui un âge métabolique de 24 ans, à bientôt 40 ans —
               la preuve concrète de ce qu&apos;il enseigne. Sportif depuis l&apos;enfance :
-              musculation, callisthénie (le handstand est sa signature), quinze ans de karaté qui
-              l&apos;ont mené jusqu&apos;au Japon pour se former auprès de grands maîtres, un
-              séjour en Inde pour se certifier au yoga, un autre en Thaïlande pour pratiquer le
-              muay thaï en stage.
+              musculation et callisthénie — force et posture — jusqu&apos;à faire du handstand sa
+              signature ; quinze ans de karaté — rigueur et précision du mouvement — qui
+              l&apos;ont mené jusqu&apos;au Japon pour se former auprès de grands maîtres ; un
+              séjour en Inde pour se certifier au yoga — respiration et maîtrise mentale — et un
+              autre en Thaïlande pour le muay thaï — endurance et sang-froid.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               Coach diplômé d&apos;État, titulaire de la carte professionnelle
-              d&apos;éducateur sportif, il cumule dix-sept ans d&apos;expérience terrain. Formé
+              d&apos;éducateur sportif et formé à l&apos;Institut des Métiers de la Forme (double
+              mention forme et force), il cumule dix-sept ans d&apos;expérience terrain. Formé
               dans les clubs premium parisiens, il exerce aujourd&apos;hui au Club Montgolfière
               Paris et au Club RITM Saint-Germain, intervient en entreprise et accompagne à
               distance depuis 2020. Il a suivi des centaines d&apos;entrepreneurs, VIP,
               politiques, acteurs et une Miss France.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Sa mission : transmettre son expertise au plus grand nombre — pour un corps sans
-              douleur, fonctionnel, qui reste jeune plus longtemps. C&apos;est pour ça que COAI
-              existe.
+              Sa mission : transmettre au plus grand nombre son expertise sur les trois piliers
+              d&apos;un corps qui reste jeune — l&apos;entraînement, l&apos;alimentation et la
+              récupération. C&apos;est pour ça que COAI existe.
             </p>
           </div>
         </Card>
