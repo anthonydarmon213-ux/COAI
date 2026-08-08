@@ -1,5 +1,6 @@
 import { JsonView } from "@/components/programme/json-view";
 import { SemainePlan } from "@/components/programme/semaine-plan";
+import { ContreIndications } from "@/components/programme/contre-indications";
 
 // Vue dédiée au pilier RÉCUPÉRATION : mêmes codes visuels que l'entraînement
 // et la nutrition (vue d'ensemble + un jour par carte repliable).
@@ -10,15 +11,17 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 export function RecuperationView({ data }: { data: unknown }) {
   if (!isPlainObject(data)) return <JsonView data={data} />;
 
-  const { titre, vueEnsemble, jours, ...reste } = data as {
+  const { titre, vueEnsemble, contreIndications, jours, ...reste } = data as {
     titre?: string;
     vueEnsemble?: string;
+    contreIndications?: string[];
     jours?: Record<string, unknown>[];
     [key: string]: unknown;
   };
 
   return (
     <div className="flex flex-col gap-5">
+      <ContreIndications items={contreIndications} />
       <SemainePlan
         titre={titre}
         vueEnsemble={vueEnsemble}

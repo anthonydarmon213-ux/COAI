@@ -8,6 +8,7 @@ export type JourRecuperation = {
 export type StructureRecuperation = {
   titre: string;
   vueEnsemble: string;
+  contreIndications: string[];
   jours: JourRecuperation[];
 };
 
@@ -37,10 +38,14 @@ Réponds uniquement avec ce JSON (rien d'autre) :
 {
   "titre": "titre court, ex: Récupération — sommeil et gestion de la fatigue",
   "vueEnsemble": "grands principes de récupération pour la semaine (sommeil, gestion de la fatigue, rythme entraînement/repos) — pas le détail jour par jour",
+  "contreIndications": ["pratique de récupération à éviter à cause d'une contrainte de santé ou d'un antécédent déclaré, un par élément — ex: sauna (hypertension signalée)"],
   "jours": [
     { "jour": "Lundi", "type": "Jour d'entraînement" }
   ]
 }
+"contreIndications" liste, de façon très visible, toute pratique de récupération à éviter à cause
+d'une contrainte de santé ou d'un antécédent déclaré — tableau vide si rien n'est renseigné, jamais
+une phrase générique inventée.
 "jours" contient un objet par jour de la semaine, les 7 jours (Lundi à Dimanche), dans l'ordre.
 Détermine "type" pour chaque jour ("Jour d'entraînement" ou "Jour de repos") à partir de la
 fréquence d'entraînement déclarée, répartis de façon réaliste sur la semaine.`;

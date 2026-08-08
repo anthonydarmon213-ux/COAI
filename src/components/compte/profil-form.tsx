@@ -149,6 +149,7 @@ type Profil = {
   frequenceEntrainement?: string | null;
   sportsPratiques?: string | null;
   habitudesAlimentaires?: string | null;
+  allergiesAlimentaires?: string | null;
   repasParJour?: string | null;
   hydratation?: string | null;
   consommationCafe?: string | null;
@@ -185,6 +186,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   );
   const [habitudesAlimentaires, setHabitudesAlimentaires] = useState(
     profil.habitudesAlimentaires ?? ""
+  );
+  const [allergiesAlimentaires, setAllergiesAlimentaires] = useState(
+    profil.allergiesAlimentaires ?? ""
   );
   const [repasParJour, setRepasParJour] = useState(profil.repasParJour ?? "");
   const [hydratation, setHydratation] = useState(profil.hydratation ?? "");
@@ -230,6 +234,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           frequenceEntrainement: frequenceEntrainement || undefined,
           sportsPratiques: sportsPratiques.length ? sportsPratiques.join(", ") : undefined,
           habitudesAlimentaires: habitudesAlimentaires || undefined,
+          allergiesAlimentaires: allergiesAlimentaires || undefined,
           repasParJour: repasParJour || undefined,
           hydratation: hydratation || undefined,
           consommationCafe: consommationCafe || undefined,
@@ -357,6 +362,13 @@ export function ProfilForm({ profil }: { profil: Profil }) {
               </option>
             ))}
           </Select>
+        </Field>
+        <Field label="Allergies, intolérances ou régime particulier">
+          <Textarea
+            placeholder="ex: allergie aux arachides, intolérance au lactose, végétarien, sans gluten..."
+            value={allergiesAlimentaires}
+            onChange={(e) => setAllergiesAlimentaires(e.target.value)}
+          />
         </Field>
         <Field label="Repas par jour">
           <Select value={repasParJour} onChange={(e) => setRepasParJour(e.target.value)}>

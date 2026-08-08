@@ -1,5 +1,6 @@
 import { JsonView } from "@/components/programme/json-view";
 import { SemainePlan } from "@/components/programme/semaine-plan";
+import { ContreIndications } from "@/components/programme/contre-indications";
 
 // Vue dédiée au pilier NUTRITION : mêmes codes visuels que l'entraînement
 // (vue d'ensemble + un jour par carte repliable) pour une lecture cohérente
@@ -17,9 +18,10 @@ type ConseilHabitude = {
 export function NutritionView({ data }: { data: unknown }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="repas" />;
 
-  const { titre, vueEnsemble, objectifsJournaliers, conseilsHabitudes, jours, ...reste } = data as {
+  const { titre, vueEnsemble, contreIndications, objectifsJournaliers, conseilsHabitudes, jours, ...reste } = data as {
     titre?: string;
     vueEnsemble?: string;
+    contreIndications?: string[];
     objectifsJournaliers?: Record<string, unknown>;
     conseilsHabitudes?: ConseilHabitude[];
     jours?: Record<string, unknown>[];
@@ -37,6 +39,7 @@ export function NutritionView({ data }: { data: unknown }) {
 
   return (
     <div className="flex flex-col gap-5">
+      <ContreIndications items={contreIndications} />
       <SemainePlan
         titre={titre}
         badges={badges}

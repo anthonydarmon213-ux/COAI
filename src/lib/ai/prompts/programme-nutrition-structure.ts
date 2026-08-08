@@ -13,6 +13,7 @@ export type ConseilHabitude = {
 export type StructureNutrition = {
   titre: string;
   vueEnsemble: string;
+  contreIndications: string[];
   objectifsJournaliers: {
     calories: string;
     proteines: string;
@@ -38,6 +39,7 @@ Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Sexe : ${profil.sexe ?? "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
+Allergies, intolérances ou régime alimentaire particulier : ${profil.allergiesAlimentaires ?? "aucun connu"}
 Habitudes alimentaires actuelles : ${profil.habitudesAlimentaires ?? "non renseignées"}
 Repas par jour actuellement : ${profil.repasParJour ?? "non renseigné"}
 Hydratation actuelle : ${profil.hydratation ?? "non renseignée"}
@@ -52,6 +54,7 @@ Réponds uniquement avec ce JSON (rien d'autre) :
 {
   "titre": "titre court, ex: Plan nutrition — maintien ~2400 kcal/jour",
   "vueEnsemble": "grands principes nutritionnels de la semaine (équilibre, structure des repas, ce sur quoi se concentrer) — pas le détail des repas jour par jour",
+  "contreIndications": ["aliment ou catégorie d'aliments à éviter absolument, un par élément — ex: arachides (allergie déclarée)"],
   "objectifsJournaliers": { "calories": "~2400 kcal", "proteines": "~150 g", "glucides": "~260 g", "lipides": "~75 g" },
   "conseilsHabitudes": [
     { "sujet": "Hydratation", "constatActuel": "...", "conseil": "..." },
@@ -62,6 +65,9 @@ Réponds uniquement avec ce JSON (rien d'autre) :
     { "jour": "Lundi" }
   ]
 }
+"contreIndications" liste, de façon très visible, tout aliment ou catégorie à éviter à cause d'une
+allergie, intolérance ou régime déclaré — tableau vide si rien n'est renseigné, jamais une phrase
+générique inventée.
 "objectifsJournaliers" doit être réaliste et basé sur le profil (âge, sexe, morphologie, objectifs,
 niveau d'activité), pas des valeurs inventées au hasard.
 Pour chaque entrée de "conseilsHabitudes", respecte TOUJOURS cet ordre de champs : "sujet", puis

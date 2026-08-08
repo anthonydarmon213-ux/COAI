@@ -10,6 +10,7 @@ export type StructureEntrainement = {
   titre: string;
   frequenceParSemaine: string;
   vueEnsemble: string;
+  contreIndications: string[];
   dureeProgramme: string;
   jours: JourEntrainement[];
 };
@@ -42,11 +43,15 @@ Réponds uniquement avec ce JSON (rien d'autre) :
   "titre": "titre court mentionnant la fréquence hebdomadaire, ex: Full Body — 4 séances/semaine",
   "frequenceParSemaine": "la fréquence en toutes lettres, ex: 4 séances par semaine",
   "vueEnsemble": "récapitulatif jour par jour de la répartition sur la semaine",
+  "contreIndications": ["mouvement ou type d'exercice à éviter à cause d'une contrainte de santé ou d'un antécédent déclaré, un par élément — ex: squat profond (douleur de genou signalée)"],
   "dureeProgramme": "3 semaines, à réévaluer et ajuster ensuite selon la progression",
   "jours": [
     { "jour": "Lundi", "focus": "Haut du corps — Push/Pull", "sportExistant": false }
   ]
 }
+"contreIndications" liste, de façon très visible, tout mouvement ou type d'effort à éviter à cause
+d'une contrainte de santé ou d'un antécédent déclaré — tableau vide si rien n'est renseigné, jamais
+une phrase générique inventée.
 "jours" ne contient qu'un objet par jour d'ENTRAÎNEMENT (pas les jours de repos). Mets
 "sportExistant": true pour un jour qui s'appuie sur un sport déjà pratiqué par l'utilisateur
 (ex: boxe, yoga) plutôt qu'une séance de musculation classique.`;

@@ -49,6 +49,7 @@ async function genererEntrainement(profil: ProfilUtilisateur) {
     titre: structure.titre,
     frequenceParSemaine: structure.frequenceParSemaine,
     vueEnsemble: structure.vueEnsemble,
+    contreIndications: structure.contreIndications,
     dureeProgramme: structure.dureeProgramme,
     seances,
   };
@@ -66,6 +67,7 @@ async function genererNutrition(profil: ProfilUtilisateur) {
   return {
     titre: structure.titre,
     vueEnsemble: structure.vueEnsemble,
+    contreIndications: structure.contreIndications,
     objectifsJournaliers: structure.objectifsJournaliers,
     conseilsHabitudes: structure.conseilsHabitudes,
     jours,
@@ -86,6 +88,7 @@ async function genererRecuperation(profil: ProfilUtilisateur) {
   return {
     titre: structure.titre,
     vueEnsemble: structure.vueEnsemble,
+    contreIndications: structure.contreIndications,
     jours,
   };
 }
@@ -131,6 +134,7 @@ export async function POST() {
     frequenceEntrainement: user.profile?.frequenceEntrainement,
     sportsPratiques: user.profile?.sportsPratiques,
     habitudesAlimentaires: user.profile?.habitudesAlimentaires,
+    allergiesAlimentaires: user.profile?.allergiesAlimentaires,
     repasParJour: user.profile?.repasParJour,
     hydratation: user.profile?.hydratation,
     consommationCafe: user.profile?.consommationCafe,

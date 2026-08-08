@@ -94,6 +94,10 @@ model Profile {
   frequenceEntrainement String?
   sportsPratiques       String?
   habitudesAlimentaires String?
+  // Allergies, intolérances ou régime alimentaire particulier (végétarien,
+  // sans gluten, sans lactose...) — distinct de contraintesSante/
+  // antecedentsMedicaux qui couvrent la santé générale, pas l'alimentation.
+  allergiesAlimentaires String?
   repasParJour          String?
   hydratation           String?
   consommationCafe      String?

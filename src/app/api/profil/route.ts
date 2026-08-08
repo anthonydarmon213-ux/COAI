@@ -25,6 +25,7 @@ const bodySchema = z.object({
   ]).optional(),
   sportsPratiques: z.string().max(1000).optional(),
   habitudesAlimentaires: z.string().max(1000).optional(),
+  allergiesAlimentaires: z.string().max(1000).optional(),
   repasParJour: z.string().max(200).optional(),
   hydratation: z.string().max(200).optional(),
   consommationCafe: z.string().max(200).optional(),

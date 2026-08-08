@@ -17,6 +17,7 @@ export type ProfilUtilisateur = {
   frequenceEntrainement?: string | null;
   sportsPratiques?: string | null;
   habitudesAlimentaires?: string | null;
+  allergiesAlimentaires?: string | null;
   repasParJour?: string | null;
   hydratation?: string | null;
   consommationCafe?: string | null;

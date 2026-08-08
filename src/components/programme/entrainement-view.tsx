@@ -1,6 +1,7 @@
 import { JsonView } from "@/components/programme/json-view";
 import { ExerciceCard } from "@/components/programme/exercice-card";
 import { SemainePlan } from "@/components/programme/semaine-plan";
+import { ContreIndications } from "@/components/programme/contre-indications";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
 // semaine, puis replie chaque séance (fermée par défaut) pour éviter
@@ -13,11 +14,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 export function EntrainementView({ data }: { data: unknown }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="exercice" />;
 
-  const { titre, frequenceParSemaine, dureeProgramme, vueEnsemble, seances, ...reste } = data as {
+  const { titre, frequenceParSemaine, dureeProgramme, vueEnsemble, contreIndications, seances, ...reste } = data as {
     titre?: string;
     frequenceParSemaine?: string;
     dureeProgramme?: string;
     vueEnsemble?: string;
+    contreIndications?: string[];
     seances?: Record<string, unknown>[];
     [key: string]: unknown;
   };
@@ -29,6 +31,7 @@ export function EntrainementView({ data }: { data: unknown }) {
 
   return (
     <div className="flex flex-col gap-5">
+      <ContreIndications items={contreIndications} />
       <SemainePlan
         titre={titre}
         badges={badges}
