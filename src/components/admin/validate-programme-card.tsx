@@ -6,13 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { SectionLabel } from "@/components/ui/section-label";
-import { JsonView } from "@/components/programme/json-view";
+import { EntrainementView } from "@/components/programme/entrainement-view";
+import { NutritionView } from "@/components/programme/nutrition-view";
+import { RecuperationView } from "@/components/programme/recuperation-view";
 
 const PILIER_LABELS: Record<string, string> = {
   ENTRAINEMENT: "Entraînement",
   NUTRITION: "Nutrition",
   RECUPERATION: "Récupération",
 };
+
+function PilierView({ pilier, contenu }: { pilier: string; contenu: unknown }) {
+  if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+  if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
+  if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
+  return null;
+}
 
 export function ValidateProgrammeCard({
   id,
@@ -99,8 +108,8 @@ export function ValidateProgrammeCard({
           onChange={(e) => setDraft(e.target.value)}
         />
       ) : (
-        <div className="max-h-96 overflow-y-auto rounded-md border border-graphite-800 p-3">
-          <JsonView data={contenu} />
+        <div className="max-h-[32rem] overflow-y-auto rounded-md border border-graphite-800 p-3">
+          <PilierView pilier={pilier} contenu={contenu} />
         </div>
       )}
 

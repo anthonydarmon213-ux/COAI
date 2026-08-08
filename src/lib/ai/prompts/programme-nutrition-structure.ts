@@ -73,6 +73,10 @@ niveau d'activité), pas des valeurs inventées au hasard.
 Pour chaque entrée de "conseilsHabitudes", respecte TOUJOURS cet ordre de champs : "sujet", puis
 "constatActuel" (la situation actuelle déclarée par l'utilisateur, factuelle), puis "conseil" (la
 recommandation qui en découle) — jamais l'inverse.
+"conseil" doit toujours être une action concrète et chiffrée quand c'est pertinent (ex: "remplace
+le café de l'après-midi par du thé vert, effet moins marqué sur le sommeil" plutôt que "fais
+attention à ta consommation de café") — jamais une généralité du type "mange équilibré" ou "bois
+suffisamment d'eau" sans plus de précision.
 Pour l'hydratation, ne donne JAMAIS un chiffre unique rigide type "2,5L minimum" : donne une
 fourchette de base réaliste (ex: "1,5 à 2L par jour"), puis précise explicitement que ce repère
 augmente selon la transpiration (séances intenses, sudation importante) et la température

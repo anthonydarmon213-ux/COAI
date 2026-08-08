@@ -36,6 +36,10 @@ repli explicite.`
     : ""
 }
 
+Reste concis et efficace : 5 à 7 exercices maximum par séance (l'essentiel, pas une liste
+exhaustive) — mieux vaut une séance courte et réalisable qu'un plan interminable que personne ne
+suit jusqu'au bout.
+
 Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "echauffement"
 (obligatoire, en 3 temps avant la charge de travail : (1) quelques minutes de cardio léger pour
 augmenter la température corporelle et le rythme cardiaque, (2) mobilité articulaire ciblée sur
