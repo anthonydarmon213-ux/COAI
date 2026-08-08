@@ -27,7 +27,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "1 mois offert dès l'inscription (carte bancaire demandée), puis 19€/mois pour ton programme généré par IA, sans relecture humaine. Passe à 49€/mois quand tu veux que chaque programme soit relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
+      "7 jours offerts dès l'inscription (carte bancaire demandée), puis 19€/mois pour ton programme généré par IA, sans relecture humaine. Passe à 49€/mois quand tu veux que chaque programme soit relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
   },
   {
     question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
@@ -258,7 +258,7 @@ export default function LandingPage() {
           Commence à ton rythme.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          1 mois offert pour découvrir ton espace et ton suivi, puis 19€/mois pour ton programme
+          7 jours offerts pour découvrir ton espace et ton suivi, puis 19€/mois pour ton programme
           généré par IA. Passe à 49€/mois quand tu veux qu&apos;un coach diplômé d&apos;État le
           relise et le valide. Sans engagement.
         </p>
@@ -290,8 +290,8 @@ export default function LandingPage() {
       <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 py-24 text-center">
         <h2 className="font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Prêt à commencer ?</h2>
         <p className="text-graphite-300">
-          1 mois offert, puis 19€/mois pour ton programme généré par IA — ou 49€/mois avec
-          relecture et validation par Anthony. Sans engagement.
+          7 jours offerts, puis 19€/mois pour ton programme généré par IA — ou 49€/mois avec
+          relecture et validation par un coach diplômé d&apos;État. Sans engagement.
         </p>
         <Link href="/sign-up">
           <Button>Commencer</Button>

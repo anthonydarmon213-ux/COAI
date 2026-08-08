@@ -4,7 +4,7 @@ export type EffectivePlan = "GRATUIT" | "STANDARD" | "PREMIUM";
 
 const ACTIVE_STATUSES = new Set(["ACTIVE", "PAST_DUE"]);
 
-// Le palier Gratuit est désormais un vrai abonnement Stripe (1 mois offert
+// Le palier Gratuit est désormais un vrai abonnement Stripe (7 jours offerts
 // puis 19€/mois, carte obligatoire dès l'inscription). En l'absence de ligne
 // Subscription (edge case : compte créé avant l'introduction de cette
 // offre, ou juste après l'inscription avant que le webhook Stripe n'ait
@@ -19,7 +19,7 @@ export function getEffectivePlan(subscription?: Subscription | null): EffectiveP
 // séance depuis ce renommage), qui n'est plus vendu comme abonnement — ce
 // label ne concerne que d'éventuels abonnés déjà sur l'ancienne offre.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
-  GRATUIT: "Impulsion — 19€/mois après 1 mois offert",
+  GRATUIT: "Impulsion — 19€/mois après 7 jours offerts",
   STANDARD: "Transformation — 49€/mois",
   PREMIUM: "Ancien Premium — 199€/mois",
 };

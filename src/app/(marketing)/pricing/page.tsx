@@ -11,7 +11,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 export const metadata: Metadata = {
   title: "Tarifs — COAI",
   description:
-    "Choisis ton niveau d'accompagnement : Impulsion (1 mois offert), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.",
+    "Choisis ton niveau d'accompagnement : Impulsion (7 jours offerts), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -44,9 +44,9 @@ const TIERS: Tier[] = [
   {
     nom: "Impulsion",
     prix: "0€",
-    suffixe: "le 1er mois",
+    suffixe: "les 7 premiers jours",
     description:
-      "1 mois offert pour découvrir COAI, puis 19€/mois. Ton programme généré par IA, sans relecture humaine. Sans engagement — résiliable à tout moment.",
+      "7 jours offerts pour découvrir COAI, puis 19€/mois. Ton programme généré par IA, sans relecture humaine. Sans engagement — résiliable à tout moment.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -202,7 +202,7 @@ export default function PricingPage() {
               <SubscribeButton plan={tier.plan} label={`S'abonner — ${tier.prix}${tier.suffixe}`} />
             ) : (
               <Link href="/sign-up">
-                <Button>Créer mon compte — 1 mois offert</Button>
+                <Button>Créer mon compte — 7 jours offerts</Button>
               </Link>
             )}
           </Card>
@@ -210,7 +210,7 @@ export default function PricingPage() {
       </div>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        L&apos;offre Impulsion (1 mois offert, carte bancaire requise à l&apos;inscription, puis
+        L&apos;offre Impulsion (7 jours offerts, carte bancaire requise à l&apos;inscription, puis
         19€/mois) et l&apos;offre Transformation sont sans engagement, résiliables à tout moment depuis
         ton compte. Les séances VIP sont réservées et payées à la séance, hors
         abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible

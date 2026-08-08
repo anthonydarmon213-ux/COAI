@@ -150,11 +150,11 @@ export default function SignUpPage() {
               onChange={(e) => setConsentOffre(e.target.checked)}
               className="mt-1"
             />
-            Je reconnais avoir pris connaissance des conditions de l&apos;offre : 1 mois d&apos;accès
+            Je reconnais avoir pris connaissance des conditions de l&apos;offre : 7 jours d&apos;accès
             gratuit à compter de ce jour, puis passage automatique à un abonnement de 19€/mois,
-            sauf résiliation avant la fin du mois gratuit. Je demande le début immédiat du
+            sauf résiliation avant la fin des 7 jours. Je demande le début immédiat du
             service et reconnais renoncer à mon droit de rétractation de 14 jours pour la partie
-            du service déjà utilisée durant le mois gratuit. J&apos;accepte les{" "}
+            du service déjà utilisée durant la période offerte. J&apos;accepte les{" "}
             <Link href="/cgv" target="_blank" className="underline">
               CGV
             </Link>
@@ -162,7 +162,7 @@ export default function SignUpPage() {
           </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading ? "Redirection vers le paiement…" : "Créer mon compte — 1 mois offert"}
+            {loading ? "Redirection vers le paiement…" : "Créer mon compte — 7 jours offerts"}
           </Button>
         </form>
         <p className="text-sm text-graphite-400">

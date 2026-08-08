@@ -14,7 +14,7 @@ const CONTENU_PAR_PLAN: Record<"GRATUIT" | "STANDARD", { titre: string; descript
   GRATUIT: {
     titre: "Bienvenue dans l'offre Impulsion",
     description:
-      "Ton abonnement est actif (1 mois offert, puis 19€/mois). Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — généré par IA, sans relecture humaine à ce palier.",
+      "Ton abonnement est actif (7 jours offerts, puis 19€/mois). Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — généré par IA, sans relecture humaine à ce palier.",
   },
   STANDARD: {
     titre: "Bienvenue dans l'offre Transformation",

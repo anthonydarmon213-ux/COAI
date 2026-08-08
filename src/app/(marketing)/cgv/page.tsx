@@ -26,9 +26,9 @@ export default function CgvPage() {
         <h2>2. Description des offres</h2>
         <ul>
           <li>
-            <strong>Impulsion (19€/mois après 1 mois offert)</strong> — 1 mois d&apos;accès gratuit
+            <strong>Impulsion (19€/mois après 7 jours offerts)</strong> — 7 jours d&apos;accès gratuit
             à compter de l&apos;inscription, carte bancaire requise dès la souscription ; sauf
-            résiliation avant la fin de ce mois, l&apos;abonnement bascule automatiquement sur
+            résiliation avant la fin de ces 7 jours, l&apos;abonnement bascule automatiquement sur
             19€/mois. Inclut le journal de séances, le suivi des mesures, les graphiques de
             progression, ainsi que la génération d&apos;un programme d&apos;entraînement, de
             nutrition et de récupération par intelligence artificielle — ce programme n&apos;est
@@ -49,7 +49,7 @@ export default function CgvPage() {
         <p>
           Pour l&apos;offre Impulsion, l&apos;utilisateur reconnaît, en cochant la case dédiée lors
           de l&apos;inscription, demander le début immédiat du service et renoncer à son droit de
-          rétractation de 14 jours pour la partie du service déjà utilisée durant le mois gratuit.
+          rétractation de 14 jours pour la partie du service déjà utilisée durant la période offerte.
         </p>
         <p>
           Le détail et les tarifs à jour de chaque offre sont consultables sur la page{" "}

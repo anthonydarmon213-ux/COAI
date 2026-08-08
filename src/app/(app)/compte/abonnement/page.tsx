@@ -140,7 +140,7 @@ export default async function AbonnementPage() {
         )}
         {!finProgrammee && enEssai && (
           <p className="text-sm text-graphite-400">
-            Ton mois offert se termine le{" "}
+            Tes 7 jours offerts se terminent le{" "}
             {user.subscription!.trialEnd!.toLocaleDateString("fr-FR", {
               day: "numeric",
               month: "long",

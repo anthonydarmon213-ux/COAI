@@ -85,14 +85,24 @@ plus faciles à convaincre.
   site qui reste piloté par `price_id`, pas par le nom du produit).
 - Case de consentement dédiée ajoutée au flow d'inscription (RGPD +
   aptitude sportive existaient déjà) : reconnaissance des conditions de
-  l'offre (1 mois puis 9€/mois) + renonciation au droit de rétractation de
-  14 jours pour la partie du service consommée pendant le mois offert.
+  l'offre (7 jours puis 19€/mois) + renonciation au droit de rétractation de
+  14 jours pour la partie du service consommée pendant la période offerte.
   Texte rédigé par Claude, **pas relu par un juriste** — à faire valider
   avant que le volume d'inscriptions grossisse.
+- **Essai gratuit ramené à 7 jours** (08/08/2026, était 1 mois) : décision
+  d'Anthony pour raccourcir le cycle avant premier prélèvement. Changement
+  fait uniquement côté code (`trial_period_days: 7` dans
+  `/api/stripe/checkout`) — rien à modifier côté Stripe (le prix
+  `price_1U29OpAPYODLq9KTXU5kusap` à 19€/mois est inchangé, la durée
+  d'essai est un paramètre de la session Checkout, pas de l'objet Price) ni
+  nouvelle migration Prisma (le champ `trialEnd` existait déjà). Toutes les
+  mentions "1 mois offert" liées à l'essai signup ont été remplacées par
+  "7 jours offerts" (pricing, CGV, sign-up, dashboard/compte, homepage). Ne
+  concerne PAS la récompense de parrainage ci-dessous, qui reste 1 mois.
 - **Parrainage** (08/08/2026) : lien unique par utilisateur
   (`/sign-up?ref=CODE`, généré à la demande), visible sur une carte dédiée
-  dans compte/abonnement. Quand un filleul passe payant (fin de son mois
-  offert), le parrain reçoit automatiquement 1 mois offert sur son propre
+  dans compte/abonnement. Quand un filleul passe payant (fin de ses 7 jours
+  offerts), le parrain reçoit automatiquement 1 mois offert sur son propre
   abonnement (coupon Stripe créé à la demande, appliqué via webhook). Le
   filleul n'a aucun avantage en plus d'une inscription normale.
 - Reste à activer côté Stripe (Réglages → Emails clients) : l'email

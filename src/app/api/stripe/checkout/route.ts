@@ -10,7 +10,7 @@ const PRICE_ENV_BY_PLAN = {
 } as const;
 
 // Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
-// d'appel, 1 mois offert puis 19€/mois) passe par un essai Stripe avec
+// d'appel, 7 jours offerts puis 19€/mois) passe par un essai Stripe avec
 // carte obligatoire dès l'inscription — payment_method_collection: "always"
 // force la saisie de la CB même si la première facture est à 0€. STANDARD
 // (affiché "Transformation", 49€/mois) est le palier payant sans
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
     ...(plan === "GRATUIT"
       ? {
-          subscription_data: { trial_period_days: 30 },
+          subscription_data: { trial_period_days: 7 },
           payment_method_collection: "always" as const,
         }
       : {}),
