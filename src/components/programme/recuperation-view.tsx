@@ -8,7 +8,13 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function RecuperationView({ data }: { data: unknown }) {
+export function RecuperationView({
+  data,
+  showContreIndications = false,
+}: {
+  data: unknown;
+  showContreIndications?: boolean;
+}) {
   if (!isPlainObject(data)) return <JsonView data={data} />;
 
   const { titre, vueEnsemble, contreIndications, jours, ...reste } = data as {
@@ -21,7 +27,7 @@ export function RecuperationView({ data }: { data: unknown }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <ContreIndications items={contreIndications} />
+      {showContreIndications && <ContreIndications items={contreIndications} />}
       <SemainePlan
         titre={titre}
         vueEnsemble={vueEnsemble}

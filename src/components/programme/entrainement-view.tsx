@@ -11,7 +11,13 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function EntrainementView({ data }: { data: unknown }) {
+export function EntrainementView({
+  data,
+  showContreIndications = false,
+}: {
+  data: unknown;
+  showContreIndications?: boolean;
+}) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="exercice" />;
 
   const { titre, frequenceParSemaine, dureeProgramme, vueEnsemble, contreIndications, seances, ...reste } = data as {
@@ -31,7 +37,7 @@ export function EntrainementView({ data }: { data: unknown }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <ContreIndications items={contreIndications} />
+      {showContreIndications && <ContreIndications items={contreIndications} />}
       <SemainePlan
         titre={titre}
         badges={badges}

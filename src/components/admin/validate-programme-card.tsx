@@ -17,9 +17,9 @@ const PILIER_LABELS: Record<string, string> = {
 };
 
 function PilierView({ pilier, contenu }: { pilier: string; contenu: unknown }) {
-  if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
-  if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
-  if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
+  if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} showContreIndications />;
+  if (pilier === "NUTRITION") return <NutritionView data={contenu} showContreIndications />;
+  if (pilier === "RECUPERATION") return <RecuperationView data={contenu} showContreIndications />;
   return null;
 }
 
