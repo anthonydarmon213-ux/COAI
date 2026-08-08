@@ -33,6 +33,11 @@ Sexe : ${profil.sexe ?? "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
 Fréquence d'entraînement actuelle : ${profil.frequenceEntrainement ?? "non renseignée"}
 Sport(s) déjà pratiqué(s) : ${profil.sportsPratiques ?? "non renseigné"}
+${
+  profil.vo2Max || profil.pasMoyenParJour || profil.frequenceCardiaqueRepos
+    ? `Données de montre connectée — VO2 max : ${profil.vo2Max ?? "non renseigné"}, pas moyen/jour : ${profil.pasMoyenParJour ?? "non renseigné"}, fréquence cardiaque de repos : ${profil.frequenceCardiaqueRepos ?? "non renseignée"} bpm.`
+    : ""
+}
 
 Détermine la fréquence hebdomadaire adaptée au niveau et à la fréquence actuelle (ne pas repartir
 de zéro si la personne s'entraîne déjà). Complète les sports déjà pratiqués plutôt que de les

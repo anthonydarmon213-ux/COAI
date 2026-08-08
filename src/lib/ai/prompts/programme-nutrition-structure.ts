@@ -45,6 +45,7 @@ Repas par jour actuellement : ${profil.repasParJour ?? "non renseigné"}
 Hydratation actuelle : ${profil.hydratation ?? "non renseignée"}
 Consommation de café : ${profil.consommationCafe ?? "non renseignée"}
 Consommation d'alcool : ${profil.consommationAlcool ?? "non renseignée"}
+${profil.caloriesMoyennesParJour ? `Calories moyennes dépensées/jour (montre connectée) : ${profil.caloriesMoyennesParJour}` : ""}
 
 Si le sexe est renseigné, ajuste les repères caloriques et protéiques indicatifs en conséquence
 (besoins généralement différents entre hommes et femmes à gabarit/activité égale), sans jamais

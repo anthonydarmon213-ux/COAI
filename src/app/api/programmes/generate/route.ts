@@ -140,6 +140,12 @@ export async function POST() {
     consommationCafe: user.profile?.consommationCafe,
     consommationAlcool: user.profile?.consommationAlcool,
     qualiteSommeil: user.profile?.qualiteSommeil,
+    pasMoyenParJour: user.profile?.pasMoyenParJour,
+    frequenceCardiaqueRepos: user.profile?.frequenceCardiaqueRepos,
+    sommeilMoyenHeures: user.profile?.sommeilMoyenHeures,
+    vo2Max: user.profile?.vo2Max,
+    caloriesMoyennesParJour: user.profile?.caloriesMoyennesParJour,
+    resumeMontre: user.profile?.resumeMontre,
   };
 
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];

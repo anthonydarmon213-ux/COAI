@@ -23,6 +23,13 @@ export type ProfilUtilisateur = {
   consommationCafe?: string | null;
   consommationAlcool?: string | null;
   qualiteSommeil?: string | null;
+  // Extraites automatiquement d'un screenshot de montre/app santé connectée.
+  pasMoyenParJour?: number | null;
+  frequenceCardiaqueRepos?: number | null;
+  sommeilMoyenHeures?: number | null;
+  vo2Max?: number | null;
+  caloriesMoyennesParJour?: number | null;
+  resumeMontre?: string | null;
 };
 
 let client: Anthropic | null = null;
@@ -49,6 +56,46 @@ export async function generateWithAI<T = unknown>(prompt: string): Promise<T> {
     model,
     max_tokens: 8192,
     messages: [{ role: "user", content: `${prompt}\n\n${JSON_INSTRUCTION}` }],
+  });
+
+  if (response.stop_reason === "max_tokens") {
+    throw new Error("Réponse IA tronquée (max_tokens atteint), génération à réessayer");
+  }
+
+  const text = response.content
+    .filter((block): block is Anthropic.TextBlock => block.type === "text")
+    .map((block) => block.text)
+    .join("");
+
+  return parseJsonResponse<T>(text);
+}
+
+type ImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+
+// Appelle le modèle avec une image en entrée (en plus du prompt texte) et
+// renvoie le JSON généré, parsé — utilisé pour l'extraction de données
+// depuis un screenshot (ex: montre connectée). Contrairement à
+// generateWithAI, le prompt doit explicitement dire au modèle de ne pas
+// halluciner les valeurs illisibles/absentes sur l'image.
+export async function generateWithVision<T = unknown>(
+  prompt: string,
+  imageBase64: string,
+  mediaType: ImageMediaType
+): Promise<T> {
+  const model = process.env.AI_MODEL || "claude-sonnet-5";
+
+  const response = await getClient().messages.create({
+    model,
+    max_tokens: 2048,
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: mediaType, data: imageBase64 } },
+          { type: "text", text: `${prompt}\n\n${JSON_INSTRUCTION}` },
+        ],
+      },
+    ],
   });
 
   if (response.stop_reason === "max_tokens") {

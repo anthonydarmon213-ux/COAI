@@ -155,6 +155,13 @@ type Profil = {
   consommationCafe?: string | null;
   consommationAlcool?: string | null;
   qualiteSommeil?: string | null;
+  pasMoyenParJour?: number | null;
+  frequenceCardiaqueRepos?: number | null;
+  sommeilMoyenHeures?: number | null;
+  vo2Max?: number | null;
+  caloriesMoyennesParJour?: number | null;
+  resumeMontre?: string | null;
+  derniereAnalyseMontre?: string | Date | null;
 };
 
 function parseMultiSelect(value?: string | null): string[] {
@@ -198,6 +205,41 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [montreData, setMontreData] = useState({
+    pasMoyenParJour: profil.pasMoyenParJour ?? null,
+    frequenceCardiaqueRepos: profil.frequenceCardiaqueRepos ?? null,
+    sommeilMoyenHeures: profil.sommeilMoyenHeures ?? null,
+    vo2Max: profil.vo2Max ?? null,
+    caloriesMoyennesParJour: profil.caloriesMoyennesParJour ?? null,
+    resumeMontre: profil.resumeMontre ?? null,
+  });
+  const [montreLoading, setMontreLoading] = useState(false);
+  const [montreError, setMontreError] = useState<string | null>(null);
+
+  async function handleAnalyserMontre(file: File) {
+    setMontreLoading(true);
+    setMontreError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/profil/montre", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse du screenshot.");
+      setMontreData({
+        pasMoyenParJour: data.pasMoyenParJour ?? null,
+        frequenceCardiaqueRepos: data.frequenceCardiaqueRepos ?? null,
+        sommeilMoyenHeures: data.sommeilMoyenHeures ?? null,
+        vo2Max: data.vo2Max ?? null,
+        caloriesMoyennesParJour: data.caloriesMoyennesParJour ?? null,
+        resumeMontre: data.resumeMontre ?? null,
+      });
+    } catch (err) {
+      setMontreError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setMontreLoading(false);
+    }
+  }
 
   function toggleAntecedent(item: string) {
     setAntecedentsMedicaux((prev) =>
@@ -255,6 +297,57 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <SectionLabel>Montre connectée</SectionLabel>
+        <div className="flex flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-4">
+          <p className="text-sm text-graphite-300">
+            Envoie un screenshot de ta montre ou app santé (Apple Watch, Garmin, Fitbit, Samsung
+            Health...) — on en extrait automatiquement pas, fréquence cardiaque, sommeil, VO2 max
+            et calories pour affiner ton programme.
+          </p>
+          <label className="w-fit">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              className="hidden"
+              disabled={montreLoading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleAnalyserMontre(file);
+                e.target.value = "";
+              }}
+            />
+            <span className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:bg-laiton-400/[0.14]">
+              {montreLoading ? "Analyse en cours…" : "Analyser un screenshot"}
+            </span>
+          </label>
+          {montreError && <p className="text-sm text-red-400">{montreError}</p>}
+          {(montreData.resumeMontre ||
+            montreData.pasMoyenParJour ||
+            montreData.frequenceCardiaqueRepos ||
+            montreData.sommeilMoyenHeures ||
+            montreData.vo2Max ||
+            montreData.caloriesMoyennesParJour) && (
+            <div className="flex flex-col gap-1.5 text-sm text-graphite-300">
+              {montreData.pasMoyenParJour != null && (
+                <p>Pas moyen/jour : {montreData.pasMoyenParJour.toLocaleString("fr-FR")}</p>
+              )}
+              {montreData.frequenceCardiaqueRepos != null && (
+                <p>Fréquence cardiaque de repos : {montreData.frequenceCardiaqueRepos} bpm</p>
+              )}
+              {montreData.sommeilMoyenHeures != null && (
+                <p>Sommeil moyen : {montreData.sommeilMoyenHeures} h</p>
+              )}
+              {montreData.vo2Max != null && <p>VO2 max : {montreData.vo2Max}</p>}
+              {montreData.caloriesMoyennesParJour != null && (
+                <p>Calories moyennes/jour : {montreData.caloriesMoyennesParJour}</p>
+              )}
+              {montreData.resumeMontre && (
+                <p className="italic text-graphite-400">{montreData.resumeMontre}</p>
+              )}
+            </div>
+          )}
+        </div>
+
         <SectionLabel>Objectifs & niveau</SectionLabel>
         <Field label="Objectifs">
           <Textarea

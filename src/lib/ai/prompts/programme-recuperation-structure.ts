@@ -30,6 +30,11 @@ Fréquence d'entraînement actuelle : ${profil.frequenceEntrainement ?? "non ren
 Qualité de sommeil actuelle : ${profil.qualiteSommeil ?? "non renseignée"}
 Consommation de café : ${profil.consommationCafe ?? "non renseignée"}
 Consommation d'alcool : ${profil.consommationAlcool ?? "non renseignée"}
+${
+  profil.sommeilMoyenHeures || profil.frequenceCardiaqueRepos
+    ? `Données de montre connectée — sommeil moyen : ${profil.sommeilMoyenHeures ? `${profil.sommeilMoyenHeures} h/nuit` : "non renseigné"}, fréquence cardiaque de repos : ${profil.frequenceCardiaqueRepos ?? "non renseignée"} bpm.`
+    : ""
+}
 
 Adapte tes recommandations à la qualité de sommeil déclarée et à la consommation de café/alcool
 (impact sur l'endormissement et la récupération).

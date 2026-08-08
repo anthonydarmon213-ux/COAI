@@ -113,6 +113,16 @@ model Profile {
   consommationCafe      String?
   consommationAlcool    String?
   qualiteSommeil        String?
+  // Données extraites automatiquement d'un screenshot de montre/app santé
+  // connectée (cf. src/app/api/profil/montre/route.ts) — dernière analyse
+  // écrase la précédente, pas d'historique conservé.
+  pasMoyenParJour           Int?
+  frequenceCardiaqueRepos   Int?
+  sommeilMoyenHeures        Float?
+  vo2Max                    Float?
+  caloriesMoyennesParJour   Int?
+  resumeMontre              String?
+  derniereAnalyseMontre     DateTime?
   updatedAt             DateTime @updatedAt
 
   @@map("profiles")
