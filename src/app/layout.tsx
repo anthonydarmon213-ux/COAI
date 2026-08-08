@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "../../sentry.client.config";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <GoogleAnalytics />
+        <Analytics />
       </body>
     </html>
   );
