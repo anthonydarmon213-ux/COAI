@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
-import { InstagramIcon, YoutubeIcon, LinkedinIcon } from "@/components/ui/social-icons";
+import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
 const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
@@ -61,15 +61,6 @@ export default async function AbonnementPage() {
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
               >
                 <InstagramIcon className="h-4 w-4" />
-              </a>
-              <a
-                href="https://youtube.com/@anthonydarmoncoach"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
-              >
-                <YoutubeIcon className="h-4 w-4" />
               </a>
               <a
                 href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
