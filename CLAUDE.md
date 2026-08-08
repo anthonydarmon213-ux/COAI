@@ -30,7 +30,9 @@ plus faciles à convaincre.
 
 ## Levée / financement (08/08/2026)
 
-- **Montant recherché** : 150 000 € pour l'amorçage.
+- **Montant recherché** : pas encore arrêté — un chiffre de 150 000 € a été
+  mentionné une fois puis retiré (Anthony ne se souvenait pas de l'avoir
+  écrit), à reconfirmer avec lui avant de le remettre où que ce soit.
 - Utilisation prévue : acquisition (coachs indépendants, campagne),
   développement produit, recrutement d'un second coach validateur.
 - Ce qui est proposé en échange reste à définir selon l'interlocuteur
@@ -39,7 +41,9 @@ plus faciles à convaincre.
   pour ces rendez-vous : problème/solution, produit, fondateur, modèle
   économique, marché (chiffres sourcés), positionnement, traction (renvoie
   vers `/admin/business`), stratégie de distribution, demande de
-  financement. Livré à Anthony, pas versionné dans le repo.
+  financement (slide "montant" volontairement laissée en placeholder tant
+  que le chiffre n'est pas confirmé). Livré à Anthony, pas versionné dans
+  le repo.
 
 ## Incidents résolus
 
