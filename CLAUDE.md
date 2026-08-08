@@ -28,6 +28,19 @@ payants + une rétention correcte (via coachs indépendants en premier), ce
 qui rend ensuite les clubs, les investisseurs et les partenaires beaucoup
 plus faciles à convaincre.
 
+## Levée / financement (08/08/2026)
+
+- **Montant recherché** : 150 000 € pour l'amorçage.
+- Utilisation prévue : acquisition (coachs indépendants, campagne),
+  développement produit, recrutement d'un second coach validateur.
+- Ce qui est proposé en échange reste à définir selon l'interlocuteur
+  (participation, intérêts, visibilité croisée, accès réseau).
+- Un deck de présentation (COAI-presentation.pptx, 12 slides) a été généré
+  pour ces rendez-vous : problème/solution, produit, fondateur, modèle
+  économique, marché (chiffres sourcés), positionnement, traction (renvoie
+  vers `/admin/business`), stratégie de distribution, demande de
+  financement. Livré à Anthony, pas versionné dans le repo.
+
 ## Incidents résolus
 
 - **08/08/2026** — Deux bugs production successifs corrigés et confirmés en
