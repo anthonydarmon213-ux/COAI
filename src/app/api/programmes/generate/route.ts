@@ -122,7 +122,7 @@ export async function POST() {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  // Palier Gratuit (9€) : programme 100% IA, jamais envoyé en relecture au
+  // Palier Gratuit (19€) : programme 100% IA, jamais envoyé en relecture au
   // coach (statut GENERE_IA, visible immédiatement). Standard/Premium :
   // comportement inchangé, en attente de validation humaine.
   const plan = getEffectivePlan(user.subscription);

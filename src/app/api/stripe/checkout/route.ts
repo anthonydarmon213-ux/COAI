@@ -10,7 +10,7 @@ const PRICE_ENV_BY_PLAN = {
 } as const;
 
 // Crée une session Stripe Checkout. GRATUIT (offre d'appel, 1 mois offert
-// puis 9€/mois) passe par un essai Stripe avec carte obligatoire dès
+// puis 19€/mois) passe par un essai Stripe avec carte obligatoire dès
 // l'inscription — payment_method_collection: "always" force la saisie de
 // la CB même si la première facture est à 0€. STANDARD (affiché "Premium",
 // 49€/mois) est le palier payant sans engagement. PREMIUM (ancienne offre

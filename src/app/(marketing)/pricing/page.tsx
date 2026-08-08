@@ -46,7 +46,7 @@ const TIERS: Tier[] = [
     prix: "0€",
     suffixe: "le 1er mois",
     description:
-      "1 mois offert pour découvrir COAI, puis 9€/mois. Sans engagement — résiliable à tout moment.",
+      "1 mois offert pour découvrir COAI, puis 19€/mois. Sans engagement — résiliable à tout moment.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -208,7 +208,7 @@ export default function PricingPage() {
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
         L&apos;offre Gratuite (1 mois offert, carte bancaire requise à l&apos;inscription, puis
-        9€/mois) et l&apos;offre Premium sont sans engagement, résiliables à tout moment depuis
+        19€/mois) et l&apos;offre Premium sont sans engagement, résiliables à tout moment depuis
         ton compte. Les séances VIP sont réservées et payées à la séance, hors
         abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
         séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}

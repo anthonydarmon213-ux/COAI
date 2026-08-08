@@ -133,7 +133,7 @@ export default function SignUpPage() {
               className="mt-1"
             />
             Je reconnais avoir pris connaissance des conditions de l&apos;offre : 1 mois d&apos;accès
-            gratuit à compter de ce jour, puis passage automatique à un abonnement de 9€/mois,
+            gratuit à compter de ce jour, puis passage automatique à un abonnement de 19€/mois,
             sauf résiliation avant la fin du mois gratuit. Je demande le début immédiat du
             service et reconnais renoncer à mon droit de rétractation de 14 jours pour la partie
             du service déjà utilisée durant le mois gratuit. J&apos;accepte les{" "}

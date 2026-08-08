@@ -145,7 +145,7 @@ export default async function AbonnementPage() {
               month: "long",
               year: "numeric",
             })}{" "}
-            — passage automatique à 9€/mois sauf résiliation avant cette date.
+            — passage automatique à 19€/mois sauf résiliation avant cette date.
           </p>
         )}
         {statut ? (

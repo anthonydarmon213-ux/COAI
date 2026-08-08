@@ -26,13 +26,18 @@ export default function CgvPage() {
         <h2>2. Description des offres</h2>
         <ul>
           <li>
-            <strong>Gratuit</strong> — accès au journal de séances, au suivi des mesures et aux
-            graphiques de progression, sans frais et sans engagement.
+            <strong>Gratuit (19€/mois après 1 mois offert)</strong> — 1 mois d&apos;accès gratuit à
+            compter de l&apos;inscription, carte bancaire requise dès la souscription ; sauf
+            résiliation avant la fin de ce mois, l&apos;abonnement bascule automatiquement sur
+            19€/mois. Inclut le journal de séances, le suivi des mesures, les graphiques de
+            progression, ainsi que la génération d&apos;un programme d&apos;entraînement, de
+            nutrition et de récupération par intelligence artificielle — ce programme n&apos;est
+            pas relu par un coach humain.
           </li>
           <li>
-            <strong>Premium (49€/mois)</strong> — inclut le palier Gratuit, ainsi que la
-            génération d&apos;un programme d&apos;entraînement, de nutrition et de récupération par
-            intelligence artificielle, relu et validé par un coach diplômé d&apos;État.
+            <strong>Premium (49€/mois)</strong> — inclut le palier Gratuit, la génération d&apos;un
+            programme d&apos;entraînement, de nutrition et de récupération par intelligence
+            artificielle relu et validé par un coach diplômé d&apos;État.
           </li>
           <li>
             <strong>VIP (à la séance)</strong> — coaching individuel avec Anthony Darmon,
@@ -41,6 +46,11 @@ export default function CgvPage() {
             d&apos;abonnement de l&apos;utilisateur, y compris Gratuit.
           </li>
         </ul>
+        <p>
+          Pour l&apos;offre Gratuite, l&apos;utilisateur reconnaît, en cochant la case dédiée lors
+          de l&apos;inscription, demander le début immédiat du service et renoncer à son droit de
+          rétractation de 14 jours pour la partie du service déjà utilisée durant le mois gratuit.
+        </p>
         <p>
           Le détail et les tarifs à jour de chaque offre sont consultables sur la page{" "}
           <a href="/pricing">Tarifs</a>.
