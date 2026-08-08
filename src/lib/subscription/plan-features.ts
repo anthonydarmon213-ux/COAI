@@ -15,11 +15,10 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Suivi de progression",
     "Coach IA — 4 questions/mois",
     "Ajustements continus selon tes retours",
-    "Streaming (yoga, mobilité, récupération…)",
     "Assistant WhatsApp 24/7",
   ],
   PREMIUM: [
-    "Tous les avantages Premium (programme IA validé, suivi, coach IA, streaming, WhatsApp)",
+    "Tous les avantages Premium (programme IA validé, suivi, coach IA, WhatsApp)",
     "1 séance/mois avec Anthony Darmon incluse — présentiel ou visio, à réserver via WhatsApp",
   ],
 };

@@ -36,9 +36,13 @@ const LINKS: NavItem[] = [
       { href: "/suivi/progression", label: "Progression" },
     ],
   },
-  { href: "/coach", label: "Votre coach IA" },
-  { href: "/compte/abonnement", label: "Votre coach humain" },
-  { href: "/videos", label: "Streaming" },
+  {
+    label: "Vos coachs",
+    children: [
+      { href: "/compte/abonnement", label: "Coach humain" },
+      { href: "/coach", label: "Coach IA" },
+    ],
+  },
   { href: "/compte/parametres", label: "Paramètres" },
 ];
 

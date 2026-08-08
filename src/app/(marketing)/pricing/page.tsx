@@ -65,7 +65,6 @@ const TIERS: Tier[] = [
       "Suivi de progression — dashboard avec ton évolution",
       "Coach IA — 4 questions/mois, pour ajuster ta routine à tout moment",
       "Ajustements continus — le programme évolue selon tes retours",
-      "Streaming (yoga, mobilité, récupération…)",
       "Assistant WhatsApp 24/7",
     ],
     plan: "STANDARD" as const,
