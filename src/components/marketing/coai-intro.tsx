@@ -69,10 +69,6 @@ export function CoaiIntro() {
         <span className="font-mono text-xs uppercase tracking-[0.32em] text-laiton-400">HI × AI™</span>
       </div>
 
-      <p className="relative z-10 max-w-md font-editorial text-xl italic text-graphite-300 sm:text-2xl">
-        « L&apos;IA génère. Ton coach valide. »
-      </p>
-
       <p className="relative z-10 max-w-md text-sm leading-6 text-graphite-400 sm:text-base">
         COAI génère ton programme d&apos;entraînement, nutrition et récupération par IA — toujours
         validé par un vrai coach avant de te l&apos;envoyer.
