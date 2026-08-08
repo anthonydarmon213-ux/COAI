@@ -6,8 +6,9 @@ import type { ExerciceMaxi } from "@prisma/client";
 
 // L'unité est déduite de l'exercice côté serveur (jamais confiée au
 // client) : kg pour les mouvements de force, reps pour la traction au
-// poids du corps, cm pour la souplesse, secondes pour l'équilibre, mètres
-// pour l'endurance (test de Cooper, distance en 12 min).
+// poids du corps, cm pour la souplesse et le saut vertical, secondes pour
+// l'équilibre et le sprint, mètres pour l'endurance (test de Cooper,
+// distance en 12 min).
 const UNITE_PAR_EXERCICE: Record<ExerciceMaxi, string> = {
   DEVELOPPE_COUCHE: "kg",
   SQUAT: "kg",
@@ -16,6 +17,8 @@ const UNITE_PAR_EXERCICE: Record<ExerciceMaxi, string> = {
   SOUPLESSE: "cm",
   EQUILIBRE: "secondes",
   ENDURANCE: "m",
+  VITESSE: "secondes",
+  PUISSANCE: "cm",
 };
 
 const bodySchema = z
@@ -28,6 +31,8 @@ const bodySchema = z
       "SOUPLESSE",
       "EQUILIBRE",
       "ENDURANCE",
+      "VITESSE",
+      "PUISSANCE",
     ]),
     date: z.coerce.date(),
     // La souplesse (flexion antérieure) se mesure parfois en négatif — ne

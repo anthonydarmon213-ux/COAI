@@ -236,6 +236,8 @@ enum ExerciceMaxi {
   SOUPLESSE
   EQUILIBRE
   ENDURANCE
+  VITESSE
+  PUISSANCE
 }
 
 // Tests de charge maximale (1RM) — distinct de Mesure (poids/mensurations)

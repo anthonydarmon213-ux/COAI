@@ -13,6 +13,8 @@ const EXERCICES = [
   { value: "SQUAT", label: "Squat", unite: "kg", qualite: "Force" },
   { value: "SOULEVE_DE_TERRE", label: "Soulevé de terre", unite: "kg", qualite: "Force" },
   { value: "TRACTION", label: "Traction", unite: "reps", qualite: "Force" },
+  { value: "VITESSE", label: "Sprint 30m", unite: "secondes", qualite: "Vitesse" },
+  { value: "PUISSANCE", label: "Saut vertical", unite: "cm", qualite: "Puissance" },
   { value: "SOUPLESSE", label: "Flexion antérieure", unite: "cm", qualite: "Souplesse" },
   { value: "EQUILIBRE", label: "Appui unipodal (yeux fermés)", unite: "secondes", qualite: "Équilibre" },
   { value: "ENDURANCE", label: "Test de Cooper (12 min)", unite: "m", qualite: "Endurance" },

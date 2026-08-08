@@ -8,9 +8,17 @@ export const LABEL_PAR_EXERCICE: Record<ExerciceMaxi, string> = {
   SOUPLESSE: "Flexion antérieure",
   EQUILIBRE: "Appui unipodal (yeux fermés)",
   ENDURANCE: "Test de Cooper (12 min)",
+  VITESSE: "Sprint 30m",
+  PUISSANCE: "Saut vertical",
 };
 
-export type QualitePhysique = "Force" | "Souplesse" | "Équilibre" | "Endurance";
+export type QualitePhysique =
+  | "Force"
+  | "Souplesse"
+  | "Équilibre"
+  | "Endurance"
+  | "Vitesse"
+  | "Puissance";
 
 export const QUALITE_PAR_EXERCICE: Record<ExerciceMaxi, QualitePhysique> = {
   DEVELOPPE_COUCHE: "Force",
@@ -20,6 +28,8 @@ export const QUALITE_PAR_EXERCICE: Record<ExerciceMaxi, QualitePhysique> = {
   SOUPLESSE: "Souplesse",
   EQUILIBRE: "Équilibre",
   ENDURANCE: "Endurance",
+  VITESSE: "Vitesse",
+  PUISSANCE: "Puissance",
 };
 
 export const ORDRE_EXERCICES: ExerciceMaxi[] = [
@@ -30,6 +40,15 @@ export const ORDRE_EXERCICES: ExerciceMaxi[] = [
   "SOUPLESSE",
   "EQUILIBRE",
   "ENDURANCE",
+  "VITESSE",
+  "PUISSANCE",
 ];
 
-export const ORDRE_QUALITES: QualitePhysique[] = ["Force", "Souplesse", "Équilibre", "Endurance"];
+export const ORDRE_QUALITES: QualitePhysique[] = [
+  "Force",
+  "Vitesse",
+  "Puissance",
+  "Souplesse",
+  "Équilibre",
+  "Endurance",
+];

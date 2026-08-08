@@ -36,8 +36,8 @@ export default async function TestsMaxiPage() {
         <SectionLabel>Suivi</SectionLabel>
         <h1 className="text-2xl font-semibold">Tests physiques</h1>
         <p className="text-sm text-graphite-400">
-          Force, souplesse, équilibre, endurance — enregistre tes résultats pour voir ta
-          progression sur les qualités physiques de référence.
+          Force, vitesse, puissance, souplesse, équilibre, endurance — enregistre tes résultats
+          pour voir ta progression sur les qualités physiques de référence.
         </p>
       </div>
 
