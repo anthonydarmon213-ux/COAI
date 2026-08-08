@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db/client";
 const bodySchema = z.object({
   prenom: z.string().max(100).nullable(),
   nom: z.string().max(100).nullable(),
+  dateNaissance: z.string().date().nullable().optional(),
 });
 
 export async function PUT(request: Request) {
@@ -21,8 +22,14 @@ export async function PUT(request: Request) {
 
   const user = await prisma.user.update({
     where: { supabaseAuthId: authUser.id },
-    data: { prenom: parsed.data.prenom, nom: parsed.data.nom },
+    data: {
+      prenom: parsed.data.prenom,
+      nom: parsed.data.nom,
+      ...(parsed.data.dateNaissance !== undefined && {
+        dateNaissance: parsed.data.dateNaissance ? new Date(parsed.data.dateNaissance) : null,
+      }),
+    },
   });
 
-  return NextResponse.json({ prenom: user.prenom, nom: user.nom });
+  return NextResponse.json({ prenom: user.prenom, nom: user.nom, dateNaissance: user.dateNaissance });
 }

@@ -15,6 +15,7 @@ model User {
   email          String    @unique
   prenom         String?
   nom            String?
+  dateNaissance  DateTime? @db.Date
   phoneWhatsapp  String?   @unique
   consentRgpdAt  DateTime?
   // Certification santé recueillie à l'inscription : l'utilisateur déclare
