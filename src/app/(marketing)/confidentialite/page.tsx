@@ -1,6 +1,9 @@
 import { LegalPage } from "@/components/marketing/legal-page";
 
-export const metadata = { title: "Politique de confidentialité — COAI" };
+export const metadata = {
+  title: "Politique de confidentialité — COAI",
+  alternates: { canonical: "/confidentialite" },
+};
 
 export default function ConfidentialitePage() {
   return (

@@ -1,6 +1,9 @@
 import { LegalPage } from "@/components/marketing/legal-page";
 
-export const metadata = { title: "Mentions légales — COAI" };
+export const metadata = {
+  title: "Mentions légales — COAI",
+  alternates: { canonical: "/mentions-legales" },
+};
 
 export default function MentionsLegalesPage() {
   return (

@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
+
+export const metadata: Metadata = {
+  title: "COAI — Coaching sportif par IA, validé par un vrai coach",
+  description:
+    "Ton programme d'entraînement, nutrition et récupération généré par IA à partir de ton profil, relu et validé par Anthony Darmon (17 ans de coaching). AI generates, humans validate.",
+  alternates: { canonical: "/" },
+};
 
 const FAQ = [
   {

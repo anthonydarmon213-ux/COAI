@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { Card } from "@/components/ui/card";
@@ -6,6 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+
+export const metadata: Metadata = {
+  title: "Tarifs — COAI",
+  description:
+    "Choisis ton niveau d'accompagnement : Gratuit (1 mois offert), Premium (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.",
+  alternates: { canonical: "/pricing" },
+};
 
 type Tier = {
   nom: string;

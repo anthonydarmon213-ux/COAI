@@ -1,6 +1,9 @@
 import { LegalPage } from "@/components/marketing/legal-page";
 
-export const metadata = { title: "Conditions générales de vente — COAI" };
+export const metadata = {
+  title: "Conditions générales de vente — COAI",
+  alternates: { canonical: "/cgv" },
+};
 
 export default function CgvPage() {
   return (
