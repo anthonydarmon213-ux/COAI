@@ -115,17 +115,35 @@ plus faciles à convaincre.
 
 ## À faire plus tard
 
-- **App iOS sur l'App Store** (idée du 08/08/2026, à reprendre plus tard —
-  Anthony a un Mac) : via Capacitor (wrapper natif autour du site Next.js
-  existant, pas de réécriture). Décision actée : l'app sert **uniquement
-  les abonnés déjà inscrits via le site web** — pas d'inscription ni de
-  paiement dans l'app, pour éviter la commission/contrainte d'achat intégré
-  (IAP) imposée par Apple sur les abonnements souscrits depuis l'app.
-  Bloqué techniquement dans les sessions Claude Code actuelles : elles
-  tournent sur Linux, or la compilation/test iOS nécessite Xcode (macOS
-  uniquement) — la config Capacitor peut être préparée depuis n'importe où,
-  mais le build final et la soumission App Store Connect devront se faire
-  sur le Mac d'Anthony.
+- **App mobile (iOS/Android) — décision révisée le 08/08/2026** : Anthony
+  veut désormais viser le grand public ("toute la planète"), pas
+  uniquement ses abonnés déjà inscrits via le site — ça change la stack et
+  le modèle de monétisation par rapport à la décision initiale du même
+  jour (ci-dessous, obsolète) :
+  - **Stack : React Native** (au lieu de Capacitor). Capacitor aurait
+    permis de réutiliser le site Next.js tel quel dans une coque native ;
+    React Native impose une réécriture complète du front (vues natives,
+    pas de HTML/CSS/DOM), le backend/API restant inchangés. Choix assumé
+    par Anthony malgré le travail supplémentaire, en échange d'une vraie
+    expérience native.
+  - **Paiement : Stripe + Apple IAP en parallèle**, pas de bascule
+    complète vers Apple. Stripe reste le paiement par défaut sur le site
+    (frais bas ~2,9%+0,30€, couvre aussi Android/desktop). L'achat intégré
+    Apple (commission 15-30% selon le programme Small Business) s'ajoute
+    uniquement pour les abonnements souscrits depuis l'app iOS —
+    nécessitera de synchroniser les deux systèmes d'abonnement
+    (entitlements côté app selon la source de paiement).
+  - Reste à faire avant de démarrer : définir le périmètre exact
+    (démarrage du chantier React Native vs. poursuite des priorités
+    business en cours), et le mode de synchronisation Stripe/Apple IAP.
+  - Contrainte technique inchangée : build/soumission App Store Connect
+    nécessitent Xcode (macOS uniquement) — à faire sur le Mac d'Anthony ;
+    le code React Native peut en revanche être développé depuis n'importe
+    quel environnement, y compris les sessions Claude Code actuelles
+    (Linux).
+  - *Décision initiale du 08/08/2026, remplacée par ce qui précède* : app
+    via Capacitor, réservée aux abonnés déjà inscrits via le site web,
+    sans inscription/paiement dans l'app (pour éviter l'IAP).
 
 ## Incidents résolus
 
