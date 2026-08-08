@@ -24,6 +24,7 @@ function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus
 function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
   const priceId = subscription.items.data[0]?.price.id;
   if (priceId && priceId === process.env.STRIPE_PRICE_ID_PREMIUM) return "PREMIUM";
+  if (priceId && priceId === process.env.STRIPE_PRICE_ID_GRATUIT) return "GRATUIT";
   return "STANDARD";
 }
 
@@ -35,6 +36,7 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
     status: mapStripeStatus(subscription.status),
     plan: mapStripePlan(subscription),
     currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
   };
 

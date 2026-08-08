@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,12 +11,12 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import Link from "next/link";
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);
+  const [consentOffre, setConsentOffre] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -31,6 +30,10 @@ export default function SignUpPage() {
     }
     if (!consentSante) {
       setError("La certification d'aptitude sportive est requise.");
+      return;
+    }
+    if (!consentOffre) {
+      setError("La confirmation des conditions de l'offre d'essai est requise.");
       return;
     }
 
@@ -47,12 +50,19 @@ export default function SignUpPage() {
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
 
-      router.push("/dashboard");
-      router.refresh();
+      const checkoutRes = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: "GRATUIT" }),
+      });
+      const checkoutData = await checkoutRes.json();
+      if (!checkoutRes.ok || !checkoutData.url) {
+        throw new Error(checkoutData.error ?? "Impossible de démarrer l'offre d'essai.");
+      }
+      window.location.href = checkoutData.url;
     } catch (err) {
       console.error("[sign-up]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
-    } finally {
       setLoading(false);
     }
   }
@@ -115,9 +125,26 @@ export default function SignUpPage() {
             Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de
             doute ou d&apos;antécédent médical.
           </label>
+          <label className="flex items-start gap-2 text-sm text-graphite-300">
+            <input
+              type="checkbox"
+              checked={consentOffre}
+              onChange={(e) => setConsentOffre(e.target.checked)}
+              className="mt-1"
+            />
+            Je reconnais avoir pris connaissance des conditions de l&apos;offre : 1 mois d&apos;accès
+            gratuit à compter de ce jour, puis passage automatique à un abonnement de 9€/mois,
+            sauf résiliation avant la fin du mois gratuit. Je demande le début immédiat du
+            service et reconnais renoncer à mon droit de rétractation de 14 jours pour la partie
+            du service déjà utilisée durant le mois gratuit. J&apos;accepte les{" "}
+            <Link href="/cgv" target="_blank" className="underline">
+              CGV
+            </Link>
+            .
+          </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading ? "Création…" : "Créer mon compte"}
+            {loading ? "Redirection vers le paiement…" : "Créer mon compte — 1 mois offert"}
           </Button>
         </form>
         <p className="text-sm text-graphite-400">

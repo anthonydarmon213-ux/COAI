@@ -48,12 +48,17 @@ enum SubscriptionStatus {
   INCOMPLETE
 }
 
+// GRATUIT = offre d'appel, 1 mois offert puis 9€/mois (essai Stripe avec
+// carte obligatoire dès l'inscription — cf. STRIPE_PRICE_ID_GRATUIT).
 // STANDARD = 49€/mois (programme IA + validation coach).
 // PREMIUM = 199€/mois (STANDARD + 1 séance/mois en présentiel ou visio,
 // version light de THE METHOD qui reste à 4 séances/mois).
-// Le palier "Gratuit" n'a pas de ligne Subscription : c'est l'absence
-// d'abonnement actif qui le représente.
+// Un utilisateur sans ligne Subscription du tout (edge case : compte créé
+// avant l'introduction du palier Gratuit payant, ou juste après
+// l'inscription avant que le webhook Stripe n'ait tourné) est aussi
+// considéré Gratuit par getEffectivePlan().
 enum SubscriptionPlan {
+  GRATUIT
   STANDARD
   PREMIUM
 }
@@ -67,6 +72,11 @@ model Subscription {
   status               SubscriptionStatus @default(INCOMPLETE)
   plan                 SubscriptionPlan   @default(STANDARD)
   currentPeriodEnd     DateTime?
+  // Fin de la période d'essai Stripe (offre Gratuite 1 mois offert). Null
+  // hors essai — status reste "ACTIVE" pendant l'essai (trialing y est
+  // mappé), donc c'est ce champ qui permet de distinguer "encore en essai"
+  // de "déjà passé à 9€/mois".
+  trialEnd             DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt

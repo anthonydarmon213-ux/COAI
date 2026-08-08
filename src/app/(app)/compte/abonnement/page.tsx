@@ -33,6 +33,8 @@ export default async function AbonnementPage() {
   const statut = user.subscription?.status;
   const plan = getEffectivePlan(user.subscription);
   const finProgrammee = user.subscription?.cancelAtPeriodEnd && user.subscription.currentPeriodEnd;
+  const enEssai =
+    statut === "ACTIVE" && user.subscription?.trialEnd && user.subscription.trialEnd > new Date();
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
   return (
@@ -133,6 +135,17 @@ export default async function AbonnementPage() {
               year: "numeric",
             })}
             .
+          </p>
+        )}
+        {!finProgrammee && enEssai && (
+          <p className="text-sm text-graphite-400">
+            Ton mois offert se termine le{" "}
+            {user.subscription!.trialEnd!.toLocaleDateString("fr-FR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            — passage automatique à 9€/mois sauf résiliation avant cette date.
           </p>
         )}
         {statut ? (

@@ -36,8 +36,9 @@ const TIERS: Tier[] = [
   {
     nom: "Gratuit",
     prix: "0€",
-    suffixe: "",
-    description: "Pour commencer à suivre ta progression, sans engagement.",
+    suffixe: "le 1er mois",
+    description:
+      "1 mois offert pour découvrir COAI, puis 9€/mois. Sans engagement — résiliable à tout moment.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -187,7 +188,7 @@ export default function PricingPage() {
               <SubscribeButton plan={tier.plan} label={`S'abonner — ${tier.prix}${tier.suffixe}`} />
             ) : (
               <Link href="/sign-up">
-                <Button>Créer mon compte gratuit</Button>
+                <Button>Créer mon compte — 1 mois offert</Button>
               </Link>
             )}
           </Card>
@@ -195,8 +196,9 @@ export default function PricingPage() {
       </div>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        L&apos;offre Gratuite et l&apos;offre Premium sont sans engagement, résiliables à tout
-        moment depuis ton compte. Les séances VIP sont réservées et payées à la séance, hors
+        L&apos;offre Gratuite (1 mois offert, carte bancaire requise à l&apos;inscription, puis
+        9€/mois) et l&apos;offre Premium sont sans engagement, résiliables à tout moment depuis
+        ton compte. Les séances VIP sont réservées et payées à la séance, hors
         abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
         séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">

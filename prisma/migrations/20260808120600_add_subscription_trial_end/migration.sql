@@ -1,0 +1,1 @@
+ALTER TABLE "subscriptions" ADD COLUMN IF NOT EXISTS "trialEnd" TIMESTAMP(3);
