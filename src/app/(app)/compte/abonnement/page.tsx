@@ -98,13 +98,13 @@ export default async function AbonnementPage() {
               mention forme et force), il cumule dix-sept ans d&apos;expérience terrain. Formé
               dans les clubs premium parisiens, il exerce aujourd&apos;hui au Club Montgolfière
               Paris et au Club RITM Saint-Germain, intervient en entreprise et accompagne à
-              distance depuis 2020. Il a suivi des centaines d&apos;entrepreneurs, VIP,
+              distance depuis 2020. Il a travaillé avec des centaines d&apos;entrepreneurs, VIP,
               politiques, acteurs et une Miss France.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Sa mission : transmettre au plus grand nombre son expertise sur les trois piliers
-              d&apos;un corps qui reste jeune — l&apos;entraînement, l&apos;alimentation et la
-              récupération. C&apos;est pour ça que COAI existe.
+              Sa mission : transmettre son expertise et motiver le plus grand nombre — pour un
+              corps et un esprit en santé le plus longtemps possible. C&apos;est pour ça que COAI
+              existe.
             </p>
           </div>
         </Card>
