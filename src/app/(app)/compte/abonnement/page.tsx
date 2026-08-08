@@ -96,8 +96,9 @@ export default async function AbonnementPage() {
               mains.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Sa mission : transmettre ce qu&apos;il vit lui-même. C&apos;est pour ça que COAI
-              existe.
+              Sa mission : partager son expertise et motiver le plus de monde possible à se
+              mettre en mouvement — un corps sans douleur, fort, souple, qui reste jeune.
+              C&apos;est pour ça que COAI existe.
             </p>
           </div>
         </Card>
