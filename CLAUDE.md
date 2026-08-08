@@ -28,6 +28,14 @@ payants + une rétention correcte (via coachs indépendants en premier), ce
 qui rend ensuite les clubs, les investisseurs et les partenaires beaucoup
 plus faciles à convaincre.
 
+- **Partenariat kiné / diététicienne** (idée du 08/08/2026, à creuser) :
+  s'associer avec un kinésithérapeute et une diététicienne pour compléter
+  l'offre COAI (aujourd'hui centrée entraînement/nutrition/récupération
+  via IA + validation coach) — renforcerait la crédibilité santé et
+  ouvrirait des cas d'usage complémentaires (rééducation, suivi
+  nutritionnel plus poussé). Détails du modèle (rémunération, intégration
+  produit) restent à définir.
+
 ## Levée / financement (08/08/2026)
 
 - **Montant recherché** : pas encore arrêté — un chiffre de 150 000 € a été
