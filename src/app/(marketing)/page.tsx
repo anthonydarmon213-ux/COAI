@@ -45,7 +45,7 @@ const PILIERS = [
     numero: "01",
     titre: "Un programme vraiment personnel",
     description:
-      "Entraînement, nutrition et récupération construits autour de ton niveau, de tes objectifs et de tes contraintes.",
+      "Entraînement, nutrition et récupération (sauna, massage, mobilité, méditation, sommeil...) construits autour de ton niveau, de tes objectifs et de tes contraintes.",
   },
   {
     numero: "02",
@@ -68,10 +68,10 @@ export default function LandingPage() {
 
       <section id="hero" className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
         <div className="relative z-10 max-w-3xl">
-          <SectionLabel>Entraînement · Nutrition · Sommeil</SectionLabel>
+          <SectionLabel>Entraînement · Nutrition · Récupération</SectionLabel>
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">
             Générer. Valider.
-            <span className="mt-2 block text-laiton-300">Progresser.</span>
+            <span className="mt-2 block text-laiton-300">Suivre votre progression.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
             COAI est l&apos;app qui génère ton programme d&apos;entraînement, de nutrition et de
@@ -97,7 +97,7 @@ export default function LandingPage() {
             <ol className="mt-5 flex flex-col gap-4">
               {[
                 ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
-                ["2", "L’IA personnalise ton programme", "Entraînement, nutrition et sommeil adaptés à toi."],
+                ["2", "L’IA personnalise ton programme", "Entraînement, nutrition et récupération adaptés à toi."],
                 ["3", "Ton coach vérifie et valide", "Tu reçois un programme fiable, clair et prêt à suivre."],
               ].map(([numero, titre, description]) => (
                 <li key={numero} className="grid grid-cols-[2rem_1fr] gap-3">
@@ -171,7 +171,7 @@ export default function LandingPage() {
         </div>
         <div className="mx-auto max-w-3xl border-t border-white/[0.08] pt-10 text-center">
           <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
-            Ton entraînement, ta nutrition et ton sommeil,
+            Ton entraînement, ta nutrition et ta récupération,
             <span className="text-laiton-300"> personnalisés par l&apos;IA et validés par un coach diplômé d&apos;État.</span>
           </p>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
