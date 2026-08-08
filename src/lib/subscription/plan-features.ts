@@ -8,6 +8,8 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Suivi des mesures et photos de progression",
     "Graphiques de progression",
     "Coach IA — 4 questions/mois",
+    "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
+    "Analyse de photo morphologique et posturale",
   ],
   STANDARD: [
     "Programme personnalisé généré par IA (entraînement, nutrition, récupération)",
@@ -16,6 +18,8 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Coach IA — 4 questions/mois",
     "Ajustements continus selon tes retours",
     "Assistant WhatsApp 24/7",
+    "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
+    "Analyse de photo morphologique et posturale",
   ],
   PREMIUM: [
     "Tous les avantages Premium (programme IA validé, suivi, coach IA, WhatsApp)",
