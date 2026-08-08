@@ -57,11 +57,27 @@ plus faciles à convaincre.
 
 - **Restructuration de l'offre Gratuite en offre d'appel** : au lieu d'un
   palier gratuit illimité, nouvelle inscription = 1 mois offert avec carte
-  bancaire obligatoire dès le départ, puis passage automatique à 9€/mois
-  (produit Stripe `COAI gratuit`, price `price_1U277IAPYODLq9KTSpX3vjKC`).
-  Palier Premium (STANDARD, 49€/mois) inchangé. Décision prise sans
-  abonnés gratuits existants à migrer (aucun abonné au moment du
-  changement), donc pas de logique de bascule à gérer pour l'historique.
+  bancaire obligatoire dès le départ, puis passage automatique à un tarif
+  payant (produit Stripe `COAI gratuit`). Prix initial 9€/mois
+  (`price_1U277IAPYODLq9KTSpX3vjKC`), remonté le jour même à **19€/mois**
+  (`price_1U29OpAPYODLq9KTXU5kusap`, nouveau produit "Coai gratuit
+  strantard puis 19") suite à l'ajout de la génération de programme IA à
+  ce palier (cf. plus bas). Palier du milieu (STANDARD, 49€/mois)
+  inchangé en prix. Décision prise sans abonnés existants à migrer.
+- **Renommage des paliers (08/08/2026)** : GRATUIT (19€) affiché
+  "**Impulsion**", STANDARD (49€) affiché "**Transformation**" — partout
+  sur le site (pricing, compte, dashboard, CGV, emails). L'enum Prisma
+  `PREMIUM` (199€, ancienne offre 1-to-1, non vendue) garde son propre
+  label "Ancien Premium", à ne pas confondre avec le nouveau nom
+  "Transformation" du palier STANDARD.
+- **Palier Impulsion (Gratuit/19€) : programme généré par IA sans
+  relecture coach** (08/08/2026) — jusque-là ce palier n'avait pas accès
+  à la génération de programme du tout (réservée à Transformation).
+  Nouveau statut `GENERE_IA` (distinct de `EN_ATTENTE`/`VALIDE`) : le
+  programme est généré et visible immédiatement, jamais envoyé à la file
+  de relecture d'Anthony. Objectif explicite : que la validation humaine
+  ne soit plus un facteur limitant pour scaler (recrutement prévu
+  d'autres coachs pour Transformation, cf. section Levée/financement).
 - Palier "Premium+" (199€/mois, self-serve) ajouté puis retiré le jour
   même sur demande d'Anthony — le produit Stripe `COAI Premium` à 199€ a
   été archivé (renommage `COAI standard` → `COAI Premium` fait par Anthony
@@ -80,6 +96,20 @@ plus faciles à convaincre.
   à vérifier qu'il respecte bien l'obligation légale française de
   résiliation en 3 clics (juin 2023) une fois que des abonnés réels
   passeront par ce flow.
+
+## À faire plus tard
+
+- **App iOS sur l'App Store** (idée du 08/08/2026, à reprendre plus tard —
+  Anthony a un Mac) : via Capacitor (wrapper natif autour du site Next.js
+  existant, pas de réécriture). Décision actée : l'app sert **uniquement
+  les abonnés déjà inscrits via le site web** — pas d'inscription ni de
+  paiement dans l'app, pour éviter la commission/contrainte d'achat intégré
+  (IAP) imposée par Apple sur les abonnements souscrits depuis l'app.
+  Bloqué techniquement dans les sessions Claude Code actuelles : elles
+  tournent sur Linux, or la compilation/test iOS nécessite Xcode (macOS
+  uniquement) — la config Capacitor peut être préparée depuis n'importe où,
+  mais le build final et la soumission App Store Connect devront se faire
+  sur le Mac d'Anthony.
 
 ## Incidents résolus
 
