@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
+import { appliquerRecompenseParrainageSiEligible } from "@/lib/parrainage/reward";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
@@ -86,7 +87,14 @@ export async function POST(request: Request) {
       }
       break;
     }
-    case "customer.subscription.updated":
+    case "customer.subscription.updated": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const statutPrecedent = (event.data.previous_attributes as { status?: string } | undefined)
+        ?.status;
+      await upsertFromSubscription(subscription);
+      await appliquerRecompenseParrainageSiEligible(subscription, statutPrecedent);
+      break;
+    }
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       await upsertFromSubscription(subscription);

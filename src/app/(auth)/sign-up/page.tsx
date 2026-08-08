@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,20 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { clearParrainageCookie, readParrainageCookie, storeParrainageCookie } from "@/lib/parrainage/cookie";
 import Link from "next/link";
 
 export default function SignUpPage() {
+  const searchParams = useSearchParams();
+
+  // Le lien de parrainage (?ref=CODE) est mémorisé en cookie pour survivre
+  // à l'aller-retour Google OAuth (l'inscription via Google ne repasse pas
+  // par cette page au retour, cf. completer-inscription-form.tsx).
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) storeParrainageCookie(ref);
+  }, [searchParams]);
+
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,9 +58,15 @@ export default function SignUpPage() {
       const res = await fetch("/api/compte/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ consentRgpd, consentSante, prenom: prenom || undefined }),
+        body: JSON.stringify({
+          consentRgpd,
+          consentSante,
+          prenom: prenom || undefined,
+          parrainageCode: readParrainageCookie() || undefined,
+        }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
+      clearParrainageCookie();
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",

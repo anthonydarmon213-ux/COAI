@@ -2,6 +2,7 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
 import { PLAN_FEATURES } from "@/lib/subscription/plan-features";
 import { PortalButton } from "@/components/compte/portal-button";
+import { ParrainageCard } from "@/components/compte/parrainage-card";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -157,10 +158,12 @@ export default async function AbonnementPage() {
           </div>
         ) : (
           <a href="/pricing" className="text-laiton-400 underline">
-            Voir les offres — à partir de 49€/mois
+            Voir les offres — à partir de 19€/mois
           </a>
         )}
       </Card>
+
+      <ParrainageCard />
 
       <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
         <div className="flex items-center gap-2">

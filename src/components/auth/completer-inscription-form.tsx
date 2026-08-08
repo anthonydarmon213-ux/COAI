@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
+import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
 import Link from "next/link";
 
 export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {
@@ -36,9 +37,15 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       const res = await fetch("/api/compte/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ consentRgpd, consentSante, prenom: prenom || undefined }),
+        body: JSON.stringify({
+          consentRgpd,
+          consentSante,
+          prenom: prenom || undefined,
+          parrainageCode: readParrainageCookie() || undefined,
+        }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
+      clearParrainageCookie();
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",

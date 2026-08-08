@@ -7,6 +7,7 @@ const bodySchema = z.object({
   consentRgpd: z.boolean(),
   consentSante: z.boolean(),
   prenom: z.string().max(100).optional(),
+  parrainageCode: z.string().max(20).optional(),
 });
 
 // Appelée par le client juste après un signUp() Supabase Auth réussi :
@@ -30,6 +31,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Certification d'aptitude sportive requise" }, { status: 400 });
   }
 
+  // Le code de parrainage n'est jamais bloquant : un code invalide ou
+  // expiré ne doit pas empêcher l'inscription, juste ne rattacher à aucun
+  // parrain.
+  let parraineParId: string | undefined;
+  if (parsed.data.parrainageCode) {
+    const parrain = await prisma.user.findUnique({
+      where: { codeParrainage: parsed.data.parrainageCode.toUpperCase() },
+      select: { id: true },
+    });
+    parraineParId = parrain?.id;
+  }
+
   const user = await prisma.user.upsert({
     where: { supabaseAuthId: authUser.id },
     update: {},
@@ -39,6 +52,7 @@ export async function POST(request: Request) {
       prenom: parsed.data.prenom || undefined,
       consentRgpdAt: new Date(),
       consentSanteAt: new Date(),
+      parraineParId,
     },
   });
 

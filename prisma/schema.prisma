@@ -31,6 +31,19 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  // Parrainage (08/08/2026) : code unique généré à la demande (première
+  // visite de la page de parrainage), pas à l'inscription — pas besoin
+  // d'un code pour qui ne parraine jamais. Quand le filleul passe payant
+  // (fin du mois offert), le parrain reçoit 1 mois offert sur son propre
+  // abonnement (coupon Stripe, cf. webhooks/stripe/route.ts).
+  // recompenseParrainageAppliquee vit sur le FILLEUL : empêche une
+  // notification Stripe rejouée de déclencher la récompense deux fois.
+  codeParrainage                String?  @unique
+  parraineParId                 String?
+  parrainePar                   User?    @relation("Parrainages", fields: [parraineParId], references: [id])
+  filleuls                      User[]   @relation("Parrainages")
+  recompenseParrainageAppliquee Boolean  @default(false)
+
   subscription   Subscription?
   profile        Profile?
   programmes     ProgrammeGenerated[]
