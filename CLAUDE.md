@@ -133,9 +133,24 @@ plus faciles à convaincre.
     uniquement pour les abonnements souscrits depuis l'app iOS —
     nécessitera de synchroniser les deux systèmes d'abonnement
     (entitlements côté app selon la source de paiement).
-  - Reste à faire avant de démarrer : définir le périmètre exact
-    (démarrage du chantier React Native vs. poursuite des priorités
-    business en cours), et le mode de synchronisation Stripe/Apple IAP.
+  - **Chantier démarré (08/08/2026)** : repo dédié
+    [`coai-mobile`](https://github.com/anthonydarmon213-ux/coai-mobile)
+    créé (Expo + React Native, TypeScript). Scaffold + v1 poussés : écrans
+    Connexion, Dashboard, Programme, Suivi séances, Suivi mesures,
+    Compte/abonnement — branchés sur le même Supabase et les mêmes routes
+    `/api/*` que le site. Reportés à une v2 : Coach IA (chat), tests
+    physiques + partage, parrainage, upload bracelet connecté/photo
+    morphologique. Reste à faire : Apple IAP + synchronisation
+    Stripe/Apple, tester sur device réel (Expo Go), build App Store
+    Connect (sur le Mac d'Anthony).
+  - **Changement backend associé (repo `lab-coach`)** : `getCurrentUser()`
+    (`src/lib/auth/server.ts`) accepte désormais un header
+    `Authorization: Bearer <access_token>` en plus du flux cookie web —
+    c'est ce qui permet à l'app mobile de s'authentifier contre les routes
+    `/api/*` existantes sans navigateur. Deux nouvelles routes JSON ajoutées
+    pour l'app (le site les affichait jusque-là uniquement via des Server
+    Components) : `GET /api/compte/moi` (résumé plan/abonnement) et
+    `GET /api/programmes` (dernier programme par pilier).
   - Contrainte technique inchangée : build/soumission App Store Connect
     nécessitent Xcode (macOS uniquement) — à faire sur le Mac d'Anthony ;
     le code React Native peut en revanche être développé depuis n'importe
