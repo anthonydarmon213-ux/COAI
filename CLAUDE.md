@@ -12,6 +12,31 @@ particuliers :
 - **Coachs indépendants** : leur proposer COAI en marque blanche / outil pour
   gérer leurs propres clients. Cycle de vente court, valide le produit en
   B2B2C avant d'attaquer plus gros.
+  - **Cadrage produit fait le 08/08/2026 (à laisser mûrir, pas démarré)** :
+    inspiré de TrueCoach (logiciel US pour coachs indépendants, ~26-137€/mois
+    selon nb de clients, mais programmation 100% manuelle — pas d'IA). COAI
+    garderait sa différenciation "l'IA génère, le coach valide", sauf que le
+    validateur ne serait plus systématiquement Anthony mais le coach abonné
+    lui-même, pour ses propres clients.
+    - Nouveaux rôles à introduire : `Particulier` (existant), `Coach`
+      (nouveau — gère un portefeuille de clients, ne voit que les siens),
+      `Admin` (déjà Anthony, supervise tout). Techniquement : champ `role`
+      sur `User` + relation coach→clients + routage de la file
+      `EN_ATTENTE` vers le bon coach au lieu d'atterrir toujours chez
+      Anthony.
+    - 3 modèles de facturation envisagés, à trancher avant de coder : (1)
+      coach paie par client actif façon TrueCoach, (2) coach paie un
+      abonnement plateforme fixe quel que soit son volume, (3) le client
+      final paie COAI directement et le coach touche une commission
+      (facturation multi-parties, plus complexe).
+    - Autres décisions en attente : tester d'abord avec 1-2 coachs pilotes
+      vs. self-service ouvert direct ; nom/branding de l'offre (ex: "COAI
+      Pro" / "COAI for Coaches").
+    - Ampleur estimée : plusieurs jours de dev (rôles/permissions,
+      facturation coach, UI dédiée liste clients/invitations, ~15-20
+      fichiers existants supposent aujourd'hui un seul coach validateur) —
+      réutilise l'essentiel du moteur déjà là (génération IA, statuts de
+      programme, Stripe).
 - **Clubs de sport** : proposer COAI aux clubs pour leurs adhérents. Plus
   lourd à vendre (contrats, plusieurs décideurs, intégration) mais gros
   volume potentiel si ça prend.
