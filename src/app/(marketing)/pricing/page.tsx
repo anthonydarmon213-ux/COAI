@@ -63,18 +63,6 @@ const TIERS: Tier[] = [
     mostPopular: true,
   },
   {
-    nom: "Premium+",
-    prix: "199€",
-    suffixe: "/mois",
-    description: "Tout Premium, avec une séance mensuelle incluse avec Anthony Darmon.",
-    features: [
-      "Tous les avantages Premium (programme IA validé par un coach, suivi, coach IA, streaming, WhatsApp)",
-      "1 séance/mois avec Anthony Darmon incluse — présentiel ou visio, à réserver directement via WhatsApp",
-      "Version allégée de THE METHOD (l'accompagnement complet reste à 4 séances/mois, disponible séparément)",
-    ],
-    plan: "PREMIUM" as const,
-  },
-  {
     nom: "VIP",
     prix: "Sur réservation",
     suffixe: "",
@@ -123,7 +111,7 @@ export default function PricingPage() {
         </h1>
       </div>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {TIERS.map((tier) => (
           <Card
             key={tier.nom}
