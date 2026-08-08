@@ -6,6 +6,7 @@ import { Gauge } from "@/components/ui/gauge";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
 import { PlanCard } from "@/components/dashboard/plan-card";
+import { WatchScreenshotCta } from "@/components/dashboard/watch-screenshot-cta";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
@@ -63,6 +64,8 @@ export default async function DashboardPage() {
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 
       <PlanCard plan={plan} />
+
+      <WatchScreenshotCta />
 
       <div className="flex flex-col gap-3">
         <SectionLabel>Vue du jour</SectionLabel>
