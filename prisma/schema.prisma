@@ -50,6 +50,7 @@ model User {
   programmes     ProgrammeGenerated[]
   seances        SeanceLog[]
   mesures        Mesure[]
+  testsMaxi      TestMaxi[]
   whatsappEvents WhatsAppEvent[]
 
   @@map("users")
@@ -220,6 +221,32 @@ model Mesure {
   createdAt                  DateTime @default(now())
 
   @@map("mesures")
+}
+
+enum ExerciceMaxi {
+  DEVELOPPE_COUCHE
+  SQUAT
+  SOULEVE_DE_TERRE
+  TRACTION
+}
+
+// Tests de charge maximale (1RM) — distinct de Mesure (poids/mensurations)
+// et des séances loguées : une entrée par test, pour suivre l'évolution de
+// la force sur les mouvements de référence. "unite" est déduite de
+// l'exercice côté serveur (kg pour les 3 mouvements de force, reps pour la
+// traction au poids du corps) plutôt que confiée au client.
+model TestMaxi {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercice  ExerciceMaxi
+  date      DateTime
+  valeur    Float
+  unite     String
+  notes     String?
+  createdAt DateTime     @default(now())
+
+  @@map("tests_maxi")
 }
 
 enum WhatsAppDirection {
