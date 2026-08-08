@@ -89,6 +89,12 @@ plus faciles à convaincre.
   14 jours pour la partie du service consommée pendant le mois offert.
   Texte rédigé par Claude, **pas relu par un juriste** — à faire valider
   avant que le volume d'inscriptions grossisse.
+- **Parrainage** (08/08/2026) : lien unique par utilisateur
+  (`/sign-up?ref=CODE`, généré à la demande), visible sur une carte dédiée
+  dans compte/abonnement. Quand un filleul passe payant (fin de son mois
+  offert), le parrain reçoit automatiquement 1 mois offert sur son propre
+  abonnement (coupon Stripe créé à la demande, appliqué via webhook). Le
+  filleul n'a aucun avantage en plus d'une inscription normale.
 - Reste à activer côté Stripe (Réglages → Emails clients) : l'email
   automatique de rappel avant la fin de l'essai, pour réduire les litiges
   et donner une vraie visibilité aux futurs abonnés avant le prélèvement.
