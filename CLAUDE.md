@@ -53,6 +53,34 @@ plus faciles à convaincre.
   que le chiffre n'est pas confirmé). Livré à Anthony, pas versionné dans
   le repo.
 
+## Pricing (08/08/2026)
+
+- **Restructuration de l'offre Gratuite en offre d'appel** : au lieu d'un
+  palier gratuit illimité, nouvelle inscription = 1 mois offert avec carte
+  bancaire obligatoire dès le départ, puis passage automatique à 9€/mois
+  (produit Stripe `COAI gratuit`, price `price_1U277IAPYODLq9KTSpX3vjKC`).
+  Palier Premium (STANDARD, 49€/mois) inchangé. Décision prise sans
+  abonnés gratuits existants à migrer (aucun abonné au moment du
+  changement), donc pas de logique de bascule à gérer pour l'historique.
+- Palier "Premium+" (199€/mois, self-serve) ajouté puis retiré le jour
+  même sur demande d'Anthony — le produit Stripe `COAI Premium` à 199€ a
+  été archivé (renommage `COAI standard` → `COAI Premium` fait par Anthony
+  pour la clarté du dashboard Stripe, sans lien avec le nom affiché côté
+  site qui reste piloté par `price_id`, pas par le nom du produit).
+- Case de consentement dédiée ajoutée au flow d'inscription (RGPD +
+  aptitude sportive existaient déjà) : reconnaissance des conditions de
+  l'offre (1 mois puis 9€/mois) + renonciation au droit de rétractation de
+  14 jours pour la partie du service consommée pendant le mois offert.
+  Texte rédigé par Claude, **pas relu par un juriste** — à faire valider
+  avant que le volume d'inscriptions grossisse.
+- Reste à activer côté Stripe (Réglages → Emails clients) : l'email
+  automatique de rappel avant la fin de l'essai, pour réduire les litiges
+  et donner une vraie visibilité aux futurs abonnés avant le prélèvement.
+- Résiliation : repose sur le portail Stripe existant (`PortalButton`) —
+  à vérifier qu'il respecte bien l'obligation légale française de
+  résiliation en 3 clics (juin 2023) une fois que des abonnés réels
+  passeront par ce flow.
+
 ## Incidents résolus
 
 - **08/08/2026** — Deux bugs production successifs corrigés et confirmés en
