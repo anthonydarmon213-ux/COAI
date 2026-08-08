@@ -146,6 +146,8 @@ export async function POST() {
     vo2Max: user.profile?.vo2Max,
     caloriesMoyennesParJour: user.profile?.caloriesMoyennesParJour,
     resumeMontre: user.profile?.resumeMontre,
+    morphologieDetectee: user.profile?.morphologieDetectee,
+    observationsPosture: user.profile?.observationsPosture,
   };
 
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];

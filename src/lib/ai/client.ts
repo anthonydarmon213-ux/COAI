@@ -30,6 +30,9 @@ export type ProfilUtilisateur = {
   vo2Max?: number | null;
   caloriesMoyennesParJour?: number | null;
   resumeMontre?: string | null;
+  // Extraites automatiquement d'une photo en tenue de sport.
+  morphologieDetectee?: string | null;
+  observationsPosture?: string | null;
 };
 
 let client: Anthropic | null = null;

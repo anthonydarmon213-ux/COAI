@@ -162,6 +162,8 @@ type Profil = {
   caloriesMoyennesParJour?: number | null;
   resumeMontre?: string | null;
   derniereAnalyseMontre?: string | Date | null;
+  morphologieDetectee?: string | null;
+  observationsPosture?: string | null;
 };
 
 function parseMultiSelect(value?: string | null): string[] {
@@ -238,6 +240,39 @@ export function ProfilForm({ profil }: { profil: Profil }) {
       setMontreError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setMontreLoading(false);
+    }
+  }
+
+  const [photoData, setPhotoData] = useState({
+    morphologieDetectee: profil.morphologieDetectee ?? null,
+    observationsPosture: profil.observationsPosture ?? null,
+  });
+  const [photoLoading, setPhotoLoading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [photoRejected, setPhotoRejected] = useState<string | null>(null);
+
+  async function handleAnalyserPhoto(file: File) {
+    setPhotoLoading(true);
+    setPhotoError(null);
+    setPhotoRejected(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/profil/photo-morphologie", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse de la photo.");
+      if (!data.analysable) {
+        setPhotoRejected(data.resume ?? "Cette photo n'a pas pu être analysée.");
+        return;
+      }
+      setPhotoData({
+        morphologieDetectee: data.morphologieDetectee ?? null,
+        observationsPosture: data.observationsPosture ?? null,
+      });
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setPhotoLoading(false);
     }
   }
 
@@ -343,6 +378,42 @@ export function ProfilForm({ profil }: { profil: Profil }) {
               )}
               {montreData.resumeMontre && (
                 <p className="italic text-graphite-400">{montreData.resumeMontre}</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <SectionLabel>Photo morphologique</SectionLabel>
+        <div className="flex flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-4">
+          <p className="text-sm text-graphite-300">
+            Envoie une photo de toi en tenue de sport (legging, short, brassière, débardeur...),
+            de face, en pied — on en extrait des observations de posture et de morphologie pour
+            affiner ton programme d&apos;entraînement. Photo jamais conservée, uniquement les
+            observations.
+          </p>
+          <label className="w-fit">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              className="hidden"
+              disabled={photoLoading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleAnalyserPhoto(file);
+                e.target.value = "";
+              }}
+            />
+            <span className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:bg-laiton-400/[0.14]">
+              {photoLoading ? "Analyse en cours…" : "Analyser une photo"}
+            </span>
+          </label>
+          {photoError && <p className="text-sm text-red-400">{photoError}</p>}
+          {photoRejected && <p className="text-sm text-graphite-400">{photoRejected}</p>}
+          {(photoData.morphologieDetectee || photoData.observationsPosture) && (
+            <div className="flex flex-col gap-1.5 text-sm text-graphite-300">
+              {photoData.morphologieDetectee && <p>Morphologie détectée : {photoData.morphologieDetectee}</p>}
+              {photoData.observationsPosture && (
+                <p className="italic text-graphite-400">{photoData.observationsPosture}</p>
               )}
             </div>
           )}

@@ -123,6 +123,15 @@ model Profile {
   caloriesMoyennesParJour   Int?
   resumeMontre              String?
   derniereAnalyseMontre     DateTime?
+  // Données extraites automatiquement d'une photo en tenue de sport (cf.
+  // src/app/api/profil/photo-morphologie/route.ts) — observations
+  // factuelles utiles à l'entraînement uniquement (posture, équilibre
+  // musculaire apparent), jamais un jugement sur l'apparence. Dernière
+  // analyse écrase la précédente, pas d'historique conservé, photo jamais
+  // stockée.
+  morphologieDetectee       String?
+  observationsPosture       String?
+  derniereAnalysePhoto      DateTime?
   updatedAt             DateTime @updatedAt
 
   @@map("profiles")

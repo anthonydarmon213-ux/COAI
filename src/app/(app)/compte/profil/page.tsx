@@ -55,6 +55,8 @@ export default async function ProfilPage() {
               caloriesMoyennesParJour: user.profile?.caloriesMoyennesParJour,
               resumeMontre: user.profile?.resumeMontre,
               derniereAnalyseMontre: user.profile?.derniereAnalyseMontre,
+              morphologieDetectee: user.profile?.morphologieDetectee,
+              observationsPosture: user.profile?.observationsPosture,
             }}
           />
         </Card>

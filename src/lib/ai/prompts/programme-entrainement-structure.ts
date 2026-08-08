@@ -38,6 +38,8 @@ ${
     ? `Données de montre connectée — VO2 max : ${profil.vo2Max ?? "non renseigné"}, pas moyen/jour : ${profil.pasMoyenParJour ?? "non renseigné"}, fréquence cardiaque de repos : ${profil.frequenceCardiaqueRepos ?? "non renseignée"} bpm.`
     : ""
 }
+${profil.morphologieDetectee ? `Morphologie détectée par photo : ${profil.morphologieDetectee}` : ""}
+${profil.observationsPosture ? `Observations de posture (photo) : ${profil.observationsPosture} — adapte le programme en conséquence (exercices correctifs, prudence sur les mouvements concernés).` : ""}
 
 Détermine la fréquence hebdomadaire adaptée au niveau et à la fréquence actuelle (ne pas repartir
 de zéro si la personne s'entraîne déjà). Complète les sports déjà pratiqués plutôt que de les
