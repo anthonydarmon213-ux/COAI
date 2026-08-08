@@ -139,7 +139,8 @@ export default async function AbonnementPage() {
         <h2 className="text-lg font-semibold text-graphite-50">Coaching VIP avec Anthony Darmon</h2>
         <p className="text-sm text-graphite-300">
           Une séance individuelle avec Anthony, en plus de ton programme — présentiel à Paris
-          centre (200€/1h) ou en visio (100€/1h). Réservation à la séance, sans abonnement.
+          centre, en club ou à domicile (200€/1h), ou en visio (100€/1h). Réservation à la
+          séance, sans abonnement.
         </p>
         {vipHref ? (
           <a href={vipHref} target="_blank" rel="noopener noreferrer">
