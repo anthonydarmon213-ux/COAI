@@ -84,32 +84,35 @@ export default async function AbonnementPage() {
               </p>
             </div>
             <p className="text-sm leading-6 text-graphite-300">
-              Passionné par le mouvement du corps, sportif depuis toujours — pratiquant de
-              musculation et de callisthénie. Quinze ans de karaté, jusqu&apos;à la ceinture
-              noire, deuxième dan obtenu à Paris — après un voyage au Japon pour pratiquer
-              directement auprès des grands maîtres. Une recherche du même genre l&apos;a mené en
-              Inde, où il s&apos;est certifié au yoga, et en Thaïlande, où il s&apos;est entraîné
-              au muay thaï en stage, dans des camps locaux. Également adepte de philosophie, il
-              est fasciné par la puissance du mental — la même exigence qu&apos;il applique au
-              corps. Sa signature, et l&apos;un de ses mouvements préférés : le handstand.
+              À l&apos;aube de la quarantaine, Anthony affiche un âge métabolique de 24 ans — la
+              preuve vivante de ce qu&apos;il vend : un corps qui reste jeune, année après année.
+              Sportif depuis toujours, passionné par le mouvement sous toutes ses formes —
+              musculation, callisthénie (le handstand est sa signature), quinze ans de karaté
+              jusqu&apos;à la ceinture noire, deuxième dan obtenu à Paris après un voyage au Japon
+              pour s&apos;entraîner aux côtés des grands maîtres. La même quête l&apos;a mené en
+              Inde, où il s&apos;est certifié au yoga, puis en Thaïlande, en stage dans des camps
+              de muay thaï. Adepte de philosophie, il reste fasciné par la puissance du mental —
+              la même exigence qu&apos;il impose à son corps.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              De ce parcours est né un métier : coach diplômé d&apos;État, titulaire de la carte
-              professionnelle d&apos;éducateur sportif. Dix-sept ans d&apos;expérience sur le
-              terrain — en salle, en visio, à corriger un mouvement, ajuster un macro, entendre ce
-              qu&apos;un chiffre sur la balance ne dit jamais. Formé dans les clubs premium
-              parisiens, il a fait évoluer sa pratique avec son temps — coaching à distance
-              développé dès le Covid, à domicile, en entreprise. Il coache aujourd&apos;hui à la
-              Montgolfière Paris et au Club RITM Saint-Germain. Il a accompagné des personnes très
-              différentes — entrepreneurs, VIP, politiques, acteurs, Miss France — mais toutes
-              réunies par la même chose : passer à l&apos;action. Lui-même Bélier, il fonce.
+              De cette discipline personnelle est né un métier : coach diplômé d&apos;État,
+              titulaire de la carte professionnelle d&apos;éducateur sportif, dix-sept ans
+              d&apos;expérience à corriger un mouvement, ajuster un macro, entendre ce qu&apos;un
+              chiffre sur la balance ne dit jamais. Formé dans les clubs premium parisiens, il
+              exerce aujourd&apos;hui à la Montgolfière Paris et au Club RITM Saint-Germain, après
+              avoir été parmi les premiers à développer le coaching à distance dès le Covid —
+              visio, domicile, entreprise. Il a accompagné des centaines d&apos;entrepreneurs,
+              ainsi que des VIP, politiques, acteurs, Miss France — des profils très différents,
+              tous réunis par la même chose : passer à l&apos;action. Lui-même Bélier, il fonce.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Son objectif : mettre les gens en mouvement, améliorer leur santé et leur longévité —
-              un corps sans douleur, fonctionnel, fort, endurant, souple : toutes les qualités
-              physiques. Convaincu que le mouvement est la clé d&apos;une meilleure santé —
-              surtout quand on reste assis toute la journée, c&apos;est vital — il veut
-              aujourd&apos;hui impacter le plus grand nombre. C&apos;est pour ça que COAI existe.
+              Sa mission : faire vivre à chacun ce qu&apos;il vit lui-même — un corps sans
+              douleur, fonctionnel, fort, endurant, souple, qui reste jeune bien plus longtemps
+              qu&apos;on ne le croit. La santé et la longévité ne sont pas une promesse abstraite,
+              c&apos;est un résultat qu&apos;il incarne. Convaincu que le mouvement en est la clé
+              — surtout quand on reste assis toute la journée, c&apos;est vital — il veut
+              aujourd&apos;hui transmettre cette conviction au plus grand nombre. C&apos;est pour
+              ça que COAI existe.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               Chaque programme généré par l&apos;IA sur COAI est relu et validé par lui, ou par un
