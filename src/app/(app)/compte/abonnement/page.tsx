@@ -84,13 +84,14 @@ export default async function AbonnementPage() {
               </p>
             </div>
             <p className="text-sm leading-6 text-graphite-300">
-              Passionné par le mouvement du corps, sportif depuis toujours. Quinze ans de karaté,
-              jusqu&apos;à la ceinture noire, deuxième dan obtenu à Paris — après un voyage au
-              Japon pour pratiquer directement auprès des grands maîtres. Une recherche du même
-              genre l&apos;a mené en Inde, où
-              il s&apos;est certifié au yoga, et en Thaïlande, où il s&apos;est formé au muay
-              thaï. Également adepte de philosophie, il est fasciné par la puissance du mental —
-              la même exigence qu&apos;il applique au corps.
+              Passionné par le mouvement du corps, sportif depuis toujours — pratiquant de
+              musculation et de callisthénie. Quinze ans de karaté, jusqu&apos;à la ceinture
+              noire, deuxième dan obtenu à Paris — après un voyage au Japon pour pratiquer
+              directement auprès des grands maîtres. Une recherche du même genre l&apos;a mené en
+              Inde, où il s&apos;est certifié au yoga, et en Thaïlande, où il s&apos;est entraîné
+              au muay thaï en stage, dans des camps locaux. Également adepte de philosophie, il
+              est fasciné par la puissance du mental — la même exigence qu&apos;il applique au
+              corps. Sa signature, et l&apos;un de ses mouvements préférés : le handstand.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               De ce parcours est né un métier : coach diplômé d&apos;État, titulaire de la carte
