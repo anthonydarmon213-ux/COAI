@@ -84,21 +84,29 @@ export default async function AbonnementPage() {
               </p>
             </div>
             <p className="text-sm leading-6 text-graphite-300">
-              À l&apos;aube de la quarantaine, Anthony affiche un âge métabolique de 24 ans — la
-              preuve vivante de ce qu&apos;il vend : un corps qui reste jeune. Musculation,
-              callisthénie, karaté, yoga vinyasa, muay thaï : le mouvement, il le vit depuis
-              toujours.
+              Anthony a 40 ans à peine, et un corps qui n&apos;a pas l&apos;air d&apos;être au
+              courant — âge métabolique 24 ans. Ce n&apos;est pas un chiffre pour épater :
+              c&apos;est ce qui arrive quand on refuse, depuis l&apos;enfance, de rester
+              immobile. Musculation, callisthénie — le handstand est devenu sa signature —,
+              quinze ans de karaté qui lui ont appris la rigueur jusqu&apos;à l&apos;envoyer
+              s&apos;entraîner au Japon, un détour par l&apos;Inde pour apprendre à respirer, un
+              autre par la Thaïlande pour apprendre à encaisser. Chez lui, le mouvement
+              n&apos;est pas une discipline qu&apos;on coche. C&apos;est une façon d&apos;être
+              vivant.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Coach diplômé d&apos;État, dix-sept ans de terrain — clubs premium parisiens,
-              Montgolfière Paris, Club RITM Saint-Germain, entreprise et distance. Des centaines
-              d&apos;entrepreneurs, VIP, politiques, acteurs, Miss France sont passés entre ses
-              mains.
+              De cette exigence-là est né un métier. Dix-sept ans à corriger un mouvement, à
+              entendre ce qu&apos;un chiffre sur la balance ne dira jamais. Formé dans les clubs
+              premium parisiens, il a trouvé sa place au Club Montgolfière Paris et au Club RITM
+              Saint-Germain, sans jamais cesser d&apos;aller vers ceux qui en avaient besoin — en
+              entreprise, à domicile, à distance depuis le Covid. Des centaines
+              d&apos;entrepreneurs sont passés entre ses mains, des VIP, des politiques, des
+              acteurs, une Miss France.
             </p>
             <p className="text-sm leading-6 text-graphite-300">
-              Sa mission : partager son expertise et motiver le plus de monde possible à se
-              mettre en mouvement, mieux manger et mieux récupérer — pour un corps jeune et en
-              bonne santé. C&apos;est pour ça que COAI existe.
+              Ce qu&apos;il veut, aujourd&apos;hui, c&apos;est simple : que le plus grand nombre
+              connaisse ce qu&apos;il vit lui-même chaque jour — un corps qui ne fait pas mal,
+              qui tient dans le temps, qui reste jeune. C&apos;est pour ça que COAI existe.
             </p>
           </div>
         </Card>
