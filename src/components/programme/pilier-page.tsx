@@ -10,7 +10,6 @@ import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { FicheMacros } from "@/components/programme/fiche-macros";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
@@ -54,7 +53,8 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
   ]);
 
   const enAttente = dernier && dernier.statut === "EN_ATTENTE";
-  const affiche = valide ? valide : enAttente ? dernier : null;
+  const genereIA = dernier && dernier.statut === "GENERE_IA";
+  const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
   const plan = getEffectivePlan(user.subscription);
 
   return (
@@ -92,59 +92,54 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <SectionLabel>{LABELS[pilier]}</SectionLabel>
-          {plan !== "GRATUIT" && <RegenerateButton hasExisting={Boolean(dernier)} />}
+          <RegenerateButton hasExisting={Boolean(dernier)} />
         </div>
 
-        {plan === "GRATUIT" ? (
-          <Card className="flex flex-col items-start gap-3">
-            <Badge tone="warning">Réservé à l&apos;offre Premium</Badge>
-            <p className="text-sm text-graphite-300">
-              Passe à l&apos;offre Premium (49€/mois) pour générer ton programme IA — relu et
-              validé par Anthony Darmon.
+        <Card className="flex flex-col gap-5 p-6 sm:p-8">
+          <div className="flex items-center justify-between">
+            {valide && (
+              <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
+            )}
+            {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
+            {!valide && genereIA && <Badge tone="neutral">Généré par l&apos;IA — non relu par un coach</Badge>}
+          </div>
+
+          {affiche && (
+            <p className="text-xs text-graphite-500">
+              Généré le{" "}
+              {affiche.generatedAt.toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </p>
-            <Link href="/pricing">
-              <Button>Voir les offres</Button>
-            </Link>
-          </Card>
-        ) : (
-          <Card className="flex flex-col gap-5 p-6 sm:p-8">
-            <div className="flex items-center justify-between">
-              {valide && (
-                <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
-              )}
-              {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
-            </div>
+          )}
 
-            {affiche && (
-              <p className="text-xs text-graphite-500">
-                Généré le{" "}
-                {affiche.generatedAt.toLocaleDateString("fr-FR", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
-            )}
+          {enAttente && (
+            <p className="text-sm text-laiton-400">
+              Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
+              détails peuvent encore être ajustés.
+            </p>
+          )}
 
-            {enAttente && (
-              <p className="text-sm text-laiton-400">
-                Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
-                détails peuvent encore être ajustés.
-              </p>
-            )}
+          {genereIA && (
+            <p className="text-sm text-graphite-400">
+              Programme généré à 100% par IA, sans relecture humaine. Passe à l&apos;offre Premium
+              (49€/mois) pour qu&apos;Anthony Darmon le relise et l&apos;ajuste personnellement.
+            </p>
+          )}
 
-            {(() => {
-              const contenu = valide ? valide.contenu : enAttente ? dernier.contenu : null;
-              if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-              if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
-              if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
-              if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
-              return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
-            })()}
+          {(() => {
+            const contenu = affiche?.contenu ?? null;
+            if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
+            if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+            if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
+            if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
+            return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
+          })()}
 
-            {pilier === "NUTRITION" && <FicheMacros />}
-          </Card>
-        )}
+          {pilier === "NUTRITION" && <FicheMacros />}
+        </Card>
 
         <Link href="/compte/profil" className="text-sm text-laiton-400 underline">
           Modifier votre profil →

@@ -19,13 +19,15 @@ const PILIER_LABELS: Record<Pilier, string> = {
 // Le pourcentage de chaque jauge reflète l'état du programme pour ce pilier
 // (aucune donnée physiologique type fréquence cardiaque/HRV n'est collectée
 // en continu dans l'app — pas de "score de récupération" inventé) :
-// 0% = jamais généré, 50% = en attente de relecture coach, 100% = validé.
-function statutVersPourcent(statut: "VALIDE" | "EN_ATTENTE" | null): {
+// 0% = jamais généré, 50% = en attente de relecture coach, 100% = validé ou
+// généré en full IA (palier Gratuit, pas de relecture prévue).
+function statutVersPourcent(statut: "VALIDE" | "EN_ATTENTE" | "GENERE_IA" | null): {
   percent: number;
   sublabel: string;
 } {
   if (statut === "VALIDE") return { percent: 100, sublabel: "Programme actif" };
   if (statut === "EN_ATTENTE") return { percent: 50, sublabel: "En cours de relecture" };
+  if (statut === "GENERE_IA") return { percent: 100, sublabel: "Généré par IA" };
   return { percent: 0, sublabel: "Pas encore généré" };
 }
 

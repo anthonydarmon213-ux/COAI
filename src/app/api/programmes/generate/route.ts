@@ -18,6 +18,7 @@ import {
 import { buildProgrammeRecuperationJourPrompt } from "@/lib/ai/prompts/programme-recuperation-jour";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
+import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
@@ -114,12 +115,18 @@ export async function POST() {
 
   const user = await prisma.user.findUnique({
     where: { supabaseAuthId: authUser.id },
-    include: { profile: true },
+    include: { profile: true, subscription: true },
   });
 
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
+
+  // Palier Gratuit (9€) : programme 100% IA, jamais envoyé en relecture au
+  // coach (statut GENERE_IA, visible immédiatement). Standard/Premium :
+  // comportement inchangé, en attente de validation humaine.
+  const plan = getEffectivePlan(user.subscription);
+  const statutInitial = plan === "GRATUIT" ? "GENERE_IA" : "EN_ATTENTE";
 
   const profil = {
     objectifs: user.profile?.objectifs,
@@ -156,7 +163,7 @@ export async function POST() {
     piliers.map(async (pilier) => {
       const contenu = await genererPilier(pilier, profil);
       return prisma.programmeGenerated.create({
-        data: { userId: user.id, pilier, contenu: contenu as object },
+        data: { userId: user.id, pilier, contenu: contenu as object, statut: statutInitial },
       });
     })
   );
@@ -179,7 +186,7 @@ export async function POST() {
     .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof prisma.programmeGenerated.create>>> => r.status === "fulfilled")
     .map((r) => r.value);
 
-  if (programmes.length > 0) {
+  if (programmes.length > 0 && statutInitial === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     await sendAdminNotification(
       "Nouveau programme à valider",

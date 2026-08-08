@@ -143,15 +143,21 @@ enum Pilier {
   RECUPERATION
 }
 
+// EN_ATTENTE / VALIDE : cycle normal pour les paliers Standard/Premium — le
+// coach humain relit et valide avant que le badge "supervisé" n'apparaisse
+// (l'abonné voit déjà l'aperçu EN_ATTENTE, avec un badge distinct).
+// GENERE_IA : palier Gratuit (9€) uniquement — programme 100% IA, jamais
+// envoyé à la file de relecture du coach, visible immédiatement.
 enum StatutProgramme {
   EN_ATTENTE
   VALIDE
+  GENERE_IA
 }
 
 // Historique des programmes générés dynamiquement par l'IA (pas de bibliothèque
 // pré-construite). Chaque génération reste EN_ATTENTE tant que le coach humain
-// (Anthony Darmon) ne l'a pas relue et validée — l'abonné ne voit que les
-// programmes VALIDE.
+// (Anthony Darmon) ne l'a pas relue et validée, sauf pour le palier Gratuit
+// (statut GENERE_IA, jamais envoyé en relecture — cf. StatutProgramme).
 model ProgrammeGenerated {
   id          String          @id @default(uuid())
   userId      String
