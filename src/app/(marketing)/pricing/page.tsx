@@ -19,10 +19,18 @@ type Tier = {
   // de bouton d'abonnement Stripe, juste une réservation via WhatsApp.
   sessions?: { label: string; prix: string }[];
   limitedSpots?: boolean;
+  // Palier Entreprise : sur devis, hors Stripe — contact direct (WhatsApp/
+  // mail) et renvoi vers le site dédié (coaching-hybride-anthony).
+  external?: { whatsappHref: string | null; mailHref: string; siteHref: string };
 };
 
 const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
+
+const ENTREPRISE_MESSAGE =
+  "Bonjour Anthony, je vous contacte au sujet d'une offre coaching pour mon entreprise.";
+const ENTREPRISE_SITE_HREF =
+  "http://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/?utm_source=pricing&utm_medium=web&utm_content=carte_entreprise";
 
 const TIERS: Tier[] = [
   {
@@ -55,6 +63,18 @@ const TIERS: Tier[] = [
     mostPopular: true,
   },
   {
+    nom: "Premium+",
+    prix: "199€",
+    suffixe: "/mois",
+    description: "Tout Premium, avec une séance mensuelle incluse avec Anthony Darmon.",
+    features: [
+      "Tous les avantages Premium (programme IA validé par un coach, suivi, coach IA, streaming, WhatsApp)",
+      "1 séance/mois avec Anthony Darmon incluse — présentiel ou visio, à réserver directement via WhatsApp",
+      "Version allégée de THE METHOD (l'accompagnement complet reste à 4 séances/mois, disponible séparément)",
+    ],
+    plan: "PREMIUM" as const,
+  },
+  {
     nom: "VIP",
     prix: "Sur réservation",
     suffixe: "",
@@ -69,6 +89,22 @@ const TIERS: Tier[] = [
       { label: "Visio (1h)", prix: "100€" },
     ],
     limitedSpots: true,
+  },
+  {
+    nom: "Entreprise",
+    prix: "Sur devis",
+    suffixe: "",
+    description: "Coaching pour vos équipes et collaborateurs — accompagnement sur-mesure.",
+    features: [
+      "Programme adapté à vos équipes (mobilité au poste, gestion de l'énergie, prévention)",
+      "Formules flexibles — ponctuel, régulier, ou intégré à une démarche QVT",
+      "Devis personnalisé selon vos effectifs et vos objectifs",
+    ],
+    external: {
+      whatsappHref: buildWhatsAppLink(ENTREPRISE_MESSAGE),
+      mailHref: `mailto:anthonydarmon213@hotmail.com?subject=${encodeURIComponent("Offre coaching entreprise")}`,
+      siteHref: ENTREPRISE_SITE_HREF,
+    },
   },
 ];
 
@@ -87,7 +123,7 @@ export default function PricingPage() {
         </h1>
       </div>
 
-      <div className="grid w-full max-w-5xl grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid w-full max-w-6xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {TIERS.map((tier) => (
           <Card
             key={tier.nom}
@@ -131,13 +167,33 @@ export default function PricingPage() {
               </ul>
             )}
 
-            {tier.sessions ? (
+            {tier.external ? (
+              <div className="flex flex-col items-center gap-2.5">
+                {tier.external.whatsappHref ? (
+                  <a href={tier.external.whatsappHref} target="_blank" rel="noopener noreferrer">
+                    <Button>Demander un devis via WhatsApp</Button>
+                  </a>
+                ) : (
+                  <a href={tier.external.mailHref}>
+                    <Button>Demander un devis par mail</Button>
+                  </a>
+                )}
+                <a
+                  href={tier.external.siteHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-laiton-400 underline hover:text-laiton-300"
+                >
+                  En savoir plus →
+                </a>
+              </div>
+            ) : tier.sessions ? (
               vipHref ? (
                 <a href={vipHref} target="_blank" rel="noopener noreferrer">
                   <Button>Réserver via WhatsApp</Button>
                 </a>
               ) : (
-                <p className="text-sm text-graphite-400">Contacte ton coach pour réserver.</p>
+                <Button disabled>Contacte ton coach pour réserver</Button>
               )
             ) : tier.plan ? (
               <SubscribeButton plan={tier.plan} label={`S'abonner — ${tier.prix}${tier.suffixe}`} />

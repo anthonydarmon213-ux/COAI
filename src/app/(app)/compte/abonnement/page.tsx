@@ -1,5 +1,6 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
+import { PLAN_FEATURES } from "@/lib/subscription/plan-features";
 import { PortalButton } from "@/components/compte/portal-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -115,6 +116,14 @@ export default async function AbonnementPage() {
           <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
           {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
         </div>
+        <ul className="flex flex-col gap-1.5">
+          {PLAN_FEATURES[plan].map((feature) => (
+            <li key={feature} className="flex items-start gap-2 text-sm text-graphite-300">
+              <span className="mt-0.5 text-laiton-400">✓</span>
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
         {finProgrammee && (
           <p className="text-sm text-laiton-400">
             Résiliation programmée — ton accès se termine le{" "}
@@ -158,7 +167,7 @@ export default async function AbonnementPage() {
             <Button>Réserver via WhatsApp</Button>
           </a>
         ) : (
-          <p className="text-sm text-graphite-400">Contacte ton coach pour réserver.</p>
+          <Button disabled>Contacte ton coach pour réserver</Button>
         )}
       </Card>
     </div>
