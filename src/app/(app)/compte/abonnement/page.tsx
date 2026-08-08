@@ -97,8 +97,8 @@ export default async function AbonnementPage() {
             </p>
             <p className="text-sm leading-6 text-graphite-300">
               Sa mission : partager son expertise et motiver le plus de monde possible à se
-              mettre en mouvement — un corps sans douleur, fort, souple, qui reste jeune.
-              C&apos;est pour ça que COAI existe.
+              mettre en mouvement, mieux manger et mieux récupérer — pour un corps jeune et en
+              bonne santé. C&apos;est pour ça que COAI existe.
             </p>
           </div>
         </Card>
