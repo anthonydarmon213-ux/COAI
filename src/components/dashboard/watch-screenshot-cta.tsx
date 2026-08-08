@@ -52,10 +52,10 @@ export function WatchScreenshotCta() {
     <div className="group relative flex flex-col gap-2 overflow-hidden rounded-lg border border-laiton-400/30 bg-laiton-400/[0.06] p-5">
       <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-laiton-500/15 blur-2xl transition group-hover:bg-laiton-500/25" />
       <span className="font-mono text-xs uppercase tracking-widest text-laiton-400">
-        Nouveau · Montre connectée
+        Nouveau · Bracelet connecté
       </span>
       <p className="text-sm text-graphite-200">
-        Envoie un screenshot de ta montre ou app santé (Apple Watch, Garmin, Fitbit, Samsung
+        Envoie un screenshot de ton bracelet ou app santé (Apple Watch, Garmin, Fitbit, Samsung
         Health...) — l&apos;IA en extrait tes données (pas, fréquence cardiaque, sommeil, VO2 max)
         pour affiner ton programme, automatiquement.
       </p>

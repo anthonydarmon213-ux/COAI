@@ -332,10 +332,10 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <SectionLabel>Montre connectée</SectionLabel>
+        <SectionLabel>Bracelet connecté</SectionLabel>
         <div className="flex flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-4">
           <p className="text-sm text-graphite-300">
-            Envoie un screenshot de ta montre ou app santé (Apple Watch, Garmin, Fitbit, Samsung
+            Envoie un screenshot de ton bracelet ou app santé (Apple Watch, Garmin, Fitbit, Samsung
             Health...) — on en extrait automatiquement pas, fréquence cardiaque, sommeil, VO2 max
             et calories pour affiner ton programme.
           </p>
