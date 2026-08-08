@@ -124,8 +124,9 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
 
           {genereIA && (
             <p className="text-sm text-graphite-400">
-              Programme généré à 100% par IA, sans relecture humaine. Passe à l&apos;offre Premium
-              (49€/mois) pour qu&apos;Anthony Darmon le relise et l&apos;ajuste personnellement.
+              Programme généré à 100% par IA, sans relecture humaine. Passe à l&apos;offre
+              Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et
+              l&apos;ajuste.
             </p>
           )}
 

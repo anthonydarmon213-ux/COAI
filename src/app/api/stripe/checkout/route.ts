@@ -9,11 +9,12 @@ const PRICE_ENV_BY_PLAN = {
   PREMIUM: "STRIPE_PRICE_ID_PREMIUM",
 } as const;
 
-// Crée une session Stripe Checkout. GRATUIT (offre d'appel, 1 mois offert
-// puis 19€/mois) passe par un essai Stripe avec carte obligatoire dès
-// l'inscription — payment_method_collection: "always" force la saisie de
-// la CB même si la première facture est à 0€. STANDARD (affiché "Premium",
-// 49€/mois) est le palier payant sans engagement. PREMIUM (ancienne offre
+// Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
+// d'appel, 1 mois offert puis 19€/mois) passe par un essai Stripe avec
+// carte obligatoire dès l'inscription — payment_method_collection: "always"
+// force la saisie de la CB même si la première facture est à 0€. STANDARD
+// (affiché "Transformation", 49€/mois) est le palier payant sans
+// engagement. PREMIUM (ancienne offre
 // 199€/mois) n'est plus exposé sur /pricing mais reste géré ici pour
 // d'éventuels abonnés existants.
 // client_reference_id porte l'id User applicatif, utilisé par le webhook pour

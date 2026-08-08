@@ -17,7 +17,7 @@ const FAQ = [
   {
     question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
     reponse:
-      "Les deux : l'IA génère ton programme à partir de ton profil, mais rien n'apparaît chez toi sans être relu et validé par Anthony Darmon. Tu ne reçois jamais un contenu IA brut.",
+      "Les deux : l'IA génère ton programme à partir de ton profil. En Transformation, chaque programme est en plus relu et validé par un coach diplômé d'État avant de t'arriver — tu ne reçois jamais de contenu IA brut à ce palier.",
   },
   {
     question: "C'est adapté si je suis débutant ?",
@@ -226,8 +226,8 @@ export default function LandingPage() {
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
           1 mois offert pour découvrir ton espace et ton suivi, puis 19€/mois pour ton programme
-          généré par IA. Passe à 49€/mois quand tu veux qu&apos;Anthony le relise et le valide.
-          Sans engagement.
+          généré par IA. Passe à 49€/mois quand tu veux qu&apos;un coach diplômé d&apos;État le
+          relise et le valide. Sans engagement.
         </p>
         <Link href="/pricing">
           <Button>Découvrir les offres</Button>

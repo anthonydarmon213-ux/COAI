@@ -14,11 +14,12 @@ export function getEffectivePlan(subscription?: Subscription | null): EffectiveP
   return subscription.plan;
 }
 
-// PREMIUM ("VIP" à la séance depuis ce renommage) n'est plus vendu comme
-// abonnement — ce label ne concerne que d'éventuels abonnés déjà sur
-// l'ancienne offre.
+// Noms marketing (08/08/2026) : GRATUIT = "Impulsion", STANDARD = "Transformation"
+// — à ne pas confondre avec l'enum PREMIUM (199€, ancienne offre, "VIP" à la
+// séance depuis ce renommage), qui n'est plus vendu comme abonnement — ce
+// label ne concerne que d'éventuels abonnés déjà sur l'ancienne offre.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
-  GRATUIT: "Gratuit — 19€/mois après 1 mois offert",
-  STANDARD: "Premium — 49€/mois",
+  GRATUIT: "Impulsion — 19€/mois après 1 mois offert",
+  STANDARD: "Transformation — 49€/mois",
   PREMIUM: "Ancien Premium — 199€/mois",
 };

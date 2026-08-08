@@ -26,8 +26,8 @@ export default function CgvPage() {
         <h2>2. Description des offres</h2>
         <ul>
           <li>
-            <strong>Gratuit (19€/mois après 1 mois offert)</strong> — 1 mois d&apos;accès gratuit à
-            compter de l&apos;inscription, carte bancaire requise dès la souscription ; sauf
+            <strong>Impulsion (19€/mois après 1 mois offert)</strong> — 1 mois d&apos;accès gratuit
+            à compter de l&apos;inscription, carte bancaire requise dès la souscription ; sauf
             résiliation avant la fin de ce mois, l&apos;abonnement bascule automatiquement sur
             19€/mois. Inclut le journal de séances, le suivi des mesures, les graphiques de
             progression, ainsi que la génération d&apos;un programme d&apos;entraînement, de
@@ -35,19 +35,19 @@ export default function CgvPage() {
             pas relu par un coach humain.
           </li>
           <li>
-            <strong>Premium (49€/mois)</strong> — inclut le palier Gratuit, la génération d&apos;un
-            programme d&apos;entraînement, de nutrition et de récupération par intelligence
-            artificielle relu et validé par un coach diplômé d&apos;État.
+            <strong>Transformation (49€/mois)</strong> — inclut le palier Impulsion, la génération
+            d&apos;un programme d&apos;entraînement, de nutrition et de récupération par
+            intelligence artificielle relu et validé par un coach diplômé d&apos;État.
           </li>
           <li>
             <strong>VIP (à la séance)</strong> — coaching individuel avec Anthony Darmon,
             réservé et payé séance par séance, sans abonnement ni engagement : 200€ en présentiel
             (Paris centre, 1h) ou 100€ en visioconférence (1h). Accessible quel que soit le palier
-            d&apos;abonnement de l&apos;utilisateur, y compris Gratuit.
+            d&apos;abonnement de l&apos;utilisateur, y compris Impulsion.
           </li>
         </ul>
         <p>
-          Pour l&apos;offre Gratuite, l&apos;utilisateur reconnaît, en cochant la case dédiée lors
+          Pour l&apos;offre Impulsion, l&apos;utilisateur reconnaît, en cochant la case dédiée lors
           de l&apos;inscription, demander le début immédiat du service et renoncer à son droit de
           rétractation de 14 jours pour la partie du service déjà utilisée durant le mois gratuit.
         </p>
@@ -60,8 +60,8 @@ export default function CgvPage() {
       <section>
         <h2>3. Prix et paiement</h2>
         <p>
-          Les prix sont indiqués en euros, toutes taxes comprises. L&apos;abonnement Premium est
-          payé par carte bancaire via notre prestataire Stripe, de manière récurrente et
+          Les prix sont indiqués en euros, toutes taxes comprises. Les abonnements Impulsion et
+          Transformation sont payés par carte bancaire via notre prestataire Stripe, de manière récurrente et
           automatique chaque mois à la date anniversaire de la souscription. COAI ne stocke aucune
           donnée bancaire : celles-ci sont traitées directement par Stripe. Les séances VIP sont
           réservées directement auprès d&apos;Anthony Darmon et réglées séance par séance, selon
@@ -72,8 +72,8 @@ export default function CgvPage() {
       <section>
         <h2>4. Durée et résiliation</h2>
         <p>
-          L&apos;abonnement Premium est sans engagement de durée et se renouvelle automatiquement
-          chaque mois. L&apos;utilisateur peut résilier à tout moment depuis son espace personnel
+          Les abonnements Impulsion et Transformation sont sans engagement de durée et se
+          renouvellent automatiquement chaque mois. L&apos;utilisateur peut résilier à tout moment depuis son espace personnel
           (Mon accompagnement → Gérer mon abonnement). La résiliation prend effet à la fin de la
           période déjà payée ; aucun remboursement au prorata n&apos;est effectué pour le mois en
           cours, sauf disposition légale contraire. Les séances VIP, payées à l&apos;acte, ne sont
@@ -98,9 +98,11 @@ export default function CgvPage() {
         <h2>6. Nature du service</h2>
         <p>
           Les programmes proposés sont générés par intelligence artificielle à partir des
-          informations renseignées par l&apos;utilisateur, puis relus et validés par un coach
-          diplômé d&apos;État avant d&apos;être considérés comme définitifs. Ils constituent des
-          recommandations d&apos;entraînement et de nutrition à visée sportive, et ne se substituent
+          informations renseignées par l&apos;utilisateur. Pour l&apos;offre Transformation, chaque
+          programme est en plus relu et validé par un coach diplômé d&apos;État avant d&apos;être
+          considéré comme définitif ; pour l&apos;offre Impulsion, il n&apos;est pas relu par un
+          coach humain. Dans tous les cas, ils constituent des recommandations d&apos;entraînement
+          et de nutrition à visée sportive, et ne se substituent
           pas à un avis médical. L&apos;utilisateur est seul responsable de vérifier sa condition
           physique auprès d&apos;un professionnel de santé avant de suivre un programme, en
           particulier en cas d&apos;antécédent médical.

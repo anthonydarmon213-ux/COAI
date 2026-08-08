@@ -11,7 +11,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 export const metadata: Metadata = {
   title: "Tarifs — COAI",
   description:
-    "Choisis ton niveau d'accompagnement : Gratuit (1 mois offert), Premium (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.",
+    "Choisis ton niveau d'accompagnement : Impulsion (1 mois offert), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -42,11 +42,11 @@ const ENTREPRISE_SITE_HREF =
 
 const TIERS: Tier[] = [
   {
-    nom: "Gratuit",
+    nom: "Impulsion",
     prix: "0€",
     suffixe: "le 1er mois",
     description:
-      "1 mois offert pour découvrir COAI, puis 19€/mois. Sans engagement — résiliable à tout moment.",
+      "1 mois offert pour découvrir COAI, puis 19€/mois. Ton programme généré par IA, sans relecture humaine. Sans engagement — résiliable à tout moment.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -54,10 +54,11 @@ const TIERS: Tier[] = [
       "Coach IA — 4 questions/mois",
       "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
       "Analyse de photo morphologique et posturale",
+      "Programme personnalisé généré par IA — sans relecture humaine",
     ],
   },
   {
-    nom: "Premium",
+    nom: "Transformation",
     prix: "49€",
     suffixe: "/mois",
     description: "Ton programme personnalisé généré par IA, validé par un vrai coach.",
@@ -87,6 +88,8 @@ const TIERS: Tier[] = [
     sessions: [
       { label: "Présentiel — Paris centre (1h)", prix: "200€" },
       { label: "Visio (1h)", prix: "100€" },
+      { label: "Présentiel — 1 mois, 1 séance/semaine", prix: "800€" },
+      { label: "Visio — 1 mois, 1 séance/semaine", prix: "400€" },
     ],
     limitedSpots: true,
   },
@@ -138,7 +141,7 @@ export default function PricingPage() {
             )}
             {tier.limitedSpots && <Badge tone="warning">Places limitées</Badge>}
             <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{tier.nom}</h2>
-            {tier.sessions ? (
+            {tier.sessions || tier.external ? (
               <p className="text-lg font-semibold text-white">{tier.prix}</p>
             ) : (
               <div className="flex items-baseline gap-1">
@@ -207,8 +210,8 @@ export default function PricingPage() {
       </div>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        L&apos;offre Gratuite (1 mois offert, carte bancaire requise à l&apos;inscription, puis
-        19€/mois) et l&apos;offre Premium sont sans engagement, résiliables à tout moment depuis
+        L&apos;offre Impulsion (1 mois offert, carte bancaire requise à l&apos;inscription, puis
+        19€/mois) et l&apos;offre Transformation sont sans engagement, résiliables à tout moment depuis
         ton compte. Les séances VIP sont réservées et payées à la séance, hors
         abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
         séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}

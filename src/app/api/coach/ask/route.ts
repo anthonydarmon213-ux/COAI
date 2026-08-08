@@ -7,7 +7,7 @@ import { getEffectivePlan } from "@/lib/subscription/plan";
 import { z } from "zod";
 
 // Le Q&A "coach IA" est illimité uniquement sur l'ancien palier PREMIUM
-// (199€/mois) — Gratuit ET Standard (l'offre à 49€, affichée "Premium")
+// (199€/mois) — Impulsion (GRATUIT, 19€) ET Transformation (STANDARD, 49€)
 // partagent le même quota (fenêtre glissante de 30 jours), un aperçu qui
 // donne envie de passer au palier supérieur plutôt qu'un mur complet.
 export const maxDuration = 30;

@@ -10,6 +10,7 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Coach IA — 4 questions/mois",
     "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
     "Analyse de photo morphologique et posturale",
+    "Programme personnalisé généré par IA (entraînement, nutrition, récupération) — sans relecture humaine",
   ],
   STANDARD: [
     "Programme personnalisé généré par IA (entraînement, nutrition, récupération)",
@@ -22,7 +23,7 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Analyse de photo morphologique et posturale",
   ],
   PREMIUM: [
-    "Tous les avantages Premium (programme IA validé, suivi, coach IA, WhatsApp)",
+    "Tous les avantages Transformation (programme IA validé, suivi, coach IA, WhatsApp)",
     "1 séance/mois avec Anthony Darmon incluse — présentiel ou visio, à réserver via WhatsApp",
   ],
 };
