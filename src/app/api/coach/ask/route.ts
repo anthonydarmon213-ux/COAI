@@ -6,13 +6,13 @@ import { prisma } from "@/lib/db/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { z } from "zod";
 
-// Le Q&A "coach IA" est illimité dès l'offre Premium (49€/mois — cohérent avec
-// l'assistant WhatsApp déjà positionné comme avantage payant), et accessible
-// en Gratuit avec un quota (fenêtre glissante de 30 jours) — un aperçu qui
-// donne envie de passer à l'offre payante plutôt qu'un mur complet.
+// Le Q&A "coach IA" est illimité uniquement sur l'ancien palier PREMIUM
+// (199€/mois) — Gratuit ET Standard (l'offre à 49€, affichée "Premium")
+// partagent le même quota (fenêtre glissante de 30 jours), un aperçu qui
+// donne envie de passer au palier supérieur plutôt qu'un mur complet.
 export const maxDuration = 30;
 
-const QUOTA_GRATUIT = 4;
+const QUOTA_LIMITE = 4;
 const QUOTA_FENETRE_MS = 30 * 24 * 60 * 60 * 1000;
 
 const bodySchema = z.object({
@@ -33,18 +33,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  const estGratuit = getEffectivePlan(user.subscription) === "GRATUIT";
+  const estLimite = getEffectivePlan(user.subscription) !== "PREMIUM";
 
-  if (estGratuit) {
+  if (estLimite) {
     const fenetreExpiree =
       !user.coachQuestionsResetAt ||
       Date.now() - user.coachQuestionsResetAt.getTime() >= QUOTA_FENETRE_MS;
     const questionsUtilisees = fenetreExpiree ? 0 : user.coachQuestionsUsed;
 
-    if (questionsUtilisees >= QUOTA_GRATUIT) {
+    if (questionsUtilisees >= QUOTA_LIMITE) {
       return NextResponse.json(
         {
-          error: `Limite de ${QUOTA_GRATUIT} questions/mois atteinte en offre Gratuite — passe à Premium pour un accès illimité.`,
+          error: `Limite de ${QUOTA_LIMITE} questions/mois atteinte — contacte Anthony pour un accès illimité.`,
         },
         { status: 429 }
       );

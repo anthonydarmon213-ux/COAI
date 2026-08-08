@@ -23,9 +23,7 @@ export default async function CoachPage() {
           Darmon. Pour un suivi médical ou un ajustement personnalisé approfondi, un échange
           direct avec ton coach reste la meilleure option.
         </p>
-        {plan === "GRATUIT" && (
-          <Badge tone="warning">4 questions/mois en offre Gratuite · illimité en Premium</Badge>
-        )}
+        {plan !== "PREMIUM" && <Badge tone="warning">4 questions/mois</Badge>}
       </div>
 
       <AskCoach />

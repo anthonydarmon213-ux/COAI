@@ -127,7 +127,12 @@ export default async function AbonnementPage() {
           </p>
         )}
         {statut ? (
-          <PortalButton />
+          <div className="flex flex-wrap items-center gap-4">
+            <PortalButton />
+            <a href="/pricing" className="text-sm text-laiton-400 underline">
+              Voir les formules et les prix
+            </a>
+          </div>
         ) : (
           <a href="/pricing" className="text-laiton-400 underline">
             Voir les offres — à partir de 49€/mois

@@ -46,7 +46,7 @@ const TIERS: Tier[] = [
       "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
       "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
       "Suivi de progression — dashboard avec ton évolution",
-      "Chat IA illimité — pour ajuster ta routine à tout moment",
+      "Coach IA — 4 questions/mois, pour ajuster ta routine à tout moment",
       "Ajustements continus — le programme évolue selon tes retours",
       "Streaming (yoga, mobilité, récupération…)",
       "Assistant WhatsApp 24/7",
