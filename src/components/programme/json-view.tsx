@@ -13,6 +13,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 const KNOWN_LABELS: Record<string, string> = {
   frequenceParSemaine: "Fréquence par semaine",
   vueEnsemble: "Vue d'ensemble",
+  retourAuCalme: "Retour au calme",
   dureeProgramme: "Durée du programme",
   objectifsJournaliers: "Objectifs journaliers",
   quantite: "Quantité",

@@ -38,14 +38,19 @@ repli explicite.`
 
 Reste concis et efficace : 5 à 7 exercices maximum par séance (l'essentiel, pas une liste
 exhaustive) — mieux vaut une séance courte et réalisable qu'un plan interminable que personne ne
-suit jusqu'au bout.
+suit jusqu'au bout. Parmi ces exercices, termine la séance par 1 à 2 exercices d'abdominaux/gainage
+en dernière position dans le tableau "exercices" — sauf si la séance cible déjà principalement les
+abdominaux, ou si c'est un jour de sport existant/cardio pur où ça n'a pas de sens.
 
 Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "echauffement"
 (obligatoire, en 3 temps avant la charge de travail : (1) quelques minutes de cardio léger pour
 augmenter la température corporelle et le rythme cardiaque, (2) mobilité articulaire ciblée sur
 les zones sollicitées, (3) pour le premier exercice de force, une gamme montante — séries
 d'approche à charge croissante avant les séries de travail, ex: "50% x10, 70% x6, 85% x3"),
-et "exercices" (tableau).
+"exercices" (tableau, abdominaux/gainage en dernier comme indiqué ci-dessus), et "retourAuCalme"
+(obligatoire, en fin de séance : quelques minutes d'étirements légers ciblés sur les groupes
+musculaires travaillés dans la séance, avec une suggestion concrète de foam roller/auto-massage
+pour accélérer la récupération — reste court, 5 à 10 minutes, pas une deuxième séance).
 Pour CHAQUE exercice, inclus obligatoirement :
 - "nom"
 - "series" (nombre de séries de travail, ex: "4")
@@ -55,5 +60,6 @@ Pour CHAQUE exercice, inclus obligatoirement :
 - "methode" ("Série classique" par défaut ; techniques d'intensification comme superset/bi-set/drop-set réservées aux niveaux intermédiaire/avancé, avec parcimonie, jamais pour un débutant)
 
 IMPORTANT : respecte cet ordre exact des champs dans le JSON de chaque exercice (nom, series,
-repetitions, repos, charge, methode) — c'est l'ordre d'affichage à l'utilisateur.`;
+repetitions, repos, charge, methode) — c'est l'ordre d'affichage à l'utilisateur. Au niveau de la
+séance, respecte aussi cet ordre : jour, nom, echauffement, exercices, retourAuCalme.`;
 }

@@ -47,9 +47,10 @@ export function EntrainementView({
           typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`
         }
         renderContenu={(seance) => {
-          const { echauffement, exercices, jour, nom, ...detailSeance } = seance as {
+          const { echauffement, exercices, retourAuCalme, jour, nom, ...detailSeance } = seance as {
             echauffement?: string;
             exercices?: unknown[];
+            retourAuCalme?: string;
             jour?: string;
             nom?: string;
             [key: string]: unknown;
@@ -71,6 +72,16 @@ export function EntrainementView({
                   {exercices.map((exercice, j) => (
                     <ExerciceCard key={j} exercice={exercice} />
                   ))}
+                </div>
+              )}
+              {retourAuCalme && (
+                <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
+                    🧘 Retour au calme
+                  </span>
+                  <p className="mt-1 text-xs leading-5 text-graphite-300">
+                    {String(retourAuCalme)}
+                  </p>
                 </div>
               )}
               {Object.keys(detailSeance).length > 0 && (
