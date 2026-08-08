@@ -74,9 +74,8 @@ export default function LandingPage() {
             <span className="mt-2 block text-laiton-300">Suivre votre progression.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
-            COAI est l&apos;app qui génère ton programme d&apos;entraînement, de nutrition et de
-            récupération par IA — et le fait toujours valider par un vrai coach avant de te
-            l&apos;envoyer.
+            Ton coach personnel, propulsé par l&apos;IA — un vrai suivi et des conseils
+            personnalisés.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Démarrer gratuitement</Button></Link>
