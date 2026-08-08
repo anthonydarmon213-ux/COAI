@@ -52,6 +52,7 @@ const PILIERS = [
     titre: "Une progression visible",
     description:
       "Tes séances, tes mesures et tes progrès réunis dans un suivi simple qui évolue avec toi.",
+    visuel: true,
   },
   {
     numero: "03",
@@ -60,6 +61,37 @@ const PILIERS = [
       "L’IA t’accompagne à tout moment. Anthony supervise la méthode et valide ce qui compte.",
   },
 ];
+
+// Courbe de progression décorative — illustre le pilier "suivi", pas une
+// donnée réelle : une seule série, pas de légende ni d'axes nécessaires.
+function ProgressionSparkline() {
+  return (
+    <svg
+      viewBox="0 0 200 64"
+      className="h-16 w-full max-w-[13rem]"
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="progression-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#c9a262" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#c9a262" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M4 48 C 30 52, 45 38, 62 40 S 96 22, 116 24 S 150 6, 196 8"
+        stroke="#c9a262"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4 48 C 30 52, 45 38, 62 40 S 96 22, 116 24 S 150 6, 196 8 V 64 H 4 Z"
+        fill="url(#progression-fill)"
+      />
+      <circle cx="196" cy="8" r="3.5" fill="#c9a262" />
+    </svg>
+  );
+}
 
 export default function LandingPage() {
   return (
@@ -71,11 +103,11 @@ export default function LandingPage() {
           <SectionLabel>Entraînement · Nutrition · Récupération</SectionLabel>
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">
             Générer. Valider.
-            <span className="mt-2 block text-laiton-300">Suivre votre progression.</span>
+            <span className="mt-2 block text-laiton-300">Suivre ta progression.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
-            Ton coach personnel, propulsé par l&apos;IA — un vrai suivi et des conseils
-            personnalisés.
+            L&apos;IA analyse toutes tes données pour un entraînement augmenté, personnalisé pour
+            toi — avec un vrai coach qui valide.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Démarrer gratuitement</Button></Link>
@@ -165,6 +197,7 @@ export default function LandingPage() {
                 <h3 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-white">{pilier.titre}</h3>
                 <p className="mt-4 max-w-xs text-base leading-7 text-graphite-300">{pilier.description}</p>
               </div>
+              {pilier.visuel && <ProgressionSparkline />}
             </Card>
           ))}
         </div>
