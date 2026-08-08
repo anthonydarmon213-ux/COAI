@@ -5,15 +5,7 @@ import { Sparkline } from "@/components/suivi/sparkline";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import type { ExerciceMaxi } from "@prisma/client";
-
-const LABEL_PAR_EXERCICE: Record<ExerciceMaxi, string> = {
-  DEVELOPPE_COUCHE: "Développé couché",
-  SQUAT: "Squat",
-  SOULEVE_DE_TERRE: "Soulevé de terre",
-  TRACTION: "Traction",
-};
-const ORDRE_EXERCICES: ExerciceMaxi[] = ["DEVELOPPE_COUCHE", "SQUAT", "SOULEVE_DE_TERRE", "TRACTION"];
+import { LABEL_PAR_EXERCICE, ORDRE_EXERCICES } from "@/lib/tests-maxi/labels";
 
 export default async function TestsMaxiPage() {
   const user = await getCurrentAppUser();
@@ -75,12 +67,22 @@ export default async function TestsMaxiPage() {
       <div className="flex flex-col gap-2">
         <SectionLabel>Historique</SectionLabel>
         {[...testsMaxi].reverse().map((t) => (
-          <Card key={t.id} className="flex items-center gap-3 p-3 text-sm">
-            <span className="font-mono text-laiton-400">{t.date.toISOString().slice(0, 10)}</span>
-            <span className="text-graphite-300">
-              {LABEL_PAR_EXERCICE[t.exercice]} — {t.valeur} {t.unite}
-              {t.notes ? ` · ${t.notes}` : ""}
-            </span>
+          <Card key={t.id} className="flex flex-wrap items-center justify-between gap-3 p-3 text-sm">
+            <div>
+              <span className="font-mono text-laiton-400">{t.date.toISOString().slice(0, 10)}</span>
+              <span className="text-graphite-300">
+                {" "}
+                — {LABEL_PAR_EXERCICE[t.exercice]} — {t.valeur} {t.unite}
+                {t.notes ? ` · ${t.notes}` : ""}
+              </span>
+            </div>
+            <a
+              href={`/api/tests-maxi/${t.id}/carte`}
+              download={`coai-record-${t.exercice.toLowerCase()}.png`}
+              className="shrink-0 rounded-lg border border-laiton-400/30 px-3 py-1.5 text-xs font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200"
+            >
+              Partager →
+            </a>
           </Card>
         ))}
         {testsMaxi.length === 0 && (
