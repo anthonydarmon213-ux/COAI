@@ -182,20 +182,34 @@ Ne plus proposer d'outreach personnel comme levier d'acquisition.
 - **Chaîne YouTube** habillée : bannière (2560×1440), avatar (logomark
   officiel — arc doré ouvert + œil bleu, généré via `next/og`/satori),
   filigrane vidéo (150×150, affichage "Intégralité de la vidéo"),
-  description, identifiant à renommer en `@coai`/`@coai.fr`/variante
-  (pas encore fait, limite de 2 changements/14 jours chez YouTube).
+  description, **identifiant renommé en COAI (09/08/2026, fait par
+  Anthony)**.
 - **4 pages d'atterrissage SEO** créées et poussées : `/programme-musculation-ia`,
   `/coach-sportif-en-ligne`, `/coaching-nutrition-ia`, `/coach-sportif-paris`
   — chacune écrite autour d'une intention de recherche précise (pas la
   page d'accueil générale qui doit couvrir tous les sujets à la fois),
   avec FAQ + données structurées FAQPage (schema.org) pour les rich
   snippets Google. Ajoutées au sitemap, liées depuis le footer.
+- **TikTok créé** (09/08/2026, par Anthony) — canal supplémentaire,
+  cohérent avec la stratégie (contenu public, pas du démarchage ciblé).
+- **Pixel Meta installé** (09/08/2026) — `NEXT_PUBLIC_META_PIXEL_ID` câblé
+  dans le code (`src/components/analytics/meta-pixel.tsx`, même schéma que
+  GoogleAnalytics), ID du dataset Events Manager : `921687973761982`,
+  variable ajoutée par Anthony sur Vercel. Premier test de pub Meta/
+  Instagram lancé (ciblage Paris + fitness, ~75-100€ sur 5-7 jours, lien
+  vers `/coach-sportif-paris` avec UTM `utm_source=meta`).
 - **Idées explorées mais pas retenues pour l'instant** : lien
   d'affiliation avec commission (proposé de tester à la main avec 1-2
-  influenceurs avant de développer un vrai système), TikTok (pas encore
-  démarré), page/calculateur gratuit comme aimant à leads (pas fait).
+  influenceurs avant de développer un vrai système), Meta Verified (pas
+  utile tant que l'audience est minuscule, coût récurrent sans effet sur
+  l'algorithme), page/calculateur gratuit comme aimant à leads (pas fait).
 - **Contenu organique** (Shorts/Reels) déjà démarré par Anthony de son
   côté, en parallèle.
+- **Règle stricte confirmée (09/08/2026)** : pas de démarchage ciblé du
+  réseau personnel/professionnel d'Anthony pour COAI — il le garde pour du
+  VIP présentiel. Seuls leviers acceptés : pub payante externe, SEO,
+  contenu organique public. Voir aussi la précision plus haut dans la
+  section Pistes de croissance.
 
 ## À faire plus tard
 
