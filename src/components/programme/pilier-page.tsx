@@ -37,6 +37,12 @@ const AUTRES_PILIERS: { pilier: Pilier; href: string }[] = [
   { pilier: "RECUPERATION", href: "/programme/recuperation" },
 ];
 
+const PDF_SLUG: Record<Pilier, string> = {
+  ENTRAINEMENT: "entrainement",
+  NUTRITION: "alimentation",
+  RECUPERATION: "recuperation",
+};
+
 export async function PilierPage({ pilier }: { pilier: Pilier }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
@@ -92,7 +98,17 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <SectionLabel>{LABELS[pilier]}</SectionLabel>
-          <RegenerateButton hasExisting={Boolean(dernier)} />
+          <div className="flex items-center gap-2">
+            {affiche && (
+              <a
+                href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
+                className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+              >
+                Télécharger en PDF
+              </a>
+            )}
+            <RegenerateButton hasExisting={Boolean(dernier)} />
+          </div>
         </div>
 
         <Card className="flex flex-col gap-5 p-6 sm:p-8">
