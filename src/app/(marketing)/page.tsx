@@ -98,7 +98,23 @@ export default function LandingPage() {
     <main className="bg-lab-grid flex flex-col">
       <CoaiIntro />
 
-      <section id="hero" className="mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
+      <section
+        id="hero"
+        className="relative mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 overflow-hidden px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28"
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        >
+          <source src="/hero-intro.mp4" type="video/mp4" />
+        </video>
+        <div
+          className="absolute inset-0 -z-10 bg-gradient-to-r from-[#090a0b] via-[#090a0bcc] to-[#090a0b66]"
+          aria-hidden="true"
+        />
         <div className="relative z-10 max-w-3xl">
           <SectionLabel>Entraînement · Nutrition · Récupération</SectionLabel>
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">
@@ -115,7 +131,7 @@ export default function LandingPage() {
           </div>
           <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
         </div>
-        <div className="relative flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
+        <div className="relative z-10 flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
           <div className="coai-orb" aria-hidden="true" />
           <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-10 lg:left-0 lg:translate-x-0">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
