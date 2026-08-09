@@ -62,10 +62,11 @@ const TIERS: Tier[] = [
     prix: "49€",
     suffixe: "/mois",
     description:
-      "Coaching hybride : IA + coach diplômé d'État — suivi entraînement et nutrition, chaque programme relu et validé par un humain, assistant WhatsApp 7/7.",
+      "Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
     features: [
       "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
       "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
+      "Suivi humain jusqu'à ton objectif — pas juste à la génération : ton coach revient vers toi si besoin (plateau, gêne, décrochage) pendant toute la durée de l'accompagnement",
       "Suivi de progression — dashboard avec ton évolution",
       "Coach IA — 4 questions/mois, pour ajuster ta routine à tout moment",
       "Ajustements continus — le programme évolue selon tes retours",
