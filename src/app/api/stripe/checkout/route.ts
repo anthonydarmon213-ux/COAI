@@ -12,7 +12,11 @@ const PRICE_ENV_BY_PLAN = {
 // Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
 // d'appel, 7 jours offerts puis 19€/mois) passe par un essai Stripe avec
 // carte obligatoire dès l'inscription — payment_method_collection: "always"
-// force la saisie de la CB même si la première facture est à 0€. STANDARD
+// force la saisie de la CB même si la première facture est à 0€. Le body
+// peut passer skipTrial: true (proposé à l'inscription pour qui ne veut pas
+// attendre 7 jours) pour facturer immédiatement au lieu de passer par
+// l'essai — même price, juste sans trial_period_days ; le programme se
+// débloque alors dès le paiement (cf. isInTrial côté génération). STANDARD
 // (affiché "Transformation", 49€/mois) est le palier payant sans
 // engagement. PREMIUM (ancienne offre
 // 199€/mois) n'est plus exposé sur /pricing mais reste géré ici pour
@@ -28,6 +32,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const plan =
     body.plan === "PREMIUM" ? "PREMIUM" : body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
+  const skipTrial = plan === "GRATUIT" && body.skipTrial === true;
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!user) {
@@ -47,7 +52,7 @@ export async function POST(request: Request) {
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
-    ...(plan === "GRATUIT"
+    ...(plan === "GRATUIT" && !skipTrial
       ? {
           subscription_data: { trial_period_days: 7 },
           payment_method_collection: "always" as const,
