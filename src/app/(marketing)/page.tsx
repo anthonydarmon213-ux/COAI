@@ -5,6 +5,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
+import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
 
 export const metadata: Metadata = {
   title: "COAI — Coaching sportif par IA, validé par un vrai coach",
@@ -58,40 +59,9 @@ const PILIERS = [
     numero: "03",
     titre: "Une présence au quotidien",
     description:
-      "L’IA t’accompagne à tout moment. Anthony supervise la méthode et valide ce qui compte.",
+      "L’IA t’accompagne à tout moment. Ton coach supervise la méthode et valide ce qui compte.",
   },
 ];
-
-// Courbe de progression décorative — illustre le pilier "suivi", pas une
-// donnée réelle : une seule série, pas de légende ni d'axes nécessaires.
-function ProgressionSparkline() {
-  return (
-    <svg
-      viewBox="0 0 200 64"
-      className="h-16 w-full max-w-[13rem]"
-      fill="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="progression-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#c9a262" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#c9a262" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M4 48 C 30 52, 45 38, 62 40 S 96 22, 116 24 S 150 6, 196 8"
-        stroke="#c9a262"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M4 48 C 30 52, 45 38, 62 40 S 96 22, 116 24 S 150 6, 196 8 V 64 H 4 Z"
-        fill="url(#progression-fill)"
-      />
-      <circle cx="196" cy="8" r="3.5" fill="#c9a262" />
-    </svg>
-  );
-}
 
 export default function LandingPage() {
   return (
@@ -146,7 +116,7 @@ export default function LandingPage() {
               {[
                 ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
                 ["2", "L’IA personnalise ton programme", "Entraînement, nutrition et récupération adaptés à toi."],
-                ["3", "Ton coach vérifie et valide", "Tu reçois un programme fiable, clair et prêt à suivre."],
+                ["3", "Ton coach vérifie, valide et démarre le suivi", "Un programme fiable, clair, prêt à suivre — et, selon ta formule, un coach qui te motive jusqu'à l'atteinte de ton objectif."],
               ].map(([numero, titre, description]) => (
                 <li key={numero} className="grid grid-cols-[2rem_1fr] gap-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-sm font-semibold text-laiton-300">{numero}</span>
