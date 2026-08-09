@@ -124,6 +124,29 @@ html {
   }
 }
 
+@keyframes nudge-right {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+}
+@keyframes nudge-left {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(-5px);
+    opacity: 1;
+  }
+}
+
 /* Halo animé du hero : désactivé si l'utilisateur préfère moins d'animations. */
 @media (prefers-reduced-motion: no-preference) {
   .animate-spin-slow {
@@ -135,6 +158,14 @@ html {
   .coai-loader-arc {
     animation: spin-loader 1.6s linear infinite;
     transform-origin: 60px 60px;
+  }
+  /* Flèches de part et d'autre du CTA de l'écran d'intro, qui "ramènent"
+     l'œil vers le bouton — cf. demande d'Anthony du 10/08. */
+  .animate-nudge-right {
+    animation: nudge-right 1.6s ease-in-out infinite;
+  }
+  .animate-nudge-left {
+    animation: nudge-left 1.6s ease-in-out infinite;
   }
 }
 
