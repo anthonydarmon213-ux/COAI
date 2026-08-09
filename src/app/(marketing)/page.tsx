@@ -159,6 +159,45 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Crédibilité / Fondateur — juste sous le hero pour rassurer tout de
+          suite sur l'humain derrière COAI (visage + nom), avant même le
+          reste du pitch. */}
+      <section className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
+        <div className="relative mx-auto h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80 md:order-first">
+          <Image
+            src="/anthony-darmon-portrait.jpg"
+            alt="Anthony Darmon, fondateur de COAI"
+            fill
+            priority
+            sizes="(min-width: 640px) 20rem, 16rem"
+            className="object-cover"
+          />
+        </div>
+        <div className="flex flex-col items-center gap-5 md:items-start">
+          <SectionLabel>Fondateur</SectionLabel>
+          <h2 className="font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+            Anthony Darmon.
+          </h2>
+          <p className="font-editorial text-xl italic text-laiton-300">
+            « Le mouvement est la clé de tout. »
+          </p>
+          <p className="max-w-md text-base leading-7 text-graphite-300">
+            Coach diplômé d&apos;État, expert en coaching sportif depuis plus de 17 ans,
+            spécialiste des dirigeants et entrepreneurs. De cette expérience est né THE METHOD,
+            puis COAI — pour rendre cette expertise accessible à tous, sans attendre le
+            coaching 1-to-1.
+          </p>
+          <a
+            href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-laiton-400 underline hover:text-laiton-300"
+          >
+            Découvrir THE METHOD (coaching 1-to-1 en présentiel ou à distance) →
+          </a>
+        </div>
+      </section>
+
       {/* L'histoire */}
       <section className="mx-auto w-full max-w-3xl px-6 py-24 sm:py-28">
         <SectionLabel>L&apos;histoire</SectionLabel>
@@ -225,41 +264,6 @@ export default function LandingPage() {
             Parce que deux coachs valent mieux qu&apos;un, COAI réunit l&apos;intelligence artificielle
             et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
           </p>
-        </div>
-      </section>
-
-      {/* Crédibilité / Fondateur */}
-      <section className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
-        <div className="relative mx-auto h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80 md:order-first">
-          <Image
-            src="/anthony-darmon-portrait.jpg"
-            alt="Anthony Darmon, fondateur de COAI"
-            fill
-            className="object-cover"
-          />
-        </div>
-        <div className="flex flex-col items-center gap-5 md:items-start">
-          <SectionLabel>Fondateur</SectionLabel>
-          <h2 className="font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-            Anthony Darmon.
-          </h2>
-          <p className="font-editorial text-xl italic text-laiton-300">
-            « Le mouvement est la clé de tout. »
-          </p>
-          <p className="max-w-md text-base leading-7 text-graphite-300">
-            Coach diplômé d&apos;État, expert en coaching sportif depuis plus de 17 ans,
-            spécialiste des dirigeants et entrepreneurs. De cette expérience est né THE METHOD,
-            puis COAI — pour rendre cette expertise accessible à tous, sans attendre le
-            coaching 1-to-1.
-          </p>
-          <a
-            href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-laiton-400 underline hover:text-laiton-300"
-          >
-            Découvrir THE METHOD (coaching 1-to-1 en présentiel ou à distance) →
-          </a>
         </div>
       </section>
 
