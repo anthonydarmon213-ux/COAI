@@ -86,7 +86,13 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="bg-lab-grid flex min-h-screen items-center justify-center px-6">
+    <main className="bg-lab-grid flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+      <Link
+        href="/"
+        className="font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"
+      >
+        ← Retour à l&apos;accueil
+      </Link>
       <Card className="flex w-full max-w-sm flex-col gap-5">
         <div className="flex flex-col gap-1">
           <SectionLabel>Inscription</SectionLabel>
