@@ -23,6 +23,28 @@ function PilierView({ pilier, contenu }: { pilier: string; contenu: unknown }) {
   return null;
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+// Checklist obligatoire avant validation — remplace la relecture "à
+// l'œil" par une vérification bornée dans le temps (quelques points fixes
+// + les contre-indications déjà générées par l'IA pour ce profil), pour
+// que la validation humaine reste scalable en ajoutant des coachs plutôt
+// qu'en dépendant du temps libre d'un seul.
+const CHECKS_GENERIQUES = [
+  "Le volume et la difficulté sont cohérents avec le niveau et les objectifs déclarés.",
+  "Le contenu est adapté à l'équipement disponible et aux contraintes déclarées.",
+];
+
+function checklistItems(contenu: unknown): string[] {
+  const contreIndications =
+    isPlainObject(contenu) && Array.isArray(contenu.contreIndications)
+      ? contenu.contreIndications.map((item) => String(item))
+      : [];
+  return [...contreIndications, ...CHECKS_GENERIQUES];
+}
+
 export function ValidateProgrammeCard({
   id,
   pilier,
@@ -41,6 +63,13 @@ export function ValidateProgrammeCard({
   const [draft, setDraft] = useState(() => JSON.stringify(contenu, null, 2));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const items = checklistItems(contenu);
+  const [checked, setChecked] = useState<boolean[]>(() => items.map(() => false));
+  const checklistComplete = checked.length > 0 && checked.every(Boolean);
+
+  function toggleCheck(i: number) {
+    setChecked((prev) => prev.map((v, idx) => (idx === i ? !v : v)));
+  }
 
   async function valider(contenuOverride?: unknown) {
     setLoading(true);
@@ -113,15 +142,32 @@ export function ValidateProgrammeCard({
         </div>
       )}
 
+      <div className="flex flex-col gap-2 rounded-md border border-graphite-800 bg-graphite-900/40 p-3">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-laiton-500">
+          Checklist avant validation
+        </span>
+        {items.map((item, i) => (
+          <label key={i} className="flex items-start gap-2 text-sm text-graphite-300">
+            <input
+              type="checkbox"
+              checked={checked[i] ?? false}
+              onChange={() => toggleCheck(i)}
+              className="mt-0.5"
+            />
+            {item}
+          </label>
+        ))}
+      </div>
+
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <div className="flex gap-2">
         {editing ? (
-          <Button onClick={validerAvecModifications} disabled={loading}>
+          <Button onClick={validerAvecModifications} disabled={loading || !checklistComplete}>
             {loading ? "Validation…" : "Valider avec ces modifications"}
           </Button>
         ) : (
-          <Button onClick={() => valider()} disabled={loading}>
+          <Button onClick={() => valider()} disabled={loading || !checklistComplete}>
             {loading ? "Validation…" : "Valider tel quel"}
           </Button>
         )}

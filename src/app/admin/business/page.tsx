@@ -5,6 +5,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/admin/stat-card";
 import { GrowthChart } from "@/components/admin/growth-chart";
+import { AdminNav } from "@/components/admin/admin-nav";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
 const PRIX_STANDARD = 49;
@@ -65,6 +66,7 @@ export default async function AdminBusinessPage() {
   return (
     <main className="bg-lab-grid min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-4xl flex-col gap-6">
+        <AdminNav current="/admin/business" />
         <div className="flex flex-col gap-1 border-b border-acier/25 pb-7">
           <div className="flex items-center gap-2.5">
             <SectionLabel>Espace coach</SectionLabel>

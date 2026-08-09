@@ -46,7 +46,7 @@ const TIERS: Tier[] = [
     prix: "0€",
     suffixe: "les 7 premiers jours",
     description:
-      "7 jours offerts pour découvrir COAI, puis 19€/mois. Ton programme généré par IA, sans relecture humaine. Sans engagement — résiliable à tout moment.",
+      "Coaching 100% IA — entraînée avec les 17 ans d'expertise terrain d'Anthony Darmon, sans relecture humaine. 7 jours offerts, puis 19€/mois. Sans engagement — résiliable à tout moment.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -61,7 +61,8 @@ const TIERS: Tier[] = [
     nom: "Transformation",
     prix: "49€",
     suffixe: "/mois",
-    description: "Ton programme personnalisé généré par IA, validé par un vrai coach.",
+    description:
+      "Coaching hybride : IA + coach diplômé d'État — suivi entraînement et nutrition, chaque programme relu et validé par un humain, assistant WhatsApp 7/7.",
     features: [
       "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
       "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
@@ -79,7 +80,8 @@ const TIERS: Tier[] = [
     nom: "VIP",
     prix: "Sur réservation",
     suffixe: "",
-    description: "Coaching individuel avec Anthony Darmon, à la séance — sans abonnement.",
+    description:
+      "Coaching 100% humain avec Anthony Darmon, à la séance — présentiel ou visio, sans abonnement.",
     features: [
       "Coaching 1-to-1 avec Anthony Darmon",
       "Réservation flexible, sans engagement ni abonnement",
