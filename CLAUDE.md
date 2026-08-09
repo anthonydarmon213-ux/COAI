@@ -124,6 +124,25 @@ plus faciles à convaincre.
   mentions "1 mois offert" liées à l'essai signup ont été remplacées par
   "7 jours offerts" (pricing, CGV, sign-up, dashboard/compte, homepage). Ne
   concerne PAS la récompense de parrainage ci-dessous, qui reste 1 mois.
+- **Génération de programme bloquée pendant l'essai** (09/08/2026) :
+  jusque-là rien n'empêchait de générer son programme IA pendant les 7
+  jours offerts puis de résilier avant le premier prélèvement (programme
+  gratuit sans jamais payer). Bloqué désormais côté serveur
+  (`/api/programmes/generate` renvoie 403 si `isInTrial()`, nouvelle
+  fonction dans `src/lib/subscription/plan.ts`) et côté UI (bouton
+  générer masqué, message explicatif à la place tant que l'essai n'est
+  pas terminé). Se débloque au premier prélèvement réel (fin d'essai
+  Impulsion, ou souscription directe à Transformation qui n'a pas
+  d'essai).
+- **Option "démarrer tout de suite" à l'inscription** (09/08/2026) : pour
+  qui ne veut pas attendre 7 jours, un second choix sur les deux flux
+  d'inscription (email/mdp et Google OAuth) facture l'abonnement
+  Impulsion (19€/mois) immédiatement au lieu de passer par l'essai Stripe
+  (`skipTrial: true` dans le body de `/api/stripe/checkout`, qui omet
+  simplement `trial_period_days`) — texte de consentement adapté en
+  conséquence. Comme la génération se débloque au premier paiement réel
+  (cf. ci-dessus), ce choix donne accès au programme dès la fin du
+  paiement.
 - **Parrainage** (08/08/2026) : lien unique par utilisateur
   (`/sign-up?ref=CODE`, généré à la demande), visible sur une carte dédiée
   dans compte/abonnement. Quand un filleul passe payant (fin de ses 7 jours
