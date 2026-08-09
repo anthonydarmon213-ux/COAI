@@ -45,6 +45,13 @@ model User {
   filleuls                      User[]   @relation("Parrainages")
   recompenseParrainageAppliquee Boolean  @default(false)
 
+  // Relance automatique des abonnés Impulsion inactifs (09/08/2026) — ce
+  // palier n'a aucun suivi humain (contrairement à Transformation, cf.
+  // admin/suivi), donc un email de relance automatique comble ce trou.
+  // Sert uniquement à espacer les relances (pas de spam quotidien tant que
+  // l'utilisateur reste inactif) — cf. /api/cron/relance-inactifs.
+  derniereRelanceInactiviteEnvoyeeAt DateTime?
+
   subscription   Subscription?
   profile        Profile?
   programmes     ProgrammeGenerated[]

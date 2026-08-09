@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/relance-inactifs",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}
