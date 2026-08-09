@@ -189,7 +189,7 @@ export default function LandingPage() {
       <section className="mx-auto w-full max-w-5xl border-y border-white/[0.07] px-6 py-20 text-center sm:py-24">
         <SectionLabel>Le constat</SectionLabel>
         <h2 className="mx-auto mt-6 max-w-4xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-          Un accompagnement sérieux, sans la complexité ni le prix du coaching individuel.
+          Un accompagnement augmenté, sans la complexité ni le prix du coaching individuel.
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
           Un programme clair, un suivi structuré et des réponses quand tu en as besoin.
