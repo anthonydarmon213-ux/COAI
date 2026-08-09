@@ -132,7 +132,6 @@ export default function LandingPage() {
           <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
         </div>
         <div className="relative z-10 flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
-          <div className="coai-orb" aria-hidden="true" />
           <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-10 lg:left-0 lg:translate-x-0">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <div>
