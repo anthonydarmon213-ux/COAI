@@ -1,5 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
+import { getEffectivePlan, isInTrial, PLAN_LABELS } from "@/lib/subscription/plan";
 import { PLAN_FEATURES } from "@/lib/subscription/plan-features";
 import { PortalButton } from "@/components/compte/portal-button";
 import { ParrainageCard } from "@/components/compte/parrainage-card";
@@ -34,8 +34,7 @@ export default async function AbonnementPage() {
   const statut = user.subscription?.status;
   const plan = getEffectivePlan(user.subscription);
   const finProgrammee = user.subscription?.cancelAtPeriodEnd && user.subscription.currentPeriodEnd;
-  const enEssai =
-    statut === "ACTIVE" && user.subscription?.trialEnd && user.subscription.trialEnd > new Date();
+  const enEssai = isInTrial(user.subscription);
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
   return (

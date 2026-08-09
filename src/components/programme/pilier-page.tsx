@@ -11,7 +11,7 @@ import { FicheMacros } from "@/components/programme/fiche-macros";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -62,6 +62,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
   const genereIA = dernier && dernier.statut === "GENERE_IA";
   const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
   const plan = getEffectivePlan(user.subscription);
+  const enEssai = isInTrial(user.subscription);
 
   return (
     <div className="flex flex-col gap-10">
@@ -107,7 +108,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
                 Télécharger en PDF
               </a>
             )}
-            <RegenerateButton hasExisting={Boolean(dernier)} />
+            {!enEssai && <RegenerateButton hasExisting={Boolean(dernier)} />}
           </div>
         </div>
 
@@ -148,7 +149,17 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
 
           {(() => {
             const contenu = affiche?.contenu ?? null;
-            if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
+            if (!contenu) {
+              if (enEssai) {
+                return (
+                  <p className="text-sm text-graphite-400">
+                    Ton programme sera généré dès la fin de ton essai offert — tu peux en attendant
+                    te balader sur l&apos;application et découvrir ce que propose COAI.
+                  </p>
+                );
+              }
+              return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
+            }
             if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
             if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
             if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;

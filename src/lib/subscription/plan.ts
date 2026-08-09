@@ -14,6 +14,18 @@ export function getEffectivePlan(subscription?: Subscription | null): EffectiveP
   return subscription.plan;
 }
 
+// Tant que l'essai Stripe (7 jours offerts, offre Impulsion) n'est pas
+// terminé, aucun prélèvement n'a encore eu lieu — status reste "ACTIVE"
+// pendant l'essai (trialing y est mappé), donc c'est trialEnd qui permet de
+// distinguer "encore en essai, jamais payé" de "déjà facturé". Utilisé pour
+// bloquer la génération de programme pendant l'essai (cf. 09/08/2026 :
+// éviter de livrer un programme complet gratuitement à quelqu'un qui
+// résilie avant le premier prélèvement).
+export function isInTrial(subscription?: Subscription | null): boolean {
+  if (!subscription || subscription.status !== "ACTIVE") return false;
+  return Boolean(subscription.trialEnd && subscription.trialEnd > new Date());
+}
+
 // Noms marketing (08/08/2026) : GRATUIT = "Impulsion", STANDARD = "Transformation"
 // — à ne pas confondre avec l'enum PREMIUM (199€, ancienne offre, "VIP" à la
 // séance depuis ce renommage), qui n'est plus vendu comme abonnement — ce

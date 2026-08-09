@@ -18,7 +18,7 @@ import {
 import { buildProgrammeRecuperationJourPrompt } from "@/lib/ai/prompts/programme-recuperation-jour";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
@@ -120,6 +120,16 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+  }
+
+  // Génération bloquée tant que l'essai offert (7 jours, offre Impulsion)
+  // n'est pas terminé — sinon un abonné peut générer son programme puis
+  // résilier avant le premier prélèvement, sans jamais payer.
+  if (isInTrial(user.subscription)) {
+    return NextResponse.json(
+      { error: "Ton programme sera généré une fois ton abonnement activé (fin de l'essai offert)." },
+      { status: 403 }
+    );
   }
 
   // Palier Gratuit (19€) : programme 100% IA, jamais envoyé en relecture au
