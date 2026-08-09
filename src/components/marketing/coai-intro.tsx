@@ -71,8 +71,8 @@ export function CoaiIntro() {
 
       <p className="relative z-10 max-w-md text-sm leading-6 text-graphite-400 sm:text-base">
         COAI est l&apos;app qui génère ton programme d&apos;entraînement, de nutrition et de
-        récupération par IA — avec, selon ta formule, la validation d&apos;un vrai coach
-        avant de te l&apos;envoyer.
+        récupération augmenté par l&apos;IA — avec, selon ta formule, la validation d&apos;un
+        coach humain diplômé d&apos;État avant de te l&apos;envoyer.
       </p>
 
       <a
