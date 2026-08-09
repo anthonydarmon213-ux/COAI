@@ -164,6 +164,16 @@ externe uniquement** — ses clients actuels restent en présentiel, pas de
 conversion de sa base existante vers COAI. Priorité donc aux canaux qui
 touchent des gens qui ne le connaissent pas encore.
 
+**Précision importante (09/08/2026)** : la règle couvre tout son réseau
+personnel/professionnel, pas seulement ses clients payants actuels — il le
+garde volontairement pour du VIP présentiel, pas pour COAI. Concrètement :
+**pas de démarchage ciblé de ses contacts** (pas de message individuel à
+son réseau pour lui proposer COAI), même si un contact s'inscrit de
+lui-même sans sollicitation (ex : David Benzaken, ami à Miami, inscrit
+spontanément le 09/08). Le contenu organique public (Reels/Shorts) reste
+OK — il touche qui veut bien s'abonner, ce n'est pas du démarchage ciblé.
+Ne plus proposer d'outreach personnel comme levier d'acquisition.
+
 - **Fiche Google Business Profile** créée (`Prestataire de services`,
   catégorie "Coach sportif", zone de service Paris/Île-de-France, sans
   adresse affichée). En attente de validation Google (jusqu'à 5 jours,
