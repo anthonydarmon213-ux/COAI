@@ -129,7 +129,7 @@ export default function LandingPage() {
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Démarrer gratuitement</Button></Link>
-            <a href="#piliers"><Button variant="secondary" className="px-7 py-3">Découvrir la méthode</Button></a>
+            <Link href="/diagnostic"><Button variant="secondary" className="px-7 py-3">Faire mon diagnostic gratuit</Button></Link>
           </div>
           <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
         </div>

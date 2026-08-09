@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { TrackConversion } from "@/components/analytics/track-conversion";
+import { DiagnosticAutofill } from "@/components/onboarding/diagnostic-autofill";
 
 // Impulsion (ex-Gratuit) et Transformation (ex-Premium/Standard) sont les
 // deux abonnements auto-souscriptibles depuis /pricing — les séances
@@ -62,6 +63,7 @@ export default async function BienvenuePage({
         <h2 className="text-lg font-semibold text-graphite-50">{TITRE}</h2>
         <p className="text-sm leading-6 text-graphite-300">{DESCRIPTION}</p>
       </Card>
+      <DiagnosticAutofill />
       <Link href="/programme">
         <Button>Voir mon profil & mon programme</Button>
       </Link>

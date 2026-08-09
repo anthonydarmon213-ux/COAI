@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: { path: string; priority: number; changeFrequency: "weekly" | "monthly" }[] = [
     { path: "/", priority: 1, changeFrequency: "weekly" },
     { path: "/pricing", priority: 0.9, changeFrequency: "weekly" },
+    { path: "/diagnostic", priority: 0.9, changeFrequency: "weekly" },
     { path: "/programme-musculation-ia", priority: 0.8, changeFrequency: "monthly" },
     { path: "/coach-sportif-en-ligne", priority: 0.8, changeFrequency: "monthly" },
     { path: "/coaching-nutrition-ia", priority: 0.8, changeFrequency: "monthly" },
