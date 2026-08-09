@@ -76,7 +76,7 @@ export function JsonView({
     return (
       <div className="flex flex-col gap-3">
         {data.map((item, i) => (
-          <div key={i} className="rounded-md border border-graphite-800 p-3">
+          <div key={i} className="rounded-lg border border-white/[0.07] bg-white/[0.02] p-3.5">
             <JsonView data={item} typeMedia={typeMedia} />
           </div>
         ))}
@@ -86,15 +86,16 @@ export function JsonView({
 
   if (isPlainObject(data)) {
     return (
-      <div className="flex flex-col gap-2">
-        {Object.entries(data).map(([key, value]) => {
+      <div className="flex flex-col">
+        {Object.entries(data).map(([key, value], i, arr) => {
           const label = humanizeKey(key);
           const isComplex = isPlainObject(value) || Array.isArray(value);
+          const isLast = i === arr.length - 1;
 
           if (isComplex) {
             return (
-              <div key={key} className="flex flex-col gap-1.5">
-                <span className="font-mono text-xs uppercase tracking-wider text-laiton-500">
+              <div key={key} className="flex flex-col gap-1.5 py-1.5">
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-laiton-500">
                   {label}
                 </span>
                 <div className="pl-2">
@@ -110,19 +111,28 @@ export function JsonView({
               : null;
 
           return (
-            <div key={key} className="flex flex-wrap items-center gap-2 text-base leading-relaxed">
-              <span className="font-medium text-graphite-200">{label} :</span>
-              <span className="text-graphite-50">{String(value)}</span>
-              {media && (
-                <a
-                  href={media.searchUrl(value as string)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-laiton-400 underline hover:text-laiton-300"
-                >
-                  {media.label}
-                </a>
-              )}
+            <div
+              key={key}
+              className={`flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2 ${
+                isLast ? "" : "border-b border-white/[0.06]"
+              }`}
+            >
+              <span className="font-mono text-[10px] uppercase tracking-widest text-graphite-500">
+                {label}
+              </span>
+              <span className="text-right text-sm font-medium text-graphite-50">
+                {String(value)}
+                {media && (
+                  <a
+                    href={media.searchUrl(value as string)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 font-mono text-[10px] uppercase tracking-wide text-laiton-400 underline decoration-laiton-400/40 hover:text-laiton-300"
+                  >
+                    {media.label}
+                  </a>
+                )}
+              </span>
             </div>
           );
         })}

@@ -64,16 +64,18 @@ export function SemainePlan({
             return (
               <details
                 key={i}
-                className="group overflow-hidden rounded-xl border border-graphite-800 bg-graphite-900/40 transition hover:border-laiton-400/30"
+                className="group overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02] transition duration-300 open:border-laiton-400/30 open:bg-white/[0.035] open:shadow-[0_0_0_1px_rgba(201,162,98,0.12),0_20px_50px_-30px_rgba(201,162,98,0.5)] hover:border-laiton-400/25"
               >
-                <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-laiton-400/25 bg-laiton-400/10 font-mono text-[10px] font-semibold text-laiton-300">
+                <summary className="flex cursor-pointer list-none items-center gap-3.5 p-4 marker:content-none">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/[0.08] font-mono text-[10px] font-semibold tracking-wide text-laiton-300 transition duration-300 group-open:border-laiton-400/70 group-open:bg-laiton-400/15 group-open:text-laiton-200 group-open:shadow-[0_0_16px_-2px_rgba(201,162,98,0.55)]">
                     {jourAbrege(jourNom)}
                   </span>
                   <span className="flex-1 text-sm font-medium text-graphite-50">{label}</span>
-                  <span className="text-graphite-500 transition group-open:rotate-180">▾</span>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-graphite-500 transition duration-300 group-open:rotate-180 group-open:border-laiton-400/30 group-open:text-laiton-400">
+                    ▾
+                  </span>
                 </summary>
-                <div className="flex flex-col gap-3 border-t border-graphite-800 p-4 pt-4">
+                <div className="flex flex-col gap-3 border-t border-white/[0.06] p-4 pt-4">
                   {renderContenu(jourData, i)}
                 </div>
               </details>
