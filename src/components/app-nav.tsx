@@ -32,6 +32,7 @@ const LINKS: NavItem[] = [
     label: "Votre suivi",
     children: [
       { href: "/suivi/seances", label: "Séances" },
+      { href: "/suivi/alimentation", label: "Nutrition" },
       { href: "/suivi/mesures", label: "Mesures" },
       { href: "/suivi/tests-maxi", label: "Tests physiques" },
       { href: "/suivi/progression", label: "Progression" },

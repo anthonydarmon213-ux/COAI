@@ -56,6 +56,7 @@ model User {
   profile        Profile?
   programmes     ProgrammeGenerated[]
   seances        SeanceLog[]
+  repasLogs      RepasLog[]
   mesures        Mesure[]
   testsMaxi      TestMaxi[]
   whatsappEvents WhatsAppEvent[]
@@ -206,6 +207,44 @@ model SeanceLog {
   createdAt DateTime @default(now())
 
   @@map("seances_log")
+}
+
+// Statut = un check-in rapide plutôt qu'un journal alimentaire complet
+// (peser/lister chaque aliment) — cohérent avec la cible COAI (débutants,
+// sédentaires, déjà submergés) : trois boutons, pas un formulaire à
+// remplir à chaque repas.
+enum StatutRepas {
+  COMME_PREVU
+  PETIT_ECART
+  GROS_ECART
+}
+
+model RepasLog {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  statut    StatutRepas
+  notes     String?
+  createdAt DateTime    @default(now())
+
+  @@map("repas_log")
+}
+
+// Lead capturé sur /diagnostic (quiz public, visiteur anonyme) juste avant
+// de révéler l'aperçu personnalisé — pas de relation User : la personne n'a
+// pas forcément de compte, potentiellement jamais si elle ne s'inscrit pas.
+// Permet de la relancer par email même sans inscription immédiate (pas
+// d'envoi automatique pour l'instant, juste la capture).
+model DiagnosticLead {
+  id        String   @id @default(uuid())
+  email     String
+  reponses  Json
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+  @@map("diagnostic_leads")
 }
 
 // Données de composition corporelle inspirées d'une balance type InBody —
