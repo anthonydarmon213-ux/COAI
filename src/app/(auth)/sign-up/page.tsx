@@ -32,7 +32,9 @@ export default function SignUpPage() {
   }, [searchParams, planVoulu]);
 
   const [prenom, setPrenom] = useState("");
-  const [email, setEmail] = useState("");
+  // Pré-rempli si on vient du diagnostic public (/diagnostic), qui capture
+  // déjà l'email juste avant de rediriger ici — évite de le ressaisir.
+  const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);

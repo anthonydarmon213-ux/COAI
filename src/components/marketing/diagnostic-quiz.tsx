@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
 
@@ -12,12 +13,15 @@ import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
 // abonnés payants, cf. canGenerateProgramme). L'aperçu est donc assemblé
 // côté client à partir de règles simples, pas un vrai appel IA — ni coût,
 // ni abus possible en spammant le quiz.
+const AUTRE_LABEL = "Autre, à préciser";
+
 const PERSONAS = [
   "Je ne sais pas quoi faire à la salle",
   "Je suis plutôt sédentaire",
   "Je m'entraîne à la maison, sans structure",
   "Même programme depuis des années, sans résultat",
   "Je veux progresser sans me blesser",
+  AUTRE_LABEL,
 ];
 
 const NIVEAUX = [
@@ -42,7 +46,53 @@ const EQUIPEMENTS = [
 // Alignés sur l'enum frequenceEntrainement de /api/profil.
 const FREQUENCES = ["2 fois par semaine", "3 fois par semaine", "4 fois par semaine", "5 fois ou plus par semaine"];
 
-const CONTRAINTES = ["Dos", "Genoux", "Épaules", "Grossesse / post-partum", "Autre blessure"];
+const CONTRAINTES = ["Dos", "Genoux", "Épaules", "Grossesse / post-partum", AUTRE_LABEL];
+
+// Alignés sur les listes équivalentes de profil-form.tsx (mêmes libellés
+// exacts) pour que le pré-remplissage post-inscription tombe pile sur les
+// bonnes cases à cocher.
+const SPORTS = [
+  "Musculation / Fitness",
+  "Course à pied",
+  "Football",
+  "Basketball",
+  "Natation",
+  "Cyclisme",
+  "Boxe / Arts martiaux",
+  "Tennis / Sports de raquette",
+  "Yoga / Pilates",
+  "CrossFit",
+  "Hyrox",
+  "Randonnée",
+  "Breathwork / Méditation",
+  "Aucun actuellement",
+];
+
+const SEXES = ["Homme", "Femme", "Préfère ne pas dire"];
+
+const HABITUDES_ALIMENTAIRES = [
+  "Repas structurés et équilibrés",
+  "Grignotage fréquent / repas irréguliers",
+  "Jeûne intermittent",
+  "Beaucoup de plats préparés ou fast-food",
+  "Déjà suivi par un nutritionniste",
+];
+
+const QUALITES_SOMMEIL = [
+  "Mauvaise (moins de 5h, sommeil agité)",
+  "Moyenne (5-6h, réveils fréquents)",
+  "Bonne (7-8h, plutôt réparateur)",
+  "Excellente (8h ou plus, réparateur)",
+];
+
+// Remplace le libellé générique "Autre, à préciser" par le texte
+// effectivement saisi (si renseigné) — garde le libellé tel quel sinon,
+// plutôt que de perdre la sélection.
+function resolveAutre(list: string[], texteLibre: string): string[] {
+  if (!list.includes(AUTRE_LABEL)) return list;
+  const texte = texteLibre.trim();
+  return texte ? list.map((v) => (v === AUTRE_LABEL ? texte : v)) : list;
+}
 
 const EXEMPLES_DEFAUT = ["pompes", "squats au poids du corps", "gainage"];
 const EXEMPLES_PAR_EQUIPEMENT: Record<string, string[]> = {
@@ -58,8 +108,43 @@ function exemplesPour(equipement: string): string[] {
   return EXEMPLES_PAR_EQUIPEMENT[equipement] ?? EXEMPLES_DEFAUT;
 }
 
-type Step = "intro" | "persona" | "niveau" | "objectif" | "equipement" | "frequence" | "sante" | "result";
-const QUESTION_STEPS: Step[] = ["persona", "niveau", "objectif", "equipement", "frequence", "sante"];
+type Step =
+  | "intro"
+  | "persona"
+  | "niveau"
+  | "objectif"
+  | "equipement"
+  | "frequence"
+  | "sport"
+  | "sexe"
+  | "alimentation"
+  | "sommeil"
+  | "sante"
+  | "email"
+  | "result";
+// Ordonné pour couvrir explicitement les 3 piliers COAI (entraînement,
+// nutrition, récupération) plutôt que de s'arrêter à l'entraînement —
+// chaque question nourrit un vrai champ de Profile, jamais du remplissage.
+// "email" est la dernière étape, juste avant la révélation : c'est le
+// moment où la personne a le plus investi, donc le plus disposée à le
+// laisser (cf. effet IKEA / coût irrécupérable).
+const QUESTION_STEPS: Step[] = [
+  "persona",
+  "niveau",
+  "objectif",
+  "equipement",
+  "frequence",
+  "sport",
+  "sexe",
+  "alimentation",
+  "sommeil",
+  "sante",
+  "email",
+];
+
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
 function OptionCard({
   label,
@@ -113,7 +198,16 @@ export function DiagnosticQuiz() {
   const [objectif, setObjectif] = useState<string | null>(null);
   const [equipement, setEquipement] = useState<string[]>([]);
   const [frequence, setFrequence] = useState<string | null>(null);
+  const [sport, setSport] = useState<string[]>([]);
+  const [sexe, setSexe] = useState<string | null>(null);
+  const [habitudesAlimentaires, setHabitudesAlimentaires] = useState<string | null>(null);
+  const [qualiteSommeil, setQualiteSommeil] = useState<string | null>(null);
   const [sante, setSante] = useState<string[]>([]);
+  const [personaAutreTexte, setPersonaAutreTexte] = useState("");
+  const [santeAutreTexte, setSanteAutreTexte] = useState("");
+  const [email, setEmail] = useState("");
+  const [consentEmail, setConsentEmail] = useState(false);
+  const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading">("idle");
 
   const stepIndex = QUESTION_STEPS.indexOf(step);
   const progressPct = stepIndex >= 0 ? Math.round((stepIndex / QUESTION_STEPS.length) * 100) : 0;
@@ -141,23 +235,39 @@ export function DiagnosticQuiz() {
     if (step === "objectif") return Boolean(objectif);
     if (step === "equipement") return equipement.length > 0;
     if (step === "frequence") return Boolean(frequence);
+    if (step === "sport") return true; // peut n'en pratiquer aucun
+    if (step === "sexe") return Boolean(sexe);
+    if (step === "alimentation") return Boolean(habitudesAlimentaires);
+    if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
+    if (step === "email") return isValidEmail(email) && consentEmail;
     return true;
-  }, [step, persona, niveau, objectif, equipement, frequence]);
+  }, [step, persona, niveau, objectif, equipement, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
 
   const teaser = useMemo(() => {
     if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
     const premierEquipement = equipement[0] ?? "Poids du corps uniquement";
     const exemples = exemplesPour(premierEquipement);
+    const santeResolue = resolveAutre(sante, santeAutreTexte);
+
+    let description = `Avec ${equipement.length > 1 ? "ton équipement" : premierEquipement.toLowerCase()} et ${frequence.toLowerCase()}, un programme ${niveau.toLowerCase()} orienté "${objectif.toLowerCase()}" s'articulerait autour d'exercices comme ${exemples.join(", ")} — dosés et progressifs, pas une liste au hasard.`;
+    if (habitudesAlimentaires || qualiteSommeil) {
+      description += ` Côté nutrition et récupération, on tiendrait aussi compte de${
+        habitudesAlimentaires ? ` tes habitudes actuelles (${habitudesAlimentaires.toLowerCase()})` : ""
+      }${habitudesAlimentaires && qualiteSommeil ? " et de" : ""}${
+        qualiteSommeil ? ` ton sommeil (${qualiteSommeil.toLowerCase()})` : ""
+      }.`;
+    }
+
     return {
       titre: `Profil ${niveau.toLowerCase()} — objectif ${objectif.toLowerCase()}`,
-      description: `Avec ${equipement.length > 1 ? "ton équipement" : premierEquipement.toLowerCase()} et ${frequence.toLowerCase()}, un programme ${niveau.toLowerCase()} orienté "${objectif.toLowerCase()}" s'articulerait autour d'exercices comme ${exemples.join(", ")} — dosés et progressifs, pas une liste au hasard.`,
+      description,
       alerte:
-        sante.length > 0
-          ? `Signalé : ${sante.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.`
+        santeResolue.length > 0
+          ? `Signalé : ${santeResolue.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.`
           : null,
     };
-  }, [niveau, objectif, equipement, frequence, sante]);
+  }, [niveau, objectif, equipement, frequence, sante, santeAutreTexte, habitudesAlimentaires, qualiteSommeil]);
 
   // "Audit" : on ne recommande pas la même offre à tout le monde. Douleur/
   // contrainte signalée ou plateau depuis des années → le suivi humain de
@@ -181,14 +291,60 @@ export function DiagnosticQuiz() {
         };
   }, [sante, persona]);
 
+  function signUpHref(standard: boolean): string {
+    const params = new URLSearchParams();
+    if (standard) params.set("plan", "STANDARD");
+    if (email) params.set("email", email);
+    const query = params.toString();
+    return query ? `/sign-up?${query}` : "/sign-up";
+  }
+
   function handleCreerCompte() {
+    const personaAutreResolue = personaAutreTexte.trim();
     storeDiagnosticAnswers({
       niveau: niveau ?? undefined,
-      objectifs: objectif ?? undefined,
+      objectifs: [objectif, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
       frequenceEntrainement: frequence ?? undefined,
-      contraintesSante: sante.length ? sante.join(", ") : undefined,
+      contraintesSante: sante.length ? resolveAutre(sante, santeAutreTexte).join(", ") : undefined,
+      sexe: sexe ?? undefined,
+      sportsPratiques: sport.length ? sport.join(", ") : undefined,
+      habitudesAlimentaires: habitudesAlimentaires ?? undefined,
+      qualiteSommeil: qualiteSommeil ?? undefined,
     });
+  }
+
+  // Capture le lead avant de révéler le résultat — best-effort : n'importe
+  // quel souci réseau/serveur ne doit jamais empêcher la personne de voir
+  // son diagnostic, elle a déjà répondu à 10 questions pour ça.
+  async function submitLeadAndReveal() {
+    setLeadEnvoi("loading");
+    try {
+      await fetch("/api/diagnostic-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          reponses: {
+            persona: resolveAutre(persona, personaAutreTexte),
+            niveau,
+            objectif,
+            equipement,
+            frequence,
+            sport,
+            sexe,
+            habitudesAlimentaires,
+            qualiteSommeil,
+            sante: resolveAutre(sante, santeAutreTexte),
+          },
+        }),
+      });
+    } catch {
+      // best-effort, cf. commentaire ci-dessus
+    } finally {
+      setLeadEnvoi("idle");
+      goNext();
+    }
   }
 
   return (
@@ -239,6 +395,15 @@ export function DiagnosticQuiz() {
                   <Chip key={p} label={p} active={persona.includes(p)} onClick={() => toggle(persona, p, setPersona)} />
                 ))}
               </div>
+              {persona.includes(AUTRE_LABEL) && (
+                <input
+                  type="text"
+                  value={personaAutreTexte}
+                  onChange={(e) => setPersonaAutreTexte(e.target.value)}
+                  placeholder="Précise en quelques mots..."
+                  className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              )}
             </div>
           )}
 
@@ -298,6 +463,64 @@ export function DiagnosticQuiz() {
             </div>
           )}
 
+          {step === "sport" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Tu pratiques déjà un sport ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Coche tout ce qui s&apos;applique, ou passe si aucun.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {SPORTS.map((s) => (
+                  <Chip key={s} label={s} active={sport.includes(s)} onClick={() => toggle(sport, s, setSport)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === "sexe" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Ton sexe ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">
+                  Sert à ajuster les repères caloriques et protéiques — jamais un jugement sur ton apparence.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {SEXES.map((s) => (
+                  <OptionCard key={s} label={s} active={sexe === s} onClick={() => setSexe(s)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === "alimentation" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Tes habitudes alimentaires aujourd&apos;hui ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Ce qui se rapproche le plus de ta réalité actuelle.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {HABITUDES_ALIMENTAIRES.map((h) => (
+                  <OptionCard key={h} label={h} active={habitudesAlimentaires === h} onClick={() => setHabitudesAlimentaires(h)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === "sommeil" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Ta qualité de sommeil ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Important pour la récupération, pas juste l&apos;entraînement.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {QUALITES_SOMMEIL.map((s) => (
+                  <OptionCard key={s} label={s} active={qualiteSommeil === s} onClick={() => setQualiteSommeil(s)} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {step === "sante" && (
             <div className="flex flex-col gap-4">
               <div>
@@ -311,6 +534,42 @@ export function DiagnosticQuiz() {
                   <Chip key={c} label={c} active={sante.includes(c)} onClick={() => toggle(sante, c, setSante)} />
                 ))}
               </div>
+              {sante.includes(AUTRE_LABEL) && (
+                <Input
+                  type="text"
+                  value={santeAutreTexte}
+                  onChange={(e) => setSanteAutreTexte(e.target.value)}
+                  placeholder="Précise en quelques mots..."
+                />
+              )}
+            </div>
+          )}
+
+          {step === "email" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Dernière étape.</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">
+                  Ton email pour voir ton diagnostic et le retrouver plus tard.
+                </p>
+              </div>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="toi@exemple.fr"
+                autoComplete="email"
+              />
+              <label className="flex items-start gap-2 text-xs leading-5 text-graphite-400">
+                <input
+                  type="checkbox"
+                  checked={consentEmail}
+                  onChange={(e) => setConsentEmail(e.target.checked)}
+                  className="mt-0.5"
+                />
+                J&apos;accepte de recevoir mon diagnostic et des informations sur COAI par email.
+                Désinscription possible à tout moment.
+              </label>
             </div>
           )}
 
@@ -334,17 +593,14 @@ export function DiagnosticQuiz() {
               </div>
 
               <div className="mt-1 flex w-full max-w-xs flex-col gap-2">
-                <Link
-                  href={recommandation.plan === "STANDARD" ? "/sign-up?plan=STANDARD" : "/sign-up"}
-                  onClick={handleCreerCompte}
-                >
+                <Link href={signUpHref(recommandation.plan === "STANDARD")} onClick={handleCreerCompte}>
                   <Button className="w-full">Créer mon compte — {recommandation.label} →</Button>
                 </Link>
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-graphite-600">
                   7 jours offerts, sans engagement
                 </span>
                 <Link
-                  href={recommandation.plan === "STANDARD" ? "/sign-up" : "/sign-up?plan=STANDARD"}
+                  href={signUpHref(recommandation.plan !== "STANDARD")}
                   onClick={handleCreerCompte}
                   className="mt-1 text-xs text-graphite-500 underline hover:text-graphite-300"
                 >
@@ -364,8 +620,13 @@ export function DiagnosticQuiz() {
             >
               ← Retour
             </button>
-            <Button variant="primary" onClick={goNext} disabled={!canContinue} className="px-6 py-2.5 text-sm">
-              Continuer
+            <Button
+              variant="primary"
+              onClick={step === "email" ? submitLeadAndReveal : goNext}
+              disabled={!canContinue || leadEnvoi === "loading"}
+              className="px-6 py-2.5 text-sm"
+            >
+              {step === "email" ? (leadEnvoi === "loading" ? "…" : "Voir mon diagnostic →") : "Continuer"}
             </Button>
           </div>
         )}

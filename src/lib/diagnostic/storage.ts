@@ -12,6 +12,10 @@ export type DiagnosticAnswers = {
   equipementDisponible?: string;
   frequenceEntrainement?: string;
   contraintesSante?: string;
+  sexe?: string;
+  sportsPratiques?: string;
+  habitudesAlimentaires?: string;
+  qualiteSommeil?: string;
 };
 
 export function storeDiagnosticAnswers(answers: DiagnosticAnswers): void {
