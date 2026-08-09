@@ -138,6 +138,36 @@ plus faciles à convaincre.
   résiliation en 3 clics (juin 2023) une fois que des abonnés réels
   passeront par ce flow.
 
+## SEO / acquisition (09/08/2026)
+
+Objectif fixé par Anthony : les 100 premiers abonnés, **en acquisition
+externe uniquement** — ses clients actuels restent en présentiel, pas de
+conversion de sa base existante vers COAI. Priorité donc aux canaux qui
+touchent des gens qui ne le connaissent pas encore.
+
+- **Fiche Google Business Profile** créée (`Prestataire de services`,
+  catégorie "Coach sportif", zone de service Paris/Île-de-France, sans
+  adresse affichée). En attente de validation Google (jusqu'à 5 jours,
+  vérification par téléphone). Description, photos (portrait + bannière
+  COAI générée) et infos renseignées.
+- **Chaîne YouTube** habillée : bannière (2560×1440), avatar (logomark
+  officiel — arc doré ouvert + œil bleu, généré via `next/og`/satori),
+  filigrane vidéo (150×150, affichage "Intégralité de la vidéo"),
+  description, identifiant à renommer en `@coai`/`@coai.fr`/variante
+  (pas encore fait, limite de 2 changements/14 jours chez YouTube).
+- **4 pages d'atterrissage SEO** créées et poussées : `/programme-musculation-ia`,
+  `/coach-sportif-en-ligne`, `/coaching-nutrition-ia`, `/coach-sportif-paris`
+  — chacune écrite autour d'une intention de recherche précise (pas la
+  page d'accueil générale qui doit couvrir tous les sujets à la fois),
+  avec FAQ + données structurées FAQPage (schema.org) pour les rich
+  snippets Google. Ajoutées au sitemap, liées depuis le footer.
+- **Idées explorées mais pas retenues pour l'instant** : lien
+  d'affiliation avec commission (proposé de tester à la main avec 1-2
+  influenceurs avant de développer un vrai système), TikTok (pas encore
+  démarré), page/calculateur gratuit comme aimant à leads (pas fait).
+- **Contenu organique** (Shorts/Reels) déjà démarré par Anthony de son
+  côté, en parallèle.
+
 ## À faire plus tard
 
 - **App mobile (iOS/Android) — décision révisée le 08/08/2026** : Anthony
