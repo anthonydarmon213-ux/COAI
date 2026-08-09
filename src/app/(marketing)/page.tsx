@@ -122,8 +122,9 @@ export default function LandingPage() {
             <span className="mt-2 block text-laiton-300">Suivre ta progression.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
-            L&apos;IA analyse toutes tes données pour un entraînement augmenté, personnalisé pour
-            toi — avec un vrai coach qui valide.
+            Tu ne sais pas quoi faire à la salle, tu t&apos;entraînes à la maison sans structure,
+            ou tu stagnes avec le même programme depuis des années ? L&apos;IA construit ton
+            programme sur-mesure — un coach humain diplômé d&apos;État valide.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Démarrer gratuitement</Button></Link>
@@ -227,10 +228,13 @@ export default function LandingPage() {
       <section className="mx-auto w-full max-w-5xl border-y border-white/[0.07] px-6 py-20 text-center sm:py-24">
         <SectionLabel>Le constat</SectionLabel>
         <h2 className="mx-auto mt-6 max-w-4xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-          Un accompagnement augmenté, sans la complexité ni le prix du coaching individuel.
+          Le même programme depuis 3 ans. Toujours les mêmes résultats.
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Un programme clair, un suivi structuré et des réponses quand tu en as besoin.
+          Débutant perdu à la salle, sédentaire qui reprend le sport, ou entraînement à la maison
+          sans structure — dans les trois cas, le problème n&apos;est pas toi. C&apos;est de ne
+          pas avoir de vrai programme. COAI construit le tien, corrige ta technique, et
+          t&apos;évite de te blesser en t&apos;entraînant au hasard.
         </p>
       </section>
 

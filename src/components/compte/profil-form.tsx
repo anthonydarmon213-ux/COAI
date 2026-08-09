@@ -57,7 +57,9 @@ const FREQUENCES_ENTRAINEMENT = [
 const EQUIPEMENTS = [
   "Salle de sport complète",
   "Matériel à la maison (haltères, bancs...)",
-  "Élastiques / bandes de résistance uniquement",
+  "Élastiques / bandes de résistance",
+  "Kettlebell",
+  "TRX / sangles de suspension",
   "Poids du corps uniquement",
   "Aucun équipement",
 ];
@@ -175,8 +177,8 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   const router = useRouter();
   const [objectifs, setObjectifs] = useState(profil.objectifs ?? "");
   const [niveau, setNiveau] = useState(profil.niveau ?? "");
-  const [equipementDisponible, setEquipementDisponible] = useState(
-    profil.equipementDisponible ?? ""
+  const [equipementDisponible, setEquipementDisponible] = useState<string[]>(
+    parseMultiSelect(profil.equipementDisponible)
   );
   const [contraintesSante, setContraintesSante] = useState(profil.contraintesSante ?? "");
   const [antecedentsMedicaux, setAntecedentsMedicaux] = useState<string[]>(
@@ -288,6 +290,12 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     );
   }
 
+  function toggleEquipement(item: string) {
+    setEquipementDisponible((prev) =>
+      prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
+    );
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -300,7 +308,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
         body: JSON.stringify({
           objectifs,
           niveau: niveau || undefined,
-          equipementDisponible: equipementDisponible || undefined,
+          equipementDisponible: equipementDisponible.length ? equipementDisponible.join(", ") : undefined,
           contraintesSante,
           antecedentsMedicaux: antecedentsMedicaux.length ? antecedentsMedicaux.join(", ") : undefined,
           tailleCm: tailleCm ? Number(tailleCm) : undefined,
@@ -453,15 +461,8 @@ export function ProfilForm({ profil }: { profil: Profil }) {
         <Field label="Sport(s) pratiqué(s) (coche tout ce qui s'applique)">
           <ToggleChips options={SPORTS_PRATIQUES} selected={sportsPratiques} onToggle={toggleSport} />
         </Field>
-        <Field label="Équipement disponible">
-          <Select value={equipementDisponible} onChange={(e) => setEquipementDisponible(e.target.value)}>
-            <option value="">Non renseigné</option>
-            {EQUIPEMENTS.map((eq) => (
-              <option key={eq} value={eq}>
-                {eq}
-              </option>
-            ))}
-          </Select>
+        <Field label="Équipement disponible (coche tout ce qui s'applique)">
+          <ToggleChips options={EQUIPEMENTS} selected={equipementDisponible} onToggle={toggleEquipement} />
         </Field>
 
         <SectionLabel>Santé & morphologie</SectionLabel>
