@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "../../sentry.client.config";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <GoogleAnalytics />
+        <MetaPixel />
         <Analytics />
       </body>
     </html>
