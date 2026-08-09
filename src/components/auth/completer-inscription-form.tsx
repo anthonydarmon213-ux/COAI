@@ -5,9 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
+import { clearIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
 import Link from "next/link";
 
-export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {
+export function CompleterInscriptionForm({
+  prenomSuggere,
+  planInitial,
+}: {
+  prenomSuggere: string;
+  planInitial: "GRATUIT" | "STANDARD";
+}) {
   const [prenom, setPrenom] = useState(prenomSuggere);
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);
@@ -47,11 +54,14 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       clearParrainageCookie();
+      clearIntendedPlanCookie();
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "GRATUIT", skipTrial }),
+        body: JSON.stringify(
+          planInitial === "STANDARD" ? { plan: "STANDARD" } : { plan: "GRATUIT", skipTrial }
+        ),
       });
       const checkoutData = await checkoutRes.json();
       if (!checkoutRes.ok || !checkoutData.url) {
@@ -94,37 +104,44 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
         Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de doute
         ou d&apos;antécédent médical.
       </label>
-      <div className="flex flex-col gap-2">
-        <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
-          Formule Impulsion — 19€/mois
-        </span>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setSkipTrial(false)}
-            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-              !skipTrial
-                ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                : "border-graphite-800 text-graphite-400 hover:text-white"
-            }`}
-          >
-            <span className="block font-semibold">7 jours offerts</span>
-            <span className="block text-graphite-500">puis 19€/mois</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSkipTrial(true)}
-            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-              skipTrial
-                ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                : "border-graphite-800 text-graphite-400 hover:text-white"
-            }`}
-          >
-            <span className="block font-semibold">Démarrer tout de suite</span>
-            <span className="block text-graphite-500">19€/mois dès aujourd&apos;hui</span>
-          </button>
+      {planInitial === "STANDARD" ? (
+        <p className="rounded-lg border border-laiton-400/40 bg-laiton-400/10 px-3 py-2 text-xs text-laiton-200">
+          Formule <span className="font-semibold">Transformation — 49€/mois</span>, programme relu
+          et validé par un coach diplômé d&apos;État.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
+            Formule Impulsion — 19€/mois
+          </span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setSkipTrial(false)}
+              className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                !skipTrial
+                  ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                  : "border-graphite-800 text-graphite-400 hover:text-white"
+              }`}
+            >
+              <span className="block font-semibold">7 jours offerts</span>
+              <span className="block text-graphite-500">puis 19€/mois</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSkipTrial(true)}
+              className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                skipTrial
+                  ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                  : "border-graphite-800 text-graphite-400 hover:text-white"
+              }`}
+            >
+              <span className="block font-semibold">Démarrer tout de suite</span>
+              <span className="block text-graphite-500">19€/mois dès aujourd&apos;hui</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       <label className="flex items-start gap-2 text-sm text-graphite-300">
         <input
           type="checkbox"
@@ -132,7 +149,18 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
           onChange={(e) => setConsentOffre(e.target.checked)}
           className="mt-1"
         />
-        {skipTrial ? (
+        {planInitial === "STANDARD" ? (
+          <>
+            Je reconnais avoir pris connaissance des conditions de l&apos;offre Transformation :
+            49€/mois, facturé immédiatement dès l&apos;inscription, sans engagement. Je demande le
+            début immédiat du service et reconnais renoncer à mon droit de rétractation de 14
+            jours pour la partie du service déjà utilisée. J&apos;accepte les{" "}
+            <Link href="/cgv" target="_blank" className="underline">
+              CGV
+            </Link>
+            .
+          </>
+        ) : skipTrial ? (
           <>
             Je reconnais avoir pris connaissance des conditions de l&apos;offre : abonnement
             Impulsion à 19€/mois, facturé immédiatement dès l&apos;inscription (sans période
@@ -162,9 +190,11 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       <Button type="submit" disabled={loading}>
         {loading
           ? "Redirection vers le paiement…"
-          : skipTrial
-            ? "Démarrer maintenant — 19€/mois"
-            : "Accéder à mon espace — 7 jours offerts"}
+          : planInitial === "STANDARD"
+            ? "Accéder à mon espace — 49€/mois"
+            : skipTrial
+              ? "Démarrer maintenant — 19€/mois"
+              : "Accéder à mon espace — 7 jours offerts"}
       </Button>
     </form>
   );

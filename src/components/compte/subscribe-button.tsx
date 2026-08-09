@@ -23,7 +23,9 @@ export function SubscribeButton({
         body: JSON.stringify({ plan }),
       });
       if (res.status === 401) {
-        window.location.href = "/sign-up";
+        // Préserve l'intention (Transformation) à travers l'inscription —
+        // sinon /sign-up créait toujours un abonnement Impulsion par défaut.
+        window.location.href = plan === "STANDARD" ? "/sign-up?plan=STANDARD" : "/sign-up";
         return;
       }
       const data = await res.json();

@@ -10,18 +10,26 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { clearParrainageCookie, readParrainageCookie, storeParrainageCookie } from "@/lib/parrainage/cookie";
+import { storeIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
 import Link from "next/link";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
+  // Un visiteur non connecté qui clique "S'abonner — Transformation" sur
+  // /pricing est redirigé ici avec ?plan=STANDARD (cf. SubscribeButton) —
+  // sans ça cette page créait toujours un abonnement Impulsion par défaut,
+  // quelle que soit l'offre initialement choisie.
+  const planVoulu: "GRATUIT" | "STANDARD" = searchParams.get("plan") === "STANDARD" ? "STANDARD" : "GRATUIT";
 
-  // Le lien de parrainage (?ref=CODE) est mémorisé en cookie pour survivre
-  // à l'aller-retour Google OAuth (l'inscription via Google ne repasse pas
-  // par cette page au retour, cf. completer-inscription-form.tsx).
+  // Le lien de parrainage (?ref=CODE) et l'intention Transformation sont
+  // mémorisés en cookie pour survivre à l'aller-retour Google OAuth
+  // (l'inscription via Google ne repasse pas par cette page au retour,
+  // cf. completer-inscription-form.tsx).
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) storeParrainageCookie(ref);
-  }, [searchParams]);
+    if (planVoulu === "STANDARD") storeIntendedPlanCookie("STANDARD");
+  }, [searchParams, planVoulu]);
 
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
@@ -72,7 +80,9 @@ export default function SignUpPage() {
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "GRATUIT", skipTrial }),
+        body: JSON.stringify(
+          planVoulu === "STANDARD" ? { plan: "STANDARD" } : { plan: "GRATUIT", skipTrial }
+        ),
       });
       const checkoutData = await checkoutRes.json();
       if (!checkoutRes.ok || !checkoutData.url) {
@@ -150,37 +160,44 @@ export default function SignUpPage() {
             Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de
             doute ou d&apos;antécédent médical.
           </label>
-          <div className="flex flex-col gap-2">
-            <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
-              Formule Impulsion — 19€/mois
-            </span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setSkipTrial(false)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                  !skipTrial
-                    ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                    : "border-graphite-800 text-graphite-400 hover:text-white"
-                }`}
-              >
-                <span className="block font-semibold">7 jours offerts</span>
-                <span className="block text-graphite-500">puis 19€/mois</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSkipTrial(true)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                  skipTrial
-                    ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                    : "border-graphite-800 text-graphite-400 hover:text-white"
-                }`}
-              >
-                <span className="block font-semibold">Démarrer tout de suite</span>
-                <span className="block text-graphite-500">19€/mois dès aujourd&apos;hui</span>
-              </button>
+          {planVoulu === "STANDARD" ? (
+            <p className="rounded-lg border border-laiton-400/40 bg-laiton-400/10 px-3 py-2 text-xs text-laiton-200">
+              Formule <span className="font-semibold">Transformation — 49€/mois</span>, programme
+              relu et validé par un coach diplômé d&apos;État.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
+                Formule Impulsion — 19€/mois
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSkipTrial(false)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                    !skipTrial
+                      ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                      : "border-graphite-800 text-graphite-400 hover:text-white"
+                  }`}
+                >
+                  <span className="block font-semibold">7 jours offerts</span>
+                  <span className="block text-graphite-500">puis 19€/mois</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSkipTrial(true)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                    skipTrial
+                      ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                      : "border-graphite-800 text-graphite-400 hover:text-white"
+                  }`}
+                >
+                  <span className="block font-semibold">Démarrer tout de suite</span>
+                  <span className="block text-graphite-500">19€/mois dès aujourd&apos;hui</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           <label className="flex items-start gap-2 text-sm text-graphite-300">
             <input
               type="checkbox"
@@ -188,7 +205,19 @@ export default function SignUpPage() {
               onChange={(e) => setConsentOffre(e.target.checked)}
               className="mt-1"
             />
-            {skipTrial ? (
+            {planVoulu === "STANDARD" ? (
+              <>
+                Je reconnais avoir pris connaissance des conditions de l&apos;offre
+                Transformation : 49€/mois, facturé immédiatement dès l&apos;inscription, sans
+                engagement. Je demande le début immédiat du service et reconnais renoncer à mon
+                droit de rétractation de 14 jours pour la partie du service déjà utilisée.
+                J&apos;accepte les{" "}
+                <Link href="/cgv" target="_blank" className="underline">
+                  CGV
+                </Link>
+                .
+              </>
+            ) : skipTrial ? (
               <>
                 Je reconnais avoir pris connaissance des conditions de l&apos;offre : abonnement
                 Impulsion à 19€/mois, facturé immédiatement dès l&apos;inscription (sans période
@@ -219,9 +248,11 @@ export default function SignUpPage() {
           <Button type="submit" disabled={loading}>
             {loading
               ? "Redirection vers le paiement…"
-              : skipTrial
-                ? "Démarrer maintenant — 19€/mois"
-                : "Créer mon compte — 7 jours offerts"}
+              : planVoulu === "STANDARD"
+                ? "Créer mon compte — 49€/mois"
+                : skipTrial
+                  ? "Démarrer maintenant — 19€/mois"
+                  : "Créer mon compte — 7 jours offerts"}
           </Button>
         </form>
         <p className="text-sm text-graphite-400">
