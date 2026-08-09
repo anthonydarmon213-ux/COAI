@@ -80,9 +80,9 @@ export function CoaiIntro() {
         <span aria-hidden="true" className="animate-nudge-right text-acier">→</span>
         <Link
           href="/diagnostic"
-          className="group flex items-center gap-2 rounded-full border border-acier/40 bg-acier/[0.08] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.22em] text-graphite-200 shadow-[0_8px_24px_-12px_rgba(91,130,150,0.6)] transition hover:border-acier/70 hover:bg-acier/[0.14] hover:text-white"
+          className="group flex items-center gap-2 rounded-full border border-acier/40 bg-acier/[0.08] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.22em] text-laiton-300 shadow-[0_8px_24px_-12px_rgba(91,130,150,0.6)] transition hover:border-acier/70 hover:bg-acier/[0.14] hover:text-laiton-200"
         >
-          Faire mon diagnostic offert
+          Diagnostic offert
           <span aria-hidden="true" className="text-acier transition group-hover:translate-x-0.5">→</span>
         </Link>
         <span aria-hidden="true" className="animate-nudge-left text-acier">←</span>
