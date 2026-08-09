@@ -123,8 +123,9 @@ export default function LandingPage() {
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
             Tu ne sais pas quoi faire à la salle, tu t&apos;entraînes à la maison sans structure,
-            ou tu stagnes avec le même programme depuis des années ? L&apos;IA construit ton
-            programme sur-mesure — un coach humain diplômé d&apos;État valide.
+            ou tu stagnes avec le même programme depuis des années ? COAI construit ton
+            programme sur-mesure — et, selon ta formule, nos coachs diplômés d&apos;État le
+            valident et te suivent jusqu&apos;à l&apos;atteinte de tes objectifs.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link href="/sign-up"><Button className="px-7 py-3">Démarrer gratuitement</Button></Link>
