@@ -26,6 +26,21 @@ export function isInTrial(subscription?: Subscription | null): boolean {
   return Boolean(subscription.trialEnd && subscription.trialEnd > new Date());
 }
 
+// Autorise la génération de programme uniquement s'il existe un
+// abonnement Stripe réel, actif (ou en retard de paiement, encore toléré),
+// et déjà facturé au moins une fois (pas en essai). Contrairement à
+// getEffectivePlan (qui retombe volontairement sur "GRATUIT" en l'absence
+// d'abonnement — utile pour l'UI juste après l'inscription, avant que le
+// webhook Stripe n'ait tourné), cette fonction ne doit JAMAIS autoriser
+// l'absence totale d'abonnement : sans elle, quelqu'un qui abandonne la
+// page de paiement Stripe (jamais de CB saisie, jamais d'essai démarré)
+// se retrouvait traité comme "GRATUIT" par défaut et pouvait générer un
+// programme complet sans jamais avoir payé (09/08/2026).
+export function canGenerateProgramme(subscription?: Subscription | null): boolean {
+  if (!subscription || !ACTIVE_STATUSES.has(subscription.status)) return false;
+  return !isInTrial(subscription);
+}
+
 // Noms marketing (08/08/2026) : GRATUIT = "Impulsion", STANDARD = "Transformation"
 // — à ne pas confondre avec l'enum PREMIUM (199€, ancienne offre, "VIP" à la
 // séance depuis ce renommage), qui n'est plus vendu comme abonnement — ce

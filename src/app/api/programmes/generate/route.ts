@@ -18,7 +18,7 @@ import {
 import { buildProgrammeRecuperationJourPrompt } from "@/lib/ai/prompts/programme-recuperation-jour";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
-import { getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
+import { canGenerateProgramme, getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
@@ -128,6 +128,18 @@ export async function POST() {
   if (isInTrial(user.subscription)) {
     return NextResponse.json(
       { error: "Ton programme sera généré une fois ton abonnement activé (fin de l'essai offert)." },
+      { status: 403 }
+    );
+  }
+
+  // Génération bloquée en l'absence d'abonnement Stripe actif — sans ce
+  // garde-fou, quelqu'un qui n'a jamais payé (checkout Stripe abandonné,
+  // abonnement résilié/incomplet) était traité comme le palier Gratuit par
+  // défaut ailleurs dans le code et pouvait générer un programme complet
+  // sans jamais avoir de CB enregistrée.
+  if (!canGenerateProgramme(user.subscription)) {
+    return NextResponse.json(
+      { error: "Un abonnement actif (Impulsion ou Transformation) est nécessaire pour générer ton programme." },
       { status: 403 }
     );
   }

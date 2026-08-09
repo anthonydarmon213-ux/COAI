@@ -9,12 +9,22 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 // deux abonnements auto-souscriptibles depuis /pricing — les séances
 // individuelles (VIP) se réservent à la séance via WhatsApp, hors palier
 // d'abonnement. Le titre/description s'adapte au palier réellement souscrit
-// (passé en query param par le succès du Stripe Checkout).
-const CONTENU_PAR_PLAN: Record<"GRATUIT" | "STANDARD", { titre: string; description: string }> = {
+// (passé en query param par le succès du Stripe Checkout). Pour Impulsion,
+// le param "essai=0" (posé par /api/stripe/checkout quand skipTrial est
+// choisi à l'inscription) distingue les 7 jours offerts du paiement
+// immédiat — sinon on ne peut pas s'appuyer sur l'abonnement en base ici :
+// le webhook Stripe qui le crée arrive de façon asynchrone et peut ne pas
+// encore être passé au moment où cette page se charge.
+const CONTENU_PAR_PLAN: Record<"GRATUIT" | "GRATUIT_SANS_ESSAI" | "STANDARD", { titre: string; description: string }> = {
   GRATUIT: {
     titre: "Bienvenue dans l'offre Impulsion",
     description:
-      "Ton abonnement est actif (7 jours offerts, puis 19€/mois). Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — généré par IA, sans relecture humaine à ce palier.",
+      "Ton abonnement est actif (7 jours offerts, puis 19€/mois). Complète ton profil si ce n'est pas déjà fait — ton programme sera généré par IA (sans relecture humaine à ce palier) dès la fin de ton essai.",
+  },
+  GRATUIT_SANS_ESSAI: {
+    titre: "Bienvenue dans l'offre Impulsion",
+    description:
+      "Ton abonnement Impulsion est actif (19€/mois). Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — généré par IA, sans relecture humaine à ce palier.",
   },
   STANDARD: {
     titre: "Bienvenue dans l'offre Transformation",
@@ -25,12 +35,17 @@ const CONTENU_PAR_PLAN: Record<"GRATUIT" | "STANDARD", { titre: string; descript
 export default async function BienvenuePage({
   searchParams,
 }: {
-  searchParams: { plan?: string };
+  searchParams: { plan?: string; essai?: string };
 }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const plan: "GRATUIT" | "STANDARD" = searchParams.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
+  const plan: "GRATUIT" | "GRATUIT_SANS_ESSAI" | "STANDARD" =
+    searchParams.plan !== "GRATUIT"
+      ? "STANDARD"
+      : searchParams.essai === "0"
+        ? "GRATUIT_SANS_ESSAI"
+        : "GRATUIT";
   const { titre: TITRE, description: DESCRIPTION } = CONTENU_PAR_PLAN[plan];
 
   return (

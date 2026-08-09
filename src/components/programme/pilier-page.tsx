@@ -11,7 +11,7 @@ import { FicheMacros } from "@/components/programme/fiche-macros";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
+import { canGenerateProgramme, getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -63,6 +63,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
   const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
   const plan = getEffectivePlan(user.subscription);
   const enEssai = isInTrial(user.subscription);
+  const peutGenerer = canGenerateProgramme(user.subscription);
 
   return (
     <div className="flex flex-col gap-10">
@@ -108,7 +109,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
                 Télécharger en PDF
               </a>
             )}
-            {!enEssai && <RegenerateButton hasExisting={Boolean(dernier)} />}
+            {peutGenerer && <RegenerateButton hasExisting={Boolean(dernier)} />}
           </div>
         </div>
 
@@ -155,6 +156,17 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
                   <p className="text-sm text-graphite-400">
                     Ton programme sera généré dès la fin de ton essai offert — tu peux en attendant
                     te balader sur l&apos;application et découvrir ce que propose COAI.
+                  </p>
+                );
+              }
+              if (!peutGenerer) {
+                return (
+                  <p className="text-sm text-graphite-400">
+                    Un abonnement actif est nécessaire pour générer ton programme.{" "}
+                    <Link href="/pricing" className="text-laiton-400 underline">
+                      Voir les formules
+                    </Link>
+                    .
                   </p>
                 );
               }

@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     line_items: [{ price: priceId, quantity: 1 }],
     customer_email: authUser.email,
     client_reference_id: user.id,
-    success_url: `${appUrl}/bienvenue?plan=${plan}`,
+    success_url: `${appUrl}/bienvenue?plan=${plan}${skipTrial ? "&essai=0" : ""}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
     ...(plan === "GRATUIT" && !skipTrial
       ? {
