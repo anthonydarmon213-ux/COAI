@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function DiagnosticPage() {
   return (
-    <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-8 px-6 py-16 sm:py-24">
+    <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-8 px-6 py-24">
       <div className="w-full max-w-lg">
         <BackLink />
       </div>
