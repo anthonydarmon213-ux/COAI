@@ -190,7 +190,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
   const [relances, alertesDouleur] = await Promise.all([
     relancerInactifs(appUrl),
