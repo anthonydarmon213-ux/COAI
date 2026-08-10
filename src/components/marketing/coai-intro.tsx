@@ -70,11 +70,15 @@ export function CoaiIntro() {
         <span className="font-mono text-xs uppercase tracking-[0.32em] text-laiton-400">HI × AI™</span>
       </div>
 
-      <p className="relative z-10 max-w-md text-sm leading-6 text-graphite-400 sm:text-base">
-        COAI est l&apos;app qui génère ton programme d&apos;entraînement, de nutrition et de
-        récupération augmenté par l&apos;IA — avec, selon ta formule, la validation d&apos;un
-        coach humain diplômé d&apos;État.
-      </p>
+      <div className="relative z-10 flex max-w-lg flex-col items-center gap-3">
+        <p className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-white sm:text-2xl">
+          Fais passer ta santé au niveau supérieur.
+        </p>
+        <p className="max-w-md text-sm leading-6 text-graphite-400 sm:text-base">
+          Découvre le coaching augmenté : une IA qui génère ton programme sur-mesure — nutrition
+          comprise —, un coach qui le valide, jamais seul jusqu&apos;à ton objectif.
+        </p>
+      </div>
 
       <div className="relative z-10 mt-6 flex items-center gap-3">
         <span aria-hidden="true" className="animate-nudge-right text-acier">→</span>
