@@ -6,10 +6,13 @@ import { prisma } from "@/lib/db/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { z } from "zod";
 
-// Le Q&A "coach IA" est illimité uniquement sur l'ancien palier PREMIUM
-// (199€/mois) — Impulsion (GRATUIT, 19€) ET Transformation (STANDARD, 49€)
-// partagent le même quota (fenêtre glissante de 30 jours), un aperçu qui
-// donne envie de passer au palier supérieur plutôt qu'un mur complet.
+// Le Q&A "coach IA" est limité (fenêtre glissante de 30 jours) uniquement
+// sur Impulsion (GRATUIT, 19€) — Transformation (STANDARD, 49€) et l'ancien
+// palier PREMIUM (199€) ont un accès illimité (11/08/2026 : avant ce
+// changement, Transformation partageait le même quota qu'Impulsion, sans
+// palier payant pour le lever puisque PREMIUM n'est plus vendu — corrigé
+// pour que la disponibilité H24/7j/7 promue sur la home soit un vrai
+// avantage du palier supérieur, pas juste une promesse marketing).
 export const maxDuration = 30;
 
 const QUOTA_LIMITE = 4;
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  const estLimite = getEffectivePlan(user.subscription) !== "PREMIUM";
+  const estLimite = getEffectivePlan(user.subscription) === "GRATUIT";
 
   if (estLimite) {
     const fenetreExpiree =

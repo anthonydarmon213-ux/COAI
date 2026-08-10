@@ -68,7 +68,7 @@ const TIERS: Tier[] = [
       "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
       "Suivi humain jusqu'à ton objectif — pas juste à la génération : ton coach revient vers toi si besoin (plateau, gêne, décrochage) pendant toute la durée de l'accompagnement",
       "Suivi de progression — dashboard avec ton évolution",
-      "Coach IA — 4 questions/mois, pour ajuster ta routine à tout moment",
+      "Coach IA — accès illimité, disponible 24h/24 pour ajuster ta routine à tout moment",
       "Ajustements continus — le programme évolue selon tes retours",
       "Assistant WhatsApp 24/7",
       "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",

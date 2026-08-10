@@ -245,9 +245,10 @@ export default function LandingPage() {
 
       {/* Coach IA 24/7 — différenciateur qu'aucun concurrent 100% manuel
           (type TrueCoach) ne peut proposer : une vraie présence permanente,
-          pas juste un programme statique. Quota réel (4 questions/mois sur
-          les deux paliers vendus) volontairement non affiché ici : le
-          bénéfice qu'on vend, c'est la disponibilité, pas le volume. */}
+          pas juste un programme statique. Depuis le 11/08/2026, seul
+          Impulsion garde un quota (4 questions/mois) — Transformation est
+          illimité (cf. /api/coach/ask), donc "disponible 24/7" est un vrai
+          avantage du palier supérieur, pas qu'une promesse marketing. */}
       <section className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 px-6 py-24 text-center">
         <SectionLabel>Coach IA</SectionLabel>
         <h2 className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">

@@ -16,7 +16,7 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Programme personnalisé généré par IA (entraînement, nutrition, récupération)",
     "Validation humaine — chaque programme relu et validé par un vrai coach",
     "Suivi de progression",
-    "Coach IA — 4 questions/mois",
+    "Coach IA — accès illimité",
     "Ajustements continus selon tes retours",
     "Assistant WhatsApp 24/7",
     "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
