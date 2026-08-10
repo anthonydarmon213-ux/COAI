@@ -207,6 +207,31 @@ export default function LandingPage() {
             puis COAI — pour rendre cette expertise accessible à tous, sans attendre le
             coaching 1-to-1.
           </p>
+          {/* Preuve de crédibilité : carte professionnelle réelle, infos
+              sensibles (date/lieu de naissance, signature) retirées avant
+              publication — demande d'Anthony du 11/08/2026. */}
+          <a
+            href="/carte-pro-anthony.png"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-3 rounded-xl border border-laiton-400/20 bg-laiton-400/[0.04] px-4 py-3 transition hover:border-laiton-400/40 hover:bg-laiton-400/[0.08]"
+          >
+            <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-md border border-white/10">
+              <Image
+                src="/carte-pro-anthony.png"
+                alt="Carte professionnelle d'éducateur sportif d'Anthony Darmon"
+                fill
+                sizes="5rem"
+                className="object-cover object-left-top"
+              />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-medium text-white">Éducateur sportif diplômé d&apos;État</p>
+              <p className="text-xs text-graphite-400">
+                Carte professionnelle n° 07511ED0179 — voir le justificatif
+              </p>
+            </div>
+          </a>
           <a
             href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
             target="_blank"
