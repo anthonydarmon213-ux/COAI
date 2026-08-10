@@ -157,6 +157,34 @@ plus faciles à convaincre.
   résiliation en 3 clics (juin 2023) une fois que des abonnés réels
   passeront par ce flow.
 
+## Identité publicitaire / direction créative (10/08/2026)
+
+Direction donnée par Anthony pour toute future création publicitaire/visuelle
+COAI (pub payante, réseaux, futures pages de vente) — à respecter par défaut
+sauf instruction contraire :
+
+- **Ordre du message : le désir d'abord, le produit ensuite.** On ne vend pas
+  une liste de fonctionnalités en premier — on vend un univers désirable, et
+  seulement après on explique comment COAI y mène.
+- **Univers visuel voulu** : corps fit, athlétiques et sexy (homme et femme),
+  confiance en soi, énergie, peau au soleil, plage, piscine, palmiers,
+  hôtel/villa premium, beaux vêtements, nourriture saine, récupération.
+  **Explicitement pas le cliché "bodybuilding"** — un physique désirable,
+  esthétique et accessible, pas une esthétique de compétition.
+- **Exemples d'accroches à garder sous le coude** (proposées par Anthony,
+  pas encore choisies/tranchées pour un usage précis) :
+  - « Ton corps. Ton rythme. Ton objectif. »
+  - « Deviens la meilleure version de toi-même. »
+  - « COAI — L'IA génère. Ton coach valide. »
+- **La crédibilité vient après le rêve, pas à sa place** : une fois
+  l'attention captée par l'univers désirable, le message redescend sur ce
+  qui rend la promesse crédible — entraînement + nutrition + récupération +
+  personnalisation + validation humaine.
+- **Formule résumée à garder comme identité publicitaire COAI** : désir +
+  lifestyle + technologie + accompagnement humain. C'est la combinaison à
+  retenir pour toute future pub/visuel, pas juste un one-off pour une
+  campagne donnée.
+
 ## SEO / acquisition (09/08/2026)
 
 Objectif fixé par Anthony : les 100 premiers abonnés, **en acquisition
