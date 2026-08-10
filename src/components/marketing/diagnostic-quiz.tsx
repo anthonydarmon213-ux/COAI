@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
+import { buildMiniDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -93,79 +94,6 @@ function resolveAutre(list: string[], texteLibre: string): string[] {
   const texte = texteLibre.trim();
   return texte ? list.map((v) => (v === AUTRE_LABEL ? texte : v)) : list;
 }
-
-const EXEMPLES_DEFAUT = ["pompes", "squats au poids du corps", "gainage"];
-const EXEMPLES_PAR_EQUIPEMENT: Record<string, string[]> = {
-  "Salle de sport complète": ["développé couché", "tirage poulie haute", "presse à cuisses"],
-  "Matériel à la maison (haltères, bancs...)": ["développé haltères", "rowing haltère", "fentes"],
-  "Élastiques / bandes de résistance": ["squat élastique", "tirage horizontal élastique", "extension triceps élastique"],
-  Kettlebell: ["swing kettlebell", "goblet squat", "soulevé de terre roumain kettlebell"],
-  "TRX / sangles de suspension": ["rowing TRX", "pompes TRX", "fentes bulgares TRX"],
-  "Poids du corps uniquement": EXEMPLES_DEFAUT,
-};
-
-function exemplesPour(equipement: string): string[] {
-  return EXEMPLES_PAR_EQUIPEMENT[equipement] ?? EXEMPLES_DEFAUT;
-}
-
-// Contenu du mini-diagnostic enrichi (11/08/2026, demande d'Anthony) : donner
-// de la vraie valeur immédiate — utilisable même sans créer de compte —
-// plutôt qu'un seul paragraphe générique. Tout reste calculé par des règles
-// simples à partir des réponses déjà collectées, pas d'appel IA (même
-// logique que le reste du quiz : gratuit, non-abusable).
-const SPLIT_PAR_FREQUENCE: Record<string, string> = {
-  "2 fois par semaine": "Full Body x2 — tout le corps à chaque séance, pour maximiser la fréquence de travail malgré le nombre réduit de séances.",
-  "3 fois par semaine": "Full Body x3 ou Push/Pull/Legs x3 — bon équilibre entre fréquence et récupération à ce rythme.",
-  "4 fois par semaine": "Upper/Lower x4 — haut et bas du corps alternés, permet un bon volume par groupe musculaire.",
-  "5 fois ou plus par semaine": "Split par groupe musculaire (type Push/Pull/Legs x2) — tenable à ce volume, à condition de bien gérer la récupération.",
-};
-
-const SERIES_PAR_NIVEAU: Record<string, string> = {
-  Débutant: "3 séries de 10 à 12 répétitions",
-  Intermédiaire: "4 séries de 8 à 12 répétitions",
-  Avancé: "4 à 5 séries de 6 à 10 répétitions",
-};
-
-const ACCROCHE_PAR_PERSONA: Record<string, string> = {
-  "Je ne sais pas quoi faire à la salle":
-    "Le plus gros progrès pour toi ne sera pas de t'entraîner plus, mais d'avoir enfin un plan clair à suivre séance après séance.",
-  "Je suis plutôt sédentaire":
-    "Le plus dur est déjà fait : tu es sur cette page. La suite, c'est démarrer doucement mais régulièrement — la régularité bat l'intensité au départ.",
-  "Je m'entraîne à la maison, sans structure":
-    "Tu as déjà la discipline de t'entraîner seul — il ne manque qu'une vraie structure pour transformer cet effort en résultats visibles.",
-  "Même programme depuis des années, sans résultat":
-    "Un plateau qui dure ne veut pas dire qu'il faut travailler plus dur — plus souvent, qu'il faut changer d'approche.",
-  "Je veux progresser sans me blesser":
-    "Bon réflexe : sur la durée, la progressivité et la technique comptent plus que la charge.",
-};
-const ACCROCHE_DEFAUT = "Voici ce qu'on peut déjà dire à partir de tes réponses.";
-
-function accrochePour(personas: string[]): string {
-  return personas.map((p) => ACCROCHE_PAR_PERSONA[p]).find(Boolean) ?? ACCROCHE_DEFAUT;
-}
-
-const NUTRITION_TIPS: Record<string, string> = {
-  "Repas structurés et équilibrés":
-    "Bonne base déjà en place — l'ajustement se fera surtout sur les quantités, pas sur la structure.",
-  "Grignotage fréquent / repas irréguliers":
-    "Le grignotage dilue souvent les apports sans qu'on s'en rende compte : structurer 3-4 repas fixes est souvent le premier levier, avant même de compter les calories.",
-  "Jeûne intermittent":
-    "Ça peut fonctionner, à condition que ta fenêtre alimentaire couvre assez de protéines pour soutenir l'entraînement.",
-  "Beaucoup de plats préparés ou fast-food":
-    "Les plats préparés sont souvent plus caloriques et moins riches en protéines qu'ils n'en ont l'air — remplacer ne serait-ce qu'un repas par jour par du fait-maison change déjà beaucoup.",
-  "Déjà suivi par un nutritionniste":
-    "Un vrai programme s'appuierait sur ce suivi plutôt que de le dupliquer.",
-};
-
-const SOMMEIL_TIPS: Record<string, string> = {
-  "Mauvaise (moins de 5h, sommeil agité)":
-    "En dessous de 5h, la récupération musculaire — et la capacité à bien manger — en pâtissent : c'est souvent plus limitant que l'entraînement lui-même.",
-  "Moyenne (5-6h, réveils fréquents)":
-    "Gagner ne serait-ce que 30 à 45 minutes de sommeil se traduit souvent directement par de meilleures séances.",
-  "Bonne (7-8h, plutôt réparateur)": "Bonne base pour bien récupérer entre les séances.",
-  "Excellente (8h ou plus, réparateur)":
-    "Excellent terrain pour progresser — peu de monde a cette régularité, c'est un vrai avantage.",
-};
 
 type Step =
   | "intro"
@@ -312,57 +240,23 @@ export function DiagnosticQuiz() {
     return true;
   }, [step, persona, niveau, objectif, equipement, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
 
-  const teaser = useMemo(() => {
-    if (!niveau || !objectif) return null;
-    const santeResolue = resolveAutre(sante, santeAutreTexte);
-
-    return {
-      titre: `Profil ${niveau.toLowerCase()} — objectif ${objectif.toLowerCase()}`,
-      alerte:
-        santeResolue.length > 0
-          ? `Signalé : ${santeResolue.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.`
-          : null,
-    };
-  }, [niveau, objectif, sante, santeAutreTexte]);
-
-  const volets = useMemo(() => {
-    if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
-    const premierEquipement = equipement[0] ?? "Poids du corps uniquement";
-    const exemples = exemplesPour(premierEquipement);
-    const series = SERIES_PAR_NIVEAU[niveau] ?? SERIES_PAR_NIVEAU.Débutant;
-
-    return {
-      accroche: accrochePour(resolveAutre(persona, personaAutreTexte)),
-      entrainement: {
-        split: SPLIT_PAR_FREQUENCE[frequence] ?? null,
-        exercices: exemples.map((nom) => `${nom} — ${series}`),
-      },
-      nutrition: habitudesAlimentaires ? NUTRITION_TIPS[habitudesAlimentaires] ?? null : null,
-      recuperation: qualiteSommeil ? SOMMEIL_TIPS[qualiteSommeil] ?? null : null,
-    };
-  }, [niveau, objectif, equipement, frequence, persona, personaAutreTexte, habitudesAlimentaires, qualiteSommeil]);
-
-  // "Audit" : on ne recommande pas la même offre à tout le monde. Douleur/
-  // contrainte signalée ou plateau depuis des années → le suivi humain de
-  // Transformation a plus de valeur que sur un profil sans signal
-  // particulier, pour qui Impulsion suffit à démarrer.
-  const recommandation = useMemo(() => {
-    const aBesoinDeSuivi = sante.length > 0 || persona.includes("Même programme depuis des années, sans résultat");
-    return aBesoinDeSuivi
-      ? {
-          plan: "STANDARD" as const,
-          label: "Transformation",
-          raison:
-            sante.length > 0
-              ? "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant."
-              : "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
-        }
-      : {
-          plan: "GRATUIT" as const,
-          label: "Impulsion",
-          raison: "Ton profil n'a pas de signal particulier — de quoi démarrer efficacement, sans surpayer.",
-        };
-  }, [sante, persona]);
+  // Même logique que l'email envoyé au lead (/api/diagnostic-lead) — extraite
+  // dans lib/diagnostic/mini-diagnostic.ts pour garantir que les deux disent
+  // exactement la même chose.
+  const diagnostic = useMemo(
+    () =>
+      buildMiniDiagnostic({
+        persona: resolveAutre(persona, personaAutreTexte),
+        niveau,
+        objectif,
+        equipement,
+        frequence,
+        habitudesAlimentaires,
+        qualiteSommeil,
+        sante: resolveAutre(sante, santeAutreTexte),
+      }),
+    [persona, personaAutreTexte, niveau, objectif, equipement, frequence, habitudesAlimentaires, qualiteSommeil, sante, santeAutreTexte]
+  );
 
   function signUpHref(standard: boolean): string {
     const params = new URLSearchParams();
@@ -647,51 +541,51 @@ export function DiagnosticQuiz() {
             </div>
           )}
 
-          {step === "result" && teaser && volets && (
+          {step === "result" && diagnostic && (
             <div className="flex flex-col items-center gap-5 py-2 text-center">
               <SectionLabel>Ton diagnostic</SectionLabel>
-              <h2 className="font-display text-2xl font-semibold text-white">{teaser.titre}.</h2>
-              <p className="max-w-sm text-sm leading-6 text-graphite-300">{volets.accroche}</p>
-              {teaser.alerte && (
+              <h2 className="font-display text-2xl font-semibold text-white">{diagnostic.titre}.</h2>
+              <p className="max-w-sm text-sm leading-6 text-graphite-300">{diagnostic.accroche}</p>
+              {diagnostic.alerte && (
                 <p className="max-w-sm rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
-                  {teaser.alerte}
+                  {diagnostic.alerte}
                 </p>
               )}
 
               <VoletCard label="Entraînement">
-                {volets.entrainement.split && <p>{volets.entrainement.split}</p>}
+                {diagnostic.split && <p>{diagnostic.split}</p>}
                 <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
-                  {volets.entrainement.exercices.map((ex) => (
+                  {diagnostic.exercices.map((ex) => (
                     <li key={ex}>• {ex}</li>
                   ))}
                 </ul>
               </VoletCard>
 
-              {volets.nutrition && <VoletCard label="Nutrition">{volets.nutrition}</VoletCard>}
+              {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
 
-              {volets.recuperation && <VoletCard label="Récupération">{volets.recuperation}</VoletCard>}
+              {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
 
               <div className="w-full max-w-sm rounded-xl border border-laiton-400/25 bg-laiton-400/[0.06] px-4 py-4 text-left">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-400">
                   Notre recommandation
                 </span>
-                <p className="mt-1.5 font-display text-lg font-semibold text-white">{recommandation.label}</p>
-                <p className="mt-1 text-xs leading-5 text-graphite-400">{recommandation.raison}</p>
+                <p className="mt-1.5 font-display text-lg font-semibold text-white">{diagnostic.recommandation.label}</p>
+                <p className="mt-1 text-xs leading-5 text-graphite-400">{diagnostic.recommandation.raison}</p>
               </div>
 
               <div className="mt-1 flex w-full max-w-xs flex-col gap-2">
-                <Link href={signUpHref(recommandation.plan === "STANDARD")} onClick={handleCreerCompte}>
-                  <Button className="w-full">Créer mon compte — {recommandation.label} →</Button>
+                <Link href={signUpHref(diagnostic.recommandation.plan === "STANDARD")} onClick={handleCreerCompte}>
+                  <Button className="w-full">Créer mon compte — {diagnostic.recommandation.label} →</Button>
                 </Link>
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-graphite-600">
                   7 jours offerts, sans engagement
                 </span>
                 <Link
-                  href={signUpHref(recommandation.plan !== "STANDARD")}
+                  href={signUpHref(diagnostic.recommandation.plan !== "STANDARD")}
                   onClick={handleCreerCompte}
                   className="mt-1 text-xs text-graphite-500 underline hover:text-graphite-300"
                 >
-                  Je préfère {recommandation.plan === "STANDARD" ? "Impulsion" : "Transformation"}
+                  Je préfère {diagnostic.recommandation.plan === "STANDARD" ? "Impulsion" : "Transformation"}
                 </Link>
               </div>
             </div>
