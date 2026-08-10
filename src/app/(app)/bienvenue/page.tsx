@@ -1,38 +1,54 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { DiagnosticAutofill } from "@/components/onboarding/diagnostic-autofill";
 
-// Impulsion (ex-Gratuit) et Transformation (ex-Premium/Standard) sont les
-// deux abonnements auto-souscriptibles depuis /pricing — les séances
-// individuelles (VIP) se réservent à la séance via WhatsApp, hors palier
-// d'abonnement. Le titre/description s'adapte au palier réellement souscrit
-// (passé en query param par le succès du Stripe Checkout). Pour Impulsion,
-// le param "essai=0" (posé par /api/stripe/checkout quand skipTrial est
-// choisi à l'inscription) distingue les 7 jours offerts du paiement
-// immédiat — sinon on ne peut pas s'appuyer sur l'abonnement en base ici :
-// le webhook Stripe qui le crée arrive de façon asynchrone et peut ne pas
-// encore être passé au moment où cette page se charge.
-const CONTENU_PAR_PLAN: Record<"GRATUIT" | "GRATUIT_SANS_ESSAI" | "STANDARD", { titre: string; description: string }> = {
+// Écran d'accueil post-paiement (10/08/2026) : repensé façon "salon
+// d'embarquement" plutôt qu'un simple accusé de réception transactionnel —
+// demande explicite d'Anthony d'un moment mémorable ("effet waouh") juste
+// après le paiement, pas seulement un écran de confirmation.
+const CONTENU_PAR_PLAN: Record<
+  "GRATUIT" | "GRATUIT_SANS_ESSAI" | "STANDARD",
+  {
+    formule: string;
+    sousTitre: string;
+    etapes: { titre: string; texte: string }[];
+  }
+> = {
   GRATUIT: {
-    titre: "Bienvenue dans l'offre Impulsion",
-    description:
-      "Ton abonnement est actif (7 jours offerts, puis 19€/mois). Complète ton profil si ce n'est pas déjà fait — ton programme sera généré par IA (sans relecture humaine à ce palier) dès la fin de ton essai.",
+    formule: "Impulsion",
+    sousTitre: "7 jours offerts, puis 19€/mois. Ton programme t'attend à la fin de ton essai.",
+    etapes: [
+      { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
+      { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
+      { titre: "Tu t'entraînes", texte: "Prêt à suivre dès la fin de ton essai." },
+      { titre: "On veille sur toi", texte: "Une relance automatique si on ne te voit plus — jamais vraiment seul." },
+    ],
   },
   GRATUIT_SANS_ESSAI: {
-    titre: "Bienvenue dans l'offre Impulsion",
-    description:
-      "Ton abonnement Impulsion est actif (19€/mois). Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — généré par IA, sans relecture humaine à ce palier.",
+    formule: "Impulsion",
+    sousTitre: "19€/mois. Ton programme est prêt à être généré, dès maintenant.",
+    etapes: [
+      { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
+      { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
+      { titre: "Tu t'entraînes", texte: "Ton programme est prêt à suivre, dès aujourd'hui." },
+      { titre: "On veille sur toi", texte: "Une relance automatique si on ne te voit plus — jamais vraiment seul." },
+    ],
   },
   STANDARD: {
-    titre: "Bienvenue dans l'offre Transformation",
-    description:
-      "Ton abonnement est actif. Complète ton profil si ce n'est pas déjà fait, puis génère ton programme — il sera relu et validé par un coach diplômé d'État avant de t'être présenté comme définitif.",
+    formule: "Transformation",
+    sousTitre: "Ton coach diplômé d'État prend le relais avec l'IA, jusqu'à l'atteinte de ton objectif.",
+    etapes: [
+      { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
+      { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
+      { titre: "Validé par ton coach", texte: "Un coach diplômé d'État relit et ajuste avant que ce soit définitif." },
+      { titre: "Suivi jusqu'à ton objectif", texte: "Ton coach revient vers toi si besoin — jusqu'à ce que tu y sois." },
+    ],
   },
 };
+
 export default async function BienvenuePage({
   searchParams,
 }: {
@@ -47,29 +63,101 @@ export default async function BienvenuePage({
       : searchParams.essai === "0"
         ? "GRATUIT_SANS_ESSAI"
         : "GRATUIT";
-  const { titre: TITRE, description: DESCRIPTION } = CONTENU_PAR_PLAN[plan];
+  const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
+  const prenom = user.prenom ?? "";
+  const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col items-center gap-6 py-16 text-center">
+    <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
       <TrackConversion name="subscription_started" params={{ plan }} />
-      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-laiton-400/15 text-3xl text-laiton-400">
-        ✓
-      </span>
-      <SectionLabel>Abonnement confirmé</SectionLabel>
-      <h1 className="text-2xl font-semibold text-graphite-50 sm:text-3xl">
-        Merci{user.prenom ? ` ${user.prenom}` : ""} !
-      </h1>
-      <Card className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-graphite-50">{TITRE}</h2>
-        <p className="text-sm leading-6 text-graphite-300">{DESCRIPTION}</p>
-      </Card>
+
+      <div className="flex flex-col items-center gap-3">
+        <SectionLabel>Accès confirmé</SectionLabel>
+        <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
+          Bienvenue{prenom ? `, ${prenom}` : ""}.
+        </h1>
+        <p className="max-w-md text-sm leading-6 text-graphite-400">
+          À partir d&apos;ici, on s&apos;occupe de tout — jusqu&apos;à l&apos;atteinte de ton
+          objectif.
+        </p>
+      </div>
+
+      {/* Carte d'embarquement COAI — écho volontaire au "salon privé avant
+          d'embarquer" évoqué par Anthony comme référence d'expérience. */}
+      <div className="w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex">
+        <div className="flex flex-1 flex-col gap-6 p-7 text-left sm:p-9">
+          <div className="flex items-center justify-between">
+            <span className="font-display text-lg font-semibold tracking-tight text-white">
+              COAI
+            </span>
+            <span className="rounded-full border border-laiton-400/30 bg-laiton-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
+              Confirmé
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Passager</p>
+              <p className="mt-1 text-sm font-medium text-white">{prenom || user.email}</p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Formule</p>
+              <p className="mt-1 text-sm font-medium text-white">{formule}</p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Date</p>
+              <p className="mt-1 text-sm font-medium text-white">{date}</p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Accompagnement</p>
+              <p className="mt-1 text-sm font-medium text-white">Jusqu&apos;à ton objectif</p>
+            </div>
+          </div>
+
+          <p className="text-sm leading-6 text-graphite-300">{sousTitre}</p>
+        </div>
+
+        {/* Talon perforé, comme une vraie carte d'embarquement. */}
+        <div className="relative flex flex-row items-center gap-0 border-t border-dashed border-white/15 bg-white/[0.02] px-7 py-6 sm:w-56 sm:flex-col sm:justify-center sm:border-l sm:border-t-0 sm:px-6 sm:py-9">
+          <span className="pointer-events-none absolute -left-2.5 -top-2.5 hidden h-5 w-5 rounded-full bg-lab-notch sm:block" aria-hidden="true" />
+          <span className="pointer-events-none absolute -bottom-2.5 -left-2.5 hidden h-5 w-5 rounded-full bg-lab-notch sm:block" aria-hidden="true" />
+          <div className="flex flex-1 flex-col items-center gap-1 sm:gap-2">
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">
+              Prochaine étape
+            </span>
+            <span className="font-display text-base font-semibold text-laiton-300">Embarquement</span>
+            <span className="text-xs text-graphite-500">Ton profil</span>
+          </div>
+        </div>
+      </div>
+
       <DiagnosticAutofill />
-      <Link href="/programme">
-        <Button>Voir mon profil & mon programme</Button>
-      </Link>
-      <Link href="/dashboard" className="text-sm text-graphite-400 underline hover:text-laiton-400">
-        Retour au tableau de bord
-      </Link>
+
+      <div className="grid w-full max-w-xl grid-cols-1 gap-3 text-left sm:grid-cols-2">
+        {etapes.map((etape, i) => (
+          <div
+            key={etape.titre}
+            className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
+          >
+            <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-xs font-semibold text-laiton-300">
+              {i + 1}
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-white">{etape.titre}</p>
+              <p className="mt-0.5 text-xs leading-5 text-graphite-400">{etape.texte}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-col items-center gap-3">
+        <Link href="/programme">
+          <Button className="px-8 py-3">Embarquer — voir mon programme</Button>
+        </Link>
+        <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
+          Retour au tableau de bord
+        </Link>
+      </div>
     </div>
   );
 }

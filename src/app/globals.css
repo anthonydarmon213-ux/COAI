@@ -288,3 +288,11 @@ html {
     animation: coach-breathe 5s ease-in-out infinite;
   }
 }
+
+/* Encoches de la carte d'embarquement (/bienvenue) : couleur approximative
+   du fond .bg-lab-grid à cet endroit, pour l'effet "perforation" d'un vrai
+   talon de billet. */
+.bg-lab-notch {
+  background-color: #0c0d0f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
