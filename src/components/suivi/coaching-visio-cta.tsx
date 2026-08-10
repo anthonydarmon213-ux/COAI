@@ -1,27 +1,44 @@
 import type { EffectivePlan } from "@/lib/subscription/plan";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
-const MESSAGE =
+const MESSAGE_VIP =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
+
+// Transformation (11/08/2026) : 1 séance visio de 30 min/mois est incluse
+// dans l'abonnement, à ne pas confondre avec la VIP payante à la séance —
+// message dédié qui rappelle que c'est déjà inclus, pas une vente
+// supplémentaire.
+const MESSAGE_INCLUSE =
+  "Bonjour Anthony, je suis abonné Transformation sur COAI et j'aimerais réserver ma séance visio de 30 min incluse ce mois-ci.";
 
 // Les séances de coaching individuel (VIP) sont réservées et payées à la
 // séance, hors abonnement — accessibles à tous les paliers, y compris
-// Gratuit. `plan` n'influence plus le message affiché ; gardé en prop pour
-// un futur usage éventuel (ex: mise en avant différenciée par palier).
-export function CoachingVisioCta({ plan: _plan }: { plan?: EffectivePlan } = {}) {
-  const href = buildWhatsAppLink(MESSAGE);
+// Gratuit. Transformation a en plus une séance visio de 30 min/mois déjà
+// incluse dans son prix, d'où le message et le lien WhatsApp différents.
+export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
+  const estTransformation = plan === "STANDARD";
+  const href = buildWhatsAppLink(estTransformation ? MESSAGE_INCLUSE : MESSAGE_VIP);
   if (!href) return null;
 
   return (
     <div className="group relative flex flex-col gap-2 overflow-hidden rounded-lg border border-graphite-800 bg-graphite-900/40 p-5">
       <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-laiton-500/10 blur-2xl transition group-hover:bg-laiton-500/20" />
       <span className="font-mono text-xs uppercase tracking-widest text-laiton-400">
-        Coaching VIP · Places limitées
+        {estTransformation ? "Ta séance visio incluse" : "Coaching VIP · Places limitées"}
       </span>
       <p className="text-sm text-graphite-200">
-        Un besoin plus poussé que ce que le programme couvre ? Réserve une séance individuelle
-        avec Anthony Darmon — présentiel à Paris centre (200€/1h) ou en visio (100€/1h), sans
-        abonnement.
+        {estTransformation ? (
+          <>
+            Ta formule Transformation inclut 1 séance visio de 30 min par mois avec Anthony
+            Darmon — profites-en pour faire un point sur ta progression.
+          </>
+        ) : (
+          <>
+            Un besoin plus poussé que ce que le programme couvre ? Réserve une séance
+            individuelle avec Anthony Darmon — présentiel à Paris centre (200€/1h) ou en visio
+            (100€/1h), sans abonnement.
+          </>
+        )}
       </p>
       <a
         href={href}
