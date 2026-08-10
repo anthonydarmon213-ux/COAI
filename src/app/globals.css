@@ -271,3 +271,20 @@ html {
     transform: scale(1) !important;
   }
 }
+
+/* Photo du Coach IA : léger effet de respiration pour ne pas avoir l'air
+   figée, sans être une vraie vidéo. */
+@keyframes coach-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .coai-coach-photo {
+    animation: coach-breathe 5s ease-in-out infinite;
+  }
+}

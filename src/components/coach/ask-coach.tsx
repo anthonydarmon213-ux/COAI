@@ -80,7 +80,7 @@ export function AskCoach() {
               alt="Anthony Darmon, ton coach IA"
               fill
               sizes="5rem"
-              className="object-cover object-[50%_22%]"
+              className="coai-coach-photo object-cover object-[50%_22%]"
               priority
             />
           </div>
