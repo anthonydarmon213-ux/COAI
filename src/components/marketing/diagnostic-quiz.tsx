@@ -372,14 +372,15 @@ export function DiagnosticQuiz() {
                 Construisons ton profil.
               </h1>
               <p className="max-w-sm text-sm leading-6 text-graphite-400">
-                6 questions rapides, aucune bonne ou mauvaise réponse — à la fin, tu vois un
-                aperçu de ce que ton programme pourrait être. Gratuit, sans inscription.
+                {QUESTION_STEPS.length - 1} questions rapides, aucune bonne ou mauvaise réponse —
+                à la fin, tu vois un aperçu de ce que ton programme pourrait être. Gratuit, sans
+                inscription.
               </p>
               <Button onClick={goNext} className="mt-2">
                 Commencer
               </Button>
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-graphite-600">
-                ≈ 60 secondes
+                ≈ 90 secondes
               </span>
             </div>
           )}

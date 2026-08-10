@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import { BackLink } from "@/components/marketing/back-link";
 import { DiagnosticQuiz } from "@/components/marketing/diagnostic-quiz";
 
+// Nombre de questions codé en dur ici (metadata = export statique, ne peut
+// pas lire QUESTION_STEPS de diagnostic-quiz.tsx) — à garder synchronisé si
+// le nombre de questions change à nouveau (cf. 10/08/2026 : oublié une
+// première fois lors du passage de 6 à 10 questions).
 export const metadata: Metadata = {
   title: "Diagnostic gratuit — quel programme te correspond ? — COAI",
   description:
-    "6 questions rapides pour voir à quoi ton programme d'entraînement pourrait ressembler — gratuit, sans inscription.",
+    "10 questions rapides pour voir à quoi ton programme d'entraînement pourrait ressembler — gratuit, sans inscription.",
   alternates: { canonical: "/diagnostic" },
 };
 
