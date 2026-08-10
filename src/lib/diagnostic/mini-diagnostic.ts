@@ -4,6 +4,16 @@
 // disent exactement la même chose, calculé une seule fois. Règles simples,
 // pas d'appel IA (gratuit, non-abusable).
 
+// Option "pas de douleur" sur l'étape contraintes santé du quiz — exportée
+// ici (source unique) pour que le composant et cette logique s'accordent
+// sur le même libellé exact, sans jamais compter cette réponse comme un
+// vrai signal de douleur/contrainte (cf. demande d'Anthony du 11/08/2026).
+export const AUCUNE_DOULEUR_LABEL = "Aucune, je suis en pleine forme";
+
+function santeReelle(sante: string[]): string[] {
+  return sante.filter((s) => s !== AUCUNE_DOULEUR_LABEL);
+}
+
 export type ReponsesDiagnostic = {
   persona?: string[];
   niveau?: string | null;
@@ -95,8 +105,9 @@ export type MiniDiagnostic = {
 };
 
 export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | null {
-  const { niveau, objectif, equipement = [], frequence, persona = [], sante = [] } = r;
+  const { niveau, objectif, equipement = [], frequence, persona = [], sante: santeBrute = [] } = r;
   if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
+  const sante = santeReelle(santeBrute);
 
   const premierEquipement = equipement[0] ?? "Poids du corps uniquement";
   const exemples = exemplesPour(premierEquipement);

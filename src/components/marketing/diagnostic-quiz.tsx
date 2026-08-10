@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
-import { buildMiniDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
+import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL } from "@/lib/diagnostic/mini-diagnostic";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -47,7 +47,7 @@ const EQUIPEMENTS = [
 // Alignés sur l'enum frequenceEntrainement de /api/profil.
 const FREQUENCES = ["2 fois par semaine", "3 fois par semaine", "4 fois par semaine", "5 fois ou plus par semaine"];
 
-const CONTRAINTES = ["Dos", "Genoux", "Épaules", "Grossesse / post-partum", AUTRE_LABEL];
+const CONTRAINTES = [AUCUNE_DOULEUR_LABEL, "Dos", "Genoux", "Épaules", "Grossesse / post-partum", AUTRE_LABEL];
 
 // Alignés sur les listes équivalentes de profil-form.tsx (mêmes libellés
 // exacts) pour que le pré-remplissage post-inscription tombe pile sur les
@@ -67,6 +67,7 @@ const SPORTS = [
   "Randonnée",
   "Breathwork / Méditation",
   "Aucun actuellement",
+  AUTRE_LABEL,
 ];
 
 const SEXES = ["Homme", "Femme", "Préfère ne pas dire"];
@@ -201,6 +202,7 @@ export function DiagnosticQuiz() {
   const [sante, setSante] = useState<string[]>([]);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
+  const [sportAutreTexte, setSportAutreTexte] = useState("");
   const [email, setEmail] = useState("");
   const [consentEmail, setConsentEmail] = useState(false);
   const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading">("idle");
@@ -210,6 +212,21 @@ export function DiagnosticQuiz() {
 
   function toggle(list: string[], value: string, setter: (v: string[]) => void) {
     setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+
+  // "Aucune, je suis en pleine forme" est exclusif avec toute vraie
+  // contrainte : la sélectionner efface le reste, en sélectionner une
+  // efface "Aucune" — évite l'incohérence "Dos" + "Aucune douleur" en même
+  // temps (demande d'Anthony du 11/08/2026).
+  function toggleSante(value: string) {
+    if (value === AUCUNE_DOULEUR_LABEL) {
+      setSante((prev) => (prev.includes(AUCUNE_DOULEUR_LABEL) ? [] : [AUCUNE_DOULEUR_LABEL]));
+      return;
+    }
+    setSante((prev) => {
+      const sansAucune = prev.filter((v) => v !== AUCUNE_DOULEUR_LABEL);
+      return sansAucune.includes(value) ? sansAucune.filter((v) => v !== value) : [...sansAucune, value];
+    });
   }
 
   function goNext() {
@@ -268,14 +285,16 @@ export function DiagnosticQuiz() {
 
   function handleCreerCompte() {
     const personaAutreResolue = personaAutreTexte.trim();
+    const santeReelle = resolveAutre(sante, santeAutreTexte).filter((s) => s !== AUCUNE_DOULEUR_LABEL);
+    const sportResolu = resolveAutre(sport, sportAutreTexte);
     storeDiagnosticAnswers({
       niveau: niveau ?? undefined,
       objectifs: [objectif, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
       frequenceEntrainement: frequence ?? undefined,
-      contraintesSante: sante.length ? resolveAutre(sante, santeAutreTexte).join(", ") : undefined,
+      contraintesSante: santeReelle.length ? santeReelle.join(", ") : undefined,
       sexe: sexe ?? undefined,
-      sportsPratiques: sport.length ? sport.join(", ") : undefined,
+      sportsPratiques: sportResolu.length ? sportResolu.join(", ") : undefined,
       habitudesAlimentaires: habitudesAlimentaires ?? undefined,
       qualiteSommeil: qualiteSommeil ?? undefined,
     });
@@ -298,7 +317,7 @@ export function DiagnosticQuiz() {
             objectif,
             equipement,
             frequence,
-            sport,
+            sport: resolveAutre(sport, sportAutreTexte),
             sexe,
             habitudesAlimentaires,
             qualiteSommeil,
@@ -442,6 +461,14 @@ export function DiagnosticQuiz() {
                   <Chip key={s} label={s} active={sport.includes(s)} onClick={() => toggle(sport, s, setSport)} />
                 ))}
               </div>
+              {sport.includes(AUTRE_LABEL) && (
+                <Input
+                  type="text"
+                  value={sportAutreTexte}
+                  onChange={(e) => setSportAutreTexte(e.target.value)}
+                  placeholder="Précise en quelques mots..."
+                />
+              )}
             </div>
           )}
 
@@ -499,7 +526,7 @@ export function DiagnosticQuiz() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {CONTRAINTES.map((c) => (
-                  <Chip key={c} label={c} active={sante.includes(c)} onClick={() => toggle(sante, c, setSante)} />
+                  <Chip key={c} label={c} active={sante.includes(c)} onClick={() => toggleSante(c)} />
                 ))}
               </div>
               {sante.includes(AUTRE_LABEL) && (
