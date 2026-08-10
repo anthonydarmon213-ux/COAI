@@ -139,6 +139,22 @@ export function CompleterInscriptionForm({
             <span className="block text-graphite-500">{prixMensuel}/mois dès aujourd&apos;hui</span>
           </button>
         </div>
+        <p className="text-xs leading-5 text-graphite-500">
+          {skipTrial ? (
+            <>
+              Ton programme complet est généré dès la fin du paiement
+              {planInitial === "STANDARD"
+                ? ", et ta séance de coaching visio de 30 min avec Anthony est disponible immédiatement (à réserver via WhatsApp)."
+                : "."}
+            </>
+          ) : (
+            <>
+              Pendant les 7 jours offerts, aucun programme n&apos;est encore généré : l&apos;accès
+              complet démarre au premier prélèvement, à la fin de l&apos;essai
+              {planInitial === "STANDARD" ? " (la séance visio avec Anthony aussi)." : "."}
+            </>
+          )}
+        </p>
       </div>
       <label className="flex items-start gap-2 text-sm text-graphite-300">
         <input
