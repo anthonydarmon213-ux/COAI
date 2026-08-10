@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/coach") ||
     request.nextUrl.pathname.startsWith("/videos") ||
     request.nextUrl.pathname.startsWith("/suivi") ||
+    request.nextUrl.pathname.startsWith("/avis") ||
     request.nextUrl.pathname.startsWith("/compte") ||
     request.nextUrl.pathname.startsWith("/admin") ||
     request.nextUrl.pathname.startsWith("/bienvenue") ||
@@ -48,5 +49,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/programme/:path*", "/coach/:path*", "/videos/:path*", "/suivi/:path*", "/compte/:path*", "/admin/:path*", "/bienvenue/:path*", "/completer-inscription/:path*"],
+  matcher: ["/dashboard/:path*", "/programme/:path*", "/coach/:path*", "/videos/:path*", "/suivi/:path*", "/avis/:path*", "/compte/:path*", "/admin/:path*", "/bienvenue/:path*", "/completer-inscription/:path*"],
 };

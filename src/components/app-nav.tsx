@@ -45,6 +45,7 @@ const LINKS: NavItem[] = [
       { href: "/coach", label: "Coach IA" },
     ],
   },
+  { href: "/avis", label: "Donner mon avis" },
   { href: "/compte/parametres", label: "Paramètres" },
 ];
 

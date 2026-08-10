@@ -57,6 +57,7 @@ model User {
   programmes     ProgrammeGenerated[]
   seances        SeanceLog[]
   repasLogs      RepasLog[]
+  avis           Avis[]
   mesures        Mesure[]
   testsMaxi      TestMaxi[]
   whatsappEvents WhatsAppEvent[]
@@ -229,6 +230,23 @@ model RepasLog {
   createdAt DateTime    @default(now())
 
   @@map("repas_log")
+}
+
+// Retour d'expérience privé (10/08/2026) : un abonné donne son avis pour
+// aider à améliorer le produit, envoyé uniquement à Anthony par email —
+// pas de mur de témoignages public pour l'instant, décision explicite vu le
+// nombre d'abonnés encore très faible (rien à afficher qui ferait preuve
+// sociale). Republication en témoignage public envisageable plus tard, au
+// cas par cas, pas automatique.
+model Avis {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note        Int
+  commentaire String
+  createdAt   DateTime @default(now())
+
+  @@map("avis")
 }
 
 // Lead capturé sur /diagnostic (quiz public, visiteur anonyme) juste avant
