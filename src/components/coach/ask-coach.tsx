@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,16 @@ export function AskCoach() {
       <Card className="flex flex-col items-center gap-5 py-10 text-center">
         <div className="relative flex h-24 w-24 items-center justify-center">
           <div className={`coai-coach-aura absolute inset-0 ${loading ? "is-thinking animate-pulse-glow" : ""}`} aria-hidden="true" />
+          <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-laiton-400/40 shadow-[0_0_24px_-6px_rgba(201,162,98,0.55)]">
+            <Image
+              src="/coach-ia-anthony.png"
+              alt="Anthony Darmon, ton coach IA"
+              fill
+              sizes="5rem"
+              className="object-cover object-[50%_22%]"
+              priority
+            />
+          </div>
           {loading && (
             <svg width="96" height="96" viewBox="0 0 120 120" fill="none" className="absolute inset-0" aria-hidden="true">
               <circle cx="60" cy="60" r={rOuter} stroke="#26282d" strokeWidth="6" />
