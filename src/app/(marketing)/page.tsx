@@ -132,6 +132,53 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Qualification — filtre honnête qui rassure (montre qu'on ne vend
+          pas à tout le monde) et évite en amont les abonnés mal alignés qui
+          se désabonnent déçus. Demande d'Anthony du 11/08/2026 : éviter de
+          dénigrer le PDF, COAI en propose un aussi (export du programme) —
+          la vraie différence est "figé" vs "évolue avec toi", pas le format. */}
+      <section className="mx-auto w-full max-w-5xl px-6 py-24">
+        <div className="text-center">
+          <SectionLabel>Pour qui</SectionLabel>
+          <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+            Est-ce que COAI est fait pour toi ?
+          </h2>
+        </div>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <Card className="flex flex-col gap-4">
+            <h3 className="text-lg font-semibold text-white">C&apos;est pour toi si...</h3>
+            <ul className="flex flex-col gap-3 text-left text-sm text-graphite-300">
+              {[
+                "Tu veux un vrai programme structuré, pas t'entraîner au hasard",
+                "Tu veux un suivi qui évolue avec toi, pas un programme figé une fois pour toutes",
+                "Tu es prêt à un minimum de régularité — l'IA et le coach font leur part, pas la tienne",
+                "Tu veux la rigueur d'un coach pro sans le prix d'un accompagnement 1-to-1 complet",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-laiton-400">✓</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+          <Card className="flex flex-col gap-4">
+            <h3 className="text-lg font-semibold text-white">Ce n&apos;est pas pour toi si...</h3>
+            <ul className="flex flex-col gap-3 text-left text-sm text-graphite-300">
+              {[
+                "Tu cherches une solution magique sans rien changer à tes habitudes",
+                "Tu veux un coach humain joignable en direct 24h/24 (le Coach IA l'est, pas Anthony)",
+                "Tu n'es pas prêt à répondre sincèrement à ton profil — l'IA se base sur ce que tu lui donnes",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-graphite-500">✕</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+      </section>
+
       {/* Crédibilité / Fondateur — juste sous le hero pour rassurer tout de
           suite sur l'humain derrière COAI (visage + nom), avant même le
           reste du pitch. */}
