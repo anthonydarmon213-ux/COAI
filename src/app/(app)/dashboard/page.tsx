@@ -65,8 +65,6 @@ export default async function DashboardPage() {
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 
-      <PlanCard plan={plan} />
-
       <WatchScreenshotCta />
 
       <div className="flex flex-col gap-3">
@@ -109,6 +107,9 @@ export default async function DashboardPage() {
       <a href="/programme" className="group flex items-center justify-between rounded-2xl border border-laiton-400/20 bg-laiton-400/[0.06] px-6 py-5 text-sm text-laiton-300 transition hover:bg-laiton-400/[0.1]">
         <span>Voir mon profil et mon programme personnalisé</span><span className="transition group-hover:translate-x-1">→</span>
       </a>
+
+      <PlanCard plan={plan} />
+
       <CoachingVisioCta plan={plan} />
     </div>
   );
