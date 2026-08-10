@@ -4,6 +4,46 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## À faire en priorité (checklist du 11/08/2026 au soir)
+
+Pour reprendre facilement demain — mis à jour à chaque session, à garder
+courte et actionnable (pas un journal, voir les sections datées plus bas
+pour le détail/contexte de chaque sujet) :
+
+**Côté Anthony (hors code)** :
+- [ ] Acheter la carte SIM prépayée, l'insérer dans le vieux téléphone
+      (numéro jamais utilisé sur WhatsApp classique — condition Meta)
+- [ ] Créer le compte ManyChat, lancer la connexion WhatsApp Business
+      ("Embedded Signup") — je prends le relais dès que t'es à cette étape
+- [ ] Relire les 6 "conseils de coach" ajoutés sur le dashboard
+      (`src/components/dashboard/conseils-coach.tsx`) — premier jet rédigé
+      par Claude dans l'esprit de ta méthode, à valider/corriger avant que
+      ça parle en ton nom auprès des abonnés
+- [ ] Confirmer avec ton ami que l'email "Ton diagnostic COAI" arrive bien
+      (vérifier aussi les spams) — dernier maillon du pipeline notifs
+      réparé cette nuit à valider en conditions réelles
+- [ ] Activer sur Stripe (Réglages → Emails clients) l'email automatique
+      de rappel avant fin d'essai — jamais fait, toujours en attente
+- [ ] Faire relire par un juriste le texte de consentement de l'offre
+      (7 jours puis facturation) — rédigé par Claude, jamais validé
+      juridiquement, à faire avant que le volume d'inscriptions grossisse
+- [ ] Vérifier que le portail de résiliation Stripe respecte bien
+      l'obligation légale française de résiliation en 3 clics
+
+**Côté Claude (code, à la prochaine session)** :
+- [ ] Construire l'endpoint ManyChat côté COAI est fait
+      (`/api/webhooks/whatsapp-manychat`) — reste à brancher une fois
+      qu'Anthony a un flow ManyChat actif (clé `WHATSAPP_WEBHOOK_SECRET`
+      à créer sur Vercel, puis renseigner côté ManyChat)
+- [ ] Re-vérifier la liste complète des tables Supabase après les 3
+      créées cette nuit (`diagnostic_leads`, `repas_log`, `avis`) — pas
+      re-testé après coup que les 14 tables attendues (13 modèles +
+      `_prisma_migrations`) sont bien toutes là
+- [ ] Statut Apple Pay sur le checkout à essai (0€) — hypothèse
+      SetupIntent vs PaymentIntent jamais confirmée ni corrigée
+- [ ] Témoignages/preuves sociales — toujours en attente de vrai contenu
+      client d'Anthony, ne pas fabriquer
+
 ## Assistant WhatsApp automatisé (10/08/2026)
 
 Le code existant (`src/lib/whatsapp/client.ts`, `/api/webhooks/whatsapp`,
