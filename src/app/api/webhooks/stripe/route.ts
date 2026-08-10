@@ -3,7 +3,14 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
 import { appliquerRecompenseParrainageSiEligible } from "@/lib/parrainage/reward";
+import { sendAdminNotification } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
+
+const PLAN_LABELS: Record<SubscriptionPlan, string> = {
+  GRATUIT: "Impulsion",
+  STANDARD: "Transformation",
+  PREMIUM: "Ancien Premium",
+};
 
 function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
   switch (status) {
@@ -84,6 +91,20 @@ export async function POST(request: Request) {
           typeof session.subscription === "string" ? session.subscription : session.subscription.id;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         await upsertFromSubscription(subscription, userId);
+
+        // Notifie Anthony à chaque nouvelle inscription — jusqu'ici seule la
+        // file de validation de programme déclenchait une notification,
+        // aucune ne partait à l'inscription elle-même (raté pour David
+        // Benzaken le 09/08, cf. demande du 10/08 de ne plus reproduire ça).
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (user) {
+          const plan = PLAN_LABELS[mapStripePlan(subscription)];
+          const enEssai = Boolean(subscription.trial_end);
+          await sendAdminNotification(
+            "Nouvelle inscription COAI",
+            `${user.prenom ? user.prenom : "Un nouvel abonné"} (${user.email}) vient de s'inscrire — palier ${plan}${enEssai ? ", en essai 7 jours" : ""}.`
+          );
+        }
       }
       break;
     }
