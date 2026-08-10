@@ -36,6 +36,23 @@ function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
   return "STANDARD";
 }
 
+// Stripe a déplacé current_period_end du niveau abonnement vers chaque
+// ligne d'abonnement (items.data[].current_period_end) dans ses versions
+// d'API récentes. Les événements webhook bruts suivent la version
+// configurée sur le endpoint Stripe (potentiellement plus récente que
+// notre SDK, épinglé sur 2024-06-20 dans src/lib/stripe/client.ts) — le
+// champ top-level peut donc être absent selon la version active sur le
+// compte. Repli sur la ligne d'abonnement, puis sur null (colonne
+// nullable) plutôt que planter (10/08/2026 : 21 webhooks sur 23 échouaient
+// en HTTP 500 à cause de "new Date(undefined * 1000)").
+function getCurrentPeriodEnd(subscription: Stripe.Subscription): Date | null {
+  const topLevel = (subscription as unknown as { current_period_end?: number }).current_period_end;
+  if (typeof topLevel === "number") return new Date(topLevel * 1000);
+  const item = subscription.items.data[0] as unknown as { current_period_end?: number } | undefined;
+  if (typeof item?.current_period_end === "number") return new Date(item.current_period_end * 1000);
+  return null;
+}
+
 async function upsertFromSubscription(subscription: Stripe.Subscription, userId?: string) {
   const customerId =
     typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
@@ -43,7 +60,7 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
     stripeSubscriptionId: subscription.id,
     status: mapStripeStatus(subscription.status),
     plan: mapStripePlan(subscription),
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    currentPeriodEnd: getCurrentPeriodEnd(subscription),
     trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
   };
