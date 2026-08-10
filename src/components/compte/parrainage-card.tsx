@@ -17,9 +17,10 @@ const STATUT_LABELS: Record<Filleul["statut"], string> = {
   converti: "Abonné payant — récompense appliquée",
 };
 
-// Chaque filleul qui devient abonné payant (fin de son mois offert) fait
-// gagner 1 mois offert au parrain, appliqué automatiquement sur sa
-// prochaine facture (cf. webhooks/stripe/route.ts).
+// Chaque filleul qui devient abonné payant (fin de son essai gratuit de 7
+// jours) fait gagner 1 mois offert au parrain, appliqué automatiquement sur
+// sa prochaine facture (cf. webhooks/stripe/route.ts). La récompense du
+// parrain reste 1 mois offert même si la durée de l'essai a changé.
 export function ParrainageCard() {
   const [lien, setLien] = useState<string | null>(null);
   const [filleuls, setFilleuls] = useState<Filleul[]>([]);
@@ -49,8 +50,8 @@ export function ParrainageCard() {
       <SectionLabel>Parrainage</SectionLabel>
       <Card className="flex flex-col gap-4">
         <p className="text-sm text-graphite-300">
-          Partage ton lien — dès qu&apos;un filleul devient abonné payant (à la fin de son mois
-          offert), tu reçois 1 mois offert sur ton propre abonnement.
+          Partage ton lien — dès qu&apos;un filleul devient abonné payant (à la fin de son essai
+          gratuit de 7 jours), tu reçois 1 mois offert sur ton propre abonnement.
         </p>
 
         {erreur && <p className="text-sm text-red-400">{erreur}</p>}
