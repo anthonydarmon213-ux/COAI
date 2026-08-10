@@ -28,7 +28,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "7 jours offerts dès l'inscription (carte bancaire demandée), puis 19€/mois pour ton programme généré par IA, sans relecture humaine. Passe à 49€/mois quand tu veux que chaque programme soit relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
+      "7 jours offerts dès l'inscription (carte bancaire demandée) sur les deux formules — 19€/mois ensuite pour ton programme généré par IA sans relecture, ou 49€/mois pour qu'un coach diplômé d'État le relise et le valide. Sans engagement dans les deux cas.",
   },
   {
     question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",

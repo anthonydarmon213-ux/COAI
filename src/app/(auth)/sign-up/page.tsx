@@ -164,8 +164,8 @@ export default function SignUpPage() {
           </label>
           {planVoulu === "STANDARD" ? (
             <p className="rounded-lg border border-laiton-400/40 bg-laiton-400/10 px-3 py-2 text-xs text-laiton-200">
-              Formule <span className="font-semibold">Transformation — 49€/mois</span>, programme
-              relu et validé par un coach diplômé d&apos;État.
+              Formule <span className="font-semibold">Transformation — 7 jours offerts</span>, puis
+              49€/mois. Programme relu et validé par un coach diplômé d&apos;État.
             </p>
           ) : (
             <div className="flex flex-col gap-2">
@@ -210,10 +210,11 @@ export default function SignUpPage() {
             {planVoulu === "STANDARD" ? (
               <>
                 Je reconnais avoir pris connaissance des conditions de l&apos;offre
-                Transformation : 49€/mois, facturé immédiatement dès l&apos;inscription, sans
-                engagement. Je demande le début immédiat du service et reconnais renoncer à mon
-                droit de rétractation de 14 jours pour la partie du service déjà utilisée.
-                J&apos;accepte les{" "}
+                Transformation : 7 jours d&apos;accès gratuit à compter de ce jour, puis passage
+                automatique à un abonnement de 49€/mois, sauf résiliation avant la fin des 7
+                jours. Je demande le début immédiat du service et reconnais renoncer à mon droit
+                de rétractation de 14 jours pour la partie du service déjà utilisée durant la
+                période offerte. J&apos;accepte les{" "}
                 <Link href="/cgv" target="_blank" className="underline">
                   CGV
                 </Link>
@@ -251,7 +252,7 @@ export default function SignUpPage() {
             {loading
               ? "Redirection vers le paiement…"
               : planVoulu === "STANDARD"
-                ? "Créer mon compte — 49€/mois"
+                ? "Créer mon compte — 7 jours offerts"
                 : skipTrial
                   ? "Démarrer maintenant — 19€/mois"
                   : "Créer mon compte — 7 jours offerts"}

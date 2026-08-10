@@ -62,7 +62,7 @@ const TIERS: Tier[] = [
     prix: "49€",
     suffixe: "/mois",
     description:
-      "Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
+      "7 jours offerts, puis 49€/mois. Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
     features: [
       "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
       "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
@@ -202,7 +202,10 @@ export default function PricingPage() {
                 <Button disabled>Contacte ton coach pour réserver</Button>
               )
             ) : tier.plan ? (
-              <SubscribeButton plan={tier.plan} label={`S'abonner — ${tier.prix}${tier.suffixe}`} />
+              <SubscribeButton
+                plan={tier.plan}
+                label={tier.plan === "STANDARD" ? "S'abonner — 7 jours offerts" : `S'abonner — ${tier.prix}${tier.suffixe}`}
+              />
             ) : (
               <Link href="/sign-up">
                 <Button>Créer mon compte — 7 jours offerts</Button>
@@ -214,8 +217,9 @@ export default function PricingPage() {
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
         L&apos;offre Impulsion (7 jours offerts, carte bancaire requise à l&apos;inscription, puis
-        19€/mois) et l&apos;offre Transformation sont sans engagement, résiliables à tout moment depuis
-        ton compte. Les séances VIP sont réservées et payées à la séance, hors
+        19€/mois) et l&apos;offre Transformation (7 jours offerts, puis 49€/mois) sont sans
+        engagement, résiliables à tout moment depuis ton compte. Les séances VIP sont réservées et
+        payées à la séance, hors
         abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
         séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">

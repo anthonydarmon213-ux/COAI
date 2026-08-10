@@ -47,6 +47,6 @@ export function canGenerateProgramme(subscription?: Subscription | null): boolea
 // label ne concerne que d'éventuels abonnés déjà sur l'ancienne offre.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
   GRATUIT: "Impulsion — 19€/mois après 7 jours offerts",
-  STANDARD: "Transformation — 49€/mois",
+  STANDARD: "Transformation — 49€/mois après 7 jours offerts",
   PREMIUM: "Ancien Premium — 199€/mois",
 };

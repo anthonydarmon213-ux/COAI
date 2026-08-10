@@ -35,9 +35,12 @@ export default function CgvPage() {
             pas relu par un coach humain.
           </li>
           <li>
-            <strong>Transformation (49€/mois)</strong> — inclut le palier Impulsion, la génération
-            d&apos;un programme d&apos;entraînement, de nutrition et de récupération par
-            intelligence artificielle relu et validé par un coach diplômé d&apos;État.
+            <strong>Transformation (49€/mois après 7 jours offerts)</strong> — 7 jours
+            d&apos;accès gratuit à compter de l&apos;inscription, carte bancaire requise dès la
+            souscription ; sauf résiliation avant la fin de ces 7 jours, l&apos;abonnement bascule
+            automatiquement sur 49€/mois. Inclut le palier Impulsion, la génération d&apos;un
+            programme d&apos;entraînement, de nutrition et de récupération par intelligence
+            artificielle relu et validé par un coach diplômé d&apos;État.
           </li>
           <li>
             <strong>VIP (à la séance)</strong> — coaching individuel avec Anthony Darmon,

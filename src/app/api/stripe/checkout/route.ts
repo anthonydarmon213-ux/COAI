@@ -10,17 +10,20 @@ const PRICE_ENV_BY_PLAN = {
 } as const;
 
 // Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
-// d'appel, 7 jours offerts puis 19€/mois) passe par un essai Stripe avec
-// carte obligatoire dès l'inscription — payment_method_collection: "always"
-// force la saisie de la CB même si la première facture est à 0€. Le body
-// peut passer skipTrial: true (proposé à l'inscription pour qui ne veut pas
-// attendre 7 jours) pour facturer immédiatement au lieu de passer par
-// l'essai — même price, juste sans trial_period_days ; le programme se
-// débloque alors dès le paiement (cf. isInTrial côté génération). STANDARD
-// (affiché "Transformation", 49€/mois) est le palier payant sans
-// engagement. PREMIUM (ancienne offre
-// 199€/mois) n'est plus exposé sur /pricing mais reste géré ici pour
-// d'éventuels abonnés existants.
+// d'appel, 7 jours offerts puis 19€/mois) et STANDARD (affiché
+// "Transformation", 7 jours offerts puis 49€/mois, décision d'Anthony du
+// 10/08/2026 d'étendre l'essai aux deux offres) passent par un essai
+// Stripe avec carte obligatoire dès l'inscription —
+// payment_method_collection: "always" force la saisie de la CB même si la
+// première facture est à 0€. Le body peut passer skipTrial: true (proposé
+// à l'inscription Impulsion pour qui ne veut pas attendre 7 jours, pas
+// encore d'équivalent sur Transformation) pour facturer immédiatement au
+// lieu de passer par l'essai — même price, juste sans trial_period_days ;
+// le programme se débloque alors dès le paiement (cf. isInTrial côté
+// génération, qui bloque déjà la génération pendant l'essai quel que soit
+// le palier). PREMIUM (ancienne offre 199€/mois) n'est plus exposé sur
+// /pricing, reste géré ici pour d'éventuels abonnés existants, et ne passe
+// jamais par un essai.
 // client_reference_id porte l'id User applicatif, utilisé par le webhook pour
 // relier la subscription Stripe à l'utilisateur.
 export async function POST(request: Request) {
@@ -52,7 +55,7 @@ export async function POST(request: Request) {
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}${skipTrial ? "&essai=0" : ""}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
-    ...(plan === "GRATUIT" && !skipTrial
+    ...(plan !== "PREMIUM" && !skipTrial
       ? {
           subscription_data: { trial_period_days: 7 },
           payment_method_collection: "always" as const,
