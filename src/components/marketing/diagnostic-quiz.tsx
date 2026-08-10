@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,6 +108,65 @@ function exemplesPour(equipement: string): string[] {
   return EXEMPLES_PAR_EQUIPEMENT[equipement] ?? EXEMPLES_DEFAUT;
 }
 
+// Contenu du mini-diagnostic enrichi (11/08/2026, demande d'Anthony) : donner
+// de la vraie valeur immédiate — utilisable même sans créer de compte —
+// plutôt qu'un seul paragraphe générique. Tout reste calculé par des règles
+// simples à partir des réponses déjà collectées, pas d'appel IA (même
+// logique que le reste du quiz : gratuit, non-abusable).
+const SPLIT_PAR_FREQUENCE: Record<string, string> = {
+  "2 fois par semaine": "Full Body x2 — tout le corps à chaque séance, pour maximiser la fréquence de travail malgré le nombre réduit de séances.",
+  "3 fois par semaine": "Full Body x3 ou Push/Pull/Legs x3 — bon équilibre entre fréquence et récupération à ce rythme.",
+  "4 fois par semaine": "Upper/Lower x4 — haut et bas du corps alternés, permet un bon volume par groupe musculaire.",
+  "5 fois ou plus par semaine": "Split par groupe musculaire (type Push/Pull/Legs x2) — tenable à ce volume, à condition de bien gérer la récupération.",
+};
+
+const SERIES_PAR_NIVEAU: Record<string, string> = {
+  Débutant: "3 séries de 10 à 12 répétitions",
+  Intermédiaire: "4 séries de 8 à 12 répétitions",
+  Avancé: "4 à 5 séries de 6 à 10 répétitions",
+};
+
+const ACCROCHE_PAR_PERSONA: Record<string, string> = {
+  "Je ne sais pas quoi faire à la salle":
+    "Le plus gros progrès pour toi ne sera pas de t'entraîner plus, mais d'avoir enfin un plan clair à suivre séance après séance.",
+  "Je suis plutôt sédentaire":
+    "Le plus dur est déjà fait : tu es sur cette page. La suite, c'est démarrer doucement mais régulièrement — la régularité bat l'intensité au départ.",
+  "Je m'entraîne à la maison, sans structure":
+    "Tu as déjà la discipline de t'entraîner seul — il ne manque qu'une vraie structure pour transformer cet effort en résultats visibles.",
+  "Même programme depuis des années, sans résultat":
+    "Un plateau qui dure ne veut pas dire qu'il faut travailler plus dur — plus souvent, qu'il faut changer d'approche.",
+  "Je veux progresser sans me blesser":
+    "Bon réflexe : sur la durée, la progressivité et la technique comptent plus que la charge.",
+};
+const ACCROCHE_DEFAUT = "Voici ce qu'on peut déjà dire à partir de tes réponses.";
+
+function accrochePour(personas: string[]): string {
+  return personas.map((p) => ACCROCHE_PAR_PERSONA[p]).find(Boolean) ?? ACCROCHE_DEFAUT;
+}
+
+const NUTRITION_TIPS: Record<string, string> = {
+  "Repas structurés et équilibrés":
+    "Bonne base déjà en place — l'ajustement se fera surtout sur les quantités, pas sur la structure.",
+  "Grignotage fréquent / repas irréguliers":
+    "Le grignotage dilue souvent les apports sans qu'on s'en rende compte : structurer 3-4 repas fixes est souvent le premier levier, avant même de compter les calories.",
+  "Jeûne intermittent":
+    "Ça peut fonctionner, à condition que ta fenêtre alimentaire couvre assez de protéines pour soutenir l'entraînement.",
+  "Beaucoup de plats préparés ou fast-food":
+    "Les plats préparés sont souvent plus caloriques et moins riches en protéines qu'ils n'en ont l'air — remplacer ne serait-ce qu'un repas par jour par du fait-maison change déjà beaucoup.",
+  "Déjà suivi par un nutritionniste":
+    "Un vrai programme s'appuierait sur ce suivi plutôt que de le dupliquer.",
+};
+
+const SOMMEIL_TIPS: Record<string, string> = {
+  "Mauvaise (moins de 5h, sommeil agité)":
+    "En dessous de 5h, la récupération musculaire — et la capacité à bien manger — en pâtissent : c'est souvent plus limitant que l'entraînement lui-même.",
+  "Moyenne (5-6h, réveils fréquents)":
+    "Gagner ne serait-ce que 30 à 45 minutes de sommeil se traduit souvent directement par de meilleures séances.",
+  "Bonne (7-8h, plutôt réparateur)": "Bonne base pour bien récupérer entre les séances.",
+  "Excellente (8h ou plus, réparateur)":
+    "Excellent terrain pour progresser — peu de monde a cette régularité, c'est un vrai avantage.",
+};
+
 type Step =
   | "intro"
   | "persona"
@@ -191,6 +250,15 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
+function VoletCard({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="w-full max-w-sm rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4 text-left">
+      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">{label}</span>
+      <div className="mt-1.5 text-sm leading-6 text-graphite-300">{children}</div>
+    </div>
+  );
+}
+
 export function DiagnosticQuiz() {
   const [step, setStep] = useState<Step>("intro");
   const [persona, setPersona] = useState<string[]>([]);
@@ -245,29 +313,34 @@ export function DiagnosticQuiz() {
   }, [step, persona, niveau, objectif, equipement, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
 
   const teaser = useMemo(() => {
-    if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
-    const premierEquipement = equipement[0] ?? "Poids du corps uniquement";
-    const exemples = exemplesPour(premierEquipement);
+    if (!niveau || !objectif) return null;
     const santeResolue = resolveAutre(sante, santeAutreTexte);
-
-    let description = `Avec ${equipement.length > 1 ? "ton équipement" : premierEquipement.toLowerCase()} et ${frequence.toLowerCase()}, un programme ${niveau.toLowerCase()} orienté "${objectif.toLowerCase()}" s'articulerait autour d'exercices comme ${exemples.join(", ")} — dosés et progressifs, pas une liste au hasard.`;
-    if (habitudesAlimentaires || qualiteSommeil) {
-      description += ` Côté nutrition et récupération, on tiendrait aussi compte de${
-        habitudesAlimentaires ? ` tes habitudes actuelles (${habitudesAlimentaires.toLowerCase()})` : ""
-      }${habitudesAlimentaires && qualiteSommeil ? " et de" : ""}${
-        qualiteSommeil ? ` ton sommeil (${qualiteSommeil.toLowerCase()})` : ""
-      }.`;
-    }
 
     return {
       titre: `Profil ${niveau.toLowerCase()} — objectif ${objectif.toLowerCase()}`,
-      description,
       alerte:
         santeResolue.length > 0
           ? `Signalé : ${santeResolue.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.`
           : null,
     };
-  }, [niveau, objectif, equipement, frequence, sante, santeAutreTexte, habitudesAlimentaires, qualiteSommeil]);
+  }, [niveau, objectif, sante, santeAutreTexte]);
+
+  const volets = useMemo(() => {
+    if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
+    const premierEquipement = equipement[0] ?? "Poids du corps uniquement";
+    const exemples = exemplesPour(premierEquipement);
+    const series = SERIES_PAR_NIVEAU[niveau] ?? SERIES_PAR_NIVEAU.Débutant;
+
+    return {
+      accroche: accrochePour(resolveAutre(persona, personaAutreTexte)),
+      entrainement: {
+        split: SPLIT_PAR_FREQUENCE[frequence] ?? null,
+        exercices: exemples.map((nom) => `${nom} — ${series}`),
+      },
+      nutrition: habitudesAlimentaires ? NUTRITION_TIPS[habitudesAlimentaires] ?? null : null,
+      recuperation: qualiteSommeil ? SOMMEIL_TIPS[qualiteSommeil] ?? null : null,
+    };
+  }, [niveau, objectif, equipement, frequence, persona, personaAutreTexte, habitudesAlimentaires, qualiteSommeil]);
 
   // "Audit" : on ne recommande pas la même offre à tout le monde. Douleur/
   // contrainte signalée ou plateau depuis des années → le suivi humain de
@@ -574,16 +647,29 @@ export function DiagnosticQuiz() {
             </div>
           )}
 
-          {step === "result" && teaser && (
+          {step === "result" && teaser && volets && (
             <div className="flex flex-col items-center gap-5 py-2 text-center">
               <SectionLabel>Ton diagnostic</SectionLabel>
               <h2 className="font-display text-2xl font-semibold text-white">{teaser.titre}.</h2>
-              <p className="max-w-sm text-sm leading-6 text-graphite-300">{teaser.description}</p>
+              <p className="max-w-sm text-sm leading-6 text-graphite-300">{volets.accroche}</p>
               {teaser.alerte && (
                 <p className="max-w-sm rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
                   {teaser.alerte}
                 </p>
               )}
+
+              <VoletCard label="Entraînement">
+                {volets.entrainement.split && <p>{volets.entrainement.split}</p>}
+                <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
+                  {volets.entrainement.exercices.map((ex) => (
+                    <li key={ex}>• {ex}</li>
+                  ))}
+                </ul>
+              </VoletCard>
+
+              {volets.nutrition && <VoletCard label="Nutrition">{volets.nutrition}</VoletCard>}
+
+              {volets.recuperation && <VoletCard label="Récupération">{volets.recuperation}</VoletCard>}
 
               <div className="w-full max-w-sm rounded-xl border border-laiton-400/25 bg-laiton-400/[0.06] px-4 py-4 text-left">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-400">
