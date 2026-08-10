@@ -7,6 +7,8 @@ import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
 import { PlanCard } from "@/components/dashboard/plan-card";
 import { WatchScreenshotCta } from "@/components/dashboard/watch-screenshot-cta";
+import { ImcCard } from "@/components/dashboard/imc-card";
+import { ConseilsCoach } from "@/components/dashboard/conseils-coach";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
@@ -104,6 +106,15 @@ export default async function DashboardPage() {
           </p>
         </Card>
       </div>
+
+      <ImcCard
+        tailleCm={user.profile?.tailleCm}
+        poidsKg={derniereMesure?.poidsKg}
+        masseGrassePourcent={derniereMesure?.masseGrassePourcent}
+        masseMusculaireKg={derniereMesure?.masseMusculaireKg}
+      />
+
+      <ConseilsCoach />
       <a href="/programme" className="group flex items-center justify-between rounded-2xl border border-laiton-400/20 bg-laiton-400/[0.06] px-6 py-5 text-sm text-laiton-300 transition hover:bg-laiton-400/[0.1]">
         <span>Voir mon profil et mon programme personnalisé</span><span className="transition group-hover:translate-x-1">→</span>
       </a>
