@@ -57,9 +57,9 @@ const PILIERS = [
   },
   {
     numero: "03",
-    titre: "Une présence au quotidien",
+    titre: "Un coach dans ta poche, H24",
     description:
-      "L’IA t’accompagne à tout moment. Ton coach supervise la méthode et valide ce qui compte.",
+      "Ton Coach IA répond à toute heure, 7j/7 — ton coach humain supervise la méthode et valide ce qui compte.",
   },
 ];
 
@@ -102,6 +102,7 @@ export default function LandingPage() {
             <Link href="/diagnostic"><Button variant="secondary" className="px-7 py-3">Faire mon diagnostic gratuit</Button></Link>
           </div>
           <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
+          <p className="mt-2 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />Ton Coach IA te répond 24h/24, 7j/7 — jamais seul entre deux séances.</p>
         </div>
         <div className="relative z-10 flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
           <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-2 lg:left-auto lg:right-0 lg:translate-x-0">
@@ -240,6 +241,37 @@ export default function LandingPage() {
             et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
           </p>
         </div>
+      </section>
+
+      {/* Coach IA 24/7 — différenciateur qu'aucun concurrent 100% manuel
+          (type TrueCoach) ne peut proposer : une vraie présence permanente,
+          pas juste un programme statique. Quota réel (4 questions/mois sur
+          les deux paliers vendus) volontairement non affiché ici : le
+          bénéfice qu'on vend, c'est la disponibilité, pas le volume. */}
+      <section className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 px-6 py-24 text-center">
+        <SectionLabel>Coach IA</SectionLabel>
+        <h2 className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+          Un coach dans ta poche, disponible H24, 7j/7.
+        </h2>
+        <p className="max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+          Une question à 23h après ta séance ? Un doute sur ta récupération un dimanche matin ?
+          Ton Coach IA te répond, jour et nuit — jamais un mail sans réponse jusqu&apos;au lundi.
+        </p>
+        <div className="mt-2 grid grid-cols-1 gap-4 text-left sm:grid-cols-3">
+          {[
+            "Disponible 24h/24, 7j/7 — jamais d'attente",
+            "Répond en quelques secondes, dans l'esprit de la méthode d'Anthony",
+            "Ton coach humain reste dans la boucle pour ce qui compte vraiment",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-2.5 text-sm leading-6 text-graphite-300">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />
+              {item}
+            </div>
+          ))}
+        </div>
+        <Link href="/sign-up" className="mt-4">
+          <Button>Essayer le Coach IA</Button>
+        </Link>
       </section>
 
       {/* Accès aux offres */}
