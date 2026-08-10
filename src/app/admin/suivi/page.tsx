@@ -35,19 +35,26 @@ const MOTS_DOULEUR = [
   "craquement",
 ];
 
-type Flag = { type: "douleur" | "inactivite" | "mesure"; detail: string };
+// Une baisse de plus de 5% sur un même exercice entre les deux derniers
+// tests peut signaler une fatigue/un surmenage qui ne se voit pas forcément
+// à l'œil nu — l'expertise qu'on vend, c'est de repérer ça avant que
+// l'abonné ne le remarque lui-même.
+const SEUIL_REGRESSION_POURCENT = 0.05;
+
+type Flag = { type: "douleur" | "inactivite" | "mesure" | "regression"; detail: string };
 
 async function computeFlags(userId: string): Promise<Flag[]> {
   const maintenant = Date.now();
   const flags: Flag[] = [];
 
-  const [derniereSeance, seancesRecentes, derniereMesure] = await Promise.all([
+  const [derniereSeance, seancesRecentes, derniereMesure, testsRecents] = await Promise.all([
     prisma.seanceLog.findFirst({ where: { userId }, orderBy: { date: "desc" } }),
     prisma.seanceLog.findMany({
       where: { userId, date: { gte: new Date(maintenant - FENETRE_DOULEUR_JOURS * JOUR_MS) } },
       orderBy: { date: "desc" },
     }),
     prisma.mesure.findFirst({ where: { userId }, orderBy: { date: "desc" } }),
+    prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 20 }),
   ]);
 
   const seanceAvecDouleur = seancesRecentes.find((s) => {
@@ -88,6 +95,24 @@ async function computeFlags(userId: string): Promise<Flag[]> {
     });
   }
 
+  // Compare les deux derniers tests d'un même exercice (testsRecents est
+  // déjà trié du plus récent au plus ancien) — première paire trouvée en
+  // baisse déclenche le flag, pas la peine de tout lister.
+  for (const exercice of new Set(testsRecents.map((t) => t.exercice))) {
+    const testsExercice = testsRecents.filter((t) => t.exercice === exercice);
+    const dernier = testsExercice[0];
+    const precedent = testsExercice[1];
+    if (!dernier || !precedent) continue;
+    if (dernier.valeur < precedent.valeur * (1 - SEUIL_REGRESSION_POURCENT)) {
+      const baisse = Math.round((1 - dernier.valeur / precedent.valeur) * 100);
+      flags.push({
+        type: "regression",
+        detail: `${exercice} en baisse de ${baisse}% (${dernier.valeur}${dernier.unite} le ${dernier.date.toLocaleDateString("fr-FR")}, contre ${precedent.valeur}${precedent.unite} avant)`,
+      });
+      break;
+    }
+  }
+
   return flags;
 }
 
@@ -95,6 +120,7 @@ const FLAG_LABELS: Record<Flag["type"], { label: string; tone: "danger" | "warni
   douleur: { label: "Douleur mentionnée", tone: "danger" },
   inactivite: { label: "Inactif", tone: "warning" },
   mesure: { label: "Pas de mesure récente", tone: "neutral" },
+  regression: { label: "Perf en baisse", tone: "warning" },
 };
 
 function buildWhatsAppContactLink(phoneWhatsapp: string | null, prenom: string | null, flags: Flag[]): string | null {
@@ -103,20 +129,20 @@ function buildWhatsAppContactLink(phoneWhatsapp: string | null, prenom: string |
   if (!digits) return null;
 
   const nom = prenom ? ` ${prenom}` : "";
-  const prioritaire = flags.find((f) => f.type === "douleur")
-    ? "douleur"
-    : flags.find((f) => f.type === "inactivite")
-      ? "inactivite"
-      : "mesure";
+  // Ordre de priorité : un signal de sécurité (douleur) passe avant un
+  // signal de performance (regression), lui-même avant un simple manque
+  // d'activité/de données.
+  const ordrePriorite: Flag["type"][] = ["douleur", "regression", "inactivite", "mesure"];
+  const prioritaire = ordrePriorite.find((type) => flags.some((f) => f.type === type)) ?? "mesure";
 
-  const message =
-    prioritaire === "douleur"
-      ? `Bonjour${nom}, j'ai vu que tu mentionnais une gêne dans ton suivi — comment tu te sens ? On ajuste le programme si besoin.`
-      : prioritaire === "inactivite"
-        ? `Bonjour${nom}, ça fait un moment qu'on n'a pas vu de séance loggée de ton côté — tout va bien ? N'hésite pas si tu as besoin qu'on ajuste quoi que ce soit.`
-        : `Bonjour${nom}, ça fait un moment sans nouvelle mesure de ta part — un petit point sur ta progression ?`;
+  const messages: Record<Flag["type"], string> = {
+    douleur: `Bonjour${nom}, j'ai vu que tu mentionnais une gêne dans ton suivi — comment tu te sens ? On ajuste le programme si besoin.`,
+    regression: `Bonjour${nom}, j'ai vu que tes derniers résultats étaient un peu en retrait — tout va bien niveau récupération/sommeil ? On peut ajuster la charge si besoin.`,
+    inactivite: `Bonjour${nom}, ça fait un moment qu'on n'a pas vu de séance loggée de ton côté — tout va bien ? N'hésite pas si tu as besoin qu'on ajuste quoi que ce soit.`,
+    mesure: `Bonjour${nom}, ça fait un moment sans nouvelle mesure de ta part — un petit point sur ta progression ?`,
+  };
 
-  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(messages[prioritaire])}`;
 }
 
 export default async function AdminSuiviPage() {

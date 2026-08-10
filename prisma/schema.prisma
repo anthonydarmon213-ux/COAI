@@ -52,6 +52,15 @@ model User {
   // l'utilisateur reste inactif) — cf. /api/cron/relance-inactifs.
   derniereRelanceInactiviteEnvoyeeAt DateTime?
 
+  // Alerte sécurité douleur, palier Impulsion (10/08/2026) — même trou que
+  // ci-dessus mais côté sécurité plutôt qu'inactivité : contrairement à
+  // Transformation (cf. admin/suivi, un coach humain lit les mentions de
+  // douleur), une douleur signalée par un abonné Impulsion n'était jusque-là
+  // vue par personne. Horodatage de la dernière alerte envoyée (comparé à la
+  // date de la séance qui la déclenche, pas une fenêtre de cooldown) pour ne
+  // pas renvoyer deux fois pour la même mention — cf. /api/cron/relance-inactifs.
+  derniereAlerteDouleurEnvoyeeAt DateTime?
+
   subscription   Subscription?
   profile        Profile?
   programmes     ProgrammeGenerated[]

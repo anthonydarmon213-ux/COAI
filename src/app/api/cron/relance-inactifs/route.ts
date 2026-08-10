@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/client";
-import { sendEmail } from "@/lib/email/client";
+import { sendEmail, sendAdminNotification } from "@/lib/email/client";
 
 // Relance automatique des abonnés Impulsion inactifs (09/08/2026). Ce palier
 // n'a aucun suivi humain (contrairement à Transformation, cf.
@@ -17,6 +17,29 @@ const SEUIL_INACTIVITE_JOURS = 10;
 // une première relance déjà envoyée.
 const RELANCE_COOLDOWN_JOURS = 14;
 const JOUR_MS = 24 * 60 * 60 * 1000;
+
+// Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
+// Transformation) — gardés synchronisés à la main, les deux vivent dans des
+// fichiers séparés (l'un lu par un coach humain, l'autre déclenché par cron)
+// donc pas d'import croisé pratique.
+const FENETRE_DOULEUR_JOURS = 14;
+const MOTS_DOULEUR = [
+  "douleur",
+  "douloureux",
+  "douloureuse",
+  "mal au",
+  "mal aux",
+  "mal à",
+  "blessure",
+  "blessé",
+  "blessée",
+  "tendinite",
+  "élongation",
+  "entorse",
+  "gêne",
+  "gênant",
+  "craquement",
+];
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -38,17 +61,11 @@ function buildEmail(prenom: string | null, joursInactif: number, appUrl: string)
   };
 }
 
-export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-  }
-
+// Relance des abonnés Impulsion inactifs (programme généré mais plus de
+// séance loggée depuis SEUIL_INACTIVITE_JOURS).
+async function relancerInactifs(appUrl: string): Promise<number> {
   const maintenant = Date.now();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.app";
 
-  // Palier Impulsion (GRATUIT) uniquement, déjà onboardé (au moins un
-  // programme généré — exclut de fait qui est encore en essai, la
-  // génération y étant bloquée) et pas déjà relancé récemment.
   const candidats = await prisma.user.findMany({
     where: {
       subscription: { plan: "GRATUIT", status: { in: ["ACTIVE", "PAST_DUE"] } },
@@ -91,5 +108,94 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ candidats: candidats.length, relances });
+  return relances;
+}
+
+// Alerte sécurité douleur, palier Impulsion (10/08/2026) — sur Transformation
+// une mention de douleur dans une séance est vue par le coach humain via
+// /admin/suivi ; sur Impulsion (IA seule, pas de relecture humaine) rien ne
+// la voyait jusqu'ici. On comble ce trou en deux temps : un email à
+// l'abonné avec un message sécurité (pas un diagnostic — juste "repose-toi,
+// consulte un professionnel de santé si ça persiste"), et une notification
+// à Anthony pour qu'il ait la visibilité et puisse recontacter si besoin.
+async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
+  const maintenant = Date.now();
+
+  const candidats = await prisma.user.findMany({
+    where: { subscription: { plan: "GRATUIT", status: { in: ["ACTIVE", "PAST_DUE"] } } },
+    select: {
+      id: true,
+      email: true,
+      prenom: true,
+      derniereAlerteDouleurEnvoyeeAt: true,
+      seances: {
+        where: { date: { gte: new Date(maintenant - FENETRE_DOULEUR_JOURS * JOUR_MS) } },
+        select: { date: true, ressenti: true, notes: true },
+        orderBy: { date: "desc" },
+      },
+    },
+  });
+
+  let alertes = 0;
+  for (const user of candidats) {
+    const seanceAvecDouleur = user.seances.find((s) => {
+      const texte = `${s.ressenti ?? ""} ${s.notes ?? ""}`.toLowerCase();
+      return MOTS_DOULEUR.some((mot) => texte.includes(mot));
+    });
+    if (!seanceAvecDouleur) continue;
+
+    // Déjà alerté pour cette mention-là (ou une plus récente) : on ne
+    // renvoie pas tant qu'aucune nouvelle séance avec douleur n'apparaît.
+    if (
+      user.derniereAlerteDouleurEnvoyeeAt &&
+      seanceAvecDouleur.date.getTime() <= user.derniereAlerteDouleurEnvoyeeAt.getTime()
+    ) {
+      continue;
+    }
+
+    const nom = user.prenom ? ` ${user.prenom}` : "";
+    const envoyeUtilisateur = await sendEmail(
+      user.email,
+      "On a vu ta remarque sur une gêne",
+      `Bonjour${nom},\n\n` +
+        `On a remarqué que tu mentionnais une gêne ou une douleur dans une séance récente. ` +
+        `Ton programme actuel est généré par IA, sans relecture par un coach humain sur ce palier.\n\n` +
+        `Par précaution : repose la zone concernée, n'insiste pas sur un mouvement douloureux, et ` +
+        `si la gêne persiste ou s'aggrave, consulte un professionnel de santé (médecin, kiné) avant de reprendre.\n\n` +
+        `Tu peux ajuster ton programme à tout moment depuis ${appUrl}/programme.\n\n` +
+        `Prends soin de toi,\nL'équipe COAI`
+    );
+
+    const extrait = (seanceAvecDouleur.ressenti || seanceAvecDouleur.notes || "").slice(0, 200);
+    await sendAdminNotification(
+      "Douleur signalée — palier Impulsion",
+      `${user.prenom ? user.prenom : "Un abonné"} (${user.email}) a mentionné une gêne/douleur dans une séance ` +
+        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier Impulsion, pas de relecture humaine) : « ${extrait} »`
+    );
+
+    if (envoyeUtilisateur) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { derniereAlerteDouleurEnvoyeeAt: new Date() },
+      });
+      alertes++;
+    }
+  }
+
+  return alertes;
+}
+
+export async function GET(request: Request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.app";
+
+  const [relances, alertesDouleur] = await Promise.all([
+    relancerInactifs(appUrl),
+    alerterDouleurImpulsion(appUrl),
+  ]);
+
+  return NextResponse.json({ relances, alertesDouleur });
 }
