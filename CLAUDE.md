@@ -4,6 +4,41 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Assistant WhatsApp automatisé (10/08/2026)
+
+Le code existant (`src/lib/whatsapp/client.ts`, `/api/webhooks/whatsapp`,
+env `MAKE_OUTGOING_WEBHOOK_URL`/`WHATSAPP_WEBHOOK_SECRET`) supposait depuis le
+tout début du projet qu'Anthony avait déjà un assistant WhatsApp automatisé
+("Coaching 2.0", Make.com + Twilio) — **hypothèse fausse, jamais vérifiée
+avec lui**, découverte le 10/08 en creusant pourquoi `notifyMakeScenario`
+échouait silencieusement (même famille de bug que les notifs email/tables
+manquantes découvertes le même jour). Rien n'existait réellement côté
+Anthony.
+
+Décision du 10/08 : construire cette fois pour de vrai, avec **ManyChat**
+(plus adapté que Make.com+Twilio — WhatsApp Business intégré nativement,
+pas besoin de gérer Twilio séparément) plutôt que l'ancienne hypothèse
+Make.com. Le vieux code Make.com sera à remplacer/adapter, pas juste
+complété.
+
+Étapes, dans l'ordre :
+1. **Anthony (hors code)** : acheter une carte SIM prépayée (prévu le
+   11/08), l'insérer dans un vieux téléphone dont il dispose déjà — ce
+   numéro doit être neuf pour WhatsApp (jamais utilisé sur l'app WhatsApp
+   classique), condition requise par Meta pour le brancher sur WhatsApp
+   Business Platform (API).
+2. **Anthony (hors code)** : créer un compte ManyChat, connecter WhatsApp
+   via leur flow "Embedded Signup" (crée le compte Meta Business si besoin
+   + valide le numéro en même temps).
+3. **Claude (code)** : construire l'endpoint côté COAI que ManyChat
+   appellera (via son "External Request") à chaque message reçu sur
+   WhatsApp — identifie l'abonné par numéro de téléphone, va chercher son
+   profil/dernier programme en base, génère une réponse IA avec ce
+   contexte (réutilise la logique déjà en place pour `/coach`), renvoie la
+   réponse à ManyChat qui l'affiche sur WhatsApp. Remplace l'ancien
+   webhook sortant Make.com par l'API ManyChat (clé API + id abonné) pour
+   les notifications proactives (ex: "ton programme est prêt").
+
 ## Pistes de croissance / distribution (08/08/2026)
 
 Idées d'Anthony pour élargir la distribution de COAI au-delà des abonnés
