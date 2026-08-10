@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL } from "@/lib/diagnostic/mini-diagnostic";
+import { Badge } from "@/components/ui/badge";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -181,9 +183,79 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
 
 function VoletCard({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="w-full max-w-sm rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4 text-left">
+    <div className="flex w-full flex-col rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4 text-left">
       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">{label}</span>
       <div className="mt-1.5 text-sm leading-6 text-graphite-300">{children}</div>
+    </div>
+  );
+}
+
+// Présentation des 3 formules pour l'écran de résultat (11/08/2026, demande
+// d'Anthony) : la personne qui fait le quiz ne connaît pas les noms/offres
+// COAI, "Notre recommandation : Transformation" seul ne veut rien dire sans
+// contexte — on explique les 3 en même temps que la recommandation.
+const FORMULES = [
+  {
+    plan: "GRATUIT" as const,
+    nom: "Impulsion",
+    prix: "19€/mois",
+    accroche: "Coaching 100% IA pour démarrer sans attendre.",
+    bullets: [
+      "Programme généré par IA (entraînement, nutrition, récupération)",
+      "Suivi séances, mesures, progression",
+      "Coach IA — 4 questions/mois",
+    ],
+  },
+  {
+    plan: "STANDARD" as const,
+    nom: "Transformation",
+    prix: "49€/mois",
+    accroche: "L'IA génère, un coach diplômé d'État valide et ajuste.",
+    bullets: [
+      "Chaque programme relu et validé par un vrai coach",
+      "Coach IA illimité, disponible 24h/24, 7j/7",
+      "1 séance visio/mois avec Anthony Darmon incluse",
+    ],
+  },
+  {
+    plan: "VIP" as const,
+    nom: "VIP",
+    prix: "dès 100€/séance",
+    accroche: "Coaching 100% humain avec Anthony, à la séance.",
+    bullets: ["1-to-1 avec Anthony Darmon", "Présentiel ou visio", "Sans abonnement"],
+  },
+];
+
+function FormuleCard({
+  formule,
+  recommandee,
+  cta,
+}: {
+  formule: (typeof FORMULES)[number];
+  recommandee: boolean;
+  cta: ReactNode;
+}) {
+  return (
+    <div
+      className={`flex flex-col gap-3 rounded-xl border p-5 text-left ${
+        recommandee ? "border-laiton-400/40 bg-laiton-400/[0.06]" : "border-graphite-800 bg-graphite-900/40"
+      }`}
+    >
+      {recommandee && <Badge tone="success">Recommandé pour toi</Badge>}
+      <div>
+        <p className="font-display text-lg font-semibold text-white">{formule.nom}</p>
+        <p className="font-mono text-sm text-laiton-300">{formule.prix}</p>
+      </div>
+      <p className="text-xs leading-5 text-graphite-400">{formule.accroche}</p>
+      <ul className="flex flex-col gap-1.5 text-xs leading-5 text-graphite-300">
+        {formule.bullets.map((b) => (
+          <li key={b} className="flex items-start gap-1.5">
+            <span className="mt-0.5 text-laiton-400">✓</span>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-1">{cta}</div>
     </div>
   );
 }
@@ -283,6 +355,10 @@ export function DiagnosticQuiz() {
     return query ? `/sign-up?${query}` : "/sign-up";
   }
 
+  const vipHref = buildWhatsAppLink(
+    "Bonjour Anthony, je viens de faire le diagnostic sur coai.fr et je suis intéressé(e) par une séance VIP."
+  );
+
   function handleCreerCompte() {
     const personaAutreResolue = personaAutreTexte.trim();
     const santeReelle = resolveAutre(sante, santeAutreTexte).filter((s) => s !== AUCUNE_DOULEUR_LABEL);
@@ -334,7 +410,7 @@ export function DiagnosticQuiz() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg">
+    <div className={`mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-3xl" : "max-w-lg"}`}>
       <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_-48px_rgba(0,0,0,0.9)]">
         {step !== "intro" && step !== "result" && (
           <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
@@ -569,51 +645,94 @@ export function DiagnosticQuiz() {
           )}
 
           {step === "result" && diagnostic && (
-            <div className="flex flex-col items-center gap-5 py-2 text-center">
-              <SectionLabel>Ton diagnostic</SectionLabel>
-              <h2 className="font-display text-2xl font-semibold text-white">{diagnostic.titre}.</h2>
-              <p className="max-w-sm text-sm leading-6 text-graphite-300">{diagnostic.accroche}</p>
-              {diagnostic.alerte && (
-                <p className="max-w-sm rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
-                  {diagnostic.alerte}
-                </p>
-              )}
-
-              <VoletCard label="Entraînement">
-                {diagnostic.split && <p>{diagnostic.split}</p>}
-                <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
-                  {diagnostic.exercices.map((ex) => (
-                    <li key={ex}>• {ex}</li>
-                  ))}
-                </ul>
-              </VoletCard>
-
-              {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
-
-              {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
-
-              <div className="w-full max-w-sm rounded-xl border border-laiton-400/25 bg-laiton-400/[0.06] px-4 py-4 text-left">
-                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-400">
-                  Notre recommandation
-                </span>
-                <p className="mt-1.5 font-display text-lg font-semibold text-white">{diagnostic.recommandation.label}</p>
-                <p className="mt-1 text-xs leading-5 text-graphite-400">{diagnostic.recommandation.raison}</p>
+            <div className="flex flex-col items-center gap-7 py-2 text-center">
+              <div className="flex flex-col items-center gap-3">
+                <SectionLabel>Ton diagnostic</SectionLabel>
+                <h2 className="coai-gradient-text font-display text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-4xl">
+                  {diagnostic.titre}.
+                </h2>
+                <p className="max-w-md text-sm leading-6 text-graphite-300">{diagnostic.accroche}</p>
+                {diagnostic.alerte && (
+                  <p className="max-w-md rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
+                    {diagnostic.alerte}
+                  </p>
+                )}
               </div>
 
-              <div className="mt-1 flex w-full max-w-xs flex-col gap-2">
-                <Link href={signUpHref(diagnostic.recommandation.plan === "STANDARD")} onClick={handleCreerCompte}>
-                  <Button className="w-full">Créer mon compte — {diagnostic.recommandation.label} →</Button>
-                </Link>
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-graphite-600">
-                  7 jours offerts, sans engagement
-                </span>
-                <Link
-                  href={signUpHref(diagnostic.recommandation.plan !== "STANDARD")}
-                  onClick={handleCreerCompte}
-                  className="mt-1 text-xs text-graphite-500 underline hover:text-graphite-300"
-                >
-                  Je préfère {diagnostic.recommandation.plan === "STANDARD" ? "Impulsion" : "Transformation"}
-                </Link>
+              <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+                <VoletCard label="Entraînement">
+                  {diagnostic.split && <p>{diagnostic.split}</p>}
+                  <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
+                    {diagnostic.exercices.map((ex) => (
+                      <li key={ex}>• {ex}</li>
+                    ))}
+                  </ul>
+                </VoletCard>
+
+                {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
+
+                {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
+              </div>
+
+              <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-5 text-left sm:flex-row sm:items-center sm:gap-5">
+                <span className="text-2xl">🎯</span>
+                <p className="text-sm leading-6 text-graphite-200">
+                  <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
+                  Transformation, chaque programme est validé et ajusté par un{" "}
+                  <span className="text-laiton-300">coach diplômé d&apos;État</span>, et ton{" "}
+                  <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> pour t&apos;aider
+                  entre deux séances.
+                </p>
+              </div>
+
+              <div className="flex w-full flex-col gap-4">
+                <SectionLabel>Nos formules</SectionLabel>
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+                  {FORMULES.map((formule) => {
+                    const recommandee = formule.plan === diagnostic.recommandation.plan;
+                    if (formule.plan === "VIP") {
+                      return (
+                        <FormuleCard
+                          key={formule.nom}
+                          formule={formule}
+                          recommandee={recommandee}
+                          cta={
+                            vipHref ? (
+                              <a href={vipHref} target="_blank" rel="noopener noreferrer">
+                                <Button variant="secondary" className="w-full">
+                                  Réserver via WhatsApp
+                                </Button>
+                              </a>
+                            ) : (
+                              <Button variant="secondary" className="w-full" disabled>
+                                Contacter Anthony
+                              </Button>
+                            )
+                          }
+                        />
+                      );
+                    }
+                    return (
+                      <FormuleCard
+                        key={formule.nom}
+                        formule={formule}
+                        recommandee={recommandee}
+                        cta={
+                          <div className="flex flex-col gap-1.5">
+                            <Link href={signUpHref(formule.plan === "STANDARD")} onClick={handleCreerCompte}>
+                              <Button variant={recommandee ? "primary" : "secondary"} className="w-full">
+                                Créer mon compte
+                              </Button>
+                            </Link>
+                            <span className="text-center font-mono text-[9px] uppercase tracking-[0.1em] text-graphite-600">
+                              7 jours offerts
+                            </span>
+                          </div>
+                        }
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
