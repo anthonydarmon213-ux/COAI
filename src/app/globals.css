@@ -169,28 +169,6 @@ html {
   }
 }
 
-/* Aura du coach IA : même vocabulaire visuel que l'orbe déjà utilisée sur la
-   landing page (doré/acier), pendant que le coach IA réfléchit. */
-.coai-coach-aura {
-  position: relative;
-  width: 6.5rem;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(255, 255, 255, 0.55),
-    rgba(201, 162, 98, 0.55) 32%,
-    rgba(91, 130, 150, 0.4) 66%,
-    transparent 78%
-  );
-  filter: blur(1px);
-  opacity: 0.45;
-  transition: opacity 0.6s ease;
-}
-.coai-coach-aura.is-thinking {
-  opacity: 0.95;
-}
-
 /* Écran d'intro (mark animé) : arc humain qui se referme, puis anneau IA qui
    apparaît, puis le point central — la séquence raconte "l'IA génère,
    l'humain valide". Rejoue l'ouverture du brand book. */
