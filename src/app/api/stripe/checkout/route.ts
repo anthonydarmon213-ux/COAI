@@ -16,10 +16,10 @@ const PRICE_ENV_BY_PLAN = {
 // Stripe avec carte obligatoire dès l'inscription —
 // payment_method_collection: "always" force la saisie de la CB même si la
 // première facture est à 0€. Le body peut passer skipTrial: true (proposé
-// à l'inscription Impulsion pour qui ne veut pas attendre 7 jours, pas
-// encore d'équivalent sur Transformation) pour facturer immédiatement au
-// lieu de passer par l'essai — même price, juste sans trial_period_days ;
-// le programme se débloque alors dès le paiement (cf. isInTrial côté
+// à l'inscription pour qui ne veut pas attendre 7 jours, sur les deux
+// offres depuis le 11/08/2026) pour facturer immédiatement au lieu de
+// passer par l'essai — même price, juste sans trial_period_days ; le
+// programme se débloque alors dès le paiement (cf. isInTrial côté
 // génération, qui bloque déjà la génération pendant l'essai quel que soit
 // le palier). PREMIUM (ancienne offre 199€/mois) n'est plus exposé sur
 // /pricing, reste géré ici pour d'éventuels abonnés existants, et ne passe
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const plan =
     body.plan === "PREMIUM" ? "PREMIUM" : body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
-  const skipTrial = plan === "GRATUIT" && body.skipTrial === true;
+  const skipTrial = plan !== "PREMIUM" && body.skipTrial === true;
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!user) {

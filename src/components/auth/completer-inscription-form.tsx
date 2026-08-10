@@ -15,6 +15,12 @@ export function CompleterInscriptionForm({
   prenomSuggere: string;
   planInitial: "GRATUIT" | "STANDARD";
 }) {
+  // 11/08/2026 : Transformation propose désormais le même choix "7 jours
+  // offerts" / "démarrer tout de suite" qu'Impulsion (avant ça,
+  // Transformation passait toujours par l'essai, sans option immédiate).
+  const nomFormule = planInitial === "STANDARD" ? "Transformation" : "Impulsion";
+  const prixMensuel = planInitial === "STANDARD" ? "49€" : "19€";
+
   const [prenom, setPrenom] = useState(prenomSuggere);
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);
@@ -59,9 +65,7 @@ export function CompleterInscriptionForm({
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          planInitial === "STANDARD" ? { plan: "STANDARD" } : { plan: "GRATUIT", skipTrial }
-        ),
+        body: JSON.stringify({ plan: planInitial, skipTrial }),
       });
       const checkoutData = await checkoutRes.json();
       if (!checkoutRes.ok || !checkoutData.url) {
@@ -104,44 +108,38 @@ export function CompleterInscriptionForm({
         Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de doute
         ou d&apos;antécédent médical.
       </label>
-      {planInitial === "STANDARD" ? (
-        <p className="rounded-lg border border-laiton-400/40 bg-laiton-400/10 px-3 py-2 text-xs text-laiton-200">
-          Formule <span className="font-semibold">Transformation — 7 jours offerts</span>, puis
-          49€/mois. Programme relu et validé par un coach diplômé d&apos;État.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
-            Formule Impulsion — 19€/mois
-          </span>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setSkipTrial(false)}
-              className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                !skipTrial
-                  ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                  : "border-graphite-800 text-graphite-400 hover:text-white"
-              }`}
-            >
-              <span className="block font-semibold">7 jours offerts</span>
-              <span className="block text-graphite-500">puis 19€/mois</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setSkipTrial(true)}
-              className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                skipTrial
-                  ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                  : "border-graphite-800 text-graphite-400 hover:text-white"
-              }`}
-            >
-              <span className="block font-semibold">Démarrer tout de suite</span>
-              <span className="block text-graphite-500">19€/mois dès aujourd&apos;hui</span>
-            </button>
-          </div>
+      <div className="flex flex-col gap-2">
+        <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
+          Formule {nomFormule} — {prixMensuel}/mois
+          {planInitial === "STANDARD" && " · programme relu par un coach diplômé d'État"}
+        </span>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setSkipTrial(false)}
+            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+              !skipTrial
+                ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                : "border-graphite-800 text-graphite-400 hover:text-white"
+            }`}
+          >
+            <span className="block font-semibold">7 jours offerts</span>
+            <span className="block text-graphite-500">puis {prixMensuel}/mois</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSkipTrial(true)}
+            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+              skipTrial
+                ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                : "border-graphite-800 text-graphite-400 hover:text-white"
+            }`}
+          >
+            <span className="block font-semibold">Démarrer tout de suite</span>
+            <span className="block text-graphite-500">{prixMensuel}/mois dès aujourd&apos;hui</span>
+          </button>
         </div>
-      )}
+      </div>
       <label className="flex items-start gap-2 text-sm text-graphite-300">
         <input
           type="checkbox"
@@ -149,26 +147,14 @@ export function CompleterInscriptionForm({
           onChange={(e) => setConsentOffre(e.target.checked)}
           className="mt-1"
         />
-        {planInitial === "STANDARD" ? (
-          <>
-            Je reconnais avoir pris connaissance des conditions de l&apos;offre Transformation :
-            7 jours d&apos;accès gratuit à compter de ce jour, puis passage automatique à un
-            abonnement de 49€/mois, sauf résiliation avant la fin des 7 jours. Je demande le
-            début immédiat du service et reconnais renoncer à mon droit de rétractation de 14
-            jours pour la partie du service déjà utilisée durant la période offerte. J&apos;accepte
-            les{" "}
-            <Link href="/cgv" target="_blank" className="underline">
-              CGV
-            </Link>
-            .
-          </>
-        ) : skipTrial ? (
+        {skipTrial ? (
           <>
             Je reconnais avoir pris connaissance des conditions de l&apos;offre : abonnement
-            Impulsion à 19€/mois, facturé immédiatement dès l&apos;inscription (sans période
-            d&apos;essai). Je demande le début immédiat du service et reconnais renoncer à mon
-            droit de rétractation de 14 jours pour la partie du service déjà utilisée.
-            J&apos;accepte les{" "}
+            {" "}
+            {nomFormule} à {prixMensuel}/mois, facturé immédiatement dès l&apos;inscription
+            (sans période d&apos;essai). Je demande le début immédiat du service et reconnais
+            renoncer à mon droit de rétractation de 14 jours pour la partie du service déjà
+            utilisée. J&apos;accepte les{" "}
             <Link href="/cgv" target="_blank" className="underline">
               CGV
             </Link>
@@ -176,11 +162,12 @@ export function CompleterInscriptionForm({
           </>
         ) : (
           <>
-            Je reconnais avoir pris connaissance des conditions de l&apos;offre : 7 jours
-            d&apos;accès gratuit à compter de ce jour, puis passage automatique à un abonnement de
-            19€/mois, sauf résiliation avant la fin des 7 jours. Je demande le début immédiat du
-            service et reconnais renoncer à mon droit de rétractation de 14 jours pour la partie
-            du service déjà utilisée durant la période offerte. J&apos;accepte les{" "}
+            Je reconnais avoir pris connaissance des conditions de l&apos;offre {nomFormule} : 7
+            jours d&apos;accès gratuit à compter de ce jour, puis passage automatique à un
+            abonnement de {prixMensuel}/mois, sauf résiliation avant la fin des 7 jours. Je
+            demande le début immédiat du service et reconnais renoncer à mon droit de
+            rétractation de 14 jours pour la partie du service déjà utilisée durant la période
+            offerte. J&apos;accepte les{" "}
             <Link href="/cgv" target="_blank" className="underline">
               CGV
             </Link>
@@ -192,11 +179,9 @@ export function CompleterInscriptionForm({
       <Button type="submit" disabled={loading}>
         {loading
           ? "Redirection vers le paiement…"
-          : planInitial === "STANDARD"
-            ? "Accéder à mon espace — 7 jours offerts"
-            : skipTrial
-              ? "Démarrer maintenant — 19€/mois"
-              : "Accéder à mon espace — 7 jours offerts"}
+          : skipTrial
+            ? `Démarrer maintenant — ${prixMensuel}/mois`
+            : "Accéder à mon espace — 7 jours offerts"}
       </Button>
     </form>
   );
