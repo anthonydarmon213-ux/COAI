@@ -4,6 +4,41 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Correction prioritaire — offre Transformation à parcours unique (11/08/2026, nuit)
+
+Signalé par Anthony : l'ancien double choix "7 jours offerts" / "Démarrer
+tout de suite — 49€/mois dès aujourd'hui" traînait encore sur l'inscription
+Transformation, alors que ce même choix avait déjà été retiré d'Impulsion
+plus tôt dans la nuit. Retiré uniquement pour Transformation ici — Impulsion,
+VIP, le diagnostic, le profil et la génération non touchés, comme demandé.
+
+- **Frontend** (`sign-up/page.tsx`, `completer-inscription-form.tsx`) : le
+  bloc à deux boutons (`skipTrial` toggle) supprimé pour STANDARD, remplacé
+  par le même texte informatif à parcours unique qu'Impulsion (adapté :
+  "généré à partir de ton profil et affiché comme « à valider par ton
+  coach »"). Case de consentement et CTA final ("Commencer gratuitement")
+  également unifiés — plus de branche conditionnelle sur `skipTrial`, l'état
+  React `skipTrial` supprimé des deux composants.
+- **Backend Stripe** (`/api/stripe/checkout`) — point important soulevé par
+  Anthony : *"il ne suffit pas de modifier l'interface"*. Avant cette
+  correction, la route acceptait `skipTrial: true` dans le body pour
+  n'importe quel plan non-PREMIUM (`plan !== "PREMIUM"`) — un appel direct à
+  l'API (hors UI) pouvait donc encore facturer Transformation immédiatement.
+  Restreint explicitement à `plan === "GRATUIT"` : Transformation ne peut
+  plus jamais sauter l'essai, quoi que le client envoie. Impulsion garde la
+  capacité côté backend (son interface ne l'utilise déjà plus non plus,
+  donc aucun changement de comportement réel pour elle).
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres (bundle
+`/sign-up` réduit de 4,84 kB à 4,49 kB, cohérent avec le code mort retiré).
+Script Playwright réel (pas de simulation) sur `/sign-up?plan=STANDARD` :
+recherche textuelle sur la page rendue confirmant l'absence complète de
+"Démarrer tout de suite" et "Démarrer maintenant", présence de "Commencer
+gratuitement" — mobile et desktop. Même vérification sur `/sign-up`
+(Impulsion) pour confirmer l'absence de régression. Capture mobile
+envoyée à Anthony : carte unique, "7 jours offerts · puis 49€/mois", CTA
+unique.
+
 ## Phase 5.1 — correction structurante de l'onboarding (11/08/2026, nuit)
 
 Brief formel : le diagnostic ne doit plus suffire à lui seul à déclencher la

@@ -11,19 +11,23 @@ const PRICE_ENV_BY_PLAN = {
 
 // Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
 // d'appel, 7 jours offerts puis 19€/mois) et STANDARD (affiché
-// "Transformation", 7 jours offerts puis 49€/mois, décision d'Anthony du
-// 10/08/2026 d'étendre l'essai aux deux offres) passent par un essai
+// "Transformation", 7 jours offerts puis 49€/mois) passent par un essai
 // Stripe avec carte obligatoire dès l'inscription —
 // payment_method_collection: "always" force la saisie de la CB même si la
-// première facture est à 0€. Le body peut passer skipTrial: true (proposé
-// à l'inscription pour qui ne veut pas attendre 7 jours, sur les deux
-// offres depuis le 11/08/2026) pour facturer immédiatement au lieu de
-// passer par l'essai — même price, juste sans trial_period_days ; le
-// programme se débloque alors dès le paiement (cf. isInTrial côté
-// génération, qui bloque déjà la génération pendant l'essai quel que soit
-// le palier). PREMIUM (ancienne offre 199€/mois) n'est plus exposé sur
-// /pricing, reste géré ici pour d'éventuels abonnés existants, et ne passe
-// jamais par un essai.
+// première facture est à 0€.
+//
+// skipTrial (11/08/2026, correction Anthony) : Transformation n'a plus
+// qu'un seul parcours possible, l'essai de 7 jours — jamais de facturation
+// immédiate, quoi que le client envoie dans le body. Restreint ici
+// explicitement à GRATUIT (`plan === "GRATUIT"`, pas juste `!== PREMIUM`)
+// pour que ce ne soit pas seulement l'interface qui ait retiré le choix
+// pour Transformation : impossible de contourner via un appel direct à
+// cette route. GRATUIT garde la capacité côté backend même si son interface
+// n'expose plus ce choix non plus (cf. sign-up/page.tsx) — capacité inerte,
+// non un comportement actif, donc pas un changement pour Impulsion.
+// PREMIUM (ancienne offre 199€/mois) n'est plus exposé sur /pricing, reste
+// géré ici pour d'éventuels abonnés existants, et ne passe jamais par un
+// essai (déjà exclu par `plan === "GRATUIT"` ci-dessous).
 // client_reference_id porte l'id User applicatif, utilisé par le webhook pour
 // relier la subscription Stripe à l'utilisateur.
 export async function POST(request: Request) {
@@ -35,7 +39,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const plan =
     body.plan === "PREMIUM" ? "PREMIUM" : body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
-  const skipTrial = plan !== "PREMIUM" && body.skipTrial === true;
+  const skipTrial = plan === "GRATUIT" && body.skipTrial === true;
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!user) {

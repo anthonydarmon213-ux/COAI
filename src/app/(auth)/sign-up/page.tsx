@@ -23,9 +23,6 @@ export default function SignUpPage() {
   // sans ça cette page créait toujours un abonnement Impulsion par défaut,
   // quelle que soit l'offre initialement choisie.
   const planVoulu: "GRATUIT" | "STANDARD" = searchParams.get("plan") === "STANDARD" ? "STANDARD" : "GRATUIT";
-  // 11/08/2026 : Transformation propose désormais le même choix
-  // "7 jours offerts" / "démarrer tout de suite" qu'Impulsion (avant ça,
-  // Transformation passait toujours par l'essai, sans option immédiate).
   const nomFormule = planVoulu === "STANDARD" ? "Transformation" : "Impulsion";
   const prixMensuel = planVoulu === "STANDARD" ? "49€" : "19€";
 
@@ -52,7 +49,6 @@ export default function SignUpPage() {
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);
   const [consentOffre, setConsentOffre] = useState(false);
-  const [skipTrial, setSkipTrial] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -108,7 +104,7 @@ export default function SignUpPage() {
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planVoulu, skipTrial }),
+        body: JSON.stringify({ plan: planVoulu }),
       });
       const checkoutData = await checkoutRes.json();
       if (!checkoutRes.ok || !checkoutData.url) {
@@ -191,59 +187,27 @@ export default function SignUpPage() {
               Formule {nomFormule} — {prixMensuel}/mois
               {planVoulu === "STANDARD" && " · programme relu par un coach diplômé d'État"}
             </span>
-            {planVoulu === "STANDARD" ? (
-              <>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSkipTrial(false)}
-                    className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                      !skipTrial
-                        ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                        : "border-graphite-800 text-graphite-400 hover:text-white"
-                    }`}
-                  >
-                    <span className="block font-semibold">7 jours offerts</span>
-                    <span className="block text-graphite-500">puis {prixMensuel}/mois</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSkipTrial(true)}
-                    className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                      skipTrial
-                        ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                        : "border-graphite-800 text-graphite-400 hover:text-white"
-                    }`}
-                  >
-                    <span className="block font-semibold">Démarrer tout de suite</span>
-                    <span className="block text-graphite-500">{prixMensuel}/mois dès aujourd&apos;hui</span>
-                  </button>
-                </div>
-                <p className="text-xs leading-5 text-graphite-500">
-                  {skipTrial ? (
-                    <>
-                      Ton programme complet est généré dès la fin du paiement, et ta séance de
-                      coaching visio de 30 min avec Anthony est disponible immédiatement (à
-                      réserver via WhatsApp).
-                    </>
-                  ) : (
-                    <>
-                      Ton programme est généré dès l&apos;activation de ton essai — 7 jours offerts,
-                      puis {prixMensuel}/mois (la séance visio avec Anthony aussi).
-                    </>
-                  )}
-                </p>
-              </>
-            ) : (
-              // Impulsion (11/08/2026, correction Anthony) : un seul parcours,
-              // plus de choix essai/paiement immédiat — moins engageant pour
-              // un trafic froid (pub TikTok/Instagram) de demander un choix
-              // supplémentaire. L'essai donne un accès réel et immédiat.
-              <p className="text-xs leading-5 text-graphite-500">
-                Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement
-                pendant 7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de l&apos;essai.
-              </p>
-            )}
+            {/* Un seul parcours pour Impulsion (correction Anthony du 11/08/2026)
+                comme pour Transformation (correction du 11/08/2026, nuit) : plus
+                de choix essai/paiement immédiat — moins engageant pour un trafic
+                froid de demander un choix supplémentaire, et l'essai donne déjà
+                un accès réel et immédiat (programme généré tout de suite, cf.
+                ActivationFlow). */}
+            <p className="text-xs leading-5 text-graphite-500">
+              {planVoulu === "STANDARD" ? (
+                <>
+                  Ton programme COAI est disponible immédiatement, généré à partir de ton profil
+                  et affiché comme « à valider par ton coach ». Profite de COAI gratuitement
+                  pendant 7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de
+                  l&apos;essai.
+                </>
+              ) : (
+                <>
+                  Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement
+                  pendant 7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de l&apos;essai.
+                </>
+              )}
+            </p>
           </div>
           <label className="flex items-start gap-2 text-sm text-graphite-300">
             <input
@@ -252,42 +216,20 @@ export default function SignUpPage() {
               onChange={(e) => setConsentOffre(e.target.checked)}
               className="mt-1"
             />
-            {skipTrial ? (
-              <>
-                Je reconnais avoir pris connaissance des conditions de l&apos;offre : abonnement{" "}
-                {nomFormule} à {prixMensuel}/mois, facturé immédiatement dès l&apos;inscription
-                (sans période d&apos;essai). Je demande le début immédiat du service et reconnais
-                renoncer à mon droit de rétractation de 14 jours pour la partie du service déjà
-                utilisée. J&apos;accepte les{" "}
-                <Link href="/cgv" target="_blank" className="underline">
-                  CGV
-                </Link>
-                .
-              </>
-            ) : (
-              <>
-                Je reconnais avoir pris connaissance des conditions de l&apos;offre {nomFormule} :
-                7 jours d&apos;accès gratuit à compter de ce jour, puis passage automatique à un
-                abonnement de {prixMensuel}/mois, sauf résiliation avant la fin des 7 jours. Je
-                demande le début immédiat du service et reconnais renoncer à mon droit de
-                rétractation de 14 jours pour la partie du service déjà utilisée durant la
-                période offerte. J&apos;accepte les{" "}
-                <Link href="/cgv" target="_blank" className="underline">
-                  CGV
-                </Link>
-                .
-              </>
-            )}
+            Je reconnais avoir pris connaissance des conditions de l&apos;offre {nomFormule} : 7
+            jours d&apos;accès gratuit à compter de ce jour, puis passage automatique à un
+            abonnement de {prixMensuel}/mois, sauf résiliation avant la fin des 7 jours. Je
+            demande le début immédiat du service et reconnais renoncer à mon droit de
+            rétractation de 14 jours pour la partie du service déjà utilisée durant la période
+            offerte. J&apos;accepte les{" "}
+            <Link href="/cgv" target="_blank" className="underline">
+              CGV
+            </Link>
+            .
           </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading
-              ? "Redirection vers le paiement…"
-              : planVoulu === "GRATUIT"
-                ? "Commencer gratuitement"
-                : skipTrial
-                  ? `Démarrer maintenant — ${prixMensuel}/mois`
-                  : "Créer mon compte — 7 jours offerts"}
+            {loading ? "Redirection vers le paiement…" : "Commencer gratuitement"}
           </Button>
         </form>
         <p className="text-sm text-graphite-400">
