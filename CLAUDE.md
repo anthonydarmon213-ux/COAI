@@ -4,6 +4,31 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Nouvel axe de marque : "un coaching qui apprend" (11/08/2026, nuit)
+
+Formulé par Anthony après la refonte du hero, en repensant à tout ce qui a
+été construit ce soir (moteur d'adaptation, NEAT, "ton programme évolue
+avec toi") : ce n'est pas juste un générateur de programme, c'est un
+système qui apprend de l'utilisateur et devient meilleur avec le temps.
+
+**Formulation retenue** :
+- "COAI n'est pas un générateur de programmes."
+- "COAI est un coaching qui apprend."
+- "Plus COAI te connaît, meilleur devient ton coaching."
+
+Différence avec "L'humain valide. L'IA personnalise." (signature actuelle
+du hero) : cette dernière décrit le *mécanisme* (qui fait quoi) ; le
+nouvel axe décrit le *bénéfice* pour l'utilisateur (ça s'améliore avec le
+temps, plus tu l'utilises). Les deux ne s'excluent pas — la signature
+reste valable comme sous-titre technique/rassurant, ce nouvel axe est
+plus fort comme accroche principale (pub, réseaux sociaux, peut-être même
+le kicker du hero à terme).
+
+Anthony compte l'utiliser largement (produit + futures pubs) — décision
+prise, pas encore déployée nulle part. Prochaine étape à clarifier avec
+lui : où en priorité (hero ? pubs Meta ? les deux ?) et si ça remplace ou
+complète "L'humain valide. L'IA personnalise." dans le hero actuel.
+
 ## Refonte du hero de la homepage (11/08/2026, nuit)
 
 Demandé par Anthony à partir d'une maquette de référence (nav complète +
