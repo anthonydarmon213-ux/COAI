@@ -18,10 +18,9 @@ function isGroup(item: NavItem): item is NavGroup {
 // Suivi (/suivi/*) et Compte (/compte/*) regroupent des routes déjà liées
 // par leur préfixe d'URL — évite un menu à 9 entrées à plat.
 const LINKS: NavItem[] = [
-  { href: "/dashboard", label: "Tableau de bord" },
-  { href: "/compte/profil", label: "Votre profil" },
+  { href: "/dashboard", label: "Aujourd’hui" },
   {
-    label: "Votre programme",
+    label: "Programme",
     children: [
       { href: "/programme/entrainement", label: "Entraînement" },
       { href: "/programme/alimentation", label: "Alimentation" },
@@ -30,7 +29,7 @@ const LINKS: NavItem[] = [
     ],
   },
   {
-    label: "Votre suivi",
+    label: "Suivi",
     children: [
       { href: "/suivi/seances", label: "Séances" },
       { href: "/suivi/alimentation", label: "Nutrition" },
@@ -39,15 +38,8 @@ const LINKS: NavItem[] = [
       { href: "/suivi/progression", label: "Progression" },
     ],
   },
-  {
-    label: "Vos coachs",
-    children: [
-      { href: "/compte/abonnement", label: "Coach humain" },
-      { href: "/coach", label: "Coach IA" },
-    ],
-  },
-  { href: "/avis", label: "Donner mon avis" },
-  { href: "/compte/parametres", label: "Paramètres" },
+  { href: "/compte/profil", label: "Profil" },
+  { href: "/coach", label: "Coach" },
 ];
 
 const ACTIVE_CLASS =
@@ -186,7 +178,14 @@ export function AppNav() {
           return <NavGroupDropdown key={item.label} item={item} active={groupActive} />;
         })}
       </nav>
-      <div className="mt-8 hidden border-t border-white/[0.07] pt-6 md:block"><p className="text-xs leading-5 text-graphite-500">Une méthode conçue et supervisée par Anthony Darmon.</p></div>
+      <div className="mt-8 hidden border-t border-white/[0.07] pt-6 md:block">
+        <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-graphite-500">
+          <Link href="/avis" className="hover:text-white">Donner mon avis</Link>
+          <Link href="/compte/parametres" className="hover:text-white">Paramètres</Link>
+          <Link href="/compte/abonnement" className="hover:text-white">Abonnement</Link>
+        </div>
+        <p className="text-xs leading-5 text-graphite-500">Une méthode conçue et supervisée par Anthony Darmon.</p>
+      </div>
     </aside>
   );
 }
