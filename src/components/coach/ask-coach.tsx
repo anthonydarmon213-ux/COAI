@@ -101,7 +101,7 @@ export function AskCoach() {
             </svg>
           )}
           {loading && (
-            <span className="relative font-mono text-sm font-medium text-graphite-50">
+            <span className="absolute inset-0 flex items-center justify-center font-mono text-sm font-medium text-graphite-50">
               {progress}%
             </span>
           )}
