@@ -61,6 +61,32 @@ la friction avant abonnement, le funnel devient accueil → diagnostic
 gratuit → découverte de la valeur, pas une demande d'achat immédiate.
 Revérifié `tsc`/`build` + captures desktop/mobile.
 
+**Malentendu découvert juste après (même soirée)** : Anthony pensait que
+"le hero" désignait l'écran d'ouverture plein écran (`CoaiIntro` — logo
+animé + titre + CTA "Diagnostic offert" avec flèches), pas la section
+`id="hero"` avec les mockups téléphone juste en dessous — deux sections
+distinctes que ni la maquette ni les échanges précédents ne distinguaient
+clairement. Confirmé par son brief suivant, qui cite mot pour mot l'ancien
+texte de `CoaiIntro` ("Fais passer ta santé au niveau supérieur.") comme
+"titre actuel" à remplacer. Appliqué à `CoaiIntro` (pas touché à la
+section `id="hero"` du dessous, comme demandé) : même kicker/titre/
+sous-titre que la section du dessous, mais CTA différents cette fois —
+"Créer mon programme" (garde le lien `/diagnostic` existant, juste le
+libellé change) + "Découvrir comment ça marche" (ancre `#comment-ca-marche`)
++ micro-copy "Un programme personnalisé au départ. Adapté dans le temps."
+Testé aussi sur petit écran (iPhone SE, 375×667) pour vérifier l'absence
+de coupure moche du titre.
+
+**Point de vigilance non résolu, à soulever avec Anthony** : `CoaiIntro`
+et la section `id="hero"` affichent maintenant un kicker + titre + sous-
+titre quasi identiques, l'un juste après l'autre au scroll — exactement le
+type de répétition que son tout premier brief demandait d'éviter. Comme
+son brief le plus récent portait explicitement sur `CoaiIntro` seul et
+disait "ne modifie rien d'autre", la section du dessous n'a pas été
+touchée. À trancher avec lui : fusionner les deux (garder le texte dans
+`CoaiIntro`, simplifier la section du dessous pour ne garder que les
+mockups téléphone + la ligne de fonctionnalités), ou une autre approche.
+
 ## Phase 3, bloc NEAT — activité quotidienne (11/08/2026, nuit)
 
 Demandé par Anthony après validation de la Phase 2 : premier bloc dédié de

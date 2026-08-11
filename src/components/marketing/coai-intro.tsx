@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 // Écran d'ouverture de la landing page : rejoue la séquence du brand book
 // (arc humain qui se referme, anneau IA qui apparaît, point central) avant
@@ -70,26 +71,33 @@ export function CoaiIntro() {
         <span className="font-mono text-xs uppercase tracking-[0.32em] text-laiton-400">HI × AI™</span>
       </div>
 
-      <div className="relative z-10 flex max-w-lg flex-col items-center gap-3">
-        <p className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-white sm:text-2xl">
-          Fais passer ta santé au niveau supérieur.
+      <div className="relative z-10 flex max-w-2xl flex-col items-center gap-5">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
+          L&apos;humain valide. L&apos;IA personnalise.
         </p>
-        <p className="max-w-md text-sm leading-6 text-graphite-400 sm:text-base">
-          Découvre le coaching augmenté : une IA qui génère ton programme sur-mesure — nutrition
-          comprise —, un coach qui le valide, jamais seul jusqu&apos;à ton objectif.
+        <h1 className="font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
+          Ton programme <span className="text-laiton-300">évolue</span> avec toi.
+        </h1>
+        <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
+          Ton corps change. Ton emploi du temps change. Tes performances changent. COAI adapte
+          ton entraînement, ta nutrition et ta récupération au fil du temps.
         </p>
       </div>
 
-      <div className="relative z-10 mt-6 flex items-center gap-3">
-        <span aria-hidden="true" className="animate-nudge-right text-acier">→</span>
-        <Link
-          href="/diagnostic"
-          className="group flex items-center gap-2 rounded-full border border-acier/40 bg-acier/[0.08] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.22em] text-laiton-300 shadow-[0_8px_24px_-12px_rgba(91,130,150,0.6)] transition hover:border-acier/70 hover:bg-acier/[0.14] hover:text-laiton-200"
-        >
-          Diagnostic offert
-          <span aria-hidden="true" className="text-acier transition group-hover:translate-x-0.5">→</span>
-        </Link>
-        <span aria-hidden="true" className="animate-nudge-left text-acier">←</span>
+      <div className="relative z-10 mt-2 flex flex-col items-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/diagnostic">
+            <Button className="px-7 py-3 uppercase tracking-wide">Créer mon programme</Button>
+          </Link>
+          <a href="#comment-ca-marche">
+            <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
+              Découvrir comment ça marche
+            </Button>
+          </a>
+        </div>
+        <p className="text-xs text-graphite-500">
+          Un programme personnalisé au départ. Adapté dans le temps.
+        </p>
       </div>
     </section>
   );
