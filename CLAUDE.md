@@ -59,6 +59,29 @@ pour le détail/contexte de chaque sujet) :
       remplit qu'avec les avis consentis (rien à afficher tant qu'aucun
       abonné n'a coché la case).
 
+## Tracking conversions Meta Pixel (11/08/2026)
+
+Troisième repêchage de la même autre session Cowork (patch jamais poussé),
+repris et vérifié ici (`tsc` + `build` réels). Le Pixel Meta (installé le
+09/08, cf. section SEO/acquisition plus bas) n'envoyait que "PageView"
+depuis son installation — aucun signal de conversion réelle ne remontait à
+Meta, alors qu'un premier budget pub Meta/Instagram a déjà été dépensé :
+l'algorithme de diffusion ne pouvait optimiser que sur les clics/vues, pas
+sur qui convertit vraiment.
+
+Trois points du funnel instrumentés avec les événements standards Meta
+(en plus de GA4, déjà en place, `src/lib/analytics.ts#trackMetaEvent`) :
+- Quiz diagnostic public → `Lead` (le seul point qui n'envoyait encore
+  aucun signal, alors que c'est la page vers laquelle pointent les pubs
+  Meta actuelles)
+- Création de compte (`/sign-up`, flow email/mot de passe) →
+  `CompleteRegistration` — **pas encore fait sur le flow Google OAuth**
+  (`completer-inscription-form.tsx`), à faire si Anthony veut une couverture
+  complète
+- Confirmation d'abonnement (`/bienvenue`) → `StartTrial` ou `Subscribe`
+  selon que l'essai de 7 jours est en cours ou déjà sauté, avec la valeur
+  mensuelle réelle de l'offre (19/49/199€)
+
 ## Réassurance page publique (11/08/2026)
 
 Même repêchage qu'au-dessus : patch d'une autre session Cowork (jamais

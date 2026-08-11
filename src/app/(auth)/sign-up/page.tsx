@@ -11,6 +11,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { clearParrainageCookie, readParrainageCookie, storeParrainageCookie } from "@/lib/parrainage/cookie";
 import { storeIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
+import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -83,6 +84,14 @@ export default function SignUpPage() {
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       clearParrainageCookie();
+
+      // Signal mi-funnel (11/08/2026) : compte créé, avant même le paiement
+      // — utile à Meta même si la personne abandonne à l'étape Stripe
+      // (jusqu'ici aucun événement entre le Lead du quiz et le Subscribe/
+      // StartTrial de /bienvenue, tout l'entre-deux était invisible pour
+      // l'algorithme de diffusion des pubs).
+      trackEvent("compte_cree", { plan: planVoulu });
+      trackMetaEvent("CompleteRegistration");
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",

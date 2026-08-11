@@ -67,9 +67,27 @@ export default async function BienvenuePage({
   const prenom = user.prenom ?? "";
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
+  // Événement Meta (11/08/2026) : StartTrial si les 7 jours offerts sont en
+  // cours (carte enregistrée, pas encore prélevée), Subscribe si le premier
+  // prélèvement a déjà eu lieu ("démarrer tout de suite", cf. sign-up).
+  // Valeur = prix mensuel réel de l'offre choisie, pour que l'algorithme Meta
+  // puisse optimiser vers les conversions les plus rentables, pas juste les
+  // plus nombreuses.
+  // PREMIUM (ancienne offre 199€, plus vendue) ne passe jamais par un essai
+  // Stripe (cf. /api/stripe/checkout) — toujours "Subscribe", jamais
+  // "StartTrial", même sans le paramètre essai=0 dans l'URL.
+  const enEssai = searchParams.plan !== "PREMIUM" && searchParams.essai !== "0";
+  const valeurMensuelle =
+    searchParams.plan === "GRATUIT" ? 19 : searchParams.plan === "PREMIUM" ? 199 : 49;
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
-      <TrackConversion name="subscription_started" params={{ plan }} />
+      <TrackConversion
+        name="subscription_started"
+        params={{ plan }}
+        metaEvent={enEssai ? "StartTrial" : "Subscribe"}
+        metaParams={{ value: valeurMensuelle, currency: "EUR" }}
+      />
 
       <div className="flex flex-col items-center gap-3">
         <SectionLabel>Accès confirmé</SectionLabel>

@@ -11,6 +11,7 @@ import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@
 import { Badge } from "@/components/ui/badge";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
+import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -407,6 +408,14 @@ export function DiagnosticQuiz() {
     } catch {
       // best-effort, cf. commentaire ci-dessus
     } finally {
+      // Seul point d'entrée du funnel qui n'envoyait encore aucun signal de
+      // conversion (11/08/2026) — pourtant c'est la page vers laquelle
+      // pointent les pubs Meta actuelles (cf. CLAUDE.md, /coach-sportif-paris
+      // avec utm_source=meta). Déclenché sur la tentative, pas sur un succès
+      // serveur confirmé, pour rester cohérent avec le best-effort ci-dessus
+      // (l'utilisateur a bien complété le quiz, quoi qu'il arrive côté API).
+      trackEvent("lead_diagnostic");
+      trackMetaEvent("Lead");
       setLeadEnvoi("idle");
       goNext();
     }
