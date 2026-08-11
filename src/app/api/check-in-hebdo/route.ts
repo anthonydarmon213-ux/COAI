@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { lundiDeSemaine } from "@/lib/checkin/semaine";
+import { trackServerEvent } from "@/lib/analytics/product-events";
 
 const bodySchema = z.object({
   sommeil: z.enum(["TRES_MAUVAIS", "MAUVAIS", "CORRECT", "BON", "EXCELLENT"]).optional(),
@@ -72,6 +73,8 @@ export async function POST(request: Request) {
     create: { userId: user.id, semaineDebut, ...parsed.data },
     update: parsed.data,
   });
+
+  trackServerEvent("weekly_checkin_completed", user.id);
 
   return NextResponse.json(checkin, { status: 201 });
 }

@@ -91,10 +91,9 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
-- [ ] Migration `20260811090000_add_programme_evolutif` à appliquer sur
-      Supabase (SQL Editor, "Run and enable RLS") — check-in séance/hebdo,
-      versionnage et adaptations ne fonctionneront pas tant que ce n'est
-      pas fait (cf. section "Nouvelle vision produit" plus haut)
+- [x] Migration `20260811090000_add_programme_evolutif` appliquée sur
+      Supabase (11/08 après-midi) — check-in séance/hebdo, versionnage et
+      adaptations opérationnels en prod
 - [x] Migration `dernierBilanMensuelEnvoyeAt` appliquée sur Supabase (11/08
       matin) — le cron bilan-mensuel a maintenant sa colonne
 - [x] Quota de crons Vercel (plan Hobby) vérifié le 11/08 matin : les 2

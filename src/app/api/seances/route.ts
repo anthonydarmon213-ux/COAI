@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { trackServerEvent } from "@/lib/analytics/product-events";
 
 const bodySchema = z.object({
   date: z.coerce.date(),
@@ -23,6 +24,7 @@ const bodySchema = z.object({
   energie: z.number().int().min(1).max(5).optional(),
   douleur: z.enum(["AUCUNE", "LEGERE", "IMPORTANTE"]).optional(),
   douleurZone: z.string().max(200).optional(),
+  dureeMinutes: z.number().int().min(0).max(600).optional(),
 });
 
 export async function GET() {
@@ -66,8 +68,14 @@ export async function POST(request: Request) {
       energie: parsed.data.energie,
       douleur: parsed.data.douleur,
       douleurZone: parsed.data.douleur === "AUCUNE" ? undefined : parsed.data.douleurZone,
+      dureeMinutes: parsed.data.dureeMinutes,
     },
   });
+
+  trackServerEvent("workout_completed", user.id);
+  if (parsed.data.difficulte != null || parsed.data.energie != null || parsed.data.douleur) {
+    trackServerEvent("workout_checkin_completed", user.id);
+  }
 
   return NextResponse.json(seance, { status: 201 });
 }

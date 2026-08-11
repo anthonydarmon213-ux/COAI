@@ -10,7 +10,9 @@ import { WatchScreenshotCta } from "@/components/dashboard/watch-screenshot-cta"
 import { ImcCard } from "@/components/dashboard/imc-card";
 import { ConseilsCoach } from "@/components/dashboard/conseils-coach";
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
+import { CoaiInsightCard } from "@/components/dashboard/coai-insight-card";
 import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import type { Pilier } from "@prisma/client";
 
 const PILIER_LABELS: Record<Pilier, string> = {
@@ -41,7 +43,7 @@ export default async function DashboardPage() {
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
   const plan = getEffectivePlan(user.subscription);
 
-  const [derniereSeance, derniereMesure, dernieresGenerations] = await Promise.all([
+  const [derniereSeance, derniereMesure, dernieresGenerations, insight] = await Promise.all([
     prisma.seanceLog.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
     prisma.mesure.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
     Promise.all(
@@ -52,6 +54,7 @@ export default async function DashboardPage() {
         })
       )
     ),
+    getCoaiInsight(user.id),
   ]);
 
   const programmeCount = dernieresGenerations.filter(Boolean).length;
@@ -65,6 +68,8 @@ export default async function DashboardPage() {
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">COAI réunit vos programmes, votre suivi et les recommandations validées par votre coach Anthony.</p>
       </div>
+
+      <CoaiInsightCard insight={insight} />
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 
@@ -120,6 +125,21 @@ export default async function DashboardPage() {
       <ConseilsCoach />
       <a href="/programme" className="group flex items-center justify-between rounded-2xl border border-laiton-400/20 bg-laiton-400/[0.06] px-6 py-5 text-sm text-laiton-300 transition hover:bg-laiton-400/[0.1]">
         <span>Voir mon profil et mon programme personnalisé</span><span className="transition group-hover:translate-x-1">→</span>
+      </a>
+
+      <a
+        href="/programme/evolution"
+        className="group flex flex-col gap-1.5 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-6 py-5 transition hover:border-laiton-400/25 hover:bg-white/[0.04]"
+      >
+        <span className="text-sm font-semibold text-white">Ce n&apos;est pas un programme figé.</span>
+        <span className="text-sm leading-6 text-graphite-400">
+          COAI apprend de tes entraînements, de ta récupération et de ton quotidien pour faire
+          évoluer ton programme au fil du temps.
+        </span>
+        <span className="mt-1 inline-flex items-center gap-1.5 text-sm text-laiton-300">
+          Voir ce que COAI a appris sur moi
+          <span className="transition group-hover:translate-x-1">→</span>
+        </span>
       </a>
 
       <PlanCard plan={plan} />

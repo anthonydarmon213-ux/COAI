@@ -29,6 +29,7 @@ export function SeanceForm() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [exercice, setExercice] = useState("");
   const [charge, setCharge] = useState("");
+  const [duree, setDuree] = useState("");
   const [difficulte, setDifficulte] = useState<number | null>(null);
   const [energie, setEnergie] = useState<number | null>(null);
   const [douleur, setDouleur] = useState<NiveauDouleur | null>(null);
@@ -60,12 +61,14 @@ export function SeanceForm() {
           energie: energie ?? undefined,
           douleur: douleur ?? undefined,
           douleurZone: douleurZone ?? undefined,
+          dureeMinutes: duree ? Number(duree) : undefined,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
       setExercice("");
       setCharge("");
+      setDuree("");
       setDifficulte(null);
       setEnergie(null);
       setDouleur(null);
@@ -101,6 +104,16 @@ export function SeanceForm() {
             placeholder="ex: 80"
             value={charge}
             onChange={(e) => setCharge(e.target.value)}
+          />
+        </Field>
+        <Field label="Durée de la séance (minutes, facultatif)">
+          <Input
+            type="number"
+            min="0"
+            step="5"
+            placeholder="ex: 50"
+            value={duree}
+            onChange={(e) => setDuree(e.target.value)}
           />
         </Field>
 

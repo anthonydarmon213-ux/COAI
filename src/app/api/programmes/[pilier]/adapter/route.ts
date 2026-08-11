@@ -21,6 +21,15 @@ const bodySchema = z.object({
   // change" → voyage, matériel indisponible...) — facultatif, sert à
   // déclencher une décision "ADAPTER" même sans assez de séances loguées.
   contrainte: z.string().max(500).optional(),
+  // Métadonnées structurées de la contrainte (cf. "Ma semaine change"),
+  // stockées telles quelles pour l'historique — jamais interprétées ici.
+  contexte: z.record(z.unknown()).optional(),
+  // Douleur signalée explicitement (hors séance loguée) — renforce le
+  // garde-fou anti-progression du moteur d'adaptation.
+  douleurSignaleeManuelle: z.enum(["LEGERE", "IMPORTANTE"]).optional(),
+  // Présent uniquement pour le mode voyage : durée en jours du programme
+  // temporaire, sert à calculer la date de fin prévue.
+  joursTemporaire: z.number().int().min(1).max(60).optional(),
 });
 
 // Déclenchement manuel de l'analyse d'adaptation (Phase 1 — bouton "Analyser
@@ -60,7 +69,16 @@ export async function POST(request: Request, { params }: { params: { pilier: str
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const resultat = await analyserEtAdapter(user, pilier, parsed.data.contrainte);
+  const finPrevue = parsed.data.joursTemporaire
+    ? new Date(Date.now() + parsed.data.joursTemporaire * 24 * 60 * 60 * 1000)
+    : null;
+
+  const resultat = await analyserEtAdapter(user, pilier, parsed.data.contrainte, {
+    contexte: parsed.data.contexte,
+    douleurSignaleeManuelle: parsed.data.douleurSignaleeManuelle,
+    temporaire: Boolean(parsed.data.joursTemporaire),
+    finPrevue,
+  });
 
   return NextResponse.json(resultat, { status: 200 });
 }

@@ -10,6 +10,7 @@ import {
   type ChangementAdaptation,
 } from "@/lib/ai/prompts/programme-adaptation-decision";
 import { collecterSignaux, donneesSuffisantes, type SignauxAdaptation } from "@/lib/adaptation/signals";
+import { trackServerEvent } from "@/lib/analytics/product-events";
 import type { Pilier, ProgrammeGenerated, User, Profile, Subscription } from "@prisma/client";
 
 const LIMITE_AUGMENTATION_CHARGE = 1.1; // +10% max par changement de charge
@@ -45,14 +46,19 @@ function extraireNombre(valeur: string | number | null): number | null {
 // dans le prompt (section 24/25 de la vision produit : "ne mets jamais des
 // règles critiques uniquement dans le prompt LLM"). Toute violation corrige
 // la décision plutôt que de la rejeter en bloc, pour ne pas perdre une
-// analyse par ailleurs valide.
+// analyse par ailleurs valide. `douleurSignaleeManuelle` couvre le flow
+// "Ma semaine change → J'ai une douleur" (signal ponctuel, pas forcément
+// encore présent dans une séance loguée) en plus de la douleur détectée
+// dans signaux.douleurRecente.
 function appliquerGardeFous(
   decisionIA: DecisionAdaptationIA,
-  signaux: SignauxAdaptation
+  signaux: SignauxAdaptation,
+  douleurSignaleeManuelle?: "LEGERE" | "IMPORTANTE" | null
 ): DecisionAdaptationIA {
   let { decision, changements } = decisionIA;
 
-  const douleurImportante = signaux.douleurRecente?.niveau === "IMPORTANTE";
+  const douleurImportante =
+    signaux.douleurRecente?.niveau === "IMPORTANTE" || douleurSignaleeManuelle === "IMPORTANTE";
   if (douleurImportante && decision === "PROGRESSER") {
     decision = "GARDER";
     changements = [];
@@ -61,7 +67,7 @@ function appliquerGardeFous(
       confiance: decisionIA.confiance,
       changements,
       resume:
-        "Une douleur importante a été signalée récemment : COAI maintient ton programme en l'état par prudence, plutôt que d'augmenter la charge. Si la gêne persiste, parles-en à ton coach ou à un professionnel de santé.",
+        "Une douleur importante a été signalée : COAI maintient ton programme en l'état par prudence, plutôt que d'augmenter la charge. COAI ne remplace pas un professionnel de santé — si la douleur est importante, inhabituelle ou persistante, demande l'avis d'un professionnel.",
     };
   }
 
@@ -136,10 +142,28 @@ function buildProfilUtilisateur(
 //    crée une nouvelle version, et trace l'adaptation avec sa raison.
 // 5. Sur Transformation (coach humain), la nouvelle version attend
 //    validation — jamais appliquée silencieusement.
+export type OptionsAdaptation = {
+  // Métadonnées de la contrainte à l'origine de la demande (ex: "Ma semaine
+  // change" → voyage, douleur...) — stockées telles quelles sur
+  // ProgrammeAdaptation.contexte pour affichage/historique, jamais lues par
+  // l'IA directement (contrainteUtilisateur, le texte, s'en charge déjà).
+  contexte?: Record<string, unknown> | null;
+  // Signal de douleur explicite hors séance loguée (cf. "Ma semaine change
+  // → J'ai une douleur") — vient renforcer le garde-fou anti-progression,
+  // en plus de signaux.douleurRecente.
+  douleurSignaleeManuelle?: "LEGERE" | "IMPORTANTE" | null;
+  // Mode voyage : la version générée est marquée temporaire avec une date
+  // de fin prévue, pour permettre "reprendre mon programme habituel" sans
+  // perdre le programme d'origine (cf. reprendreProgrammeHabituel).
+  temporaire?: boolean;
+  finPrevue?: Date | null;
+};
+
 export async function analyserEtAdapter(
   user: User & { profile: Profile | null; subscription: Subscription | null },
   pilier: Pilier,
-  contrainteUtilisateur?: string | null
+  contrainteUtilisateur?: string | null,
+  options?: OptionsAdaptation
 ): Promise<ResultatAdaptation> {
   const [signaux, programmeActuel] = await Promise.all([
     collecterSignaux(user.id, pilier),
@@ -171,7 +195,7 @@ export async function analyserEtAdapter(
   );
 
   const decisionBrute = await generateWithAI<DecisionAdaptationIA>(prompt);
-  const decision = appliquerGardeFous(decisionBrute, signaux);
+  const decision = appliquerGardeFous(decisionBrute, signaux, options?.douleurSignaleeManuelle);
 
   const actionnable = decision.decision !== "GARDER";
   const plan = getEffectivePlan(user.subscription);
@@ -191,6 +215,8 @@ export async function analyserEtAdapter(
         contenu: contenu as object,
         statut: plan === "GRATUIT" ? "GENERE_IA" : "EN_ATTENTE",
         version,
+        temporaire: options?.temporaire ?? false,
+        finPrevue: options?.finPrevue ?? null,
       },
     });
   }
@@ -208,8 +234,11 @@ export async function analyserEtAdapter(
       programmePrecedentId: programmeActuel?.id ?? null,
       programmeSuivantId: nouveauProgramme?.id ?? null,
       statut: statutAdaptation,
+      contexte: (options?.contexte as object | undefined) ?? undefined,
     },
   });
+
+  trackServerEvent("adaptation_proposed", user.id, { pilier, decision: decision.decision });
 
   if (statutAdaptation === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
@@ -227,4 +256,59 @@ export async function analyserEtAdapter(
     adaptationId: adaptation.id,
     nouvelleVersion: nouveauProgramme?.version ?? null,
   };
+}
+
+// "Ton voyage est terminé. Reprendre ton programme habituel ?" — recrée une
+// nouvelle version à partir du contenu d'AVANT l'adaptation temporaire
+// (jamais une suppression : le programme voyage reste consultable dans
+// l'historique des versions). Repère la version pré-voyage via
+// programmePrecedentId de l'adaptation qui a activé le mode voyage.
+export async function reprendreProgrammeHabituel(
+  userId: string,
+  pilier: Pilier
+): Promise<{ nouvelleVersion: number } | null> {
+  const dernierProgramme = await prisma.programmeGenerated.findFirst({
+    where: { userId, pilier },
+    orderBy: { generatedAt: "desc" },
+  });
+  if (!dernierProgramme || !dernierProgramme.temporaire) return null;
+
+  const adaptationVoyage = await prisma.programmeAdaptation.findFirst({
+    where: { userId, pilier, programmeSuivantId: dernierProgramme.id },
+    orderBy: { createdAt: "desc" },
+  });
+  const programmeAvantVoyage = adaptationVoyage?.programmePrecedentId
+    ? await prisma.programmeGenerated.findUnique({ where: { id: adaptationVoyage.programmePrecedentId } })
+    : null;
+  if (!programmeAvantVoyage) return null;
+
+  const version = await prochaineVersion(userId, pilier);
+  const nouveauProgramme = await prisma.programmeGenerated.create({
+    data: {
+      userId,
+      pilier,
+      contenu: programmeAvantVoyage.contenu as object,
+      statut: programmeAvantVoyage.statut,
+      version,
+      temporaire: false,
+    },
+  });
+
+  await prisma.programmeAdaptation.create({
+    data: {
+      userId,
+      pilier,
+      decision: "GARDER",
+      changements: [],
+      resume: "Retour au programme habituel après le mode voyage.",
+      programmePrecedentId: dernierProgramme.id,
+      programmeSuivantId: nouveauProgramme.id,
+      statut: "APPLIQUEE",
+      contexte: { type: "FIN_VOYAGE" },
+    },
+  });
+
+  trackServerEvent("travel_mode_finished", userId, { pilier });
+
+  return { nouvelleVersion: nouveauProgramme.version };
 }

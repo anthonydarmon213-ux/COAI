@@ -217,6 +217,14 @@ model ProgrammeGenerated {
   version     Int             @default(1)
   valideAt    DateTime?
   generatedAt DateTime        @default(now())
+  // Mode voyage / contraintes ponctuelles (Phase 2, 11/08/2026) : une
+  // version "temporaire" (ex: adaptation voyage) garde le programme
+  // d'origine intact dans l'historique — "reprendre mon programme habituel"
+  // crée une nouvelle version à partir du contenu d'avant l'adaptation,
+  // jamais une suppression. `finPrevue` alimente l'affichage "jusqu'au
+  // <date>" ; reste null pour toute génération normale.
+  temporaire  Boolean         @default(false)
+  finPrevue   DateTime?
 
   @@index([userId, pilier, generatedAt])
   @@index([statut, generatedAt])
@@ -251,6 +259,11 @@ model SeanceLog {
   energie     Int?           // 1 (à plat) à 5 (en pleine forme)
   douleur     NiveauDouleur?
   douleurZone String?
+  // Phase 2 (11/08/2026) : facultatif, alimente "Durée moyenne" dans "Ce
+  // que COAI apprend sur toi" — absent sur toutes les séances déjà loguées,
+  // donc cette conclusion ne s'affiche que si assez de séances récentes
+  // l'ont renseignée.
+  dureeMinutes Int?
 
   @@map("seances_log")
 }
@@ -502,6 +515,13 @@ model ProgrammeAdaptation {
   programmeSuivantId    String?
   statut                StatutAdaptation   @default(APPLIQUEE)
   noteCoach             String?
+  // Métadonnées libres selon l'origine de l'adaptation (Phase 2, 11/08/2026)
+  // — ex: { type: "VOYAGE", jours: 10, materiel: "Salle d'hôtel" } ou
+  // { type: "DOULEUR", zone: "Épaule", intensite: "LEGERE" }. JSON plutôt
+  // que des colonnes dédiées par type : la liste des contraintes ("Ma
+  // semaine change") est amenée à s'étendre sans nouvelle migration à
+  // chaque fois.
+  contexte              Json?
   createdAt             DateTime           @default(now())
 
   @@index([userId, createdAt])
