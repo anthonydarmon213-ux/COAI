@@ -219,6 +219,9 @@ export async function analyserEtAdapter(
         finPrevue: options?.finPrevue ?? null,
       },
     });
+    if (options?.temporaire) {
+      trackServerEvent("travel_mode_started", user.id, { pilier, finPrevue: options.finPrevue });
+    }
   }
 
   const statutAdaptation = !actionnable ? "APPLIQUEE" : plan === "GRATUIT" ? "APPLIQUEE" : "EN_ATTENTE";

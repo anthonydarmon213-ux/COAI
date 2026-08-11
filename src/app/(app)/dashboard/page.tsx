@@ -11,8 +11,11 @@ import { ImcCard } from "@/components/dashboard/imc-card";
 import { ConseilsCoach } from "@/components/dashboard/conseils-coach";
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { CoaiInsightCard } from "@/components/dashboard/coai-insight-card";
+import { AdaptationNotificationCard } from "@/components/dashboard/adaptation-notification-card";
+import { SemaineChangeButton } from "@/components/dashboard/semaine-change-button";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
+import { getNotificationAdaptation } from "@/lib/insight/derniere-adaptation";
 import type { Pilier } from "@prisma/client";
 
 const PILIER_LABELS: Record<Pilier, string> = {
@@ -43,19 +46,21 @@ export default async function DashboardPage() {
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
   const plan = getEffectivePlan(user.subscription);
 
-  const [derniereSeance, derniereMesure, dernieresGenerations, insight] = await Promise.all([
-    prisma.seanceLog.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
-    prisma.mesure.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
-    Promise.all(
-      piliers.map((pilier) =>
-        prisma.programmeGenerated.findFirst({
-          where: { userId: user.id, pilier },
-          orderBy: { generatedAt: "desc" },
-        })
-      )
-    ),
-    getCoaiInsight(user.id),
-  ]);
+  const [derniereSeance, derniereMesure, dernieresGenerations, insight, notificationAdaptation] =
+    await Promise.all([
+      prisma.seanceLog.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
+      prisma.mesure.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
+      Promise.all(
+        piliers.map((pilier) =>
+          prisma.programmeGenerated.findFirst({
+            where: { userId: user.id, pilier },
+            orderBy: { generatedAt: "desc" },
+          })
+        )
+      ),
+      getCoaiInsight(user.id),
+      getNotificationAdaptation(user.id),
+    ]);
 
   const programmeCount = dernieresGenerations.filter(Boolean).length;
 
@@ -70,6 +75,8 @@ export default async function DashboardPage() {
       </div>
 
       <CoaiInsightCard insight={insight} />
+
+      {notificationAdaptation && <AdaptationNotificationCard notification={notificationAdaptation} />}
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 
@@ -141,6 +148,10 @@ export default async function DashboardPage() {
           <span className="transition group-hover:translate-x-1">→</span>
         </span>
       </a>
+
+      <div className="flex justify-center">
+        <SemaineChangeButton />
+      </div>
 
       <PlanCard plan={plan} />
 

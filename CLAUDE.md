@@ -4,6 +4,69 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 2 — rendre COAI vivant et intelligent (11/08/2026, soir)
+
+Deuxième phase de la vision "programme évolutif" (cf. section ci-dessous),
+livrée et vérifiée (`tsc` + `build` réels + captures Playwright mobile/
+desktop) — reste à appliquer 2 migrations en prod (cf. checklist).
+Explicitement **pas touché** : nutrition adaptative, dashboard coach
+(Phase 3/4, à venir sur demande).
+
+- **COAI Insight** (carte premium en tête de dashboard) : réutilise le
+  résumé de la dernière adaptation réelle si elle existe (zéro coût IA
+  supplémentaire), sinon compose un constat court à partir des signaux du
+  moteur d'adaptation. Jamais de donnée inventée ; "COAI apprend encore à
+  te connaître" si rien d'exploitable.
+- **"Ce que COAI apprend sur toi"** (section sur `/programme/evolution`) :
+  fréquence habituelle, meilleur jour, récupération, exercice en
+  progression, zone à surveiller — chaque conclusion nécessite un seuil
+  minimum de données réelles (ex: 6 séances sur 90 jours pour la
+  fréquence), jamais affichée sinon. Durée de séance ajoutée (facultative)
+  au check-in post-séance pour une future "durée moyenne".
+- **Timeline "Mon évolution"** — mêmes page, événements réels uniquement
+  (compte créé, première séance, premier programme par pilier,
+  adaptations avec leur résumé, check-ins hebdo, nouveaux records
+  détectés par comparaison chronologique) — aucun événement fabriqué.
+- **"Ma semaine change"** (bouton sur le dashboard) — 10 motifs (voyage,
+  manque de temps, sommeil, fatigue, douleur, maladie, changement de
+  salle/matériel, emploi du temps, autre), chacun avec son
+  sous-formulaire minimal, qui alimente le moteur d'adaptation existant
+  (`contrainteUtilisateur`) avec un texte + un `contexte` JSON structuré
+  et extensible. La douleur signalée ici renforce le même garde-fou
+  anti-progression que la douleur loguée en séance (paramètre
+  `douleurSignaleeManuelle`), avec la phrase de prudence obligatoire
+  ("COAI ne remplace pas un professionnel de santé...").
+- **Mode voyage** — la version générée est marquée `temporaire` avec une
+  `finPrevue` (jours renseignés par l'utilisateur) ; bandeau "Mode voyage
+  activé — jusqu'au ..." + bouton "Reprendre mon programme habituel" sur
+  la page du pilier, qui recrée une version à partir du contenu
+  d'AVANT l'adaptation (jamais une suppression, l'historique reste
+  consultable).
+- **Notification d'adaptation** sur le dashboard ("COAI a une
+  adaptation à te proposer" / "...a fait évoluer ton programme" selon
+  qu'elle attend le coach ou est déjà appliquée) — dismissible
+  (sessionStorage), volontairement pas un vrai accept/reject qui
+  annulerait une décision déjà passée par les garde-fous du moteur (choix
+  assumé, cf. note ci-dessous).
+- **Page "Ton programme évolue"** améliorée : chaque changement affiché en
+  bloc AVANT → APRÈS distinct avec sa raison, plus premium que l'ancien
+  format en ligne.
+- **Architecture analytics produit interne** (`src/lib/analytics/
+  product-events.ts`) — pas de nouvelle dépendance, événements typés
+  (workout_completed, weekly_checkin_completed, adaptation_proposed,
+  travel_mode_started/finished...) actuellement juste loggés côté
+  serveur, prêts à être branchés sur un vrai outil plus tard.
+
+**Note d'interprétation (point 10 de la demande initiale)** : la version
+demandait un vrai geste "accepter/refuser AVANT application". Le moteur
+Phase 1 (déjà validé) applique immédiatement sur Impulsion et met en
+attente de coach sur Transformation — je n'ai pas retouché cette
+mécanique déjà testée. La carte de notification reste donc informative
+avec un dismiss local, pas un blocage de l'application. Si un vrai geste
+"refuser avant application" reste voulu, c'est un chantier distinct
+(delay la création de version jusqu'à confirmation) — à me redemander
+explicitement si besoin.
+
 ## Nouvelle vision produit : programme évolutif (11/08/2026, soir)
 
 Changement de cap demandé par Anthony : COAI ne doit plus être perçu comme
@@ -91,6 +154,10 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
+- [ ] Migration `20260811120000_add_phase2_programme_vivant` à appliquer
+      sur Supabase (SQL Editor) — durée de séance, mode voyage temporaire
+      et contexte d'adaptation ne fonctionneront pas tant que ce n'est pas
+      fait (SQL donné dans le chat le 11/08 soir)
 - [x] Migration `20260811090000_add_programme_evolutif` appliquée sur
       Supabase (11/08 après-midi) — check-in séance/hebdo, versionnage et
       adaptations opérationnels en prod

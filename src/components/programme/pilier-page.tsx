@@ -3,6 +3,7 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
 import { AnalyserAdaptationButton } from "@/components/programme/analyser-adaptation-button";
+import { ReprendreProgrammeButton } from "@/components/programme/reprendre-programme-button";
 import { JsonView } from "@/components/programme/json-view";
 import { EntrainementView } from "@/components/programme/entrainement-view";
 import { NutritionView } from "@/components/programme/nutrition-view";
@@ -192,6 +193,13 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
 
           {pilier === "NUTRITION" && <FicheMacros />}
         </Card>
+
+        {affiche?.temporaire && (
+          <ReprendreProgrammeButton
+            pilierSlug={PDF_SLUG[pilier]}
+            finPrevue={affiche.finPrevue ? affiche.finPrevue.toISOString() : null}
+          />
+        )}
 
         {affiche && peutGenerer && <AnalyserAdaptationButton pilierSlug={PDF_SLUG[pilier]} />}
 

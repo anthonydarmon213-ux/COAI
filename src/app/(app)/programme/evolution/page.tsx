@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { buildProfilAppris } from "@/lib/insight/profil-appris";
+import { buildTimeline } from "@/lib/timeline/evenements";
 import type { DecisionAdaptation, Pilier, StatutAdaptation } from "@prisma/client";
 
 const PILIER_LABEL: Record<Pilier, string> = {
@@ -38,7 +39,7 @@ export default async function EvolutionPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const [adaptations, versionsParPilier, profilAppris] = await Promise.all([
+  const [adaptations, versionsParPilier, profilAppris, timeline] = await Promise.all([
     prisma.programmeAdaptation.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
@@ -50,6 +51,7 @@ export default async function EvolutionPage() {
       select: { id: true, pilier: true, version: true, generatedAt: true, statut: true },
     }),
     buildProfilAppris(user.id),
+    buildTimeline(user.id),
   ]);
 
   const versionsGroupees = versionsParPilier.reduce<Record<Pilier, typeof versionsParPilier>>(
@@ -92,6 +94,28 @@ export default async function EvolutionPage() {
         )}
       </div>
 
+      {timeline.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <SectionLabel>Mon évolution</SectionLabel>
+          <div className="flex flex-col gap-0">
+            {timeline.map((e, i) => (
+              <div key={i} className="flex gap-4 border-l border-white/[0.08] pb-5 pl-5 last:pb-0">
+                <div className="relative">
+                  <span className="absolute -left-[1.375rem] top-1 h-2 w-2 rounded-full bg-laiton-400" />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-graphite-500">
+                    {e.date.toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
+                  </span>
+                  <span className="text-sm font-medium text-white">{e.titre}</span>
+                  {e.detail && <span className="text-xs text-graphite-400">{e.detail}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-3">
         {adaptations.length === 0 && (
           <Card className="text-sm text-graphite-400">
@@ -116,16 +140,24 @@ export default async function EvolutionPage() {
               </div>
               <p className="text-sm leading-6 text-graphite-200">{a.resume}</p>
               {changements.length > 0 && (
-                <ul className="flex flex-col gap-1 text-xs text-graphite-400">
+                <div className="flex flex-col gap-2">
                   {changements.map((c, i) => (
-                    <li key={i}>
-                      <span className="text-graphite-200">{c.cible}</span>
-                      {c.avant != null && c.apres != null ? ` : ${c.avant} → ${c.apres}` : ""}
-                      {" — "}
-                      {c.raison}
-                    </li>
+                    <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+                      <span className="text-sm font-medium text-white">{c.cible}</span>
+                      {c.avant != null && c.apres != null && (
+                        <div className="mt-1 flex items-center gap-2 font-mono text-sm">
+                          <span className="text-graphite-400">{c.avant}</span>
+                          <span className="text-laiton-400">→</span>
+                          <span className="font-semibold text-laiton-200">{c.apres}</span>
+                        </div>
+                      )}
+                      <p className="mt-1 text-xs leading-5 text-graphite-500">
+                        <span className="text-graphite-600">Pourquoi ? </span>
+                        {c.raison}
+                      </p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
               {a.statut !== "APPLIQUEE" && (
                 <span className="text-xs text-laiton-300">{STATUT_LABEL[a.statut]}</span>
