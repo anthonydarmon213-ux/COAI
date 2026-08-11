@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ensureWorkoutCompleteness, isCoreExercise } from "@/lib/daily/session";
 
 type Session = Record<string, unknown> & {
   nom?: string;
@@ -52,21 +53,49 @@ function Chip({ active, children, onClick }: { active: boolean; children: React.
   );
 }
 
-function Exercise({ data, index }: { data: Record<string, unknown>; index: number }) {
+function Exercise({
+  data,
+  index,
+  active,
+  done,
+  core,
+  onOpen,
+  onDone,
+}: {
+  data: Record<string, unknown>;
+  index: number;
+  active: boolean;
+  done: boolean;
+  core: boolean;
+  onOpen: () => void;
+  onDone: () => void;
+}) {
   return (
-    <div className="rounded-xl border border-white/[0.07] bg-black/15 p-4">
-      <div className="flex items-start gap-3">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-laiton-400/25 font-mono text-[10px] text-laiton-300">{index + 1}</span>
-        <div className="min-w-0 flex-1">
-          <h4 className="text-sm font-semibold text-white">{String(data.nom ?? `Exercice ${index + 1}`)}</h4>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite-400">
+    <div className={`overflow-hidden rounded-2xl border transition ${done ? "border-emerald-500/30 bg-emerald-500/[0.05]" : active ? "border-laiton-400/40 bg-laiton-400/[0.06]" : "border-white/[0.07] bg-black/15"}`}>
+      <div className="flex items-center gap-3 p-3.5 sm:p-4">
+        <button type="button" aria-label={done ? "Marquer comme non fait" : "Marquer comme fait"} onClick={onDone} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs transition ${done ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-laiton-400/30 text-laiton-300 hover:border-laiton-300"}`}>
+          {done ? "✓" : index + 1}
+        </button>
+        <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className={`text-sm font-semibold ${done ? "text-graphite-400 line-through" : "text-white"}`}>{String(data.nom ?? `Exercice ${index + 1}`)}</h4>
+            {core && <span className="rounded-full border border-violet-400/25 bg-violet-400/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-violet-200">Abdos & gainage</span>}
+          </div>
+          <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-graphite-400">
             {data.series != null && <span>{String(data.series)} séries</span>}
             {data.repetitions != null && <span>{String(data.repetitions)}</span>}
             {data.repos != null && <span>Repos {String(data.repos)}</span>}
           </div>
-          {data.charge != null && <p className="mt-2 text-xs leading-5 text-graphite-300">{String(data.charge)}</p>}
-        </div>
+        </button>
+        <button type="button" aria-label={active ? "Replier l'exercice" : "Afficher les consignes"} onClick={onOpen} className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-xs text-graphite-400 transition ${active ? "rotate-180 border-laiton-400/30 text-laiton-300" : ""}`}>⌄</button>
       </div>
+      {active && (
+        <div className="border-t border-white/[0.07] px-4 py-4 sm:pl-16">
+          {data.charge != null && <p className="text-xs leading-5 text-graphite-200"><span className="text-laiton-300">Repère d’effort — </span>{String(data.charge)}</p>}
+          {data.methode != null && <p className="mt-2 text-[11px] text-graphite-500">Méthode : {String(data.methode)}</p>}
+          <button type="button" onClick={onDone} className={`mt-4 w-full rounded-full border px-4 py-2 text-xs font-semibold transition sm:w-auto ${done ? "border-emerald-500/30 text-emerald-300" : "border-laiton-400/30 text-laiton-200 hover:bg-laiton-400/10"}`}>{done ? "Exercice terminé ✓" : "J’ai terminé cet exercice"}</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -99,11 +128,33 @@ export function DailyExperience({
   const [feedbackPain, setFeedbackPain] = useState(false);
   const [comment, setComment] = useState("");
   const [started, setStarted] = useState(Boolean(initialDaily?.completedAt));
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(() => new Set());
+  const [activeExercise, setActiveExercise] = useState<number | null>(null);
 
-  const activeSession = (daily?.adaptedSession as Session | null) ?? sourceSession;
+  const rawSession = (daily?.adaptedSession as Session | null) ?? sourceSession;
+  const activeSession = ensureWorkoutCompleteness(rawSession);
   const adaptation = daily?.adaptation as Adaptation | null;
   const exercises = Array.isArray(activeSession.exercices) ? activeSession.exercices : [];
+  const mainExercises = exercises.map((exercise, index) => ({ exercise, index })).filter(({ exercise }) => !isCoreExercise(exercise));
+  const coreExercises = exercises.map((exercise, index) => ({ exercise, index })).filter(({ exercise }) => isCoreExercise(exercise));
   const checkinDone = Boolean(daily?.sleep);
+  const totalSteps = exercises.length + (activeSession.echauffement ? 1 : 0) + (activeSession.retourAuCalme ? 1 : 0);
+  const progress = totalSteps > 0 ? Math.round((completedSteps.size / totalSteps) * 100) : 0;
+
+  function toggleStep(key: string) {
+    setCompletedSteps((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  function completeExercise(index: number) {
+    toggleStep(`exercise-${index}`);
+    const next = exercises.findIndex((_, candidate) => candidate > index && !completedSteps.has(`exercise-${candidate}`));
+    setActiveExercise(next >= 0 ? next : null);
+  }
 
   async function post(body: Record<string, unknown>) {
     setLoading(true);
@@ -189,14 +240,48 @@ export function DailyExperience({
           </div>
 
           {checkinDone && exercises.length > 0 && (
-            <div className="mt-6 flex flex-col gap-3">
-              {activeSession.echauffement && <div className="rounded-xl border border-white/[0.07] bg-black/15 p-4"><p className="font-mono text-[10px] uppercase tracking-wider text-laiton-300">Échauffement</p><p className="mt-2 text-xs leading-5 text-graphite-300">{activeSession.echauffement}</p></div>}
-              {exercises.map((exercise, index) => <Exercise key={index} data={exercise} index={index} />)}
-              {activeSession.retourAuCalme && <div className="rounded-xl border border-white/[0.07] bg-black/15 p-4"><p className="font-mono text-[10px] uppercase tracking-wider text-laiton-300">Retour au calme</p><p className="mt-2 text-xs leading-5 text-graphite-300">{activeSession.retourAuCalme}</p></div>}
+            <div className="mt-6 flex flex-col gap-5">
+              <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-4">
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="font-mono text-[9px] uppercase tracking-[0.18em] text-laiton-400">Progression de la séance</p><p className="mt-1 text-sm text-white">{completedSteps.size} étape{completedSteps.size > 1 ? "s" : ""} sur {totalSteps}</p></div>
+                  <span className="font-editorial text-3xl text-laiton-200">{progress}%</span>
+                </div>
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-laiton-500 to-laiton-200 transition-all duration-500" style={{ width: `${progress}%` }} /></div>
+                <div className="mt-3 grid grid-cols-4 gap-1.5 text-center font-mono text-[8px] uppercase tracking-wide text-graphite-500"><span>Échauffement</span><span>Renforcement</span><span>Abdos</span><span>Retour au calme</span></div>
+              </div>
+
+              {activeSession.echauffement && (
+                <details className="group rounded-2xl border border-amber-400/20 bg-amber-400/[0.04]" open={started}>
+                  <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none">
+                    <button type="button" onClick={(event) => { event.preventDefault(); toggleStep("warmup"); }} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("warmup") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-amber-400/30 text-amber-200"}`}>{completedSteps.has("warmup") ? "✓" : "↗"}</button>
+                    <div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-amber-200">01 · Échauffement</p><p className="mt-0.5 text-xs text-graphite-400">Prépare ton corps avant les séries de travail</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.echauffement}</p><button type="button" onClick={() => toggleStep("warmup")} className="mt-3 rounded-full border border-amber-400/25 px-4 py-2 text-xs text-amber-100">{completedSteps.has("warmup") ? "Échauffement terminé ✓" : "Échauffement terminé"}</button></div>
+                </details>
+              )}
+
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-laiton-300">02 · Renforcement principal</p><span className="text-[10px] text-graphite-500">{mainExercises.length} exercices</span></div>
+                {mainExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core={false} active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}
+              </div>
+
+              {coreExercises.length > 0 && (
+                <div className="rounded-2xl border border-violet-400/20 bg-violet-400/[0.035] p-3 sm:p-4">
+                  <div className="mb-3 flex items-center justify-between"><div><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-violet-200">03 · Finisher abdos & gainage</p><p className="mt-1 text-xs text-graphite-400">Le dernier bloc de ta séance</p></div><span className="text-xl">◉</span></div>
+                  <div className="flex flex-col gap-2.5">{coreExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}</div>
+                </div>
+              )}
+
+              {activeSession.retourAuCalme && (
+                <details className="group rounded-2xl border border-sky-400/20 bg-sky-400/[0.035]" open={progress >= 70}>
+                  <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none"><button type="button" onClick={(event) => { event.preventDefault(); toggleStep("cooldown"); }} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("cooldown") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-sky-400/30 text-sky-200"}`}>{completedSteps.has("cooldown") ? "✓" : "↓"}</button><div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-sky-200">04 · Retour au calme</p><p className="mt-0.5 text-xs text-graphite-400">5 à 8 minutes pour faire redescendre le rythme</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span></summary>
+                  <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.retourAuCalme}</p><button type="button" onClick={() => toggleStep("cooldown")} className="mt-3 rounded-full border border-sky-400/25 px-4 py-2 text-xs text-sky-100">{completedSteps.has("cooldown") ? "Retour au calme terminé ✓" : "Retour au calme terminé"}</button></div>
+                </details>
+              )}
             </div>
           )}
 
-          {checkinDone && !daily?.completedAt && !pain && !started && <Button onClick={() => setStarted(true)} className="mt-6 w-full">Commencer ma séance</Button>}
+          {checkinDone && !daily?.completedAt && !pain && !started && <Button onClick={() => { setStarted(true); setActiveExercise(0); }} className="mt-6 w-full">Commencer ma séance</Button>}
           {checkinDone && !daily?.completedAt && !pain && started && <Button onClick={completeWorkout} disabled={loading} className="mt-6 w-full">{loading ? "Enregistrement…" : "Terminer ma séance"}</Button>}
           {checkinDone && pain && <p className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm leading-6 text-amber-100">Ne t’entraîne pas à travers une douleur. Si elle persiste, s’intensifie ou t’inquiète, demande l’avis d’un professionnel de santé.</p>}
           {!checkinDone && <p className="mt-6 text-sm text-graphite-400">Complète le check-in pour afficher le détail et confirmer l’adaptation.</p>}
