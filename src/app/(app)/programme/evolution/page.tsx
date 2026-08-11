@@ -109,6 +109,27 @@ export default async function EvolutionPage() {
         </div>
         <Card className="flex flex-col gap-3">
           <h2 className="text-base font-semibold text-white">Ton mouvement quotidien compte aussi</h2>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {[
+              { lettre: "N", mot: "Non", sens: "pas lié à l'exercice" },
+              { lettre: "E", mot: "Exercise", sens: "l'exercice structuré" },
+              { lettre: "A", mot: "Activity", sens: "l'activité physique" },
+              { lettre: "T", mot: "Thermogenesis", sens: "la dépense d'énergie" },
+            ].map((item) => (
+              <div key={item.lettre} className="flex flex-col gap-0.5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+                <span className="font-editorial text-xl text-laiton-300">{item.lettre}</span>
+                <span className="text-xs font-medium text-white">{item.mot}</span>
+                <span className="text-[11px] leading-4 text-graphite-500">{item.sens}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs leading-5 text-graphite-500">
+            NEAT = <em>Non-Exercise Activity Thermogenesis</em>, littéralement « la dépense d&apos;énergie
+            liée à l&apos;activité physique qui n&apos;est pas de l&apos;exercice structuré ». En clair :
+            tout ce qui fait bouger ton corps en dehors d&apos;une séance de sport.
+          </p>
+
           <p className="text-sm leading-6 text-graphite-300">
             Le NEAT représente toute l&apos;activité physique que tu réalises en dehors de tes séances :
             marcher, prendre les escaliers, rester debout, faire le ménage, jardiner ou simplement te
