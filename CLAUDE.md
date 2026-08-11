@@ -16,11 +16,10 @@ pour le détail/contexte de chaque sujet) :
 - [x] Quota de crons Vercel (plan Hobby) vérifié le 11/08 matin : les 2
       crons (`relance-inactifs` 09:00, `bilan-mensuel` 08:00) apparaissent
       bien actifs sur la page Cron Jobs du projet, aucune alerte de quota
-- [ ] Relire le contenu des 2 emails de rétention (relance
-      Transformation/Premium signée "Anthony", bilan mensuel) — cf. section
-      "Rétention : relance étendue + bilan mensuel" plus bas — jamais
-      envoyés pour de vrai, à tester en conditions réelles avant qu'un
-      abonné payant les reçoive
+- [x] Contenu des 2 emails de rétention relu et validé par Anthony (11/08
+      matin, texte inchangé) — reste à confirmer un vrai envoi une fois
+      qu'un cron se sera déclenché en conditions réelles (rien à forcer,
+      les crons tournent tout seuls désormais)
 - [ ] Acheter la carte SIM prépayée, l'insérer dans le vieux téléphone
       (numéro jamais utilisé sur WhatsApp classique — condition Meta)
 - [ ] Créer le compte ManyChat, lancer la connexion WhatsApp Business
