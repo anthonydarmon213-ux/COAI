@@ -780,6 +780,10 @@ export function DiagnosticQuiz() {
                     spécialiste des dirigeants et entrepreneurs. Ton programme est toujours validé
                     par lui ou un coach qu&apos;il a formé — jamais de l&apos;IA brute.
                   </p>
+                  <p className="text-xs leading-5 text-graphite-500">
+                    Tu peux aussi le croiser à Paris, à La Montgolfière Club ou au RITM
+                    Saint-Germain.
+                  </p>
                   <div className="flex items-center justify-center gap-2.5 sm:justify-start">
                     <a
                       href="https://instagram.com/anthonydarmoncoach"

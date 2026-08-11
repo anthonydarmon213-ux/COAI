@@ -230,6 +230,9 @@ export default function LandingPage() {
             puis COAI — pour rendre cette expertise accessible à tous, sans attendre le
             coaching 1-to-1.
           </p>
+          <p className="max-w-md text-sm leading-6 text-graphite-400">
+            Tu peux aussi le croiser à Paris, à La Montgolfière Club ou au RITM Saint-Germain.
+          </p>
           <a
             href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
             target="_blank"
