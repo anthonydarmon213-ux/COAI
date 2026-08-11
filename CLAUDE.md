@@ -4,6 +4,35 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Architecture funnel validée + reste pour Phase 5.1 (11/08/2026, nuit)
+
+Anthony a validé l'architecture à deux entrées mise en place par les
+corrections ci-dessous, comme axe définitif du funnel COAI :
+- **Prospect froid** : Diagnostic offert → personnalisation → offre →
+  abonnement.
+- **Prospect chaud** : Voir les formules → abonnement direct →
+  diagnostic/personnalisation ensuite.
+« Le diagnostic aide à vendre, mais ne bloque jamais l'achat. »
+
+**Remarques explicitement mises de côté pour la Phase 5.1** (pas traitées
+dans cette session, à reprendre) :
+- Ajouter "1 fois par semaine" aux fréquences du quiz `/diagnostic`
+  (`FREQUENCES` dans `diagnostic-quiz.tsx`) — déjà présent dans
+  `profil-form.tsx`, manquant côté quiz public.
+- Objectifs du quiz plus complets + option "Autre" (`OBJECTIFS` n'a
+  aujourd'hui que 4 choix fixes, sans échappatoire).
+- Ajouter "Aucun matériel" aux équipements du quiz (`EQUIPEMENTS` dans
+  `diagnostic-quiz.tsx`) — déjà présent dans `profil-form.tsx` sous
+  "Aucun équipement", manquant côté quiz public.
+- Loader COAI mal centré à un endroit signalé par Anthony (à clarifier
+  lequel — plusieurs loaders existent maintenant : coach IA sur `/coach`
+  déjà corrigé le 11/08, transition "analyse" du quiz, spinner de
+  `ActivationFlow` sur `/bienvenue`) — pas encore identifié précisément,
+  à reproduire avec Anthony avant de corriger.
+- Responsive des cartes tarifs sur petits écrans — déjà vérifié une fois
+  par Playwright (cartes visibles et scrollables), mais Anthony a
+  peut-être un cas précis en tête à reproduire.
+
 ## Corrections prioritaires post-Phase 5 : essai Impulsion + accès direct aux offres (11/08/2026, nuit)
 
 Deux corrections envoyées coup sur coup par Anthony après la Phase 5, toutes les deux implémentées ensemble (fortement liées : la seconde s'appuie sur la nouvelle logique d'essai de la première).
