@@ -4,6 +4,90 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 5.1 — corrections UX après test utilisateur réel (11/08/2026, nuit)
+
+Brief formel envoyé par Anthony après avoir testé COAI en direct sur
+coai.fr (compte existant, nouveau compte, diagnostic, Impulsion,
+Transformation, `/pricing`) — avec une exigence explicite en tête de brief :
+ne jamais considérer une correction "faite" simplement parce que
+`tsc`/`build` passent, vérifier la chaîne complète. **Phase 6 explicitement
+pas démarrée**, comme demandé.
+
+- **Objectifs du diagnostic enrichis** (`diagnostic-quiz.tsx`) : 4 → 8
+  choix ("Perdre du gras", "Prendre du muscle", "Me sentir mieux au
+  quotidien", "Progresser en force", "Améliorer mes performances", "Gagner
+  en mobilité", "Reprendre le sport", "Autre objectif") + champ texte libre
+  ("Quel est ton objectif ?") quand "Autre objectif" est choisi, sur le
+  modèle exact du champ "Autre" déjà existant pour persona/santé/sport
+  (nouveau helper `resolveObjectif`, substitue le texte saisi au libellé
+  générique partout où l'objectif est utilisé : résultat affiché, lead
+  envoyé par email, profil appliqué en base). Chaîne vérifiée de bout en
+  bout, pas seulement les boutons visuels.
+- **Fréquence d'entraînement** : nouveau titre "Combien de fois peux-tu
+  réellement t'entraîner par semaine ?" / sous-titre "Pas ta semaine
+  idéale. Ta vraie semaine." Liste étendue à 6 choix, de "1 fois par
+  semaine" à "6 fois ou plus par semaine" (avant : plafonnée à "5 fois ou
+  plus par semaine", sans le cas 1×/semaine dans le titre/plan). Mis à jour
+  partout où cette liste est dupliquée : zod de `/api/profil`,
+  `profil-form.tsx` (formulaire profil abonné), `SPLIT_PAR_FREQUENCE` dans
+  `mini-diagnostic.ts` (structure de séance suggérée pour chaque fréquence,
+  y compris les nouvelles valeurs 1× et 6×+). Renforcé aussi le prompt IA
+  de génération (`programme-entrainement-structure.ts`) : la fréquence
+  déclarée est désormais présentée comme un engagement réel à respecter
+  EXACTEMENT, jamais un point de départ à revoir à la hausse — un
+  programme à 1 séance/semaine doit être aussi complet et cohérent qu'un
+  programme à 4-5 séances, jamais une version au rabais.
+- **Équipement — "Poids du corps uniquement" → "Aucun matériel"** :
+  renommé dans `diagnostic-quiz.tsx` et harmonisé avec `profil-form.tsx`
+  qui avait jusque-là DEUX libellés différents et redondants pour la même
+  idée ("Poids du corps uniquement" et "Aucun équipement" coexistaient) —
+  un seul intitulé "Aucun matériel" désormais aux deux endroits. Référence
+  mise à jour aussi dans `mini-diagnostic.ts` (exemples d'exercices par
+  équipement + équipement par défaut).
+- **Loader "COAI analyse ton profil" — bug de concentricité identifié et
+  corrigé** (`globals.css`, classe `.coai-loader-arc` partagée avec le
+  loader du coach IA) : la cause réelle n'était pas géométrique dans le
+  SVG (cx/cy/r déjà corrects et identiques entre l'anneau de fond et
+  l'arc), mais une interaction CSS — l'animation `spin-loader` anime la
+  propriété CSS `transform`, qui **remplace entièrement** l'attribut SVG
+  `transform="rotate(-90 60 60)"` posé sur le cercle (les deux ne se
+  cumulent jamais). Le point de pivot retombait donc sur le
+  `transform-box` par défaut du navigateur pour les éléments SVG — qui
+  diffère entre Chrome (`view-box`) et Safari (`fill-box` historiquement)
+  — d'où un décentrage visible et inconsistant selon le navigateur.
+  Corrigé en rendant le point de pivot explicite et sans ambiguïté
+  (`transform-box: fill-box; transform-origin: center;`, qui pointe
+  exactement vers cx/cy pour un cercle) et en réintégrant l'offset de
+  départ -90° directement dans les keyframes (`from { rotate(-90deg) } to
+  { rotate(270deg) }`) plutôt que de compter sur l'attribut SVG ignoré.
+  Vérifié visuellement par script Playwright (zoom x4, plusieurs frames de
+  l'animation) : l'arc doré suit exactement l'anneau de fond à tout instant
+  de la rotation, aucun décalage. Bénéficie aussi au loader du coach IA
+  (`/coach`), qui réutilise la même classe.
+- **Items 5 à 9 du brief (accès direct aux offres, simplification
+  Impulsion/Transformation, VIP inchangé)** : déjà livrés lors de la
+  correction prioritaire précédente cette même nuit (cf. section
+  "Corrections prioritaires post-Phase 5" ci-dessous) — re-vérifiés
+  fonctionnels dans le code à cette occasion (nav "Nos formules", `/pricing`
+  sans mur diagnostic, sign-up Impulsion à parcours unique, sign-up
+  Transformation qui garde son choix essai/immédiat, VIP non touché).
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres (cache `.next`
+purgé au préalable — contenait une référence stale à une route de preview
+temporaire déjà supprimée d'une session précédente). Script Playwright réel
+(mobile 390px, deviceScaleFactor ×4) sur une route de preview temporaire
+(supprimée après coup) pour vérifier visuellement la concentricité du
+loader corrigé, plusieurs frames de l'animation capturées.
+
+**Non testable depuis ce sandbox (mêmes limites qu'd'habitude)** : `next
+build` complet inclut `prisma migrate deploy`, qui échoue ici en P1001
+(pas d'accès réseau sortant vers Supabase) — contourné en lançant `next
+build` directement pour valider la partie Next.js/TypeScript. Aucun accès
+direct à coai.fr ni au dashboard Vercel depuis ce sandbox (egress
+bloqué) : la vérification "sur la version de production réellement
+servie" explicitement demandée par Anthony en tête de ce brief reste à
+faire par lui une fois cette branche déployée.
+
 ## Architecture funnel validée + reste pour Phase 5.1 (11/08/2026, nuit)
 
 Anthony a validé l'architecture à deux entrées mise en place par les

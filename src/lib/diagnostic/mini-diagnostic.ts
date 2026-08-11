@@ -34,7 +34,7 @@ const EXEMPLES_PAR_EQUIPEMENT: Record<string, string[]> = {
   "Élastiques / bandes de résistance": ["squat élastique", "tirage horizontal élastique", "extension triceps élastique"],
   Kettlebell: ["swing kettlebell", "goblet squat", "soulevé de terre roumain kettlebell"],
   "TRX / sangles de suspension": ["rowing TRX", "pompes TRX", "fentes bulgares TRX"],
-  "Poids du corps uniquement": EXEMPLES_DEFAUT,
+  "Aucun matériel": EXEMPLES_DEFAUT,
 };
 
 export function exemplesPour(equipement: string): string[] {
@@ -42,10 +42,12 @@ export function exemplesPour(equipement: string): string[] {
 }
 
 export const SPLIT_PAR_FREQUENCE: Record<string, string> = {
+  "1 fois par semaine": "Full Body x1 — une séance complète, tout le corps travaillé pour rentabiliser au maximum cette unique séance.",
   "2 fois par semaine": "Full Body x2 — tout le corps à chaque séance, pour maximiser la fréquence de travail malgré le nombre réduit de séances.",
   "3 fois par semaine": "Full Body x3 ou Push/Pull/Legs x3 — bon équilibre entre fréquence et récupération à ce rythme.",
   "4 fois par semaine": "Upper/Lower x4 — haut et bas du corps alternés, permet un bon volume par groupe musculaire.",
-  "5 fois ou plus par semaine": "Split par groupe musculaire (type Push/Pull/Legs x2) — tenable à ce volume, à condition de bien gérer la récupération.",
+  "5 fois par semaine": "Split par groupe musculaire (type Push/Pull/Legs x2 + 1) — tenable à ce volume, à condition de bien gérer la récupération.",
+  "6 fois ou plus par semaine": "Split par groupe musculaire (type Push/Pull/Legs x2) — volume élevé, récupération à surveiller de près à ce rythme.",
 };
 
 export const SERIES_PAR_NIVEAU: Record<string, string> = {
@@ -208,7 +210,7 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
   if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
   const sante = santeReelle(santeBrute);
 
-  const premierEquipement = equipement[0] ?? "Poids du corps uniquement";
+  const premierEquipement = equipement[0] ?? "Aucun matériel";
   const exemples = exemplesPour(premierEquipement);
   const series = SERIES_PAR_NIVEAU[niveau] ?? SERIES_PAR_NIVEAU.Débutant;
 

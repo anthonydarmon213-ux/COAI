@@ -33,7 +33,7 @@ Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Sexe : ${profil.sexe ?? "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
-Fréquence d'entraînement actuelle : ${profil.frequenceEntrainement ?? "non renseignée"}
+Fréquence d'entraînement visée (engagement réel, à respecter exactement) : ${profil.frequenceEntrainement ?? "non renseignée"}
 Sport(s) déjà pratiqué(s) : ${profil.sportsPratiques ?? "non renseigné"}
 ${
   profil.vo2Max || profil.pasMoyenParJour || profil.frequenceCardiaqueRepos
@@ -44,8 +44,12 @@ ${profil.morphologieDetectee ? `Morphologie détectée par photo : ${profil.morp
 ${profil.observationsPosture ? `Observations de posture (photo) : ${profil.observationsPosture} — adapte le programme en conséquence (exercices correctifs, prudence sur les mouvements concernés).` : ""}
 ${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du programme précédent, pas une création depuis zéro. Directives à respecter impérativement : ${profil.directivesAdaptation}. Garde tout ce qui fonctionne déjà, ne change que ce que les directives demandent.` : ""}
 
-Détermine la fréquence hebdomadaire adaptée au niveau et à la fréquence actuelle (ne pas repartir
-de zéro si la personne s'entraîne déjà). Complète les sports déjà pratiqués plutôt que de les
+La fréquence d'entraînement indiquée est un engagement réel de la personne, pas un point de
+départ à revoir à la hausse : construis la structure sur EXACTEMENT ce nombre de séances par
+semaine, jamais plus, même si un nombre plus élevé te semblerait "mieux" pour ses objectifs — un
+programme à 1 séance/semaine doit être aussi complet et cohérent (full body, contenu variable
+d'une semaine à l'autre) qu'un programme à 4 ou 5 séances, jamais une version au rabais ni un
+prétexte pour recommander davantage. Complète les sports déjà pratiqués plutôt que de les
 dupliquer inutilement dans le programme. Si une durée de séance visée est renseignée, dimensionne
 le volume (nombre d'exercices, séries) de chaque séance pour qu'elle tienne réellement dans ce
 temps — ne compte pas sur des séances plus longues que ce que la personne a dit pouvoir tenir.

@@ -51,17 +51,20 @@ const FREQUENCES_ENTRAINEMENT = [
   "2 fois par semaine",
   "3 fois par semaine",
   "4 fois par semaine",
-  "5 fois ou plus par semaine",
+  "5 fois par semaine",
+  "6 fois ou plus par semaine",
 ];
 
+// Alignés sur diagnostic-quiz.tsx (Phase 5.1, 11/08/2026) : un seul intitulé
+// "Aucun matériel" au lieu des deux libellés distincts et redondants
+// "Poids du corps uniquement" / "Aucun équipement" qui coexistaient ici.
 const EQUIPEMENTS = [
   "Salle de sport complète",
   "Matériel à la maison (haltères, bancs...)",
   "Élastiques / bandes de résistance",
   "Kettlebell",
   "TRX / sangles de suspension",
-  "Poids du corps uniquement",
-  "Aucun équipement",
+  "Aucun matériel",
 ];
 
 // Alignés sur diagnostic-quiz.tsx (Phase 5, 11/08/2026).

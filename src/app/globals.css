@@ -119,8 +119,11 @@ html {
 }
 
 @keyframes spin-loader {
+  from {
+    transform: rotate(-90deg);
+  }
   to {
-    transform: rotate(360deg);
+    transform: rotate(270deg);
   }
 }
 
@@ -157,7 +160,14 @@ html {
   }
   .coai-loader-arc {
     animation: spin-loader 1.6s linear infinite;
-    transform-origin: 60px 60px;
+    /* transform-box: fill-box + origin "center" pointe sans ambiguïté vers
+       le centre de la bounding box du cercle lui-même (= cx/cy exacts), au
+       lieu de dépendre du transform-box par défaut du navigateur (view-box
+       vs fill-box, incohérent entre Chrome et Safari) — c'est cette
+       divergence qui causait le léger décentrage signalé par Anthony
+       (11/08/2026, Phase 5.1). */
+    transform-box: fill-box;
+    transform-origin: center;
   }
   /* Flèches de part et d'autre du CTA de l'écran d'intro, qui "ramènent"
      l'œil vers le bouton — cf. demande d'Anthony du 10/08. */

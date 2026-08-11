@@ -43,21 +43,50 @@ const NIVEAUX = [
   { value: "Avancé", hint: "Tu cherches à optimiser, pas à découvrir" },
 ];
 
-const OBJECTIFS = ["Perdre du gras", "Prendre du muscle", "Me sentir mieux au quotidien", "Progresser en force"];
+// Phase 5.1 (11/08/2026, correction post-test réel) : liste élargie, plus
+// un produit "personnalisé" ne peut pas se limiter à 4 objectifs fixes.
+// "Autre objectif" ouvre un champ texte libre plutôt que de forcer un choix
+// approximatif.
+const OBJECTIF_AUTRE_LABEL = "Autre objectif";
+const OBJECTIFS = [
+  "Perdre du gras",
+  "Prendre du muscle",
+  "Me sentir mieux au quotidien",
+  "Progresser en force",
+  "Améliorer mes performances",
+  "Gagner en mobilité",
+  "Reprendre le sport",
+  OBJECTIF_AUTRE_LABEL,
+];
 
 // Libellés alignés sur EQUIPEMENTS (profil-form.tsx) pour que la valeur
 // stockée corresponde exactement aux chips du vrai formulaire de profil.
+// "Poids du corps uniquement" → "Aucun matériel" (Phase 5.1, 11/08/2026,
+// correction post-test réel) : l'ancien libellé était ambigu ("uniquement"
+// laissait penser qu'il fallait quand même un minimum de matériel).
 const EQUIPEMENTS = [
   "Salle de sport complète",
   "Matériel à la maison (haltères, bancs...)",
   "Élastiques / bandes de résistance",
   "Kettlebell",
   "TRX / sangles de suspension",
-  "Poids du corps uniquement",
+  "Aucun matériel",
 ];
 
-// Alignés sur l'enum frequenceEntrainement de /api/profil.
-const FREQUENCES = ["2 fois par semaine", "3 fois par semaine", "4 fois par semaine", "5 fois ou plus par semaine"];
+// Alignés sur l'enum frequenceEntrainement de /api/profil. Phase 5.1
+// (11/08/2026, correction post-test réel) : "2 fois par semaine" comme
+// minimum excluait quelqu'un qui ne peut réellement s'entraîner qu'une
+// fois — jamais forcer un minimum artificiel (cf. prompt de génération,
+// programme-entrainement-structure.ts, qui respecte désormais cette
+// fréquence à l'exact, sans jamais la revoir à la hausse).
+const FREQUENCES = [
+  "1 fois par semaine",
+  "2 fois par semaine",
+  "3 fois par semaine",
+  "4 fois par semaine",
+  "5 fois par semaine",
+  "6 fois ou plus par semaine",
+];
 
 // Lieu d'entraînement (Phase 5, 11/08/2026) — distinct de l'équipement :
 // deux personnes peuvent avoir le même matériel mais un lieu différent
@@ -129,6 +158,12 @@ const QUALITES_SOMMEIL = [
 // Remplace le libellé générique "Autre, à préciser" par le texte
 // effectivement saisi (si renseigné) — garde le libellé tel quel sinon,
 // plutôt que de perdre la sélection.
+function resolveObjectif(objectif: string | null, texteLibre: string): string | null {
+  if (objectif !== OBJECTIF_AUTRE_LABEL) return objectif;
+  const texte = texteLibre.trim();
+  return texte || objectif;
+}
+
 function resolveAutre(list: string[], texteLibre: string): string[] {
   if (!list.includes(AUTRE_LABEL)) return list;
   const texte = texteLibre.trim();
@@ -340,6 +375,7 @@ export function DiagnosticQuiz({
   const [qualiteSommeil, setQualiteSommeil] = useState<string | null>(null);
   const [sante, setSante] = useState<string[]>([]);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
+  const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
   const [sportAutreTexte, setSportAutreTexte] = useState("");
   const [email, setEmail] = useState("");
@@ -418,6 +454,7 @@ export function DiagnosticQuiz({
       personaAutreTexte,
       niveau,
       objectif,
+      objectifAutreTexte,
       equipement,
       lieu,
       duree,
@@ -441,6 +478,7 @@ export function DiagnosticQuiz({
     personaAutreTexte,
     niveau,
     objectif,
+    objectifAutreTexte,
     equipement,
     lieu,
     duree,
@@ -463,6 +501,7 @@ export function DiagnosticQuiz({
     if (typeof saved.personaAutreTexte === "string") setPersonaAutreTexte(saved.personaAutreTexte);
     if (typeof saved.niveau === "string") setNiveau(saved.niveau);
     if (typeof saved.objectif === "string") setObjectif(saved.objectif);
+    if (typeof saved.objectifAutreTexte === "string") setObjectifAutreTexte(saved.objectifAutreTexte);
     if (Array.isArray(saved.equipement)) setEquipement(saved.equipement as string[]);
     if (typeof saved.lieu === "string") setLieu(saved.lieu);
     if (typeof saved.duree === "string") setDuree(saved.duree);
@@ -561,7 +600,7 @@ export function DiagnosticQuiz({
       buildMiniDiagnostic({
         persona: resolveAutre(persona, personaAutreTexte),
         niveau,
-        objectif,
+        objectif: resolveObjectif(objectif, objectifAutreTexte),
         equipement,
         lieu,
         duree,
@@ -575,6 +614,7 @@ export function DiagnosticQuiz({
       personaAutreTexte,
       niveau,
       objectif,
+      objectifAutreTexte,
       equipement,
       lieu,
       duree,
@@ -603,11 +643,12 @@ export function DiagnosticQuiz({
   // profil (appliquerAuProfil, visiteur déjà connecté — parcours D).
   function reponsesEnProfil() {
     const personaAutreResolue = personaAutreTexte.trim();
+    const objectifResolu = resolveObjectif(objectif, objectifAutreTexte);
     const santeReelle = resolveAutre(sante, santeAutreTexte).filter((s) => s !== AUCUNE_DOULEUR_LABEL);
     const sportResolu = resolveAutre(sport, sportAutreTexte);
     return {
       niveau: niveau ?? undefined,
-      objectifs: [objectif, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
+      objectifs: [objectifResolu, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
       lieuEntrainement: lieu ?? undefined,
       dureeSeanceMinutes: duree ? DUREE_EN_MINUTES[duree] : undefined,
@@ -677,7 +718,7 @@ export function DiagnosticQuiz({
           reponses: {
             persona: resolveAutre(persona, personaAutreTexte),
             niveau,
-            objectif,
+            objectif: resolveObjectif(objectif, objectifAutreTexte),
             equipement,
             lieu,
             duree,
@@ -829,6 +870,15 @@ export function DiagnosticQuiz({
                   <OptionCard key={o} label={o} active={objectif === o} onClick={() => setObjectif(o)} />
                 ))}
               </div>
+              {objectif === OBJECTIF_AUTRE_LABEL && (
+                <input
+                  type="text"
+                  value={objectifAutreTexte}
+                  onChange={(e) => setObjectifAutreTexte(e.target.value)}
+                  placeholder="Quel est ton objectif ?"
+                  className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              )}
             </div>
           )}
 
@@ -879,8 +929,10 @@ export function DiagnosticQuiz({
           {step === "frequence" && (
             <div className="flex flex-col gap-4">
               <div>
-                <h2 className="font-display text-xl font-semibold text-white">Ta fréquence idéale ?</h2>
-                <p className="mt-1.5 text-sm text-graphite-400">Vise ce que tu peux tenir sur la durée.</p>
+                <h2 className="font-display text-xl font-semibold text-white">
+                  Combien de fois peux-tu réellement t&apos;entraîner par semaine ?
+                </h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Pas ta semaine idéale. Ta vraie semaine.</p>
               </div>
               <div className="flex flex-col gap-2">
                 {FREQUENCES.map((f) => (
