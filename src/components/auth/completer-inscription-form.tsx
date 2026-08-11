@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
 import { clearIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
+import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import Link from "next/link";
 
 export function CompleterInscriptionForm({
@@ -61,6 +62,12 @@ export function CompleterInscriptionForm({
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       clearParrainageCookie();
       clearIntendedPlanCookie();
+
+      // 11/08/2026 : même signal que sur le flow email/mot de passe
+      // (sign-up/page.tsx) — jusqu'ici seule l'inscription Google n'envoyait
+      // pas cet événement, un trou dans la couverture du funnel.
+      trackEvent("compte_cree", { plan: planInitial });
+      trackMetaEvent("CompleteRegistration");
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",
