@@ -35,6 +35,7 @@ ${
     ? `Données de montre connectée — sommeil moyen : ${profil.sommeilMoyenHeures ? `${profil.sommeilMoyenHeures} h/nuit` : "non renseigné"}, fréquence cardiaque de repos : ${profil.frequenceCardiaqueRepos ?? "non renseignée"} bpm.`
     : ""
 }
+${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du plan précédent, pas une création depuis zéro. Directives à respecter impérativement : ${profil.directivesAdaptation}. Garde tout ce qui fonctionne déjà, ne change que ce que les directives demandent.` : ""}
 
 Adapte tes recommandations à la qualité de sommeil déclarée et à la consommation de café/alcool
 (impact sur l'endormissement et la récupération).

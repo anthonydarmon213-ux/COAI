@@ -4,6 +4,86 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Nouvelle vision produit : programme évolutif (11/08/2026, soir)
+
+Changement de cap demandé par Anthony : COAI ne doit plus être perçu comme
+"une IA qui génère un programme" mais comme "un coaching intelligent qui
+apprend et fait évoluer le programme en continu". Signature retenue :
+**« L'humain valide. L'IA personnalise. »** Promesses centrales : « Ton
+programme n'est jamais terminé. Il évolue avec toi. » / « Ta vie change.
+Ton corps change. Ton programme aussi. »
+
+Découpage en 4 phases fourni par Anthony ; **Phase 1 (boucle centrale)
+livrée et vérifiée** (`tsc` + `build` réels + captures Playwright
+mobile/desktop) cette session — reste à appliquer la migration en prod
+(cf. checklist ci-dessous) :
+
+1. **Check-in post-séance structuré** — intégré au formulaire de log
+   existant (`suivi/seances`) plutôt qu'un écran séparé : difficulté 1-5,
+   énergie 1-5, douleur (aucune/légère/importante) + zone, commentaire.
+   `ressenti` (texte libre existant) conservé tel quel, pas remplacé.
+2. **Check-in hebdomadaire** — carte sur le dashboard, visible uniquement
+   si aucun check-in n'existe pour la semaine ISO en cours (lundi de
+   référence), modal <1min (sommeil/énergie/stress/faim/motivation/poids/
+   douleurs/séances réalisées/commentaire).
+3. **Versionnage explicite** — `ProgrammeGenerated.version` (V1, V2...),
+   affiché sur chaque page de pilier avec lien vers l'historique dès qu'on
+   dépasse V1.
+4. **Moteur d'adaptation** (`src/lib/adaptation/`) — architecture en
+   couches, comme demandé (jamais de règle critique uniquement dans le
+   prompt) :
+   - `signals.ts` : indicateurs calculés en code à partir des données
+     réelles (moyenne difficulté/énergie sur 14j, douleur récente,
+     tendance poids, régression de perf déjà détectée façon
+     `admin/suivi`, dernier check-in hebdo).
+   - `programme-adaptation-decision.ts` (prompt) : décision IA structurée
+     en JSON strict (`GARDER`/`PROGRESSER`/`REDUIRE`/`MODIFIER`/`ADAPTER`
+     + changements + résumé) — jamais du texte libre interprété à la main.
+   - `engine.ts` : garde-fous appliqués **en code après** la réponse IA
+     (jamais uniquement dans le prompt) — douleur importante ne peut
+     jamais mener à "PROGRESSER" (forcé à "GARDER"), augmentation de
+     charge plafonnée à +10%. Si décision actionnable : régénère le
+     contenu du pilier via le même pipeline que la génération initiale
+     (extrait dans `src/lib/programmes/generer.ts`, réutilisé par les
+     deux), avec la décision injectée comme directive d'adaptation
+     (`ProfilUtilisateur.directivesAdaptation`, nouveau champ optionnel).
+     Nouvelle version créée + `ProgrammeAdaptation` tracée avec sa raison.
+     Sur Transformation (coach humain), la nouvelle version reste
+     `EN_ATTENTE` (jamais appliquée silencieusement) — même principe que
+     la génération initiale, notification admin identique.
+   - Si moins de 2 séances loguées sur 14 jours et aucun check-in
+     hebdomadaire : retourne "Pas encore assez de données pour
+     recommander une modification" **sans appeler l'IA** — rien à
+     analyser, rien à inventer (exigence explicite de la vision).
+   - Déclenchement **manuel** pour l'instant (bouton "Analyser mon
+     programme" sur chaque page de pilier) — l'automatisation après
+     chaque check-in est prévue pour une phase ultérieure, une fois le
+     comportement observé en conditions réelles avec de vrais abonnés.
+5. **Page "Ton programme évolue"** (`/programme/evolution`, nouvelle
+   entrée de menu sous "Votre programme") — timeline des adaptations avec
+   leur raison + historique des versions par pilier. Jamais de changement
+   silencieux : chaque `ProgrammeAdaptation` explique son "pourquoi".
+
+Nouveaux modèles Prisma : `WeeklyCheckin`, `ProgrammeAdaptation` ; champs
+ajoutés à `SeanceLog` (difficulté/énergie/douleur/zone) et
+`ProgrammeGenerated` (`version`). Migration
+`20260811090000_add_programme_evolutif` écrite mais **pas encore
+appliquée en prod** — à faire via Supabase SQL Editor comme les
+précédentes (cf. checklist ci-dessous).
+
+**Reste des phases (pas commencé, dans l'ordre donné par Anthony)** :
+Phase 2 (COAI Insight sur le dashboard, timeline "Mon évolution" dédiée
+même si l'historique existe déjà côté données, "Ce que COAI apprend sur
+toi", bouton "Ma semaine change" + mode voyage, déclenchement automatique
+de l'adaptation), Phase 3 (nutrition/récupération adaptatives avec la
+même logique que l'entraînement, wearables), Phase 4 (COAI HUMAN —
+dashboard coach dédié aux adaptations en attente, au-delà de
+`/admin/programmes` qui gère déjà la validation des programmes ; alertes
+formalisées au-delà des flags déjà calculés dans `/admin/suivi`).
+Onboarding progressif (actuellement un formulaire unique sur
+`compte/profil`) pas encore découpé en étapes — pas dans le découpage en
+phases d'Anthony, à clarifier avec lui si prioritaire.
+
 ## À faire en priorité (checklist du 11/08/2026 au soir)
 
 Pour reprendre facilement demain — mis à jour à chaque session, à garder
@@ -11,6 +91,10 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
+- [ ] Migration `20260811090000_add_programme_evolutif` à appliquer sur
+      Supabase (SQL Editor, "Run and enable RLS") — check-in séance/hebdo,
+      versionnage et adaptations ne fonctionneront pas tant que ce n'est
+      pas fait (cf. section "Nouvelle vision produit" plus haut)
 - [x] Migration `dernierBilanMensuelEnvoyeAt` appliquée sur Supabase (11/08
       matin) — le cron bilan-mensuel a maintenant sa colonne
 - [x] Quota de crons Vercel (plan Hobby) vérifié le 11/08 matin : les 2

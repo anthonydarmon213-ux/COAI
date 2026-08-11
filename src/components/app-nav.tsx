@@ -26,6 +26,7 @@ const LINKS: NavItem[] = [
       { href: "/programme/entrainement", label: "Entraînement" },
       { href: "/programme/alimentation", label: "Alimentation" },
       { href: "/programme/recuperation", label: "Récupération" },
+      { href: "/programme/evolution", label: "Ton évolution" },
     ],
   },
   {

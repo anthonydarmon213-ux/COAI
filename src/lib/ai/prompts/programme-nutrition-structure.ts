@@ -47,6 +47,7 @@ Consommation de café : ${profil.consommationCafe ?? "non renseignée"}
 Consommation d'alcool : ${profil.consommationAlcool ?? "non renseignée"}
 ${profil.caloriesMoyennesParJour ? `Calories moyennes dépensées/jour (montre connectée) : ${profil.caloriesMoyennesParJour}` : ""}
 ${profil.morphologieDetectee ? `Morphologie détectée par photo (à recouper avec la morphologie déclarée ci-dessus) : ${profil.morphologieDetectee}` : ""}
+${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du plan précédent, pas une création depuis zéro. Directives à respecter impérativement : ${profil.directivesAdaptation}. Garde tout ce qui fonctionne déjà, ne change que ce que les directives demandent.` : ""}
 
 Si le sexe est renseigné, ajuste les repères caloriques et protéiques indicatifs en conséquence
 (besoins généralement différents entre hommes et femmes à gabarit/activité égale), sans jamais

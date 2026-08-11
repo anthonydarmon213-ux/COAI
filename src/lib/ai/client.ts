@@ -33,6 +33,13 @@ export type ProfilUtilisateur = {
   // Extraites automatiquement d'une photo en tenue de sport.
   morphologieDetectee?: string | null;
   observationsPosture?: string | null;
+  // Directive du moteur d'adaptation (11/08/2026, cf. src/lib/adaptation) —
+  // présente uniquement lors d'une régénération suite à une adaptation
+  // (pas à la toute première génération). Injectée dans les prompts de
+  // structure pour que le programme régénéré applique la décision prise
+  // (ex: "augmente légèrement la charge du développé couché, réduis le
+  // volume jambes") plutôt que de repartir de zéro à chaque fois.
+  directivesAdaptation?: string | null;
 };
 
 let client: Anthropic | null = null;

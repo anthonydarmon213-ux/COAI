@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
+import { AnalyserAdaptationButton } from "@/components/programme/analyser-adaptation-button";
 import { JsonView } from "@/components/programme/json-view";
 import { EntrainementView } from "@/components/programme/entrainement-view";
 import { NutritionView } from "@/components/programme/nutrition-view";
@@ -115,11 +116,14 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
 
         <Card className="flex flex-col gap-5 p-6 sm:p-8">
           <div className="flex items-center justify-between">
-            {valide && (
-              <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
-            )}
-            {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
-            {!valide && genereIA && <Badge tone="neutral">Généré par l&apos;IA — non relu par un coach</Badge>}
+            <div className="flex items-center gap-2">
+              {valide && (
+                <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
+              )}
+              {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
+              {!valide && genereIA && <Badge tone="neutral">Généré par l&apos;IA — non relu par un coach</Badge>}
+            </div>
+            {affiche && <Badge tone="neutral">V{affiche.version}</Badge>}
           </div>
 
           {affiche && (
@@ -130,6 +134,14 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
                 month: "long",
                 year: "numeric",
               })}
+              {affiche.version > 1 && (
+                <>
+                  {" — "}
+                  <Link href="/programme/evolution" className="underline hover:text-laiton-400">
+                    voir comment ton programme a évolué
+                  </Link>
+                </>
+              )}
             </p>
           )}
 
@@ -180,6 +192,8 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
 
           {pilier === "NUTRITION" && <FicheMacros />}
         </Card>
+
+        {affiche && peutGenerer && <AnalyserAdaptationButton pilierSlug={PDF_SLUG[pilier]} />}
 
         <Link href="/compte/profil" className="text-sm text-laiton-400 underline">
           Modifier votre profil →
