@@ -14,6 +14,7 @@ import { trackServerEvent } from "@/lib/analytics/product-events";
 import type { Pilier, User, Profile, Subscription } from "@prisma/client";
 
 const LIMITE_AUGMENTATION_CHARGE = 1.1; // +10% max par changement de charge
+const LIMITE_VARIATION_CALORIES = 0.1; // ±10% max par changement nutritionnel (Phase 3)
 
 export type ResultatAdaptation = {
   decision: DecisionAdaptationIA["decision"];
@@ -79,14 +80,32 @@ function appliquerGardeFous(
   changements = changements
     .filter((c) => c.raison && c.raison.trim().length > 0)
     .map((c) => {
-      if (c.type !== "LOAD") return c;
-      const avantNum = extraireNombre(c.avant);
-      const apresNum = extraireNombre(c.apres);
-      if (avantNum == null || apresNum == null) return c;
-      const plafond = avantNum * LIMITE_AUGMENTATION_CHARGE;
-      if (apresNum > plafond) {
-        const apresClampe = Math.round(plafond * 2) / 2; // arrondi au 0.5 le plus proche
-        return { ...c, apres: typeof c.apres === "number" ? apresClampe : `${apresClampe}` };
+      if (c.type === "LOAD") {
+        const avantNum = extraireNombre(c.avant);
+        const apresNum = extraireNombre(c.apres);
+        if (avantNum == null || apresNum == null) return c;
+        const plafond = avantNum * LIMITE_AUGMENTATION_CHARGE;
+        if (apresNum > plafond) {
+          const apresClampe = Math.round(plafond * 2) / 2; // arrondi au 0.5 le plus proche
+          return { ...c, apres: typeof c.apres === "number" ? apresClampe : `${apresClampe}` };
+        }
+        return c;
+      }
+      if (c.type === "CALORIES") {
+        // Contrairement à LOAD, plafonné dans les DEUX sens : une
+        // restriction extrême est tout aussi risquée qu'un surplus extrême
+        // (section 12 de la vision : "ne jamais faire de modification
+        // extrême").
+        const avantNum = extraireNombre(c.avant);
+        const apresNum = extraireNombre(c.apres);
+        if (avantNum == null || apresNum == null) return c;
+        const ecartMax = avantNum * LIMITE_VARIATION_CALORIES;
+        const ecart = apresNum - avantNum;
+        if (Math.abs(ecart) > ecartMax) {
+          const apresClampe = Math.round(avantNum + Math.sign(ecart) * ecartMax);
+          return { ...c, apres: typeof c.apres === "number" ? apresClampe : `${apresClampe}` };
+        }
+        return c;
       }
       return c;
     });
@@ -132,6 +151,7 @@ function buildProfilUtilisateur(
     sommeilMoyenHeures: profile?.sommeilMoyenHeures,
     vo2Max: profile?.vo2Max,
     caloriesMoyennesParJour: profile?.caloriesMoyennesParJour,
+    hrv: profile?.hrv,
     resumeMontre: profile?.resumeMontre,
     morphologieDetectee: profile?.morphologieDetectee,
     observationsPosture: profile?.observationsPosture,

@@ -4,6 +4,55 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 3 — nutrition adaptative, récupération, wearables (11/08/2026, soir)
+
+Troisième phase de la vision "programme évolutif" — livrée et vérifiée
+(`tsc`/`build` réels). Explicitement **pas touché** : Phase 4 (dashboard
+coach), qui reste à venir sur demande.
+
+**Découverte utile en démarrant cette phase** : le moteur d'adaptation
+(Phases 1-2) a été conçu dès le départ pilier-agnostique
+(`analyserEtAdapter`/`proposerAdaptation` prend `pilier: Pilier` en
+paramètre, `genererPilier` gère déjà ENTRAINEMENT/NUTRITION/RECUPERATION,
+`pilier-page.tsx` — composant partagé par les 3 pages de pilier — affiche
+déjà "Analyser mon programme" partout). L'essentiel de "nutrition
+adaptative" et "récupération adaptative" fonctionnait donc déjà de bout
+en bout sans rien coder de nouveau. Le vrai travail de cette phase a été
+de **rendre ces adaptations réellement bien informées et sûres**, pas de
+les rendre possibles :
+
+- **Signal d'adhérence nutrition** — `collecterSignaux` intègre désormais
+  les check-ins repas existants (`RepasLog`, comme prévu/petit écart/gros
+  écart sur 14 jours), injecté dans le prompt de décision. Avant ça, une
+  analyse sur le pilier nutrition utilisait les mêmes signaux
+  d'entraînement (difficulté de séance, régression de perf) qui n'ont pas
+  grand-chose à voir avec l'alimentation.
+- **Garde-fou calorique bidirectionnel** (nouveau type `CALORIES`,
+  `src/lib/adaptation/engine.ts`) — contrairement à `LOAD` (plafonné
+  uniquement à la hausse, pertinent pour la charge d'entraînement), un
+  changement calorique est plafonné à ±10% **dans les deux sens** : une
+  restriction extrême est tout aussi dangereuse qu'un surplus extrême
+  (exigence explicite de la vision : "ne jamais faire de modification
+  extrême"). Une adaptation nutrition peut aussi être proposée même sans
+  aucune séance loguée, dès 3 check-ins repas (`donneesSuffisantes`
+  étendue) — sinon un utilisateur qui ne fait que suivre son alimentation
+  sur COAI n'aurait jamais pu recevoir de recommandation.
+- **Récupération** : vérifiée fonctionnelle telle quelle (signaux
+  sommeil/stress/énergie du check-in hebdomadaire déjà pertinents,
+  aucune règle spécifique à l'entraînement ne s'applique par erreur).
+- **Wearables — champ HRV** (`Profile.hrv`, migration
+  `20260811170000_add_hrv`) — variabilité de fréquence cardiaque en ms,
+  extraite automatiquement du screenshot montre/app santé comme les
+  autres métriques (VO2 max, fréquence cardiaque de repos...), utilisée
+  dans le prompt de génération récupération. L'architecture "Données
+  récupération" demandée par la vision existait déjà (upload screenshot
+  → extraction IA → `Profile`) — HRV était la seule métrique wearable
+  explicitement citée qui manquait.
+- **"Ce que COAI apprend sur toi"** enrichi de 2 items : "Durée moyenne"
+  (à partir de `SeanceLog.dureeMinutes`, ajouté en Phase 2) et "Adhérence
+  nutrition" (% de repas "comme prévu" sur repas loggés, seuil minimum 5
+  check-ins) — mêmes garde-fous de seuil minimum que les items existants.
+
 ## Phase 2 — rendre COAI vivant et intelligent (11/08/2026, soir)
 
 Deuxième phase de la vision "programme évolutif" (cf. section ci-dessous),
@@ -156,6 +205,8 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
+- [ ] Migration `20260811170000_add_hrv` à appliquer sur Supabase (SQL
+      Editor) — 1 ligne, ajoute juste `Profile.hrv`
 - [ ] Migration `20260811150000_add_adaptation_confirmation` à appliquer
       sur Supabase (SQL Editor) — 2 lignes `ALTER TYPE ... ADD VALUE`,
       sans elle "Accepter"/"Garder mon programme actuel" échoueront

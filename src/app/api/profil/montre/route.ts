@@ -13,6 +13,7 @@ type Extraction = {
   sommeilMoyenHeures: number | null;
   vo2Max: number | null;
   caloriesMoyennesParJour: number | null;
+  hrv: number | null;
   resume: string | null;
 };
 
@@ -75,6 +76,7 @@ export async function POST(request: Request) {
   if (extraction.vo2Max != null) data.vo2Max = extraction.vo2Max;
   if (extraction.caloriesMoyennesParJour != null)
     data.caloriesMoyennesParJour = extraction.caloriesMoyennesParJour;
+  if (extraction.hrv != null) data.hrv = extraction.hrv;
   if (extraction.resume) data.resumeMontre = extraction.resume;
 
   const profile = await prisma.profile.upsert({

@@ -162,6 +162,7 @@ type Profil = {
   sommeilMoyenHeures?: number | null;
   vo2Max?: number | null;
   caloriesMoyennesParJour?: number | null;
+  hrv?: number | null;
   resumeMontre?: string | null;
   derniereAnalyseMontre?: string | Date | null;
   morphologieDetectee?: string | null;
@@ -216,6 +217,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     sommeilMoyenHeures: profil.sommeilMoyenHeures ?? null,
     vo2Max: profil.vo2Max ?? null,
     caloriesMoyennesParJour: profil.caloriesMoyennesParJour ?? null,
+    hrv: profil.hrv ?? null,
     resumeMontre: profil.resumeMontre ?? null,
   });
   const [montreLoading, setMontreLoading] = useState(false);
@@ -236,6 +238,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
         sommeilMoyenHeures: data.sommeilMoyenHeures ?? null,
         vo2Max: data.vo2Max ?? null,
         caloriesMoyennesParJour: data.caloriesMoyennesParJour ?? null,
+        hrv: data.hrv ?? null,
         resumeMontre: data.resumeMontre ?? null,
       });
     } catch (err) {
@@ -369,7 +372,8 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             montreData.frequenceCardiaqueRepos ||
             montreData.sommeilMoyenHeures ||
             montreData.vo2Max ||
-            montreData.caloriesMoyennesParJour) && (
+            montreData.caloriesMoyennesParJour ||
+            montreData.hrv) && (
             <div className="flex flex-col gap-1.5 text-sm text-graphite-300">
               {montreData.pasMoyenParJour != null && (
                 <p>Pas moyen/jour : {montreData.pasMoyenParJour.toLocaleString("fr-FR")}</p>
@@ -384,6 +388,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
               {montreData.caloriesMoyennesParJour != null && (
                 <p>Calories moyennes/jour : {montreData.caloriesMoyennesParJour}</p>
               )}
+              {montreData.hrv != null && <p>HRV : {montreData.hrv} ms</p>}
               {montreData.resumeMontre && (
                 <p className="italic text-graphite-400">{montreData.resumeMontre}</p>
               )}

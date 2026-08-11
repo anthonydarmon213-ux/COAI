@@ -31,8 +31,8 @@ Qualité de sommeil actuelle : ${profil.qualiteSommeil ?? "non renseignée"}
 Consommation de café : ${profil.consommationCafe ?? "non renseignée"}
 Consommation d'alcool : ${profil.consommationAlcool ?? "non renseignée"}
 ${
-  profil.sommeilMoyenHeures || profil.frequenceCardiaqueRepos
-    ? `Données de montre connectée — sommeil moyen : ${profil.sommeilMoyenHeures ? `${profil.sommeilMoyenHeures} h/nuit` : "non renseigné"}, fréquence cardiaque de repos : ${profil.frequenceCardiaqueRepos ?? "non renseignée"} bpm.`
+  profil.sommeilMoyenHeures || profil.frequenceCardiaqueRepos || profil.hrv
+    ? `Données de montre connectée — sommeil moyen : ${profil.sommeilMoyenHeures ? `${profil.sommeilMoyenHeures} h/nuit` : "non renseigné"}, fréquence cardiaque de repos : ${profil.frequenceCardiaqueRepos ?? "non renseignée"} bpm${profil.hrv ? `, HRV : ${profil.hrv} ms` : ""}.`
     : ""
 }
 ${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du plan précédent, pas une création depuis zéro. Directives à respecter impérativement : ${profil.directivesAdaptation}. Garde tout ce qui fonctionne déjà, ne change que ce que les directives demandent.` : ""}

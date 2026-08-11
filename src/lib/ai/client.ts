@@ -29,6 +29,7 @@ export type ProfilUtilisateur = {
   sommeilMoyenHeures?: number | null;
   vo2Max?: number | null;
   caloriesMoyennesParJour?: number | null;
+  hrv?: number | null;
   resumeMontre?: string | null;
   // Extraites automatiquement d'une photo en tenue de sport.
   morphologieDetectee?: string | null;

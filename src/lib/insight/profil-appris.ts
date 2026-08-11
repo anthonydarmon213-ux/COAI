@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db/client";
 import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
-import type { SeanceLog, TestMaxi } from "@prisma/client";
+import type { RepasLog, SeanceLog, TestMaxi } from "@prisma/client";
 
 export type ProfilApprisItem = { label: string; valeur: string };
 
@@ -13,6 +13,8 @@ const MIN_SEANCES_MEILLEUR_JOUR = 6;
 const MIN_CHECKINS_RECUPERATION = 2;
 const MIN_TESTS_PROGRESSION = 2;
 const MIN_MENTIONS_ZONE = 2;
+const MIN_SEANCES_DUREE = 4;
+const MIN_REPAS_ADHERENCE = 5;
 
 const JOURS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 const SEMAINE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -69,6 +71,23 @@ function exerciceEnProgression(tests: TestMaxi[]): ProfilApprisItem | null {
   };
 }
 
+function dureeMoyenne(seances: SeanceLog[]): ProfilApprisItem | null {
+  const durees = seances.map((s) => s.dureeMinutes).filter((v): v is number => v != null);
+  if (durees.length < MIN_SEANCES_DUREE) return null;
+  const moyenne = Math.round(durees.reduce((a, b) => a + b, 0) / durees.length);
+  return { label: "Durée moyenne", valeur: `${moyenne} minutes` };
+}
+
+// Phase 3 (11/08/2026) — adhérence au plan nutrition, à partir des
+// check-ins repas (RepasLog). "Comme prévu" compte seul comme respecté :
+// un petit ou gros écart reste un écart, même partiel.
+function adherenceNutrition(repas: RepasLog[]): ProfilApprisItem | null {
+  if (repas.length < MIN_REPAS_ADHERENCE) return null;
+  const commePrevu = repas.filter((r) => r.statut === "COMME_PREVU").length;
+  const pourcent = Math.round((commePrevu / repas.length) * 100);
+  return { label: "Adhérence nutrition", valeur: `${pourcent} %` };
+}
+
 function zoneASurveiller(seances: SeanceLog[]): ProfilApprisItem | null {
   const compteParZone = new Map<string, number>();
   seances.forEach((s) => {
@@ -88,10 +107,11 @@ function zoneASurveiller(seances: SeanceLog[]): ProfilApprisItem | null {
 export async function buildProfilAppris(userId: string): Promise<ProfilApprisItem[]> {
   const depuis90Jours = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 
-  const [seances, checkins, tests] = await Promise.all([
+  const [seances, checkins, tests, repas] = await Promise.all([
     prisma.seanceLog.findMany({ where: { userId, date: { gte: depuis90Jours } }, orderBy: { date: "asc" } }),
     prisma.weeklyCheckin.findMany({ where: { userId }, orderBy: { semaineDebut: "desc" }, take: 8 }),
     prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "asc" } }),
+    prisma.repasLog.findMany({ where: { userId, date: { gte: depuis90Jours } } }),
   ]);
 
   const items: ProfilApprisItem[] = [];
@@ -101,6 +121,9 @@ export async function buildProfilAppris(userId: string): Promise<ProfilApprisIte
 
   const jour = meilleurJour(seances);
   if (jour) items.push(jour);
+
+  const duree = dureeMoyenne(seances);
+  if (duree) items.push(duree);
 
   const energies = checkins.map((c) => c.energie).filter((v): v is number => v != null);
   if (energies.length >= MIN_CHECKINS_RECUPERATION) {
@@ -116,6 +139,9 @@ export async function buildProfilAppris(userId: string): Promise<ProfilApprisIte
 
   const zone = zoneASurveiller(seances);
   if (zone) items.push(zone);
+
+  const adherence = adherenceNutrition(repas);
+  if (adherence) items.push(adherence);
 
   return items;
 }

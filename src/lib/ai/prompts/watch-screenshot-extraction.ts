@@ -16,6 +16,7 @@ unités metriques) :
   "sommeilMoyenHeures": durée moyenne de sommeil en heures (ex: 6.5), sinon null,
   "vo2Max": VO2 max si affiché, sinon null,
   "caloriesMoyennesParJour": calories actives/totales moyennes par jour si visible, sinon null,
+  "hrv": variabilité de fréquence cardiaque (HRV) en millisecondes si affichée (Whoop, Oura, Garmin...), sinon null,
   "resume": une phrase courte résumant ce que montre l'image (marque/app détectée si identifiable,
     période couverte par les données, toute autre métrique intéressante non couverte par les
     champs ci-dessus — poids, distance parcourue, tendance activité...)

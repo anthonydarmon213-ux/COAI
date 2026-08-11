@@ -53,6 +53,7 @@ export default async function ProfilPage() {
               sommeilMoyenHeures: user.profile?.sommeilMoyenHeures,
               vo2Max: user.profile?.vo2Max,
               caloriesMoyennesParJour: user.profile?.caloriesMoyennesParJour,
+              hrv: user.profile?.hrv,
               resumeMontre: user.profile?.resumeMontre,
               derniereAnalyseMontre: user.profile?.derniereAnalyseMontre,
               morphologieDetectee: user.profile?.morphologieDetectee,

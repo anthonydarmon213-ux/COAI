@@ -22,6 +22,11 @@ export type SignauxAdaptation = {
   regressionPerf: { exercice: string; baissePourcent: number } | null;
   versionActuelle: number | null;
   joursDepuisDerniereVersion: number | null;
+  // Phase 3 (11/08/2026) — adhérence au plan nutrition sur la même fenêtre
+  // de 14 jours, à partir des check-ins repas existants (RepasLog). Le
+  // signal le plus direct pour décider d'un ajustement nutritionnel, plus
+  // fiable qu'inférer l'adhérence depuis l'entraînement.
+  adherenceRepas: { commePrevu: number; petitEcart: number; grosEcart: number; total: number } | null;
 };
 
 // Couche métier déterministe (11/08/2026, section 24 de la vision produit) :
@@ -34,16 +39,18 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
   const maintenant = Date.now();
   const depuis = new Date(maintenant - FENETRE_SEANCES_JOURS * 24 * 60 * 60 * 1000);
 
-  const [seancesRecentes, dernierCheckin, mesures, testsRecents, dernierProgramme] = await Promise.all([
-    prisma.seanceLog.findMany({
-      where: { userId, date: { gte: depuis } },
-      orderBy: { date: "desc" },
-    }),
-    prisma.weeklyCheckin.findFirst({ where: { userId }, orderBy: { semaineDebut: "desc" } }),
-    prisma.mesure.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 2 }),
-    prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 20 }),
-    prisma.programmeGenerated.findFirst({ where: { userId, pilier }, orderBy: { generatedAt: "desc" } }),
-  ]);
+  const [seancesRecentes, dernierCheckin, mesures, testsRecents, dernierProgramme, repasRecents] =
+    await Promise.all([
+      prisma.seanceLog.findMany({
+        where: { userId, date: { gte: depuis } },
+        orderBy: { date: "desc" },
+      }),
+      prisma.weeklyCheckin.findFirst({ where: { userId }, orderBy: { semaineDebut: "desc" } }),
+      prisma.mesure.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 2 }),
+      prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 20 }),
+      prisma.programmeGenerated.findFirst({ where: { userId, pilier }, orderBy: { generatedAt: "desc" } }),
+      prisma.repasLog.findMany({ where: { userId, date: { gte: depuis } } }),
+    ]);
 
   const difficultes = seancesRecentes.map((s) => s.difficulte).filter((v): v is number => v != null);
   const energies = seancesRecentes.map((s) => s.energie).filter((v): v is number => v != null);
@@ -79,6 +86,15 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
     ? Math.floor((maintenant - dernierProgramme.generatedAt.getTime()) / (24 * 60 * 60 * 1000))
     : null;
 
+  const adherenceRepas = repasRecents.length
+    ? {
+        commePrevu: repasRecents.filter((r) => r.statut === "COMME_PREVU").length,
+        petitEcart: repasRecents.filter((r) => r.statut === "PETIT_ECART").length,
+        grosEcart: repasRecents.filter((r) => r.statut === "GROS_ECART").length,
+        total: repasRecents.length,
+      }
+    : null;
+
   return {
     nombreSeancesRecentes: seancesRecentes.length,
     moyenneDifficulte: moyenne(difficultes),
@@ -105,6 +121,7 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
     regressionPerf,
     versionActuelle: dernierProgramme?.version ?? null,
     joursDepuisDerniereVersion,
+    adherenceRepas,
   };
 }
 
@@ -113,6 +130,12 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
 // assez de données pour recommander une modification").
 export const MIN_SEANCES_POUR_ADAPTER = 2;
 
+const MIN_REPAS_POUR_ADAPTER = 3;
+
 export function donneesSuffisantes(signaux: SignauxAdaptation): boolean {
-  return signaux.nombreSeancesRecentes >= MIN_SEANCES_POUR_ADAPTER || signaux.checkinHebdo !== null;
+  return (
+    signaux.nombreSeancesRecentes >= MIN_SEANCES_POUR_ADAPTER ||
+    signaux.checkinHebdo !== null ||
+    (signaux.adherenceRepas?.total ?? 0) >= MIN_REPAS_POUR_ADAPTER
+  );
 }

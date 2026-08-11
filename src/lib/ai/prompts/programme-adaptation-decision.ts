@@ -3,7 +3,11 @@ import type { SignauxAdaptation } from "@/lib/adaptation/signals";
 import type { Pilier } from "@prisma/client";
 
 export type ChangementAdaptation = {
-  type: "LOAD" | "VOLUME" | "EXERCICE" | "CONTRAINTE";
+  // CALORIES (Phase 3, nutrition) : cible "Calories journalières" ou
+  // "Protéines"/"Glucides"/"Lipides", clampé de façon bidirectionnelle en
+  // code (cf. engine.ts) — contrairement à LOAD qui n'est plafonné qu'à la
+  // hausse.
+  type: "LOAD" | "VOLUME" | "EXERCICE" | "CONTRAINTE" | "CALORIES";
   cible: string;
   avant: string | number | null;
   apres: string | number | null;
@@ -68,12 +72,18 @@ Dernier check-in hebdomadaire : ${
       ? `sommeil ${signaux.checkinHebdo.sommeil ?? "non renseigné"}, énergie ${signaux.checkinHebdo.energie ?? "non renseignée"}/5, stress ${signaux.checkinHebdo.stress ?? "non renseigné"}/5, motivation ${signaux.checkinHebdo.motivation ?? "non renseignée"}/5, douleurs cette semaine : ${signaux.checkinHebdo.douleurs === true ? "oui" : signaux.checkinHebdo.douleurs === false ? "non" : "non renseigné"}, séances réalisées : ${signaux.checkinHebdo.seancesRealisees ?? "non renseigné"}`
       : "aucun check-in hebdomadaire enregistré"
   }
+Adhérence au plan nutrition (check-ins repas, 14 derniers jours) : ${
+    signaux.adherenceRepas
+      ? `${signaux.adherenceRepas.commePrevu}/${signaux.adherenceRepas.total} comme prévu, ${signaux.adherenceRepas.petitEcart} petit(s) écart(s), ${signaux.adherenceRepas.grosEcart} gros écart(s)`
+      : "aucun check-in repas enregistré"
+  }
 ${directiveUtilisateur ? `\nCONTRAINTE PONCTUELLE SIGNALÉE PAR L'UTILISATEUR : "${directiveUtilisateur}" — le programme doit s'y adapter temporairement (decision "ADAPTER").` : ""}
 
 RÈGLES STRICTES (obligatoires)
 - Ne jamais inventer une donnée non fournie : si une valeur est "non renseignée", n'en tiens pas compte pour ta décision.
 - Si une douleur IMPORTANTE est signalée, la décision doit être "REDUIRE" ou "GARDER", jamais "PROGRESSER".
 - Toute augmentation de charge doit rester modérée (maximum +10% par rapport à la valeur actuelle).
+- Pour le pilier nutrition, tout changement calorique ou de macronutriment (type "CALORIES") doit rester modéré (maximum ±10% par rapport à la valeur actuelle) — jamais une restriction ou un surplus extrême, même si l'adhérence est mauvaise ou le poids stagne depuis longtemps.
 - Si les signaux sont insuffisants ou ambigus, choisis "GARDER" et explique-le dans "resume" plutôt que de forcer un changement.
 - Chaque élément de "changements" doit avoir une raison concrète, appuyée sur un signal listé ci-dessus — jamais une justification générique.
 
@@ -82,9 +92,9 @@ Réponds uniquement avec ce JSON (rien d'autre) :
   "decision": "GARDER" | "PROGRESSER" | "REDUIRE" | "MODIFIER" | "ADAPTER",
   "confiance": 0.75,
   "changements": [
-    { "type": "LOAD" | "VOLUME" | "EXERCICE" | "CONTRAINTE", "cible": "ex: Développé couché", "avant": "70 kg", "apres": "72.5 kg", "raison": "phrase courte, appuyée sur un signal réel" }
+    { "type": "LOAD" | "VOLUME" | "EXERCICE" | "CONTRAINTE" | "CALORIES", "cible": "ex: Développé couché ou Calories journalières", "avant": "70 kg ou 2500 kcal", "apres": "72.5 kg ou 2400 kcal", "raison": "phrase courte, appuyée sur un signal réel" }
   ],
   "resume": "1-2 phrases résumant la décision et pourquoi, dans un ton de coach — cette phrase sera montrée telle quelle à l'utilisateur"
 }
-"changements" doit être un tableau vide si decision est "GARDER".`;
+"changements" doit être un tableau vide si decision est "GARDER". Utilise le type "CALORIES" uniquement pour le pilier nutrition (calories, protéines, glucides, lipides) — jamais pour l'entraînement ou la récupération.`;
 }

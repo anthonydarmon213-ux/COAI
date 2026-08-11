@@ -164,6 +164,11 @@ model Profile {
   sommeilMoyenHeures        Float?
   vo2Max                    Float?
   caloriesMoyennesParJour   Int?
+  // HRV (variabilité de fréquence cardiaque, en ms) — ajoutée Phase 3
+  // (11/08/2026, "Données récupération" de la vision produit) : signal de
+  // récupération/fatigue le plus direct parmi les métriques wearable
+  // courantes, quand la montre l'affiche (Whoop, Oura, Garmin...).
+  hrv                       Float?
   resumeMontre              String?
   derniereAnalyseMontre     DateTime?
   // Données extraites automatiquement d'une photo en tenue de sport (cf.

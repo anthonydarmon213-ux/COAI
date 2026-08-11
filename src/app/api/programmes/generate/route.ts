@@ -84,6 +84,7 @@ export async function POST() {
     sommeilMoyenHeures: user.profile?.sommeilMoyenHeures,
     vo2Max: user.profile?.vo2Max,
     caloriesMoyennesParJour: user.profile?.caloriesMoyennesParJour,
+    hrv: user.profile?.hrv,
     resumeMontre: user.profile?.resumeMontre,
     morphologieDetectee: user.profile?.morphologieDetectee,
     observationsPosture: user.profile?.observationsPosture,
