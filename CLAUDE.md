@@ -4,6 +4,44 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Roadmap Phases 5-10 (11/08/2026, nuit)
+
+Suite envisagée par Anthony après les Phases 1-4 (programme évolutif) et
+le bloc NEAT de ce soir. Rien commencé, juste posé pour la suite —
+chaque phase à confirmer une par une avant de démarrer, comme pour les
+précédentes.
+
+1. **Phase 5 — Conversion / onboarding intelligent.** Diagnostic offert →
+   résultat personnalisé spectaculaire → aperçu de ce que COAI a compris
+   → programme proposé → paywall au bon moment. Un vrai funnel intégré au
+   produit, pas juste une page tarifs.
+2. **Phase 6 — Rétention / "Daily COAI".** Un écran "Aujourd'hui" ultra
+   simple : ce qu'il y a à faire aujourd'hui (séance, nutrition, pas,
+   récupération, adaptation éventuelle) — ouvrir COAI sans avoir à
+   réfléchir.
+3. **Phase 7 — Mémoire & intelligence long terme ("COAI Profile /
+   Training Intelligence").** Celle qui intéresse le plus Anthony :
+   construire progressivement un profil sportif vivant par utilisateur
+   ("tu progresses mieux avec 4 séances", "ta récupération chute après X
+   volume", "tu rates souvent le vendredi", "meilleures perfs après 7h+
+   de sommeil"...). Plus l'usage est long, plus quitter COAI coûte cher
+   en valeur perdue. **Recoupe déjà largement `src/lib/insight/
+   profil-appris.ts` et `coai-insight.ts`** (Phase 2, ce soir) — pas un
+   départ de zéro, plutôt un approfondissement de ce qui existe déjà.
+4. **Phase 8 — Business model / Stripe.** Free → Pro → Human, essai,
+   upgrade/downgrade, mensuel/annuel, paywall, quotas IA, suivi MRR/
+   churn/conversion. Vérifier aussi que le coût IA par utilisateur reste
+   compatible avec le prix.
+5. **Phase 9 — Acquisition virale.** Éléments partageables (progression,
+   PR, transformation, "mon programme s'est adapté", bilan mensuel) →
+   partage Instagram/TikTok → lien → diagnostic offert.
+6. **Phase 10 — COAI Coach / B2B.** Une fois le B2C solide : d'autres
+   coachs utilisent COAI avec leurs propres clients (dashboard
+   multi-clients, validation IA, alertes, notes coach, marque blanche
+   éventuelle plus tard). Recoupe l'idée déjà notée dans "Pistes de
+   croissance / distribution" (08/08/2026) — cadrage produit rôles
+   Particulier/Coach/Admin déjà esquissé là-bas.
+
 ## Nouvel axe de marque : "un coaching qui apprend" (11/08/2026, nuit)
 
 Formulé par Anthony après la refonte du hero, en repensant à tout ce qui a
