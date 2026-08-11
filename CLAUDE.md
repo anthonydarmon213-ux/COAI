@@ -27,6 +27,14 @@ visibles, sans overlay ni erreur navigateur. Captures :
 `test-results/daily-interactive-mobile.png` et
 `daily-interactive-finishers-mobile.png`.
 
+Le bouton « Besoin d'aide pendant la séance ? » ouvre un Coach IA contextuel
+en panneau mobile/desktop. Il reçoit uniquement le check-in du jour, la séance
+et l'exercice actuellement ouverts, réutilise `/api/coach/ask` et ses quotas
+existants, et ne modifie jamais le programme ni la séance enregistrée. Les cas
+de douleur déclenchent des suggestions prudentes. Vérifié en 390×844 et
+1440×1000, captures `test-results/daily-coach-mobile.png` et
+`daily-coach-desktop.png`.
+
 - **Entrée principale** : `/dashboard` devient l'écran « Aujourd'hui » ;
   `/aujourdhui` redirige vers lui. En-tête contextuel, séance ou récupération,
   puis COAI Insight et un résumé NEAT compact.

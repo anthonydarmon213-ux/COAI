@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DailyCoach } from "@/components/daily/daily-coach";
 import { ensureWorkoutCompleteness, isCoreExercise } from "@/lib/daily/session";
 
 type Session = Record<string, unknown> & {
@@ -140,6 +141,7 @@ export function DailyExperience({
   const checkinDone = Boolean(daily?.sleep);
   const totalSteps = exercises.length + (activeSession.echauffement ? 1 : 0) + (activeSession.retourAuCalme ? 1 : 0);
   const progress = totalSteps > 0 ? Math.round((completedSteps.size / totalSteps) * 100) : 0;
+  const focusedExercise = activeExercise == null ? null : exercises[activeExercise];
 
   function toggleStep(key: string) {
     setCompletedSteps((current) => {
@@ -285,6 +287,25 @@ export function DailyExperience({
           {checkinDone && !daily?.completedAt && !pain && started && <Button onClick={completeWorkout} disabled={loading} className="mt-6 w-full">{loading ? "Enregistrement…" : "Terminer ma séance"}</Button>}
           {checkinDone && pain && <p className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm leading-6 text-amber-100">Ne t’entraîne pas à travers une douleur. Si elle persiste, s’intensifie ou t’inquiète, demande l’avis d’un professionnel de santé.</p>}
           {!checkinDone && <p className="mt-6 text-sm text-graphite-400">Complète le check-in pour afficher le détail et confirmer l’adaptation.</p>}
+          {checkinDone && (
+            <DailyCoach context={{
+              source: "DAILY_WORKOUT",
+              sessionName: activeSession.nom,
+              exerciseName: focusedExercise ? String(focusedExercise.nom ?? "Exercice en cours") : undefined,
+              series: focusedExercise?.series == null ? undefined : String(focusedExercise.series),
+              repetitions: focusedExercise?.repetitions == null ? undefined : String(focusedExercise.repetitions),
+              rest: focusedExercise?.repos == null ? undefined : String(focusedExercise.repos),
+              loadGuidance: focusedExercise?.charge == null ? undefined : String(focusedExercise.charge),
+              workoutStarted: started,
+              sleep: daily?.sleep ?? undefined,
+              energy: daily?.energy ?? undefined,
+              pain: daily?.pain ?? false,
+              painArea: daily?.painArea ?? undefined,
+              availableMinutes: daily?.availableMinutes ?? undefined,
+              adaptationReason: adaptation?.reason,
+              pendingCoach,
+            }} />
+          )}
         </div>
       </section>
 
