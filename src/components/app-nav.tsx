@@ -155,7 +155,7 @@ export function AppNav() {
             </span>
           </div>
           <span className="text-[0.65rem] font-medium tracking-wide text-graphite-300">
-            AI generates. Humans validate.
+            L&apos;humain valide. L&apos;IA personnalise.
           </span>
         </Link>
         <div className="flex items-center gap-2 md:mt-5">
