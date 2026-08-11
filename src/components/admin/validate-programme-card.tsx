@@ -6,9 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { SectionLabel } from "@/components/ui/section-label";
+import { Badge } from "@/components/ui/badge";
 import { EntrainementView } from "@/components/programme/entrainement-view";
 import { NutritionView } from "@/components/programme/nutrition-view";
 import { RecuperationView } from "@/components/programme/recuperation-view";
+
+type SuggestionCoai = {
+  resume: string;
+  changements: { cible: string; avant: string | number | null; apres: string | number | null; raison: string }[];
+};
 
 const PILIER_LABELS: Record<string, string> = {
   ENTRAINEMENT: "Entraînement",
@@ -51,16 +57,19 @@ export function ValidateProgrammeCard({
   userEmail,
   contenu,
   generatedAt,
+  suggestionCoai,
 }: {
   id: string;
   pilier: string;
   userEmail: string;
   contenu: unknown;
   generatedAt: string;
+  suggestionCoai?: SuggestionCoai | null;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(() => JSON.stringify(contenu, null, 2));
+  const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const items = checklistItems(contenu);
@@ -78,7 +87,10 @@ export function ValidateProgrammeCard({
       const res = await fetch(`/api/admin/programmes/${id}/valider`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(contenuOverride !== undefined ? { contenu: contenuOverride } : {}),
+        body: JSON.stringify({
+          ...(contenuOverride !== undefined ? { contenu: contenuOverride } : {}),
+          ...(note.trim() ? { note: note.trim() } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de la validation.");
@@ -95,7 +107,11 @@ export function ValidateProgrammeCard({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/programmes/${id}/rejeter`, { method: "POST" });
+      const res = await fetch(`/api/admin/programmes/${id}/rejeter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(note.trim() ? { note: note.trim() } : {}),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec du rejet.");
       router.refresh();
@@ -129,6 +145,25 @@ export function ValidateProgrammeCard({
         </Button>
       </div>
 
+      {suggestionCoai && (
+        <div className="flex flex-col gap-2 rounded-md border border-laiton-400/20 bg-laiton-400/[0.04] p-3">
+          <Badge tone="success">Suggestion COAI</Badge>
+          <p className="text-sm leading-6 text-graphite-200">{suggestionCoai.resume}</p>
+          {suggestionCoai.changements.length > 0 && (
+            <ul className="flex flex-col gap-1 text-xs text-graphite-400">
+              {suggestionCoai.changements.map((c, i) => (
+                <li key={i}>
+                  <span className="text-graphite-200">{c.cible}</span>
+                  {c.avant != null && c.apres != null ? ` : ${c.avant} → ${c.apres}` : ""}
+                  {" — "}
+                  {c.raison}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       {editing ? (
         <Textarea
           rows={16}
@@ -158,6 +193,13 @@ export function ValidateProgrammeCard({
           </label>
         ))}
       </div>
+
+      <Textarea
+        rows={2}
+        placeholder="Note pour l'abonné (facultatif) — visible dans son historique"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+      />
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 

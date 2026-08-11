@@ -6,6 +6,7 @@ import { notifyMakeScenario } from "@/lib/whatsapp/client";
 
 const bodySchema = z.object({
   contenu: z.unknown().optional(),
+  note: z.string().max(1000).optional(),
 });
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
@@ -32,6 +33,19 @@ export async function POST(request: Request, { params }: { params: { id: string 
       ...(parsed.data.contenu !== undefined ? { contenu: parsed.data.contenu as object } : {}),
     },
     include: { user: true },
+  });
+
+  // Si ce programme vient d'une adaptation (cf. src/lib/adaptation/engine.ts
+  // confirmerAdaptation), sa trace restait "EN_ATTENTE" indéfiniment même
+  // une fois validée par le coach — jamais mise à jour avant ce correctif
+  // (Phase 4). MODIFIEE si le coach a édité le contenu avant de valider,
+  // VALIDEE sinon.
+  await prisma.programmeAdaptation.updateMany({
+    where: { programmeSuivantId: programme.id, statut: "EN_ATTENTE" },
+    data: {
+      statut: parsed.data.contenu !== undefined ? "MODIFIEE" : "VALIDEE",
+      ...(parsed.data.note ? { noteCoach: parsed.data.note } : {}),
+    },
   });
 
   if (programme.user.phoneWhatsapp) {

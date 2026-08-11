@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db/client";
 
 const LINKS = [
+  { href: "/admin", label: "Dashboard" },
   { href: "/admin/business", label: "Business" },
   { href: "/admin/programmes", label: "Validation" },
   { href: "/admin/suivi", label: "Suivi à risque" },

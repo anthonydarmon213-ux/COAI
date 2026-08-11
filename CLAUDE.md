@@ -4,6 +4,43 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 4 — dashboard coach, validation humaine (11/08/2026, soir)
+
+Quatrième et dernière phase du découpage initial de la vision "programme
+évolutif" — livrée et vérifiée (`tsc`/`build` réels + captures Playwright
+mobile/desktop).
+
+**Bug de fond corrigé au passage** : les routes de validation/rejet coach
+(`/api/admin/programmes/[id]/valider` et `/rejeter`, existantes avant
+cette vision) ne mettaient jamais à jour la `ProgrammeAdaptation`
+d'origine quand le programme validé venait d'une adaptation (créée par
+`confirmerAdaptation`, Phase 2) — elle restait "EN_ATTENTE" indéfiniment
+même une fois réellement validée par le coach, avec un `programmeSuivantId`
+pointant vers un programme parfois supprimé (cas du rejet). Corrigé : la
+validation marque l'adaptation `VALIDEE` (ou `MODIFIEE` si le coach édite
+le contenu avant de valider), le rejet la marque `REJETEE` — les deux
+supportent maintenant une note coach optionnelle (`noteCoach`), affichée
+côté abonné sur `/programme/evolution`.
+
+- **`/admin`** (nouveau, n'existait pas) : dashboard coach — nombre de
+  clients Transformation actifs, programmes à valider (dont adaptations),
+  alertes actives, clients nécessitant attention (top 5, lien vers leur
+  fiche). Ajouté en premier lien de `AdminNav`.
+- **`/admin/clients/[id]`** (nouveau) : fiche client — profil, alertes,
+  programme actuel par pilier, feedback récent (séances/check-in/mesures),
+  suggestion COAI en attente avec les boutons Valider/Modifier déjà
+  fournis par `ValidateProgrammeCard` (réutilisé tel quel), bouton
+  Contacter (WhatsApp). Accessible depuis `/admin` et `/admin/suivi`
+  (noms de clients maintenant cliquables).
+- **`ValidateProgrammeCard`** affiche désormais la suggestion COAI
+  (résumé + changements avant→après) quand le programme en attente vient
+  d'une adaptation — le coach voit le "pourquoi" suggéré par l'IA, pas
+  seulement le contenu brut à relire à l'œil.
+- **`src/lib/admin/flags.ts`** (nouveau) : logique de flags (douleur,
+  inactivité, pas de mesure récente, régression de perf) extraite de
+  `/admin/suivi` pour être réutilisée par le nouveau dashboard — même
+  calcul, pas de divergence entre les deux pages.
+
 ## Phase 3 — nutrition adaptative, récupération, wearables (11/08/2026, soir)
 
 Troisième phase de la vision "programme évolutif" — livrée et vérifiée

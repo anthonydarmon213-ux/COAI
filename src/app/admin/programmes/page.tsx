@@ -18,6 +18,15 @@ export default async function AdminProgrammesPage() {
     orderBy: { generatedAt: "asc" },
   });
 
+  // Une partie de ces programmes vient d'une adaptation (cf.
+  // src/lib/adaptation/engine.ts confirmerAdaptation), pas d'une première
+  // génération — le coach doit voir la raison suggérée par COAI, pas
+  // seulement le contenu brut (Phase 4).
+  const adaptations = await prisma.programmeAdaptation.findMany({
+    where: { programmeSuivantId: { in: enAttente.map((p) => p.id) } },
+  });
+  const adaptationParProgrammeId = new Map(adaptations.map((a) => [a.programmeSuivantId, a]));
+
   return (
     <main className="bg-lab-grid min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -36,16 +45,34 @@ export default async function AdminProgrammesPage() {
           <p className="text-graphite-400">Aucun programme en attente pour le moment.</p>
         )}
 
-        {enAttente.map((programme) => (
-          <ValidateProgrammeCard
-            key={programme.id}
-            id={programme.id}
-            pilier={programme.pilier}
-            userEmail={programme.user.email}
-            contenu={programme.contenu}
-            generatedAt={programme.generatedAt.toISOString()}
-          />
-        ))}
+        {enAttente.map((programme) => {
+          const adaptation = adaptationParProgrammeId.get(programme.id);
+          return (
+            <ValidateProgrammeCard
+              key={programme.id}
+              id={programme.id}
+              pilier={programme.pilier}
+              userEmail={programme.user.email}
+              contenu={programme.contenu}
+              generatedAt={programme.generatedAt.toISOString()}
+              suggestionCoai={
+                adaptation
+                  ? {
+                      resume: adaptation.resume,
+                      changements: Array.isArray(adaptation.changements)
+                        ? (adaptation.changements as unknown as {
+                            cible: string;
+                            avant: string | number | null;
+                            apres: string | number | null;
+                            raison: string;
+                          }[])
+                        : [],
+                    }
+                  : null
+              }
+            />
+          );
+        })}
       </div>
     </main>
   );

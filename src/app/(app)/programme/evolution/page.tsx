@@ -164,6 +164,14 @@ export default async function EvolutionPage() {
               {a.statut !== "APPLIQUEE" && (
                 <span className="text-xs text-laiton-300">{STATUT_LABEL[a.statut]}</span>
               )}
+              {a.noteCoach && (
+                <div className="rounded-xl border border-laiton-400/20 bg-laiton-400/[0.04] p-3">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-laiton-500">
+                    Note de ton coach
+                  </span>
+                  <p className="mt-1 text-sm text-graphite-200">{a.noteCoach}</p>
+                </div>
+              )}
             </Card>
           );
         })}
