@@ -77,15 +77,13 @@ libellé change) + "Découvrir comment ça marche" (ancre `#comment-ca-marche`)
 Testé aussi sur petit écran (iPhone SE, 375×667) pour vérifier l'absence
 de coupure moche du titre.
 
-**Point de vigilance non résolu, à soulever avec Anthony** : `CoaiIntro`
-et la section `id="hero"` affichent maintenant un kicker + titre + sous-
-titre quasi identiques, l'un juste après l'autre au scroll — exactement le
-type de répétition que son tout premier brief demandait d'éviter. Comme
-son brief le plus récent portait explicitement sur `CoaiIntro` seul et
-disait "ne modifie rien d'autre", la section du dessous n'a pas été
-touchée. À trancher avec lui : fusionner les deux (garder le texte dans
-`CoaiIntro`, simplifier la section du dessous pour ne garder que les
-mockups téléphone + la ligne de fonctionnalités), ou une autre approche.
+**Fusion demandée par Anthony juste après ("oui fusionne")** : la section
+`id="hero"` (kicker/titre/sous-titre/CTA dupliqués avec `CoaiIntro`) perd
+tout son texte — ne garde que `<AppPreviewPhones />`, renommée
+`id="apercu-produit"` (rien ne pointait vers l'ancien id `#hero` dans la
+nav, changement sans casse). Résultat : un seul message ("Ton programme
+évolue avec toi.") sur tout le parcours de la page, plus de répétition.
+Revérifié `tsc`/`build` + captures desktop/mobile pleine page.
 
 ## Phase 3, bloc NEAT — activité quotidienne (11/08/2026, nuit)
 

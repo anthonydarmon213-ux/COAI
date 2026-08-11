@@ -103,38 +103,12 @@ export default function LandingPage() {
     <main className="bg-lab-grid flex flex-col">
       <CoaiIntro />
 
-      <section
-        id="hero"
-        className="relative mx-auto grid w-full max-w-7xl items-center gap-16 overflow-hidden px-6 pb-20 pt-32 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-24"
-      >
-        <div className="relative z-10 max-w-2xl">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
-            L&apos;humain valide. L&apos;IA personnalise.
-          </p>
-          <h1 className="mt-6 font-display text-[clamp(2.6rem,5.2vw,4.5rem)] font-semibold leading-[1.03] tracking-[-0.045em] text-white">
-            Ton programme <span className="text-laiton-300">évolue</span> avec toi.
-          </h1>
-          <p className="mt-7 max-w-lg text-lg leading-8 text-graphite-200">
-            Ton corps change. Ton emploi du temps change. Tes performances changent. COAI adapte
-            ton entraînement, ta nutrition et ta récupération au fil du temps.
-          </p>
-          <div className="mt-8 flex flex-wrap items-start gap-4">
-            <div className="flex flex-col gap-2">
-              <Link href="/diagnostic">
-                <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
-              </Link>
-              <p className="text-xs text-graphite-500">2 min · Gratuit · Sans engagement</p>
-            </div>
-            <a href="#comment-ca-marche">
-              <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
-                Voir comment ça marche
-              </Button>
-            </a>
-          </div>
-        </div>
-        <div className="relative z-10">
-          <AppPreviewPhones />
-        </div>
+      {/* Aperçu produit — anciennement dupliquait le kicker/titre/sous-titre
+          de CoaiIntro juste au-dessus (11/08/2026, fusion demandée par
+          Anthony pour éviter la répétition). Ne garde que les mockups,
+          sans re-décrire ce que CoaiIntro vient déjà de dire. */}
+      <section id="apercu-produit" className="relative mx-auto flex w-full max-w-5xl justify-center px-6 pb-16 pt-8 sm:px-10">
+        <AppPreviewPhones />
       </section>
 
       {/* Ligne de fonctionnalités sous le hero — reprend exactement les
