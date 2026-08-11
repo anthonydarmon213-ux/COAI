@@ -4,6 +4,40 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Migrations Prisma automatisées au déploiement (11/08/2026, nuit)
+
+Demandé par Anthony ("on fait les migrations sur vercel?") après le test de
+bout en bout ci-dessous, en réaction au copier-coller manuel répété dans
+Supabase SQL Editor (source d'une erreur de troncature déjà vécue, et de
+migrations qui traînent en attente plusieurs jours faute d'y penser).
+
+- **`package.json`** : `build` devient `prisma migrate deploy && next
+  build`. `prisma/schema.prisma` avait déjà un `directUrl` séparé du `url`
+  pooled (nécessaire pour que les migrations passent en direct plutôt que
+  via le pooler Supavisor) — rien à changer côté schéma. Vérifié localement
+  que `prisma migrate deploy` échoue bien avec la même erreur P1001 déjà
+  connue (pas d'accès réseau depuis ce sandbox) et pas une erreur de
+  configuration — donc la commande est correctement câblée, juste
+  impossible à exécuter jusqu'au bout d'ici.
+- **Piège identifié avant de pousser** : `prisma migrate deploy` décide quoi
+  appliquer à partir de la table `_prisma_migrations`, pas en relisant le
+  SQL. Comme les 37 migrations précédentes ont toutes été appliquées à la
+  main via l'éditeur SQL Supabase (jamais via la CLI Prisma), cette table
+  n'a probablement aucune trace qu'elles sont déjà faites — un
+  `prisma migrate deploy` naïf aurait donc tenté de les rejouer depuis
+  `20260802101253_init` (dont des `CREATE TABLE` sans `IF NOT EXISTS`) et
+  fait échouer le premier déploiement.
+- **Solution** : script SQL `baseline-migrations-a-coller-dans-supabase.sql`
+  généré et envoyé à Anthony — insère juste 37 lignes dans
+  `_prisma_migrations` (nom + checksum SHA-256 du fichier `migration.sql`,
+  calculé ici sans accès à la base, juste en hashant les fichiers du repo)
+  pour dire à Prisma "ces migrations sont déjà faites, ne les rejoue pas".
+  Une seule fois, à coller avant le prochain déploiement de cette branche.
+  Après ça, `prisma migrate deploy` n'appliquera que les 3 migrations
+  réellement en attente — automatiquement, sans autre action manuelle — et
+  chaque migration future suivra le même chemin. cf. checklist plus bas
+  pour le détail de la manip.
+
 ## Test de bout en bout des 4 phases "programme évolutif" (11/08/2026, nuit)
 
 Demandé par Anthony ("test tout d'abord") avant de continuer, après la
@@ -281,22 +315,35 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
-- [ ] Migration `20260811170000_add_hrv` à appliquer sur Supabase (SQL
-      Editor) — 1 ligne, ajoute juste `Profile.hrv`
-- [ ] Migration `20260811150000_add_adaptation_confirmation` à appliquer
-      sur Supabase (SQL Editor) — 2 lignes `ALTER TYPE ... ADD VALUE`,
-      sans elle "Accepter"/"Garder mon programme actuel" échoueront
-- [ ] Migration `20260811120000_add_phase2_programme_vivant` à appliquer
-      sur Supabase (SQL Editor) — durée de séance, mode voyage temporaire
-      et contexte d'adaptation ne fonctionneront pas tant que ce n'est pas
-      fait (SQL donné dans le chat le 11/08 soir)
-- [ ] Une fois les 3 migrations ci-dessus appliquées : tester en conditions
-      réelles le parcours "programme évolutif" (logue 2-3 séances → Analyser
-      mon programme → Accepter → vérifie `/programme/evolution` ; teste
-      "Ma semaine change" en mode voyage ; valide/rejette une suggestion
-      côté `/admin/clients/[id]`) — non testable depuis le sandbox Claude
-      Code (pas d'accès direct à Supabase ni d'URL de déploiement
-      joignable, cf. section "Test de bout en bout" ci-dessus)
+- [ ] **Migrations automatisées (11/08/2026, nuit)** — le script `build`
+      lance désormais `prisma migrate deploy` avant `next build` : chaque
+      déploiement Vercel applique automatiquement les migrations en
+      attente, fini le copier-coller manuel dans Supabase SQL Editor à
+      chaque fois (source de l'erreur de troncature déjà vécue). Mais ça
+      ne marche que si Prisma sait déjà que les 37 migrations précédentes
+      sont appliquées — sinon `prisma migrate deploy` va tenter de les
+      rejouer depuis le début (dont des `CREATE TABLE` sur des tables qui
+      existent déjà) et bloquer le déploiement. **Avant le prochain
+      déploiement de cette branche**, coller une seule fois dans Supabase
+      SQL Editor le script `baseline-migrations-a-coller-dans-supabase.sql`
+      (fichier envoyé dans le chat le 11/08 nuit) — il ne fait qu'insérer
+      des lignes dans la table `_prisma_migrations` (aucune donnée
+      applicative touchée), et neutralise cette liste en un coup : les 3
+      migrations encore en attente (`20260811120000_add_phase2_programme_vivant`,
+      `20260811150000_add_adaptation_confirmation`, `20260811170000_add_hrv`)
+      seront alors appliquées automatiquement par le prochain déploiement,
+      plus besoin de les coller à la main. Vérifier aussi que `DIRECT_URL`
+      (pas seulement `DATABASE_URL`) est bien dans les variables d'env
+      Vercel (Production + Preview) — c'est cette variable que Prisma
+      utilise pour les migrations, en direct plutôt que via le pooler.
+- [ ] Une fois le script de baseline collé et le prochain déploiement
+      passé : tester en conditions réelles le parcours "programme évolutif"
+      (logue 2-3 séances → Analyser mon programme → Accepter → vérifie
+      `/programme/evolution` ; teste "Ma semaine change" en mode voyage ;
+      valide/rejette une suggestion côté `/admin/clients/[id]`) — non
+      testable depuis le sandbox Claude Code (pas d'accès direct à
+      Supabase ni d'URL de déploiement joignable, cf. section "Test de
+      bout en bout" plus haut)
 - [x] Migration `20260811090000_add_programme_evolutif` appliquée sur
       Supabase (11/08 après-midi) — check-in séance/hebdo, versionnage et
       adaptations opérationnels en prod
