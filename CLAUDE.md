@@ -120,9 +120,10 @@ dashboard de calcul du funnel.
   externes bloqués côté sandbox) — la présence des appels `trackEvent`/
   `trackFunnelEvent` a été vérifiée dans le code et testée fonctionnellement
   (comportement UI correct), pas la réception réelle côté GA4/Meta.
-- Migration `20260812000000_add_utm_attribution` à appliquer en prod
-  (automatique au prochain déploiement via `prisma migrate deploy`, cf.
-  section plus bas — rien à coller manuellement).
+- Migration `20260812000000_add_utm_attribution` — déployée (11/08/2026,
+  nuit, confirmé par Anthony), appliquée automatiquement via
+  `prisma migrate deploy`. Reste à tester en conditions réelles (cf.
+  checklist ci-dessous).
 
 ## Phase 5, bloc A — diagnostic enrichi + "COAI a compris de toi" (11/08/2026, nuit)
 
