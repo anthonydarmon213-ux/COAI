@@ -13,10 +13,10 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Programme personnalisé généré par IA (entraînement, nutrition, récupération) — sans relecture humaine",
   ],
   STANDARD: [
+    "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs",
     "Programme personnalisé généré par IA (entraînement, nutrition, récupération)",
     "Validation humaine — chaque programme relu et validé par un vrai coach",
     "1 séance visio de 30 min/mois avec Anthony Darmon incluse, à réserver via WhatsApp",
-    "Suivi de progression",
     "Coach IA — accès illimité",
     "Ajustements continus selon tes retours",
     "Assistant WhatsApp 24/7",

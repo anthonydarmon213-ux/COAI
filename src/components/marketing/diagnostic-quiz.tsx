@@ -212,8 +212,9 @@ const FORMULES = [
     plan: "STANDARD" as const,
     nom: "Transformation",
     prix: "49€/mois",
-    accroche: "L'IA génère, un coach diplômé d'État valide et ajuste.",
+    accroche: "L'IA génère, un coach diplômé d'État valide et te suit jusqu'à ton objectif.",
     bullets: [
+      "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs",
       "Chaque programme relu et validé par un vrai coach",
       "Coach IA illimité, disponible 24h/24, 7j/7",
       "1 séance visio/mois avec Anthony Darmon incluse",

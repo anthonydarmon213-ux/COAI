@@ -64,10 +64,10 @@ const TIERS: Tier[] = [
     description:
       "7 jours offerts, puis 49€/mois. Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
     features: [
+      "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs — pas juste à la génération : ton coach revient vers toi si besoin (plateau, gêne, décrochage) pendant toute la durée de l'accompagnement",
       "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
       "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
       "1 séance visio de 30 min/mois avec Anthony Darmon incluse, à réserver via WhatsApp",
-      "Suivi humain jusqu'à ton objectif — pas juste à la génération : ton coach revient vers toi si besoin (plateau, gêne, décrochage) pendant toute la durée de l'accompagnement",
       "Suivi de progression — dashboard avec ton évolution",
       "Coach IA — accès illimité, disponible 24h/24 pour ajuster ta routine à tout moment",
       "Ajustements continus — le programme évolue selon tes retours",
