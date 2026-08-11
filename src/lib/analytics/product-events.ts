@@ -22,11 +22,14 @@ export type ProductEventName =
   | "neat_log_recorded"
   | "neat_recommendation_shown"
   | "neat_goal_accepted"
-  | "first_workout_started";
+  | "first_workout_started"
+  | "diagnostic_email_sent";
 
+// userId nullable (Phase 5.1, 11/08/2026) : diagnostic_email_sent se produit
+// avant toute création de compte (lead anonyme, identifié par email seul).
 export function trackServerEvent(
   name: ProductEventName,
-  userId: string,
+  userId: string | null,
   meta?: Record<string, unknown>
 ): void {
   console.log(`[product-event] ${name}`, { userId, ...meta });

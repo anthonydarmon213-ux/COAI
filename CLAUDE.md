@@ -4,6 +4,153 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 5.1 — correction structurante de l'onboarding (11/08/2026, nuit)
+
+Brief formel : le diagnostic ne doit plus suffire à lui seul à déclencher la
+génération du programme définitif — il sert à qualifier/personnaliser/
+convertir, le profil sert ensuite à la précision. Nouveau parcours :
+diagnostic → résultat → formule → compte/abonnement → profil préremplis →
+compléter l'essentiel manquant → génération → (Transformation) validation
+coach → première séance. Règle d'or : ne jamais redemander une info déjà
+donnée dans le diagnostic. **Phase 6 non démarrée**, comme demandé.
+
+**1. Architecture retenue** — plutôt qu'un gros chantier neuf, cette phase
+étend 3 briques qui existaient déjà partiellement : le pont diagnostic→profil
+(`storage.ts`, déjà branché sur `/api/profil`), un tracker de complétion
+16 champs déjà présent (`computeProfilCompletion`, jusque-là un simple
+ratio non pondéré sans notion d'essentiel/facultatif), et `ActivationFlow`
+(déjà l'écran post-abonnement). Le vrai changement : **conditionner la
+génération automatique à la complétion du profil essentiel**, plutôt que de
+la déclencher inconditionnellement dès qu'un diagnostic existe.
+
+**2. Mapping diagnostic → profil** — déjà entièrement fonctionnel avant
+cette session (`ActivationFlow` applique `readDiagnosticAnswers()` via
+`PUT /api/profil` dès l'arrivée sur `/bienvenue`) : aucun changement
+nécessaire ici, vérifié champ par champ que `DiagnosticAnswers` couvre bien
+tout ce que `/api/profil` accepte.
+
+**3. Champs essentiels (7, bloquent la génération)** — audité le moteur de
+génération (`src/lib/programmes/generer.ts` + les 8 prompts
+`src/lib/ai/prompts/*`) plutôt que de reprendre une liste supposée : objectif,
+niveau, fréquence d'entraînement, durée de séance, équipement disponible,
+âge, sexe. Tous les 7 sont déjà collectés par le diagnostic public — un
+utilisateur qui l'a fait a donc l'essentiel à 100% dès son arrivée sur
+`/bienvenue`, sans jamais rien resaisir.
+
+Volontairement **pas** dans les essentiels malgré un usage réel par le
+moteur : `contraintesSante` et `allergiesAlimentaires`. Piège identifié en
+auditant : "vide" y est une réponse légitime et fréquente ("aucune
+contrainte", "aucune allergie") — les rendre bloquants aurait pénalisé à vie
+une personne en bonne santé qui n'a simplement rien à déclarer, sans moyen de
+distinguer "jamais demandé" de "répondu aucune". Comptés en enrichissement à
+la place (leur présence améliore le score, leur absence ne bloque jamais).
+
+**4. Champs d'enrichissement (16 unités, jamais bloquants)** — lieu
+d'entraînement, morphologie, antécédents médicaux, allergies, taille, poids,
+sports pratiqués, habitudes alimentaires, repas/jour, hydratation, café,
+alcool, sommeil, contraintes santé, + bracelet connecté et photo
+morphologique comptés chacun pour **une seule unité** (une action = un point,
+pas un point par champ auto-extrait, pour ne pas surpondérer ces deux
+actions face aux champs saisis à la main).
+
+**5. Logique du pourcentage** (`src/lib/profil/completion.ts`, réutilisé
+partout : `ActivationFlow`, `/compte/profil`, garde-fou serveur) — 60% du
+score sur les essentiels, 40% sur l'enrichissement, calculé en direct à
+chaque affichage (jamais de palier hardcodé). Vérifié par script : profil
+vide → 0%, juste après un diagnostic type → ~73% (essentiel déjà 7/7,
+enrichissement partiel selon ce que le diagnostic a couvert), profil
+totalement rempli → 100%. `essentielComplet` (booléen strict, 7/7) est ce qui
+déclenche réellement la génération — jamais besoin d'atteindre 100%.
+
+**6. Parcours Impulsion** — `ActivationFlow` inchangé dans l'esprit
+(génération immédiate) mais désormais conditionné : si `essentielComplet`
+(cas normal après diagnostic), génération auto comme avant, "Ton programme
+est prêt" → "Commencer ma première séance". Si incomplet (abonnement direct
+sans diagnostic, ou diagnostic abandonné avant les questions essentielles) :
+écran "COAI te connaît à X%" (barre réelle, champs manquants listés) → CTA
+"Compléter mon profil" → `/compte/profil?onboarding=1`, où un nouveau
+bandeau (`GenererProgrammeOnboarding`) affiche "Ton profil est suffisamment
+précis" + CTA manuel "Générer mon programme" dès que l'essentiel devient
+complet (jamais de génération automatique silencieuse, cohérent avec le
+reste de l'app — moteur d'adaptation, etc. — qui ne change jamais rien sans
+geste explicite).
+
+**7. Parcours Transformation** — même logique de profil minimum, avec la
+notification coach déjà existante (`sendAdminNotification` dans
+`/api/programmes/generate`, rien à ajouter) et le statut `EN_ATTENTE` déjà
+existant (`StatutProgramme`, badge "À valider par le coach" déjà affiché sur
+`/programme/entrainement`). Nouveauté : l'écran `ActivationFlow` juste après
+génération distingue maintenant le plan — "À valider par ton coach" + CTA
+"Découvrir mon programme" pour Transformation (au lieu de "Ton programme est
+prêt" + "Commencer ma première séance", réservé à Impulsion dont le contenu
+est déjà définitif).
+
+**8. Email diagnostic** — l'envoi automatique existait déjà
+(`/api/diagnostic-lead`, envoyé à la fin du quiz, résultat toujours visible
+côté client indépendamment du succès de l'email). Ajouté cette session : (a)
+**protection anti-doublon** — ne renvoie pas si la même adresse a déjà reçu
+un email il y a moins de 5 min (double-clic/retry), un nouveau diagnostic
+plus tard reste un envoi légitime ; (b) **CTA adapté au statut réel** du
+destinataire (recherché par email : pas de compte → "Voir mes formules",
+compte sans programme → "Compléter mon profil", compte avec programme →
+"Voir mon programme") ; (c) **tracking** `diagnostic_email_sent` (nouveau,
+`trackServerEvent`, déclenché uniquement si l'envoi a réellement réussi) ;
+(d) **bug latent corrigé au passage** — l'admin notification et l'email
+utilisateur partageaient un seul `Promise.all` sans catch individuel : un
+échec de l'un (ex. souci transitoire du service email) aurait fait échouer
+toute la route en 500, malgré le lead déjà écrit en base. Chacun a
+maintenant son propre try/catch, tous deux toujours attendus avant de
+répondre (jamais de "fire and forget" après le retour de la réponse — une
+fonction serverless Vercel peut être suspendue juste après, sans garantie
+d'exécution du reste).
+
+**9. Routes/composants modifiés** — `src/lib/profil/completion.ts` (réécrit,
+essentiel/enrichissement), `src/components/compte/profil-completion.tsx`
+(réécrit), nouveau `src/components/compte/generer-programme-onboarding.tsx`,
+`src/app/(app)/compte/profil/page.tsx` (bandeau onboarding conditionnel),
+`src/components/onboarding/activation-flow.tsx` (réécrit, nouvel état
+"completion", copy Transformation), `src/app/(app)/bienvenue/page.tsx`
+(passe `plan`/`profilInitial`), `src/app/api/programmes/generate/route.ts`
+(garde-fou serveur), `src/app/api/diagnostic-lead/route.ts` (dédoublonnage +
+CTA + tracking + fix du Promise.all), `src/lib/diagnostic/mini-diagnostic.ts`
+(CTA surchargeable), `src/lib/analytics/product-events.ts`
+(`diagnostic_email_sent`, `userId` désormais nullable).
+
+**10. Migration** — `20260812010000_add_diagnostic_email_tracking` : ajoute
+`DiagnosticLead.resultEmailSentAt` (nullable, additive, `ADD COLUMN IF NOT
+EXISTS`). **Reste à appliquer par Anthony** — automatique au prochain
+déploiement grâce à `prisma migrate deploy` déjà en place dans `build`, rien
+à coller manuellement.
+
+**11. Tests effectués** — `npx tsc --noEmit` et `next build` réels, propres.
+Script Node dédié validant `computeProfilCompletion` directement (7
+assertions : profil vide, post-diagnostic, profil complet, contraintes/
+allergies vides n'empêchant jamais l'essentiel, liste des champs manquants).
+5 scripts Playwright réels (mobile 390px + desktop 1280px) montant les
+composants directement avec fetch mocké (pas d'accès Supabase/Stripe depuis
+ce sandbox) : Parcours A (Impulsion, diagnostic complet → génération
+immédiate), Parcours B (Transformation → "À valider par ton coach"),
+Parcours C (profil déjà complet sans diagnostic en localStorage → génération
+auto, pas de détour par "compléter mon profil"), Parcours D (essentiel
+incomplet → écran "COAI te connaît à X%"), et un test de génération qui
+échoue systématiquement pour confirmer qu'aucun loader ne tourne
+indéfiniment (état "erreur" atteint en ~4,7s, 3 tentatives bornées).
+Bandeau "Générer mon programme" de `/compte/profil` aussi vérifié en
+composant isolé (desktop + mobile).
+
+**12. Captures** — desktop et mobile pour l'écran "COAI te connaît à X%"
+(ActivationFlow), l'écran Transformation "À valider par ton coach", et le
+bandeau de confirmation "Générer mon programme" sur `/compte/profil`.
+
+**13. Reste à faire par Anthony** — appliquer la migration (automatique au
+déploiement) ; tester en conditions réelles les 4 parcours sur le site
+déployé (aucun accès Supabase/Stripe depuis ce sandbox pour un test de bout
+en bout avec vraie authentification/abonnement) ; valider que la
+catégorisation essentiel/enrichissement (en particulier le choix d'exclure
+contraintesSante/allergiesAlimentaires du blocage strict) correspond bien à
+l'intention côté sécurité/pertinence — c'est un jugement documenté ici, pas
+une certitude absolue, à confirmer ou ajuster.
+
 ## Correction responsive des cartes tarifs (11/08/2026, nuit)
 
 Anthony a testé `/pricing` en production après le déploiement de Phase 5.1

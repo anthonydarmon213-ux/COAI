@@ -158,7 +158,7 @@ export default async function BienvenuePage({
         ))}
       </div>
 
-      <ActivationFlow />
+      <ActivationFlow plan={plan} profilInitial={user.profile ?? null} />
 
       <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
         Retour au tableau de bord

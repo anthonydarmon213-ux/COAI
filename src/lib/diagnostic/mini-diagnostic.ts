@@ -249,7 +249,16 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
 }
 
 // Version texte brut du diagnostic, pour l'email envoyé au lead.
-export function miniDiagnosticEnTexte(d: MiniDiagnostic, appUrl: string): string {
+// `cta` (Phase 5.1, 11/08/2026) : surchage le lien final selon le statut réel
+// du destinataire (prospect non abonné / abonné au profil incomplet / abonné
+// avec un programme) — cf. /api/diagnostic-lead, qui détermine ce statut par
+// email avant d'appeler cette fonction. Reste sur le lien sign-up générique
+// par défaut si aucun statut particulier n'a pu être déterminé.
+export function miniDiagnosticEnTexte(
+  d: MiniDiagnostic,
+  appUrl: string,
+  cta?: { label: string; href: string }
+): string {
   const lignes = [
     `${d.titre}.`,
     "",
@@ -277,7 +286,9 @@ export function miniDiagnosticEnTexte(d: MiniDiagnostic, appUrl: string): string
     "",
     "COAI est fondé par Anthony Darmon, coach diplômé d'État, 17 ans d'expérience en coaching sportif.",
     "",
-    `Pour aller plus loin : ${appUrl}/sign-up${d.recommandation.plan === "STANDARD" ? "?plan=STANDARD" : ""}`,
+    cta
+      ? `${cta.label} : ${appUrl}${cta.href}`
+      : `Pour aller plus loin : ${appUrl}/sign-up${d.recommandation.plan === "STANDARD" ? "?plan=STANDARD" : ""}`,
     "",
     "Cette expérience t'a plu ? Parles-en à quelqu'un qui a besoin de s'y mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage."
   );

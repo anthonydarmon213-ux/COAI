@@ -5,6 +5,7 @@ import { prochaineVersion } from "@/lib/programmes/version";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
 import { canGenerateProgramme, getEffectivePlan } from "@/lib/subscription/plan";
+import { computeProfilCompletion } from "@/lib/profil/completion";
 import type { Pilier } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
@@ -41,6 +42,23 @@ export async function POST() {
     return NextResponse.json(
       { error: "Un abonnement actif (Impulsion ou Transformation) est nécessaire pour générer ton programme." },
       { status: 403 }
+    );
+  }
+
+  // Profil minimum requis (Phase 5.1, 11/08/2026) : garde-fou serveur en
+  // plus du contrôle côté client (ActivationFlow) — n'empêche jamais une
+  // régénération pour un abonné qui a déjà généré au moins une fois (ses
+  // champs essentiels étaient forcément déjà complets à ce moment-là, et un
+  // PUT /api/profil ne peut jamais les vider, seulement les compléter).
+  const completion = computeProfilCompletion(user.profile);
+  if (!completion.essentielComplet) {
+    return NextResponse.json(
+      {
+        error:
+          "Ton profil n'a pas encore les informations essentielles pour générer un programme sûr et pertinent.",
+        champsManquants: completion.champsEssentielsManquants,
+      },
+      { status: 422 }
     );
   }
 

@@ -342,6 +342,11 @@ model DiagnosticLead {
   email     String
   reponses  Json
   createdAt DateTime @default(now())
+  // Protection contre les doubles envois (Phase 5.1, 11/08/2026) : posé
+  // uniquement une fois l'email de résumé réellement envoyé avec succès —
+  // avant d'en envoyer un nouveau pour la même adresse, on vérifie qu'aucun
+  // lead récent (5 min) ne l'a déjà reçu (cf. /api/diagnostic-lead).
+  resultEmailSentAt DateTime?
   // Attribution publicitaire (Phase 5B, 11/08/2026) — même principe que
   // User.utmSource et consorts, mais capturée dès le lead (avant même la
   // création de compte) : un visiteur qui ne convertit jamais reste

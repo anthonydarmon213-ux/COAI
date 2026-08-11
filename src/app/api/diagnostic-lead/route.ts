@@ -4,6 +4,31 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import { buildMiniDiagnostic, miniDiagnosticEnTexte, type ReponsesDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
+import { trackServerEvent } from "@/lib/analytics/product-events";
+
+const FENETRE_ANTI_DOUBLON_MS = 5 * 60 * 1000;
+
+// CTA adapté au statut réel du destinataire (Phase 5.1, 11/08/2026) — cette
+// route est appelée avant tout compte (lead anonyme), mais la même adresse
+// email peut déjà correspondre à un compte existant (re-fait le diagnostic
+// sans être connecté, par exemple). Toujours "prospect" par défaut : le cas
+// de loin le plus fréquent, et le seul qui ne nécessite pas de requête
+// supplémentaire.
+async function resoudreCta(email: string): Promise<{ label: string; href: string }> {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+  if (!user) return { label: "Voir mes formules", href: "/pricing" };
+
+  const aUnProgramme = await prisma.programmeGenerated.findFirst({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+  if (aUnProgramme) return { label: "Voir mon programme", href: "/programme/entrainement" };
+
+  return { label: "Compléter mon profil", href: "/compte/profil" };
+}
 
 const bodySchema = z.object({
   email: z.string().email().max(320),
@@ -37,31 +62,64 @@ export async function POST(request: Request) {
     },
   });
 
-  // Notifie Anthony à chaque lead capturé sur le diagnostic public — ce
-  // trou existait depuis la création du quiz (09/08/2026), jusqu'ici
-  // invisible sans requête SQL manuelle (repéré le 10/08 via un test d'un
-  // ami d'Anthony). Best-effort, ne doit jamais faire échouer la capture.
+  // Best-effort, chacun dans son propre try/catch : un échec de l'un ne doit
+  // jamais faire échouer l'autre ni la réponse 201 déjà acquise (bug latent
+  // corrigé le 11/08/2026 : un seul Promise.all groupant les deux pouvait
+  // faire tomber toute la route en 500 si l'un des deux rejetait, malgré le
+  // lead déjà écrit en base). Toujours attendus avant de répondre : une
+  // fonction serverless Vercel peut être suspendue juste après l'envoi de la
+  // réponse, un "fire and forget" après le retour n'a aucune garantie
+  // d'exécution complète.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
   const diagnostic = buildMiniDiagnostic(parsed.data.reponses as ReponsesDiagnostic);
 
-  // Envoie aussi le diagnostic à la personne elle-même — jusqu'ici seule
-  // Anthony était notifié, malgré la case cochée "j'accepte de recevoir mon
-  // diagnostic par email" à l'étape précédente du quiz : la promesse n'était
-  // jamais tenue (repéré le 11/08 via le test d'un ami d'Anthony qui n'a
-  // rien reçu). Best-effort comme le reste, ne doit jamais faire échouer la
-  // capture ni bloquer l'affichage du résultat côté client.
   await Promise.all([
+    // Notifie Anthony à chaque lead capturé sur le diagnostic public — ce
+    // trou existait depuis la création du quiz (09/08/2026), jusqu'ici
+    // invisible sans requête SQL manuelle (repéré le 10/08 via un test d'un
+    // ami d'Anthony).
     sendAdminNotification(
       "Nouveau lead — diagnostic COAI",
       `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`
-    ),
-    diagnostic
-      ? sendEmail(
+    ).catch((err) => console.error("[diagnostic-lead] admin notification :", err)),
+
+    // Envoie aussi le diagnostic à la personne elle-même — CTA final adapté
+    // à son statut réel (prospect / abonné profil incomplet / abonné avec
+    // programme, Phase 5.1 11/08/2026). Protection anti-doublon : ne renvoie
+    // pas l'email si la même adresse en a déjà reçu un il y a moins de 5 min
+    // (double-clic, retry réseau côté client) — un nouveau diagnostic plus
+    // tard (résultats différents) reste un envoi légitime, jamais bloqué.
+    (async () => {
+      try {
+        if (!diagnostic) return;
+
+        const recent = await prisma.diagnosticLead.findFirst({
+          where: {
+            email: parsed.data.email,
+            id: { not: lead.id },
+            resultEmailSentAt: { not: null, gte: new Date(Date.now() - FENETRE_ANTI_DOUBLON_MS) },
+          },
+          select: { id: true },
+        });
+        if (recent) return;
+
+        const cta = await resoudreCta(parsed.data.email);
+        const envoye = await sendEmail(
           parsed.data.email,
           "Ton diagnostic COAI",
-          miniDiagnosticEnTexte(diagnostic, appUrl)
-        )
-      : Promise.resolve(),
+          miniDiagnosticEnTexte(diagnostic, appUrl, cta)
+        );
+        if (envoye) {
+          await prisma.diagnosticLead.update({
+            where: { id: lead.id },
+            data: { resultEmailSentAt: new Date() },
+          });
+          trackServerEvent("diagnostic_email_sent", null, { email: parsed.data.email });
+        }
+      } catch (err) {
+        console.error("[diagnostic-lead] envoi email résultat :", err);
+      }
+    })(),
   ]);
 
   return NextResponse.json(lead, { status: 201 });
