@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
 import { TrustBadges } from "@/components/marketing/trust-badges";
+import { AppPreviewPhones } from "@/components/marketing/app-preview-phones";
+import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
 const TITLE = "COAI — Coaching sportif par IA, validé par un vrai coach";
@@ -62,6 +64,19 @@ const FAQ = [
   },
 ];
 
+const FONCTIONNALITES_HERO = [
+  { icon: AdaptatifIcon, titre: "Programme adaptatif", description: "Des ajustements basés sur tes données réelles." },
+  { icon: SuiviIcon, titre: "Suivi intelligent", description: "COAI analyse tes performances, ta récupération et ton quotidien." },
+  { icon: ValidationIcon, titre: "Validation humaine", description: "Un coach vérifie et optimise là où l'IA a ses limites." },
+  { icon: SecuriteIcon, titre: "Sécurisé & privé", description: "Tes données sont protégées, jamais revendues." },
+];
+
+const COMMENT_CA_MARCHE = [
+  ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
+  ["2", "L'IA personnalise ton programme", "Entraînement, nutrition et récupération adaptés à toi."],
+  ["3", "Ton coach vérifie, valide et démarre le suivi", "Un programme fiable, clair, prêt à suivre — et, selon ta formule, un coach qui te motive jusqu'à l'atteinte de ton objectif."],
+];
+
 const PILIERS = [
   {
     numero: "01",
@@ -91,69 +106,71 @@ export default function LandingPage() {
 
       <section
         id="hero"
-        className="relative mx-auto grid min-h-[92vh] w-full max-w-7xl items-center gap-12 overflow-hidden px-6 pb-20 pt-36 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-28"
+        className="relative mx-auto grid w-full max-w-7xl items-center gap-16 overflow-hidden px-6 pb-20 pt-32 sm:px-10 sm:pt-40 lg:grid-cols-[1.05fr_.95fr] lg:py-24"
       >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
-        >
-          <source src="/hero-intro.mp4" type="video/mp4" />
-        </video>
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-r from-[#090a0b] via-[#090a0bcc] to-[#090a0b66]"
-          aria-hidden="true"
-        />
-        <div className="relative z-10 max-w-3xl">
-          <SectionLabel>Entraînement · Nutrition · Récupération</SectionLabel>
-          <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.8rem,5.7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-white">
-            Générer. Valider.
-            <span className="mt-2 block text-laiton-300">Suivre ta progression.</span>
-          </h1>
-          <p className="mt-8 max-w-xl text-lg leading-8 text-graphite-100 sm:text-xl">
-            Tu ne sais pas quoi faire à la salle, tu t&apos;entraînes à la maison sans structure,
-            ou tu stagnes avec le même programme depuis des années ? COAI construit ton
-            programme sur-mesure — et, selon ta formule, nos coachs diplômés d&apos;État le
-            valident et te suivent jusqu&apos;à l&apos;atteinte de tes objectifs.
+        <div className="relative z-10 max-w-2xl">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
+            L&apos;humain valide. L&apos;IA personnalise.
           </p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Link href="/sign-up"><Button className="px-7 py-3">Démarrer gratuitement</Button></Link>
-            <Link href="/diagnostic"><Button variant="secondary" className="px-7 py-3">Faire mon diagnostic gratuit</Button></Link>
+          <h1 className="mt-6 font-display text-[clamp(2.6rem,5.2vw,4.5rem)] font-semibold leading-[1.03] tracking-[-0.045em] text-white">
+            Ton programme <span className="text-laiton-300">évolue</span> avec toi.
+          </h1>
+          <p className="mt-7 max-w-lg text-lg leading-8 text-graphite-200">
+            COAI crée ton entraînement, analyse ta progression et adapte ton programme en
+            fonction de ta vie, de ta récupération et de tes objectifs.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/sign-up">
+              <Button className="px-7 py-3">Créer mon programme →</Button>
+            </Link>
+            <a href="#comment-ca-marche">
+              <Button variant="secondary" className="px-7 py-3">Découvrir comment ça marche</Button>
+            </a>
           </div>
-          <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
-          <p className="mt-2 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />Ton Coach IA te répond 24h/24, 7j/7 — jamais seul entre deux séances.</p>
-          <div className="mt-6">
+          <div className="mt-8">
             <TrustBadges />
           </div>
         </div>
-        <div className="relative z-10 flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
-          <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-2 lg:left-auto lg:right-0 lg:translate-x-0">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-laiton-400">Comment ça marche ?</p>
-                <p className="mt-1.5 text-base font-semibold text-white">Simplement, en trois étapes.</p>
-              </div>
-              <span className="rounded-full bg-laiton-400/10 px-2.5 py-1 text-xs font-medium text-laiton-300">COAI</span>
-            </div>
-            <ol className="mt-5 flex flex-col gap-4">
-              {[
-                ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
-                ["2", "L’IA personnalise ton programme", "Entraînement, nutrition et récupération adaptés à toi."],
-                ["3", "Ton coach vérifie, valide et démarre le suivi", "Un programme fiable, clair, prêt à suivre — et, selon ta formule, un coach qui te motive jusqu'à l'atteinte de ton objectif."],
-              ].map(([numero, titre, description]) => (
-                <li key={numero} className="grid grid-cols-[2rem_1fr] gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-sm font-semibold text-laiton-300">{numero}</span>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{titre}</p>
-                    <p className="mt-1 text-sm leading-5 text-graphite-400">{description}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
+        <div className="relative z-10">
+          <AppPreviewPhones />
         </div>
+      </section>
+
+      {/* Ligne de fonctionnalités sous le hero — reprend exactement les
+          garde-fous déjà mis en avant ailleurs sur la page (adaptatif,
+          suivi, validation humaine, sécurité), condensés en un coup d'œil. */}
+      <section className="mx-auto w-full max-w-6xl border-t border-white/[0.06] px-6 py-12 sm:px-10">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          {FONCTIONNALITES_HERO.map((item) => (
+            <div key={item.titre} className="flex flex-col gap-2">
+              <item.icon className="h-6 w-6 text-laiton-400" />
+              <p className="text-sm font-semibold text-white">{item.titre}</p>
+              <p className="text-xs leading-5 text-graphite-400">{item.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Comment ça marche — anciennement une carte flottante dans le hero,
+          devenue sa propre section (11/08/2026) avec l'ancre nav dédiée. */}
+      <section id="comment-ca-marche" className="mx-auto w-full max-w-4xl px-6 py-20 sm:px-10">
+        <div className="text-center">
+          <SectionLabel>Comment ça marche</SectionLabel>
+          <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+            Simplement, en trois étapes.
+          </h2>
+        </div>
+        <ol className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {COMMENT_CA_MARCHE.map(([numero, titre, description]) => (
+            <li key={numero} className="flex flex-col items-center gap-3 text-center">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-base font-semibold text-laiton-300">
+                {numero}
+              </span>
+              <p className="text-base font-semibold text-white">{titre}</p>
+              <p className="max-w-xs text-sm leading-6 text-graphite-400">{description}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       {/* Qualification — filtre honnête qui rassure (montre qu'on ne vend
@@ -206,7 +223,7 @@ export default function LandingPage() {
       {/* Crédibilité / Fondateur — juste sous le hero pour rassurer tout de
           suite sur l'humain derrière COAI (visage + nom), avant même le
           reste du pitch. */}
-      <section className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
+      <section id="fondateur" className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
           <div className="relative h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80">
             <Image
@@ -268,7 +285,7 @@ export default function LandingPage() {
       </section>
 
       {/* L'histoire */}
-      <section className="mx-auto w-full max-w-3xl px-6 py-24 sm:py-28">
+      <section id="histoire" className="mx-auto w-full max-w-3xl px-6 py-24 sm:py-28">
         <SectionLabel>L&apos;histoire</SectionLabel>
         <h2 className="mt-6 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
           Pourquoi COAI existe.

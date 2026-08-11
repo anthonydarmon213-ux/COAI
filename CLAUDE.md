@@ -4,6 +4,49 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Refonte du hero de la homepage (11/08/2026, nuit)
+
+Demandé par Anthony à partir d'une maquette de référence (nav complète +
+titre "Ton programme évolue avec toi." + mockups de téléphone + ligne de
+fonctionnalités). Portée confirmée par Anthony : uniquement le hero + la
+nav, pas le reste de la page (qualification, fondateur, histoire, piliers,
+coach IA, offres, FAQ — tous inchangés, vérifié par capture Playwright que
+rien n'a régressé plus bas).
+
+- **`src/components/marketing/site-nav.tsx`** (nouveau) : remplace la barre
+  minimale (logo + "Se connecter") par une vraie nav — Accueil /
+  Fonctionnalités / Comment ça marche / Coaching / À propos + bouton
+  "Commencer", menu mobile en dropdown. Les liens pointent vers des ancres
+  de la homepage (`/#piliers`, `/#comment-ca-marche`, `/#fondateur`,
+  `/#histoire` — ids ajoutés aux sections existantes) pour fonctionner
+  depuis n'importe quelle page marketing (pricing, diagnostic...), pas
+  seulement depuis l'accueil.
+- **Hero réécrit** (`(marketing)/page.tsx`) : kicker "L'humain valide.
+  L'IA personnalise." (la signature déjà retenue pour la vision programme
+  évolutif) + titre "Ton programme évolue avec toi." + CTA "Créer mon
+  programme" / "Découvrir comment ça marche". Ancienne vidéo de fond
+  (`hero-intro.mp4`) retirée, remplacée par les mockups téléphone.
+- **`src/components/marketing/app-preview-phones.tsx`** (nouveau) —
+  point de vigilance appliqué ici : plutôt qu'une maquette de téléphone
+  avec du contenu inventé, les deux écrans reconstruisent les vraies
+  cartes du produit (COAI Insight, "Cette semaine X/X séances",
+  progression de charge, "Ton programme évolue" V3...) avec les mêmes
+  libellés que le vrai dashboard/la vraie page évolution — données
+  illustratives mais fonctionnalités réelles, jamais présentées comme
+  celles d'un abonné existant (même principe que "ne jamais fabriquer de
+  témoignage").
+- **`src/components/marketing/feature-icons.tsx`** (nouveau) : 4 icônes
+  SVG minimales (Programme adaptatif, Suivi intelligent, Validation
+  humaine, Sécurisé & privé) pour la ligne sous le hero.
+- **"Comment ça marche"** : l'ancienne carte flottante à l'intérieur du
+  hero devient sa propre section pleine largeur juste en dessous, avec
+  l'ancre `#comment-ca-marche` — contenu identique (3 étapes), juste
+  déplacé.
+
+Vérifié : `tsc` + `next build` réels, captures Playwright desktop (1280px)
+et mobile (390px) du hero et du menu mobile ouvert, capture pleine page
+pour confirmer qu'aucune section existante plus bas n'a régressé.
+
 ## Phase 3, bloc NEAT — activité quotidienne (11/08/2026, nuit)
 
 Demandé par Anthony après validation de la Phase 2 : premier bloc dédié de
