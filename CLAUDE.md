@@ -38,6 +38,22 @@ migrations qui traînent en attente plusieurs jours faute d'y penser).
   chaque migration future suivra le même chemin. cf. checklist plus bas
   pour le détail de la manip.
 
+## Mot de passe Supabase périmé sur DIRECT_URL (11/08/2026, nuit)
+
+Suite à l'automatisation des migrations ci-dessous, le premier déploiement
+a échoué (`P1000: Authentication failed`) — `DIRECT_URL` existait sur
+Vercel depuis le 5 août mais avec un mot de passe qui n'était visiblement
+plus le bon (jamais utilisé en pratique avant cette nuit, `DATABASE_URL`
+seule servait à l'app jusque-là). Un premier essai avec le mot de passe
+du trousseau macOS d'Anthony a aussi échoué (probablement lui-même périmé
+ou une confusion de caractère à la copie). Résolu en régénérant le mot de
+passe de la base directement sur Supabase (Database Settings → Reset
+password) et en mettant à jour `DATABASE_URL` **et** `DIRECT_URL` sur
+Vercel avec ce nouveau mot de passe — déploiement repassé au vert ensuite.
+À retenir : si l'app en prod se met à érrer en base de données après ça,
+vérifier en premier que rien d'autre n'a l'ancien mot de passe en dur
+quelque part (script local, autre service).
+
 ## Test de bout en bout des 4 phases "programme évolutif" (11/08/2026, nuit)
 
 Demandé par Anthony ("test tout d'abord") avant de continuer, après la
@@ -324,17 +340,19 @@ pour le détail/contexte de chaque sujet) :
       applicative touchée) collé par Anthony dans Supabase SQL Editor —
       Prisma sait maintenant que les 37 migrations précédentes sont déjà
       appliquées et ne tentera pas de les rejouer.
-- [ ] Vérifier que `DIRECT_URL` (pas seulement `DATABASE_URL`) est bien
-      dans les variables d'env Vercel (Production + Preview) — c'est cette
-      variable que Prisma utilise pour les migrations, en direct plutôt
-      que via le pooler. Sans elle, `prisma migrate deploy` échouera au
-      prochain déploiement.
-- [ ] Déployer cette branche — `prisma migrate deploy` devrait alors
-      appliquer automatiquement les 3 migrations encore en attente
+- [x] `DIRECT_URL` existait déjà sur Vercel (Production + Preview) mais
+      avec un mot de passe périmé — jamais réellement utilisé avant cette
+      nuit (`prisma migrate deploy` est le premier appel à s'en servir).
+      Provoquait `P1000: Authentication failed` au build. Corrigé : mot de
+      passe de la base régénéré sur Supabase (Database Settings → Reset
+      password), `DATABASE_URL` et `DIRECT_URL` mises à jour sur Vercel
+      avec le nouveau mot de passe (les deux, sinon l'app en prod aurait
+      cassé aussi).
+- [x] Déployé — build passé au vert avec `prisma migrate deploy` inclus.
+      Les 3 migrations encore en attente
       (`20260811120000_add_phase2_programme_vivant`,
       `20260811150000_add_adaptation_confirmation`, `20260811170000_add_hrv`)
-      sans autre action manuelle. Vérifier dans les logs de build Vercel
-      que ces 3 migrations apparaissent bien comme appliquées.
+      ont dû s'appliquer automatiquement à ce déploiement.
 - [ ] Une fois déployé : tester en conditions réelles le parcours
       "programme évolutif" (logue 2-3 séances → Analyser mon programme →
       Accepter → vérifie `/programme/evolution` ; teste "Ma semaine
