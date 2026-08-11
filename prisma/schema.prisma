@@ -78,6 +78,8 @@ model User {
   mesures        Mesure[]
   testsMaxi      TestMaxi[]
   whatsappEvents WhatsAppEvent[]
+  weeklyCheckins WeeklyCheckin[]
+  adaptations    ProgrammeAdaptation[]
 
   @@map("users")
 }
@@ -199,6 +201,12 @@ enum StatutProgramme {
 // pré-construite). Chaque génération reste EN_ATTENTE tant que le coach humain
 // (Anthony Darmon) ne l'a pas relue et validée, sauf pour le palier Gratuit
 // (statut GENERE_IA, jamais envoyé en relecture — cf. StatutProgramme).
+//
+// 11/08/2026 — vision "programme évolutif" : chaque génération créait déjà
+// une nouvelle ligne (jamais d'écrasement), ce qui donnait un historique
+// implicite. `version` le rend explicite et affichable (V1, V2...), calculé
+// en code à la création (max version existante pour ce pilier + 1), pas par
+// la base — pas de séquence dédiée à gérer par pilier/utilisateur.
 model ProgrammeGenerated {
   id          String          @id @default(uuid())
   userId      String
@@ -206,12 +214,23 @@ model ProgrammeGenerated {
   pilier      Pilier
   contenu     Json
   statut      StatutProgramme @default(EN_ATTENTE)
+  version     Int             @default(1)
   valideAt    DateTime?
   generatedAt DateTime        @default(now())
 
   @@index([userId, pilier, generatedAt])
   @@index([statut, generatedAt])
   @@map("programmes_generated")
+}
+
+// Niveau de douleur signalé au check-in post-séance — volontairement à 3
+// crans (pas une échelle 1-10) : COAI ne fait pas de diagnostic médical,
+// juste un signal "à surveiller" ou "à faire remonter au coach" (cf. moteur
+// d'adaptation et alertes coach).
+enum NiveauDouleur {
+  AUCUNE
+  LEGERE
+  IMPORTANTE
 }
 
 model SeanceLog {
@@ -223,6 +242,15 @@ model SeanceLog {
   ressenti  String?
   notes     String?
   createdAt DateTime @default(now())
+
+  // Check-in post-séance (11/08/2026) — rapide (1-5, boutons), rempli juste
+  // après la séance, distinct du champ libre "ressenti" existant (conservé
+  // tel quel pour compatibilité avec les entrées déjà enregistrées). Sert de
+  // signal d'entrée au moteur d'adaptation.
+  difficulte  Int?           // 1 (très facile) à 5 (très difficile)
+  energie     Int?           // 1 (à plat) à 5 (en pleine forme)
+  douleur     NiveauDouleur?
+  douleurZone String?
 
   @@map("seances_log")
 }
@@ -385,4 +413,97 @@ model FounderWaitlistEntry {
   createdAt        DateTime  @default(now())
 
   @@map("founder_waitlist_entries")
+}
+
+// Niveau de sommeil déclaré au check-in hebdomadaire — échelle qualitative
+// (pas d'heures précises, déjà couvert par qualiteSommeil/sommeilMoyenHeures
+// dans Profile pour la donnée de fond) volontairement courte pour rester
+// dans l'esprit "moins d'une minute à remplir".
+enum NiveauSommeil {
+  TRES_MAUVAIS
+  MAUVAIS
+  CORRECT
+  BON
+  EXCELLENT
+}
+
+// Bilan hebdomadaire (11/08/2026, vision "programme évolutif") — signal
+// principal du moteur d'adaptation en complément du check-in post-séance :
+// capture ce qui ne se voit pas séance par séance (tendance sommeil/stress/
+// motivation sur la semaine). Une entrée par semaine et par utilisateur
+// (semaineDebut = lundi de la semaine concernée), tout est facultatif pour
+// ne jamais bloquer l'envoi sur un champ non renseigné.
+model WeeklyCheckin {
+  id               String         @id @default(uuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semaineDebut     DateTime       @db.Date
+  sommeil          NiveauSommeil?
+  energie          Int?
+  stress           Int?
+  faim             Int?
+  motivation       Int?
+  poidsKg          Float?
+  douleurs         Boolean?
+  seancesRealisees Int?
+  commentaire      String?
+  createdAt        DateTime       @default(now())
+
+  @@unique([userId, semaineDebut])
+  @@map("weekly_checkins")
+}
+
+// Décision du moteur d'adaptation pour un pilier donné, à un instant T.
+// GARDER = programme inchangé (données insuffisantes ou stables) ;
+// PROGRESSER/REDUIRE = ajustement de volume/charge ; MODIFIER = un exercice
+// ou une séance change ; ADAPTER = contrainte ponctuelle (ex: voyage).
+enum DecisionAdaptation {
+  GARDER
+  PROGRESSER
+  REDUIRE
+  MODIFIER
+  ADAPTER
+}
+
+// APPLIQUEE = palier sans relecture coach obligatoire (Impulsion), la
+// nouvelle version est visible immédiatement. EN_ATTENTE/VALIDEE/MODIFIEE
+// suivent le même principe que StatutProgramme pour Transformation : le
+// coach doit valider une adaptation avant qu'elle ne devienne le programme
+// affiché à l'abonné (cf. StatutProgramme.EN_ATTENTE côté ProgrammeGenerated,
+// que la nouvelle version porte aussi).
+enum StatutAdaptation {
+  APPLIQUEE
+  EN_ATTENTE
+  VALIDEE
+  MODIFIEE
+}
+
+// Trace explicite de CHAQUE changement de programme et de sa raison (jamais
+// de modification silencieuse — exigence centrale de la vision produit) :
+// alimente la page "Ton programme évolue" et la timeline "Mon évolution".
+// `changements` est un tableau structuré (pas du texte libre) pour rester
+// affichable de façon uniforme quel que soit le type de changement :
+// [{ type: "LOAD"|"VOLUME"|"EXERCICE"|"CONTRAINTE", cible, avant, apres, raison }]
+model ProgrammeAdaptation {
+  id                    String             @id @default(uuid())
+  userId                String
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pilier                Pilier
+  decision              DecisionAdaptation
+  confiance             Float?
+  changements           Json
+  resume                String
+  // Références vers ProgrammeGenerated.id — pas de relation Prisma dédiée
+  // (une seule ligne peut avoir besoin de pointer vers l'ancienne ET la
+  // nouvelle version du même modèle ; deux relations nommées vers la même
+  // table n'apportent pas de garantie supplémentaire ici, le lookup se fait
+  // par id applicatif).
+  programmePrecedentId String?
+  programmeSuivantId    String?
+  statut                StatutAdaptation   @default(APPLIQUEE)
+  noteCoach             String?
+  createdAt             DateTime           @default(now())
+
+  @@index([userId, createdAt])
+  @@map("programme_adaptations")
 }

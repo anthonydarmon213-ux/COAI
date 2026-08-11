@@ -15,6 +15,14 @@ const bodySchema = z.object({
   ),
   ressenti: z.string().max(500).optional(),
   notes: z.string().max(2000).optional(),
+  // Check-in post-séance structuré (11/08/2026) — distinct de
+  // ressenti/notes (texte libre existant), sert de signal au moteur
+  // d'adaptation. Tout facultatif : le check-in reste utilisable même sans
+  // les répondre toutes.
+  difficulte: z.number().int().min(1).max(5).optional(),
+  energie: z.number().int().min(1).max(5).optional(),
+  douleur: z.enum(["AUCUNE", "LEGERE", "IMPORTANTE"]).optional(),
+  douleurZone: z.string().max(200).optional(),
 });
 
 export async function GET() {
@@ -54,6 +62,10 @@ export async function POST(request: Request) {
       exercices: parsed.data.exercices,
       ressenti: parsed.data.ressenti,
       notes: parsed.data.notes,
+      difficulte: parsed.data.difficulte,
+      energie: parsed.data.energie,
+      douleur: parsed.data.douleur,
+      douleurZone: parsed.data.douleur === "AUCUNE" ? undefined : parsed.data.douleurZone,
     },
   });
 

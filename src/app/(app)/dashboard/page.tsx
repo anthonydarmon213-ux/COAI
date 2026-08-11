@@ -9,6 +9,7 @@ import { PlanCard } from "@/components/dashboard/plan-card";
 import { WatchScreenshotCta } from "@/components/dashboard/watch-screenshot-cta";
 import { ImcCard } from "@/components/dashboard/imc-card";
 import { ConseilsCoach } from "@/components/dashboard/conseils-coach";
+import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
@@ -66,6 +67,8 @@ export default async function DashboardPage() {
       </div>
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
+
+      <WeeklyCheckinCard />
 
       <WatchScreenshotCta />
 
