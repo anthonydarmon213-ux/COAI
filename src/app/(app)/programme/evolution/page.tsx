@@ -23,6 +23,8 @@ const DECISION_LABEL: Record<DecisionAdaptation, { label: string; tone: "neutral
 };
 
 const STATUT_LABEL: Record<StatutAdaptation, string> = {
+  PROPOSEE: "En attente de ta confirmation",
+  REJETEE: "Non retenue — tu as gardé ton programme actuel",
   APPLIQUEE: "Appliquée",
   EN_ATTENTE: "En attente de validation coach",
   VALIDEE: "Validée par ton coach",

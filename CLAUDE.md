@@ -42,30 +42,32 @@ Explicitement **pas touché** : nutrition adaptative, dashboard coach
   la page du pilier, qui recrée une version à partir du contenu
   d'AVANT l'adaptation (jamais une suppression, l'historique reste
   consultable).
-- **Notification d'adaptation** sur le dashboard ("COAI a une
-  adaptation à te proposer" / "...a fait évoluer ton programme" selon
-  qu'elle attend le coach ou est déjà appliquée) — dismissible
-  (sessionStorage), volontairement pas un vrai accept/reject qui
-  annulerait une décision déjà passée par les garde-fous du moteur (choix
-  assumé, cf. note ci-dessous).
+- **Accepter / Garder mon programme actuel — geste réel avant application**
+  (11/08/2026 soir, suite à la demande explicite d'Anthony sur le point 10) :
+  le moteur d'adaptation ne régénère plus rien ni ne crée de version au
+  moment de l'analyse. Une décision actionnable reste `PROPOSEE` — contenu
+  et version ne sont créés qu'après confirmation explicite. Nouvelles
+  fonctions `confirmerAdaptation`/`rejeterAdaptation` (`src/lib/adaptation/
+  engine.ts`), routes `POST /api/adaptations/[id]/confirmer` et `/rejeter`,
+  nouveaux statuts `PROPOSEE`/`REJETEE` (migration
+  `20260811150000_add_adaptation_confirmation`). Bénéfice annexe : une
+  adaptation refusée ne déclenche plus jamais de génération IA inutile
+  (le coût de régénération est désormais payé à la confirmation, pas à la
+  proposition). La carte de notification et `AdaptationResultat` (partagé
+  entre "Analyser mon programme" et "Ma semaine change") portent les vrais
+  boutons "Accepter" / "Garder mon programme actuel" quand une décision est
+  en attente ; sinon (déjà appliquée ou en attente du coach), ils restent
+  informatifs avec un simple dismiss.
 - **Page "Ton programme évolue"** améliorée : chaque changement affiché en
   bloc AVANT → APRÈS distinct avec sa raison, plus premium que l'ancien
-  format en ligne.
+  format en ligne. Timeline et liste d'adaptations excluent les
+  `PROPOSEE`/`REJETEE` (rien de réel à raconter tant que non confirmées).
 - **Architecture analytics produit interne** (`src/lib/analytics/
   product-events.ts`) — pas de nouvelle dépendance, événements typés
   (workout_completed, weekly_checkin_completed, adaptation_proposed,
-  travel_mode_started/finished...) actuellement juste loggés côté
-  serveur, prêts à être branchés sur un vrai outil plus tard.
-
-**Note d'interprétation (point 10 de la demande initiale)** : la version
-demandait un vrai geste "accepter/refuser AVANT application". Le moteur
-Phase 1 (déjà validé) applique immédiatement sur Impulsion et met en
-attente de coach sur Transformation — je n'ai pas retouché cette
-mécanique déjà testée. La carte de notification reste donc informative
-avec un dismiss local, pas un blocage de l'application. Si un vrai geste
-"refuser avant application" reste voulu, c'est un chantier distinct
-(delay la création de version jusqu'à confirmation) — à me redemander
-explicitement si besoin.
+  adaptation_accepted, adaptation_rejected, travel_mode_started/finished...)
+  actuellement juste loggés côté serveur, prêts à être branchés sur un
+  vrai outil plus tard.
 
 ## Nouvelle vision produit : programme évolutif (11/08/2026, soir)
 
@@ -154,6 +156,9 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
+- [ ] Migration `20260811150000_add_adaptation_confirmation` à appliquer
+      sur Supabase (SQL Editor) — 2 lignes `ALTER TYPE ... ADD VALUE`,
+      sans elle "Accepter"/"Garder mon programme actuel" échoueront
 - [ ] Migration `20260811120000_add_phase2_programme_vivant` à appliquer
       sur Supabase (SQL Editor) — durée de séance, mode voyage temporaire
       et contexte d'adaptation ne fonctionneront pas tant que ce n'est pas

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import { analyserEtAdapter } from "@/lib/adaptation/engine";
+import { proposerAdaptation } from "@/lib/adaptation/engine";
 import { canGenerateProgramme } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
@@ -32,10 +32,11 @@ const bodySchema = z.object({
   joursTemporaire: z.number().int().min(1).max(60).optional(),
 });
 
-// Déclenchement manuel de l'analyse d'adaptation (Phase 1 — bouton "Analyser
-// mon programme"). Le déclenchement automatique après chaque check-in est
-// prévu pour une phase ultérieure, une fois le comportement observé en
-// conditions réelles.
+// Déclenchement manuel de l'analyse d'adaptation (bouton "Analyser mon
+// programme" / "Ma semaine change"). Propose seulement — ne régénère rien
+// et ne crée aucune version tant que l'utilisateur n'a pas confirmé (cf.
+// /api/adaptations/[id]/confirmer). Le déclenchement automatique après
+// chaque check-in reste prévu pour une phase ultérieure.
 export async function POST(request: Request, { params }: { params: { pilier: string } }) {
   const pilier = SLUG_TO_PILIER[params.pilier];
   if (!pilier) {
@@ -73,7 +74,7 @@ export async function POST(request: Request, { params }: { params: { pilier: str
     ? new Date(Date.now() + parsed.data.joursTemporaire * 24 * 60 * 60 * 1000)
     : null;
 
-  const resultat = await analyserEtAdapter(user, pilier, parsed.data.contrainte, {
+  const resultat = await proposerAdaptation(user, pilier, parsed.data.contrainte, {
     contexte: parsed.data.contexte,
     douleurSignaleeManuelle: parsed.data.douleurSignaleeManuelle,
     temporaire: Boolean(parsed.data.joursTemporaire),

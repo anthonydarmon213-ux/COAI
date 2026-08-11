@@ -28,7 +28,10 @@ export async function buildTimeline(userId: string): Promise<EvenementTimeline[]
       select: { pilier: true, generatedAt: true },
     }),
     prisma.programmeAdaptation.findMany({
-      where: { userId, decision: { not: "GARDER" } },
+      // PROPOSEE (pas encore confirmée par l'utilisateur) et REJETEE
+      // (programme gardé, rien de réel à raconter) exclues — la timeline
+      // ne montre que ce qui s'est effectivement passé.
+      where: { userId, decision: { not: "GARDER" }, statut: { notIn: ["PROPOSEE", "REJETEE"] } },
       orderBy: { createdAt: "asc" },
     }),
     prisma.weeklyCheckin.findMany({ where: { userId }, orderBy: { semaineDebut: "asc" } }),

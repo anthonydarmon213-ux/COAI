@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AdaptationResultat, type ResultatAdaptationUI } from "@/components/programme/adaptation-resultat";
 
@@ -59,7 +58,6 @@ export function SemaineChangeButton() {
 }
 
 function SemaineChangeModal({ onClose }: { onClose: () => void }) {
-  const router = useRouter();
   const [option, setOption] = useState<OptionContrainte | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -163,7 +161,6 @@ function SemaineChangeModal({ onClose }: { onClose: () => void }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'adaptation.");
       setResultat(data);
-      if (data.nouvelleVersion) router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {

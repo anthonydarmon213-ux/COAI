@@ -11,7 +11,7 @@ import {
 } from "@/lib/ai/prompts/programme-adaptation-decision";
 import { collecterSignaux, donneesSuffisantes, type SignauxAdaptation } from "@/lib/adaptation/signals";
 import { trackServerEvent } from "@/lib/analytics/product-events";
-import type { Pilier, ProgrammeGenerated, User, Profile, Subscription } from "@prisma/client";
+import type { Pilier, User, Profile, Subscription } from "@prisma/client";
 
 const LIMITE_AUGMENTATION_CHARGE = 1.1; // +10% max par changement de charge
 
@@ -22,6 +22,11 @@ export type ResultatAdaptation = {
   donneesSuffisantes: boolean;
   adaptationId: string | null;
   nouvelleVersion: number | null;
+  // true si une décision actionnable a été calculée mais pas encore
+  // appliquée — l'utilisateur doit "Accepter" ou "Garder mon programme
+  // actuel" (cf. confirmerAdaptation / rejeterAdaptation) avant que le
+  // contenu ne soit régénéré et qu'une nouvelle version n'existe.
+  enAttenteConfirmation: boolean;
 };
 
 function resumerContenuActuel(contenu: unknown): string {
@@ -89,7 +94,10 @@ function appliquerGardeFous(
   return { decision, confiance: decisionIA.confiance, changements, resume: decisionIA.resume };
 }
 
-function buildDirectiveTexte(decision: DecisionAdaptationIA): string {
+function buildDirectiveTexte(decision: {
+  resume: string;
+  changements: ChangementAdaptation[];
+}): string {
   const lignes = decision.changements.map(
     (c) => `- ${c.cible} : ${c.avant ?? "non précisé"} → ${c.apres ?? "non précisé"} (${c.raison})`
   );
@@ -131,17 +139,6 @@ function buildProfilUtilisateur(
   };
 }
 
-// Orchestre une analyse d'adaptation pour un pilier donné :
-// 1. Collecte les signaux réels (couche métier, jamais l'IA seule).
-// 2. Si les données sont insuffisantes, retourne "pas assez de données"
-//    sans même appeler l'IA (rien à analyser, rien à inventer).
-// 3. Sinon, demande une décision structurée à l'IA, puis applique les
-//    garde-fous de sécurité en code.
-// 4. Si la décision est actionnable, régénère le contenu du pilier (même
-//    pipeline que la génération initiale) avec la décision comme directive,
-//    crée une nouvelle version, et trace l'adaptation avec sa raison.
-// 5. Sur Transformation (coach humain), la nouvelle version attend
-//    validation — jamais appliquée silencieusement.
 export type OptionsAdaptation = {
   // Métadonnées de la contrainte à l'origine de la demande (ex: "Ma semaine
   // change" → voyage, douleur...) — stockées telles quelles sur
@@ -152,14 +149,30 @@ export type OptionsAdaptation = {
   // → J'ai une douleur") — vient renforcer le garde-fou anti-progression,
   // en plus de signaux.douleurRecente.
   douleurSignaleeManuelle?: "LEGERE" | "IMPORTANTE" | null;
-  // Mode voyage : la version générée est marquée temporaire avec une date
-  // de fin prévue, pour permettre "reprendre mon programme habituel" sans
-  // perdre le programme d'origine (cf. reprendreProgrammeHabituel).
+  // Mode voyage : la version générée (une fois confirmée) sera marquée
+  // temporaire avec une date de fin prévue, pour permettre "reprendre mon
+  // programme habituel" sans perdre le programme d'origine. Stockées dans
+  // ProgrammeAdaptation.contexte (clés _temporaire/_finPrevue) le temps que
+  // l'utilisateur confirme — cf. confirmerAdaptation.
   temporaire?: boolean;
   finPrevue?: Date | null;
 };
 
-export async function analyserEtAdapter(
+// Analyse un pilier et propose une décision — NE L'APPLIQUE PLUS
+// directement (11/08/2026, point 10 de la Phase 2 : "ne pas imposer
+// systématiquement une modification si ce n'est pas une question de
+// sécurité"). Si la décision est actionnable, elle reste "PROPOSEE" tant
+// que l'utilisateur n'a pas cliqué "Accepter" (confirmerAdaptation) — le
+// contenu n'est régénéré, et la nouvelle version créée, qu'à ce moment-là.
+// Une décision "GARDER" reste appliquée directement : rien à confirmer
+// quand rien ne change.
+//
+// 1. Collecte les signaux réels (couche métier, jamais l'IA seule).
+// 2. Si les données sont insuffisantes, retourne "pas assez de données"
+//    sans même appeler l'IA (rien à analyser, rien à inventer).
+// 3. Sinon, demande une décision structurée à l'IA, puis applique les
+//    garde-fous de sécurité en code.
+export async function proposerAdaptation(
   user: User & { profile: Profile | null; subscription: Subscription | null },
   pilier: Pilier,
   contrainteUtilisateur?: string | null,
@@ -182,6 +195,7 @@ export async function analyserEtAdapter(
       donneesSuffisantes: false,
       adaptationId: null,
       nouvelleVersion: null,
+      enAttenteConfirmation: false,
     };
   }
 
@@ -196,35 +210,15 @@ export async function analyserEtAdapter(
 
   const decisionBrute = await generateWithAI<DecisionAdaptationIA>(prompt);
   const decision = appliquerGardeFous(decisionBrute, signaux, options?.douleurSignaleeManuelle);
-
   const actionnable = decision.decision !== "GARDER";
-  const plan = getEffectivePlan(user.subscription);
 
-  let nouveauProgramme: ProgrammeGenerated | null = null;
-  if (actionnable) {
-    const directivesAdaptation = buildDirectiveTexte(decision);
-    const profilAdaptation = buildProfilUtilisateur(user.profile, directivesAdaptation);
-    const [contenu, version] = await Promise.all([
-      genererPilier(pilier, profilAdaptation),
-      prochaineVersion(user.id, pilier),
-    ]);
-    nouveauProgramme = await prisma.programmeGenerated.create({
-      data: {
-        userId: user.id,
-        pilier,
-        contenu: contenu as object,
-        statut: plan === "GRATUIT" ? "GENERE_IA" : "EN_ATTENTE",
-        version,
-        temporaire: options?.temporaire ?? false,
-        finPrevue: options?.finPrevue ?? null,
-      },
-    });
-    if (options?.temporaire) {
-      trackServerEvent("travel_mode_started", user.id, { pilier, finPrevue: options.finPrevue });
-    }
-  }
-
-  const statutAdaptation = !actionnable ? "APPLIQUEE" : plan === "GRATUIT" ? "APPLIQUEE" : "EN_ATTENTE";
+  const contexteAvecMeta = actionnable
+    ? {
+        ...(options?.contexte ?? {}),
+        _temporaire: options?.temporaire ?? false,
+        _finPrevue: options?.finPrevue ? options.finPrevue.toISOString() : null,
+      }
+    : ((options?.contexte as object | undefined) ?? undefined);
 
   const adaptation = await prisma.programmeAdaptation.create({
     data: {
@@ -235,21 +229,13 @@ export async function analyserEtAdapter(
       changements: decision.changements as unknown as object,
       resume: decision.resume,
       programmePrecedentId: programmeActuel?.id ?? null,
-      programmeSuivantId: nouveauProgramme?.id ?? null,
-      statut: statutAdaptation,
-      contexte: (options?.contexte as object | undefined) ?? undefined,
+      programmeSuivantId: null,
+      statut: actionnable ? "PROPOSEE" : "APPLIQUEE",
+      contexte: contexteAvecMeta,
     },
   });
 
   trackServerEvent("adaptation_proposed", user.id, { pilier, decision: decision.decision });
-
-  if (statutAdaptation === "EN_ATTENTE") {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-    await sendAdminNotification(
-      "Adaptation de programme à valider",
-      `${user.prenom ?? user.email} a une adaptation de programme (${pilier}) en attente de ta validation.\n\n${decision.resume}\n\n${appUrl}/admin/programmes`
-    );
-  }
 
   return {
     decision: decision.decision,
@@ -257,8 +243,100 @@ export async function analyserEtAdapter(
     changements: decision.changements,
     donneesSuffisantes: true,
     adaptationId: adaptation.id,
-    nouvelleVersion: nouveauProgramme?.version ?? null,
+    nouvelleVersion: null,
+    enAttenteConfirmation: actionnable,
   };
+}
+
+// "Accepter" — régénère réellement le contenu du pilier à partir de la
+// décision déjà calculée et crée la nouvelle version. Coût IA (régénération
+// complète) déplacé ici plutôt qu'à la proposition : une adaptation
+// refusée ne déclenche jamais de génération inutile.
+export async function confirmerAdaptation(
+  userId: string,
+  adaptationId: string
+): Promise<{ nouvelleVersion: number } | { error: string }> {
+  const adaptation = await prisma.programmeAdaptation.findUnique({ where: { id: adaptationId } });
+  if (!adaptation || adaptation.userId !== userId) {
+    return { error: "Adaptation introuvable." };
+  }
+  if (adaptation.statut !== "PROPOSEE") {
+    return { error: "Cette adaptation a déjà été traitée." };
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, include: { profile: true, subscription: true } });
+  if (!user) return { error: "Utilisateur introuvable." };
+
+  const changements = Array.isArray(adaptation.changements)
+    ? (adaptation.changements as unknown as ChangementAdaptation[])
+    : [];
+  const directivesAdaptation = buildDirectiveTexte({ resume: adaptation.resume, changements });
+  const profilAdaptation = buildProfilUtilisateur(user.profile, directivesAdaptation);
+
+  const contexte = (adaptation.contexte as Record<string, unknown> | null) ?? {};
+  const temporaire = Boolean(contexte._temporaire);
+  const finPrevue = typeof contexte._finPrevue === "string" ? new Date(contexte._finPrevue) : null;
+
+  const [contenu, version] = await Promise.all([
+    genererPilier(adaptation.pilier, profilAdaptation),
+    prochaineVersion(userId, adaptation.pilier),
+  ]);
+
+  const plan = getEffectivePlan(user.subscription);
+  const nouveauProgramme = await prisma.programmeGenerated.create({
+    data: {
+      userId,
+      pilier: adaptation.pilier,
+      contenu: contenu as object,
+      statut: plan === "GRATUIT" ? "GENERE_IA" : "EN_ATTENTE",
+      version,
+      temporaire,
+      finPrevue,
+    },
+  });
+
+  const statutFinal = plan === "GRATUIT" ? "APPLIQUEE" : "EN_ATTENTE";
+  await prisma.programmeAdaptation.update({
+    where: { id: adaptationId },
+    data: { programmeSuivantId: nouveauProgramme.id, statut: statutFinal },
+  });
+
+  trackServerEvent("adaptation_accepted", userId, { pilier: adaptation.pilier });
+  if (temporaire) {
+    trackServerEvent("travel_mode_started", userId, { pilier: adaptation.pilier, finPrevue });
+  }
+
+  if (statutFinal === "EN_ATTENTE") {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    await sendAdminNotification(
+      "Adaptation de programme à valider",
+      `${user.prenom ?? user.email} a accepté une adaptation de programme (${adaptation.pilier}), en attente de ta validation.\n\n${adaptation.resume}\n\n${appUrl}/admin/programmes`
+    );
+  }
+
+  return { nouvelleVersion: nouveauProgramme.version };
+}
+
+// "Garder mon programme actuel" — aucune version créée, l'adaptation
+// proposée est classée refusée. Reste consultable dans l'historique
+// (jamais supprimée) pour que l'utilisateur comprenne pourquoi son
+// programme n'a pas changé s'il revient dessus plus tard.
+export async function rejeterAdaptation(
+  userId: string,
+  adaptationId: string
+): Promise<{ ok: true } | { error: string }> {
+  const adaptation = await prisma.programmeAdaptation.findUnique({ where: { id: adaptationId } });
+  if (!adaptation || adaptation.userId !== userId) {
+    return { error: "Adaptation introuvable." };
+  }
+  if (adaptation.statut !== "PROPOSEE") {
+    return { error: "Cette adaptation a déjà été traitée." };
+  }
+
+  await prisma.programmeAdaptation.update({ where: { id: adaptationId }, data: { statut: "REJETEE" } });
+  trackServerEvent("adaptation_rejected", userId, { pilier: adaptation.pilier });
+
+  return { ok: true };
 }
 
 // "Ton voyage est terminé. Reprendre ton programme habituel ?" — recrée une

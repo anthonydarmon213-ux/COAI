@@ -478,13 +478,24 @@ enum DecisionAdaptation {
   ADAPTER
 }
 
-// APPLIQUEE = palier sans relecture coach obligatoire (Impulsion), la
-// nouvelle version est visible immédiatement. EN_ATTENTE/VALIDEE/MODIFIEE
-// suivent le même principe que StatutProgramme pour Transformation : le
-// coach doit valider une adaptation avant qu'elle ne devienne le programme
-// affiché à l'abonné (cf. StatutProgramme.EN_ATTENTE côté ProgrammeGenerated,
-// que la nouvelle version porte aussi).
+// PROPOSEE (11/08/2026, point 10 de la Phase 2) = décision actionnable
+// calculée mais PAS ENCORE appliquée : COAI ne régénère le contenu du
+// pilier et ne crée la nouvelle version qu'après confirmation explicite de
+// l'utilisateur ("Accepter" / "Garder mon programme actuel" sur la carte
+// de notification). REJETEE = l'utilisateur a choisi de garder son
+// programme actuel, aucune version créée.
+// APPLIQUEE = confirmée par l'utilisateur sur un palier sans relecture
+// coach obligatoire (Impulsion), la nouvelle version est visible
+// immédiatement après confirmation. EN_ATTENTE/VALIDEE/MODIFIEE suivent le
+// même principe que StatutProgramme pour Transformation : une fois
+// l'utilisateur confirmé, le coach doit encore valider avant que la
+// nouvelle version ne devienne le programme affiché (cf.
+// StatutProgramme.EN_ATTENTE côté ProgrammeGenerated, que la nouvelle
+// version porte aussi). GARDER (decision) reste toujours APPLIQUEE
+// directement — rien à confirmer quand rien ne change.
 enum StatutAdaptation {
+  PROPOSEE
+  REJETEE
   APPLIQUEE
   EN_ATTENTE
   VALIDEE
