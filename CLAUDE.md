@@ -47,6 +47,20 @@ Vérifié : `tsc` + `next build` réels, captures Playwright desktop (1280px)
 et mobile (390px) du hero et du menu mobile ouvert, capture pleine page
 pour confirmer qu'aucune section existante plus bas n'a régressé.
 
+**Itération demandée par Anthony juste après (brief très encadré : hero
+uniquement, rien d'autre)** — sous-titre remplacé par "Ton corps change.
+Ton emploi du temps change. Tes performances changent. COAI adapte ton
+entraînement, ta nutrition et ta récupération au fil du temps." ; CTA
+principal devient "Diagnostic offert" → `/diagnostic` (même lien que celui
+déjà existant dans `CoaiIntro`, pas de nouvelle route) avec micro-copy "2
+min · Gratuit · Sans engagement" ; CTA secondaire renommé "Voir comment ça
+marche" (ancre `#comment-ca-marche` déjà en place). `TrustBadges` retiré du
+hero (n'était pas dans la hiérarchie demandée, "hero extrêmement propre")
+— le composant reste utilisé sur `/pricing`. Objectif explicite : réduire
+la friction avant abonnement, le funnel devient accueil → diagnostic
+gratuit → découverte de la valeur, pas une demande d'achat immédiate.
+Revérifié `tsc`/`build` + captures desktop/mobile.
+
 ## Phase 3, bloc NEAT — activité quotidienne (11/08/2026, nuit)
 
 Demandé par Anthony après validation de la Phase 2 : premier bloc dédié de

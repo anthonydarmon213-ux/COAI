@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
-import { TrustBadges } from "@/components/marketing/trust-badges";
 import { AppPreviewPhones } from "@/components/marketing/app-preview-phones";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
@@ -116,19 +115,21 @@ export default function LandingPage() {
             Ton programme <span className="text-laiton-300">évolue</span> avec toi.
           </h1>
           <p className="mt-7 max-w-lg text-lg leading-8 text-graphite-200">
-            COAI crée ton entraînement, analyse ta progression et adapte ton programme en
-            fonction de ta vie, de ta récupération et de tes objectifs.
+            Ton corps change. Ton emploi du temps change. Tes performances changent. COAI adapte
+            ton entraînement, ta nutrition et ta récupération au fil du temps.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/sign-up">
-              <Button className="px-7 py-3">Créer mon programme →</Button>
-            </Link>
+          <div className="mt-8 flex flex-wrap items-start gap-4">
+            <div className="flex flex-col gap-2">
+              <Link href="/diagnostic">
+                <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
+              </Link>
+              <p className="text-xs text-graphite-500">2 min · Gratuit · Sans engagement</p>
+            </div>
             <a href="#comment-ca-marche">
-              <Button variant="secondary" className="px-7 py-3">Découvrir comment ça marche</Button>
+              <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
+                Voir comment ça marche
+              </Button>
             </a>
-          </div>
-          <div className="mt-8">
-            <TrustBadges />
           </div>
         </div>
         <div className="relative z-10">
