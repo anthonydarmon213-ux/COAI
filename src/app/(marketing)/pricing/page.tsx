@@ -8,6 +8,8 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrustBadges } from "@/components/marketing/trust-badges";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { TrackConversion } from "@/components/analytics/track-conversion";
+import { PlanSelectedLink } from "@/components/marketing/plan-selected-link";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
@@ -126,6 +128,7 @@ export default function PricingPage() {
 
   return (
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-10 px-6 py-24">
+      <TrackConversion name="pricing_viewed" />
       <div className="w-full max-w-5xl pt-8">
         <BackLink />
       </div>
@@ -217,9 +220,7 @@ export default function PricingPage() {
                 label={tier.plan === "STANDARD" ? "S'abonner — 7 jours offerts" : `S'abonner — ${tier.prix}${tier.suffixe}`}
               />
             ) : (
-              <Link href="/sign-up">
-                <Button>Créer mon compte — 7 jours offerts</Button>
-              </Link>
+              <PlanSelectedLink href="/sign-up" plan="GRATUIT" label="Créer mon compte — 7 jours offerts" />
             )}
           </Card>
         ))}

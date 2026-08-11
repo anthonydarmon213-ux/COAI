@@ -8,6 +8,11 @@ import { buildMiniDiagnostic, miniDiagnosticEnTexte, type ReponsesDiagnostic } f
 const bodySchema = z.object({
   email: z.string().email().max(320),
   reponses: z.record(z.unknown()),
+  utmSource: z.string().max(200).optional(),
+  utmMedium: z.string().max(200).optional(),
+  utmCampaign: z.string().max(200).optional(),
+  utmContent: z.string().max(200).optional(),
+  utmTerm: z.string().max(200).optional(),
 });
 
 // Capture le lead sur /diagnostic (quiz public, visiteur anonyme) juste
@@ -21,7 +26,15 @@ export async function POST(request: Request) {
   }
 
   const lead = await prisma.diagnosticLead.create({
-    data: { email: parsed.data.email, reponses: parsed.data.reponses as Prisma.InputJsonValue },
+    data: {
+      email: parsed.data.email,
+      reponses: parsed.data.reponses as Prisma.InputJsonValue,
+      utmSource: parsed.data.utmSource,
+      utmMedium: parsed.data.utmMedium,
+      utmCampaign: parsed.data.utmCampaign,
+      utmContent: parsed.data.utmContent,
+      utmTerm: parsed.data.utmTerm,
+    },
   });
 
   // Notifie Anthony à chaque lead capturé sur le diagnostic public — ce

@@ -21,7 +21,8 @@ export type ProductEventName =
   | "neat_first_log"
   | "neat_log_recorded"
   | "neat_recommendation_shown"
-  | "neat_goal_accepted";
+  | "neat_goal_accepted"
+  | "first_workout_started";
 
 export function trackServerEvent(
   name: ProductEventName,

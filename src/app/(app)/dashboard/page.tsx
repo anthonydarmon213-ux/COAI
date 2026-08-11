@@ -77,7 +77,9 @@ export default async function DashboardPage() {
 
       <CoaiInsightCard insight={insight} />
 
-      {notificationAdaptation && <AdaptationNotificationCard notification={notificationAdaptation} />}
+      {notificationAdaptation && (
+        <AdaptationNotificationCard notification={notificationAdaptation} plan={plan} />
+      )}
 
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 

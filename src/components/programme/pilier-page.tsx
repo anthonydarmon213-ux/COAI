@@ -10,6 +10,7 @@ import { NutritionView } from "@/components/programme/nutrition-view";
 import { RecuperationView } from "@/components/programme/recuperation-view";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { FicheMacros } from "@/components/programme/fiche-macros";
+import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -69,6 +70,13 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
 
   return (
     <div className="flex flex-col gap-10">
+      {/* Funnel (Phase 5B, 11/08/2026) : "première fois qu'un programme est
+          vu" approximé par la V1 du pilier Entraînement, page d'atterrissage
+          par défaut après /programme (cf. "Embarquer" sur /bienvenue) — pas
+          besoin d'un nouveau flag en base pour ça. */}
+      {affiche && affiche.version === 1 && pilier === "ENTRAINEMENT" && (
+        <TrackConversion name="first_programme_viewed" />
+      )}
       <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
         <SectionLabel>Votre programme</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{LABELS[pilier]}.</h1>

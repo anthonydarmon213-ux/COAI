@@ -8,6 +8,11 @@ const bodySchema = z.object({
   consentSante: z.boolean(),
   prenom: z.string().max(100).optional(),
   parrainageCode: z.string().max(20).optional(),
+  utmSource: z.string().max(200).optional(),
+  utmMedium: z.string().max(200).optional(),
+  utmCampaign: z.string().max(200).optional(),
+  utmContent: z.string().max(200).optional(),
+  utmTerm: z.string().max(200).optional(),
 });
 
 // Appelée par le client juste après un signUp() Supabase Auth réussi :
@@ -53,6 +58,11 @@ export async function POST(request: Request) {
       consentRgpdAt: new Date(),
       consentSanteAt: new Date(),
       parraineParId,
+      utmSource: parsed.data.utmSource,
+      utmMedium: parsed.data.utmMedium,
+      utmCampaign: parsed.data.utmCampaign,
+      utmContent: parsed.data.utmContent,
+      utmTerm: parsed.data.utmTerm,
     },
   });
 

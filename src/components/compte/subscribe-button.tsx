@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
 export function SubscribeButton({
   plan,
@@ -14,9 +15,11 @@ export function SubscribeButton({
   const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
+    trackFunnelEvent("plan_selected", { plan });
     setLoading(true);
     setError(null);
     try {
+      trackFunnelEvent("checkout_started", { plan });
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

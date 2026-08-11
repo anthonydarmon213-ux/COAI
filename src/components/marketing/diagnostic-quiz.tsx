@@ -7,11 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
+import {
+  clearDiagnosticProgress,
+  readDiagnosticProgress,
+  saveDiagnosticProgress,
+} from "@/lib/diagnostic/progress-storage";
+import { readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
 import { Badge } from "@/components/ui/badge";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -304,8 +311,16 @@ function FormuleCard({
   );
 }
 
-export function DiagnosticQuiz() {
+export function DiagnosticQuiz({ connecte = false }: { connecte?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
+  // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
+  // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
+  // retirée de la liste des questions pour ce cas, sans dupliquer tout le
+  // reste du composant.
+  const questionSteps = useMemo(
+    () => (connecte ? QUESTION_STEPS.filter((s) => s !== "email") : QUESTION_STEPS),
+    [connecte]
+  );
   const [persona, setPersona] = useState<string[]>([]);
   const [niveau, setNiveau] = useState<string | null>(null);
   const [objectif, setObjectif] = useState<string | null>(null);
@@ -327,9 +342,12 @@ export function DiagnosticQuiz() {
   const [email, setEmail] = useState("");
   const [consentEmail, setConsentEmail] = useState(false);
   const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading">("idle");
+  const [applyStatus, setApplyStatus] = useState<"idle" | "loading" | "done">("idle");
+  const [resumable, setResumable] = useState(false);
 
-  const stepIndex = QUESTION_STEPS.indexOf(step);
-  const progressPct = stepIndex >= 0 ? Math.round((stepIndex / QUESTION_STEPS.length) * 100) : 0;
+  const stepIndex = questionSteps.indexOf(step);
+  const progressPct = stepIndex >= 0 ? Math.round((stepIndex / questionSteps.length) * 100) : 0;
+  const lastQuestionStep = questionSteps[questionSteps.length - 1];
 
   function toggle(list: string[], value: string, setter: (v: string[]) => void) {
     setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
@@ -350,9 +368,14 @@ export function DiagnosticQuiz() {
     });
   }
 
-  const STEP_ORDER: Step[] = ["intro", ...QUESTION_STEPS, "analyse", "result"];
+  const STEP_ORDER: Step[] = ["intro", ...questionSteps, "analyse", "result"];
 
   function goNext() {
+    // Événement funnel (section 15) : une vraie question vient d'être
+    // répondue — jamais déclenché pour "intro"/"analyse" (pas de question).
+    if (questionSteps.includes(step)) {
+      trackFunnelEvent("diagnostic_step_completed", { step });
+    }
     const i = STEP_ORDER.indexOf(step);
     const target = STEP_ORDER[i + 1];
     if (target) setStep(target);
@@ -364,6 +387,115 @@ export function DiagnosticQuiz() {
     // enchaîne automatiquement vers "result" sans jamais s'arrêter dessus.
     const target = STEP_ORDER[i - 1];
     if (target) setStep(target);
+  }
+
+  // Reprise du diagnostic (Phase 5B, section 14, 11/08/2026) : au premier
+  // rendu, on regarde si une progression a été laissée en cours — si oui,
+  // l'écran d'intro propose "Continuer mon diagnostic" plutôt que de
+  // recommencer à zéro. Ne s'applique qu'une fois, pas à chaque changement
+  // d'étape (sinon on écraserait resumable=false dès le premier goNext).
+  useEffect(() => {
+    const saved = readDiagnosticProgress<Record<string, unknown>>();
+    if (saved && typeof saved.step === "string" && saved.step !== "intro") {
+      setResumable(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sauvegarde la progression à chaque étape de question (jamais pendant
+  // "intro"/"analyse"/"result" — rien à reprendre une fois le résultat
+  // atteint, ce n'est plus un abandon).
+  useEffect(() => {
+    if (step === "intro" || step === "analyse" || step === "result") return;
+    saveDiagnosticProgress({
+      step,
+      persona,
+      personaAutreTexte,
+      niveau,
+      objectif,
+      equipement,
+      lieu,
+      duree,
+      frequence,
+      sport,
+      sportAutreTexte,
+      sexe,
+      age,
+      tailleCm,
+      poidsKg,
+      habitudesAlimentaires,
+      qualiteSommeil,
+      sante,
+      santeAutreTexte,
+      email,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    step,
+    persona,
+    personaAutreTexte,
+    niveau,
+    objectif,
+    equipement,
+    lieu,
+    duree,
+    frequence,
+    sport,
+    sportAutreTexte,
+    sexe,
+    age,
+    tailleCm,
+    poidsKg,
+    habitudesAlimentaires,
+    qualiteSommeil,
+    sante,
+    santeAutreTexte,
+    email,
+  ]);
+
+  function applySavedProgress(saved: Record<string, unknown>) {
+    if (Array.isArray(saved.persona)) setPersona(saved.persona as string[]);
+    if (typeof saved.personaAutreTexte === "string") setPersonaAutreTexte(saved.personaAutreTexte);
+    if (typeof saved.niveau === "string") setNiveau(saved.niveau);
+    if (typeof saved.objectif === "string") setObjectif(saved.objectif);
+    if (Array.isArray(saved.equipement)) setEquipement(saved.equipement as string[]);
+    if (typeof saved.lieu === "string") setLieu(saved.lieu);
+    if (typeof saved.duree === "string") setDuree(saved.duree);
+    if (typeof saved.frequence === "string") setFrequence(saved.frequence);
+    if (Array.isArray(saved.sport)) setSport(saved.sport as string[]);
+    if (typeof saved.sportAutreTexte === "string") setSportAutreTexte(saved.sportAutreTexte);
+    if (typeof saved.sexe === "string") setSexe(saved.sexe);
+    if (typeof saved.age === "string") setAge(saved.age);
+    if (typeof saved.tailleCm === "string") setTailleCm(saved.tailleCm);
+    if (typeof saved.poidsKg === "string") setPoidsKg(saved.poidsKg);
+    if (typeof saved.habitudesAlimentaires === "string") setHabitudesAlimentaires(saved.habitudesAlimentaires);
+    if (typeof saved.qualiteSommeil === "string") setQualiteSommeil(saved.qualiteSommeil);
+    if (Array.isArray(saved.sante)) setSante(saved.sante as string[]);
+    if (typeof saved.santeAutreTexte === "string") setSanteAutreTexte(saved.santeAutreTexte);
+    if (typeof saved.email === "string") setEmail(saved.email);
+  }
+
+  function startDiagnostic() {
+    trackFunnelEvent("diagnostic_started", { resumed: false });
+    goNext();
+  }
+
+  function resumeDiagnostic() {
+    const saved = readDiagnosticProgress<Record<string, unknown>>();
+    if (!saved) {
+      startDiagnostic();
+      return;
+    }
+    applySavedProgress(saved);
+    trackFunnelEvent("diagnostic_started", { resumed: true });
+    const savedStep = saved.step as Step;
+    setStep(questionSteps.includes(savedStep) ? savedStep : questionSteps[0] ?? "persona");
+  }
+
+  function restartDiagnostic() {
+    clearDiagnosticProgress();
+    setResumable(false);
+    startDiagnostic();
   }
 
   // "COAI analyse ton profil" (Phase 5, 11/08/2026) : moment de transition
@@ -383,6 +515,18 @@ export function DiagnosticQuiz() {
       clearInterval(messageInterval);
       clearTimeout(advance);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  // Résultat atteint : plus rien à reprendre (efface la progression
+  // sauvegardée) + événements funnel (section 15) — l'aperçu programme est
+  // sur le même écran que le résultat, mais reste un événement distinct
+  // pour pouvoir mesurer les deux séparément plus tard.
+  useEffect(() => {
+    if (step !== "result") return;
+    clearDiagnosticProgress();
+    trackFunnelEvent("diagnostic_result_viewed");
+    trackFunnelEvent("programme_preview_viewed");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
@@ -449,11 +593,14 @@ export function DiagnosticQuiz() {
     "Bonjour Anthony, je viens de faire le diagnostic sur coai.fr et je suis intéressé(e) par une séance VIP."
   );
 
-  function handleCreerCompte() {
+  // Réponses au format Profile — partagé entre le pont pré-inscription
+  // (handleCreerCompte, visiteur anonyme) et la mise à jour directe du
+  // profil (appliquerAuProfil, visiteur déjà connecté — parcours D).
+  function reponsesEnProfil() {
     const personaAutreResolue = personaAutreTexte.trim();
     const santeReelle = resolveAutre(sante, santeAutreTexte).filter((s) => s !== AUCUNE_DOULEUR_LABEL);
     const sportResolu = resolveAutre(sport, sportAutreTexte);
-    storeDiagnosticAnswers({
+    return {
       niveau: niveau ?? undefined,
       objectifs: [objectif, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
@@ -468,7 +615,30 @@ export function DiagnosticQuiz() {
       age: age ? Number(age) : undefined,
       tailleCm: tailleCm ? Number(tailleCm) : undefined,
       poidsKg: poidsKg ? Number(poidsKg) : undefined,
-    });
+    };
+  }
+
+  function handleCreerCompte(plan: "GRATUIT" | "STANDARD") {
+    trackFunnelEvent("plan_selected", { plan });
+    storeDiagnosticAnswers(reponsesEnProfil());
+  }
+
+  // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
+  // le diagnostic n'a besoin ni de créer un compte ni de repasser par le
+  // pont localStorage — on met à jour son profil réel directement.
+  async function appliquerAuProfil() {
+    setApplyStatus("loading");
+    try {
+      const res = await fetch("/api/profil", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reponsesEnProfil()),
+      });
+      if (!res.ok) throw new Error();
+      setApplyStatus("done");
+    } catch {
+      setApplyStatus("idle");
+    }
   }
 
   // Capture le lead avant de révéler le résultat — best-effort : n'importe
@@ -477,11 +647,13 @@ export function DiagnosticQuiz() {
   async function submitLeadAndReveal() {
     setLeadEnvoi("loading");
     try {
+      const utm = readUtmCookie();
       await fetch("/api/diagnostic-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
+          ...utm,
           reponses: {
             persona: resolveAutre(persona, personaAutreTexte),
             niveau,
@@ -512,9 +684,23 @@ export function DiagnosticQuiz() {
       // (l'utilisateur a bien complété le quiz, quoi qu'il arrive côté API).
       trackEvent("lead_diagnostic");
       trackMetaEvent("Lead");
+      trackFunnelEvent("diagnostic_completed");
       setLeadEnvoi("idle");
       goNext();
     }
+  }
+
+  // Dernière question avant le résultat : capture le lead pour un visiteur
+  // anonyme (email + consentement déjà validés par canContinue), ou avance
+  // directement pour un visiteur connecté (parcours D — pas d'email à
+  // capturer, ce n'est pas un lead, c'est déjà un client).
+  function finishQuestions() {
+    if (connecte) {
+      trackFunnelEvent("diagnostic_completed");
+      goNext();
+      return;
+    }
+    submitLeadAndReveal();
   }
 
   return (
@@ -523,7 +709,7 @@ export function DiagnosticQuiz() {
         {step !== "intro" && step !== "result" && step !== "analyse" && (
           <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
-              Étape {stepIndex + 1}/{QUESTION_STEPS.length}
+              Étape {stepIndex + 1}/{questionSteps.length}
             </span>
             <div className="h-1 w-28 overflow-hidden rounded-full bg-graphite-800">
               <div
@@ -539,16 +725,36 @@ export function DiagnosticQuiz() {
             <div className="flex flex-col items-center gap-4 py-4 text-center">
               <SectionLabel>Diagnostic COAI</SectionLabel>
               <h1 className="font-display text-2xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-3xl">
-                Construisons ton profil.
+                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Construisons ton profil."}
               </h1>
               <p className="max-w-sm text-sm leading-6 text-graphite-400">
-                {QUESTION_STEPS.length - 1} questions rapides, aucune bonne ou mauvaise réponse —
-                à la fin, tu vois un aperçu de ce que ton programme pourrait être. Gratuit, sans
-                inscription.
+                {resumable ? (
+                  "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
+                ) : (
+                  <>
+                    {questionSteps.length - (connecte ? 0 : 1)} questions rapides, aucune bonne ou
+                    mauvaise réponse. Chaque réponse compte : c&apos;est ce que COAI utilise pour
+                    construire ton profil, pas un simple formulaire. Gratuit
+                    {!connecte && ", sans inscription"}.
+                  </>
+                )}
               </p>
-              <Button onClick={goNext} className="mt-2">
-                Commencer
-              </Button>
+              {resumable ? (
+                <div className="mt-2 flex flex-col items-center gap-2">
+                  <Button onClick={resumeDiagnostic}>Continuer mon diagnostic</Button>
+                  <button
+                    type="button"
+                    onClick={restartDiagnostic}
+                    className="font-mono text-[11px] uppercase tracking-[0.12em] text-graphite-500 underline transition hover:text-white"
+                  >
+                    Recommencer à zéro
+                  </button>
+                </div>
+              ) : (
+                <Button onClick={startDiagnostic} className="mt-2">
+                  Commencer
+                </Button>
+              )}
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-graphite-600">
                 ≈ 2 minutes
               </span>
@@ -931,55 +1137,88 @@ export function DiagnosticQuiz() {
                 </p>
               </div>
 
-              <div className="flex w-full flex-col gap-4">
-                <SectionLabel>Nos formules</SectionLabel>
-                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
-                  {FORMULES.map((formule) => {
-                    const recommandee = formule.plan === diagnostic.recommandation.plan;
-                    if (formule.plan === "VIP") {
+              {connecte ? (
+                // Parcours D (Phase 5B, 11/08/2026) : déjà abonné, aucune
+                // raison de proposer de créer un compte — on applique
+                // directement ces réponses à son profil réel.
+                <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
+                  <SectionLabel>Mettre à jour ton profil</SectionLabel>
+                  <p className="max-w-md text-sm leading-6 text-graphite-300">
+                    Applique ces réponses à ton profil COAI pour que ton prochain programme en
+                    tienne compte.
+                  </p>
+                  {applyStatus === "done" ? (
+                    <p className="text-sm text-laiton-300">
+                      Profil mis à jour ✓{" "}
+                      <Link href="/dashboard" className="underline hover:text-laiton-200">
+                        Retour au tableau de bord
+                      </Link>
+                    </p>
+                  ) : (
+                    <Button onClick={appliquerAuProfil} disabled={applyStatus === "loading"}>
+                      {applyStatus === "loading" ? "…" : "Mettre à jour mon profil"}
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex w-full flex-col gap-4">
+                  <SectionLabel>Nos formules</SectionLabel>
+                  <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+                    {FORMULES.map((formule) => {
+                      const recommandee = formule.plan === diagnostic.recommandation.plan;
+                      if (formule.plan === "VIP") {
+                        return (
+                          <FormuleCard
+                            key={formule.nom}
+                            formule={formule}
+                            recommandee={recommandee}
+                            cta={
+                              vipHref ? (
+                                <a
+                                  href={vipHref}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={() => trackFunnelEvent("plan_selected", { plan: "VIP" })}
+                                >
+                                  <Button variant="secondary" className="w-full">
+                                    Réserver via WhatsApp
+                                  </Button>
+                                </a>
+                              ) : (
+                                <Button variant="secondary" className="w-full" disabled>
+                                  Contacter Anthony
+                                </Button>
+                              )
+                            }
+                          />
+                        );
+                      }
                       return (
                         <FormuleCard
                           key={formule.nom}
                           formule={formule}
                           recommandee={recommandee}
                           cta={
-                            vipHref ? (
-                              <a href={vipHref} target="_blank" rel="noopener noreferrer">
-                                <Button variant="secondary" className="w-full">
-                                  Réserver via WhatsApp
+                            <div className="flex flex-col gap-1.5">
+                              <Link
+                                href={signUpHref(formule.plan === "STANDARD")}
+                                onClick={() => handleCreerCompte(formule.plan)}
+                              >
+                                <Button variant={recommandee ? "primary" : "secondary"} className="w-full">
+                                  Créer mon compte
                                 </Button>
-                              </a>
-                            ) : (
-                              <Button variant="secondary" className="w-full" disabled>
-                                Contacter Anthony
-                              </Button>
-                            )
+                              </Link>
+                              <span className="text-center font-mono text-[9px] uppercase tracking-[0.1em] text-graphite-600">
+                                7 jours offerts
+                              </span>
+                            </div>
                           }
                         />
                       );
-                    }
-                    return (
-                      <FormuleCard
-                        key={formule.nom}
-                        formule={formule}
-                        recommandee={recommandee}
-                        cta={
-                          <div className="flex flex-col gap-1.5">
-                            <Link href={signUpHref(formule.plan === "STANDARD")} onClick={handleCreerCompte}>
-                              <Button variant={recommandee ? "primary" : "secondary"} className="w-full">
-                                Créer mon compte
-                              </Button>
-                            </Link>
-                            <span className="text-center font-mono text-[9px] uppercase tracking-[0.1em] text-graphite-600">
-                              7 jours offerts
-                            </span>
-                          </div>
-                        }
-                      />
-                    );
-                  })}
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex w-full flex-col items-center gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-center sm:flex-row sm:text-left">
                 <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-laiton-400/25">
@@ -1047,11 +1286,15 @@ export function DiagnosticQuiz() {
             </button>
             <Button
               variant="primary"
-              onClick={step === "email" ? submitLeadAndReveal : goNext}
+              onClick={step === lastQuestionStep ? finishQuestions : goNext}
               disabled={!canContinue || leadEnvoi === "loading"}
               className="px-6 py-2.5 text-sm"
             >
-              {step === "email" ? (leadEnvoi === "loading" ? "…" : "Voir mon diagnostic →") : "Continuer"}
+              {step === lastQuestionStep
+                ? leadEnvoi === "loading"
+                  ? "…"
+                  : "Voir mon diagnostic →"
+                : "Continuer"}
             </Button>
           </div>
         )}

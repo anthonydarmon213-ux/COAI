@@ -11,7 +11,9 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { clearParrainageCookie, readParrainageCookie, storeParrainageCookie } from "@/lib/parrainage/cookie";
 import { storeIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
+import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -36,6 +38,11 @@ export default function SignUpPage() {
     if (ref) storeParrainageCookie(ref);
     if (planVoulu === "STANDARD") storeIntendedPlanCookie("STANDARD");
   }, [searchParams, planVoulu]);
+
+  useEffect(() => {
+    trackFunnelEvent("signup_started", { plan: planVoulu });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [prenom, setPrenom] = useState("");
   // Pré-rempli si on vient du diagnostic public (/diagnostic), qui capture
@@ -72,6 +79,7 @@ export default function SignUpPage() {
       const { error: signUpError } = await supabase.auth.signUp({ email, password });
       if (signUpError) throw signUpError;
 
+      const utm = readUtmCookie();
       const res = await fetch("/api/compte/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,10 +88,12 @@ export default function SignUpPage() {
           consentSante,
           prenom: prenom || undefined,
           parrainageCode: readParrainageCookie() || undefined,
+          ...utm,
         }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       clearParrainageCookie();
+      clearUtmCookie();
 
       // Signal mi-funnel (11/08/2026) : compte créé, avant même le paiement
       // — utile à Meta même si la personne abandonne à l'étape Stripe
@@ -92,6 +102,8 @@ export default function SignUpPage() {
       // l'algorithme de diffusion des pubs).
       trackEvent("compte_cree", { plan: planVoulu });
       trackMetaEvent("CompleteRegistration");
+      trackFunnelEvent("signup_completed", { plan: planVoulu });
+      trackFunnelEvent("checkout_started", { plan: planVoulu });
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",

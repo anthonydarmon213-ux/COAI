@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
 import { clearIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
+import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
 export function CompleterInscriptionForm({
@@ -30,6 +32,11 @@ export function CompleterInscriptionForm({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    trackFunnelEvent("signup_started", { plan: planInitial });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -49,6 +56,7 @@ export function CompleterInscriptionForm({
 
     setLoading(true);
     try {
+      const utm = readUtmCookie();
       const res = await fetch("/api/compte/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,17 +65,21 @@ export function CompleterInscriptionForm({
           consentSante,
           prenom: prenom || undefined,
           parrainageCode: readParrainageCookie() || undefined,
+          ...utm,
         }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       clearParrainageCookie();
       clearIntendedPlanCookie();
+      clearUtmCookie();
 
       // 11/08/2026 : même signal que sur le flow email/mot de passe
       // (sign-up/page.tsx) — jusqu'ici seule l'inscription Google n'envoyait
       // pas cet événement, un trou dans la couverture du funnel.
       trackEvent("compte_cree", { plan: planInitial });
       trackMetaEvent("CompleteRegistration");
+      trackFunnelEvent("signup_completed", { plan: planInitial });
+      trackFunnelEvent("checkout_started", { plan: planInitial });
 
       const checkoutRes = await fetch("/api/stripe/checkout", {
         method: "POST",

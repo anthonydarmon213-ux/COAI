@@ -4,6 +4,126 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 5, bloc B — reprise, funnel analytics, UTM, parcours connecté/upgrade (11/08/2026, nuit)
+
+Suite du brief Phase 5 (sections 14 à 25, envoyées séparément après le bloc A
+ci-dessous — le premier envoi s'était coupé à la section 14). Portée
+strictement respectée : rien démarré sur les Phases 6-10, Stripe existant
+réutilisé tel quel (aucune nouvelle intégration), pas de plateforme A/B ni
+de dashboard de métriques construits ("prépare, ne construis pas").
+
+**Ce qui existait déjà avant ce bloc** (vérifié avant de coder, comme
+demandé) : abstraction analytics propre en 2 couches — `trackEvent`/
+`trackMetaEvent` (GA4/Meta Pixel, `src/lib/analytics.ts`) côté acquisition,
+`trackServerEvent` (`src/lib/analytics/product-events.ts`, simple
+`console.log` prêt à être branché sur un vrai outil) côté produit — donc
+"ne pas rajouter une énorme dépendance analytics" était déjà acquis, juste à
+étendre. `TrackConversion` (composant client réutilisable pour déclencher un
+événement au montage d'une page serveur) existait aussi déjà.
+
+**14. Reprise du diagnostic** — `src/lib/diagnostic/progress-storage.ts`
+(nouveau, distinct du pont pré-inscription `storage.ts` déjà existant) :
+sauvegarde la progression (réponses + étape courante) en localStorage à
+chaque étape de question, effacée dès que le résultat est atteint. Au
+retour sur `/diagnostic`, l'écran d'intro propose "Continuer mon
+diagnostic" (reprend exactement à la bonne étape) ou "Recommencer à zéro".
+Vérifié par test Playwright réel (abandon à l'étape 3, fermeture/réouverture
+de la page, reprise confirmée à l'étape 4/14 exacte).
+
+**15-16. Analytics funnel** — `src/lib/analytics/funnel-events.ts`
+(nouveau) : liste unique des 14 événements demandés
+(landing_viewed → first_workout_started), tous routés vers `trackEvent`
+(GA4, déjà en place) — aucune nouvelle dépendance. Câblés à : homepage,
+`/diagnostic` (démarrage, chaque étape, complétion, vue résultat, aperçu
+programme), `/sign-up` + `completer-inscription-form.tsx` (Google OAuth),
+`/pricing`, `SubscribeButton`, `/bienvenue`, première vue de
+`/programme/entrainement` (V1), premier `SeanceLog` jamais loggué (approximé
+en l'absence de suivi live d'une séance en cours — cf. limite ci-dessous).
+Pas de dashboard de calcul de taux de passage construit (pas demandé à ce
+stade) — juste l'instrumentation posée pour le calculer plus tard.
+
+**17. UTM / attribution** — `src/lib/attribution/utm-cookie.ts` (nouveau,
+même pattern que le cookie de parrainage existant) : capture first-touch
+des utm_source/medium/campaign/content/term à l'arrivée sur n'importe quelle
+page marketing (`UtmCapture`, monté dans le layout marketing — couvre aussi
+les pages SEO, pas seulement l'accueil), conservés jusqu'à la conversion
+(inscription email/mdp et Google OAuth), rattachés au `User` et au
+`DiagnosticLead`. Nouveaux champs `utmSource/utmMedium/utmCampaign/
+utmContent/utmTerm` sur les deux modèles, migration
+`20260812000000_add_utm_attribution`. Vérifié par test Playwright réel
+(`?utm_source=meta&utm_medium=cpc&utm_campaign=...` → cookie posé
+correctement).
+
+**18-19. Mobile first / performance** — déjà couvert par construction : le
+diagnostic reste 100% règles déterministes (aucun appel IA, cf. bloc A),
+`inputMode="numeric"` déjà sur les champs numériques (pas de clavier
+alphabétique inutile), CTA pleine largeur au pouce déjà en place. Testé
+mobile (390px) via Playwright sur l'ensemble du parcours.
+
+**20. Composants prêts pour l'A/B testing futur** — pas de plateforme
+construite (explicitement demandé de ne pas le faire). Le contenu marketing
+déjà concerné (formules, messages de transition, blocs du résultat) vivait
+déjà dans des constantes nommées en tête de fichier plutôt qu'inliné en
+profondeur — rien de plus fait ici, juste vérifié que ce n'était pas
+régressé.
+
+**21. Parcours D — utilisateur déjà connecté** — `/diagnostic` détecte la
+session côté serveur (`getCurrentAppUser`) et passe `connecte` au quiz.
+Pour un visiteur connecté : l'étape email est retirée (déjà connue, jamais
+redemandée), la dernière question mène directement à la transition
+"analyse" sans capturer de lead, et l'écran de résultat remplace "Nos
+formules" (paywall) par un bouton "Mettre à jour mon profil" qui applique
+directement les réponses via `PUT /api/profil`. Vérifié par test Playwright
+réel (route de preview temporaire, supprimée après coup) : 13/13 étapes
+(pas 14), pas de carte tarifs, mise à jour confirmée.
+
+**21 (suite). Parcours E — moment d'upgrade contextuel Free→Pro** — audité
+l'existant (dashboard, moteur d'adaptation, COAI Insight) : aucun signal
+d'upgrade contextuel n'existait avant ce bloc. Ajouté un seul moment précis
+(pas un paywall générique partout, comme demandé) : sur
+`AdaptationNotificationCard`, quand un abonné Impulsion (GRATUIT) reçoit une
+adaptation de type REDUIRE (signal de prudence réel — fatigue, plateau,
+contrainte — pas un chiffre inventé), une ligne contextuelle "Un coach
+diplômé d'État peut t'accompagner sur ce type d'ajustement" renvoie vers
+`/pricing`. `NotificationAdaptation` étendu du champ `decision` pour
+permettre ce ciblage.
+
+**24. Renfort narratif pendant le diagnostic** — la promesse "COAI n'est pas
+un générateur de programmes, c'est un coaching qui apprend" ne vivait avant
+ce bloc que dans le pitch du résultat final (bloc A). Renforcée pendant le
+parcours lui-même : sous-titre de l'écran d'intro modifié ("chaque réponse
+compte : c'est ce que COAI utilise pour construire ton profil, pas un
+simple formulaire"), messages du step "analyse" déjà orientés dans ce sens
+(bloc A).
+
+**22. Tests effectués** — `npx tsc --noEmit` et `npm run build` réels,
+propres. 3 scripts Playwright réels (mobile 390px, pas de simulation) :
+parcours complet visiteur anonyme avec UTM + abandon/reprise + résultat +
+paywall (captures : accueil, diagnostic mobile, reprise, résultat, aperçu
+programme, formules), parcours utilisateur connecté (13/14 étapes, CTA
+profil), aucune erreur console/page détectée en dehors de
+`ERR_TUNNEL_CONNECTION_FAILED` sur les scripts GA4/Meta externes (attendu,
+sandbox sans accès réseau sortant vers ces domaines).
+
+**23. Explicitement pas fait, par instruction du brief** — aucune Phase 6 à
+10 démarrée. Stripe existant réutilisé sans modification (checkout,
+webhook, portail — rien touché). Pas de plateforme de test A/B, pas de
+dashboard de calcul du funnel.
+
+**Limites connues / à vérifier par Anthony** :
+- `first_workout_started` est approximé par le premier `SeanceLog` jamais
+  créé (log après-coup) — COAI n'a pas de suivi live d'une séance en cours,
+  donc pas de vrai "début de séance" à instrumenter autrement.
+- Comme pour tout le reste de cette session : aucun test possible avec de
+  vraies données de production (pas d'accès direct à Supabase depuis ce
+  sandbox), et aucun envoi réel vers GA4/Meta Pixel vérifiable ici (domaines
+  externes bloqués côté sandbox) — la présence des appels `trackEvent`/
+  `trackFunnelEvent` a été vérifiée dans le code et testée fonctionnellement
+  (comportement UI correct), pas la réception réelle côté GA4/Meta.
+- Migration `20260812000000_add_utm_attribution` à appliquer en prod
+  (automatique au prochain déploiement via `prisma migrate deploy`, cf.
+  section plus bas — rien à coller manuellement).
+
 ## Phase 5, bloc A — diagnostic enrichi + "COAI a compris de toi" (11/08/2026, nuit)
 
 Démarré par Anthony ("on continue mon brave!" + brief détaillé "PHASE 5 —

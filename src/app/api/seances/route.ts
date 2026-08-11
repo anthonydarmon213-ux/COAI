@@ -57,6 +57,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
+  const seancesExistantes = await prisma.seanceLog.count({ where: { userId: user.id } });
+
   const seance = await prisma.seanceLog.create({
     data: {
       userId: user.id,
@@ -72,6 +74,12 @@ export async function POST(request: Request) {
     },
   });
 
+  // Funnel (Phase 5B, 11/08/2026) : "first_workout_started" — COAI n'a pas
+  // de suivi live d'une séance en cours, le log après-coup est le seul
+  // signal disponible ; approximé par le tout premier SeanceLog du compte.
+  if (seancesExistantes === 0) {
+    trackServerEvent("first_workout_started", user.id);
+  }
   trackServerEvent("workout_completed", user.id);
   if (parsed.data.difficulte != null || parsed.data.energie != null || parsed.data.douleur) {
     trackServerEvent("workout_checkin_completed", user.id);

@@ -6,6 +6,10 @@ export type NotificationAdaptation = {
   resume: string;
   statut: StatutAdaptation;
   pilier: string;
+  // Exposé pour le moment d'upgrade contextuel Free→Pro (Phase 5B,
+  // 11/08/2026, parcours E) — REDUIRE signale un ajustement de prudence
+  // (fatigue, plateau...) où un coach humain apporte une vraie valeur.
+  decision: string;
 };
 
 const FENETRE_HEURES = 48;
@@ -42,5 +46,6 @@ export async function getNotificationAdaptation(userId: string): Promise<Notific
     resume: adaptation.resume,
     statut: adaptation.statut,
     pilier: adaptation.pilier,
+    decision: adaptation.decision,
   };
 }

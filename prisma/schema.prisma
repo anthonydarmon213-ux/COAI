@@ -32,6 +32,16 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  // Attribution publicitaire (Phase 5B, 11/08/2026) — premier utm_* capturé
+  // à l'arrivée (cookie, first-touch), rattaché au compte à l'inscription.
+  // Sert à savoir plus tard "cette personne vient de cette pub"
+  // (Instagram/TikTok/Meta Ads) sans dépendance analytics tierce.
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
+
   // Parrainage (08/08/2026) : code unique généré à la demande (première
   // visite de la page de parrainage), pas à l'inscription — pas besoin
   // d'un code pour qui ne parraine jamais. Quand le filleul passe payant
@@ -332,6 +342,15 @@ model DiagnosticLead {
   email     String
   reponses  Json
   createdAt DateTime @default(now())
+  // Attribution publicitaire (Phase 5B, 11/08/2026) — même principe que
+  // User.utmSource et consorts, mais capturée dès le lead (avant même la
+  // création de compte) : un visiteur qui ne convertit jamais reste
+  // attribuable à sa source.
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
 
   @@index([email])
   @@index([createdAt])

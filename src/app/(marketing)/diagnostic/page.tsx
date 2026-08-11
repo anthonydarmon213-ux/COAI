@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BackLink } from "@/components/marketing/back-link";
 import { DiagnosticQuiz } from "@/components/marketing/diagnostic-quiz";
+import { getCurrentAppUser } from "@/lib/auth/server";
 
 // Nombre de questions codé en dur ici (metadata = export statique, ne peut
 // pas lire QUESTION_STEPS de diagnostic-quiz.tsx) — à garder synchronisé si
@@ -18,13 +19,18 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export default function DiagnosticPage() {
+export default async function DiagnosticPage() {
+  // Parcours D (Phase 5B, 11/08/2026) : un abonné déjà connecté qui refait
+  // le diagnostic n'a pas besoin de créer un compte ni de ressaisir son
+  // email — cf. DiagnosticQuiz (prop `connecte`).
+  const user = await getCurrentAppUser();
+
   return (
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-8 px-6 py-24">
       <div className="w-full max-w-lg">
         <BackLink />
       </div>
-      <DiagnosticQuiz />
+      <DiagnosticQuiz connecte={!!user} />
     </main>
   );
 }

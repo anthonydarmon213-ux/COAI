@@ -9,6 +9,7 @@ import { ProgressionSparkline } from "@/components/marketing/progression-sparkli
 import { AppPreviewPhones } from "@/components/marketing/app-preview-phones";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
+import { TrackConversion } from "@/components/analytics/track-conversion";
 
 const TITLE = "COAI — Coaching sportif par IA, validé par un vrai coach";
 const DESCRIPTION =
@@ -101,6 +102,7 @@ const PILIERS = [
 export default function LandingPage() {
   return (
     <main className="bg-lab-grid flex flex-col">
+      <TrackConversion name="landing_viewed" />
       <CoaiIntro />
 
       {/* Aperçu produit — anciennement dupliquait le kicker/titre/sous-titre

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import type { NotificationAdaptation } from "@/lib/insight/derniere-adaptation";
 
 const STORAGE_PREFIX = "coai_adaptation_vue_";
@@ -16,7 +17,13 @@ const STORAGE_PREFIX = "coai_adaptation_vue_";
 // cliqué Accepter. Pour une adaptation déjà traitée (appliquée ou en
 // attente du coach), la carte reste informative et simplement dismissible
 // (sessionStorage) — il n'y a plus rien à décider.
-export function AdaptationNotificationCard({ notification }: { notification: NotificationAdaptation }) {
+export function AdaptationNotificationCard({
+  notification,
+  plan,
+}: {
+  notification: NotificationAdaptation;
+  plan: "GRATUIT" | "STANDARD" | "PREMIUM";
+}) {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [etat, setEtat] = useState<"attente" | "accepte" | "rejete">("attente");
@@ -68,6 +75,13 @@ export function AdaptationNotificationCard({ notification }: { notification: Not
 
   const enAttenteConfirmation = notification.statut === "PROPOSEE" && etat === "attente";
 
+  // Moment d'upgrade contextuel Free→Pro (Phase 5B, 11/08/2026, parcours E)
+  // — une décision REDUIRE signale un ajustement de prudence (fatigue,
+  // plateau, contrainte...) : c'est précisément le genre de moment où un
+  // coach humain apporte une vraie valeur. Jamais affiché en dehors de ce
+  // contexte précis (pas de paywall générique plaqué partout).
+  const momentUpgrade = plan === "GRATUIT" && notification.decision === "REDUIRE";
+
   const titre =
     etat === "accepte"
       ? "Adaptation appliquée"
@@ -114,6 +128,19 @@ export function AdaptationNotificationCard({ notification }: { notification: Not
             OK
           </button>
         </div>
+      )}
+
+      {momentUpgrade && (
+        <Link
+          href="/pricing"
+          onClick={() => trackFunnelEvent("plan_selected", { plan: "STANDARD", contexte: "adaptation_reduire" })}
+          className="flex items-center justify-between rounded-xl border border-laiton-400/25 bg-laiton-400/[0.06] px-4 py-3 text-sm text-laiton-200 transition hover:bg-laiton-400/[0.1]"
+        >
+          <span>Un coach diplômé d&apos;État peut t&apos;accompagner sur ce type d&apos;ajustement.</span>
+          <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide">
+            Découvrir Transformation →
+          </span>
+        </Link>
       )}
     </Card>
   );

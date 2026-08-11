@@ -88,6 +88,7 @@ export default async function BienvenuePage({
         metaEvent={enEssai ? "StartTrial" : "Subscribe"}
         metaParams={{ value: valeurMensuelle, currency: "EUR" }}
       />
+      <TrackConversion name="checkout_completed" params={{ plan }} />
 
       <div className="flex flex-col items-center gap-3">
         <SectionLabel>Accès confirmé</SectionLabel>
