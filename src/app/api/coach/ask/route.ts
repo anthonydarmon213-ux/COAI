@@ -18,14 +18,38 @@ export const maxDuration = 30;
 const QUOTA_LIMITE = 4;
 const QUOTA_FENETRE_MS = 30 * 24 * 60 * 60 * 1000;
 
+const contextSchema = z.object({
+  source: z.literal("DAILY_WORKOUT"),
+  sessionName: z.string().trim().max(150).optional(),
+  exerciseName: z.string().trim().max(150).optional(),
+  series: z.string().trim().max(50).optional(),
+  repetitions: z.string().trim().max(100).optional(),
+  rest: z.string().trim().max(50).optional(),
+  loadGuidance: z.string().trim().max(500).optional(),
+  workoutStarted: z.boolean().optional(),
+  sleep: z.string().trim().max(30).optional(),
+  energy: z.string().trim().max(30).optional(),
+  pain: z.boolean().optional(),
+  painArea: z.string().trim().max(100).optional(),
+  availableMinutes: z.number().int().min(1).max(180).optional(),
+  adaptationReason: z.string().trim().max(500).optional(),
+  pendingCoach: z.boolean().optional(),
+}).strict();
+
 const bodySchema = z.object({
   question: z.string().trim().min(1).max(1000),
-});
+  context: contextSchema.optional(),
+}).strict();
 
 export async function POST(request: Request) {
   const authUser = await getCurrentUser();
   if (!authUser) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Question invalide" }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
@@ -62,11 +86,6 @@ export async function POST(request: Request) {
     });
   }
 
-  const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Question invalide" }, { status: 400 });
-  }
-
   const profil = {
     objectifs: user.profile?.objectifs,
     niveau: user.profile?.niveau,
@@ -77,7 +96,7 @@ export async function POST(request: Request) {
 
   try {
     const answer = await generateTextWithAI(
-      buildCoachQuestionPrompt(profil, parsed.data.question)
+      buildCoachQuestionPrompt(profil, parsed.data.question, parsed.data.context)
     );
     return NextResponse.json({ answer });
   } catch (error) {
