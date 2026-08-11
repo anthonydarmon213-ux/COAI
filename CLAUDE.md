@@ -11,6 +11,18 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
+- [ ] Appliquer la migration `dernierBilanMensuelEnvoyeAt` sur Supabase (SQL
+      Editor, même méthode que `diagnostic_leads`/`avis`/`repas_log`) :
+      `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "dernierBilanMensuelEnvoyeAt" TIMESTAMP(3);`
+      — sinon le nouveau cron bilan-mensuel plantera en prod (même bug que
+      les tables manquantes découvert cette nuit)
+- [ ] Relire le contenu des 2 emails de rétention (relance
+      Transformation/Premium signée "Anthony", bilan mensuel) — cf. section
+      "Rétention : relance étendue + bilan mensuel" plus bas — jamais
+      envoyés pour de vrai, à tester en conditions réelles avant qu'un
+      abonné payant les reçoive
+- [ ] Vérifier que le 2ᵉ cron Vercel (`bilan-mensuel`, ajouté ce soir) ne
+      dépasse pas le quota de crons de ton plan Vercel actuel (Hobby vs Pro)
 - [ ] Acheter la carte SIM prépayée, l'insérer dans le vieux téléphone
       (numéro jamais utilisé sur WhatsApp classique — condition Meta)
 - [ ] Créer le compte ManyChat, lancer la connexion WhatsApp Business
@@ -43,6 +55,40 @@ pour le détail/contexte de chaque sujet) :
       SetupIntent vs PaymentIntent jamais confirmée ni corrigée
 - [ ] Témoignages/preuves sociales — toujours en attente de vrai contenu
       client d'Anthony, ne pas fabriquer
+
+## Rétention : relance étendue + bilan mensuel (11/08/2026)
+
+Une autre session Claude Code (Cowork, sans accès `git push` direct) avait
+préparé ce chantier sous forme de patch email à appliquer à la main —
+jamais poussé nulle part, repéré et repris proprement ici (avec `tsc` et
+`build` réels, contrairement à cette session-là qui n'avait pas accès
+réseau npm).
+
+1. **Relance d'inactivité étendue à Transformation/Premium** (jusque-là
+   Impulsion uniquement) — `src/app/api/cron/relance-inactifs/route.ts`.
+   Message personnalisé et signé "Anthony" sur ces deux paliers (au lieu de
+   "L'équipe COAI") pour préserver le positionnement coaching humain.
+   `alerterDouleurImpulsion` non touchée (reste Impulsion uniquement —
+   Transformation a déjà un coach humain qui lit les mentions de douleur
+   via `/admin/suivi`).
+2. **Bilan mensuel automatique** (nouveau) —
+   `src/app/api/cron/bilan-mensuel/route.ts`, nouvelle route + nouveau cron
+   Vercel (`vercel.json`). Récap par email (séances loggées, delta de
+   poids, delta de charge sur l'exercice le mieux renseigné) calculé sur
+   une fenêtre glissante par abonné (~30 jours depuis son dernier bilan ou
+   son inscription), pas un envoi groupé le 1er du mois. Rien envoyé si
+   aucune séance sur la période (le cas "inactif" est déjà couvert par le
+   point 1).
+3. Nouveau champ `User.dernierBilanMensuelEnvoyeAt` + migration
+   `20260811060000_add_bilan_mensuel` — **pas encore appliquée en prod**,
+   cf. checklist du haut.
+4. Helper `src/lib/cron/auth.ts` extrait (dupliqué avant dans
+   relance-inactifs).
+
+Vérifié cette fois : `npx tsc --noEmit` et `npm run build` passent tous les
+deux. Reste à vérifier (cf. checklist) : migration appliquée en prod, quota
+de crons Vercel, et un vrai envoi test des 2 emails avant qu'un abonné
+payant les reçoive.
 
 ## Assistant WhatsApp automatisé (10/08/2026)
 

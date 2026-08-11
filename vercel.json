@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/relance-inactifs",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/bilan-mensuel",
+      "schedule": "0 8 * * *"
     }
   ]
 }

@@ -1,13 +1,25 @@
 import { NextResponse } from "next/server";
+import type { SubscriptionPlan } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { sendEmail, sendAdminNotification } from "@/lib/email/client";
+import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 
-// Relance automatique des abonnés Impulsion inactifs (09/08/2026). Ce palier
-// n'a aucun suivi humain (contrairement à Transformation, cf.
+// Relance automatique des abonnés inactifs (09/08/2026, étendu à
+// Transformation/Premium le 11/08/2026). À l'origine réservé au palier
+// Impulsion, qui n'a aucun suivi humain (contrairement à Transformation, cf.
 // /admin/suivi + relance WhatsApp par le coach) — sans ce cron, un abonné
 // qui décroche après sa première semaine ne reçoit jamais de relance et
 // churn silencieusement, alors que l'acquisition ne se fait qu'en pub
 // payante/SEO (pas de réseau perso à réactiver en filet de secours).
+//
+// Étendu à Transformation/Premium : le suivi manuel via /admin/suivi ne
+// scale pas avec le volume d'abonnés visé par l'acquisition externe — ce
+// cron sert de filet de sécurité qui garantit qu'aucun abonné (quel que
+// soit le palier payé) ne décroche silencieusement, sans remplacer le
+// suivi humain existant sur ces deux paliers. Message personnalisé et
+// signé "Anthony" sur Transformation/Premium (au lieu de "L'équipe COAI")
+// pour rester cohérent avec le positionnement coaching humain qui
+// justifie leur prix.
 //
 // Déclenché par Vercel Cron (cf. vercel.json), protégé par CRON_SECRET :
 // Vercel ajoute automatiquement un header "Authorization: Bearer
@@ -41,34 +53,52 @@ const MOTS_DOULEUR = [
   "craquement",
 ];
 
-function isAuthorized(request: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return request.headers.get("authorization") === `Bearer ${secret}`;
-}
-
-function buildEmail(prenom: string | null, joursInactif: number, appUrl: string) {
+// Impulsion (IA seule) : ton générique, "L'équipe COAI". Transformation/
+// Premium (coach humain qui valide) : signé Anthony directement, pour ne
+// pas casser la promesse "coaching humain" avec un email qui sonne comme un
+// système automatisé anonyme.
+function buildEmail(
+  prenom: string | null,
+  joursInactif: number,
+  appUrl: string,
+  plan: SubscriptionPlan
+) {
   const nom = prenom ? ` ${prenom}` : "";
+
+  if (plan === "GRATUIT") {
+    return {
+      subject: "Ton programme t'attend",
+      text:
+        `Bonjour${nom},\n\n` +
+        `Ça fait ${joursInactif} jours qu'on n'a pas vu de séance loggée de ta part sur COAI. ` +
+        `Ton programme est toujours là, prêt à être suivi.\n\n` +
+        `Pas besoin de tout reprendre à zéro : une seule séance suffit pour relancer la dynamique.\n\n` +
+        `Retrouve ton programme ici : ${appUrl}/programme\n\n` +
+        `À bientôt,\nL'équipe COAI`,
+    };
+  }
+
   return {
-    subject: "Ton programme t'attend",
+    subject: "Des nouvelles ?",
     text:
       `Bonjour${nom},\n\n` +
-      `Ça fait ${joursInactif} jours qu'on n'a pas vu de séance loggée de ta part sur COAI. ` +
-      `Ton programme est toujours là, prêt à être suivi.\n\n` +
-      `Pas besoin de tout reprendre à zéro : une seule séance suffit pour relancer la dynamique.\n\n` +
+      `Ça fait ${joursInactif} jours que je ne vois pas de séance loggée de ton côté sur COAI, ` +
+      `et je voulais prendre des nouvelles directement plutôt que de laisser filer.\n\n` +
+      `Rien à justifier — dis-moi juste si ton programme a besoin d'être ajusté (charge, disponibilité, ` +
+      `douleur...), je le fais avec toi. Sinon, une seule séance suffit pour relancer la dynamique.\n\n` +
       `Retrouve ton programme ici : ${appUrl}/programme\n\n` +
-      `À bientôt,\nL'équipe COAI`,
+      `À bientôt,\nAnthony`,
   };
 }
 
-// Relance des abonnés Impulsion inactifs (programme généré mais plus de
-// séance loggée depuis SEUIL_INACTIVITE_JOURS).
+// Relance des abonnés inactifs (programme généré mais plus de séance
+// loggée depuis SEUIL_INACTIVITE_JOURS), tous paliers payants confondus.
 async function relancerInactifs(appUrl: string): Promise<number> {
   const maintenant = Date.now();
 
   const candidats = await prisma.user.findMany({
     where: {
-      subscription: { plan: "GRATUIT", status: { in: ["ACTIVE", "PAST_DUE"] } },
+      subscription: { plan: { in: ["GRATUIT", "STANDARD", "PREMIUM"] }, status: { in: ["ACTIVE", "PAST_DUE"] } },
       programmes: { some: {} },
     },
     select: {
@@ -76,6 +106,7 @@ async function relancerInactifs(appUrl: string): Promise<number> {
       email: true,
       prenom: true,
       derniereRelanceInactiviteEnvoyeeAt: true,
+      subscription: { select: { plan: true } },
       programmes: { select: { generatedAt: true }, orderBy: { generatedAt: "desc" }, take: 1 },
       seances: { select: { date: true }, orderBy: { date: "desc" }, take: 1 },
     },
@@ -96,7 +127,10 @@ async function relancerInactifs(appUrl: string): Promise<number> {
     const joursInactif = Math.floor((maintenant - derniereActivite.getTime()) / JOUR_MS);
     if (joursInactif <= SEUIL_INACTIVITE_JOURS) continue;
 
-    const { subject, text } = buildEmail(user.prenom, joursInactif, appUrl);
+    // subscription ne peut pas être null ici (filtré par le where ci-dessus),
+    // le ?? est une garde TypeScript pure.
+    const plan = user.subscription?.plan ?? "GRATUIT";
+    const { subject, text } = buildEmail(user.prenom, joursInactif, appUrl, plan);
     const envoye = await sendEmail(user.email, subject, text);
 
     if (envoye) {
@@ -186,7 +220,7 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
 }
 
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 

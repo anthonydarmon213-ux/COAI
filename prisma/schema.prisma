@@ -45,12 +45,20 @@ model User {
   filleuls                      User[]   @relation("Parrainages")
   recompenseParrainageAppliquee Boolean  @default(false)
 
-  // Relance automatique des abonnés Impulsion inactifs (09/08/2026) — ce
-  // palier n'a aucun suivi humain (contrairement à Transformation, cf.
-  // admin/suivi), donc un email de relance automatique comble ce trou.
-  // Sert uniquement à espacer les relances (pas de spam quotidien tant que
-  // l'utilisateur reste inactif) — cf. /api/cron/relance-inactifs.
+  // Relance automatique des abonnés inactifs (09/08/2026, tous paliers
+  // payants depuis le 11/08/2026) — sert uniquement à espacer les relances
+  // (pas de spam quotidien tant que l'utilisateur reste inactif) — cf.
+  // /api/cron/relance-inactifs.
   derniereRelanceInactiviteEnvoyeeAt DateTime?
+
+  // Bilan mensuel automatique (11/08/2026) — récap des séances loggées et
+  // de la progression (poids, force) envoyé par email à chaque abonné payant
+  // actif, environ tous les 30 jours (calculé depuis cette date, pas un jour
+  // calendaire fixe, pour étaler l'envoi dans le temps plutôt qu'un pic le
+  // 1er du mois). Null tant qu'aucun bilan n'a encore été envoyé — dans ce
+  // cas la première échéance se base sur createdAt. Cf.
+  // /api/cron/bilan-mensuel.
+  dernierBilanMensuelEnvoyeAt DateTime?
 
   // Alerte sécurité douleur, palier Impulsion (10/08/2026) — même trou que
   // ci-dessus mais côté sécurité plutôt qu'inactivité : contrairement à
