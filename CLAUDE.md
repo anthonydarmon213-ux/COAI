@@ -4,6 +4,66 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Correction responsive des cartes tarifs (11/08/2026, nuit)
+
+Anthony a testé `/pricing` en production après le déploiement de Phase 5.1
+et constaté le problème "toujours non résolu" : hauteurs déséquilibrées,
+CTA Impulsion/Transformation non alignés, "7 jours offerts" trop petit,
+pas d'impression de comparateur premium.
+
+- **Restructuration des 3 cartes principales** (`(marketing)/pricing/
+  page.tsx`) : ordre badge → nom → prix → description → bénéfices →
+  espace flexible → CTA → information essai, via `flex h-full flex-col`
+  + `mt-auto` (implémenté par un `<div className="flex-1" />` avant le
+  bloc CTA) — les CTA s'alignent désormais en bas, quelle que soit la
+  longueur du contenu au-dessus, sans jamais imposer de hauteur fixe qui
+  couperait quoi que ce soit. Grid passé de 4 à 3 colonnes propres
+  (`lg:grid-cols-3`) : **Entreprise sorti du comparateur** (structurellement
+  différent — devis, pas d'abonnement) et affiché en bandeau à part
+  en dessous, plutôt que compressé en 4e colonne.
+- **"7 jours offerts" rendu visible** : déplacé du haut de carte (à côté du
+  prix, `text-[10px]` très discret) vers directement sous le CTA, format
+  "7 jours offerts · puis 19€/mois" / "· puis 49€/mois", `text-sm
+  font-medium text-laiton-300` — largement plus lisible.
+- **CTA harmonisés** : Impulsion et Transformation partagent désormais le
+  même libellé "Commencer gratuitement" (avant : Transformation affichait
+  "S'abonner — 7 jours offerts", incohérent avec Impulsion) — `SubscribeButton`
+  et `PlanSelectedLink` acceptent maintenant un `className` pour permettre
+  le `w-full` dans le nouveau layout flex.
+- **Responsive vérifié réellement** (Playwright, pas juste le build) à 4
+  largeurs : desktop large (1440px, 3 colonnes propres), desktop petite
+  fenêtre (1024px, toujours 3 colonnes lisibles), tablette (834px, bascule
+  automatique en 2 colonnes — VIP passe seul en dessous plutôt que d'être
+  compressé à 3), mobile (390px, 1 carte par ligne, rien de coupé, CTA
+  entièrement visible, scroll naturel).
+- **Divergence corrigée entre `/pricing` et le résultat du diagnostic** —
+  Anthony avait explicitement demandé de vérifier que ces deux endroits ne
+  divergent pas. Le composant `FormuleCard` (teaser "Nos formules" dans
+  `diagnostic-quiz.tsx`, volontairement plus compact, avec un
+  "Recommandé pour toi") a été audité : il utilisait encore l'ancien CTA
+  "Créer mon compte" et un "7 jours offerts" minuscule (`text-[9px]`) —
+  harmonisés avec `/pricing` (même information d'essai, format identique).
+  **Piège découvert en testant** : copier littéralement "Commencer
+  gratuitement" dans cette carte plus étroite (grille 3 colonnes dans un
+  conteneur `max-w-3xl`, donc bien plus resserrée que `/pricing`) faisait
+  déborder le texte hors du bouton `rounded-full` (mesuré : bouton de
+  96px, texte de 110px, aucun retour à la ligne possible sur un mot seul).
+  Résolu par un nouveau prop `size="compact"` sur le composant `Button`
+  partagé (`ui/button.tsx`, padding/texte réduits explicitement plutôt que
+  de tenter de surcharger `px-6`/`text-sm` par une className externe de
+  même spécificité CSS — approche fragile, ordre de sortie Tailwind non
+  garanti) + libellé raccourci à "Commencer" pour ce contexte précis
+  (l'offre complète reste lisible juste en dessous, dans la ligne essai).
+  Le bouton VIP "Réserver via WhatsApp" de ce même teaser avait le même
+  risque de débordement (texte sur 2 lignes dans un pill `rounded-full`,
+  visuellement coupé) — corrigé avec le même `size="compact"`.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Captures
+Playwright à chaque largeur listée ci-dessus, plus une mesure DOM directe
+(`scrollWidth` vs `offsetWidth`) pour confirmer que le débordement du
+bouton "Commencer" était réel avant correction (110px de texte dans 96px
+de bouton) et bien résolu après (96px = 96px, aucun débordement).
+
 ## Phase 5.1 — corrections UX après test utilisateur réel (11/08/2026, nuit)
 
 Brief formel envoyé par Anthony après avoir testé COAI en direct sur

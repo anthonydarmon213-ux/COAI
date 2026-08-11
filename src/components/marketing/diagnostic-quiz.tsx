@@ -323,7 +323,7 @@ function FormuleCard({
 }) {
   return (
     <div
-      className={`flex flex-col gap-3 rounded-xl border p-5 text-left ${
+      className={`flex h-full flex-col gap-3 rounded-xl border p-5 text-left ${
         recommandee ? "border-laiton-400/40 bg-laiton-400/[0.06]" : "border-graphite-800 bg-graphite-900/40"
       }`}
     >
@@ -341,6 +341,10 @@ function FormuleCard({
           </li>
         ))}
       </ul>
+      {/* Espace flexible : aligne les CTA en bas des cartes voisines, même
+          quand les listes de bullets ont des longueurs différentes (cf.
+          correction responsive /pricing, même principe ici). */}
+      <div className="flex-1" />
       <div className="mt-1">{cta}</div>
     </div>
   );
@@ -1277,7 +1281,7 @@ export function DiagnosticQuiz({
               ) : (
                 <div className="flex w-full flex-col gap-4">
                   <SectionLabel>Nos formules</SectionLabel>
-                  <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div className="grid w-full grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
                     {FORMULES.map((formule) => {
                       const recommandee = formule.plan === diagnostic.recommandation.plan;
                       if (formule.plan === "VIP") {
@@ -1293,13 +1297,14 @@ export function DiagnosticQuiz({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={() => trackFunnelEvent("plan_selected", { plan: "VIP" })}
+                                  className="w-full"
                                 >
-                                  <Button variant="secondary" className="w-full">
+                                  <Button variant="secondary" size="compact" className="w-full">
                                     Réserver via WhatsApp
                                   </Button>
                                 </a>
                               ) : (
-                                <Button variant="secondary" className="w-full" disabled>
+                                <Button variant="secondary" size="compact" className="w-full" disabled>
                                   Contacter Anthony
                                 </Button>
                               )
@@ -1313,17 +1318,29 @@ export function DiagnosticQuiz({
                           formule={formule}
                           recommandee={recommandee}
                           cta={
-                            <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-col items-center gap-1.5">
                               <Link
                                 href={signUpHref(formule.plan === "STANDARD")}
                                 onClick={() => handleCreerCompte(formule.plan)}
+                                className="w-full"
                               >
-                                <Button variant={recommandee ? "primary" : "secondary"} className="w-full">
-                                  Créer mon compte
+                                {/* Libellé raccourci par rapport à /pricing ("Commencer
+                                    gratuitement") + size="compact" : cette carte est nettement
+                                    plus étroite (grille à 3 colonnes dans un conteneur max-w-3xl),
+                                    le texte complet débordait visuellement du bouton rounded-full
+                                    même en réduisant le padding. Même offre, même sens (l'essai
+                                    est détaillé juste en dessous), texte adapté à la largeur
+                                    réelle disponible ici. */}
+                                <Button
+                                  variant={recommandee ? "primary" : "secondary"}
+                                  size="compact"
+                                  className="w-full"
+                                >
+                                  Commencer
                                 </Button>
                               </Link>
-                              <span className="text-center font-mono text-[9px] uppercase tracking-[0.1em] text-graphite-600">
-                                7 jours offerts
+                              <span className="text-center text-xs font-medium text-laiton-300">
+                                7 jours offerts · puis {formule.prix}
                               </span>
                             </div>
                           }

@@ -27,10 +27,11 @@ type Tier = {
   nom: string;
   prix: string;
   suffixe: string;
-  // Étiquette courte affichée sous le prix (ex: "7 jours offerts") —
-  // distincte de mostPopular ("Le plus choisi"), qui reste un badge
-  // au-dessus de la carte.
-  badge?: string;
+  // Information d'essai affichée sous le CTA (ex: "7 jours offerts · puis
+  // 19€/mois") — Phase 5.1 (11/08/2026, correction responsive) : déplacée
+  // du haut de carte (peu visible, à côté du prix) vers directement sous le
+  // CTA, là où Anthony voulait qu'elle saute aux yeux.
+  essai?: string;
   description: string;
   features: string[];
   plan?: "STANDARD" | "PREMIUM";
@@ -39,25 +40,37 @@ type Tier = {
   // de bouton d'abonnement Stripe, juste une réservation via WhatsApp.
   sessions?: { label: string; prix: string }[];
   limitedSpots?: boolean;
-  // Palier Entreprise : sur devis, hors Stripe — contact direct (WhatsApp/
-  // mail) et renvoi vers le site dédié (coaching-hybride-anthony).
-  external?: { whatsappHref: string | null; mailHref: string; siteHref: string };
+};
+
+// Palier Entreprise : sur devis, hors Stripe, structurellement différent
+// (contact direct, pas d'abonnement) — sorti du comparateur à 3 colonnes
+// (Phase 5.1, correction responsive) plutôt que compressé en 4e colonne,
+// affiché en bandeau à part sous les 3 offres principales.
+const ENTREPRISE = {
+  nom: "Entreprise",
+  description: "Coaching pour vos équipes et collaborateurs — accompagnement sur-mesure, sur devis.",
+  features: [
+    "Programme adapté à vos équipes (mobilité au poste, gestion de l'énergie, prévention)",
+    "Formules flexibles — ponctuel, régulier, ou intégré à une démarche QVT",
+    "Devis personnalisé selon vos effectifs et vos objectifs",
+  ],
+  whatsappHref: buildWhatsAppLink(
+    "Bonjour Anthony, je vous contacte au sujet d'une offre coaching pour mon entreprise."
+  ),
+  mailHref: `mailto:anthonydarmon213@hotmail.com?subject=${encodeURIComponent("Offre coaching entreprise")}`,
+  siteHref:
+    "http://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/?utm_source=pricing&utm_medium=web&utm_content=carte_entreprise",
 };
 
 const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
-
-const ENTREPRISE_MESSAGE =
-  "Bonjour Anthony, je vous contacte au sujet d'une offre coaching pour mon entreprise.";
-const ENTREPRISE_SITE_HREF =
-  "http://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/?utm_source=pricing&utm_medium=web&utm_content=carte_entreprise";
 
 const TIERS: Tier[] = [
   {
     nom: "Impulsion",
     prix: "19€",
     suffixe: "/mois",
-    badge: "7 jours offerts",
+    essai: "7 jours offerts · puis 19€/mois",
     // Correction Anthony (11/08/2026) : un seul parcours, accès immédiat
     // pendant l'essai — plus de choix essai/paiement immédiat qui cassait
     // la dynamique du diagnostic pour un trafic froid (pub TikTok/Instagram).
@@ -77,8 +90,9 @@ const TIERS: Tier[] = [
     nom: "Transformation",
     prix: "49€",
     suffixe: "/mois",
+    essai: "7 jours offerts · puis 49€/mois",
     description:
-      "7 jours offerts, puis 49€/mois. Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
+      "Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
     features: [
       "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs — pas juste à la génération : ton coach revient vers toi si besoin (plateau, gêne, décrochage) pendant toute la durée de l'accompagnement",
       "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
@@ -113,22 +127,6 @@ const TIERS: Tier[] = [
     ],
     limitedSpots: true,
   },
-  {
-    nom: "Entreprise",
-    prix: "Sur devis",
-    suffixe: "",
-    description: "Coaching pour vos équipes et collaborateurs — accompagnement sur-mesure.",
-    features: [
-      "Programme adapté à vos équipes (mobilité au poste, gestion de l'énergie, prévention)",
-      "Formules flexibles — ponctuel, régulier, ou intégré à une démarche QVT",
-      "Devis personnalisé selon vos effectifs et vos objectifs",
-    ],
-    external: {
-      whatsappHref: buildWhatsAppLink(ENTREPRISE_MESSAGE),
-      mailHref: `mailto:anthonydarmon213@hotmail.com?subject=${encodeURIComponent("Offre coaching entreprise")}`,
-      siteHref: ENTREPRISE_SITE_HREF,
-    },
-  },
 ];
 
 export default function PricingPage() {
@@ -153,35 +151,45 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <div className="grid w-full max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Comparateur à 3 colonnes propres (Phase 5.1, correction responsive
+          11/08/2026) — Entreprise sorti de ce grid (structurellement
+          différent : devis, pas d'abonnement) et affiché en bandeau à part
+          plus bas, plutôt que compressé en 4e colonne. */}
+      <div className="grid w-full max-w-4xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {TIERS.map((tier) => (
           <Card
             key={tier.nom}
-            className={`flex flex-col items-center gap-5 px-6 py-8 text-center ${
+            className={`flex h-full flex-col gap-5 px-6 py-8 text-center ${
               tier.mostPopular ? "border-laiton-400/40" : ""
             }`}
           >
-            {tier.mostPopular && (
-              <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
-                Le plus choisi
-              </span>
-            )}
-            {tier.limitedSpots && <Badge tone="warning">Places limitées</Badge>}
+            {/* 1. Badge éventuel */}
+            <div className="flex min-h-5 items-center justify-center">
+              {tier.mostPopular && (
+                <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
+                  Le plus choisi
+                </span>
+              )}
+              {tier.limitedSpots && <Badge tone="warning">Places limitées</Badge>}
+            </div>
+
+            {/* 2. Nom */}
             <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{tier.nom}</h2>
-            {tier.sessions || tier.external ? (
+
+            {/* 3. Prix */}
+            {tier.sessions ? (
               <p className="text-lg font-semibold text-white">{tier.prix}</p>
             ) : (
-              <div className="flex items-baseline gap-1">
+              <div className="flex items-baseline justify-center gap-1">
                 <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
                 <span className="text-sm text-graphite-400">{tier.suffixe}</span>
               </div>
             )}
-            {tier.badge && (
-              <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
-                {tier.badge}
-              </span>
-            )}
+
+            {/* 4. Description */}
             <p className="text-sm text-graphite-300">{tier.description}</p>
+
+            {/* 5. Liste des bénéfices */}
             <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
               {tier.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-2">
@@ -202,45 +210,69 @@ export default function PricingPage() {
               </ul>
             )}
 
-            {tier.external ? (
-              <div className="flex flex-col items-center gap-2.5">
-                {tier.external.whatsappHref ? (
-                  <a href={tier.external.whatsappHref} target="_blank" rel="noopener noreferrer">
-                    <Button>Demander un devis via WhatsApp</Button>
+            {/* 6. Espace flexible — pousse le CTA en bas, aligné entre
+                cartes voisines de longueurs de contenu différentes, sans
+                jamais imposer de hauteur fixe qui couperait le contenu. */}
+            <div className="flex-1" />
+
+            {/* 7. CTA + 8. information essai */}
+            <div className="flex flex-col items-center gap-2">
+              {tier.sessions ? (
+                vipHref ? (
+                  <a href={vipHref} target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button className="w-full">Réserver via WhatsApp</Button>
                   </a>
                 ) : (
-                  <a href={tier.external.mailHref}>
-                    <Button>Demander un devis par mail</Button>
-                  </a>
-                )}
-                <a
-                  href={tier.external.siteHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-laiton-400 underline hover:text-laiton-300"
-                >
-                  En savoir plus →
-                </a>
-              </div>
-            ) : tier.sessions ? (
-              vipHref ? (
-                <a href={vipHref} target="_blank" rel="noopener noreferrer">
-                  <Button>Réserver via WhatsApp</Button>
-                </a>
+                  <Button className="w-full" disabled>
+                    Contacte ton coach pour réserver
+                  </Button>
+                )
+              ) : tier.plan ? (
+                <SubscribeButton plan={tier.plan} label="Commencer gratuitement" className="w-full" />
               ) : (
-                <Button disabled>Contacte ton coach pour réserver</Button>
-              )
-            ) : tier.plan ? (
-              <SubscribeButton
-                plan={tier.plan}
-                label={tier.plan === "STANDARD" ? "S'abonner — 7 jours offerts" : `S'abonner — ${tier.prix}${tier.suffixe}`}
-              />
-            ) : (
-              <PlanSelectedLink href="/sign-up" plan="GRATUIT" label="Commencer gratuitement" />
-            )}
+                <PlanSelectedLink href="/sign-up" plan="GRATUIT" label="Commencer gratuitement" className="w-full" />
+              )}
+              {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
+            </div>
           </Card>
         ))}
       </div>
+
+      {/* Entreprise : structurellement différent (devis, pas d'abonnement) —
+          bandeau à part plutôt que compressé dans le comparateur 3 colonnes. */}
+      <Card className="flex w-full max-w-4xl flex-col items-center gap-4 px-6 py-8 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+        <div className="flex flex-col gap-2 sm:max-w-md">
+          <h2 className="text-xl font-semibold tracking-[-0.02em] text-white">{ENTREPRISE.nom}</h2>
+          <p className="text-sm text-graphite-300">{ENTREPRISE.description}</p>
+          <ul className="flex flex-col gap-1.5 text-left text-xs leading-5 text-graphite-400">
+            {ENTREPRISE.features.map((feature) => (
+              <li key={feature} className="flex items-start gap-2">
+                <span className="mt-0.5 text-laiton-400">✓</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex shrink-0 flex-col items-center gap-2.5">
+          {ENTREPRISE.whatsappHref ? (
+            <a href={ENTREPRISE.whatsappHref} target="_blank" rel="noopener noreferrer">
+              <Button>Demander un devis via WhatsApp</Button>
+            </a>
+          ) : (
+            <a href={ENTREPRISE.mailHref}>
+              <Button>Demander un devis par mail</Button>
+            </a>
+          )}
+          <a
+            href={ENTREPRISE.siteHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-laiton-400 underline hover:text-laiton-300"
+          >
+            En savoir plus →
+          </a>
+        </div>
+      </Card>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
         L&apos;offre Impulsion (7 jours offerts, carte bancaire requise à l&apos;inscription, puis

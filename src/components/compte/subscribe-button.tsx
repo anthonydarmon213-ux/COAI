@@ -7,9 +7,11 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 export function SubscribeButton({
   plan,
   label,
+  className,
 }: {
   plan: "STANDARD" | "PREMIUM";
   label: string;
+  className?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,8 +43,8 @@ export function SubscribeButton({
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <Button onClick={handleClick} disabled={loading}>
+    <div className="flex w-full flex-col items-center gap-2">
+      <Button onClick={handleClick} disabled={loading} className={className}>
         {loading ? "Redirection…" : label}
       </Button>
       {error && <p className="text-sm text-red-400">{error}</p>}

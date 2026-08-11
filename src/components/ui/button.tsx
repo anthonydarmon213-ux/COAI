@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
 type Variant = "primary" | "secondary" | "ghost";
+type Size = "default" | "compact";
 
 // Primaire brass / secondaire steel outline (spec design system v2).
 const VARIANTS: Record<Variant, string> = {
@@ -9,13 +10,23 @@ const VARIANTS: Record<Variant, string> = {
   ghost: "bg-transparent text-graphite-200 hover:text-laiton-400",
 };
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
+// "compact" : pour les CTA dans des cartes étroites (ex: teaser "Nos
+// formules" du résultat diagnostic) où le padding/texte par défaut déborde
+// du bouton — padding explicitement plus petit plutôt qu'une className
+// externe qui tenterait de surcharger px-6/py-3/text-sm par une classe
+// Tailwind de même spécificité (ordre de sortie non garanti).
+const SIZES: Record<Size, string> = {
+  default: "rounded-full px-6 py-3 text-sm",
+  compact: "rounded-full px-3 py-2 text-xs",
+};
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size };
 
 // Composant de base du design system (palette graphite/laiton + brass/steel).
-export function Button({ className = "", variant = "primary", ...props }: ButtonProps) {
+export function Button({ className = "", variant = "primary", size = "default", ...props }: ButtonProps) {
   return (
     <button
-      className={`rounded-full px-6 py-3 text-sm font-semibold tracking-wide outline-none transition duration-300 hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-acier/40 active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 ${VARIANTS[variant]} ${className}`}
+      className={`font-semibold tracking-wide outline-none transition duration-300 hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-acier/40 active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 ${SIZES[size]} ${VARIANTS[variant]} ${className}`}
       {...props}
     />
   );

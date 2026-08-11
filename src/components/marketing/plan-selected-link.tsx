@@ -12,14 +12,16 @@ export function PlanSelectedLink({
   href,
   plan,
   label,
+  className,
 }: {
   href: string;
   plan: "GRATUIT" | "STANDARD" | "VIP";
   label: string;
+  className?: string;
 }) {
   return (
-    <Link href={href} onClick={() => trackFunnelEvent("plan_selected", { plan })}>
-      <Button>{label}</Button>
+    <Link href={href} onClick={() => trackFunnelEvent("plan_selected", { plan })} className="w-full">
+      <Button className={className}>{label}</Button>
     </Link>
   );
 }
