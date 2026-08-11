@@ -51,7 +51,36 @@ pour le détail/contexte de chaque sujet) :
 - [ ] Statut Apple Pay sur le checkout à essai (0€) — hypothèse
       SetupIntent vs PaymentIntent jamais confirmée ni corrigée
 - [ ] Témoignages/preuves sociales — toujours en attente de vrai contenu
-      client d'Anthony, ne pas fabriquer
+      client d'Anthony, ne pas fabriquer. Vérifié le 11/08/2026 : le
+      formulaire `/avis` existant est privé par design (`model Avis` sans
+      champ de consentement public) — pas réutilisable tel quel pour la
+      homepage. Si Anthony veut avancer : ajouter une case de consentement
+      explicite à `/avis` + une section témoignages publique qui ne se
+      remplit qu'avec les avis consentis (rien à afficher tant qu'aucun
+      abonné n'a coché la case).
+
+## Réassurance page publique (11/08/2026)
+
+Même repêchage qu'au-dessus : patch d'une autre session Cowork (jamais
+poussé), repris et vérifié ici (`tsc` + `build` réels).
+
+En attendant les témoignages consentis (cf. checklist du haut), renforcé ce
+qui ne dépend pas de vrais avis clients — tout est un fait déjà vrai
+ailleurs sur le site (CGV, confidentialité), rien de nouveau promis :
+
+- `src/components/marketing/trust-badges.tsx` (nouveau) : bandeau de badges
+  "Sans engagement", "Résiliable à tout moment", "Coach diplômé d'État",
+  "Paiement sécurisé (Stripe)", "Données hébergées en UE (RGPD)" — ajouté
+  sous les CTA du hero (homepage) et sous le titre de `/pricing`.
+  Volontairement **pas** de "satisfait ou remboursé" : les CGV excluent
+  explicitement le remboursement au prorata et la rétractation sur la
+  période d'essai déjà consommée — en ajouter un aurait contredit le
+  contrat.
+- 2 questions FAQ ajoutées sur la homepage : "Et si mon programme ne me
+  convient pas ?" (réponse honnête : ajustements/régénération, puis
+  résiliation si besoin — pas de promesse de remboursement) et "Mes
+  données sont-elles en sécurité ?" (RGPD/UE, Stripe, export/suppression
+  déjà existants).
 
 ## Rétention : relance étendue + bilan mensuel (11/08/2026)
 

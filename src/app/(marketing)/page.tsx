@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
+import { TrustBadges } from "@/components/marketing/trust-badges";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
 export const metadata: Metadata = {
@@ -39,6 +40,16 @@ const FAQ = [
   {
     question: "Je peux résilier quand je veux ?",
     reponse: "Oui, l'abonnement est sans engagement — tu résilies à tout moment depuis ton compte.",
+  },
+  {
+    question: "Et si mon programme ne me convient pas ?",
+    reponse:
+      "Il évolue avec tes retours (charge, disponibilité, gêne...) — en Transformation, ton coach ajuste directement ; en Impulsion, tu régénères depuis ton profil mis à jour. Et si ça ne te convient toujours pas, tu résilies à tout moment depuis ton compte, sans justification.",
+  },
+  {
+    question: "Mes données sont-elles en sécurité ?",
+    reponse:
+      "Oui — hébergement en UE (RGPD), paiement géré directement par Stripe (COAI ne voit jamais ta carte bancaire), et tu peux exporter ou supprimer tes données à tout moment depuis ton compte.",
   },
 ];
 
@@ -104,6 +115,9 @@ export default function LandingPage() {
           </div>
           <p className="mt-6 flex items-center gap-2 text-sm italic text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />« L&apos;IA génère. Ton coach valide. »</p>
           <p className="mt-2 flex items-center gap-2 text-sm text-graphite-400"><span className="h-1.5 w-1.5 rounded-full bg-laiton-400 shadow-[0_0_10px_#c9a262]" />Ton Coach IA te répond 24h/24, 7j/7 — jamais seul entre deux séances.</p>
+          <div className="mt-6">
+            <TrustBadges />
+          </div>
         </div>
         <div className="relative z-10 flex min-h-[30rem] items-center justify-center lg:min-h-[38rem]">
           <div className="absolute bottom-8 left-1/2 w-[min(92%,30rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 p-6 shadow-2xl backdrop-blur-xl lg:bottom-2 lg:left-auto lg:right-0 lg:translate-x-0">

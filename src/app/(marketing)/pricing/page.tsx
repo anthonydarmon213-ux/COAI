@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
+import { TrustBadges } from "@/components/marketing/trust-badges";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -128,6 +129,9 @@ export default function PricingPage() {
         <h1 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
           Choisis ton niveau d&apos;accompagnement
         </h1>
+        <div className="mt-6 flex justify-center">
+          <TrustBadges />
+        </div>
       </div>
 
       <div className="grid w-full max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
