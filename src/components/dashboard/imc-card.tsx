@@ -57,7 +57,7 @@ export function ImcCard({
   if (!tailleCm || !poidsKg) {
     return (
       <Card className="flex flex-col gap-2">
-        <SectionLabel>Mon IMC</SectionLabel>
+        <SectionLabel>Ton IMC</SectionLabel>
         <p className="text-sm text-graphite-400">
           Renseigne ta taille (profil) et une mesure de poids pour voir ton IMC ici.
         </p>
@@ -74,7 +74,7 @@ export function ImcCard({
   return (
     <Card className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <SectionLabel>Mon IMC</SectionLabel>
+        <SectionLabel>Ton IMC</SectionLabel>
         <p className="font-editorial text-3xl text-graphite-50">{imc.toFixed(1)}</p>
         <p className="text-xs text-graphite-500">D&apos;après ta taille et ton dernier poids enregistré</p>
       </div>
