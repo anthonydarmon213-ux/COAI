@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/client";
 import { collecterSignaux, donneesSuffisantes, type SignauxAdaptation } from "@/lib/adaptation/signals";
+import { collecterSignauxNeat, donneesSuffisantesNeat, type SignauxNeat } from "@/lib/neat/signaux";
 
 export type CoaiInsight = { texte: string; ton: "neutral" | "success" | "warning" };
 
@@ -8,7 +9,7 @@ export type CoaiInsight = { texte: string; ton: "neutral" | "success" | "warning
 // des mêmes signaux que le moteur d'adaptation. Chaque phrase ne cite que
 // des valeurs réellement présentes dans `signaux` — jamais de texte
 // générique qui sous-entendrait une donnée non renseignée.
-function composerDepuisSignaux(signaux: SignauxAdaptation): CoaiInsight {
+function composerDepuisSignaux(signaux: SignauxAdaptation, signauxNeat?: SignauxNeat): CoaiInsight {
   if (!donneesSuffisantes(signaux)) {
     return {
       texte:
@@ -49,6 +50,18 @@ function composerDepuisSignaux(signaux: SignauxAdaptation): CoaiInsight {
     );
   }
 
+  // Phase 3, bloc NEAT (11/08/2026) — priorité la plus basse de l'insight
+  // (après douleur, fatigue/sommeil, entraînement) : ne s'affiche que si
+  // rien de plus prioritaire n'a déjà rempli les 2 phrases retenues, et
+  // jamais si une douleur importante est en cours.
+  if (!douleurImportante && phrases.length < 2 && signauxNeat && donneesSuffisantesNeat(signauxNeat)) {
+    if ((signauxNeat.tendance ?? 0) <= -0.2) {
+      phrases.push("Tu bouges moins que d'habitude en dehors de tes séances cette semaine.");
+    } else if ((signauxNeat.tendance ?? 0) >= 0.2) {
+      phrases.push("Ton activité quotidienne (hors séances) est en hausse en ce moment.");
+    }
+  }
+
   if (phrases.length === 0) {
     phrases.push(
       `${signaux.nombreSeancesRecentes} séance${signaux.nombreSeancesRecentes > 1 ? "s" : ""} loguée${signaux.nombreSeancesRecentes > 1 ? "s" : ""} ces 2 dernières semaines — continue comme ça.`
@@ -75,6 +88,9 @@ export async function getCoaiInsight(userId: string): Promise<CoaiInsight> {
     return { texte: recente.resume, ton };
   }
 
-  const signaux = await collecterSignaux(userId, "ENTRAINEMENT");
-  return composerDepuisSignaux(signaux);
+  const [signaux, signauxNeat] = await Promise.all([
+    collecterSignaux(userId, "ENTRAINEMENT"),
+    collecterSignauxNeat(userId),
+  ]);
+  return composerDepuisSignaux(signaux, signauxNeat);
 }

@@ -10,6 +10,7 @@ import { WatchScreenshotCta } from "@/components/dashboard/watch-screenshot-cta"
 import { ImcCard } from "@/components/dashboard/imc-card";
 import { ConseilsCoach } from "@/components/dashboard/conseils-coach";
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
+import { ActiviteQuotidienneCard } from "@/components/dashboard/activite-quotidienne-card";
 import { CoaiInsightCard } from "@/components/dashboard/coai-insight-card";
 import { AdaptationNotificationCard } from "@/components/dashboard/adaptation-notification-card";
 import { SemaineChangeButton } from "@/components/dashboard/semaine-change-button";
@@ -81,6 +82,8 @@ export default async function DashboardPage() {
       <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
 
       <WeeklyCheckinCard />
+
+      <ActiviteQuotidienneCard />
 
       <WatchScreenshotCta />
 

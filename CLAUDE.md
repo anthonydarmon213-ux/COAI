@@ -4,6 +4,95 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 3, bloc NEAT — activité quotidienne (11/08/2026, nuit)
+
+Demandé par Anthony après validation de la Phase 2 : premier bloc dédié de
+la Phase 3 (activité hors séances — marche, escaliers, temps debout).
+Aucune autre fonction de Phase 3 touchée, aucune régression Phase 1/2
+(vérifié `tsc` + `next build` réels + captures Playwright).
+
+**Résumé** : nouveau modèle `ActiviteJournaliere` (une entrée par jour et
+par utilisateur, jamais écrasée pour les jours passés — seule celle du jour
+peut être corrigée). Carte "Activité quotidienne" sur le dashboard : saisie
+rapide facultative (pas, source, type de journée, type de travail) tant
+qu'aucune entrée n'existe pour le jour, sinon résumé + recommandation.
+Référence personnelle (moyenne 7j/28j, jamais un objectif universel de
+10 000 pas) calculée dès 7 jours renseignés ; en dessous, "COAI apprend
+encore ton niveau d'activité quotidien." Section pédagogique complète ("Ton
+mouvement quotidien compte aussi") + infobulle NEAT ajoutées sur
+`/programme/evolution` (ancre `#neat`, liée depuis la carte dashboard) et
+item "Activité quotidienne" ajouté à "Ce que COAI apprend sur toi" (même
+seuil minimum). Intégré à COAI Insight en dernière priorité (jamais devant
+douleur/fatigue/entraînement). Connecté au mode voyage existant (réutilise
+`ProgrammeGenerated.temporaire` du pilier Entraînement — aucun nouvel état
+à maintenir, retour automatique à la référence habituelle une fois le
+voyage terminé).
+
+**Migration** : `20260811190000_add_activite_journaliere` — additive,
+crée la table `activite_journaliere` + 3 enums (`SourceActivite`,
+`TypeJournee`, `TypeTravail`). S'appliquera automatiquement au prochain
+déploiement grâce à `prisma migrate deploy` (cf. section suivante) — rien
+à coller manuellement dans Supabase cette fois.
+
+**Règles métier (moteur déterministe, `src/lib/neat/recommandation.ts`,
+aucun appel IA)**, par ordre de priorité :
+1. Données insuffisantes (< 7 jours) → aucune recommandation.
+2. Douleur importante signalée récemment → jamais de suggestion d'augmenter
+   la marche, quelle que soit la tendance.
+3. Mode voyage actif → objectif flexible, aucune pénalité de baisse.
+4. Sommeil mauvais / énergie faible / stress élevé → pas d'augmentation
+   simultanée entraînement + NEAT, priorité récupération.
+5. Métier physique déclaré, ou activité déjà nettement au-dessus de la
+   référence perso (+20%) → pas d'ajout arbitraire de pas.
+6. Baisse nette (-20% vs référence) → retour progressif suggéré (marches
+   courtes si contrainte "manque de temps" récente détectée).
+7. Stable (±10%) → message de maintien.
+8. Sinon → petite augmentation progressive suggérée, jamais un chiffre
+   précis à atteindre.
+
+**Garde-fous** : tous les seuils comparent l'utilisateur à SA propre
+moyenne 28 jours, jamais à un seuil absolu — aucune ligne de code ne
+compare à 10 000 pas. Le NEAT n'est jamais formulé comme punition,
+compensation ou obligation calorique (aucun texte du moteur ne mentionne
+un nombre de calories à brûler).
+
+**Simplification assumée** : le point 9 de la demande listait
+"acceptation d'un objectif progressif" parmi les métriques à suivre — pas
+d'implémentée comme action interactive dédiée (bouton "j'accepte") dans ce
+premier passage, la recommandation reste un affichage passif comme les
+autres. Événement `neat_goal_accepted` déclaré dans `product-events.ts`
+mais pas encore déclenché nulle part — à activer si Anthony veut ce bouton
+plus tard. Les autres métriques du point 9 (ouverture de l'explication,
+première saisie, recommandation affichée) sont bien câblées.
+
+**Tests réalisés** : `tsc` + `next build` propres. Page de test temporaire
+(non commitée) avec `fetch` mocké pour couvrir les 8 scénarios (données
+insuffisantes, baisse, stable, déjà élevé/métier physique, voyage, douleur
+importante, augmentation, formulaire de saisie vide) — captures Playwright
+mobile (420px), tooltip vérifié au survol. Pas de test avec de vraies
+données (mêmes limites que d'habitude : pas d'accès direct à Supabase
+depuis ce sandbox).
+
+**Reste à faire par Anthony** : déployer cette branche (la migration
+s'appliquera seule) puis tester en conditions réelles — saisir quelques
+jours de pas, vérifier que la carte dashboard réagit, consulter
+`/programme/evolution#neat`.
+
+## Bug corrigé : animation de chargement du coach IA mal centrée (11/08/2026, nuit)
+
+Signalé par Anthony avec capture. Le pourcentage ("85%") affiché pendant le
+chargement n'était pas positionné en `absolute`, donc traité comme un
+troisième élément du conteneur flex à côté de la photo — ça poussait la
+photo hors du centre pendant que l'anneau de progression (bien en
+`absolute`, lui) restait fixe, créant un décalage visible entre les deux.
+Vérifié par une page de test temporaire reproduisant l'état de chargement
+(captures avant/après) : `src/components/coach/ask-coach.tsx`, une ligne.
+
+## Petites corrections UI (11/08/2026, nuit)
+
+- "Mon IMC" → "Ton IMC" sur le dashboard (incohérence avec le reste du
+  site qui s'adresse à l'abonné en "tu").
+
 ## Migrations Prisma automatisées au déploiement (11/08/2026, nuit)
 
 Demandé par Anthony ("on fait les migrations sur vercel?") après le test de

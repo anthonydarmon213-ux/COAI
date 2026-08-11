@@ -80,6 +80,7 @@ model User {
   whatsappEvents WhatsAppEvent[]
   weeklyCheckins WeeklyCheckin[]
   adaptations    ProgrammeAdaptation[]
+  activitesJournalieres ActiviteJournaliere[]
 
   @@map("users")
 }
@@ -542,4 +543,48 @@ model ProgrammeAdaptation {
 
   @@index([userId, createdAt])
   @@map("programme_adaptations")
+}
+
+// Origine d'une entrée d'activité quotidienne — une estimation venant d'une
+// montre ou d'une capture n'a pas la même fiabilité qu'une saisie manuelle,
+// affiché comme tel côté UI (jamais présenté comme une valeur exacte).
+enum SourceActivite {
+  SAISIE_MANUELLE
+  MONTRE
+  APPLICATION_SANTE
+}
+
+enum TypeJournee {
+  TRAVAIL
+  REPOS
+  VOYAGE
+  WEEKEND
+}
+
+enum TypeTravail {
+  ASSIS
+  MIXTE
+  DEBOUT
+  PHYSIQUE
+}
+
+// Activité quotidienne / NEAT (Phase 3, bloc dédié, 11/08/2026) — une entrée
+// par jour et par utilisateur, jamais écrasée pour les jours passés (seule
+// l'entrée du jour peut être corrigée, via l'upsert sur @@unique). Sert de
+// référence personnelle (moyenne 7j/28j) plutôt que de comparaison à un
+// objectif universel (10 000 pas) — cf. src/lib/neat/signaux.ts.
+model ActiviteJournaliere {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime        @db.Date
+  pas         Int?
+  source      SourceActivite  @default(SAISIE_MANUELLE)
+  typeJournee TypeJournee?
+  typeTravail TypeTravail?
+  createdAt   DateTime        @default(now())
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("activite_journaliere")
 }

@@ -16,7 +16,12 @@ export type ProductEventName =
   | "adaptation_rejected"
   | "travel_mode_started"
   | "travel_mode_finished"
-  | "insight_viewed";
+  | "insight_viewed"
+  | "neat_explanation_opened"
+  | "neat_first_log"
+  | "neat_log_recorded"
+  | "neat_recommendation_shown"
+  | "neat_goal_accepted";
 
 export function trackServerEvent(
   name: ProductEventName,

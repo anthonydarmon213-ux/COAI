@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { buildProfilAppris } from "@/lib/insight/profil-appris";
 import { buildTimeline } from "@/lib/timeline/evenements";
+import { InfoTooltip } from "@/components/ui/tooltip";
+import { trackServerEvent } from "@/lib/analytics/product-events";
 import type { DecisionAdaptation, Pilier, StatutAdaptation } from "@prisma/client";
 
 const PILIER_LABEL: Record<Pilier, string> = {
@@ -56,6 +58,10 @@ export default async function EvolutionPage() {
     buildTimeline(user.id),
   ]);
 
+  // Phase 3, bloc NEAT — visite de cette page = ouverture de l'explication
+  // "Ton mouvement quotidien compte aussi" affichée plus bas.
+  trackServerEvent("neat_explanation_opened", user.id);
+
   const versionsGroupees = versionsParPilier.reduce<Record<Pilier, typeof versionsParPilier>>(
     (acc, v) => {
       acc[v.pilier] = [...(acc[v.pilier] ?? []), v];
@@ -94,6 +100,38 @@ export default async function EvolutionPage() {
             ))}
           </div>
         )}
+      </div>
+
+      <div id="neat" className="flex flex-col gap-3 scroll-mt-8">
+        <div className="flex items-center gap-2">
+          <SectionLabel>Activité quotidienne</SectionLabel>
+          <InfoTooltip text="Le NEAT correspond à toute l'activité réalisée en dehors de tes séances : marche, déplacements, escaliers, tâches quotidiennes et temps passé debout." />
+        </div>
+        <Card className="flex flex-col gap-3">
+          <h2 className="text-base font-semibold text-white">Ton mouvement quotidien compte aussi</h2>
+          <p className="text-sm leading-6 text-graphite-300">
+            Le NEAT représente toute l&apos;activité physique que tu réalises en dehors de tes séances :
+            marcher, prendre les escaliers, rester debout, faire le ménage, jardiner ou simplement te
+            déplacer au cours de la journée.
+          </p>
+          <p className="text-sm leading-6 text-graphite-300">
+            Ces petits mouvements s&apos;accumulent et peuvent jouer un rôle important dans ta dépense
+            énergétique, ta santé et ta progression.
+          </p>
+          <p className="text-sm leading-6 text-graphite-300">
+            COAI ne t&apos;impose pas automatiquement 10 000 pas par jour. Il apprend d&apos;abord ton
+            niveau d&apos;activité habituel, puis te propose une évolution progressive adaptée à ton
+            travail, ton emploi du temps et ta récupération.
+          </p>
+          <p className="text-sm leading-6 text-graphite-300">
+            L&apos;objectif n&apos;est pas de brûler le plus de calories possible. L&apos;objectif est de
+            bouger suffisamment, régulièrement et durablement, sans augmenter ta fatigue ni compromettre
+            tes entraînements.
+          </p>
+          <p className="text-sm font-medium leading-6 text-graphite-100">
+            Tes séances comptent. Tout ce que tu fais entre tes séances compte aussi.
+          </p>
+        </Card>
       </div>
 
       {timeline.length > 0 && (

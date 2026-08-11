@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/client";
 import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
+import { MIN_JOURS_NEAT } from "@/lib/neat/signaux";
 import type { RepasLog, SeanceLog, TestMaxi } from "@prisma/client";
 
 export type ProfilApprisItem = { label: string; valeur: string };
@@ -88,6 +89,15 @@ function adherenceNutrition(repas: RepasLog[]): ProfilApprisItem | null {
   return { label: "Adhérence nutrition", valeur: `${pourcent} %` };
 }
 
+// Phase 3, bloc NEAT (11/08/2026) — activité quotidienne hors séances.
+// Même seuil minimum que le reste du bloc (MIN_JOURS_NEAT) pour rester
+// cohérent avec la carte "Activité quotidienne" du dashboard.
+function activiteQuotidienne(pasParJour: number[]): ProfilApprisItem | null {
+  if (pasParJour.length < MIN_JOURS_NEAT) return null;
+  const moyenne = Math.round(pasParJour.reduce((a, b) => a + b, 0) / pasParJour.length);
+  return { label: "Activité quotidienne", valeur: `~${moyenne} pas / jour en moyenne` };
+}
+
 function zoneASurveiller(seances: SeanceLog[]): ProfilApprisItem | null {
   const compteParZone = new Map<string, number>();
   seances.forEach((s) => {
@@ -107,11 +117,12 @@ function zoneASurveiller(seances: SeanceLog[]): ProfilApprisItem | null {
 export async function buildProfilAppris(userId: string): Promise<ProfilApprisItem[]> {
   const depuis90Jours = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 
-  const [seances, checkins, tests, repas] = await Promise.all([
+  const [seances, checkins, tests, repas, activites] = await Promise.all([
     prisma.seanceLog.findMany({ where: { userId, date: { gte: depuis90Jours } }, orderBy: { date: "asc" } }),
     prisma.weeklyCheckin.findMany({ where: { userId }, orderBy: { semaineDebut: "desc" }, take: 8 }),
     prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "asc" } }),
     prisma.repasLog.findMany({ where: { userId, date: { gte: depuis90Jours } } }),
+    prisma.activiteJournaliere.findMany({ where: { userId, date: { gte: depuis90Jours } } }),
   ]);
 
   const items: ProfilApprisItem[] = [];
@@ -142,6 +153,10 @@ export async function buildProfilAppris(userId: string): Promise<ProfilApprisIte
 
   const adherence = adherenceNutrition(repas);
   if (adherence) items.push(adherence);
+
+  const pasParJour = activites.map((a) => a.pas).filter((v): v is number => v != null);
+  const activite = activiteQuotidienne(pasParJour);
+  if (activite) items.push(activite);
 
   return items;
 }
