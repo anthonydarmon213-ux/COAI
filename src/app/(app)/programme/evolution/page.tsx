@@ -4,9 +4,10 @@ import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { buildProfilAppris } from "@/lib/insight/profil-appris";
+import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
 import { buildTimeline } from "@/lib/timeline/evenements";
 import { InfoTooltip } from "@/components/ui/tooltip";
+import { ProfilIntelligenceSection } from "@/components/programme/profil-intelligence";
 import { trackServerEvent } from "@/lib/analytics/product-events";
 import type { DecisionAdaptation, Pilier, StatutAdaptation } from "@prisma/client";
 
@@ -43,7 +44,7 @@ export default async function EvolutionPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const [adaptations, versionsParPilier, profilAppris, timeline] = await Promise.all([
+  const [adaptations, versionsParPilier, profilIntelligence, timeline] = await Promise.all([
     prisma.programmeAdaptation.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
@@ -54,7 +55,7 @@ export default async function EvolutionPage() {
       orderBy: [{ pilier: "asc" }, { version: "desc" }],
       select: { id: true, pilier: true, version: true, generatedAt: true, statut: true },
     }),
-    buildProfilAppris(user.id),
+    buildProfilIntelligence(user.id),
     buildTimeline(user.id),
   ]);
 
@@ -84,23 +85,7 @@ export default async function EvolutionPage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <SectionLabel>Ce que COAI apprend sur toi</SectionLabel>
-        {profilAppris.length === 0 ? (
-          <Card className="text-sm text-graphite-400">COAI apprend encore à te connaître.</Card>
-        ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {profilAppris.map((item) => (
-              <Card key={item.label} className="flex flex-col gap-1 p-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
-                  {item.label}
-                </span>
-                <span className="text-sm font-semibold text-white">{item.valeur}</span>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+      <ProfilIntelligenceSection profil={profilIntelligence} />
 
       <div id="neat" className="flex flex-col gap-3 scroll-mt-8">
         <div className="flex items-center gap-2">

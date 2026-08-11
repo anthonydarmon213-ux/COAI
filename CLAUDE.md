@@ -4,6 +4,30 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 7 — Mémoire COAI, premier bloc (12/08/2026)
+
+La page `/programme/evolution` rend désormais la mémoire longitudinale
+compréhensible et vérifiable, sans nouvelle table ni appel IA. Elle réutilise
+les séances, check-ins hebdomadaires et quotidiens, tests physiques, repas et
+activité déjà enregistrés.
+
+- jauge de maturité par source (entraînement, récupération, progression,
+  nutrition, activité et Daily), calculée à partir des seuils minimum réels ;
+- chaque conclusion indique sa preuve et son statut « En observation » ou
+  « Établi » ; aucune carte n'apparaît sous le seuil requis ;
+- nouveau signal « Temps disponible habituel » issu des check-ins Daily ;
+- fréquence calculée sur toutes les semaines consécutives observées, y compris
+  celles sans séance, pour ne pas gonfler artificiellement l'habitude ;
+- progression considérée prête uniquement si plusieurs tests concernent le
+  même exercice ;
+- navigation renommée « Mémoire & évolution » ; programme source, adaptations,
+  Stripe et abonnements inchangés.
+
+Vérifié avec TypeScript, ESLint, build Next.js et navigateur réel en 390×844
+et 1440×1000 : aucun débordement, overlay ou loader. Captures :
+`test-results/phase-7-memory-mobile.png` et
+`test-results/phase-7-memory-desktop.png`.
+
 ## Phase 6.1 — Daily COAI / Aujourd'hui (12/08/2026)
 
 Phase 6.1 implémentée sans modifier Stripe, les abonnements, le trial, les
