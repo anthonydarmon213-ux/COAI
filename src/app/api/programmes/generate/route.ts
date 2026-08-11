@@ -64,6 +64,8 @@ export async function POST() {
     objectifs: user.profile?.objectifs,
     niveau: user.profile?.niveau,
     equipementDisponible: user.profile?.equipementDisponible,
+    lieuEntrainement: user.profile?.lieuEntrainement,
+    dureeSeanceMinutes: user.profile?.dureeSeanceMinutes,
     contraintesSante: user.profile?.contraintesSante,
     antecedentsMedicaux: user.profile?.antecedentsMedicaux,
     tailleCm: user.profile?.tailleCm,

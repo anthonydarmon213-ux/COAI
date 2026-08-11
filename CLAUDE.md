@@ -4,6 +4,71 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 5, bloc A — diagnostic enrichi + "COAI a compris de toi" (11/08/2026, nuit)
+
+Démarré par Anthony ("on continue mon brave!" + brief détaillé "PHASE 5 —
+COAI CONVERSION & ONBOARDING INTELLIGENT"). Le brief s'est coupé net dans
+le message d'Anthony au milieu de la section 14 ("REPRISE DU DI...") —
+tout ce qui suit dans le brief original (probablement : reprise du
+diagnostic en cas de refresh, copy exacte du paywall, moments d'upgrade
+contextuels Free→Pro, section 12+ activation détaillée) n'a **jamais été
+reçu**. Ce qui a été livré ce soir est donc un premier bloc solide, pas
+la Phase 5 complète — **à reprendre avec Anthony pour la suite du brief**.
+
+**Audit fait avant de coder** (exigé explicitement par le brief) : le
+quiz public `/diagnostic` (11 étapes), le pont pré-inscription
+(`storage.ts`/`DiagnosticAutofill`, déjà fonctionnel pour survivre à
+refresh/signup), `/bienvenue` (déjà un vrai écran d'activation "salon
+d'embarquement" avec une seule action claire) et `/pricing` (paywall déjà
+value-first) existaient **déjà** et couvraient une bonne partie du brief
+— confirmé qu'aucun de ces éléments n'avait besoin d'être reconstruit,
+seulement complété.
+
+**Ce qui a été ajouté** :
+- **3 nouvelles étapes au quiz** (`src/components/marketing/
+  diagnostic-quiz.tsx`) : lieu d'entraînement (distinct de l'équipement —
+  salle/maison/extérieur/ça dépend), durée de séance visée (30 min → 1h30+),
+  et un step facultatif âge/taille/poids (aucune donnée obligatoire en
+  plus, juste plus de précision si renseignée). Nouveaux champs
+  `Profile.lieuEntrainement`/`Profile.dureeSeanceMinutes` (migration
+  `20260811200000_add_lieu_duree_profil`), branchés dans les prompts de
+  génération d'entraînement (structure + séance) pour que ça influence
+  vraiment le programme (volume dimensionné à la durée réelle), pas juste
+  collecté sans effet. Mêmes champs ajoutés à `profil-form.tsx` (abonnés
+  existants) pour cohérence.
+- **Transition "COAI analyse ton profil"** (nouveau step "analyse", entre
+  email et résultat) — anneau de progression réutilisant l'esthétique déjà
+  validée du coach IA (`coai-loader-arc`), messages qui reflètent ce qui
+  est réellement calculé, auto-avance après ~2,5s.
+- **Résultat redessiné** (`src/lib/diagnostic/mini-diagnostic.ts`) :
+  nouveau titre fixe "Voici ce que COAI a compris de toi.", 5 blocs
+  structurés Objectif/Rythme/Format/Environnement/Frein (calculés à partir
+  des réponses, jamais inventés), paragraphe personnalisé "Ton profil
+  COAI" en une phrase de synthèse, section pitch évolution reprenant
+  l'axe de marque mémorisé la nuit dernière ("COAI n'est pas un générateur
+  de programmes. COAI est un coaching qui apprend..."). Tout le contenu
+  existant (aperçu entraînement/nutrition/récupération, formules, carte
+  fondateur) conservé tel quel, rien retiré.
+
+**Explicitement pas fait** (faute du brief tronqué) : copy exacte du
+paywall si elle devait différer de ce qui existe déjà sur `/pricing`,
+moments d'upgrade Free→Pro contextuels ailleurs que le paywall existant,
+logique de reprise du diagnostic en cas d'abandon en cours de route
+(aujourd'hui : recommencer à zéro si on quitte avant l'étape email).
+
+**Vérifié** : `tsc` + `next build` réels. Captures Playwright mobile
+(390px, parcours complet des 14 étapes) et desktop (1280px, page complète
+du résultat) — endpoint `/api/diagnostic-lead` mocké pour le test
+(sandbox sans accès réseau sortant pour l'envoi d'email, comportement
+attendu, cf. sections plus bas). Aucune régression visuelle sur le reste
+du quiz (formules, carte fondateur, reassurance coach).
+
+**Reste à faire par Anthony** : renvoyer la suite du brief Phase 5 (à
+partir de la section 14) pour compléter ce bloc, puis appliquer la
+migration `20260811200000_add_lieu_duree_profil` en prod (automatique au
+prochain déploiement grâce à `prisma migrate deploy`, rien à coller
+manuellement).
+
 ## Roadmap Phases 5-10 (11/08/2026, nuit)
 
 Suite envisagée par Anthony après les Phases 1-4 (programme évolutif) et

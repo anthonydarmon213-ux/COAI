@@ -131,6 +131,8 @@ function buildProfilUtilisateur(
     objectifs: profile?.objectifs,
     niveau: profile?.niveau,
     equipementDisponible: profile?.equipementDisponible,
+    lieuEntrainement: profile?.lieuEntrainement,
+    dureeSeanceMinutes: profile?.dureeSeanceMinutes,
     contraintesSante: profile?.contraintesSante,
     antecedentsMedicaux: profile?.antecedentsMedicaux,
     tailleCm: profile?.tailleCm,

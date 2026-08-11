@@ -138,6 +138,15 @@ model Profile {
   objectifs             String?
   niveau                String?
   equipementDisponible  String?
+  // Lieu d'entraînement habituel — distinct de l'équipement (Phase 5,
+  // 11/08/2026) : deux personnes peuvent avoir le même matériel disponible
+  // mais un lieu différent (ex: extérieur vs salle), ce qui change la
+  // structure du programme (temps de trajet, disponibilité, ambiance).
+  lieuEntrainement      String?
+  // Durée de séance visée, en minutes (Phase 5, 11/08/2026) — la génération
+  // de programme utilisait jusque-là une durée implicite non renseignée par
+  // l'utilisateur.
+  dureeSeanceMinutes    Int?
   contraintesSante      String?
   antecedentsMedicaux   String?
   tailleCm              Float?

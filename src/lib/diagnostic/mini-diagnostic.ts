@@ -19,6 +19,8 @@ export type ReponsesDiagnostic = {
   niveau?: string | null;
   objectif?: string | null;
   equipement?: string[];
+  lieu?: string | null;
+  duree?: string | null;
   frequence?: string | null;
   habitudesAlimentaires?: string | null;
   qualiteSommeil?: string | null;
@@ -93,6 +95,16 @@ export const SOMMEIL_TIPS: Record<string, string> = {
     "Excellent terrain pour progresser — peu de monde a cette régularité, c'est un vrai avantage.",
 };
 
+// Bloc "Voici ce que COAI a compris de toi" (Phase 5, 11/08/2026) — chaque
+// champ vient directement d'une réponse au quiz, jamais inventé.
+export type ProfilStructure = {
+  objectif: string;
+  rythme: string;
+  format: string;
+  environnement: string;
+  frein: string | null;
+};
+
 export type MiniDiagnostic = {
   titre: string;
   accroche: string;
@@ -103,7 +115,55 @@ export type MiniDiagnostic = {
   nutrition: string | null;
   recuperation: string | null;
   recommandation: { plan: "GRATUIT" | "STANDARD"; label: string; raison: string };
+  profil: ProfilStructure;
+  profilParagraphe: string;
+  pitchEvolution: string;
 };
+
+// Reprend l'axe de marque retenu par Anthony (11/08/2026, en mémoire dans
+// CLAUDE.md) : COAI n'est pas un générateur one-shot, la promesse tient sur
+// la durée grâce au moteur d'adaptation réel (Phases 1-3), pas juste un
+// argument marketing.
+export const PITCH_EVOLUTION =
+  "COAI n'est pas un générateur de programmes. COAI est un coaching qui apprend. Plus COAI te connaît, meilleur devient ton coaching. Ce diagnostic n'est qu'un point de départ : ton vrai programme, une fois créé, s'ajuste à chaque séance, chaque check-in, chaque changement dans ta vie.";
+
+const FREIN_PAR_PERSONA: Record<string, string> = {
+  "Je ne sais pas quoi faire à la salle": "Pas de structure claire à suivre",
+  "Je suis plutôt sédentaire": "Manque de régularité pour démarrer",
+  "Je m'entraîne à la maison, sans structure": "Pas de plan structuré",
+  "Même programme depuis des années, sans résultat": "Plateau de progression",
+  "Je veux progresser sans me blesser": "Prudence à avoir sur les blessures",
+};
+
+function calculerFrein(persona: string[], sante: string[]): string | null {
+  const freins: string[] = [];
+  const freinPersona = persona.map((p) => FREIN_PAR_PERSONA[p]).find(Boolean);
+  if (freinPersona) freins.push(freinPersona);
+  if (sante.length > 0) freins.push(`Contrainte physique à ménager (${sante.join(", ")})`);
+  return freins.length > 0 ? freins.join(" + ") : null;
+}
+
+function calculerProfilStructure(r: ReponsesDiagnostic, sante: string[]): ProfilStructure {
+  const frequenceLabel = r.frequence ?? "Rythme à définir";
+  const rythme = r.duree ? `${frequenceLabel}, ${r.duree.toLowerCase()} par séance` : frequenceLabel;
+  const formatLabel = (SPLIT_PAR_FREQUENCE[r.frequence ?? ""] ?? "").split(" — ")[0];
+  const environnement = r.lieu ?? r.equipement?.[0] ?? "Non renseigné";
+  return {
+    objectif: r.objectif ?? "Non renseigné",
+    rythme,
+    format: formatLabel || "À déterminer selon ton profil complet",
+    environnement,
+    frein: calculerFrein(r.persona ?? [], sante),
+  };
+}
+
+function construireProfilParagraphe(r: ReponsesDiagnostic, profil: ProfilStructure): string {
+  const niveauTxt = r.niveau ? r.niveau.toLowerCase() : "ton niveau";
+  const rythmeTxt = profil.rythme.toLowerCase();
+  const environnementTxt = profil.environnement.toLowerCase();
+  const freinTxt = profil.frein ? ` Ton frein principal aujourd'hui : ${profil.frein.toLowerCase()}.` : "";
+  return `Tu es ${niveauTxt}, avec l'objectif de ${profil.objectif.toLowerCase()}. Tu comptes t'entraîner ${rythmeTxt}, principalement dans cet environnement : ${environnementTxt}.${freinTxt} C'est exactement ce que COAI utilise pour construire — puis faire évoluer — ton programme.`;
+}
 
 // Message sur le délai de résultats — volontairement identique pour tout le
 // monde plutôt que fragmenté par niveau (demande d'Anthony du 11/08 d'être
@@ -168,6 +228,8 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
         raison: "Ton profil n'a pas de signal particulier — de quoi démarrer efficacement, sans surpayer.",
       };
 
+  const profil = calculerProfilStructure(r, sante);
+
   return {
     titre: `Profil ${niveau.toLowerCase()} — objectif ${objectif.toLowerCase()}`,
     accroche: accrochePour(persona),
@@ -178,6 +240,9 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
     nutrition: r.habitudesAlimentaires ? NUTRITION_TIPS[r.habitudesAlimentaires] ?? null : null,
     recuperation: r.qualiteSommeil ? SOMMEIL_TIPS[r.qualiteSommeil] ?? null : null,
     recommandation,
+    profil,
+    profilParagraphe: construireProfilParagraphe(r, profil),
+    pitchEvolution: PITCH_EVOLUTION,
   };
 }
 
@@ -187,6 +252,8 @@ export function miniDiagnosticEnTexte(d: MiniDiagnostic, appUrl: string): string
     `${d.titre}.`,
     "",
     d.accroche,
+    "",
+    d.profilParagraphe,
   ];
   if (d.alerte) lignes.push("", d.alerte);
   if (d.pointsATravailler.length > 0) {

@@ -26,6 +26,8 @@ de chaque séance sera généré séparément ensuite, ne le fais pas ici).
 Objectifs : ${profil.objectifs ?? "non renseignés"}
 Niveau : ${profil.niveau ?? "non renseigné"}
 Équipement disponible : ${profil.equipementDisponible ?? "non renseigné"}
+Lieu d'entraînement habituel : ${profil.lieuEntrainement ?? "non renseigné"}
+Durée de séance visée : ${profil.dureeSeanceMinutes ? `${profil.dureeSeanceMinutes} minutes` : "non renseignée"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
@@ -44,7 +46,9 @@ ${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du programme précéd
 
 Détermine la fréquence hebdomadaire adaptée au niveau et à la fréquence actuelle (ne pas repartir
 de zéro si la personne s'entraîne déjà). Complète les sports déjà pratiqués plutôt que de les
-dupliquer inutilement dans le programme.
+dupliquer inutilement dans le programme. Si une durée de séance visée est renseignée, dimensionne
+le volume (nombre d'exercices, séries) de chaque séance pour qu'elle tienne réellement dans ce
+temps — ne compte pas sur des séances plus longues que ce que la personne a dit pouvoir tenir.
 
 Réponds uniquement avec ce JSON (rien d'autre) :
 {

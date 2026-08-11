@@ -8,6 +8,8 @@ const bodySchema = z.object({
   objectifs: z.string().max(1000).optional(),
   niveau: z.string().max(100).optional(),
   equipementDisponible: z.string().max(1000).optional(),
+  lieuEntrainement: z.string().max(200).optional(),
+  dureeSeanceMinutes: z.number().int().positive().max(240).optional(),
   contraintesSante: z.string().max(1000).optional(),
   antecedentsMedicaux: z.string().max(2000).optional(),
   tailleCm: z.number().positive().max(300).optional(),

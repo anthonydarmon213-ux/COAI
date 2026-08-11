@@ -8,6 +8,8 @@ export type ProfilUtilisateur = {
   objectifs?: string | null;
   niveau?: string | null;
   equipementDisponible?: string | null;
+  lieuEntrainement?: string | null;
+  dureeSeanceMinutes?: number | null;
   contraintesSante?: string | null;
   antecedentsMedicaux?: string | null;
   tailleCm?: number | null;

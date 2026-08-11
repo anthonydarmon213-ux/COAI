@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,33 @@ const EQUIPEMENTS = [
 
 // Alignés sur l'enum frequenceEntrainement de /api/profil.
 const FREQUENCES = ["2 fois par semaine", "3 fois par semaine", "4 fois par semaine", "5 fois ou plus par semaine"];
+
+// Lieu d'entraînement (Phase 5, 11/08/2026) — distinct de l'équipement :
+// deux personnes peuvent avoir le même matériel mais un lieu différent
+// (salle vs maison vs extérieur), ce qui change la structure du programme
+// (trajet, disponibilité, ambiance). Alignés sur profil-form.tsx.
+const LIEUX = ["Salle de sport", "À la maison", "En extérieur", "Ça dépend des jours"];
+
+// Durée de séance visée (Phase 5, 11/08/2026) — jusque-là jamais demandée,
+// la génération de programme utilisait une durée implicite non renseignée.
+const DUREES = ["30 minutes", "45 minutes", "1 heure", "1h30 ou plus"];
+// Valeur numérique envoyée à Profile.dureeSeanceMinutes (1h30 ou plus → 90,
+// valeur plancher plutôt qu'une fourchette non représentable en Int).
+const DUREE_EN_MINUTES: Record<string, number> = {
+  "30 minutes": 30,
+  "45 minutes": 45,
+  "1 heure": 60,
+  "1h30 ou plus": 90,
+};
+
+// Messages du step "analyse" (Phase 5, 11/08/2026) — reflètent ce qui est
+// réellement fait avec les réponses (calcul du split, du format...), pas du
+// texte générique type "chargement...".
+const ANALYSE_MESSAGES = [
+  "Analyse de ton objectif...",
+  "Calcul de ton format d'entraînement...",
+  "Personnalisation de ton profil...",
+];
 
 const CONTRAINTES = [AUCUNE_DOULEUR_LABEL, "Dos", "Genoux", "Épaules", "Grossesse / post-partum", AUTRE_LABEL];
 
@@ -107,13 +134,17 @@ type Step =
   | "niveau"
   | "objectif"
   | "equipement"
+  | "lieu"
+  | "duree"
   | "frequence"
   | "sport"
   | "sexe"
+  | "profilPhysique"
   | "alimentation"
   | "sommeil"
   | "sante"
   | "email"
+  | "analyse"
   | "result";
 // Ordonné pour couvrir explicitement les 3 piliers COAI (entraînement,
 // nutrition, récupération) plutôt que de s'arrêter à l'entraînement —
@@ -121,14 +152,23 @@ type Step =
 // "email" est la dernière étape, juste avant la révélation : c'est le
 // moment où la personne a le plus investi, donc le plus disposée à le
 // laisser (cf. effet IKEA / coût irrécupérable).
+// "lieu"/"duree" (Phase 5, 11/08/2026) : lieu distinct de l'équipement,
+// durée de séance visée — deux infos jusque-là jamais demandées.
+// "profilPhysique" regroupe âge/taille/poids en une seule étape, tous
+// facultatifs (peu de friction, mais utile pour un aperçu plus précis).
+// "analyse" (Phase 5) : moment de transition avant la révélation, pas une
+// vraie question — exclu de la barre de progression comme "result".
 const QUESTION_STEPS: Step[] = [
   "persona",
   "niveau",
   "objectif",
   "equipement",
+  "lieu",
+  "duree",
   "frequence",
   "sport",
   "sexe",
+  "profilPhysique",
   "alimentation",
   "sommeil",
   "sante",
@@ -270,9 +310,14 @@ export function DiagnosticQuiz() {
   const [niveau, setNiveau] = useState<string | null>(null);
   const [objectif, setObjectif] = useState<string | null>(null);
   const [equipement, setEquipement] = useState<string[]>([]);
+  const [lieu, setLieu] = useState<string | null>(null);
+  const [duree, setDuree] = useState<string | null>(null);
   const [frequence, setFrequence] = useState<string | null>(null);
   const [sport, setSport] = useState<string[]>([]);
   const [sexe, setSexe] = useState<string | null>(null);
+  const [age, setAge] = useState("");
+  const [tailleCm, setTailleCm] = useState("");
+  const [poidsKg, setPoidsKg] = useState("");
   const [habitudesAlimentaires, setHabitudesAlimentaires] = useState<string | null>(null);
   const [qualiteSommeil, setQualiteSommeil] = useState<string | null>(null);
   const [sante, setSante] = useState<string[]>([]);
@@ -305,33 +350,59 @@ export function DiagnosticQuiz() {
     });
   }
 
+  const STEP_ORDER: Step[] = ["intro", ...QUESTION_STEPS, "analyse", "result"];
+
   function goNext() {
-    const order: Step[] = ["intro", ...QUESTION_STEPS, "result"];
-    const i = order.indexOf(step);
-    const target = order[i + 1];
+    const i = STEP_ORDER.indexOf(step);
+    const target = STEP_ORDER[i + 1];
     if (target) setStep(target);
   }
   function goBack() {
-    const order: Step[] = ["intro", ...QUESTION_STEPS, "result"];
-    const i = order.indexOf(step);
-    const target = order[i - 1];
+    const i = STEP_ORDER.indexOf(step);
+    // "analyse" n'est pas une vraie étape (rien à corriger) : "Retour" depuis
+    // "result" n'existe pas (pas de bouton nav sur ce step), et "analyse"
+    // enchaîne automatiquement vers "result" sans jamais s'arrêter dessus.
+    const target = STEP_ORDER[i - 1];
     if (target) setStep(target);
   }
+
+  // "COAI analyse ton profil" (Phase 5, 11/08/2026) : moment de transition
+  // volontaire avant la révélation — la personne vient de répondre à 14
+  // questions, ce court passage matérialise le "travail" fait sur ses
+  // réponses plutôt qu'un résultat qui apparaît instantanément.
+  const [analyseIndex, setAnalyseIndex] = useState(0);
+  useEffect(() => {
+    if (step !== "analyse") return;
+    setAnalyseIndex(0);
+    const stepDuration = 750;
+    const messageInterval = setInterval(() => {
+      setAnalyseIndex((i) => (i + 1 < ANALYSE_MESSAGES.length ? i + 1 : i));
+    }, stepDuration);
+    const advance = setTimeout(goNext, stepDuration * ANALYSE_MESSAGES.length + 300);
+    return () => {
+      clearInterval(messageInterval);
+      clearTimeout(advance);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   const canContinue = useMemo(() => {
     if (step === "persona") return persona.length > 0;
     if (step === "niveau") return Boolean(niveau);
     if (step === "objectif") return Boolean(objectif);
     if (step === "equipement") return equipement.length > 0;
+    if (step === "lieu") return Boolean(lieu);
+    if (step === "duree") return Boolean(duree);
     if (step === "frequence") return Boolean(frequence);
     if (step === "sport") return true; // peut n'en pratiquer aucun
     if (step === "sexe") return Boolean(sexe);
+    if (step === "profilPhysique") return true; // âge/taille/poids facultatifs
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
     if (step === "email") return isValidEmail(email) && consentEmail;
     return true;
-  }, [step, persona, niveau, objectif, equipement, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
+  }, [step, persona, niveau, objectif, equipement, lieu, duree, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
 
   // Même logique que l'email envoyé au lead (/api/diagnostic-lead) — extraite
   // dans lib/diagnostic/mini-diagnostic.ts pour garantir que les deux disent
@@ -343,12 +414,27 @@ export function DiagnosticQuiz() {
         niveau,
         objectif,
         equipement,
+        lieu,
+        duree,
         frequence,
         habitudesAlimentaires,
         qualiteSommeil,
         sante: resolveAutre(sante, santeAutreTexte),
       }),
-    [persona, personaAutreTexte, niveau, objectif, equipement, frequence, habitudesAlimentaires, qualiteSommeil, sante, santeAutreTexte]
+    [
+      persona,
+      personaAutreTexte,
+      niveau,
+      objectif,
+      equipement,
+      lieu,
+      duree,
+      frequence,
+      habitudesAlimentaires,
+      qualiteSommeil,
+      sante,
+      santeAutreTexte,
+    ]
   );
 
   function signUpHref(standard: boolean): string {
@@ -371,12 +457,17 @@ export function DiagnosticQuiz() {
       niveau: niveau ?? undefined,
       objectifs: [objectif, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
+      lieuEntrainement: lieu ?? undefined,
+      dureeSeanceMinutes: duree ? DUREE_EN_MINUTES[duree] : undefined,
       frequenceEntrainement: frequence ?? undefined,
       contraintesSante: santeReelle.length ? santeReelle.join(", ") : undefined,
       sexe: sexe ?? undefined,
       sportsPratiques: sportResolu.length ? sportResolu.join(", ") : undefined,
       habitudesAlimentaires: habitudesAlimentaires ?? undefined,
       qualiteSommeil: qualiteSommeil ?? undefined,
+      age: age ? Number(age) : undefined,
+      tailleCm: tailleCm ? Number(tailleCm) : undefined,
+      poidsKg: poidsKg ? Number(poidsKg) : undefined,
     });
   }
 
@@ -396,9 +487,14 @@ export function DiagnosticQuiz() {
             niveau,
             objectif,
             equipement,
+            lieu,
+            duree,
             frequence,
             sport: resolveAutre(sport, sportAutreTexte),
             sexe,
+            age: age ? Number(age) : undefined,
+            tailleCm: tailleCm ? Number(tailleCm) : undefined,
+            poidsKg: poidsKg ? Number(poidsKg) : undefined,
             habitudesAlimentaires,
             qualiteSommeil,
             sante: resolveAutre(sante, santeAutreTexte),
@@ -424,7 +520,7 @@ export function DiagnosticQuiz() {
   return (
     <div className={`mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-3xl" : "max-w-lg"}`}>
       <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_-48px_rgba(0,0,0,0.9)]">
-        {step !== "intro" && step !== "result" && (
+        {step !== "intro" && step !== "result" && step !== "analyse" && (
           <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
               Étape {stepIndex + 1}/{QUESTION_STEPS.length}
@@ -454,7 +550,7 @@ export function DiagnosticQuiz() {
                 Commencer
               </Button>
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-graphite-600">
-                ≈ 90 secondes
+                ≈ 2 minutes
               </span>
             </div>
           )}
@@ -524,6 +620,36 @@ export function DiagnosticQuiz() {
             </div>
           )}
 
+          {step === "lieu" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Où t&apos;entraînes-tu le plus souvent ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">
+                  Distinct de ton équipement — ça change la structure du programme.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {LIEUX.map((l) => (
+                  <OptionCard key={l} label={l} active={lieu === l} onClick={() => setLieu(l)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === "duree" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Combien de temps par séance ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Ce que tu peux vraiment tenir, pas ce que tu voudrais.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {DUREES.map((d) => (
+                  <OptionCard key={d} label={d} active={duree === d} onClick={() => setDuree(d)} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {step === "frequence" && (
             <div className="flex flex-col gap-4">
               <div>
@@ -572,6 +698,40 @@ export function DiagnosticQuiz() {
                 {SEXES.map((s) => (
                   <OptionCard key={s} label={s} active={sexe === s} onClick={() => setSexe(s)} />
                 ))}
+              </div>
+            </div>
+          )}
+
+          {step === "profilPhysique" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Quelques repères physiques ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">
+                  Facultatif — sert à affiner tes repères caloriques et de charge. Tu peux passer.
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  placeholder="Âge"
+                />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  value={tailleCm}
+                  onChange={(e) => setTailleCm(e.target.value)}
+                  placeholder="Taille (cm)"
+                />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  value={poidsKg}
+                  onChange={(e) => setPoidsKg(e.target.value)}
+                  placeholder="Poids (kg)"
+                />
               </div>
             </div>
           )}
@@ -656,19 +816,65 @@ export function DiagnosticQuiz() {
             </div>
           )}
 
+          {step === "analyse" && (
+            <div className="flex flex-col items-center gap-6 py-10 text-center">
+              <div className="relative flex h-24 w-24 items-center justify-center">
+                <svg width="96" height="96" viewBox="0 0 120 120" fill="none" className="absolute inset-0" aria-hidden="true">
+                  <circle cx="60" cy="60" r="44" stroke="#26282d" strokeWidth="6" />
+                  <circle
+                    className="coai-loader-arc"
+                    cx="60"
+                    cy="60"
+                    r="44"
+                    stroke="#c9a262"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray="90 190"
+                    transform="rotate(-90 60 60)"
+                  />
+                </svg>
+                <span className="font-display text-2xl font-semibold text-white">COAI</span>
+              </div>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
+                COAI analyse ton profil
+              </p>
+              <p className="text-sm text-graphite-400">{ANALYSE_MESSAGES[analyseIndex]}</p>
+            </div>
+          )}
+
           {step === "result" && diagnostic && (
             <div className="flex flex-col items-center gap-7 py-2 text-center">
               <div className="flex flex-col items-center gap-3">
                 <SectionLabel>Ton diagnostic</SectionLabel>
                 <h2 className="coai-gradient-text font-display text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-4xl">
-                  {diagnostic.titre}.
+                  Voici ce que COAI a compris de toi.
                 </h2>
-                <p className="max-w-md text-sm leading-6 text-graphite-300">{diagnostic.accroche}</p>
+                <p className="max-w-md text-sm leading-6 text-graphite-300">{diagnostic.profilParagraphe}</p>
                 {diagnostic.alerte && (
                   <p className="max-w-md rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
                     {diagnostic.alerte}
                   </p>
                 )}
+              </div>
+
+              <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-5">
+                {[
+                  { label: "Objectif", valeur: diagnostic.profil.objectif },
+                  { label: "Rythme", valeur: diagnostic.profil.rythme },
+                  { label: "Format", valeur: diagnostic.profil.format },
+                  { label: "Environnement", valeur: diagnostic.profil.environnement },
+                  ...(diagnostic.profil.frein ? [{ label: "Frein", valeur: diagnostic.profil.frein }] : []),
+                ].map((bloc) => (
+                  <div
+                    key={bloc.label}
+                    className="flex flex-col gap-1 rounded-xl border border-graphite-800 bg-graphite-900/40 px-3 py-3 text-left"
+                  >
+                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-graphite-500">
+                      {bloc.label}
+                    </span>
+                    <span className="text-xs font-medium leading-5 text-white">{bloc.valeur}</span>
+                  </div>
+                ))}
               </div>
 
               {diagnostic.pointsATravailler.length > 0 && (
@@ -707,6 +913,11 @@ export function DiagnosticQuiz() {
               </div>
 
               <p className="max-w-lg text-sm leading-6 text-laiton-200">{RESULTATS_TIMELINE}</p>
+
+              <div className="flex w-full flex-col gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
+                <SectionLabel>Ce que tu viens de voir n&apos;est qu&apos;un début</SectionLabel>
+                <p className="text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
+              </div>
 
               <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-5 text-left sm:flex-row sm:items-center sm:gap-5">
                 <span className="text-2xl">🎯</span>
@@ -825,7 +1036,7 @@ export function DiagnosticQuiz() {
           )}
         </div>
 
-        {step !== "intro" && step !== "result" && (
+        {step !== "intro" && step !== "result" && step !== "analyse" && (
           <div className="flex items-center justify-between border-t border-white/[0.06] px-6 py-4">
             <button
               type="button"

@@ -16,6 +16,7 @@ d'entraînement personnalisé pour cet utilisateur.
 Objectifs : ${profil.objectifs ?? "non renseignés"}
 Niveau : ${profil.niveau ?? "non renseigné"}
 Équipement disponible : ${profil.equipementDisponible ?? "non renseigné"}
+Durée de séance visée : ${profil.dureeSeanceMinutes ? `${profil.dureeSeanceMinutes} minutes` : "non renseignée"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}

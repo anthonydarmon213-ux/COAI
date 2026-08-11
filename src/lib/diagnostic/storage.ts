@@ -10,12 +10,17 @@ export type DiagnosticAnswers = {
   niveau?: string;
   objectifs?: string;
   equipementDisponible?: string;
+  lieuEntrainement?: string;
+  dureeSeanceMinutes?: number;
   frequenceEntrainement?: string;
   contraintesSante?: string;
   sexe?: string;
   sportsPratiques?: string;
   habitudesAlimentaires?: string;
   qualiteSommeil?: string;
+  age?: number;
+  tailleCm?: number;
+  poidsKg?: number;
 };
 
 export function storeDiagnosticAnswers(answers: DiagnosticAnswers): void {

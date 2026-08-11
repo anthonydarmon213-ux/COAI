@@ -64,6 +64,22 @@ const EQUIPEMENTS = [
   "Aucun équipement",
 ];
 
+// Alignés sur diagnostic-quiz.tsx (Phase 5, 11/08/2026).
+const LIEUX = ["Salle de sport", "À la maison", "En extérieur", "Ça dépend des jours"];
+const DUREES = ["30 minutes", "45 minutes", "1 heure", "1h30 ou plus"];
+const DUREE_EN_MINUTES: Record<string, number> = {
+  "30 minutes": 30,
+  "45 minutes": 45,
+  "1 heure": 60,
+  "1h30 ou plus": 90,
+};
+const MINUTES_EN_DUREE: Record<number, string> = {
+  30: "30 minutes",
+  45: "45 minutes",
+  60: "1 heure",
+  90: "1h30 ou plus",
+};
+
 const HABITUDES_ALIMENTAIRES = [
   "Repas structurés et équilibrés",
   "Grignotage fréquent / repas irréguliers",
@@ -141,6 +157,8 @@ type Profil = {
   objectifs?: string | null;
   niveau?: string | null;
   equipementDisponible?: string | null;
+  lieuEntrainement?: string | null;
+  dureeSeanceMinutes?: number | null;
   contraintesSante?: string | null;
   antecedentsMedicaux?: string | null;
   tailleCm?: number | null;
@@ -180,6 +198,10 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   const [niveau, setNiveau] = useState(profil.niveau ?? "");
   const [equipementDisponible, setEquipementDisponible] = useState<string[]>(
     parseMultiSelect(profil.equipementDisponible)
+  );
+  const [lieuEntrainement, setLieuEntrainement] = useState(profil.lieuEntrainement ?? "");
+  const [dureeSeance, setDureeSeance] = useState(
+    profil.dureeSeanceMinutes ? MINUTES_EN_DUREE[profil.dureeSeanceMinutes] ?? "" : ""
   );
   const [contraintesSante, setContraintesSante] = useState(profil.contraintesSante ?? "");
   const [antecedentsMedicaux, setAntecedentsMedicaux] = useState<string[]>(
@@ -312,6 +334,8 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           objectifs,
           niveau: niveau || undefined,
           equipementDisponible: equipementDisponible.length ? equipementDisponible.join(", ") : undefined,
+          lieuEntrainement: lieuEntrainement || undefined,
+          dureeSeanceMinutes: dureeSeance ? DUREE_EN_MINUTES[dureeSeance] : undefined,
           contraintesSante,
           antecedentsMedicaux: antecedentsMedicaux.length ? antecedentsMedicaux.join(", ") : undefined,
           tailleCm: tailleCm ? Number(tailleCm) : undefined,
@@ -468,6 +492,26 @@ export function ProfilForm({ profil }: { profil: Profil }) {
         </Field>
         <Field label="Équipement disponible (coche tout ce qui s'applique)">
           <ToggleChips options={EQUIPEMENTS} selected={equipementDisponible} onToggle={toggleEquipement} />
+        </Field>
+        <Field label="Lieu d'entraînement habituel">
+          <Select value={lieuEntrainement} onChange={(e) => setLieuEntrainement(e.target.value)}>
+            <option value="">Non renseigné</option>
+            {LIEUX.map((l) => (
+              <option key={l} value={l}>
+                {l}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Durée de séance visée">
+          <Select value={dureeSeance} onChange={(e) => setDureeSeance(e.target.value)}>
+            <option value="">Non renseignée</option>
+            {DUREES.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </Select>
         </Field>
 
         <SectionLabel>Santé & morphologie</SectionLabel>
