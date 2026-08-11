@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
-import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL } from "@/lib/diagnostic/mini-diagnostic";
+import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
 import { Badge } from "@/components/ui/badge";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
@@ -659,6 +660,26 @@ export function DiagnosticQuiz() {
                 )}
               </div>
 
+              {diagnostic.pointsATravailler.length > 0 && (
+                <div className="w-full rounded-xl border border-graphite-800 bg-graphite-900/50 px-5 py-4 text-left">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                    Ce qui freine ta progression aujourd&apos;hui
+                  </span>
+                  <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
+                    {diagnostic.pointsATravailler.map((p) => (
+                      <li key={p} className="flex items-start gap-2">
+                        <span className="mt-0.5 text-acier">✕</span>
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-sm leading-6 text-graphite-200">
+                    <span className="font-semibold text-white">COAI corrige ces points un par un</span> —
+                    voici comment, avec le programme ci-dessous.
+                  </p>
+                </div>
+              )}
+
               <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
                 <VoletCard label="Entraînement">
                   {diagnostic.split && <p>{diagnostic.split}</p>}
@@ -674,14 +695,17 @@ export function DiagnosticQuiz() {
                 {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
               </div>
 
+              <p className="max-w-lg text-sm leading-6 text-laiton-200">{RESULTATS_TIMELINE}</p>
+
               <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-5 text-left sm:flex-row sm:items-center sm:gap-5">
                 <span className="text-2xl">🎯</span>
                 <p className="text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
-                  Transformation, chaque programme est validé et ajusté par un{" "}
-                  <span className="text-laiton-300">coach diplômé d&apos;État</span>, et ton{" "}
-                  <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> pour t&apos;aider
-                  entre deux séances.
+                  Transformation, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
+                  valide ton programme et te suit dans la durée — pas juste à la génération, à chaque
+                  plateau ou gêne — pendant que ton{" "}
+                  <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
+                  séances. La vraie différence, ce n&apos;est pas la validation, c&apos;est le suivi.
                 </p>
               </div>
 
@@ -734,6 +758,34 @@ export function DiagnosticQuiz() {
                   })}
                 </div>
               </div>
+
+              <div className="flex w-full flex-col items-center gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-center sm:flex-row sm:text-left">
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-laiton-400/25">
+                  <Image
+                    src="/anthony-darmon-portrait.jpg"
+                    alt="Anthony Darmon, fondateur de COAI"
+                    fill
+                    sizes="6rem"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                    Derrière COAI
+                  </span>
+                  <p className="font-display text-lg font-semibold text-white">Anthony Darmon</p>
+                  <p className="text-xs leading-5 text-graphite-400">
+                    Coach diplômé d&apos;État, expert en coaching sportif depuis plus de 17 ans,
+                    spécialiste des dirigeants et entrepreneurs. Ton programme est toujours validé
+                    par lui ou un coach qu&apos;il a formé — jamais de l&apos;IA brute.
+                  </p>
+                </div>
+              </div>
+
+              <p className="max-w-lg text-xs leading-5 text-graphite-500">
+                Cette expérience t&apos;a plu ? Parles-en à quelqu&apos;un qui a besoin de s&apos;y
+                mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage.
+              </p>
             </div>
           )}
         </div>

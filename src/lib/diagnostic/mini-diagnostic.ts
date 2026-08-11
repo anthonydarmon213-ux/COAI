@@ -97,12 +97,51 @@ export type MiniDiagnostic = {
   titre: string;
   accroche: string;
   alerte: string | null;
+  pointsATravailler: string[];
   split: string | null;
   exercices: string[];
   nutrition: string | null;
   recuperation: string | null;
   recommandation: { plan: "GRATUIT" | "STANDARD"; label: string; raison: string };
 };
+
+// Message sur le délai de résultats — volontairement identique pour tout le
+// monde plutôt que fragmenté par niveau (demande d'Anthony du 11/08 d'être
+// "le plus simple et efficace" ; le niveau influence déjà le programme via
+// SERIES_PAR_NIVEAU, pas la peine de dupliquer la nuance ici).
+export const RESULTATS_TIMELINE =
+  "Avec un programme adapté et un vrai suivi, les premiers effets se font généralement sentir dès 6 semaines, et l'atteinte de ton objectif sous 3 mois.";
+
+const STRUCTURE_PERSONAS = [
+  "Je ne sais pas quoi faire à la salle",
+  "Je m'entraîne à la maison, sans structure",
+  "Même programme depuis des années, sans résultat",
+];
+const NUTRITION_A_AMELIORER = ["Grignotage fréquent / repas irréguliers", "Beaucoup de plats préparés ou fast-food"];
+const SOMMEIL_A_AMELIORER = ["Mauvaise (moins de 5h, sommeil agité)", "Moyenne (5-6h, réveils fréquents)"];
+
+// Les "points à travailler" recadrent le diagnostic en problème → solution
+// (demande d'Anthony du 11/08) : avant de vendre COAI, on nomme clairement
+// ce qui freine la personne aujourd'hui à partir de ses propres réponses.
+function calculerPointsATravailler(r: ReponsesDiagnostic, sante: string[]): string[] {
+  const points: string[] = [];
+  if (sante.length > 0) {
+    points.push("Une contrainte physique non accompagnée, qui expose à la blessure ou freine la progression.");
+  }
+  if ((r.persona ?? []).some((p) => STRUCTURE_PERSONAS.includes(p))) {
+    points.push("Pas de structure d'entraînement claire aujourd'hui, ce qui limite tes résultats.");
+  }
+  if (r.habitudesAlimentaires && NUTRITION_A_AMELIORER.includes(r.habitudesAlimentaires)) {
+    points.push("Des habitudes alimentaires qui ne soutiennent pas encore ton objectif.");
+  }
+  if (r.qualiteSommeil && SOMMEIL_A_AMELIORER.includes(r.qualiteSommeil)) {
+    points.push("Un sommeil qui freine ta récupération et donc tes progrès.");
+  }
+  if (r.objectif) {
+    points.push(`L'objectif "${r.objectif.toLowerCase()}" pas encore atteint avec ta routine actuelle.`);
+  }
+  return points.slice(0, 4);
+}
 
 export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | null {
   const { niveau, objectif, equipement = [], frequence, persona = [], sante: santeBrute = [] } = r;
@@ -133,6 +172,7 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
     titre: `Profil ${niveau.toLowerCase()} — objectif ${objectif.toLowerCase()}`,
     accroche: accrochePour(persona),
     alerte: sante.length > 0 ? `Signalé : ${sante.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.` : null,
+    pointsATravailler: calculerPointsATravailler(r, sante),
     split: SPLIT_PAR_FREQUENCE[frequence] ?? null,
     exercices: exemples.map((nom) => `${nom} — ${series}`),
     nutrition: r.habitudesAlimentaires ? NUTRITION_TIPS[r.habitudesAlimentaires] ?? null : null,
@@ -149,6 +189,9 @@ export function miniDiagnosticEnTexte(d: MiniDiagnostic, appUrl: string): string
     d.accroche,
   ];
   if (d.alerte) lignes.push("", d.alerte);
+  if (d.pointsATravailler.length > 0) {
+    lignes.push("", "CE QUI FREINE TA PROGRESSION AUJOURD'HUI", ...d.pointsATravailler.map((p) => `- ${p}`));
+  }
   lignes.push(
     "",
     "ENTRAÎNEMENT",
@@ -157,12 +200,17 @@ export function miniDiagnosticEnTexte(d: MiniDiagnostic, appUrl: string): string
   );
   if (d.nutrition) lignes.push("", "NUTRITION", d.nutrition);
   if (d.recuperation) lignes.push("", "RÉCUPÉRATION", d.recuperation);
+  lignes.push("", RESULTATS_TIMELINE);
   lignes.push(
     "",
     `NOTRE RECOMMANDATION : ${d.recommandation.label}`,
     d.recommandation.raison,
     "",
-    `Pour aller plus loin : ${appUrl}/sign-up${d.recommandation.plan === "STANDARD" ? "?plan=STANDARD" : ""}`
+    "COAI est fondé par Anthony Darmon, coach diplômé d'État, 17 ans d'expérience en coaching sportif.",
+    "",
+    `Pour aller plus loin : ${appUrl}/sign-up${d.recommandation.plan === "STANDARD" ? "?plan=STANDARD" : ""}`,
+    "",
+    "Cette expérience t'a plu ? Parles-en à quelqu'un qui a besoin de s'y mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage."
   );
   return lignes.join("\n");
 }
