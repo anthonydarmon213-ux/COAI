@@ -4,6 +4,36 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Carte premium Transformation sur l'inscription (11/08/2026, nuit)
+
+Demandé juste après la simplification à parcours unique ci-dessous : l'offre
+Transformation restait noyée dans un paragraphe gris discret, au même
+niveau visuel qu'une mention légale — pas désirable, pas assez visible.
+UI/UX uniquement, aucune logique Stripe/trial/prix touchée (confirmé par
+`git diff` avant de committer : seuls des `className`/JSX changent, aucune
+ligne de `handleSubmit`).
+
+- **`sign-up/page.tsx` + `completer-inscription-form.tsx`** (même traitement
+  dans les deux, pour éviter la divergence entre le flow email/mot de passe
+  et le flow Google OAuth) : le paragraphe gris remplacé par une vraie carte
+  DA noir/or COAI (`border-laiton-400/40`, `bg-laiton-400/[0.07]`) — badge
+  "TRANSFORMATION", "7 jours offerts" en grand (`font-display text-2xl`,
+  couleur laiton) à côté de "puis 49€/mois", puis les 5 bénéfices demandés
+  en liste à coche. CTA changé en "Commencer mes 7 jours offerts"
+  (uniquement pour Transformation — Impulsion garde "Commencer
+  gratuitement", non touchée).
+- Consentements RGPD/aptitude/CGV et toute la logique de soumission
+  (`handleSubmit`, l'appel à `/api/stripe/checkout`) strictement inchangés.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Script
+Playwright réel (pas de simulation) sur `/sign-up?plan=STANDARD`, 3 largeurs
+(390px, 375px iPhone SE, desktop 1280px) — présence confirmée de "7 jours
+offerts" et du nouveau CTA, **aucun débordement horizontal** mesuré
+(`scrollWidth` vs `clientWidth`) à aucune des 3 largeurs. Impulsion revérifiée
+en parallèle pour confirmer l'absence de régression (CTA "Commencer
+gratuitement" toujours présent, paragraphe gris inchangé). Captures mobile
+et desktop envoyées à Anthony.
+
 ## Correction prioritaire — offre Transformation à parcours unique (11/08/2026, nuit)
 
 Signalé par Anthony : l'ancien double choix "7 jours offerts" / "Démarrer

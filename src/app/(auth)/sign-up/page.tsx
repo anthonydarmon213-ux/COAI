@@ -182,33 +182,61 @@ export default function SignUpPage() {
             Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de
             doute ou d&apos;antécédent médical.
           </label>
-          <div className="flex flex-col gap-2">
-            <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
-              Formule {nomFormule} — {prixMensuel}/mois
-              {planVoulu === "STANDARD" && " · programme relu par un coach diplômé d'État"}
-            </span>
-            {/* Un seul parcours pour Impulsion (correction Anthony du 11/08/2026)
-                comme pour Transformation (correction du 11/08/2026, nuit) : plus
-                de choix essai/paiement immédiat — moins engageant pour un trafic
-                froid de demander un choix supplémentaire, et l'essai donne déjà
-                un accès réel et immédiat (programme généré tout de suite, cf.
-                ActivationFlow). */}
-            <p className="text-xs leading-5 text-graphite-500">
-              {planVoulu === "STANDARD" ? (
-                <>
-                  Ton programme COAI est disponible immédiatement, généré à partir de ton profil
-                  et affiché comme « à valider par ton coach ». Profite de COAI gratuitement
-                  pendant 7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de
-                  l&apos;essai.
-                </>
-              ) : (
-                <>
-                  Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement
-                  pendant 7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de l&apos;essai.
-                </>
-              )}
-            </p>
-          </div>
+          {planVoulu === "STANDARD" ? (
+            // Carte premium (11/08/2026, correction Anthony) : l'offre
+            // Transformation était noyée dans un paragraphe gris discret,
+            // au même niveau visuel qu'une mention légale — remplacée par
+            // un vrai bloc identifiable, DA noir/or COAI, prix et essai mis
+            // en avant plutôt que listés en petit texte. UI uniquement,
+            // aucune logique Stripe/trial touchée ici (cf. handleSubmit).
+            <div className="flex flex-col gap-3 rounded-2xl border border-laiton-400/40 bg-laiton-400/[0.07] p-4">
+              <span className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-300">
+                Transformation
+              </span>
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span className="font-display text-2xl font-semibold tracking-tight text-laiton-300">
+                  7 jours offerts
+                </span>
+                <span className="text-sm text-graphite-300">puis {prixMensuel}/mois</span>
+              </div>
+              <ul className="flex flex-col gap-1.5 text-sm leading-5 text-graphite-200">
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-laiton-400">✓</span>
+                  <span>Programme personnalisé généré immédiatement</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-laiton-400">✓</span>
+                  <span>Entraînement · nutrition · récupération</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-laiton-400">✓</span>
+                  <span>Programme relu et validé par un coach diplômé d&apos;État</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-laiton-400">✓</span>
+                  <span>Coach IA illimité</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-laiton-400">✓</span>
+                  <span>1 visio/mois avec Anthony incluse</span>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            // Impulsion (11/08/2026, correction Anthony) : un seul parcours,
+            // plus de choix essai/paiement immédiat — moins engageant pour
+            // un trafic froid (pub TikTok/Instagram) de demander un choix
+            // supplémentaire. L'essai donne un accès réel et immédiat.
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-xs uppercase tracking-widest text-graphite-500">
+                Formule {nomFormule} — {prixMensuel}/mois
+              </span>
+              <p className="text-xs leading-5 text-graphite-500">
+                Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement
+                pendant 7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de l&apos;essai.
+              </p>
+            </div>
+          )}
           <label className="flex items-start gap-2 text-sm text-graphite-300">
             <input
               type="checkbox"
@@ -229,7 +257,11 @@ export default function SignUpPage() {
           </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading ? "Redirection vers le paiement…" : "Commencer gratuitement"}
+            {loading
+              ? "Redirection vers le paiement…"
+              : planVoulu === "STANDARD"
+                ? "Commencer mes 7 jours offerts"
+                : "Commencer gratuitement"}
           </Button>
         </form>
         <p className="text-sm text-graphite-400">
