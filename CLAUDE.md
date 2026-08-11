@@ -9,6 +9,24 @@ décisions business d'Anthony (pas de la doc technique — voir README.md pour
 Phase 6.1 implémentée sans modifier Stripe, les abonnements, le trial, les
 tarifs, l'authentification ou le tunnel diagnostic. Phase 6.2 non commencée.
 
+### Correctif UX séance interactive (12/08/2026)
+
+Après le premier test réel, une ancienne V1 présentait 7 exercices mais aucun
+gainage identifiable ni `retourAuCalme`. Le Daily normalise désormais ces V1
+uniquement dans la copie quotidienne : ajout d'un dead bug contrôlé sans charge
+avec consigne d'arrêt au moindre inconfort et d'un retour au calme prudent. Le
+programme source reste intact. Lors d'une réduction de durée, le finisher
+gainage est conservé avec les exercices prioritaires.
+
+La fiche longue est remplacée par un parcours interactif en quatre phases :
+échauffement, renforcement, abdos/gainage, retour au calme. Chaque exercice est
+repliable et cochable, les consignes détaillées s'ouvrent à la demande et une
+barre indique la progression. Testé en 390×844 avec `agent-browser` : contenu,
+progression, ouverture/validation d'exercice, gainage et retour au calme
+visibles, sans overlay ni erreur navigateur. Captures :
+`test-results/daily-interactive-mobile.png` et
+`daily-interactive-finishers-mobile.png`.
+
 - **Entrée principale** : `/dashboard` devient l'écran « Aujourd'hui » ;
   `/aujourdhui` redirige vers lui. En-tête contextuel, séance ou récupération,
   puis COAI Insight et un résumé NEAT compact.

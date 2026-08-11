@@ -29,6 +29,44 @@ function normalise(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
+const CORE_PATTERN = /(abdo|gainage|planche|crunch|core|dead bug|hollow|bird dog|pallof)/i;
+
+export function isCoreExercise(exercise: Record<string, unknown>) {
+  return CORE_PATTERN.test(String(exercise.nom ?? ""));
+}
+
+// Les toutes premières V1 ont parfois été générées avant que le prompt
+// n'impose un finisher gainage et un retour au calme. Cette normalisation
+// complète uniquement la séance du jour : elle ne modifie jamais le programme
+// source. Le mouvement proposé est volontairement simple, sans charge, et
+// demande explicitement d'arrêter au moindre inconfort.
+export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSession {
+  const exercises = Array.isArray(session.exercices) ? session.exercices : [];
+  if (exercises.length === 0) return session;
+
+  const completedExercises = exercises.some(isCoreExercise)
+    ? exercises
+    : [
+        ...exercises,
+        {
+          nom: "Dead bug contrôlé — gainage profond",
+          series: "2",
+          repetitions: "6 à 8 répétitions lentes par côté",
+          repos: "45 sec",
+          charge: "Poids du corps — garde le bas du dos stable et arrête au moindre inconfort",
+          methode: "Série classique",
+        },
+      ];
+
+  return {
+    ...session,
+    exercices: completedExercises,
+    retourAuCalme:
+      session.retourAuCalme ??
+      "5 à 8 minutes : marche ou pédalage très léger, respiration calme, puis mobilité douce des zones travaillées. Aucun étirement ne doit provoquer de douleur.",
+  };
+}
+
 export function getWorkoutForDate(contenu: unknown, date: Date): WorkoutSession | null {
   if (!contenu || typeof contenu !== "object" || Array.isArray(contenu)) return null;
   const seances = (contenu as { seances?: unknown }).seances;
@@ -56,14 +94,15 @@ export function adaptWorkout(
   checkin: DailyCheckinInput,
   expectedMinutes: number
 ): { session: WorkoutSession; summary: AdaptationSummary } {
-  const exercices = Array.isArray(source.exercices) ? source.exercices : [];
+  const completeSource = ensureWorkoutCompleteness(source);
+  const exercices = Array.isArray(completeSource.exercices) ? completeSource.exercices : [];
   const changes: string[] = [];
 
   if (checkin.pain) {
     const zone = checkin.painArea ? ` au niveau ${checkin.painArea.toLowerCase()}` : "";
     return {
       session: {
-        ...source,
+        ...completeSource,
         nom: "Récupération prudente",
         exercices: [],
         echauffement: undefined,
@@ -87,7 +126,10 @@ export function adaptWorkout(
 
   if (checkin.availableMinutes < expectedMinutes && exercices.length > 0) {
     const targetCount = Math.max(2, Math.min(exercices.length, Math.floor(exercices.length * checkin.availableMinutes / expectedMinutes)));
-    adaptedExercises = adaptedExercises.slice(0, targetCount);
+    const coreExercise = exercices.find(isCoreExercise);
+    const priorityCount = coreExercise ? targetCount - 1 : targetCount;
+    adaptedExercises = exercices.filter((exercise) => exercise !== coreExercise).slice(0, priorityCount);
+    if (coreExercise) adaptedExercises.push(coreExercise);
     changes.push(`Durée ramenée à ${checkin.availableMinutes === 75 ? "60+" : checkin.availableMinutes} min en gardant les exercices prioritaires`);
   }
 
@@ -102,7 +144,7 @@ export function adaptWorkout(
   if (lowRecovery) reasonParts.push("ton sommeil ou ton énergie est faible aujourd'hui");
 
   return {
-    session: { ...source, exercices: adaptedExercises },
+    session: { ...completeSource, exercices: adaptedExercises },
     summary: {
       adapted,
       title: adapted ? "COAI a adapté ta séance" : "Ta séance reste inchangée",
