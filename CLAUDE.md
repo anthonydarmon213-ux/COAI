@@ -315,35 +315,33 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
-- [ ] **Migrations automatisées (11/08/2026, nuit)** — le script `build`
+- [x] **Migrations automatisées (11/08/2026, nuit)** — le script `build`
       lance désormais `prisma migrate deploy` avant `next build` : chaque
       déploiement Vercel applique automatiquement les migrations en
       attente, fini le copier-coller manuel dans Supabase SQL Editor à
-      chaque fois (source de l'erreur de troncature déjà vécue). Mais ça
-      ne marche que si Prisma sait déjà que les 37 migrations précédentes
-      sont appliquées — sinon `prisma migrate deploy` va tenter de les
-      rejouer depuis le début (dont des `CREATE TABLE` sur des tables qui
-      existent déjà) et bloquer le déploiement. **Avant le prochain
-      déploiement de cette branche**, coller une seule fois dans Supabase
-      SQL Editor le script `baseline-migrations-a-coller-dans-supabase.sql`
-      (fichier envoyé dans le chat le 11/08 nuit) — il ne fait qu'insérer
-      des lignes dans la table `_prisma_migrations` (aucune donnée
-      applicative touchée), et neutralise cette liste en un coup : les 3
-      migrations encore en attente (`20260811120000_add_phase2_programme_vivant`,
+      chaque fois (source de l'erreur de troncature déjà vécue). Script de
+      baseline (37 lignes insérées dans `_prisma_migrations`, aucune donnée
+      applicative touchée) collé par Anthony dans Supabase SQL Editor —
+      Prisma sait maintenant que les 37 migrations précédentes sont déjà
+      appliquées et ne tentera pas de les rejouer.
+- [ ] Vérifier que `DIRECT_URL` (pas seulement `DATABASE_URL`) est bien
+      dans les variables d'env Vercel (Production + Preview) — c'est cette
+      variable que Prisma utilise pour les migrations, en direct plutôt
+      que via le pooler. Sans elle, `prisma migrate deploy` échouera au
+      prochain déploiement.
+- [ ] Déployer cette branche — `prisma migrate deploy` devrait alors
+      appliquer automatiquement les 3 migrations encore en attente
+      (`20260811120000_add_phase2_programme_vivant`,
       `20260811150000_add_adaptation_confirmation`, `20260811170000_add_hrv`)
-      seront alors appliquées automatiquement par le prochain déploiement,
-      plus besoin de les coller à la main. Vérifier aussi que `DIRECT_URL`
-      (pas seulement `DATABASE_URL`) est bien dans les variables d'env
-      Vercel (Production + Preview) — c'est cette variable que Prisma
-      utilise pour les migrations, en direct plutôt que via le pooler.
-- [ ] Une fois le script de baseline collé et le prochain déploiement
-      passé : tester en conditions réelles le parcours "programme évolutif"
-      (logue 2-3 séances → Analyser mon programme → Accepter → vérifie
-      `/programme/evolution` ; teste "Ma semaine change" en mode voyage ;
-      valide/rejette une suggestion côté `/admin/clients/[id]`) — non
-      testable depuis le sandbox Claude Code (pas d'accès direct à
-      Supabase ni d'URL de déploiement joignable, cf. section "Test de
-      bout en bout" plus haut)
+      sans autre action manuelle. Vérifier dans les logs de build Vercel
+      que ces 3 migrations apparaissent bien comme appliquées.
+- [ ] Une fois déployé : tester en conditions réelles le parcours
+      "programme évolutif" (logue 2-3 séances → Analyser mon programme →
+      Accepter → vérifie `/programme/evolution` ; teste "Ma semaine
+      change" en mode voyage ; valide/rejette une suggestion côté
+      `/admin/clients/[id]`) — non testable depuis le sandbox Claude Code
+      (pas d'accès direct à Supabase ni d'URL de déploiement joignable,
+      cf. section "Test de bout en bout" plus haut)
 - [x] Migration `20260811090000_add_programme_evolutif` appliquée sur
       Supabase (11/08 après-midi) — check-in séance/hebdo, versionnage et
       adaptations opérationnels en prod
