@@ -311,7 +311,10 @@ function FormuleCard({
   );
 }
 
-export function DiagnosticQuiz({ connecte = false }: { connecte?: boolean } = {}) {
+export function DiagnosticQuiz({
+  connecte = false,
+  aDejaUnProgramme = false,
+}: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
   // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
@@ -342,7 +345,9 @@ export function DiagnosticQuiz({ connecte = false }: { connecte?: boolean } = {}
   const [email, setEmail] = useState("");
   const [consentEmail, setConsentEmail] = useState(false);
   const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading">("idle");
-  const [applyStatus, setApplyStatus] = useState<"idle" | "loading" | "done">("idle");
+  const [applyStatus, setApplyStatus] = useState<
+    "idle" | "loading" | "done" | "generation" | "pret" | "erreur"
+  >("idle");
   const [resumable, setResumable] = useState(false);
 
   const stepIndex = questionSteps.indexOf(step);
@@ -626,8 +631,14 @@ export function DiagnosticQuiz({ connecte = false }: { connecte?: boolean } = {}
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
   // le diagnostic n'a besoin ni de créer un compte ni de repasser par le
   // pont localStorage — on met à jour son profil réel directement.
+  // Correction Anthony (11/08/2026) : un nouvel abonné sans programme
+  // encore généré (aDejaUnProgramme=false) enchaîne directement sur la
+  // génération et "Ton programme est prêt" — un abonné existant qui
+  // ajuste son profil garde le geste explicite habituel, jamais de
+  // régénération silencieuse de son programme déjà en place.
   async function appliquerAuProfil() {
     setApplyStatus("loading");
+    let profilApplique = false;
     try {
       const res = await fetch("/api/profil", {
         method: "PUT",
@@ -635,9 +646,18 @@ export function DiagnosticQuiz({ connecte = false }: { connecte?: boolean } = {}
         body: JSON.stringify(reponsesEnProfil()),
       });
       if (!res.ok) throw new Error();
-      setApplyStatus("done");
+      profilApplique = true;
+      if (aDejaUnProgramme) {
+        setApplyStatus("done");
+        return;
+      }
+      setApplyStatus("generation");
+      const genRes = await fetch("/api/programmes/generate", { method: "POST" });
+      if (!genRes.ok) throw new Error();
+      trackFunnelEvent("first_programme_viewed");
+      setApplyStatus("pret");
     } catch {
-      setApplyStatus("idle");
+      setApplyStatus(profilApplique ? "erreur" : "idle");
     }
   }
 
@@ -1140,24 +1160,66 @@ export function DiagnosticQuiz({ connecte = false }: { connecte?: boolean } = {}
               {connecte ? (
                 // Parcours D (Phase 5B, 11/08/2026) : déjà abonné, aucune
                 // raison de proposer de créer un compte — on applique
-                // directement ces réponses à son profil réel.
+                // directement ces réponses à son profil réel. Correction
+                // Anthony (11/08/2026) : sans programme existant, enchaîne
+                // sur la génération et "Ton programme est prêt" — avec un
+                // programme déjà en place, reste au geste explicite habituel
+                // (jamais de régénération silencieuse).
                 <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
-                  <SectionLabel>Mettre à jour ton profil</SectionLabel>
-                  <p className="max-w-md text-sm leading-6 text-graphite-300">
-                    Applique ces réponses à ton profil COAI pour que ton prochain programme en
-                    tienne compte.
-                  </p>
-                  {applyStatus === "done" ? (
-                    <p className="text-sm text-laiton-300">
-                      Profil mis à jour ✓{" "}
-                      <Link href="/dashboard" className="underline hover:text-laiton-200">
-                        Retour au tableau de bord
+                  {applyStatus === "pret" ? (
+                    <>
+                      <SectionLabel>Ton programme est prêt</SectionLabel>
+                      <p className="max-w-md text-sm leading-6 text-graphite-300">
+                        Entraînement, nutrition et récupération, personnalisés à partir de ton
+                        diagnostic.
+                      </p>
+                      <Link href="/programme/entrainement">
+                        <Button className="px-8 py-3">Commencer ma première séance</Button>
                       </Link>
-                    </p>
+                    </>
+                  ) : applyStatus === "generation" ? (
+                    <>
+                      <SectionLabel>COAI prépare ton programme</SectionLabel>
+                      <p className="max-w-md text-sm leading-6 text-graphite-300">
+                        Quelques secondes, entraînement, nutrition et récupération.
+                      </p>
+                    </>
+                  ) : applyStatus === "erreur" ? (
+                    <>
+                      <p className="text-sm text-graphite-300">
+                        Ton profil est enregistré, mais la génération de ton programme a rencontré
+                        un souci.
+                      </p>
+                      <Link href="/programme/entrainement" className="text-sm text-laiton-300 underline">
+                        Réessayer depuis ton programme →
+                      </Link>
+                    </>
+                  ) : applyStatus === "done" ? (
+                    <>
+                      <SectionLabel>Mettre à jour ton profil</SectionLabel>
+                      <p className="text-sm text-laiton-300">
+                        Profil mis à jour ✓{" "}
+                        <Link href="/dashboard" className="underline hover:text-laiton-200">
+                          Retour au tableau de bord
+                        </Link>
+                      </p>
+                    </>
                   ) : (
-                    <Button onClick={appliquerAuProfil} disabled={applyStatus === "loading"}>
-                      {applyStatus === "loading" ? "…" : "Mettre à jour mon profil"}
-                    </Button>
+                    <>
+                      <SectionLabel>Mettre à jour ton profil</SectionLabel>
+                      <p className="max-w-md text-sm leading-6 text-graphite-300">
+                        {aDejaUnProgramme
+                          ? "Applique ces réponses à ton profil COAI pour que ton prochain programme en tienne compte."
+                          : "Applique ces réponses et génère ton programme personnalisé."}
+                      </p>
+                      <Button onClick={appliquerAuProfil} disabled={applyStatus === "loading"}>
+                        {applyStatus === "loading"
+                          ? "…"
+                          : aDejaUnProgramme
+                            ? "Mettre à jour mon profil"
+                            : "Générer mon programme"}
+                      </Button>
+                    </>
                   )}
                 </div>
               ) : (

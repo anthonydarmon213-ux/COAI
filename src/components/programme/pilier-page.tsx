@@ -14,7 +14,7 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { canGenerateProgramme, getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
+import { canGenerateProgramme, getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -65,7 +65,6 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
   const genereIA = dernier && dernier.statut === "GENERE_IA";
   const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
   const plan = getEffectivePlan(user.subscription);
-  const enEssai = isInTrial(user.subscription);
   const peutGenerer = canGenerateProgramme(user.subscription);
 
   return (
@@ -172,14 +171,6 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
           {(() => {
             const contenu = affiche?.contenu ?? null;
             if (!contenu) {
-              if (enEssai) {
-                return (
-                  <p className="text-sm text-graphite-400">
-                    Ton programme sera généré dès la fin de ton essai offert — tu peux en attendant
-                    te balader sur l&apos;application et découvrir ce que propose COAI.
-                  </p>
-                );
-              }
               if (!peutGenerer) {
                 return (
                   <p className="text-sm text-graphite-400">

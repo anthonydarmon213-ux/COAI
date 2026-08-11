@@ -98,6 +98,13 @@ export function CoaiIntro() {
         <p className="font-mono text-xs uppercase tracking-widest text-graphite-500">
           2 min · Gratuit · Sans engagement
         </p>
+        {/* Accès direct discret aux tarifs (11/08/2026, correction Anthony) :
+            un prospect chaud doit pouvoir acheter sans passer par le
+            diagnostic — volontairement en retrait pour ne pas concurrencer
+            le CTA principal. */}
+        <Link href="/pricing" className="text-xs text-graphite-600 underline transition hover:text-graphite-400">
+          Voir les formules
+        </Link>
       </div>
     </section>
   );

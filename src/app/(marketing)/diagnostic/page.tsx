@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BackLink } from "@/components/marketing/back-link";
 import { DiagnosticQuiz } from "@/components/marketing/diagnostic-quiz";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { prisma } from "@/lib/db/client";
 
 // Nombre de questions codé en dur ici (metadata = export statique, ne peut
 // pas lire QUESTION_STEPS de diagnostic-quiz.tsx) — à garder synchronisé si
@@ -24,13 +25,21 @@ export default async function DiagnosticPage() {
   // le diagnostic n'a pas besoin de créer un compte ni de ressaisir son
   // email — cf. DiagnosticQuiz (prop `connecte`).
   const user = await getCurrentAppUser();
+  // Correction Anthony (11/08/2026) : un nouvel abonné sans programme
+  // encore généré termine le diagnostic sur "Ton programme est prêt"
+  // (génération automatique) — un abonné existant qui reprend le
+  // diagnostic pour ajuster son profil garde le geste explicite habituel
+  // ("Mettre à jour mon profil", régénération jamais silencieuse).
+  const dejaUnProgramme = user
+    ? Boolean(await prisma.programmeGenerated.findFirst({ where: { userId: user.id }, select: { id: true } }))
+    : false;
 
   return (
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-8 px-6 py-24">
       <div className="w-full max-w-lg">
         <BackLink />
       </div>
-      <DiagnosticQuiz connecte={!!user} />
+      <DiagnosticQuiz connecte={!!user} aDejaUnProgramme={dejaUnProgramme} />
     </main>
   );
 }

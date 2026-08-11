@@ -14,21 +14,23 @@ export function getEffectivePlan(subscription?: Subscription | null): EffectiveP
   return subscription.plan;
 }
 
-// Tant que l'essai Stripe (7 jours offerts, offre Impulsion) n'est pas
-// terminé, aucun prélèvement n'a encore eu lieu — status reste "ACTIVE"
-// pendant l'essai (trialing y est mappé), donc c'est trialEnd qui permet de
-// distinguer "encore en essai, jamais payé" de "déjà facturé". Utilisé pour
-// bloquer la génération de programme pendant l'essai (cf. 09/08/2026 :
-// éviter de livrer un programme complet gratuitement à quelqu'un qui
-// résilie avant le premier prélèvement).
+// Tant que l'essai Stripe (7 jours offerts) n'est pas terminé, aucun
+// prélèvement n'a encore eu lieu — status reste "ACTIVE" pendant l'essai
+// (trialing y est mappé), donc c'est trialEnd qui permet de distinguer
+// "encore en essai, jamais payé" de "déjà facturé". Purement informatif
+// désormais (affichage de la date de fin d'essai sur compte/abonnement) —
+// ne bloque plus la génération de programme (cf. correction du 11/08/2026 :
+// l'essai doit donner un accès réel et immédiat à COAI, pas un accès
+// différé à J+7).
 export function isInTrial(subscription?: Subscription | null): boolean {
   if (!subscription || subscription.status !== "ACTIVE") return false;
   return Boolean(subscription.trialEnd && subscription.trialEnd > new Date());
 }
 
-// Autorise la génération de programme uniquement s'il existe un
-// abonnement Stripe réel, actif (ou en retard de paiement, encore toléré),
-// et déjà facturé au moins une fois (pas en essai). Contrairement à
+// Autorise la génération de programme dès qu'il existe un abonnement
+// Stripe réel, actif (ou en retard de paiement, encore toléré) — y compris
+// pendant l'essai offert (11/08/2026 : l'essai doit donner un accès réel,
+// immédiat, pas un accès différé à la fin des 7 jours). Contrairement à
 // getEffectivePlan (qui retombe volontairement sur "GRATUIT" en l'absence
 // d'abonnement — utile pour l'UI juste après l'inscription, avant que le
 // webhook Stripe n'ait tourné), cette fonction ne doit JAMAIS autoriser
@@ -37,8 +39,8 @@ export function isInTrial(subscription?: Subscription | null): boolean {
 // se retrouvait traité comme "GRATUIT" par défaut et pouvait générer un
 // programme complet sans jamais avoir payé (09/08/2026).
 export function canGenerateProgramme(subscription?: Subscription | null): boolean {
-  if (!subscription || !ACTIVE_STATUSES.has(subscription.status)) return false;
-  return !isInTrial(subscription);
+  if (!subscription) return false;
+  return ACTIVE_STATUSES.has(subscription.status);
 }
 
 // Noms marketing (08/08/2026) : GRATUIT = "Impulsion", STANDARD = "Transformation"

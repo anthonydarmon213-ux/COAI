@@ -1,16 +1,22 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { DiagnosticAutofill } from "@/components/onboarding/diagnostic-autofill";
+import { ActivationFlow } from "@/components/onboarding/activation-flow";
 
 // Écran d'accueil post-paiement (10/08/2026) : repensé façon "salon
 // d'embarquement" plutôt qu'un simple accusé de réception transactionnel —
 // demande explicite d'Anthony d'un moment mémorable ("effet waouh") juste
 // après le paiement, pas seulement un écran de confirmation.
+//
+// GRATUIT_SANS_ESSAI retiré (11/08/2026, correction Anthony) : Impulsion
+// n'offre plus de choix essai/paiement immédiat à l'inscription (cf.
+// sign-up/page.tsx) — cette branche ne peut plus être atteinte. GRATUIT
+// couvre maintenant le seul parcours Impulsion, avec un accès immédiat
+// pendant l'essai (ActivationFlow s'occupe de la génération, plus besoin
+// de l'annoncer ici de façon statique).
 const CONTENU_PAR_PLAN: Record<
-  "GRATUIT" | "GRATUIT_SANS_ESSAI" | "STANDARD",
+  "GRATUIT" | "STANDARD",
   {
     formule: string;
     sousTitre: string;
@@ -19,21 +25,11 @@ const CONTENU_PAR_PLAN: Record<
 > = {
   GRATUIT: {
     formule: "Impulsion",
-    sousTitre: "7 jours offerts, puis 19€/mois. Ton programme t'attend à la fin de ton essai.",
+    sousTitre: "7 jours offerts, puis 19€/mois. Ton programme est prêt dès maintenant.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
       { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
-      { titre: "Tu t'entraînes", texte: "Prêt à suivre dès la fin de ton essai." },
-      { titre: "On veille sur toi", texte: "Une relance automatique si on ne te voit plus — jamais vraiment seul." },
-    ],
-  },
-  GRATUIT_SANS_ESSAI: {
-    formule: "Impulsion",
-    sousTitre: "19€/mois. Ton programme est prêt à être généré, dès maintenant.",
-    etapes: [
-      { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
-      { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
-      { titre: "Tu t'entraînes", texte: "Ton programme est prêt à suivre, dès aujourd'hui." },
+      { titre: "Tu t'entraînes", texte: "Ton programme est prêt dès aujourd'hui, essai ou pas." },
       { titre: "On veille sur toi", texte: "Une relance automatique si on ne te voit plus — jamais vraiment seul." },
     ],
   },
@@ -57,12 +53,7 @@ export default async function BienvenuePage({
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const plan: "GRATUIT" | "GRATUIT_SANS_ESSAI" | "STANDARD" =
-    searchParams.plan !== "GRATUIT"
-      ? "STANDARD"
-      : searchParams.essai === "0"
-        ? "GRATUIT_SANS_ESSAI"
-        : "GRATUIT";
+  const plan: "GRATUIT" | "STANDARD" = searchParams.plan !== "GRATUIT" ? "STANDARD" : "GRATUIT";
   const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const prenom = user.prenom ?? "";
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
@@ -150,8 +141,6 @@ export default async function BienvenuePage({
         </div>
       </div>
 
-      <DiagnosticAutofill />
-
       <div className="grid w-full max-w-xl grid-cols-1 gap-3 text-left sm:grid-cols-2">
         {etapes.map((etape, i) => (
           <div
@@ -169,14 +158,11 @@ export default async function BienvenuePage({
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-3">
-        <Link href="/programme">
-          <Button className="px-8 py-3">Embarquer — voir mon programme</Button>
-        </Link>
-        <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
-          Retour au tableau de bord
-        </Link>
-      </div>
+      <ActivationFlow />
+
+      <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
+        Retour au tableau de bord
+      </Link>
     </div>
   );
 }

@@ -8,6 +8,10 @@ const LIENS = [
   { href: "/", label: "Accueil" },
   { href: "/#piliers", label: "Fonctionnalités" },
   { href: "/#comment-ca-marche", label: "Comment ça marche" },
+  // Accès direct aux tarifs (11/08/2026, correction Anthony) : le diagnostic
+  // reste le parcours principal recommandé, mais ne doit jamais être un mur
+  // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
+  { href: "/pricing", label: "Nos formules" },
   { href: "/#fondateur", label: "Coaching" },
   { href: "/#histoire", label: "À propos" },
 ];

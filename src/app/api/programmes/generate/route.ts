@@ -4,7 +4,7 @@ import { genererPilier } from "@/lib/programmes/generer";
 import { prochaineVersion } from "@/lib/programmes/version";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
-import { canGenerateProgramme, getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
+import { canGenerateProgramme, getEffectivePlan } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
@@ -30,16 +30,6 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
-  }
-
-  // Génération bloquée tant que l'essai offert (7 jours, offre Impulsion)
-  // n'est pas terminé — sinon un abonné peut générer son programme puis
-  // résilier avant le premier prélèvement, sans jamais payer.
-  if (isInTrial(user.subscription)) {
-    return NextResponse.json(
-      { error: "Ton programme sera généré une fois ton abonnement activé (fin de l'essai offert)." },
-      { status: 403 }
-    );
   }
 
   // Génération bloquée en l'absence d'abonnement Stripe actif — sans ce

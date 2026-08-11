@@ -132,48 +132,58 @@ export function CompleterInscriptionForm({
           Formule {nomFormule} — {prixMensuel}/mois
           {planInitial === "STANDARD" && " · programme relu par un coach diplômé d'État"}
         </span>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setSkipTrial(false)}
-            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-              !skipTrial
-                ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                : "border-graphite-800 text-graphite-400 hover:text-white"
-            }`}
-          >
-            <span className="block font-semibold">7 jours offerts</span>
-            <span className="block text-graphite-500">puis {prixMensuel}/mois</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSkipTrial(true)}
-            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
-              skipTrial
-                ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
-                : "border-graphite-800 text-graphite-400 hover:text-white"
-            }`}
-          >
-            <span className="block font-semibold">Démarrer tout de suite</span>
-            <span className="block text-graphite-500">{prixMensuel}/mois dès aujourd&apos;hui</span>
-          </button>
-        </div>
-        <p className="text-xs leading-5 text-graphite-500">
-          {skipTrial ? (
-            <>
-              Ton programme complet est généré dès la fin du paiement
-              {planInitial === "STANDARD"
-                ? ", et ta séance de coaching visio de 30 min avec Anthony est disponible immédiatement (à réserver via WhatsApp)."
-                : "."}
-            </>
-          ) : (
-            <>
-              Pendant les 7 jours offerts, aucun programme n&apos;est encore généré : l&apos;accès
-              complet démarre au premier prélèvement, à la fin de l&apos;essai
-              {planInitial === "STANDARD" ? " (la séance visio avec Anthony aussi)." : "."}
-            </>
-          )}
-        </p>
+        {planInitial === "STANDARD" ? (
+          <>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSkipTrial(false)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                  !skipTrial
+                    ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                    : "border-graphite-800 text-graphite-400 hover:text-white"
+                }`}
+              >
+                <span className="block font-semibold">7 jours offerts</span>
+                <span className="block text-graphite-500">puis {prixMensuel}/mois</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSkipTrial(true)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                  skipTrial
+                    ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                    : "border-graphite-800 text-graphite-400 hover:text-white"
+                }`}
+              >
+                <span className="block font-semibold">Démarrer tout de suite</span>
+                <span className="block text-graphite-500">{prixMensuel}/mois dès aujourd&apos;hui</span>
+              </button>
+            </div>
+            <p className="text-xs leading-5 text-graphite-500">
+              {skipTrial ? (
+                <>
+                  Ton programme complet est généré dès la fin du paiement, et ta séance de coaching
+                  visio de 30 min avec Anthony est disponible immédiatement (à réserver via
+                  WhatsApp).
+                </>
+              ) : (
+                <>
+                  Ton programme est généré dès l&apos;activation de ton essai — 7 jours offerts, puis
+                  {" "}
+                  {prixMensuel}/mois (la séance visio avec Anthony aussi).
+                </>
+              )}
+            </p>
+          </>
+        ) : (
+          // Impulsion (11/08/2026, correction Anthony) : un seul parcours, cf.
+          // sign-up/page.tsx pour le détail de la décision.
+          <p className="text-xs leading-5 text-graphite-500">
+            Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement pendant
+            7 jours, puis {prixMensuel}/mois. Résiliable avant la fin de l&apos;essai.
+          </p>
+        )}
       </div>
       <label className="flex items-start gap-2 text-sm text-graphite-300">
         <input
@@ -214,9 +224,11 @@ export function CompleterInscriptionForm({
       <Button type="submit" disabled={loading}>
         {loading
           ? "Redirection vers le paiement…"
-          : skipTrial
-            ? `Démarrer maintenant — ${prixMensuel}/mois`
-            : "Accéder à mon espace — 7 jours offerts"}
+          : planInitial === "GRATUIT"
+            ? "Commencer gratuitement"
+            : skipTrial
+              ? `Démarrer maintenant — ${prixMensuel}/mois`
+              : "Accéder à mon espace — 7 jours offerts"}
       </Button>
     </form>
   );

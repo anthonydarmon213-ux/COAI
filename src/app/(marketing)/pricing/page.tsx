@@ -13,7 +13,7 @@ import { PlanSelectedLink } from "@/components/marketing/plan-selected-link";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
-  "Choisis ton niveau d'accompagnement : Impulsion (7 jours offerts), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
+  "Choisis le coaching qui te correspond : Impulsion (7 jours offerts), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -27,6 +27,10 @@ type Tier = {
   nom: string;
   prix: string;
   suffixe: string;
+  // Étiquette courte affichée sous le prix (ex: "7 jours offerts") —
+  // distincte de mostPopular ("Le plus choisi"), qui reste un badge
+  // au-dessus de la carte.
+  badge?: string;
   description: string;
   features: string[];
   plan?: "STANDARD" | "PREMIUM";
@@ -51,10 +55,14 @@ const ENTREPRISE_SITE_HREF =
 const TIERS: Tier[] = [
   {
     nom: "Impulsion",
-    prix: "0€",
-    suffixe: "les 7 premiers jours",
+    prix: "19€",
+    suffixe: "/mois",
+    badge: "7 jours offerts",
+    // Correction Anthony (11/08/2026) : un seul parcours, accès immédiat
+    // pendant l'essai — plus de choix essai/paiement immédiat qui cassait
+    // la dynamique du diagnostic pour un trafic froid (pub TikTok/Instagram).
     description:
-      "Coaching 100% IA — entraînée avec les 17 ans d'expertise terrain d'Anthony Darmon, sans relecture humaine. 7 jours offerts, puis 19€/mois. Sans engagement — résiliable à tout moment.",
+      "Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement pendant 7 jours, puis 19€/mois. Résiliable avant la fin de l'essai.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -135,8 +143,11 @@ export default function PricingPage() {
       <div className="text-center">
         <SectionLabel>Tarifs</SectionLabel>
         <h1 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-          Choisis ton niveau d&apos;accompagnement
+          Choisis le coaching qui te correspond.
         </h1>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-graphite-400">
+          Commence simplement avec COAI. Tu pourras faire ton diagnostic personnalisé ensuite.
+        </p>
         <div className="mt-6 flex justify-center">
           <TrustBadges />
         </div>
@@ -164,6 +175,11 @@ export default function PricingPage() {
                 <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
                 <span className="text-sm text-graphite-400">{tier.suffixe}</span>
               </div>
+            )}
+            {tier.badge && (
+              <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
+                {tier.badge}
+              </span>
             )}
             <p className="text-sm text-graphite-300">{tier.description}</p>
             <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
@@ -220,7 +236,7 @@ export default function PricingPage() {
                 label={tier.plan === "STANDARD" ? "S'abonner — 7 jours offerts" : `S'abonner — ${tier.prix}${tier.suffixe}`}
               />
             ) : (
-              <PlanSelectedLink href="/sign-up" plan="GRATUIT" label="Créer mon compte — 7 jours offerts" />
+              <PlanSelectedLink href="/sign-up" plan="GRATUIT" label="Commencer gratuitement" />
             )}
           </Card>
         ))}
