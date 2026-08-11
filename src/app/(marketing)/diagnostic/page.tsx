@@ -6,11 +6,16 @@ import { DiagnosticQuiz } from "@/components/marketing/diagnostic-quiz";
 // pas lire QUESTION_STEPS de diagnostic-quiz.tsx) — à garder synchronisé si
 // le nombre de questions change à nouveau (cf. 10/08/2026 : oublié une
 // première fois lors du passage de 6 à 10 questions).
+const TITLE = "Diagnostic gratuit — quel programme te correspond ? — COAI";
+const DESCRIPTION =
+  "10 questions rapides pour voir à quoi ton programme d'entraînement pourrait ressembler — gratuit, sans inscription.";
+
 export const metadata: Metadata = {
-  title: "Diagnostic gratuit — quel programme te correspond ? — COAI",
-  description:
-    "10 questions rapides pour voir à quoi ton programme d'entraînement pourrait ressembler — gratuit, sans inscription.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/diagnostic" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/diagnostic" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 export default function DiagnosticPage() {

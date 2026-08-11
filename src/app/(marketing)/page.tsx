@@ -9,11 +9,20 @@ import { ProgressionSparkline } from "@/components/marketing/progression-sparkli
 import { TrustBadges } from "@/components/marketing/trust-badges";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
+const TITLE = "COAI — Coaching sportif par IA, validé par un vrai coach";
+const DESCRIPTION =
+  "Ton programme d'entraînement, nutrition et récupération généré par IA à partir de ton profil, relu et validé par Anthony Darmon (17 ans de coaching). AI generates, humans validate.";
+
+// 11/08/2026 : sans ce bloc openGraph/twitter dédié, chaque page publique
+// affichait le titre/description génériques du layout racine ("COAI — HI ×
+// AI™") quand on la partageait sur WhatsApp/Facebook/LinkedIn — Next.js ne
+// déduit pas automatiquement openGraph/twitter à partir de title/description.
 export const metadata: Metadata = {
-  title: "COAI — Coaching sportif par IA, validé par un vrai coach",
-  description:
-    "Ton programme d'entraînement, nutrition et récupération généré par IA à partir de ton profil, relu et validé par Anthony Darmon (17 ans de coaching). AI generates, humans validate.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const FAQ = [

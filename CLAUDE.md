@@ -59,6 +59,31 @@ pour le détail/contexte de chaque sujet) :
       remplit qu'avec les avis consentis (rien à afficher tant qu'aucun
       abonné n'a coché la case).
 
+## SEO technique : Open Graph par page + maillage interne (11/08/2026)
+
+Quatrième repêchage de la même autre session Cowork (patch jamais poussé),
+repris et vérifié ici (`tsc` + `build` réels). Jusqu'ici, seul le layout
+racine déclarait des champs `openGraph`/`twitter` (titre/description
+génériques "COAI — HI × AI™") — Next.js ne déduit pas automatiquement ces
+champs à partir du `title`/`description` propres à chaque page. Résultat :
+partager n'importe quelle page publique (pricing, une des 4 pages SEO...)
+sur WhatsApp/Facebook/LinkedIn affichait toujours le même aperçu générique
+au lieu du titre/texte spécifique à la page partagée.
+
+- `openGraph`/`twitter` ajoutés sur les 7 pages publiques (accueil,
+  pricing, diagnostic, + les 4 pages SEO) — `TITLE`/`DESCRIPTION` hissés en
+  constantes réutilisées par `metadata`, `openGraph` et `twitter` pour
+  éviter la duplication. L'image de partage reste celle générée
+  dynamiquement par `src/app/opengraph-image.tsx` (déjà en place,
+  héritée par toutes les pages via la convention de fichier Next.js).
+- Nouveau composant `src/components/marketing/related-seo-links.tsx` :
+  maillage interne entre les 4 pages SEO (`/coach-sportif-paris`,
+  `/coach-sportif-en-ligne`, `/programme-musculation-ia`,
+  `/coaching-nutrition-ia`) — chacune renvoie désormais vers les 3 autres
+  juste avant son bloc CTA final. Avant ça, chacune était une impasse SEO
+  (aucun lien interne vers les 3 autres), ce qui n'aidait ni la navigation
+  ni la compréhension par Google de leur cohérence thématique.
+
 ## Tracking conversions Meta Pixel (11/08/2026)
 
 Troisième repêchage de la même autre session Cowork (patch jamais poussé),

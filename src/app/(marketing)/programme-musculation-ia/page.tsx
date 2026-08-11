@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BackLink } from "@/components/marketing/back-link";
 import { SeoFaq } from "@/components/marketing/seo-faq";
+import { RelatedSeoLinks } from "@/components/marketing/related-seo-links";
+
+const TITLE = "Programme de musculation généré par IA — COAI";
+const DESCRIPTION =
+  "Un programme de musculation personnalisé, généré en quelques secondes par intelligence artificielle à partir de ton profil, ton matériel et tes objectifs. Sans engagement, 7 jours offerts.";
 
 export const metadata: Metadata = {
-  title: "Programme de musculation généré par IA — COAI",
-  description:
-    "Un programme de musculation personnalisé, généré en quelques secondes par intelligence artificielle à partir de ton profil, ton matériel et tes objectifs. Sans engagement, 7 jours offerts.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/programme-musculation-ia" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/programme-musculation-ia" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const ETAPES = [
@@ -105,7 +111,9 @@ export default function ProgrammeMusculationIaPage() {
 
       <SeoFaq items={FAQ_ITEMS} />
 
-      <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 pt-16 text-center">
+      <RelatedSeoLinks currentPath="/programme-musculation-ia" />
+
+      <section className="flex flex-col items-center gap-5 px-6 pt-6 text-center">
         <h2 className="font-display text-2xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
           Prêt à voir ton programme ?
         </h2>

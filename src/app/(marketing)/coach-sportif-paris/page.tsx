@@ -6,13 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BackLink } from "@/components/marketing/back-link";
 import { SeoFaq } from "@/components/marketing/seo-faq";
+import { RelatedSeoLinks } from "@/components/marketing/related-seo-links";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
+const TITLE = "Coach sportif à Paris — COAI";
+const DESCRIPTION =
+  "Anthony Darmon, coach sportif diplômé d'État à Paris, 17 ans d'expérience : séances individuelles en présentiel ou accompagnement à distance avec programme généré par IA et validé par un coach.";
+
 export const metadata: Metadata = {
-  title: "Coach sportif à Paris — COAI",
-  description:
-    "Anthony Darmon, coach sportif diplômé d'État à Paris, 17 ans d'expérience : séances individuelles en présentiel ou accompagnement à distance avec programme généré par IA et validé par un coach.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/coach-sportif-paris" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/coach-sportif-paris" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const VIP_MESSAGE =
@@ -104,7 +110,9 @@ export default function CoachSportifParisPage() {
 
       <SeoFaq items={FAQ_ITEMS} />
 
-      <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 pt-16 text-center">
+      <RelatedSeoLinks currentPath="/coach-sportif-paris" />
+
+      <section className="flex flex-col items-center gap-5 px-6 pt-6 text-center">
         <h2 className="font-display text-2xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
           Envie de commencer ?
         </h2>

@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BackLink } from "@/components/marketing/back-link";
 import { SeoFaq } from "@/components/marketing/seo-faq";
+import { RelatedSeoLinks } from "@/components/marketing/related-seo-links";
+
+const TITLE = "Coaching nutrition par IA — COAI";
+const DESCRIPTION =
+  "Un plan nutritionnel personnalisé, généré par intelligence artificielle à partir de ton profil, tes objectifs et tes habitudes alimentaires. Objectifs journaliers, conseils, sans engagement.";
 
 export const metadata: Metadata = {
-  title: "Coaching nutrition par IA — COAI",
-  description:
-    "Un plan nutritionnel personnalisé, généré par intelligence artificielle à partir de ton profil, tes objectifs et tes habitudes alimentaires. Objectifs journaliers, conseils, sans engagement.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/coaching-nutrition-ia" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/coaching-nutrition-ia" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const INCLUS = [
@@ -91,7 +97,9 @@ export default function CoachingNutritionIaPage() {
 
       <SeoFaq items={FAQ_ITEMS} />
 
-      <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 pt-16 text-center">
+      <RelatedSeoLinks currentPath="/coaching-nutrition-ia" />
+
+      <section className="flex flex-col items-center gap-5 px-6 pt-6 text-center">
         <h2 className="font-display text-2xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
           Prêt à voir ton plan nutritionnel ?
         </h2>

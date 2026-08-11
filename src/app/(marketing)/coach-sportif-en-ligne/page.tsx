@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BackLink } from "@/components/marketing/back-link";
 import { SeoFaq } from "@/components/marketing/seo-faq";
+import { RelatedSeoLinks } from "@/components/marketing/related-seo-links";
+
+const TITLE = "Coach sportif en ligne — COAI";
+const DESCRIPTION =
+  "Un accompagnement sportif à distance : programme généré par IA, validé par un coach diplômé d'État, suivi de ta progression et coach IA disponible à tout moment. Sans engagement.";
 
 export const metadata: Metadata = {
-  title: "Coach sportif en ligne — COAI",
-  description:
-    "Un accompagnement sportif à distance : programme généré par IA, validé par un coach diplômé d'État, suivi de ta progression et coach IA disponible à tout moment. Sans engagement.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/coach-sportif-en-ligne" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/coach-sportif-en-ligne" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const AVANTAGES = [
@@ -101,7 +107,9 @@ export default function CoachSportifEnLignePage() {
 
       <SeoFaq items={FAQ_ITEMS} />
 
-      <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 pt-16 text-center">
+      <RelatedSeoLinks currentPath="/coach-sportif-en-ligne" />
+
+      <section className="flex flex-col items-center gap-5 px-6 pt-6 text-center">
         <h2 className="font-display text-2xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
           Prêt à commencer ton accompagnement ?
         </h2>

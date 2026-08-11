@@ -9,11 +9,16 @@ import { BackLink } from "@/components/marketing/back-link";
 import { TrustBadges } from "@/components/marketing/trust-badges";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
+const TITLE = "Tarifs — COAI";
+const DESCRIPTION =
+  "Choisis ton niveau d'accompagnement : Impulsion (7 jours offerts), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
+
 export const metadata: Metadata = {
-  title: "Tarifs — COAI",
-  description:
-    "Choisis ton niveau d'accompagnement : Impulsion (7 jours offerts), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/pricing" },
+  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/pricing" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 type Tier = {
