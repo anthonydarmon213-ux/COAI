@@ -11,18 +11,16 @@ courte et actionnable (pas un journal, voir les sections datées plus bas
 pour le détail/contexte de chaque sujet) :
 
 **Côté Anthony (hors code)** :
-- [ ] Appliquer la migration `dernierBilanMensuelEnvoyeAt` sur Supabase (SQL
-      Editor, même méthode que `diagnostic_leads`/`avis`/`repas_log`) :
-      `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "dernierBilanMensuelEnvoyeAt" TIMESTAMP(3);`
-      — sinon le nouveau cron bilan-mensuel plantera en prod (même bug que
-      les tables manquantes découvert cette nuit)
+- [x] Migration `dernierBilanMensuelEnvoyeAt` appliquée sur Supabase (11/08
+      matin) — le cron bilan-mensuel a maintenant sa colonne
+- [x] Quota de crons Vercel (plan Hobby) vérifié le 11/08 matin : les 2
+      crons (`relance-inactifs` 09:00, `bilan-mensuel` 08:00) apparaissent
+      bien actifs sur la page Cron Jobs du projet, aucune alerte de quota
 - [ ] Relire le contenu des 2 emails de rétention (relance
       Transformation/Premium signée "Anthony", bilan mensuel) — cf. section
       "Rétention : relance étendue + bilan mensuel" plus bas — jamais
       envoyés pour de vrai, à tester en conditions réelles avant qu'un
       abonné payant les reçoive
-- [ ] Vérifier que le 2ᵉ cron Vercel (`bilan-mensuel`, ajouté ce soir) ne
-      dépasse pas le quota de crons de ton plan Vercel actuel (Hobby vs Pro)
 - [ ] Acheter la carte SIM prépayée, l'insérer dans le vieux téléphone
       (numéro jamais utilisé sur WhatsApp classique — condition Meta)
 - [ ] Créer le compte ManyChat, lancer la connexion WhatsApp Business
