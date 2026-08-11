@@ -1,166 +1,107 @@
+import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
-import { Gauge } from "@/components/ui/gauge";
-import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
-import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
-import { PlanCard } from "@/components/dashboard/plan-card";
-import { WatchScreenshotCta } from "@/components/dashboard/watch-screenshot-cta";
-import { ImcCard } from "@/components/dashboard/imc-card";
-import { ConseilsCoach } from "@/components/dashboard/conseils-coach";
-import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
+import { DailyExperience } from "@/components/daily/daily-experience";
 import { ActiviteQuotidienneCard } from "@/components/dashboard/activite-quotidienne-card";
 import { CoaiInsightCard } from "@/components/dashboard/coai-insight-card";
-import { AdaptationNotificationCard } from "@/components/dashboard/adaptation-notification-card";
-import { SemaineChangeButton } from "@/components/dashboard/semaine-change-button";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
-import { getNotificationAdaptation } from "@/lib/insight/derniere-adaptation";
-import type { Pilier } from "@prisma/client";
+import { computeProfilCompletion } from "@/lib/profil/completion";
+import { canGenerateProgramme } from "@/lib/subscription/plan";
+import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 
-const PILIER_LABELS: Record<Pilier, string> = {
-  ENTRAINEMENT: "Entraînement",
-  NUTRITION: "Nutrition",
-  RECUPERATION: "Récupération",
-};
-
-// Le pourcentage de chaque jauge reflète l'état du programme pour ce pilier
-// (aucune donnée physiologique type fréquence cardiaque/HRV n'est collectée
-// en continu dans l'app — pas de "score de récupération" inventé) :
-// 0% = jamais généré, 50% = en attente de relecture coach, 100% = validé ou
-// généré en full IA (palier Gratuit, pas de relecture prévue).
-function statutVersPourcent(statut: "VALIDE" | "EN_ATTENTE" | "GENERE_IA" | null): {
-  percent: number;
-  sublabel: string;
-} {
-  if (statut === "VALIDE") return { percent: 100, sublabel: "Programme actif" };
-  if (statut === "EN_ATTENTE") return { percent: 50, sublabel: "En cours de relecture" };
-  if (statut === "GENERE_IA") return { percent: 100, sublabel: "Généré par IA" };
-  return { percent: 0, sublabel: "Pas encore généré" };
+function today() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 export default async function DashboardPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
-  const plan = getEffectivePlan(user.subscription);
+  const date = today();
+  const completion = computeProfilCompletion(user.profile);
+  const [validated, latest, daily, insight] = await Promise.all([
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
+      orderBy: { generatedAt: "desc" },
+    }),
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "ENTRAINEMENT" },
+      orderBy: { generatedAt: "desc" },
+    }),
+    prisma.dailySession.findUnique({ where: { userId_date: { userId: user.id, date } } }),
+    getCoaiInsight(user.id),
+  ]);
 
-  const [derniereSeance, derniereMesure, dernieresGenerations, insight, notificationAdaptation] =
-    await Promise.all([
-      prisma.seanceLog.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
-      prisma.mesure.findFirst({ where: { userId: user.id }, orderBy: { date: "desc" } }),
-      Promise.all(
-        piliers.map((pilier) =>
-          prisma.programmeGenerated.findFirst({
-            where: { userId: user.id, pilier },
-            orderBy: { generatedAt: "desc" },
-          })
-        )
-      ),
-      getCoaiInsight(user.id),
-      getNotificationAdaptation(user.id),
-    ]);
-
-  const programmeCount = dernieresGenerations.filter(Boolean).length;
+  const programme = validated ?? latest;
+  const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
+  const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
+  const objective = sourceSession?.nom ? `Aujourd’hui, on travaille ${String(sourceSession.nom).toLowerCase()}.` : "Une journée utile, adaptée à ton rythme.";
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
-        <SectionLabel>Vue d&apos;ensemble</SectionLabel>
+    <div className="flex flex-col gap-7">
+      <header className="flex flex-col gap-2 border-b border-acier/25 pb-6">
+        <SectionLabel>Aujourd&apos;hui</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
-          {user.prenom ? `Bonjour ${user.prenom}.` : "Votre progression commence ici."}
+          {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
         </h1>
-        <p className="max-w-2xl text-sm leading-6 text-graphite-400">COAI réunit vos programmes, votre suivi et les recommandations validées par votre coach Anthony.</p>
-      </div>
+        <p className="max-w-2xl text-sm leading-6 text-graphite-300">{objective}</p>
+      </header>
 
-      <CoaiInsightCard insight={insight} />
-
-      {notificationAdaptation && (
-        <AdaptationNotificationCard notification={notificationAdaptation} plan={plan} />
+      {!completion.essentielComplet ? (
+        <section className="rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Profil incomplet</p>
+          <h2 className="mt-2 text-2xl text-white">COAI a besoin de quelques repères essentiels.</h2>
+          <p className="mt-2 text-sm leading-6 text-graphite-300">Il manque : {completion.champsEssentielsManquants.join(", ")}. Ces informations permettent de préparer une séance cohérente et prudente.</p>
+          <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
+        </section>
+      ) : !programme ? (
+        canGenerateProgramme(user.subscription) ? (
+          <section className="flex flex-col gap-4">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-6 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme à préparer</p>
+              <h2 className="mt-2 text-2xl text-white">Ta première semaine peut être générée maintenant.</h2>
+              <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-graphite-300">Pendant la génération, COAI affiche un état explicite puis revient vers ton programme — aucun chargement ne tourne indéfiniment.</p>
+            </div>
+            <GenererProgrammeOnboarding />
+          </section>
+        ) : (
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Aucun programme</p>
+            <h2 className="mt-2 text-2xl text-white">Commençons par ton diagnostic.</h2>
+            <p className="mt-2 text-sm leading-6 text-graphite-300">Il permet à COAI de comprendre ton objectif, ton niveau et le temps dont tu disposes.</p>
+            <Link href="/diagnostic" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Faire mon diagnostic</Link>
+          </section>
+        )
+      ) : sourceSession ? (
+        <DailyExperience
+          sourceSession={sourceSession as WorkoutSession}
+          initialDaily={daily}
+          expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
+          pendingCoach={pendingCoach}
+          programmeVersion={programme.version}
+        />
+      ) : (
+        <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
+          <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
+          {pendingCoach && <p className="mt-4 text-sm text-amber-200">Programme V{programme.version} — à valider par ton coach.</p>}
+          <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-white/15 px-5 py-2.5 text-sm text-white">Voir ma récupération</Link>
+        </section>
       )}
 
-      <OnboardingChecklist hasProfile={!!user.profile} hasProgramme={programmeCount > 0} />
-
-      <WeeklyCheckinCard />
-
-      <ActiviteQuotidienneCard />
-
-      <WatchScreenshotCta />
-
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Vue du jour</SectionLabel>
-        <Card className="flex flex-wrap justify-around gap-8 py-8">
-          {piliers.map((pilier, i) => {
-            const { percent, sublabel } = statutVersPourcent(
-              dernieresGenerations[i]?.statut ?? null
-            );
-            return (
-              <Gauge
-                key={pilier}
-                label={PILIER_LABELS[pilier]}
-                percent={percent}
-                sublabel={sublabel}
-              />
-            );
-          })}
-        </Card>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <CoaiInsightCard insight={insight} />
+        <ActiviteQuotidienneCard />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card className="min-h-32">
-          <h2 className="font-mono text-xs uppercase tracking-wider text-graphite-400">
-            Dernière séance
-          </h2>
-          <p className="mt-5 font-editorial text-2xl text-graphite-50">
-            {derniereSeance ? derniereSeance.date.toISOString().slice(0, 10) : "Aucune séance loguée"}
-          </p>
-        </Card>
-        <Card className="min-h-32">
-          <h2 className="font-mono text-xs uppercase tracking-wider text-graphite-400">
-            Dernière mesure
-          </h2>
-          <p className="mt-5 font-editorial text-2xl text-graphite-50">
-            {derniereMesure?.poidsKg ? `${derniereMesure.poidsKg} kg` : "Aucune mesure enregistrée"}
-          </p>
-        </Card>
+      <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
+        <Link href="/programme" className="text-laiton-300 hover:underline">Voir le programme source →</Link>
+        <Link href="/suivi/progression" className="text-graphite-300 hover:text-white">Voir mon suivi →</Link>
       </div>
-
-      <ImcCard
-        tailleCm={user.profile?.tailleCm}
-        poidsKg={derniereMesure?.poidsKg}
-        masseGrassePourcent={derniereMesure?.masseGrassePourcent}
-        masseMusculaireKg={derniereMesure?.masseMusculaireKg}
-      />
-
-      <ConseilsCoach />
-      <a href="/programme" className="group flex items-center justify-between rounded-2xl border border-laiton-400/20 bg-laiton-400/[0.06] px-6 py-5 text-sm text-laiton-300 transition hover:bg-laiton-400/[0.1]">
-        <span>Voir mon profil et mon programme personnalisé</span><span className="transition group-hover:translate-x-1">→</span>
-      </a>
-
-      <a
-        href="/programme/evolution"
-        className="group flex flex-col gap-1.5 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-6 py-5 transition hover:border-laiton-400/25 hover:bg-white/[0.04]"
-      >
-        <span className="text-sm font-semibold text-white">Ce n&apos;est pas un programme figé.</span>
-        <span className="text-sm leading-6 text-graphite-400">
-          COAI apprend de tes entraînements, de ta récupération et de ton quotidien pour faire
-          évoluer ton programme au fil du temps.
-        </span>
-        <span className="mt-1 inline-flex items-center gap-1.5 text-sm text-laiton-300">
-          Voir ce que COAI a appris sur moi
-          <span className="transition group-hover:translate-x-1">→</span>
-        </span>
-      </a>
-
-      <div className="flex justify-center">
-        <SemaineChangeButton />
-      </div>
-
-      <PlanCard plan={plan} />
-
-      <CoachingVisioCta plan={plan} />
     </div>
   );
 }

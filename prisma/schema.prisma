@@ -91,8 +91,61 @@ model User {
   weeklyCheckins WeeklyCheckin[]
   adaptations    ProgrammeAdaptation[]
   activitesJournalieres ActiviteJournaliere[]
+  dailySessions  DailySession[]
 
   @@map("users")
+}
+
+enum DailySleep {
+  TRES_MAUVAIS
+  MAUVAIS
+  CORRECT
+  BON
+  EXCELLENT
+}
+
+enum DailyEnergy {
+  TRES_BASSE
+  BASSE
+  NORMALE
+  HAUTE
+  TRES_HAUTE
+}
+
+enum DailyWorkoutRating {
+  TROP_FACILE
+  BIEN_DOSEE
+  TROP_DURE
+}
+
+// Phase 6.1 — photographie immuable de la séance proposée pour une journée.
+// La séance source et sa version adaptée sont copiées ici : le contenu de
+// ProgrammeGenerated n'est jamais modifié par un check-in quotidien.
+model DailySession {
+  id                  String              @id @default(uuid())
+  userId              String
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date                DateTime            @db.Date
+  programmeSourceId   String?
+  programmeVersion    Int?
+  sourceSession       Json?
+  adaptedSession      Json?
+  adaptation          Json?
+  sleep               DailySleep?
+  energy              DailyEnergy?
+  pain                 Boolean?
+  painArea             String?
+  availableMinutes    Int?
+  completedAt         DateTime?
+  workoutRating       DailyWorkoutRating?
+  feedbackPain        Boolean?
+  feedbackComment     String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("daily_sessions")
 }
 
 enum SubscriptionStatus {

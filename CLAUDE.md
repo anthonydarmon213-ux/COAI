@@ -4,6 +4,50 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 6.1 — Daily COAI / Aujourd'hui (12/08/2026)
+
+Phase 6.1 implémentée sans modifier Stripe, les abonnements, le trial, les
+tarifs, l'authentification ou le tunnel diagnostic. Phase 6.2 non commencée.
+
+- **Entrée principale** : `/dashboard` devient l'écran « Aujourd'hui » ;
+  `/aujourdhui` redirige vers lui. En-tête contextuel, séance ou récupération,
+  puis COAI Insight et un résumé NEAT compact.
+- **Navigation** : cinq destinations principales, `Aujourd'hui / Programme /
+  Suivi / Profil / Coach`. Avis, paramètres et abonnement restent secondaires
+  sur desktop. Les routes existantes sont conservées.
+- **Séance source** : sélection déterministe par jour français dans la dernière
+  version validée ; si aucune version validée n'existe, la dernière V1
+  `EN_ATTENTE` reste consultable avec « À valider par ton coach » clairement
+  affiché. Un jour absent du tableau `seances` est un jour de repos.
+- **Check-in quotidien** : sommeil (5 niveaux), énergie (5), douleur oui/non +
+  zone, temps disponible (15/25/40/60/60+). Endpoint authentifié `/api/daily`.
+- **Adaptation déterministe et explicable** (`src/lib/daily/session.ts`) : le
+  temps réduit conserve les premiers exercices prioritaires ; mauvais sommeil
+  ou énergie basse retire une série et les méthodes d'intensification ; une
+  douleur suspend la séance plutôt que de pousser à travers la gêne. Chaque
+  changement et sa raison sont affichés.
+- **Immutabilité** : `ProgrammeGenerated.contenu` n'est jamais mis à jour. La
+  nouvelle table `daily_sessions` conserve une photographie JSON de la séance
+  source, la séance adaptée, sa raison, la version du programme, le check-in,
+  la fin de séance et le feedback. Une ligne par utilisateur/jour.
+- **Feedback** : trop facile / bien dosée / trop dure, douleur oui/non,
+  commentaire facultatif, tous enregistrés dans `daily_sessions`.
+- **États** : profil incomplet, aucun programme, génération explicite et bornée
+  à 90 s, programme disponible, Transformation en attente, entraînement et
+  repos. Aucun loader Daily ne dépend d'un polling infini.
+- **Migration** :
+  `20260812023000_add_daily_coai_phase_6_1`, additive uniquement, avec RLS
+  activé par défense en profondeur ; la table reste utilisée via Prisma côté
+  serveur, pas directement depuis le client Supabase.
+- **Vérification locale** : Prisma generate, `tsc --noEmit`, ESLint ciblé et
+  `next build` propres. Six assertions de règles métier (jour de séance/repos,
+  25 min, faible récupération, douleur, séance inchangée). Playwright Chromium
+  réel : 390×844 et 1440×1000, scénario 25 min + faible récupération,
+  douleur prudente, Transformation en attente et check-in interactif avec API
+  simulée ; aucune erreur console, aucun débordement horizontal, aucun loader
+  résiduel. Captures dans `test-results/daily-mobile.png`,
+  `daily-desktop.png`, `daily-pain-mobile.png`.
+
 ## Carte premium Transformation sur l'inscription (11/08/2026, nuit)
 
 Demandé juste après la simplification à parcours unique ci-dessous : l'offre

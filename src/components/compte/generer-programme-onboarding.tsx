@@ -18,13 +18,17 @@ export function GenererProgrammeOnboarding() {
 
   async function generer() {
     setEtat("loading");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 90_000);
     try {
-      const res = await fetch("/api/programmes/generate", { method: "POST" });
+      const res = await fetch("/api/programmes/generate", { method: "POST", signal: controller.signal });
       if (!res.ok) throw new Error("generation");
       trackFunnelEvent("first_programme_viewed");
       router.push("/programme/entrainement");
     } catch {
       setEtat("erreur");
+    } finally {
+      window.clearTimeout(timeout);
     }
   }
 
@@ -36,7 +40,7 @@ export function GenererProgrammeOnboarding() {
         à enrichir ton profil plus tard.
       </p>
       <Button onClick={generer} disabled={etat === "loading"} className="px-8 py-3">
-        {etat === "loading" ? "…" : "Générer mon programme"}
+        {etat === "loading" ? "Génération en cours…" : "Générer mon programme"}
       </Button>
       {etat === "erreur" && (
         <p className="text-sm text-red-400">
