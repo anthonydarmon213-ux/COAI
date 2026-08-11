@@ -4,6 +4,45 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Test de bout en bout des 4 phases "programme évolutif" (11/08/2026, nuit)
+
+Demandé par Anthony ("test tout d'abord") avant de continuer, après la
+livraison des 4 phases ci-dessous. Ce qui a été réellement possible depuis
+ce sandbox, et ce qui ne l'était pas :
+
+- **Fait** : `npx tsc --noEmit` et `npm run build` consolidés sur
+  l'ensemble du code accumulé Phase 1→4 — les deux passent sans erreur,
+  toutes les routes (dont les nouvelles `/admin`, `/admin/clients/[id]`,
+  `/api/adaptations/[id]/confirmer`, `/rejeter`, `/api/programmes/[pilier]/
+  reprendre`) compilent et sont bien générées par Next.js.
+- **Fait** : test visuel par composant (page temporaire non commitée,
+  supprimée après coup) avec données simulées — `AdaptationResultat` (cas
+  décision actionnable et cas données insuffisantes), `AdaptationNotificationCard`
+  (statuts PROPOSEE et APPLIQUEE), `SemaineChangeButton` (ouverture de la
+  modale + sous-formulaire "Je voyage" cliqué en conditions réelles),
+  `ReprendreProgrammeButton`, `ValidateProgrammeCard` avec suggestion COAI.
+  Captures Playwright mobile (390px) et desktop (1280px) : aucun débordement,
+  aucune régression visuelle, textes français corrects. Un badge "1 error"
+  Next.js aperçu pendant le test vient d'un warning webpack préexistant
+  (Sentry/`require-in-the-middle`), sans lien avec ce chantier.
+- **Pas fait, impossible depuis ce sandbox** : aucun test de bout en bout
+  avec de vraies données/authentification. Ce sandbox n'a pas d'accès direct
+  à la base Supabase (`npx prisma db execute` échoue en P1001 sur le pooler,
+  déjà constaté plus tôt) ni d'URL de déploiement joignable
+  (`NEXT_PUBLIC_APP_URL=http://localhost:3000` en local uniquement) — donc
+  impossible de vérifier ici qu'un vrai abonné peut réellement analyser son
+  programme, accepter/rejeter une adaptation, ou qu'un coach peut valider
+  une suggestion, en conditions réelles.
+- **Reste à faire par Anthony** : appliquer les 3 migrations encore en
+  attente (`20260811120000_add_phase2_programme_vivant`,
+  `20260811150000_add_adaptation_confirmation`, `20260811170000_add_hrv` —
+  cf. checklist plus bas) puis tester lui-même en conditions réelles sur le
+  site déployé : loguer 2-3 séances, cliquer "Analyser mon programme",
+  Accepter puis vérifier que `/programme/evolution` affiche bien le
+  changement ; tester "Ma semaine change" → voyage puis "Reprendre mon
+  programme habituel" ; côté coach, valider/rejeter une suggestion sur
+  `/admin/clients/[id]` et vérifier que la note s'affiche côté abonné.
+
 ## Phase 4 — dashboard coach, validation humaine (11/08/2026, soir)
 
 Quatrième et dernière phase du découpage initial de la vision "programme
@@ -251,6 +290,13 @@ pour le détail/contexte de chaque sujet) :
       sur Supabase (SQL Editor) — durée de séance, mode voyage temporaire
       et contexte d'adaptation ne fonctionneront pas tant que ce n'est pas
       fait (SQL donné dans le chat le 11/08 soir)
+- [ ] Une fois les 3 migrations ci-dessus appliquées : tester en conditions
+      réelles le parcours "programme évolutif" (logue 2-3 séances → Analyser
+      mon programme → Accepter → vérifie `/programme/evolution` ; teste
+      "Ma semaine change" en mode voyage ; valide/rejette une suggestion
+      côté `/admin/clients/[id]`) — non testable depuis le sandbox Claude
+      Code (pas d'accès direct à Supabase ni d'URL de déploiement
+      joignable, cf. section "Test de bout en bout" ci-dessus)
 - [x] Migration `20260811090000_add_programme_evolutif` appliquée sur
       Supabase (11/08 après-midi) — check-in séance/hebdo, versionnage et
       adaptations opérationnels en prod
