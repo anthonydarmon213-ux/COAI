@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 // Écran d'ouverture de la landing page : rejoue la séquence du brand book
@@ -18,7 +19,21 @@ export function CoaiIntro() {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 text-center">
+    <section className="relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 py-10 text-center">
+      {/* Bannière statique (même visuel que la chaîne YouTube) — demande
+          d'Anthony du 11/08, ajoutée au-dessus de l'animation existante,
+          pas en remplacement. */}
+      <div className="relative z-10 aspect-[2560/1440] w-full max-w-4xl overflow-hidden rounded-2xl border border-laiton-400/20">
+        <Image
+          src="/coai-banner-anthony.png"
+          alt="COAI — Coaching, suivi, IA. HI × AI. AI generates, humans validate. Anthony Darmon."
+          fill
+          priority
+          sizes="(min-width: 1024px) 56rem, 100vw"
+          className="object-cover"
+        />
+      </div>
+
       <div
         className="pointer-events-none absolute inset-0"
         style={{
