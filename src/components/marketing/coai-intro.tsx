@@ -87,7 +87,7 @@ export function CoaiIntro() {
       <div className="relative z-10 mt-2 flex flex-col items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/diagnostic">
-            <Button className="px-7 py-3 uppercase tracking-wide">Créer mon programme</Button>
+            <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
           </Link>
           <a href="#comment-ca-marche">
             <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
@@ -95,8 +95,8 @@ export function CoaiIntro() {
             </Button>
           </a>
         </div>
-        <p className="text-xs text-graphite-500">
-          Un programme personnalisé au départ. Adapté dans le temps.
+        <p className="font-mono text-xs uppercase tracking-widest text-graphite-500">
+          2 min · Gratuit · Sans engagement
         </p>
       </div>
     </section>
