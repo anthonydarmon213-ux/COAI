@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
+import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
 export const metadata: Metadata = {
   title: "COAI — Coaching sportif par IA, validé par un vrai coach",
@@ -183,15 +184,37 @@ export default function LandingPage() {
           suite sur l'humain derrière COAI (visage + nom), avant même le
           reste du pitch. */}
       <section className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
-        <div className="relative mx-auto h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80 md:order-first">
-          <Image
-            src="/anthony-darmon-portrait.jpg"
-            alt="Anthony Darmon, fondateur de COAI"
-            fill
-            priority
-            sizes="(min-width: 640px) 20rem, 16rem"
-            className="object-cover"
-          />
+        <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
+          <div className="relative h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80">
+            <Image
+              src="/anthony-darmon-portrait.jpg"
+              alt="Anthony Darmon, fondateur de COAI"
+              fill
+              priority
+              sizes="(min-width: 640px) 20rem, 16rem"
+              className="object-cover"
+            />
+          </div>
+          <div className="flex items-center justify-center gap-2.5">
+            <a
+              href="https://instagram.com/anthonydarmoncoach"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+            >
+              <InstagramIcon className="h-4 w-4" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+            >
+              <LinkedinIcon className="h-4 w-4" />
+            </a>
+          </div>
         </div>
         <div className="flex flex-col items-center gap-5 md:items-start">
           <SectionLabel>Fondateur</SectionLabel>

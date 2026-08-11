@@ -10,6 +10,7 @@ import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
 import { Badge } from "@/components/ui/badge";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -779,6 +780,26 @@ export function DiagnosticQuiz() {
                     spécialiste des dirigeants et entrepreneurs. Ton programme est toujours validé
                     par lui ou un coach qu&apos;il a formé — jamais de l&apos;IA brute.
                   </p>
+                  <div className="flex items-center justify-center gap-2.5 sm:justify-start">
+                    <a
+                      href="https://instagram.com/anthonydarmoncoach"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Instagram"
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+                    >
+                      <InstagramIcon className="h-4 w-4" />
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="LinkedIn"
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
+                    >
+                      <LinkedinIcon className="h-4 w-4" />
+                    </a>
+                  </div>
                 </div>
               </div>
 
