@@ -323,7 +323,8 @@ export default async function AdminBusinessPage() {
             <p className="break-all font-mono text-xs text-graphite-300">https://coai.fr/diagnostic?utm_source=meta&amp;utm_medium=paid_social&amp;utm_campaign=acquisition_coai&amp;utm_content=video_1</p>
             <p className="break-all font-mono text-xs text-graphite-300">https://coai.fr/diagnostic?utm_source=meta&amp;utm_medium=paid_social&amp;utm_campaign=acquisition_coai&amp;utm_content=video_2</p>
             <p className="break-all font-mono text-xs text-graphite-300">https://coai.fr/diagnostic?utm_source=meta&amp;utm_medium=paid_social&amp;utm_campaign=acquisition_coai&amp;utm_content=video_3</p>
-            <p className="text-xs text-graphite-500">Utilise un contenu différent par publicité pour comparer les trois vidéos dans GA4, tout en gardant la même campagne dans ce tableau.</p>
+            <p className="break-all font-mono text-xs text-graphite-300">https://coai.fr/diagnostic?utm_source=meta&amp;utm_medium=paid_social&amp;utm_campaign=acquisition_coai&amp;utm_content=video_4</p>
+            <p className="text-xs text-graphite-500">Utilise un contenu différent par publicité pour comparer les quatre vidéos dans GA4, tout en gardant la même campagne dans ce tableau.</p>
           </Card>
         </section>
 
