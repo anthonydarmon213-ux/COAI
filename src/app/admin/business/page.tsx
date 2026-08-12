@@ -40,7 +40,7 @@ export default async function AdminBusinessPage() {
   const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
-      select: { plan: true, billingInterval: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
+      select: { plan: true, billingInterval: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: true } } } } },
     }),
     prisma.programmeGenerated.count(),
     prisma.seanceLog.count(),
@@ -86,6 +86,11 @@ export default async function AdminBusinessPage() {
   const nbAnnulations30Jours = subscriptions.filter(
     (s) => s.status === "CANCELED" && s.updatedAt >= ilYA30Jours
   ).length;
+  const essaisAvecProgramme = essaisActifs.filter((subscription) => subscription.user._count.programmes > 0).length;
+  const essaisAvecSeance = essaisActifs.filter((subscription) => subscription.user._count.seances > 0).length;
+  const tauxActivationProgramme = essaisActifs.length > 0 ? (essaisAvecProgramme / essaisActifs.length) * 100 : 0;
+  const tauxActivationSeance = essaisActifs.length > 0 ? (essaisAvecSeance / essaisActifs.length) * 100 : 0;
+  const relancesActivationEnvoyees = subscriptions.filter((subscription) => subscription.trialActivationReminderSentAt).length;
   const churnFeedbackCount = churnReasons.reduce((total, item) => total + item._count._all, 0);
   const topChurnReason = churnReasons[0]?.reason ?? "Aucun retour";
   const churnReasonLabels: Record<string, string> = {
@@ -247,6 +252,19 @@ export default async function AdminBusinessPage() {
             <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
           </div>
           <p className="text-xs text-graphite-500">{relancesDiagnosticEnvoyees} relance{relancesDiagnosticEnvoyees > 1 ? "s" : ""} diagnostic envoyée{relancesDiagnosticEnvoyees > 1 ? "s" : ""} sur la période.</p>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <div>
+            <SectionLabel>Activation des essais</SectionLabel>
+            <p className="mt-2 text-xs text-graphite-500">Un essai activé découvre la valeur avant le premier prélèvement.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatCard label="Essais en cours" value={String(essaisActifs.length)} sublabel="Fenêtre de 7 jours" />
+            <StatCard label="Programme généré" value={String(essaisAvecProgramme)} sublabel={`${tauxActivationProgramme.toFixed(1)} % des essais`} highlight />
+            <StatCard label="Première séance" value={String(essaisAvecSeance)} sublabel={`${tauxActivationSeance.toFixed(1)} % des essais`} highlight />
+            <StatCard label="Relances activation" value={String(relancesActivationEnvoyees)} sublabel="Essais sans programme" />
+          </div>
         </section>
 
         <section className="flex flex-col gap-3">
