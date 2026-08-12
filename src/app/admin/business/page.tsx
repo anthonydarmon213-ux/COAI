@@ -36,7 +36,7 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons] = await Promise.all([
+  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
       select: { plan: true, billingInterval: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
@@ -51,6 +51,15 @@ export default async function AdminBusinessPage() {
       by: ["reason"],
       _count: { _all: true },
       orderBy: { _count: { reason: "desc" } },
+    }),
+    prisma.user.count({ where: { codeParrainage: { not: null } } }),
+    prisma.user.findMany({
+      where: { parraineParId: { not: null } },
+      select: {
+        createdAt: true,
+        recompenseParrainageAppliquee: true,
+        subscription: { select: { status: true, trialEnd: true } },
+      },
     }),
   ]);
 
@@ -88,6 +97,12 @@ export default async function AdminBusinessPage() {
   }, 0);
   const arr = mrr * 12;
   const tauxConversion = totalUsers > 0 ? (abonnesPayants.length / totalUsers) * 100 : 0;
+  const filleuls30Jours = filleuls.filter((f) => f.createdAt >= ilYA30Jours);
+  const filleulsConvertis = filleuls.filter((f) => f.recompenseParrainageAppliquee).length;
+  const filleulsEnEssai = filleuls.filter(
+    (f) => !f.recompenseParrainageAppliquee && f.subscription?.trialEnd && f.subscription.trialEnd > maintenant
+  ).length;
+  const conversionParrainage = filleuls.length > 0 ? (filleulsConvertis / filleuls.length) * 100 : 0;
 
   const semaineMs = 7 * 24 * 60 * 60 * 1000;
   const debut = new Date(Date.now() - (NB_SEMAINES - 1) * semaineMs);
@@ -173,6 +188,22 @@ export default async function AdminBusinessPage() {
         </div>
 
         <GrowthChart label={`Croissance des inscriptions — ${NB_SEMAINES} dernières semaines`} points={croissance} />
+
+        <section className="flex flex-col gap-3">
+          <div>
+            <SectionLabel>Acquisition virale</SectionLabel>
+            <p className="mt-2 text-xs text-graphite-500">
+              Données d&apos;attribution réelles en base. Les clics et partages sont suivis séparément dans GA4.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatCard label="Liens personnels créés" value={String(liensParrainage)} sublabel="Membres ayant activé le parrainage" />
+            <StatCard label="Filleuls inscrits" value={String(filleuls.length)} sublabel={`+${filleuls30Jours.length} sur les 30 derniers jours`} highlight />
+            <StatCard label="Filleuls en essai" value={String(filleulsEnEssai)} sublabel="Conversion encore en cours" />
+            <StatCard label="Conversion parrainage" value={`${conversionParrainage.toFixed(1)}%`} sublabel={`${filleulsConvertis} filleul(s) devenu(s) payant(s)`} highlight />
+          </div>
+        </section>
+
         <CapacityPanel capacity={capacity} />
         <AIEconomicsPanel economics={aiEconomics} mrrEur={mrr} />
       </div>
