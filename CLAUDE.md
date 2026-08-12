@@ -18,6 +18,12 @@ l'utilisateur connecté : aucun record ni résumé privé n'est publiquement
 accessible. Ce bloc ne crée pas encore de galerie publique ni de publication
 automatique sur un réseau social.
 
+Le bloc 2 ajoute sur `/suivi/progression` un bilan partageable des 30 derniers
+jours : nombre de séances et semaines actives uniquement. Poids, mensurations,
+photos, douleurs et objectifs personnels en sont volontairement exclus. Le
+visuel reprend l'axe de marque « Plus COAI me connaît, meilleur devient mon
+coaching » et renvoie vers le diagnostic public.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements

@@ -5,6 +5,8 @@ import { Sparkline } from "@/components/suivi/sparkline";
 import { MetricRing } from "@/components/suivi/metric-ring";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { getEffectivePlan } from "@/lib/subscription/plan";
+import { Card } from "@/components/ui/card";
+import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 
 type Metrique = {
   label: string;
@@ -62,6 +64,8 @@ export default async function ProgressionPage() {
   const graphiquesForce = Array.from(chargesParExercice.entries())
     .filter(([, points]) => points.length > 1)
     .map(([nom, points]) => ({ nom, points }));
+  const debutBilan = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const seancesDuMois = seances.filter((seance) => seance.date >= debutBilan).length;
 
   return (
     <div className="flex flex-col gap-8">
@@ -69,6 +73,18 @@ export default async function ProgressionPage() {
         <SectionLabel>Suivi</SectionLabel>
         <h1 className="text-2xl font-semibold">Progression</h1>
       </div>
+
+      {seancesDuMois > 0 && (
+        <Card className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <SectionLabel>Bilan des 30 derniers jours</SectionLabel>
+            <p className="mt-2 text-sm text-graphite-300">
+              {seancesDuMois} séance{seancesDuMois > 1 ? "s" : ""} réalisée{seancesDuMois > 1 ? "s" : ""}. Transforme ta régularité en carte COAI.
+            </p>
+          </div>
+          <ShareProgressCardButton imageUrl="/api/suivi/bilan-mensuel/carte" filename="coai-bilan-30-jours.png" title="Mon bilan COAI" />
+        </Card>
+      )}
 
       {graphiques.length === 0 && graphiquesForce.length === 0 ? (
         <p className="text-graphite-400">
