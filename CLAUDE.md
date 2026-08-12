@@ -43,6 +43,14 @@ aucun écran ni export client et vivent dans `coach_notes`, table avec RLS actif
 et aucune politique Data API. Migration additive :
 `20260812104500_add_coach_notes`.
 
+Le bloc 3A ajoute un portefeuille coach exhaustif sur `/admin/clients` :
+recherche par identité/email, filtre des clients à surveiller, priorité des
+alertes et accès direct au dossier. Il réutilise les abonnés Transformation,
+les alertes et les notes existantes, sans nouveau rôle ni nouvelle donnée.
+Le rôle Coach et les affectations individuelles restent le bloc 3B : ils ne
+seront ajoutés qu'avec une migration Supabase testable et un cloisonnement
+serveur vérifié.
+
 ## Phase 9 — cartes de progression partageables, bloc 1 (12/08/2026)
 
 Les records physiques et adaptations de programme disposent désormais d'un
