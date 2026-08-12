@@ -17,6 +17,11 @@ avec contrôles natifs, lecture mobile inline et chargement différé des donné
 vidéo (`preload="metadata"`). Aucun média générique ou contenu inventé n'a été
 ajouté.
 
+Une seconde vidéo fournie par Anthony est ajoutée immédiatement à la suite
+(`public/coai-presentation-2.mp4`). Elle dispose de son propre lecteur, reste
+sans autoplay et utilise également `preload="metadata"` pour éviter de charger
+les deux fichiers complets avant une action du visiteur.
+
 ## Phase 10 — COAI Coach / B2B, bloc 1 (12/08/2026)
 
 Le dashboard coach existant devient une file quotidienne réellement
