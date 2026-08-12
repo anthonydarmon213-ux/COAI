@@ -71,5 +71,5 @@ export async function GET() {
         : "inscrit",
   }));
 
-  return NextResponse.json({ code, lien: `${appUrl}/sign-up?ref=${code}`, filleuls });
+  return NextResponse.json({ code, lien: `${appUrl}/invitation/${code}`, filleuls });
 }
