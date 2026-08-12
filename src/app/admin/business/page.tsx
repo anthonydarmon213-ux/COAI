@@ -10,6 +10,7 @@ import { CapacityPanel } from "@/components/admin/capacity-panel";
 import { getCapacitySnapshot } from "@/lib/admin/capacity";
 import { AIEconomicsPanel } from "@/components/admin/ai-economics-panel";
 import { getAIEconomics } from "@/lib/admin/ai-economics";
+import { getRevenueMetrics } from "@/lib/admin/revenue-metrics";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
 const PRIX_IMPULSION = 19;
@@ -23,6 +24,11 @@ const eur = new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 0,
 });
 
+const eurCents = new Intl.NumberFormat("fr-FR", {
+  style: "currency",
+  currency: "EUR",
+});
+
 export default async function AdminBusinessPage() {
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/sign-in");
@@ -30,7 +36,7 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics] = await Promise.all([
+  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
       select: { plan: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
@@ -40,6 +46,7 @@ export default async function AdminBusinessPage() {
     prisma.user.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
     getCapacitySnapshot(),
     getAIEconomics(),
+    getRevenueMetrics(),
   ]);
 
   const maintenant = new Date();
@@ -118,6 +125,22 @@ export default async function AdminBusinessPage() {
           <StatCard label="Essais actifs" value={String(essaisActifs.length)} sublabel="Pas encore inclus dans le MRR" />
           <StatCard label="Paiements en retard" value={String(nbPaiementsEnRetard)} sublabel="Abonnements PAST_DUE" />
           <StatCard label="Annulations · 30 j" value={String(nbAnnulations30Jours)} sublabel="Indicateur de churn récent" />
+          <StatCard
+            label="Encaissé · 30 j"
+            value={eurCents.format(revenue.collectedCents30d / 100)}
+            sublabel={`${revenue.successfulPayments30d} paiement(s) réussi(s)`}
+            highlight
+          />
+          <StatCard
+            label="Clients payeurs · 30 j"
+            value={String(revenue.uniquePayingCustomers30d)}
+            sublabel="Clients uniques réellement débités"
+          />
+          <StatCard
+            label="Échecs de paiement · 30 j"
+            value={String(revenue.failedPayments30d)}
+            sublabel="À relancer ou surveiller"
+          />
         </div>
 
         <GrowthChart label={`Croissance des inscriptions — ${NB_SEMAINES} dernières semaines`} points={croissance} />
