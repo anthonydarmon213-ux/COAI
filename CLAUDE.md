@@ -1939,3 +1939,13 @@ Les économies exactes sont explicitées : 38 € sur Impulsion et 98 € sur
 Transformation. Les prix et les 7 jours d'essai ne changent pas. Les événements
 de sélection transmettent désormais aussi le rythme de facturation afin de
 comparer mensuel et annuel dans GA4.
+
+## Phase Revenus 3 — acquisition attribuable (12/08/2026)
+
+Le dashboard business ventile désormais les 30 derniers jours par première
+source/campagne connue : diagnostics uniques, comptes, essais actifs, clients
+payants et conversion diagnostic → payant. Les rapprochements utilisent les
+emails normalisés déjà recueillis ; aucune nouvelle donnée ni plateforme n'est
+ajoutée. Deux liens Meta normalisés (`video_1` et `video_2`) sont fournis pour
+envoyer chaque publicité vers le diagnostic tout en conservant une attribution
+comparable dans GA4 et dans COAI.

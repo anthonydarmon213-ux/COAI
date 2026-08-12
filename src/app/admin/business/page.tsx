@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/admin/stat-card";
+import { Card } from "@/components/ui/card";
 import { GrowthChart } from "@/components/admin/growth-chart";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { CapacityPanel } from "@/components/admin/capacity-panel";
@@ -63,7 +64,8 @@ export default async function AdminBusinessPage() {
     }),
     prisma.diagnosticLead.findMany({
       where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
-      select: { email: true, utmSource: true, conversionReminderSentAt: true },
+      select: { email: true, utmSource: true, utmCampaign: true, utmContent: true, conversionReminderSentAt: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
     }),
     prisma.user.findMany({
       select: { email: true, createdAt: true, subscription: { select: { status: true, trialEnd: true } } },
@@ -123,6 +125,28 @@ export default async function AdminBusinessPage() {
   const relancesDiagnosticEnvoyees = new Set(
     diagnosticLeads30d.filter((lead) => lead.conversionReminderSentAt).map((lead) => lead.email.toLowerCase())
   ).size;
+  const utilisateurParEmail = new Map(usersAvecAbonnement.map((user) => [user.email.toLowerCase(), user]));
+  const premierLeadParEmail = new Map<string, (typeof diagnosticLeads30d)[number]>();
+  for (const lead of diagnosticLeads30d) {
+    const emailNormalise = lead.email.toLowerCase();
+    if (!premierLeadParEmail.has(emailNormalise)) premierLeadParEmail.set(emailNormalise, lead);
+  }
+  const campagnes = new Map<string, { source: string; campagne: string; diagnostics: number; comptes: number; essais: number; payants: number }>();
+  for (const [emailNormalise, lead] of premierLeadParEmail) {
+    const source = lead.utmSource?.trim() || "direct";
+    const campagne = lead.utmCampaign?.trim() || "sans campagne";
+    const key = `${source}\u0000${campagne}`;
+    const ligne = campagnes.get(key) ?? { source, campagne, diagnostics: 0, comptes: 0, essais: 0, payants: 0 };
+    ligne.diagnostics++;
+    const user = utilisateurParEmail.get(emailNormalise);
+    if (user) ligne.comptes++;
+    if (user?.subscription?.status === "ACTIVE") {
+      ligne.essais++;
+      if (!user.subscription.trialEnd || user.subscription.trialEnd <= maintenant) ligne.payants++;
+    }
+    campagnes.set(key, ligne);
+  }
+  const campagnesTriees = [...campagnes.values()].sort((a, b) => b.diagnostics - a.diagnostics || b.payants - a.payants);
 
   const semaineMs = 7 * 24 * 60 * 60 * 1000;
   const debut = new Date(Date.now() - (NB_SEMAINES - 1) * semaineMs);
@@ -223,6 +247,40 @@ export default async function AdminBusinessPage() {
             <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
           </div>
           <p className="text-xs text-graphite-500">{relancesDiagnosticEnvoyees} relance{relancesDiagnosticEnvoyees > 1 ? "s" : ""} diagnostic envoyée{relancesDiagnosticEnvoyees > 1 ? "s" : ""} sur la période.</p>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <div>
+            <SectionLabel>Acquisition par campagne · 30 jours</SectionLabel>
+            <p className="mt-2 text-xs text-graphite-500">Attribution au premier diagnostic connu. Une campagne rentable doit produire des payants, pas seulement des diagnostics.</p>
+          </div>
+          <Card className="overflow-x-auto p-0">
+            <table className="w-full min-w-[680px] text-left text-sm">
+              <thead className="border-b border-white/[0.08] text-xs text-graphite-500">
+                <tr><th className="px-4 py-3">Source / campagne</th><th className="px-3 py-3">Diagnostics</th><th className="px-3 py-3">Comptes</th><th className="px-3 py-3">Essais</th><th className="px-3 py-3">Payants</th><th className="px-4 py-3">Conv.</th></tr>
+              </thead>
+              <tbody className="divide-y divide-white/[0.06]">
+                {campagnesTriees.length === 0 ? (
+                  <tr><td colSpan={6} className="px-4 py-6 text-center text-graphite-500">Aucune campagne attribuée sur cette période.</td></tr>
+                ) : campagnesTriees.map((campagne) => (
+                  <tr key={`${campagne.source}-${campagne.campagne}`}>
+                    <td className="px-4 py-3"><span className="font-medium text-white">{campagne.source}</span><span className="block text-xs text-graphite-500">{campagne.campagne}</span></td>
+                    <td className="px-3 py-3 text-graphite-200">{campagne.diagnostics}</td>
+                    <td className="px-3 py-3 text-graphite-200">{campagne.comptes}</td>
+                    <td className="px-3 py-3 text-graphite-200">{campagne.essais}</td>
+                    <td className="px-3 py-3 font-semibold text-laiton-300">{campagne.payants}</td>
+                    <td className="px-4 py-3 text-graphite-200">{campagne.diagnostics > 0 ? `${((campagne.payants / campagne.diagnostics) * 100).toFixed(1)} %` : "0 %"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+          <Card className="flex flex-col gap-3">
+            <p className="text-sm font-semibold text-white">Liens prêts pour les publicités Meta</p>
+            <p className="break-all font-mono text-xs text-graphite-300">https://coai.fr/diagnostic?utm_source=meta&amp;utm_medium=paid_social&amp;utm_campaign=acquisition_coai&amp;utm_content=video_1</p>
+            <p className="break-all font-mono text-xs text-graphite-300">https://coai.fr/diagnostic?utm_source=meta&amp;utm_medium=paid_social&amp;utm_campaign=acquisition_coai&amp;utm_content=video_2</p>
+            <p className="text-xs text-graphite-500">Utilise un contenu différent par publicité pour comparer les deux vidéos dans GA4, tout en gardant la même campagne dans ce tableau.</p>
+          </Card>
         </section>
 
         <section className="flex flex-col gap-3">
