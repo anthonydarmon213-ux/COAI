@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
 import { uploadProgressPhoto } from "@/lib/storage/progress-photos";
 
-const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_SIZE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(request: Request) {
   const authUser = await getCurrentUser();
@@ -16,11 +17,11 @@ export async function POST(request: Request) {
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
   }
-  if (!file.type.startsWith("image/")) {
-    return NextResponse.json({ error: "Le fichier doit être une image" }, { status: 400 });
+  if (!ALLOWED_TYPES.has(file.type)) {
+    return NextResponse.json({ error: "Formats acceptés : JPG, PNG ou WebP" }, { status: 400 });
   }
   if (file.size > MAX_SIZE_BYTES) {
-    return NextResponse.json({ error: "Image trop volumineuse (10 Mo max)" }, { status: 400 });
+    return NextResponse.json({ error: "Image trop volumineuse après optimisation (2 Mo max)" }, { status: 400 });
   }
 
   const result = await uploadProgressPhoto(authUser.id, file);
