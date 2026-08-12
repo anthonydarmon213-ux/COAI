@@ -10,6 +10,7 @@ import { TrustBadges } from "@/components/marketing/trust-badges";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { PlanSelectedLink } from "@/components/marketing/plan-selected-link";
+import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
@@ -36,9 +37,8 @@ type Tier = {
   features: string[];
   plan?: "STANDARD" | "PREMIUM";
   mostPopular?: boolean;
-  // Palier VIP : tarifs à la séance plutôt qu'un abonnement mensuel — pas
-  // de bouton d'abonnement Stripe, juste une réservation via WhatsApp.
-  sessions?: { label: string; prix: string }[];
+  // Palier VIP : packs payés une fois plutôt qu'un abonnement mensuel.
+  sessions?: { label: string; prix: string; pack?: "VISIO" | "PRESENTIEL" }[];
   limitedSpots?: boolean;
 };
 
@@ -113,23 +113,21 @@ const TIERS: Tier[] = [
     prix: "Sur réservation",
     suffixe: "",
     description:
-      "Coaching 100% humain avec Anthony Darmon, à la séance — présentiel ou visio, sans abonnement.",
+      "Coaching 100% humain avec Anthony Darmon — présentiel ou visio, en pack sans abonnement.",
     features: [
       "Coaching 1-to-1 avec Anthony Darmon",
-      "Réservation flexible, sans engagement ni abonnement",
+      "Pack de 4 séances, sans abonnement",
       "Accessible à tous, quel que soit ton palier",
     ],
     sessions: [
-      { label: "Présentiel — Paris centre (1h)", prix: "200€" },
-      { label: "Visio (1h)", prix: "100€" },
-      { label: "Présentiel — 1 mois, 1 séance/semaine", prix: "800€" },
-      { label: "Visio — 1 mois, 1 séance/semaine", prix: "400€" },
+      { label: "Pack Visio — 4 séances", prix: "360€", pack: "VISIO" },
+      { label: "Pack Présentiel — 4 séances", prix: "720€", pack: "PRESENTIEL" },
     ],
     limitedSpots: true,
   },
 ];
 
-export default function PricingPage({ searchParams }: { searchParams?: { billing?: string } }) {
+export default function PricingPage({ searchParams }: { searchParams?: { billing?: string; vip?: string } }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
   const annual = searchParams?.billing === "annual";
   const displayedTiers = TIERS.map((tier) => {
@@ -173,6 +171,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
       <div className="grid w-full max-w-4xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {displayedTiers.map((tier) => (
           <Card
+            id={tier.sessions ? "vip" : undefined}
             key={tier.nom}
             className={`flex h-full flex-col gap-5 px-6 py-8 text-center ${
               tier.mostPopular ? "border-laiton-400/40" : ""
@@ -222,14 +221,20 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
             </ul>
 
             {tier.sessions && (
-              <ul className="flex w-full flex-col gap-2 rounded-lg border border-graphite-800 bg-graphite-900/40 p-3 text-left text-sm">
+              <div className="flex w-full flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-3 text-left text-sm">
                 {tier.sessions.map((session) => (
-                  <li key={session.label} className="flex items-center justify-between gap-3">
-                    <span className="text-graphite-300">{session.label}</span>
-                    <span className="font-semibold text-white">{session.prix}</span>
-                  </li>
+                  <div key={session.label} className="flex flex-col gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-graphite-300">{session.label}</span>
+                      <span className="font-semibold text-white">{session.prix}</span>
+                    </div>
+                    {session.pack && <VipCheckoutButton pack={session.pack} label={`Acheter — ${session.prix}`} variant="secondary" />}
+                  </div>
                 ))}
-              </ul>
+                <p className="text-xs leading-5 text-graphite-400">
+                  Valable 3 mois. Report gratuit jusqu&apos;à 24 h avant la séance ; passé ce délai, la séance est due.
+                </p>
+              </div>
             )}
 
             {/* 6. Espace flexible — pousse le CTA en bas, aligné entre
@@ -242,7 +247,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
               {tier.sessions ? (
                 vipHref ? (
                   <a href={vipHref} target="_blank" rel="noopener noreferrer" className="w-full">
-                    <Button className="w-full">Réserver via WhatsApp</Button>
+                    <Button variant="ghost" className="w-full">Une question ? Écrire sur WhatsApp</Button>
                   </a>
                 ) : (
                   <Button className="w-full" disabled>
@@ -259,6 +264,13 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
           </Card>
         ))}
       </div>
+
+      {searchParams?.vip === "success" && (
+        <Card className="w-full max-w-4xl border-emerald-400/30 bg-emerald-400/[0.06] px-6 py-5 text-center">
+          <p className="font-semibold text-white">Paiement confirmé — ton pack VIP est réservé.</p>
+          <p className="mt-1 text-sm text-graphite-300">Contacte Anthony sur WhatsApp pour choisir les dates de tes séances.</p>
+        </Card>
+      )}
 
       {/* Entreprise : structurellement différent (devis, pas d'abonnement) —
           bandeau à part plutôt que compressé dans le comparateur 3 colonnes. */}
@@ -298,9 +310,8 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
         Les offres Impulsion et Transformation incluent 7 jours offerts, puis sont facturées au choix chaque mois ou chaque année. Elles sont sans
-        engagement, résiliables à tout moment depuis ton compte. Les séances VIP sont réservées et
-        payées à la séance, hors
-        abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
+        engagement, résiliables à tout moment depuis ton compte. Les packs VIP sont payés une fois,
+        hors abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
         séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">
           CGV

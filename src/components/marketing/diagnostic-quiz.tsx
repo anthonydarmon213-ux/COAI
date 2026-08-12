@@ -19,6 +19,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -308,10 +309,10 @@ const FORMULES = [
   {
     plan: "VIP" as const,
     nom: "VIP",
-    prix: "dès 100€/séance",
+    prix: "dès 360€ / 4 séances",
     prixAnnuel: null,
-    accroche: "Coaching 100% humain avec Anthony, à la séance.",
-    bullets: ["1-to-1 avec Anthony Darmon", "Présentiel ou visio", "Sans abonnement"],
+    accroche: "Coaching 100% humain avec Anthony, en pack sans abonnement.",
+    bullets: ["4 séances visio : 360€", "4 séances en présentiel : 720€", "Valable 3 mois"],
   },
 ];
 
@@ -1325,25 +1326,12 @@ export function DiagnosticQuiz({
                             formule={formule}
                             recommandee={recommandee}
                             annuel={facturationAnnuelle}
-                            cta={
-                              vipHref ? (
-                                <a
-                                  href={vipHref}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={() => trackFunnelEvent("plan_selected", { plan: "VIP" })}
-                                  className="w-full"
-                                >
-                                  <Button variant="secondary" size="compact" className="w-full">
-                                    Réserver via WhatsApp
-                                  </Button>
-                                </a>
-                              ) : (
-                                <Button variant="secondary" size="compact" className="w-full" disabled>
-                                  Contacter Anthony
-                                </Button>
-                              )
-                            }
+                            cta={<div className="flex flex-col gap-2">
+                              <VipCheckoutButton pack="VISIO" label="Acheter Visio — 360€" variant="secondary" />
+                              <VipCheckoutButton pack="PRESENTIEL" label="Acheter Présentiel — 720€" variant="secondary" />
+                              {vipHref && <a href={vipHref} target="_blank" rel="noopener noreferrer" onClick={() => trackFunnelEvent("plan_selected", { plan: "VIP" })} className="text-center text-xs text-laiton-300 underline">Une question ? WhatsApp</a>}
+                              <p className="text-[11px] leading-4 text-graphite-500">Valable 3 mois · report gratuit jusqu&apos;à 24 h avant</p>
+                            </div>}
                           />
                         );
                       }
