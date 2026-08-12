@@ -18,6 +18,12 @@ export type CoachSessionContext = {
   pendingCoach?: boolean;
 };
 
+export type CoachMemoryContext = {
+  progression: number;
+  observations: Array<{ label: string; valeur: string; preuve: string; maturite: "EN_OBSERVATION" | "ETABLI" }>;
+  tendances: Array<{ titre: string; constat: string; preuve: string }>;
+};
+
 // Réponse libre à une question posée par l'utilisateur à son "coach IA" —
 // contrairement aux prompts de génération de programme, pas de JSON attendu
 // ici, juste une réponse claire et courte, dans l'esprit de la méthode
@@ -25,7 +31,8 @@ export type CoachSessionContext = {
 export function buildCoachQuestionPrompt(
   profil: ProfilUtilisateur,
   question: string,
-  context?: CoachSessionContext
+  context?: CoachSessionContext,
+  memory?: CoachMemoryContext
 ): string {
   const sessionContext = context
     ? `\nContexte vérifié de la séance du jour :
@@ -48,6 +55,17 @@ N'invente aucune donnée absente. Si une modification est proposée, présente-l
 et explicite : tu ne modifies jamais le programme ni la séance enregistrée. Si le programme est encore à
 valider par Anthony, rappelle ce statut seulement quand il est utile à la réponse.\n`
     : "";
+  const memoryContext = memory && (memory.observations.length > 0 || memory.tendances.length > 0)
+    ? `\nMémoire longitudinale COAI calculée côté serveur :
+- Maturité globale des sources : ${memory.progression} %
+- Observations : ${JSON.stringify(memory.observations)}
+- Tendances comparatives : ${JSON.stringify(memory.tendances)}
+
+Cette mémoire contient des observations, pas des vérités médicales ni des liens de causalité.
+Utilise-la seulement si elle aide directement à répondre. Distingue une observation « EN_OBSERVATION »
+d'une habitude « ETABLI ». Une tendance comparative reste une association mesurée, jamais une prédiction.
+Ne cite pas les détails de preuve sauf si l'utilisateur demande pourquoi tu affirmes quelque chose.\n`
+    : "";
 
   return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon et plus de 17 ans
 d'expérience en coaching sportif. Un utilisateur te pose une question directement — réponds-lui
@@ -61,6 +79,7 @@ Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 ${sessionContext}
+${memoryContext}
 
 Règles importantes :
 - Tu n'es pas médecin : si la question évoque une douleur, une blessure, un symptôme ou nécessite
