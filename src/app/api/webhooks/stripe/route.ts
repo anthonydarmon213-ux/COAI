@@ -82,6 +82,26 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
   await prisma.subscription.updateMany({ where: { stripeCustomerId: customerId }, data });
 }
 
+async function recordBillingEvent(event: Stripe.Event, invoice: Stripe.Invoice, kind: "PAID" | "FAILED") {
+  const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+  if (!customerId) return;
+  const subscriptionId =
+    typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id;
+
+  await prisma.billingEvent.create({
+    data: {
+      id: event.id,
+      invoiceId: invoice.id,
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscriptionId ?? null,
+      kind,
+      amountCents: kind === "PAID" ? invoice.amount_paid : invoice.amount_due,
+      currency: invoice.currency.toUpperCase(),
+      occurredAt: new Date(event.created * 1000),
+    },
+  });
+}
+
 // Webhook Stripe : synchronise le statut et le palier d'abonnement avec le
 // modèle Subscription.
 export async function POST(request: Request) {
@@ -155,6 +175,14 @@ export async function POST(request: Request) {
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       await upsertFromSubscription(subscription);
+      break;
+    }
+    case "invoice.payment_succeeded": {
+      await recordBillingEvent(event, event.data.object as Stripe.Invoice, "PAID");
+      break;
+    }
+    case "invoice.payment_failed": {
+      await recordBillingEvent(event, event.data.object as Stripe.Invoice, "FAILED");
       break;
     }
     // Un remboursement n'annule pas l'abonnement côté Stripe par défaut —

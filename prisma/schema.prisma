@@ -224,6 +224,24 @@ model StripeWebhookEvent {
   @@map("stripe_webhook_events")
 }
 
+// Événements financiers minimaux issus des factures Stripe. Aucun moyen de
+// paiement, nom, email ou payload brut n'est stocké.
+model BillingEvent {
+  id                   String   @id
+  invoiceId            String
+  stripeCustomerId     String
+  stripeSubscriptionId String?
+  kind                 String
+  amountCents          Int
+  currency             String
+  occurredAt           DateTime
+  createdAt            DateTime @default(now())
+
+  @@index([occurredAt])
+  @@index([kind, occurredAt])
+  @@map("billing_events")
+}
+
 // Données d'entrée utilisées par l'IA pour générer les programmes.
 // Informations relativement stables (contrairement aux Mesure, qui suivent
 // leur évolution dans le temps).
