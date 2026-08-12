@@ -79,6 +79,13 @@ model User {
   // pas renvoyer deux fois pour la même mention — cf. /api/cron/relance-inactifs.
   derniereAlerteDouleurEnvoyeeAt DateTime?
 
+  // Récupération de Checkout : mémorise uniquement l'intention commerciale,
+  // jamais une donnée bancaire (Stripe reste le seul détenteur de la carte).
+  checkoutStartedAt       DateTime?
+  checkoutPlan            SubscriptionPlan?
+  checkoutBillingInterval BillingInterval?
+  checkoutReminderSentAt  DateTime?
+
   subscription   Subscription?
   profile        Profile?
   programmes     ProgrammeGenerated[]
@@ -97,6 +104,7 @@ model User {
   coachNotesReceived CoachNote[] @relation("CoachNoteClient")
   coachNotesAuthored CoachNote[] @relation("CoachNoteAuthor")
 
+  @@index([checkoutStartedAt, checkoutReminderSentAt])
   @@map("users")
 }
 

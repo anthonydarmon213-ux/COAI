@@ -83,5 +83,17 @@ export async function POST(request: Request) {
       : {}),
   });
 
+  // Enregistré seulement après création réussie de la session Stripe. Cette
+  // donnée sert à récupérer un Checkout abandonné, sans stocker de donnée CB.
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      checkoutStartedAt: new Date(),
+      checkoutPlan: plan,
+      checkoutBillingInterval: billing,
+      checkoutReminderSentAt: null,
+    },
+  });
+
   return NextResponse.json({ url: session.url });
 }

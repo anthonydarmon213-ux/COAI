@@ -1958,3 +1958,13 @@ essais actifs depuis plus de 24 heures qui n'ont encore aucun programme, puis
 les renvoie vers `/bienvenue` pour reprendre l'activation. Les essais déjà
 activés, annulés ou terminés sont exclus. Aucun nouvel outil d'email n'est
 ajouté : Resend et le cron existants sont réutilisés.
+
+## Phase Revenus 5 — récupération Checkout (12/08/2026)
+
+Le début d'un Checkout Stripe est désormais mémorisé côté serveur avec le plan
+et la périodicité, sans aucune donnée bancaire. Si aucun abonnement actif
+n'existe deux heures plus tard, une relance unique permet de reprendre l'offre
+choisie. La validation Stripe neutralise immédiatement la relance. Le retour
+d'annulation affiche aussi une confirmation explicite qu'aucun paiement n'a
+été enregistré. Le dashboard mesure les Checkouts commencés et relancés ; les
+échecs de paiement continuent d'être traités par le webhook Stripe existant.
