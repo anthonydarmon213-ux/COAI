@@ -19,7 +19,7 @@ export function CoaiIntro() {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 text-center">
+    <section className="relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-10 pt-28 text-center sm:pb-12 sm:pt-32">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -71,14 +71,14 @@ export function CoaiIntro() {
         <span className="font-mono text-xs uppercase tracking-[0.32em] text-laiton-400">HI × AI™</span>
       </div>
 
-      <div className="relative z-10 flex max-w-2xl flex-col items-center gap-5">
+      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5">
         <Link href="/pricing" className="rounded-full border border-laiton-400/35 bg-laiton-400/[0.1] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-200 transition hover:bg-laiton-400/[0.16]">
           7 jours offerts · sans engagement
         </Link>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
           L&apos;humain valide. L&apos;IA personnalise.
         </p>
-        <h1 className="font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
+        <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
           Ton programme <span className="text-laiton-300">évolue</span> avec toi.
         </h1>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
