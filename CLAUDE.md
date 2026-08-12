@@ -50,6 +50,13 @@ gratuit et montre le résultat avant toute décision. Aucune identité du parrai
 n'est exposée et aucun témoignage n'est fabriqué. L'événement GA4
 `referral_invitation_opened` mesure les ouvertures réelles.
 
+Le bloc 7 termine la boucle virale au moment de satisfaction le plus naturel :
+après une séance Daily terminée et son ressenti enregistré. La carte indique
+uniquement « Séance accomplie », la durée disponible choisie et le nombre de
+séances terminées sur 30 jours. Exercices, charges, douleur, ressenti et profil
+restent privés. Le partage réutilise le composant et le lien de parrainage des
+blocs précédents.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements
