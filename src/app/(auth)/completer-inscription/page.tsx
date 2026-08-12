@@ -29,6 +29,7 @@ export default async function CompleterInscriptionPage() {
   // vers Google (cf. intended-plan-cookie.ts) — lue ici côté serveur pour
   // éviter tout flash de contenu au premier rendu.
   const planInitial: "GRATUIT" | "STANDARD" = cookies().get("coai_plan")?.value === "STANDARD" ? "STANDARD" : "GRATUIT";
+  const billingInitial: "MONTHLY" | "ANNUAL" = cookies().get("coai_billing")?.value === "ANNUAL" ? "ANNUAL" : "MONTHLY";
 
   return (
     <main className="bg-lab-grid flex min-h-screen items-center justify-center px-6">
@@ -40,7 +41,7 @@ export default async function CompleterInscriptionPage() {
           </h1>
           <p className="text-sm text-graphite-400">{authUser.email}</p>
         </div>
-        <CompleterInscriptionForm prenomSuggere={prenomSuggere} planInitial={planInitial} />
+        <CompleterInscriptionForm prenomSuggere={prenomSuggere} planInitial={planInitial} billingInitial={billingInitial} />
       </Card>
     </main>
   );

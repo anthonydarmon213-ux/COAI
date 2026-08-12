@@ -129,8 +129,19 @@ const TIERS: Tier[] = [
   },
 ];
 
-export default function PricingPage() {
+export default function PricingPage({ searchParams }: { searchParams?: { billing?: string } }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
+  const annual = searchParams?.billing === "annual";
+  const displayedTiers = TIERS.map((tier) => {
+    if (!annual || tier.sessions) return tier;
+    if (tier.nom === "Impulsion") {
+      return { ...tier, prix: "190€", suffixe: "/an", essai: "7 jours offerts · puis 190€/an", description: "Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement pendant 7 jours, puis 190€/an — environ 2 mois offerts." };
+    }
+    if (tier.nom === "Transformation") {
+      return { ...tier, prix: "490€", suffixe: "/an", essai: "7 jours offerts · puis 490€/an" };
+    }
+    return tier;
+  });
 
   return (
     <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-10 px-6 py-24">
@@ -149,6 +160,10 @@ export default function PricingPage() {
         <div className="mt-6 flex justify-center">
           <TrustBadges />
         </div>
+        <div className="mt-6 inline-flex rounded-full border border-white/10 bg-white/[0.03] p-1">
+          <Link href="/pricing" className={`rounded-full px-4 py-2 text-sm ${!annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Mensuel</Link>
+          <Link href="/pricing?billing=annual" className={`rounded-full px-4 py-2 text-sm ${annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Annuel · 2 mois offerts</Link>
+        </div>
       </div>
 
       {/* Comparateur à 3 colonnes propres (Phase 5.1, correction responsive
@@ -156,7 +171,7 @@ export default function PricingPage() {
           différent : devis, pas d'abonnement) et affiché en bandeau à part
           plus bas, plutôt que compressé en 4e colonne. */}
       <div className="grid w-full max-w-4xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {TIERS.map((tier) => (
+        {displayedTiers.map((tier) => (
           <Card
             key={tier.nom}
             className={`flex h-full flex-col gap-5 px-6 py-8 text-center ${
@@ -228,9 +243,9 @@ export default function PricingPage() {
                   </Button>
                 )
               ) : tier.plan ? (
-                <SubscribeButton plan={tier.plan} label="Commencer gratuitement" className="w-full" />
+                <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer gratuitement" className="w-full" />
               ) : (
-                <PlanSelectedLink href="/sign-up" plan="GRATUIT" label="Commencer gratuitement" className="w-full" />
+                <PlanSelectedLink href={`/sign-up?billing=${annual ? "ANNUAL" : "MONTHLY"}`} plan="GRATUIT" label="Commencer gratuitement" className="w-full" />
               )}
               {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
             </div>
@@ -275,8 +290,7 @@ export default function PricingPage() {
       </Card>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        L&apos;offre Impulsion (7 jours offerts, carte bancaire requise à l&apos;inscription, puis
-        19€/mois) et l&apos;offre Transformation (7 jours offerts, puis 49€/mois) sont sans
+        Les offres Impulsion et Transformation incluent 7 jours offerts, puis sont facturées au choix chaque mois ou chaque année. Elles sont sans
         engagement, résiliables à tout moment depuis ton compte. Les séances VIP sont réservées et
         payées à la séance, hors
         abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible

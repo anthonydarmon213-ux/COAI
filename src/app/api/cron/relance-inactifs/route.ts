@@ -238,7 +238,9 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
   let rappels = 0;
   for (const subscription of candidats) {
     if (!subscription.trialEnd) continue;
-    const prix = subscription.plan === "GRATUIT" ? "19 €" : subscription.plan === "STANDARD" ? "49 €" : "199 €";
+    const prixMensuel = subscription.plan === "GRATUIT" ? 19 : subscription.plan === "STANDARD" ? 49 : 199;
+    const prixAnnuel = subscription.plan === "GRATUIT" ? 190 : subscription.plan === "STANDARD" ? 490 : 2388;
+    const prix = subscription.billingInterval === "ANNUAL" ? `${prixAnnuel} €/an` : `${prixMensuel} €/mois`;
     const date = subscription.trialEnd.toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "long",
@@ -250,7 +252,7 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
       subscription.user.email,
       "Ton essai COAI se termine bientôt",
       `Bonjour${nom},\n\n` +
-        `Ton essai COAI se termine le ${date}. Ton abonnement passera ensuite à ${prix}/mois, sans engagement.\n\n` +
+        `Ton essai COAI se termine le ${date}. Ton abonnement passera ensuite à ${prix}, sans engagement.\n\n` +
         `Profite des derniers jours pour ouvrir ta séance du jour et tester ton accompagnement : ${appUrl}/aujourdhui\n\n` +
         `Tu peux consulter ou gérer ton abonnement à tout moment ici : ${appUrl}/compte/abonnement\n\n` +
         `À bientôt,\nL'équipe COAI`

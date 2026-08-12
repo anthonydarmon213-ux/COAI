@@ -9,6 +9,11 @@ const PRICE_ENV_BY_PLAN = {
   PREMIUM: "STRIPE_PRICE_ID_PREMIUM",
 } as const;
 
+const ANNUAL_PRICE_ENV_BY_PLAN = {
+  GRATUIT: "STRIPE_PRICE_ID_GRATUIT_ANNUAL",
+  STANDARD: "STRIPE_PRICE_ID_STANDARD_ANNUAL",
+} as const;
+
 // Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
 // d'appel, 7 jours offerts puis 19€/mois) et STANDARD (affiché
 // "Transformation", 7 jours offerts puis 49€/mois) passent par un essai
@@ -40,6 +45,7 @@ export async function POST(request: Request) {
   const plan =
     body.plan === "PREMIUM" ? "PREMIUM" : body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
   const skipTrial = plan === "GRATUIT" && body.skipTrial === true;
+  const billing = body.billing === "ANNUAL" && plan !== "PREMIUM" ? "ANNUAL" : "MONTHLY";
 
   const user = await prisma.user.findUnique({
     where: { supabaseAuthId: authUser.id },
@@ -49,7 +55,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  const priceId = process.env[PRICE_ENV_BY_PLAN[plan]];
+  const priceEnv = billing === "ANNUAL"
+    ? ANNUAL_PRICE_ENV_BY_PLAN[plan as "GRATUIT" | "STANDARD"]
+    : PRICE_ENV_BY_PLAN[plan];
+  const priceId = process.env[priceEnv];
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (!priceId || !appUrl) {
     return NextResponse.json({ error: "Configuration Stripe manquante" }, { status: 500 });
@@ -64,7 +73,7 @@ export async function POST(request: Request) {
       ? { customer: user.subscription.stripeCustomerId }
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
-    success_url: `${appUrl}/bienvenue?plan=${plan}${skipTrial ? "&essai=0" : ""}`,
+    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}${skipTrial ? "&essai=0" : ""}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
     ...(plan !== "PREMIUM" && !skipTrial
       ? {
