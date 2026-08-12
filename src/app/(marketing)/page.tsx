@@ -11,9 +11,9 @@ import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/compon
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 
-const TITLE = "COAI — Coaching sportif par IA, validé par un vrai coach";
+const TITLE = "COAI — Ton programme évolue avec toi";
 const DESCRIPTION =
-  "Ton programme d'entraînement, nutrition et récupération généré par IA à partir de ton profil, relu et validé par Anthony Darmon (17 ans de coaching). AI generates, humans validate.";
+  "Ton entraînement, ta nutrition et ta récupération personnalisés par IA et adaptés à ton quotidien. En Transformation, un coach diplômé valide ton programme.";
 
 // 11/08/2026 : sans ce bloc openGraph/twitter dédié, chaque page publique
 // affichait le titre/description génériques du layout racine ("COAI — HI ×
@@ -116,8 +116,8 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="overflow-hidden rounded-3xl border border-laiton-400/20 bg-black shadow-[0_30px_90px_-45px_rgba(201,162,98,0.5)]">
-          <video controls playsInline preload="metadata" className="aspect-video w-full bg-black object-contain" aria-label="Vidéo de présentation de COAI">
-            <source src="/hero-intro.mp4" type="video/mp4" />
+          <video controls playsInline preload="metadata" className="aspect-video w-full bg-black object-contain" aria-label="Vidéo principale de présentation de COAI">
+            <source src="/coai-presentation-7.mp4" type="video/mp4" />
             Ton navigateur ne peut pas lire cette vidéo. Découvre COAI avec le diagnostic offert.
           </video>
         </div>
@@ -177,7 +177,7 @@ export default function LandingPage() {
         </div>
         <div className="mx-auto mt-5 max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-black shadow-[0_30px_90px_-50px_rgba(201,162,98,0.45)]">
           <video controls playsInline preload="none" className="max-h-[80vh] w-full bg-black object-contain" aria-label="Septième vidéo de présentation de COAI">
-            <source src="/coai-presentation-7.mp4" type="video/mp4" />
+            <source src="/hero-intro.mp4" type="video/mp4" />
             Ton navigateur ne peut pas lire cette vidéo. Découvre COAI avec le diagnostic offert.
           </video>
         </div>
