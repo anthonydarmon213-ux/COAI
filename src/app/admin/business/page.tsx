@@ -261,7 +261,7 @@ export default async function AdminBusinessPage() {
         <section className="flex flex-col gap-3">
           <div>
             <SectionLabel>Récupération Checkout · 30 jours</SectionLabel>
-            <p className="mt-2 text-xs text-graphite-500">Aucune donnée bancaire n'est stockée dans COAI.</p>
+            <p className="mt-2 text-xs text-graphite-500">Aucune donnée bancaire n&apos;est stockée dans COAI.</p>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <StatCard label="Checkouts commencés" value={String(checkoutsCommences30d)} sublabel="Sessions Stripe créées" />
