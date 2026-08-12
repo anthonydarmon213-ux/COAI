@@ -494,6 +494,9 @@ model DiagnosticLead {
   // avant d'en envoyer un nouveau pour la même adresse, on vérifie qu'aucun
   // lead récent (5 min) ne l'a déjà reçu (cf. /api/diagnostic-lead).
   resultEmailSentAt DateTime?
+  // Relance commerciale unique, envoyée 24 h après le diagnostic uniquement
+  // si aucun compte ne correspond encore à cette adresse.
+  conversionReminderSentAt DateTime?
   // Attribution publicitaire (Phase 5B, 11/08/2026) — même principe que
   // User.utmSource et consorts, mais capturée dès le lead (avant même la
   // création de compte) : un visiteur qui ne convertit jamais reste
@@ -506,6 +509,7 @@ model DiagnosticLead {
 
   @@index([email])
   @@index([createdAt])
+  @@index([conversionReminderSentAt, createdAt])
   @@map("diagnostic_leads")
 }
 

@@ -1918,3 +1918,15 @@ Ne plus proposer d'outreach personnel comme levier d'acquisition.
   Action or Route Handler" causé par les callbacks `set`/`remove` non
   protégés dans `src/lib/auth/server.ts` (fix : try/catch, le middleware
   gère déjà la persistance du token rafraîchi).
+## Phase Revenus 1 — tunnel et relance diagnostic (12/08/2026)
+
+Le dashboard business mesure désormais sur 30 jours le passage entre quatre
+étapes internes vérifiables : diagnostic terminé, compte créé, essai actif et
+client réellement sorti d'essai. Le rapprochement se fait par email normalisé,
+sans nouveau traceur ni donnée personnelle.
+
+Le cron quotidien existant relance une seule fois, après 24 heures, les
+diagnostics dont le résumé a bien été envoyé mais qui n'ont créé aucun compte.
+La relance rappelle les deux formules, l'essai de 7 jours et les tarifs annuels.
+Un compte existant exclut immédiatement le prospect de cette relance. Le champ
+`conversionReminderSentAt` empêche les doubles envois.
