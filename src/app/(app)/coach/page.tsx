@@ -4,12 +4,15 @@ import { AskCoach } from "@/components/coach/ask-coach";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
+import { CoachMemoryStatus } from "@/components/coach/coach-memory-status";
 
 export default async function CoachPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
   const plan = getEffectivePlan(user.subscription);
+  const intelligence = await buildProfilIntelligence(user.id);
 
   return (
     <div className="flex flex-col gap-8">
@@ -24,6 +27,7 @@ export default async function CoachPage() {
           direct avec ton coach reste la meilleure option.
         </p>
         {plan === "GRATUIT" && <Badge tone="warning">4 questions/mois</Badge>}
+        <CoachMemoryStatus progression={intelligence.progression} observations={intelligence.items.length} tendances={intelligence.tendances.length} />
       </div>
 
       <AskCoach />

@@ -40,6 +40,22 @@ sans débordement, requête pendante, overlay ni loader. Captures :
 `test-results/phase-7-longitudinal-mobile.png` et
 `test-results/phase-7-longitudinal-desktop.png`.
 
+### Coach IA connecté à la mémoire (suite Phase 7)
+
+`/api/coach/ask` recalcule désormais la mémoire côté serveur avant chaque
+réponse et transmet au prompt au maximum 8 observations et 3 tendances. Le
+navigateur ne peut pas fournir ou altérer ces apprentissages. Les statuts
+« En observation » / « Établi », preuves et garde-fous association ≠ causalité
+sont conservés dans le prompt. Si la mémoire échoue isolément, le Coach reste
+disponible sans elle. Les quotas et le nombre d'appels IA restent inchangés.
+
+La page `/coach` affiche le pourcentage de mémoire et le nombre d'observations
+et tendances disponibles. Trois assertions valident présence, absence à vide
+et garde-fou de prédiction dans le prompt. Build et navigateur vérifiés en
+390×844 et 1440×1000 sans débordement, requête pendante ou overlay. Captures :
+`test-results/phase-7-coach-memory-mobile.png` et
+`test-results/phase-7-coach-memory-desktop.png`.
+
 Vérifié avec TypeScript, ESLint, build Next.js et navigateur réel en 390×844
 et 1440×1000 : aucun débordement, overlay ou loader. Captures :
 `test-results/phase-7-memory-mobile.png` et

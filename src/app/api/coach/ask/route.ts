@@ -4,6 +4,7 @@ import { generateTextWithAI } from "@/lib/ai/client";
 import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
+import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
 import { z } from "zod";
 
 // Le Q&A "coach IA" est limité (fenêtre glissante de 30 jours) uniquement
@@ -95,8 +96,20 @@ export async function POST(request: Request) {
   };
 
   try {
+    // La mémoire est toujours recalculée côté serveur : le client ne peut ni
+    // fabriquer ni modifier les apprentissages utilisés par le Coach IA.
+    // Un échec isolé de ce calcul ne doit pas rendre le Coach indisponible.
+    const intelligence = await buildProfilIntelligence(user.id).catch((error) => {
+      console.error("[coach/ask:memory]", error);
+      return null;
+    });
+    const memory = intelligence ? {
+      progression: intelligence.progression,
+      observations: intelligence.items.slice(0, 8),
+      tendances: intelligence.tendances.slice(0, 3).map(({ titre, constat, preuve }) => ({ titre, constat, preuve })),
+    } : undefined;
     const answer = await generateTextWithAI(
-      buildCoachQuestionPrompt(profil, parsed.data.question, parsed.data.context)
+      buildCoachQuestionPrompt(profil, parsed.data.question, parsed.data.context, memory)
     );
     return NextResponse.json({ answer });
   } catch (error) {
