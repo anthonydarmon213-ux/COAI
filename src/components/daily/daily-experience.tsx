@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DailyCoach } from "@/components/daily/daily-coach";
 import { ensureWorkoutCompleteness, isCoreExercise } from "@/lib/daily/session";
+import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 
 type Session = Record<string, unknown> & {
   nom?: string;
@@ -321,7 +322,12 @@ export function DailyExperience({
         </section>
       )}
 
-      {daily?.workoutRating && <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-3 text-sm text-emerald-200">Séance et ressenti enregistrés. COAI conservera ce signal pour les prochaines adaptations.</p>}
+      {daily?.workoutRating && (
+        <section className="flex flex-col items-start justify-between gap-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-4 sm:flex-row sm:items-center">
+          <div><p className="text-sm font-medium text-emerald-200">Séance accomplie.</p><p className="mt-1 text-xs leading-5 text-graphite-400">Ton ressenti est enregistré pour les prochaines adaptations. Tu peux partager ta régularité sans exposer le détail de ta séance.</p></div>
+          <ShareProgressCardButton imageUrl="/api/daily/carte" filename="coai-seance-accomplie.png" title="Séance COAI accomplie" />
+        </section>
+      )}
     </div>
   );
 }
