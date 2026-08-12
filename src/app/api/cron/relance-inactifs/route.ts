@@ -29,6 +29,7 @@ const SEUIL_INACTIVITE_JOURS = 10;
 // une première relance déjà envoyée.
 const RELANCE_COOLDOWN_JOURS = 14;
 const JOUR_MS = 24 * 60 * 60 * 1000;
+const RAPPEL_ESSAI_AVANT_MS = 72 * 60 * 60 * 1000;
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Transformation) — gardés synchronisés à la main, les deux vivent dans des
@@ -219,6 +220,52 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
   return alertes;
 }
 
+// Rappel transparent et unique avant le premier prélèvement. Il réduit les
+// annulations surprises tout en ramenant l'abonné vers la valeur du produit.
+async function rappelerFinEssai(appUrl: string): Promise<number> {
+  const maintenant = new Date();
+  const limite = new Date(maintenant.getTime() + RAPPEL_ESSAI_AVANT_MS);
+  const candidats = await prisma.subscription.findMany({
+    where: {
+      status: "ACTIVE",
+      cancelAtPeriodEnd: false,
+      trialReminderSentAt: null,
+      trialEnd: { gt: maintenant, lte: limite },
+    },
+    include: { user: { select: { email: true, prenom: true } } },
+  });
+
+  let rappels = 0;
+  for (const subscription of candidats) {
+    if (!subscription.trialEnd) continue;
+    const prix = subscription.plan === "GRATUIT" ? "19 €" : subscription.plan === "STANDARD" ? "49 €" : "199 €";
+    const date = subscription.trialEnd.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "Europe/Paris",
+    });
+    const nom = subscription.user.prenom ? ` ${subscription.user.prenom}` : "";
+    const envoye = await sendEmail(
+      subscription.user.email,
+      "Ton essai COAI se termine bientôt",
+      `Bonjour${nom},\n\n` +
+        `Ton essai COAI se termine le ${date}. Ton abonnement passera ensuite à ${prix}/mois, sans engagement.\n\n` +
+        `Profite des derniers jours pour ouvrir ta séance du jour et tester ton accompagnement : ${appUrl}/aujourdhui\n\n` +
+        `Tu peux consulter ou gérer ton abonnement à tout moment ici : ${appUrl}/compte/abonnement\n\n` +
+        `À bientôt,\nL'équipe COAI`
+    );
+    if (!envoye) continue;
+
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: { trialReminderSentAt: new Date() },
+    });
+    rappels++;
+  }
+  return rappels;
+}
+
 export async function GET(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -226,10 +273,11 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur] = await Promise.all([
+  const [relances, alertesDouleur, rappelsFinEssai] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
+    rappelerFinEssai(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur });
+  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai });
 }

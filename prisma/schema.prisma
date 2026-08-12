@@ -204,6 +204,8 @@ model Subscription {
   // mappé), donc c'est ce champ qui permet de distinguer "encore en essai"
   // de "déjà passé à 9€/mois".
   trialEnd             DateTime?
+  // Rappel unique envoyé environ 48 h avant le premier prélèvement.
+  trialReminderSentAt  DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
