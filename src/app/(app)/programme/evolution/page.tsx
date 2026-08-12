@@ -10,6 +10,7 @@ import { InfoTooltip } from "@/components/ui/tooltip";
 import { ProfilIntelligenceSection } from "@/components/programme/profil-intelligence";
 import { trackServerEvent } from "@/lib/analytics/product-events";
 import type { DecisionAdaptation, Pilier, StatutAdaptation } from "@prisma/client";
+import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 
 const PILIER_LABEL: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
@@ -216,6 +217,13 @@ export default async function EvolutionPage() {
                   <p className="mt-1 text-sm text-graphite-200">{a.noteCoach}</p>
                 </div>
               )}
+              <div className="mt-1 flex justify-end border-t border-white/[0.06] pt-3">
+                <ShareProgressCardButton
+                  imageUrl={`/api/programmes/adaptations/${a.id}/carte`}
+                  filename={`coai-evolution-${a.pilier.toLowerCase()}.png`}
+                  title="Mon coaching COAI évolue"
+                />
+              </div>
             </Card>
           );
         })}
