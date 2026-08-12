@@ -36,7 +36,7 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue] = await Promise.all([
+  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
       select: { plan: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
@@ -47,6 +47,11 @@ export default async function AdminBusinessPage() {
     getCapacitySnapshot(),
     getAIEconomics(),
     getRevenueMetrics(),
+    prisma.churnFeedback.groupBy({
+      by: ["reason"],
+      _count: { _all: true },
+      orderBy: { _count: { reason: "desc" } },
+    }),
   ]);
 
   const maintenant = new Date();
@@ -63,6 +68,16 @@ export default async function AdminBusinessPage() {
   const nbAnnulations30Jours = subscriptions.filter(
     (s) => s.status === "CANCELED" && s.updatedAt >= ilYA30Jours
   ).length;
+  const churnFeedbackCount = churnReasons.reduce((total, item) => total + item._count._all, 0);
+  const topChurnReason = churnReasons[0]?.reason ?? "Aucun retour";
+  const churnReasonLabels: Record<string, string> = {
+    PRIX: "Prix",
+    UTILISATION: "Usage insuffisant",
+    RESULTATS: "Résultats",
+    TECHNIQUE: "Problème technique",
+    COACHING: "Coaching",
+    AUTRE: "Autre",
+  };
 
   // MRR conservateur : exclut les essais non encore facturés et inclut bien
   // Impulsion, qui était auparavant oubliée du calcul.
@@ -145,6 +160,11 @@ export default async function AdminBusinessPage() {
             label="Conversion essai · 30 j"
             value={`${revenue.trialConversionRate30d.toFixed(1)}%`}
             sublabel={`${revenue.convertedTrials30d}/${revenue.endedTrials30d} essai(s) devenu(s) payant(s)`}
+          />
+          <StatCard
+            label="Retours résiliation"
+            value={String(churnFeedbackCount)}
+            sublabel={`Motif principal : ${churnReasonLabels[topChurnReason] ?? topChurnReason}`}
           />
         </div>
 

@@ -10,6 +10,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import Image from "next/image";
+import { ChurnFeedbackForm } from "@/components/compte/churn-feedback-form";
 
 const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
@@ -143,6 +144,7 @@ export default async function AbonnementPage() {
             </p>
             <p className="text-xs text-graphite-400">Tu peux annuler la résiliation depuis le portail tant que cette date n’est pas passée.</p>
             <PortalButton label="Conserver mon abonnement" />
+            <ChurnFeedbackForm />
           </div>
         )}
         {statut === "PAST_DUE" && (
