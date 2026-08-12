@@ -41,7 +41,10 @@ export async function POST(request: Request) {
     body.plan === "PREMIUM" ? "PREMIUM" : body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
   const skipTrial = plan === "GRATUIT" && body.skipTrial === true;
 
-  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
+  const user = await prisma.user.findUnique({
+    where: { supabaseAuthId: authUser.id },
+    include: { subscription: true },
+  });
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
@@ -55,7 +58,11 @@ export async function POST(request: Request) {
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
-    customer_email: authUser.email,
+    // Réutilise le client Stripe déjà rattaché au compte. Sans cela, chaque
+    // nouvelle ouverture de Checkout pouvait créer un doublon client.
+    ...(user.subscription?.stripeCustomerId
+      ? { customer: user.subscription.stripeCustomerId }
+      : { customer_email: authUser.email }),
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}${skipTrial ? "&essai=0" : ""}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,

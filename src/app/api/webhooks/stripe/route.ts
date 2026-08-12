@@ -99,7 +99,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Signature invalide" }, { status: 400 });
   }
 
-  switch (event.type) {
+  // Stripe garantit l'unicité de event.id mais peut renvoyer le même
+  // événement. On le réserve avant tout effet de bord. En cas d'échec réel,
+  // la réservation est retirée afin que la prochaine tentative puisse le
+  // retraiter.
+  try {
+    await prisma.stripeWebhookEvent.create({ data: { id: event.id, type: event.type } });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    throw error;
+  }
+
+  try {
+    switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.client_reference_id;
@@ -155,8 +174,12 @@ export async function POST(request: Request) {
       }
       break;
     }
-    default:
-      break;
+      default:
+        break;
+    }
+  } catch (error) {
+    await prisma.stripeWebhookEvent.delete({ where: { id: event.id } }).catch(() => undefined);
+    throw error;
   }
 
   return NextResponse.json({ received: true });
