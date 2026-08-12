@@ -90,7 +90,10 @@ export async function POST(request: Request) {
   };
 
   try {
-    const reply = await generateTextWithAI(buildCoachQuestionPrompt(profil, message));
+    const reply = await generateTextWithAI(buildCoachQuestionPrompt(profil, message), {
+      userId: user.id,
+      feature: "coach_whatsapp",
+    });
     await prisma.whatsAppEvent.create({
       data: { userId: user.id, direction: "OUTBOUND", payload: { reply } as Prisma.InputJsonValue },
     });

@@ -105,7 +105,7 @@ export async function POST() {
   const resultats = await Promise.allSettled(
     piliers.map(async (pilier) => {
       const [contenu, version] = await Promise.all([
-        genererPilier(pilier, profil),
+        genererPilier(pilier, profil, user.id),
         prochaineVersion(user.id, pilier),
       ]);
       return prisma.programmeGenerated.create({

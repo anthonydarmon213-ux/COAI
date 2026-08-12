@@ -15,6 +15,7 @@ import {
 } from "@/lib/ai/prompts/programme-recuperation-structure";
 import { buildProgrammeRecuperationJourPrompt } from "@/lib/ai/prompts/programme-recuperation-jour";
 import type { Pilier } from "@prisma/client";
+import type { AIUsageContext } from "@/lib/ai/usage";
 
 // Extrait de src/app/api/programmes/generate/route.ts (11/08/2026) : logique
 // partagée entre la génération initiale et le moteur d'adaptation
@@ -22,14 +23,14 @@ import type { Pilier } from "@prisma/client";
 // appels IA mais un profil enrichi de `directivesAdaptation`. Toujours en 2
 // étapes (structure rapide, puis détail de chaque jour en parallèle) pour
 // rester sous la limite de temps d'une fonction Vercel.
-async function genererEntrainement(profil: ProfilUtilisateur) {
+async function genererEntrainement(profil: ProfilUtilisateur, usage: AIUsageContext) {
   const structure = await generateWithAI<StructureEntrainement>(
-    buildProgrammeEntrainementStructurePrompt(profil)
+    buildProgrammeEntrainementStructurePrompt(profil), usage
   );
 
   const seances = await Promise.all(
     structure.jours.map((jour) =>
-      generateWithAI(buildProgrammeEntrainementSessionPrompt(profil, jour))
+      generateWithAI(buildProgrammeEntrainementSessionPrompt(profil, jour), usage)
     )
   );
 
@@ -43,13 +44,13 @@ async function genererEntrainement(profil: ProfilUtilisateur) {
   };
 }
 
-async function genererNutrition(profil: ProfilUtilisateur) {
+async function genererNutrition(profil: ProfilUtilisateur, usage: AIUsageContext) {
   const structure = await generateWithAI<StructureNutrition>(
-    buildProgrammeNutritionStructurePrompt(profil)
+    buildProgrammeNutritionStructurePrompt(profil), usage
   );
 
   const jours = await Promise.all(
-    structure.jours.map((jour) => generateWithAI(buildProgrammeNutritionJourPrompt(profil, jour)))
+    structure.jours.map((jour) => generateWithAI(buildProgrammeNutritionJourPrompt(profil, jour), usage))
   );
 
   return {
@@ -62,14 +63,14 @@ async function genererNutrition(profil: ProfilUtilisateur) {
   };
 }
 
-async function genererRecuperation(profil: ProfilUtilisateur) {
+async function genererRecuperation(profil: ProfilUtilisateur, usage: AIUsageContext) {
   const structure = await generateWithAI<StructureRecuperation>(
-    buildProgrammeRecuperationStructurePrompt(profil)
+    buildProgrammeRecuperationStructurePrompt(profil), usage
   );
 
   const jours = await Promise.all(
     structure.jours.map((jour) =>
-      generateWithAI(buildProgrammeRecuperationJourPrompt(profil, jour))
+      generateWithAI(buildProgrammeRecuperationJourPrompt(profil, jour), usage)
     )
   );
 
@@ -81,13 +82,14 @@ async function genererRecuperation(profil: ProfilUtilisateur) {
   };
 }
 
-export async function genererPilier(pilier: Pilier, profil: ProfilUtilisateur) {
+export async function genererPilier(pilier: Pilier, profil: ProfilUtilisateur, userId: string) {
+  const usage = { userId, feature: `programme_${pilier.toLowerCase()}` };
   switch (pilier) {
     case "ENTRAINEMENT":
-      return genererEntrainement(profil);
+      return genererEntrainement(profil, usage);
     case "NUTRITION":
-      return genererNutrition(profil);
+      return genererNutrition(profil, usage);
     case "RECUPERATION":
-      return genererRecuperation(profil);
+      return genererRecuperation(profil, usage);
   }
 }

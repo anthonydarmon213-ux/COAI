@@ -8,8 +8,11 @@ import { GrowthChart } from "@/components/admin/growth-chart";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { CapacityPanel } from "@/components/admin/capacity-panel";
 import { getCapacitySnapshot } from "@/lib/admin/capacity";
+import { AIEconomicsPanel } from "@/components/admin/ai-economics-panel";
+import { getAIEconomics } from "@/lib/admin/ai-economics";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
+const PRIX_IMPULSION = 19;
 const PRIX_STANDARD = 49;
 const PRIX_PREMIUM = 199;
 const NB_SEMAINES = 12;
@@ -27,26 +30,38 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, activeSubs, programmesCount, seancesCount, signupDates, capacity] = await Promise.all([
+  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
-      where: { status: "ACTIVE" },
-      select: { plan: true, cancelAtPeriodEnd: true },
+      select: { plan: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
     }),
     prisma.programmeGenerated.count(),
     prisma.seanceLog.count(),
     prisma.user.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
     getCapacitySnapshot(),
+    getAIEconomics(),
   ]);
 
-  const nbStandard = activeSubs.filter((s) => s.plan === "STANDARD").length;
-  const nbPremium = activeSubs.filter((s) => s.plan === "PREMIUM").length;
+  const maintenant = new Date();
+  const ilYA30Jours = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const activeSubs = subscriptions.filter((s) => s.status === "ACTIVE");
+  const essaisActifs = activeSubs.filter((s) => s.trialEnd && s.trialEnd > maintenant);
+  const abonnesPayants = activeSubs.filter((s) => !s.trialEnd || s.trialEnd <= maintenant);
+  const nbImpulsion = abonnesPayants.filter((s) => s.plan === "GRATUIT").length;
+  const nbStandard = abonnesPayants.filter((s) => s.plan === "STANDARD").length;
+  const nbPremium = abonnesPayants.filter((s) => s.plan === "PREMIUM").length;
   const nbActifs = activeSubs.length;
   const nbResiliationsPrevues = activeSubs.filter((s) => s.cancelAtPeriodEnd).length;
+  const nbPaiementsEnRetard = subscriptions.filter((s) => s.status === "PAST_DUE").length;
+  const nbAnnulations30Jours = subscriptions.filter(
+    (s) => s.status === "CANCELED" && s.updatedAt >= ilYA30Jours
+  ).length;
 
-  const mrr = nbStandard * PRIX_STANDARD + nbPremium * PRIX_PREMIUM;
+  // MRR conservateur : exclut les essais non encore facturés et inclut bien
+  // Impulsion, qui était auparavant oubliée du calcul.
+  const mrr = nbImpulsion * PRIX_IMPULSION + nbStandard * PRIX_STANDARD + nbPremium * PRIX_PREMIUM;
   const arr = mrr * 12;
-  const tauxConversion = totalUsers > 0 ? (nbActifs / totalUsers) * 100 : 0;
+  const tauxConversion = totalUsers > 0 ? (abonnesPayants.length / totalUsers) * 100 : 0;
 
   const semaineMs = 7 * 24 * 60 * 60 * 1000;
   const debut = new Date(Date.now() - (NB_SEMAINES - 1) * semaineMs);
@@ -84,13 +99,13 @@ export default async function AdminBusinessPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbStandard} Transformation · ${nbPremium} Ancien Premium`} highlight />
+          <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} Impulsion · ${nbStandard} Transformation · ${essaisActifs.length} essai(s)`} highlight />
           <StatCard label="MRR" value={eur.format(mrr)} sublabel="Revenu mensuel récurrent" highlight />
           <StatCard label="ARR projeté" value={eur.format(arr)} sublabel="MRR × 12" />
           <StatCard
             label="Taux de conversion"
             value={`${tauxConversion.toFixed(1)}%`}
-            sublabel="Abonnés actifs / inscrits"
+            sublabel="Abonnés facturés / inscrits"
           />
           <StatCard label="Utilisateurs inscrits" value={String(totalUsers)} sublabel="Tous paliers confondus" />
           <StatCard label="Programmes générés" value={String(programmesCount)} sublabel="IA + validation coach" />
@@ -100,10 +115,14 @@ export default async function AdminBusinessPage() {
             value={String(nbResiliationsPrevues)}
             sublabel="Fin d'abonnement programmée"
           />
+          <StatCard label="Essais actifs" value={String(essaisActifs.length)} sublabel="Pas encore inclus dans le MRR" />
+          <StatCard label="Paiements en retard" value={String(nbPaiementsEnRetard)} sublabel="Abonnements PAST_DUE" />
+          <StatCard label="Annulations · 30 j" value={String(nbAnnulations30Jours)} sublabel="Indicateur de churn récent" />
         </div>
 
         <GrowthChart label={`Croissance des inscriptions — ${NB_SEMAINES} dernières semaines`} points={croissance} />
         <CapacityPanel capacity={capacity} />
+        <AIEconomicsPanel economics={aiEconomics} mrrEur={mrr} />
       </div>
     </main>
   );

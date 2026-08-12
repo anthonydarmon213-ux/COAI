@@ -57,7 +57,8 @@ export async function POST(request: Request) {
     extraction = await generateWithVision<Extraction>(
       buildBodyPhotoExtractionPrompt(),
       buffer.toString("base64"),
-      mediaType
+      mediaType,
+      { userId: user.id, feature: "vision_morphologie" }
     );
   } catch (err) {
     console.error("[profil/photo-morphologie] Échec de l'extraction IA", err);

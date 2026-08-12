@@ -4,6 +4,31 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
+
+Premier bloc volontairement sans modification des prix ni des abonnements
+clients. COAI mesure désormais chaque appel Anthropic par fonctionnalité :
+programme, adaptation, Coach web/Daily/WhatsApp et analyses vision. Seuls le
+modèle et les volumes de jetons sont conservés ; jamais les prompts, réponses
+ou données de santé. Le coût estimé au moment de l'appel est historisé dans
+`ai_usage_events`, table interne avec RLS sans politique Data API.
+
+Le dashboard `/admin/business` affiche sur 30 jours : appels, coût total,
+coût par appel, coût par utilisateur et répartition par fonction. Les tarifs
+peuvent être précisés par `AI_INPUT_USD_PER_MILLION` et
+`AI_OUTPUT_USD_PER_MILLION`.
+
+Audit business corrigé en parallèle : le MRR incluait Transformation et
+l'ancien Premium mais oubliait complètement Impulsion à 19 €. Il pouvait
+aussi compter les essais non encore facturés. Le MRR est maintenant
+conservateur : Impulsion + Transformation + anciens Premium réellement sortis
+d'essai. Essais actifs, paiements en retard et annulations récentes sont
+affichés séparément.
+
+Migration additive : `20260812080000_add_phase_8_ai_economics`, appliquée sur
+Supabase et vérifiée (RLS actif, quatre index). Le suivi d'usage est non
+bloquant : une panne de mesure ne prive jamais l'utilisateur de sa réponse IA.
+
 ## Phase 7 — Mémoire COAI, premier bloc (12/08/2026)
 
 La page `/programme/evolution` rend désormais la mémoire longitudinale
