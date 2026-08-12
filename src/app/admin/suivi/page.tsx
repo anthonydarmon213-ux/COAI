@@ -6,7 +6,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AdminNav } from "@/components/admin/admin-nav";
-import { computeFlags, buildWhatsAppContactLink, FLAG_LABELS } from "@/lib/admin/flags";
+import { computeFlags, buildWhatsAppContactLink, FLAG_LABELS, getFlagsPriority, getPriorityLabel } from "@/lib/admin/flags";
 
 export default async function AdminSuiviPage() {
   const authUser = await getCurrentUser();
@@ -27,7 +27,7 @@ export default async function AdminSuiviPage() {
   );
   const aSuivre = avecFlags
     .filter((x) => x.flags.length > 0)
-    .sort((a, b) => b.flags.length - a.flags.length);
+    .sort((a, b) => getFlagsPriority(b.flags) - getFlagsPriority(a.flags));
 
   return (
     <main className="bg-lab-grid min-h-screen px-6 py-10">
@@ -50,6 +50,7 @@ export default async function AdminSuiviPage() {
           const contactLink = buildWhatsAppContactLink(user.phoneWhatsapp, user.prenom, flags);
           return (
             <Card key={user.id} className="flex flex-col gap-3">
+              <div><Badge tone={getPriorityLabel(flags).tone}>{getPriorityLabel(flags).label}</Badge></div>
               <div className="flex items-center justify-between">
                 <Link
                   href={`/admin/clients/${user.id}`}
