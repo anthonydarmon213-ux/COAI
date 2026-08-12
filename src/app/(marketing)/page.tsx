@@ -141,6 +141,16 @@ export default function LandingPage() {
             Ton navigateur ne peut pas lire cette vidéo. Découvre COAI avec le diagnostic offert.
           </video>
         </div>
+        <div className="mt-8 text-center">
+          <h3 className="font-display text-xl font-semibold text-white sm:text-2xl">Entre dans l&apos;univers COAI.</h3>
+          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-graphite-400">Une dernière séquence pour ressentir la méthode et passer à l&apos;action.</p>
+        </div>
+        <div className="mx-auto mt-5 max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-black shadow-[0_30px_90px_-50px_rgba(58,90,107,0.55)]">
+          <video controls playsInline preload="metadata" className="max-h-[80vh] w-full bg-black object-contain" aria-label="Quatrième vidéo de présentation de COAI">
+            <source src="/coai-presentation-4.mov" type="video/quicktime" />
+            Ton navigateur ne peut pas lire cette vidéo. Découvre COAI avec le diagnostic offert.
+          </video>
+        </div>
         <div className="mt-5 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
           <Link href="/pricing"><Button>Essayer gratuitement pendant 7 jours</Button></Link>
           <Link href="/diagnostic" className="text-sm text-laiton-300 underline hover:text-laiton-200">Faire mon diagnostic offert →</Link>
