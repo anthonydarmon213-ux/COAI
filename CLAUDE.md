@@ -1930,3 +1930,12 @@ diagnostics dont le résumé a bien été envoyé mais qui n'ont créé aucun co
 La relance rappelle les deux formules, l'essai de 7 jours et les tarifs annuels.
 Un compte existant exclut immédiatement le prospect de cette relance. Le champ
 `conversionReminderSentAt` empêche les doubles envois.
+
+## Phase Revenus 2 — priorité à l'annuel (12/08/2026)
+
+Les offres annuelles existantes deviennent le choix affiché par défaut sur la
+page Formules et après le diagnostic. Le mensuel reste disponible en un clic.
+Les économies exactes sont explicitées : 38 € sur Impulsion et 98 € sur
+Transformation. Les prix et les 7 jours d'essai ne changent pas. Les événements
+de sélection transmettent désormais aussi le rythme de facturation afin de
+comparer mensuel et annuel dans GA4.
