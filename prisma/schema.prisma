@@ -258,10 +258,15 @@ model Subscription {
   // Relance d'activation unique pendant l'essai si aucun programme n'a été
   // généré dans les 24 premières heures.
   trialActivationReminderSentAt DateTime?
+  // Dernier échec de prélèvement connu et relance de régularisation unique.
+  // Aucun détail de carte ou moyen de paiement n'est conservé.
+  paymentFailedAt                DateTime?
+  paymentRecoveryReminderSentAt DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
+  @@index([status, paymentFailedAt])
   @@map("subscriptions")
 }
 

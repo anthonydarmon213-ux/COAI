@@ -35,6 +35,7 @@ const RELANCE_DIAGNOSTIC_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_ACTIVATION_APRES_MS = 24 * 60 * 60 * 1000;
 const RELANCE_CHECKOUT_APRES_MS = 2 * 60 * 60 * 1000;
 const RELANCE_CHECKOUT_FENETRE_MS = 7 * JOUR_MS;
+const RELANCE_PAIEMENT_APRES_MS = 48 * 60 * 60 * 1000;
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Transformation) — gardés synchronisés à la main, les deux vivent dans des
@@ -429,6 +430,43 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
   return relancesCheckout;
 }
 
+// Deuxième filet de sécurité après l'email immédiat du webhook Stripe.
+// Une seule relance 48 h après l'échec, uniquement si l'abonnement est
+// toujours en retard. Un paiement réussi efface automatiquement cet état.
+async function relancerPaiementsEnRetard(appUrl: string): Promise<number> {
+  const maintenant = new Date();
+  const candidats = await prisma.subscription.findMany({
+    where: {
+      status: "PAST_DUE",
+      cancelAtPeriodEnd: false,
+      paymentFailedAt: { lte: new Date(maintenant.getTime() - RELANCE_PAIEMENT_APRES_MS) },
+      paymentRecoveryReminderSentAt: null,
+    },
+    include: { user: { select: { email: true, prenom: true } } },
+  });
+
+  let relancesPaiement = 0;
+  for (const subscription of candidats) {
+    const nom = subscription.user.prenom ? ` ${subscription.user.prenom}` : "";
+    const envoye = await sendEmail(
+      subscription.user.email,
+      "Ton abonnement COAI attend ta régularisation",
+      `Bonjour${nom},\n\n` +
+        `Ton dernier paiement n'a toujours pas pu être régularisé. Tu peux mettre à jour ton moyen de paiement en toute sécurité depuis le portail Stripe : ${appUrl}/compte/abonnement\n\n` +
+        `COAI ne stocke aucune donnée bancaire. Si tu as déjà effectué la mise à jour, tu peux ignorer ce message.\n\n` +
+        `Besoin d'aide ? Réponds simplement à cet email.\n\nL'équipe COAI`
+    );
+    if (!envoye) continue;
+
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: { paymentRecoveryReminderSentAt: maintenant },
+    });
+    relancesPaiement++;
+  }
+  return relancesPaiement;
+}
+
 export async function GET(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -436,14 +474,15 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout] = await Promise.all([
+  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
     rappelerFinEssai(appUrl),
     relancerDiagnosticsNonConvertis(appUrl),
     relancerEssaisNonActives(appUrl),
     relancerCheckoutsAbandonnes(appUrl),
+    relancerPaiementsEnRetard(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout });
+  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement });
 }
