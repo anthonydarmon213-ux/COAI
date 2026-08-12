@@ -18,6 +18,13 @@ alertes et droits administrateur existants. Il n'ajoute ni rôle Coach, ni
 multi-tenant, ni marque blanche, ni facturation B2B. Le score sert uniquement
 à ordonner le travail humain et n'est jamais présenté comme un diagnostic.
 
+Le bloc 2 ajoute au dossier client des notes internes horodatées avec auteur,
+création et suppression. Elles sont accessibles exclusivement aux
+administrateurs via des routes qui revérifient `isAdmin`, n'apparaissent dans
+aucun écran ni export client et vivent dans `coach_notes`, table avec RLS actif
+et aucune politique Data API. Migration additive :
+`20260812104500_add_coach_notes`.
+
 ## Phase 9 — cartes de progression partageables, bloc 1 (12/08/2026)
 
 Les records physiques et adaptations de programme disposent désormais d'un
