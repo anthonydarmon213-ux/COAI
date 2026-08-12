@@ -5,6 +5,7 @@ import { Sparkline } from "@/components/suivi/sparkline";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
+import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 import {
   LABEL_PAR_EXERCICE,
   ORDRE_EXERCICES,
@@ -94,13 +95,11 @@ export default async function TestsMaxiPage() {
                 {t.notes ? ` · ${t.notes}` : ""}
               </span>
             </div>
-            <a
-              href={`/api/tests-maxi/${t.id}/carte`}
-              download={`coai-record-${t.exercice.toLowerCase()}.png`}
-              className="shrink-0 rounded-lg border border-laiton-400/30 px-3 py-1.5 text-xs font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200"
-            >
-              Partager →
-            </a>
+            <ShareProgressCardButton
+              imageUrl={`/api/tests-maxi/${t.id}/carte`}
+              filename={`coai-record-${t.exercice.toLowerCase()}.png`}
+              title={`Mon record COAI — ${LABEL_PAR_EXERCICE[t.exercice]}`}
+            />
           </Card>
         ))}
         {testsMaxi.length === 0 && (

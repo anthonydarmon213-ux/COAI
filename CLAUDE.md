@@ -4,6 +4,20 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 9 — cartes de progression partageables, bloc 1 (12/08/2026)
+
+Les records physiques et adaptations de programme disposent désormais d'un
+bouton de partage réel. Sur mobile, la Web Share API transmet directement la
+carte PNG aux applications compatibles ; sur desktop, la même action
+télécharge le fichier. Les cartes d'adaptation carrées reprennent le pilier,
+la décision, son explication et l'adresse du diagnostic COAI.
+
+Les images sont générées à la demande, sans stockage supplémentaire ni appel
+IA. Chaque endpoint vérifie côté serveur que l'enregistrement appartient à
+l'utilisateur connecté : aucun record ni résumé privé n'est publiquement
+accessible. Ce bloc ne crée pas encore de galerie publique ni de publication
+automatique sur un réseau social.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements
