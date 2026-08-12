@@ -4,6 +4,7 @@ import { genererPilier } from "@/lib/programmes/generer";
 import { prochaineVersion } from "@/lib/programmes/version";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
+import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
 import { canGenerateProgramme, getEffectivePlan } from "@/lib/subscription/plan";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import type { Pilier } from "@prisma/client";
@@ -134,9 +135,21 @@ export async function POST() {
 
   if (programmes.length > 0 && statutInitial === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    // Lien direct vers la fiche de CE client (11/08/2026, amélioration
+    // workflow coach) plutôt que /admin/programmes (liste générale) — le
+    // coach tombe directement sur le bon programme après authentification,
+    // au lieu d'avoir à le rechercher dans la liste.
+    const lienValidation = `${appUrl}/admin/clients/${user.id}`;
+    const utilisateur = user.prenom ?? user.email;
     await sendAdminNotification(
       "Nouveau programme à valider",
-      `${user.prenom ?? user.email} vient de générer ${programmes.length} pilier(s) de programme, en attente de ta validation.\n\n${appUrl}/admin/programmes`
+      `${utilisateur} vient de générer ${programmes.length} pilier(s) de programme, en attente de ta validation.\n\n${lienValidation}`,
+      buildProgrammeAValiderEmailHtml({
+        utilisateur,
+        piliers: programmes.map((p) => p.pilier),
+        generatedAt: programmes[0]?.generatedAt ?? new Date(),
+        href: lienValidation,
+      })
     );
   }
 

@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
 
 // Point d'atterrissage du flow OAuth (ex: Google) initié par
 // supabase.auth.signInWithOAuth. Échange le code contre une session, puis
 // redirige vers /completer-inscription si c'est un nouveau compte (pas
 // encore de ligne User applicative — consentements RGPD/santé non recueillis),
-// ou directement vers /dashboard si le compte existe déjà.
+// ou vers `redirect_to` si présent et validé (ex: coach revenant du lien
+// "Valider le programme" reçu par email, 11/08/2026), sinon /dashboard.
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const returnTo = sanitizeReturnTo(searchParams.get("redirect_to"));
 
   if (!code) {
     return NextResponse.redirect(`${origin}/sign-in`);
@@ -26,5 +29,5 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/completer-inscription`);
   }
 
-  return NextResponse.redirect(`${origin}/dashboard`);
+  return NextResponse.redirect(`${origin}${returnTo ?? "/dashboard"}`);
 }

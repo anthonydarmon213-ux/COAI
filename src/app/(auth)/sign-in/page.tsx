@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,20 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
 import Link from "next/link";
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Posé par middleware.ts quand une route protégée (dont /admin/*) a
+  // redirigé ici faute d'authentification — permet de renvoyer le coach
+  // exactement là où il voulait aller (ex: le lien "Valider le programme"
+  // reçu par email) une fois connecté, plutôt que toujours /dashboard.
+  // Validé à la fois ici (avant navigation) et par la page de destination
+  // elle-même (auth + rôle admin vérifiés côté serveur), jamais une seule
+  // ligne de défense.
+  const returnTo = sanitizeReturnTo(searchParams.get("redirect_to"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +37,7 @@ export default function SignInPage() {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
 
-      router.push("/dashboard");
+      router.push(returnTo ?? "/dashboard");
       router.refresh();
     } catch (err) {
       console.error("[sign-in]", err);
@@ -50,7 +60,7 @@ export default function SignInPage() {
           <SectionLabel>Connexion</SectionLabel>
           <h1 className="text-xl font-semibold text-graphite-50">Se connecter</h1>
         </div>
-        <GoogleSignInButton />
+        <GoogleSignInButton redirectTo={returnTo} />
         <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
           <div className="h-px flex-1 bg-graphite-800" />
           ou

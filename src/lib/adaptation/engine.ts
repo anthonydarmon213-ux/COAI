@@ -333,9 +333,12 @@ export async function confirmerAdaptation(
 
   if (statutFinal === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    // Lien direct vers la fiche de ce client (11/08/2026, amélioration
+    // workflow coach, même correction que /api/programmes/generate) plutôt
+    // que /admin/programmes (liste générale).
     await sendAdminNotification(
       "Adaptation de programme à valider",
-      `${user.prenom ?? user.email} a accepté une adaptation de programme (${adaptation.pilier}), en attente de ta validation.\n\n${adaptation.resume}\n\n${appUrl}/admin/programmes`
+      `${user.prenom ?? user.email} a accepté une adaptation de programme (${adaptation.pilier}), en attente de ta validation.\n\n${adaptation.resume}\n\n${appUrl}/admin/clients/${userId}`
     );
   }
 

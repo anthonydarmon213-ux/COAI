@@ -256,6 +256,61 @@ de douleur déclenchent des suggestions prudentes. Vérifié en 390×844 et
   résiduel. Captures dans `test-results/daily-mobile.png`,
   `daily-desktop.png`, `daily-pain-mobile.png`.
 
+## Workflow coach : lien direct depuis l'email de validation (11/08/2026, nuit)
+
+Anthony recevait bien l'email "Nouveau programme à valider" mais le lien
+pointait vers `/admin/programmes` (liste générale) — sur mobile, non
+connecté, ça demandait une authentification puis laissait sur la liste
+plutôt que le bon programme. Objectif : email → clic → auth si besoin →
+retour automatique sur le programme précis → validation. Protection de
+`/admin` inchangée (toujours vérifiée côté serveur).
+
+- **`src/lib/auth/safe-redirect.ts`** (nouveau) — `sanitizeReturnTo()` :
+  n'accepte qu'un chemin interne relatif (commence par un seul `/`, jamais
+  `//` ni `://` dans la valeur) — anti-open-redirect. Utilisé à la fois
+  côté client (avant `router.push`) et côté serveur (`/auth/callback`),
+  jamais une seule ligne de défense.
+- **`middleware.ts`** posait déjà `redirect_to` sur l'URL de `/sign-in`
+  lors d'une redirection auth (mécanisme existant, juste jamais exploité
+  en aval) — `sign-in/page.tsx` le lit maintenant via `useSearchParams`,
+  le sanitize, et redirige dessus après connexion réussie (email/mot de
+  passe **et** Google OAuth, ce dernier en le faisant transiter par
+  `GoogleSignInButton` → `/auth/callback?redirect_to=...` →
+  `auth/callback/route.ts`, qui le revalide côté serveur avant d'y
+  rediriger).
+- **Lien de l'email** — `/api/programmes/generate/route.ts` et
+  `src/lib/adaptation/engine.ts` (notification "Adaptation à valider")
+  pointent désormais vers `/admin/clients/{userId}` (fiche client précise,
+  déjà existante depuis la Phase 4, jamais eu besoin d'une nouvelle route)
+  au lieu de `/admin/programmes`.
+- **Email enrichi** — `src/lib/email/coach-notification.ts` (nouveau) :
+  vrai HTML (DA noir/or COAI, styles inline pour compatibilité Gmail/Apple
+  Mail) avec prénom/email, piliers générés, date, et CTA "VALIDER LE
+  PROGRAMME" — remplace l'ancien texte brut avec URL nue, uniquement pour
+  la notification "Nouveau programme à valider" (celle explicitement
+  visée par le brief). `sendEmail`/`sendAdminNotification`
+  (`src/lib/email/client.ts`) acceptent maintenant un `html` optionnel en
+  plus de `text` (Resend envoie les deux, tous les appelants existants
+  restent inchangés). Aucune donnée de santé/personnelle dans l'email —
+  juste prénom/email déjà présents dans l'ancienne version, piliers et
+  date ; le contenu réel du programme reste uniquement accessible derrière
+  l'authentification + vérification `isAdmin` sur `/admin/clients/[id]`.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Test
+Playwright réel (mobile + desktop) confirmant qu'un accès non authentifié à
+`/admin/clients/abc123` redirige bien vers
+`/sign-in?redirect_to=%2Fadmin%2Fclients%2Fabc123` (le mécanisme que
+`sign-in/page.tsx` exploite ensuite pour revenir au bon endroit après
+connexion).
+
+**Non testable depuis ce sandbox** : le flow complet email → clic → login
+→ retour automatique nécessite un vrai email Resend reçu et un vrai compte
+admin authentifié (pas de réseau sortant vers Resend/Supabase depuis ce
+sandbox) — la mécanique de redirection elle-même est vérifiée (ci-dessus),
+mais le parcours de bout en bout reste à confirmer par Anthony en
+conditions réelles : cliquer sur "Valider le programme" dans un vrai
+email reçu, sur mobile non connecté puis desktop déjà connecté.
+
 ## Carte premium Transformation sur l'inscription (11/08/2026, nuit)
 
 Demandé juste après la simplification à parcours unique ci-dessous : l'offre
