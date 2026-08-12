@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
 import { appliquerRecompenseParrainageSiEligible } from "@/lib/parrainage/reward";
-import { sendAdminNotification } from "@/lib/email/client";
+import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
@@ -112,6 +112,14 @@ async function getCustomerLabel(customerId: string) {
     : `Client Stripe ${customerId}`;
 }
 
+async function getCustomerContact(customerId: string) {
+  const subscription = await prisma.subscription.findUnique({
+    where: { stripeCustomerId: customerId },
+    include: { user: { select: { prenom: true, email: true } } },
+  });
+  return subscription?.user ?? null;
+}
+
 // Webhook Stripe : synchronise le statut et le palier d'abonnement avec le
 // modèle Subscription.
 export async function POST(request: Request) {
@@ -183,10 +191,28 @@ export async function POST(request: Request) {
       const previousCancelAtPeriodEnd = (event.data.previous_attributes as { cancel_at_period_end?: boolean } | undefined)?.cancel_at_period_end;
       if (subscription.cancel_at_period_end && previousCancelAtPeriodEnd === false) {
         const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
+        const contact = await getCustomerContact(customerId);
         await sendAdminNotification(
           "Résiliation programmée COAI",
           `${await getCustomerLabel(customerId)} a programmé la fin de son abonnement.`
         );
+        if (contact) {
+          const fin = getCurrentPeriodEnd(subscription)?.toLocaleDateString("fr-FR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "Europe/Paris",
+          });
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
+          await sendEmail(
+            contact.email,
+            "Ta résiliation COAI est programmée",
+            `Bonjour${contact.prenom ? ` ${contact.prenom}` : ""},\n\n` +
+              `Ta demande est bien prise en compte${fin ? ` : ton accès reste disponible jusqu'au ${fin}` : ""}.\n\n` +
+              `Si tu changes d'avis, tu peux conserver ton abonnement depuis ton espace : ${appUrl}/compte/abonnement\n\n` +
+              `À bientôt,\nL'équipe COAI`
+          );
+        }
       }
       break;
     }
@@ -209,10 +235,23 @@ export async function POST(request: Request) {
       await recordBillingEvent(event, invoice, "FAILED");
       const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
       if (customerId) {
+        const contact = await getCustomerContact(customerId);
         await sendAdminNotification(
           "Paiement COAI échoué",
           `${await getCustomerLabel(customerId)} : paiement de ${(invoice.amount_due / 100).toFixed(2)} ${invoice.currency.toUpperCase()} à surveiller.`
         );
+        if (contact) {
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
+          await sendEmail(
+            contact.email,
+            "Action requise pour ton abonnement COAI",
+            `Bonjour${contact.prenom ? ` ${contact.prenom}` : ""},\n\n` +
+              `Le paiement de ${(invoice.amount_due / 100).toFixed(2)} ${invoice.currency.toUpperCase()} n'a pas abouti. ` +
+              `Tu peux vérifier ou mettre à jour ton moyen de paiement ici : ${appUrl}/compte/abonnement\n\n` +
+              `Ton espace reste accessible pendant la tentative de régularisation.\n\n` +
+              `Besoin d'aide ? Réponds simplement à cet email.\n\nL'équipe COAI`
+          );
+        }
       }
       break;
     }
