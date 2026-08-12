@@ -10,7 +10,7 @@ export async function uploadProgressPhoto(
   userId: string,
   file: File
 ): Promise<{ path: string } | { error: string }> {
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
   const path = `${userId}/${Date.now()}.${ext}`;
 
   const admin = createSupabaseAdminClient();

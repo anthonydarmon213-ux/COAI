@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 export function MesureForm() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export function MesureForm() {
   const [photo, setPhoto] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photoInfo, setPhotoInfo] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -28,8 +30,9 @@ export function MesureForm() {
       let photoPath: string | undefined;
 
       if (photo) {
+        const optimized = await compressProgressPhoto(photo);
         const formData = new FormData();
-        formData.append("file", photo);
+        formData.append("file", optimized.file);
         const photoRes = await fetch("/api/mesures/photo", { method: "POST", body: formData });
         const photoData = await photoRes.json();
         if (!photoRes.ok) throw new Error(photoData.error ?? "Échec de l'envoi de la photo.");
@@ -59,6 +62,7 @@ export function MesureForm() {
       setMasseMusculaireKg("");
       setFrequenceCardiaqueReposBpm("");
       setPhoto(null);
+      setPhotoInfo(null);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -118,11 +122,16 @@ export function MesureForm() {
         <Field label="Photo de progression (optionnel)">
           <input
             type="file"
-            accept="image/*"
-            onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => {
+              const selected = e.target.files?.[0] ?? null;
+              setPhoto(selected);
+              setPhotoInfo(selected ? "La photo sera optimisée automatiquement avant l’envoi." : null);
+            }}
             className="text-sm text-graphite-300 file:mr-3 file:rounded-md file:border-0 file:bg-laiton-500 file:px-3 file:py-1.5 file:text-graphite-950 file:transition hover:file:bg-laiton-400"
           />
         </Field>
+        {photoInfo && <p className="-mt-2 text-xs text-graphite-400">{photoInfo}</p>}
         {error && <p className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={loading}>
           {loading ? "Ajout…" : "Ajouter la mesure"}

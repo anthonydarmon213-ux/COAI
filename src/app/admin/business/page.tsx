@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/admin/stat-card";
 import { GrowthChart } from "@/components/admin/growth-chart";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { CapacityPanel } from "@/components/admin/capacity-panel";
+import { getCapacitySnapshot } from "@/lib/admin/capacity";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
 const PRIX_STANDARD = 49;
@@ -25,7 +27,7 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, activeSubs, programmesCount, seancesCount, signupDates] = await Promise.all([
+  const [totalUsers, activeSubs, programmesCount, seancesCount, signupDates, capacity] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
       where: { status: "ACTIVE" },
@@ -34,6 +36,7 @@ export default async function AdminBusinessPage() {
     prisma.programmeGenerated.count(),
     prisma.seanceLog.count(),
     prisma.user.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
+    getCapacitySnapshot(),
   ]);
 
   const nbStandard = activeSubs.filter((s) => s.plan === "STANDARD").length;
@@ -100,6 +103,7 @@ export default async function AdminBusinessPage() {
         </div>
 
         <GrowthChart label={`Croissance des inscriptions — ${NB_SEMAINES} dernières semaines`} points={croissance} />
+        <CapacityPanel capacity={capacity} />
       </div>
     </main>
   );
