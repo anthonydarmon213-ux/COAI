@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/client";
 import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
 import { MIN_JOURS_NEAT } from "@/lib/neat/signaux";
+import { buildTendancesDaily, type TendanceLongitudinale } from "@/lib/insight/tendances-longitudinales";
 import type { DailySession, RepasLog, SeanceLog, TestMaxi } from "@prisma/client";
 
 export type ProfilApprisItem = {
@@ -20,6 +21,7 @@ export type ProfilIntelligence = {
   items: ProfilApprisItem[];
   progression: number;
   axes: AxeApprentissage[];
+  tendances: TendanceLongitudinale[];
 };
 
 // Seuils minimum avant d'afficher une conclusion — jamais une conclusion
@@ -252,7 +254,7 @@ export async function buildProfilIntelligence(userId: string): Promise<ProfilInt
     axes.reduce((total, axe) => total + Math.min(1, axe.actuel / axe.cible), 0) / axes.length * 100
   );
 
-  return { items, progression, axes };
+  return { items, progression, axes, tendances: buildTendancesDaily(dailies) };
 }
 
 export async function buildProfilAppris(userId: string): Promise<ProfilApprisItem[]> {
