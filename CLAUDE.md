@@ -44,6 +44,12 @@ sur les relations et récompenses déjà persistées en base. Les interactions d
 partage restent mesurées dans GA4 et ne sont pas artificiellement assimilées
 aux liens simplement générés.
 
+Le bloc 6 personnalise l'arrivée du filleul sur le diagnostic : un encart
+« Invitation COAI » explique que le parcours dure environ deux minutes, reste
+gratuit et montre le résultat avant toute décision. Aucune identité du parrain
+n'est exposée et aucun témoignage n'est fabriqué. L'événement GA4
+`referral_invitation_opened` mesure les ouvertures réelles.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements
