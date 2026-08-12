@@ -102,6 +102,16 @@ async function recordBillingEvent(event: Stripe.Event, invoice: Stripe.Invoice, 
   });
 }
 
+async function getCustomerLabel(customerId: string) {
+  const subscription = await prisma.subscription.findUnique({
+    where: { stripeCustomerId: customerId },
+    include: { user: { select: { prenom: true, email: true } } },
+  });
+  return subscription?.user
+    ? `${subscription.user.prenom ?? "Client"} (${subscription.user.email})`
+    : `Client Stripe ${customerId}`;
+}
+
 // Webhook Stripe : synchronise le statut et le palier d'abonnement avec le
 // modèle Subscription.
 export async function POST(request: Request) {
@@ -170,11 +180,24 @@ export async function POST(request: Request) {
         ?.status;
       await upsertFromSubscription(subscription);
       await appliquerRecompenseParrainageSiEligible(subscription, statutPrecedent);
+      const previousCancelAtPeriodEnd = (event.data.previous_attributes as { cancel_at_period_end?: boolean } | undefined)?.cancel_at_period_end;
+      if (subscription.cancel_at_period_end && previousCancelAtPeriodEnd === false) {
+        const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
+        await sendAdminNotification(
+          "Résiliation programmée COAI",
+          `${await getCustomerLabel(customerId)} a programmé la fin de son abonnement.`
+        );
+      }
       break;
     }
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       await upsertFromSubscription(subscription);
+      const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
+      await sendAdminNotification(
+        "Abonnement COAI terminé",
+        `${await getCustomerLabel(customerId)} n'a plus d'abonnement actif.`
+      );
       break;
     }
     case "invoice.payment_succeeded": {
@@ -182,7 +205,15 @@ export async function POST(request: Request) {
       break;
     }
     case "invoice.payment_failed": {
-      await recordBillingEvent(event, event.data.object as Stripe.Invoice, "FAILED");
+      const invoice = event.data.object as Stripe.Invoice;
+      await recordBillingEvent(event, invoice, "FAILED");
+      const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+      if (customerId) {
+        await sendAdminNotification(
+          "Paiement COAI échoué",
+          `${await getCustomerLabel(customerId)} : paiement de ${(invoice.amount_due / 100).toFixed(2)} ${invoice.currency.toUpperCase()} à surveiller.`
+        );
+      }
       break;
     }
     // Un remboursement n'annule pas l'abonnement côté Stripe par défaut —

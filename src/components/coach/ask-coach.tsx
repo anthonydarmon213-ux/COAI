@@ -26,12 +26,13 @@ function useSimulatedProgress(active: boolean) {
   return [progress, setProgress] as const;
 }
 
-export function AskCoach() {
+export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: number | null }) {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quotaAtteint, setQuotaAtteint] = useState(false);
   const [historique, setHistorique] = useState<Echange[]>([]);
+  const [quotaRemaining, setQuotaRemaining] = useState(initialQuotaRemaining);
   const [progress, setProgress] = useSimulatedProgress(loading);
 
   const rOuter = 44;
@@ -53,12 +54,16 @@ export function AskCoach() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (res.status === 429) setQuotaAtteint(true);
+        if (res.status === 429) {
+          setQuotaAtteint(true);
+          setQuotaRemaining(0);
+        }
         throw new Error(data.error ?? "Impossible d'obtenir une réponse.");
       }
       setProgress(100);
       await new Promise((resolve) => setTimeout(resolve, 350));
       setHistorique((prev) => [...prev, { question: q, reponse: data.answer }]);
+      if (typeof data.quotaRemaining === "number") setQuotaRemaining(data.quotaRemaining);
       setQuestion("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -109,6 +114,11 @@ export function AskCoach() {
         <p className="font-mono text-xs uppercase tracking-widest text-graphite-400">
           {loading ? "Ton coach réfléchit…" : "Prêt à répondre"}
         </p>
+        {quotaRemaining !== null && (
+          <p className="text-xs text-laiton-300">
+            {quotaRemaining} question{quotaRemaining > 1 ? "s" : ""} restante{quotaRemaining > 1 ? "s" : ""} ce mois-ci
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="flex w-full max-w-lg flex-col gap-3">
           <textarea
             value={question}
@@ -126,9 +136,9 @@ export function AskCoach() {
           <div className="flex flex-col items-center gap-3">
             <p className="text-sm text-red-400">{error}</p>
             {quotaAtteint && (
-              <Link href="/pricing">
+              <Link href="/pricing?plan=STANDARD">
                 <Button variant="secondary" className="px-6">
-                  Voir les offres
+                  Passer à Transformation
                 </Button>
               </Link>
             )}
