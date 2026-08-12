@@ -366,7 +366,10 @@ export function DiagnosticQuiz({
   aDejaUnProgramme = false,
 }: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
-  const [facturationAnnuelle, setFacturationAnnuelle] = useState(false);
+  // Après un diagnostic complet, on recommande l'engagement annuel (deux
+  // mois offerts) pour maximiser la valeur et la trésorerie. Le mensuel reste
+  // disponible immédiatement dans le même sélecteur.
+  const [facturationAnnuelle, setFacturationAnnuelle] = useState(true);
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
   // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
   // retirée de la liste des questions pour ce cas, sans dupliquer tout le
@@ -1312,7 +1315,7 @@ export function DiagnosticQuiz({
                           facturationAnnuelle ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"
                         }`}
                       >
-                        Annuel · 2 mois offerts
+                        Annuel recommandé · 2 mois offerts
                       </button>
                     </div>
                   </div>
@@ -1366,6 +1369,11 @@ export function DiagnosticQuiz({
                               <span className="text-center text-xs font-medium text-laiton-300">
                                 7 jours offerts · puis {facturationAnnuelle && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}
                               </span>
+                              {facturationAnnuelle && formule.prixAnnuel && (
+                                <span className="text-center text-[11px] font-medium text-emerald-300">
+                                  Économie de {formule.plan === "GRATUIT" ? "38 €" : "98 €"} sur l&apos;année
+                                </span>
+                              )}
                             </div>
                           }
                         />

@@ -129,7 +129,9 @@ const TIERS: Tier[] = [
 
 export default function PricingPage({ searchParams }: { searchParams?: { billing?: string; vip?: string } }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
-  const annual = searchParams?.billing === "annual";
+  // L'annuel est présenté en premier pour privilégier l'engagement et la
+  // trésorerie, sans retirer le mensuel (accessible en un clic).
+  const annual = searchParams?.billing !== "monthly";
   const displayedTiers = TIERS.map((tier) => {
     if (!annual || tier.sessions) return tier;
     if (tier.nom === "Impulsion") {
@@ -159,7 +161,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
           <TrustBadges />
         </div>
         <div className="mt-6 inline-flex rounded-full border border-white/10 bg-white/[0.03] p-1">
-          <Link href="/pricing" className={`rounded-full px-4 py-2 text-sm ${!annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Mensuel</Link>
+          <Link href="/pricing?billing=monthly" className={`rounded-full px-4 py-2 text-sm ${!annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Mensuel</Link>
           <Link href="/pricing?billing=annual" className={`rounded-full px-4 py-2 text-sm ${annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Annuel · 2 mois offerts</Link>
         </div>
       </div>
@@ -199,6 +201,11 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
                   <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
                   <span className="text-sm text-graphite-400">{tier.suffixe}</span>
                 </div>
+                {annual && (
+                  <p className="mt-2 text-xs font-medium text-emerald-300">
+                    Économie de {tier.nom === "Impulsion" ? "38 €" : "98 €"} par an
+                  </p>
+                )}
                 {!annual && (
                   <Link href="/pricing?billing=annual" className="mt-2 block text-xs font-medium text-laiton-300 hover:text-laiton-200">
                     ou {tier.nom === "Impulsion" ? "190€/an" : "490€/an"} · 2 mois offerts
@@ -257,7 +264,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
               ) : tier.plan ? (
                 <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer gratuitement" className="w-full" />
               ) : (
-                <PlanSelectedLink href={`/sign-up?billing=${annual ? "ANNUAL" : "MONTHLY"}`} plan="GRATUIT" label="Commencer gratuitement" className="w-full" />
+                <PlanSelectedLink href={`/sign-up?billing=${annual ? "ANNUAL" : "MONTHLY"}`} plan="GRATUIT" billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer gratuitement" className="w-full" />
               )}
               {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
             </div>

@@ -11,16 +11,18 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 export function PlanSelectedLink({
   href,
   plan,
+  billing,
   label,
   className,
 }: {
   href: string;
   plan: "GRATUIT" | "STANDARD" | "VIP";
+  billing?: "MONTHLY" | "ANNUAL";
   label: string;
   className?: string;
 }) {
   return (
-    <Link href={href} onClick={() => trackFunnelEvent("plan_selected", { plan })} className="w-full">
+    <Link href={href} onClick={() => trackFunnelEvent("plan_selected", { plan, billing })} className="w-full">
       <Button className={className}>{label}</Button>
     </Link>
   );
