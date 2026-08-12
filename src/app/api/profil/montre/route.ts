@@ -58,7 +58,8 @@ export async function POST(request: Request) {
     extraction = await generateWithVision<Extraction>(
       buildWatchScreenshotExtractionPrompt(),
       buffer.toString("base64"),
-      mediaType
+      mediaType,
+      { userId: user.id, feature: "vision_montre" }
     );
   } catch (err) {
     console.error("[profil/montre] Échec de l'extraction IA", err);

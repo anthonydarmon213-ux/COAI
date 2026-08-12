@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { recordAIUsage, type AIUsageContext } from "@/lib/ai/usage";
 
 // Client IA pour la génération dynamique des programmes.
 // Aucune bibliothèque de programmes pré-construite : chaque appel régénère
@@ -62,7 +63,10 @@ const JSON_INSTRUCTION =
   "Réponds uniquement avec un objet JSON valide, sans texte avant ou après, sans balises markdown.";
 
 // Appelle le modèle et renvoie le JSON généré, parsé.
-export async function generateWithAI<T = unknown>(prompt: string): Promise<T> {
+export async function generateWithAI<T = unknown>(
+  prompt: string,
+  usageContext?: AIUsageContext
+): Promise<T> {
   const model = process.env.AI_MODEL || "claude-sonnet-5";
 
   const response = await getClient().messages.create({
@@ -70,6 +74,7 @@ export async function generateWithAI<T = unknown>(prompt: string): Promise<T> {
     max_tokens: 8192,
     messages: [{ role: "user", content: `${prompt}\n\n${JSON_INSTRUCTION}` }],
   });
+  await recordAIUsage(model, response.usage, usageContext);
 
   if (response.stop_reason === "max_tokens") {
     throw new Error("Réponse IA tronquée (max_tokens atteint), génération à réessayer");
@@ -93,7 +98,8 @@ type ImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 export async function generateWithVision<T = unknown>(
   prompt: string,
   imageBase64: string,
-  mediaType: ImageMediaType
+  mediaType: ImageMediaType,
+  usageContext?: AIUsageContext
 ): Promise<T> {
   const model = process.env.AI_MODEL || "claude-sonnet-5";
 
@@ -110,6 +116,7 @@ export async function generateWithVision<T = unknown>(
       },
     ],
   });
+  await recordAIUsage(model, response.usage, usageContext);
 
   if (response.stop_reason === "max_tokens") {
     throw new Error("Réponse IA tronquée (max_tokens atteint), génération à réessayer");
@@ -126,7 +133,10 @@ export async function generateWithVision<T = unknown>(
 // Appelle le modèle et renvoie une réponse en texte libre (pas de JSON) —
 // utilisé pour les réponses conversationnelles (ex: question au coach IA),
 // à la différence de generateWithAI qui structure toujours un programme.
-export async function generateTextWithAI(prompt: string): Promise<string> {
+export async function generateTextWithAI(
+  prompt: string,
+  usageContext?: AIUsageContext
+): Promise<string> {
   const model = process.env.AI_MODEL || "claude-sonnet-5";
 
   const response = await getClient().messages.create({
@@ -134,6 +144,7 @@ export async function generateTextWithAI(prompt: string): Promise<string> {
     max_tokens: 1024,
     messages: [{ role: "user", content: prompt }],
   });
+  await recordAIUsage(model, response.usage, usageContext);
 
   return response.content
     .filter((block): block is Anthropic.TextBlock => block.type === "text")

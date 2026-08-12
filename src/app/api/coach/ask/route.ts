@@ -109,7 +109,8 @@ export async function POST(request: Request) {
       tendances: intelligence.tendances.slice(0, 3).map(({ titre, constat, preuve }) => ({ titre, constat, preuve })),
     } : undefined;
     const answer = await generateTextWithAI(
-      buildCoachQuestionPrompt(profil, parsed.data.question, parsed.data.context, memory)
+      buildCoachQuestionPrompt(profil, parsed.data.question, parsed.data.context, memory),
+      { userId: user.id, feature: parsed.data.context ? "coach_daily" : "coach_chat" }
     );
     return NextResponse.json({ answer });
   } catch (error) {

@@ -92,8 +92,29 @@ model User {
   adaptations    ProgrammeAdaptation[]
   activitesJournalieres ActiviteJournaliere[]
   dailySessions  DailySession[]
+  aiUsageEvents  AiUsageEvent[]
 
   @@map("users")
+}
+
+// Phase 8 — mesure économique des appels IA. Aucun prompt, réponse ou donnée
+// de santé n'est conservé : uniquement les compteurs techniques nécessaires
+// pour piloter le coût par fonctionnalité et par utilisateur.
+model AiUsageEvent {
+  id                     String   @id @default(uuid())
+  userId                 String?
+  user                   User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  feature                String
+  model                  String
+  inputTokens            Int
+  outputTokens           Int
+  estimatedCostUsdMicros Int
+  createdAt              DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([feature, createdAt])
+  @@map("ai_usage_events")
 }
 
 enum DailySleep {
@@ -155,11 +176,10 @@ enum SubscriptionStatus {
   INCOMPLETE
 }
 
-// GRATUIT = offre d'appel, 1 mois offert puis 9€/mois (essai Stripe avec
+// GRATUIT = offre d'appel, 7 jours offerts puis 19€/mois (essai Stripe avec
 // carte obligatoire dès l'inscription — cf. STRIPE_PRICE_ID_GRATUIT).
 // STANDARD = 49€/mois (programme IA + validation coach).
-// PREMIUM = 199€/mois (STANDARD + 1 séance/mois en présentiel ou visio,
-// version light de THE METHOD qui reste à 4 séances/mois).
+// PREMIUM = ancien abonnement 199€/mois, conservé pour compatibilité.
 // Un utilisateur sans ligne Subscription du tout (edge case : compte créé
 // avant l'introduction du palier Gratuit payant, ou juste après
 // l'inscription avant que le webhook Stripe n'ait tourné) est aussi
@@ -179,7 +199,7 @@ model Subscription {
   status               SubscriptionStatus @default(INCOMPLETE)
   plan                 SubscriptionPlan   @default(STANDARD)
   currentPeriodEnd     DateTime?
-  // Fin de la période d'essai Stripe (offre Gratuite 1 mois offert). Null
+  // Fin de la période d'essai Stripe (7 jours). Null
   // hors essai — status reste "ACTIVE" pendant l'essai (trialing y est
   // mappé), donc c'est ce champ qui permet de distinguer "encore en essai"
   // de "déjà passé à 9€/mois".

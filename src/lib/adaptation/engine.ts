@@ -230,7 +230,10 @@ export async function proposerAdaptation(
     contrainteUtilisateur
   );
 
-  const decisionBrute = await generateWithAI<DecisionAdaptationIA>(prompt);
+  const decisionBrute = await generateWithAI<DecisionAdaptationIA>(prompt, {
+    userId: user.id,
+    feature: "adaptation_decision",
+  });
   const decision = appliquerGardeFous(decisionBrute, signaux, options?.douleurSignaleeManuelle);
   const actionnable = decision.decision !== "GARDER";
 
@@ -300,7 +303,7 @@ export async function confirmerAdaptation(
   const finPrevue = typeof contexte._finPrevue === "string" ? new Date(contexte._finPrevue) : null;
 
   const [contenu, version] = await Promise.all([
-    genererPilier(adaptation.pilier, profilAdaptation),
+    genererPilier(adaptation.pilier, profilAdaptation, userId),
     prochaineVersion(userId, adaptation.pilier),
   ]);
 
