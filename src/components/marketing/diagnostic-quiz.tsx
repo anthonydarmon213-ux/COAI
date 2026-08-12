@@ -284,6 +284,7 @@ const FORMULES = [
     plan: "GRATUIT" as const,
     nom: "Impulsion",
     prix: "19€/mois",
+    prixAnnuel: "190€/an",
     accroche: "Coaching 100% IA pour démarrer sans attendre.",
     bullets: [
       "Programme généré par IA (entraînement, nutrition, récupération)",
@@ -295,6 +296,7 @@ const FORMULES = [
     plan: "STANDARD" as const,
     nom: "Transformation",
     prix: "49€/mois",
+    prixAnnuel: "490€/an",
     accroche: "L'IA génère, un coach diplômé d'État valide et te suit jusqu'à ton objectif.",
     bullets: [
       "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs",
@@ -307,6 +309,7 @@ const FORMULES = [
     plan: "VIP" as const,
     nom: "VIP",
     prix: "dès 100€/séance",
+    prixAnnuel: null,
     accroche: "Coaching 100% humain avec Anthony, à la séance.",
     bullets: ["1-to-1 avec Anthony Darmon", "Présentiel ou visio", "Sans abonnement"],
   },
@@ -316,10 +319,12 @@ function FormuleCard({
   formule,
   recommandee,
   cta,
+  annuel = false,
 }: {
   formule: (typeof FORMULES)[number];
   recommandee: boolean;
   cta: ReactNode;
+  annuel?: boolean;
 }) {
   return (
     <div
@@ -330,7 +335,12 @@ function FormuleCard({
       {recommandee && <Badge tone="success">Recommandé pour toi</Badge>}
       <div>
         <p className="font-display text-lg font-semibold text-white">{formule.nom}</p>
-        <p className="font-mono text-sm text-laiton-300">{formule.prix}</p>
+        <p className="font-mono text-sm text-laiton-300">
+          {annuel && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}
+        </p>
+        {annuel && formule.prixAnnuel && (
+          <p className="mt-1 text-[11px] font-medium text-laiton-200">2 mois offerts</p>
+        )}
       </div>
       <p className="text-xs leading-5 text-graphite-400">{formule.accroche}</p>
       <ul className="flex flex-col gap-1.5 text-xs leading-5 text-graphite-300">
@@ -355,6 +365,7 @@ export function DiagnosticQuiz({
   aDejaUnProgramme = false,
 }: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
+  const [facturationAnnuelle, setFacturationAnnuelle] = useState(false);
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
   // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
   // retirée de la liste des questions pour ce cas, sans dupliquer tout le
@@ -633,6 +644,7 @@ export function DiagnosticQuiz({
   function signUpHref(standard: boolean): string {
     const params = new URLSearchParams();
     if (standard) params.set("plan", "STANDARD");
+    params.set("billing", facturationAnnuelle ? "ANNUAL" : "MONTHLY");
     if (email) params.set("email", email);
     const query = params.toString();
     return query ? `/sign-up?${query}` : "/sign-up";
@@ -1281,6 +1293,28 @@ export function DiagnosticQuiz({
               ) : (
                 <div className="flex w-full flex-col gap-4">
                   <SectionLabel>Nos formules</SectionLabel>
+                  <div className="flex justify-center">
+                    <div className="inline-flex rounded-full border border-white/10 bg-white/[0.03] p-1">
+                      <button
+                        type="button"
+                        onClick={() => setFacturationAnnuelle(false)}
+                        className={`rounded-full px-3 py-2 text-xs transition ${
+                          !facturationAnnuelle ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"
+                        }`}
+                      >
+                        Mensuel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFacturationAnnuelle(true)}
+                        className={`rounded-full px-3 py-2 text-xs transition ${
+                          facturationAnnuelle ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"
+                        }`}
+                      >
+                        Annuel · 2 mois offerts
+                      </button>
+                    </div>
+                  </div>
                   <div className="grid w-full grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
                     {FORMULES.map((formule) => {
                       const recommandee = formule.plan === diagnostic.recommandation.plan;
@@ -1290,6 +1324,7 @@ export function DiagnosticQuiz({
                             key={formule.nom}
                             formule={formule}
                             recommandee={recommandee}
+                            annuel={facturationAnnuelle}
                             cta={
                               vipHref ? (
                                 <a
@@ -1317,6 +1352,7 @@ export function DiagnosticQuiz({
                           key={formule.nom}
                           formule={formule}
                           recommandee={recommandee}
+                          annuel={facturationAnnuelle}
                           cta={
                             <div className="flex flex-col items-center gap-1.5">
                               <Link
@@ -1340,7 +1376,7 @@ export function DiagnosticQuiz({
                                 </Button>
                               </Link>
                               <span className="text-center text-xs font-medium text-laiton-300">
-                                7 jours offerts · puis {formule.prix}
+                                7 jours offerts · puis {facturationAnnuelle && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}
                               </span>
                             </div>
                           }

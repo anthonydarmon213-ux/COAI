@@ -195,9 +195,16 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
             {tier.sessions ? (
               <p className="text-lg font-semibold text-white">{tier.prix}</p>
             ) : (
-              <div className="flex items-baseline justify-center gap-1">
-                <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
-                <span className="text-sm text-graphite-400">{tier.suffixe}</span>
+              <div>
+                <div className="flex items-baseline justify-center gap-1">
+                  <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
+                  <span className="text-sm text-graphite-400">{tier.suffixe}</span>
+                </div>
+                {!annual && (
+                  <Link href="/pricing?billing=annual" className="mt-2 block text-xs font-medium text-laiton-300 hover:text-laiton-200">
+                    ou {tier.nom === "Impulsion" ? "190€/an" : "490€/an"} · 2 mois offerts
+                  </Link>
+                )}
               </div>
             )}
 
