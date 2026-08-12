@@ -247,7 +247,15 @@ export async function POST(request: Request) {
       break;
     }
     case "invoice.payment_succeeded": {
-      await recordBillingEvent(event, event.data.object as Stripe.Invoice, "PAID");
+      const invoice = event.data.object as Stripe.Invoice;
+      await recordBillingEvent(event, invoice, "PAID");
+      const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+      if (customerId) {
+        await prisma.subscription.updateMany({
+          where: { stripeCustomerId: customerId },
+          data: { paymentFailedAt: null, paymentRecoveryReminderSentAt: null },
+        });
+      }
       break;
     }
     case "invoice.payment_failed": {
@@ -255,6 +263,13 @@ export async function POST(request: Request) {
       await recordBillingEvent(event, invoice, "FAILED");
       const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
       if (customerId) {
+        await prisma.subscription.updateMany({
+          where: { stripeCustomerId: customerId },
+          data: {
+            paymentFailedAt: new Date(event.created * 1000),
+            paymentRecoveryReminderSentAt: null,
+          },
+        });
         const contact = await getCustomerContact(customerId);
         await sendAdminNotification(
           "Paiement COAI échoué",

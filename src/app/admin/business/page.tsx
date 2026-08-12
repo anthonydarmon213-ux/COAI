@@ -91,9 +91,10 @@ export default async function AdminBusinessPage() {
   const tauxActivationProgramme = essaisActifs.length > 0 ? (essaisAvecProgramme / essaisActifs.length) * 100 : 0;
   const tauxActivationSeance = essaisActifs.length > 0 ? (essaisAvecSeance / essaisActifs.length) * 100 : 0;
   const relancesActivationEnvoyees = subscriptions.filter((subscription) => subscription.trialActivationReminderSentAt).length;
-  const [checkoutsCommences30d, relancesCheckout30d] = await Promise.all([
+  const [checkoutsCommences30d, relancesCheckout30d, relancesPaiement30d] = await Promise.all([
     prisma.user.count({ where: { checkoutStartedAt: { gte: ilYA30Jours } } }),
     prisma.user.count({ where: { checkoutReminderSentAt: { gte: ilYA30Jours } } }),
+    prisma.subscription.count({ where: { paymentRecoveryReminderSentAt: { gte: ilYA30Jours } } }),
   ]);
   const churnFeedbackCount = churnReasons.reduce((total, item) => total + item._count._all, 0);
   const topChurnReason = churnReasons[0]?.reason ?? "Aucun retour";
@@ -229,6 +230,12 @@ export default async function AdminBusinessPage() {
             sublabel="À relancer ou surveiller"
           />
           <StatCard
+            label="Revenu récupéré · 30 j"
+            value={eurCents.format(revenue.recoveredCents30d / 100)}
+            sublabel={`${revenue.recoveredPayments30d} paiement(s) régularisé(s)`}
+            highlight
+          />
+          <StatCard
             label="Conversion essai · 30 j"
             value={`${revenue.trialConversionRate30d.toFixed(1)}%`}
             sublabel={`${revenue.convertedTrials30d}/${revenue.endedTrials30d} essai(s) devenu(s) payant(s)`}
@@ -267,6 +274,8 @@ export default async function AdminBusinessPage() {
             <StatCard label="Checkouts commencés" value={String(checkoutsCommences30d)} sublabel="Sessions Stripe créées" />
             <StatCard label="Relances envoyées" value={String(relancesCheckout30d)} sublabel="Après 2 h sans conversion" />
             <StatCard label="Paiements échoués" value={String(revenue.failedPayments30d)} sublabel="Déjà relancés par webhook" />
+            <StatCard label="Relances à 48 h" value={String(relancesPaiement30d)} sublabel="Uniquement si toujours impayé" />
+            <StatCard label="Paiements récupérés" value={String(revenue.recoveredPayments30d)} sublabel={eurCents.format(revenue.recoveredCents30d / 100)} highlight />
           </div>
         </section>
 

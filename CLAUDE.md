@@ -1968,3 +1968,12 @@ choisie. La validation Stripe neutralise immédiatement la relance. Le retour
 d'annulation affiche aussi une confirmation explicite qu'aucun paiement n'a
 été enregistré. Le dashboard mesure les Checkouts commencés et relancés ; les
 échecs de paiement continuent d'être traités par le webhook Stripe existant.
+
+## Phase Revenus 6 — récupération des paiements échoués (12/08/2026)
+
+Le premier échec déclenche toujours l'email immédiat du webhook Stripe. Si
+l'abonnement reste en retard 48 heures plus tard, le cron envoie une relance
+unique vers le portail de facturation sécurisé. Un paiement réussi neutralise
+automatiquement toute relance restante. Le dashboard mesure les relances, les
+paiements régularisés sous 14 jours et le revenu ainsi récupéré. COAI ne stocke
+aucune donnée bancaire.
