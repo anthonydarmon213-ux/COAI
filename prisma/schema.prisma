@@ -93,8 +93,24 @@ model User {
   activitesJournalieres ActiviteJournaliere[]
   dailySessions  DailySession[]
   aiUsageEvents  AiUsageEvent[]
+  churnFeedback  ChurnFeedback?
 
   @@map("users")
+}
+
+// Motif facultatif donné après une résiliation programmée. Une seule réponse
+// courante par utilisateur, sans donnée de paiement ni payload Stripe.
+model ChurnFeedback {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason    String
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reason, createdAt])
+  @@map("churn_feedback")
 }
 
 // Phase 8 — mesure économique des appels IA. Aucun prompt, réponse ou donnée
