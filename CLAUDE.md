@@ -37,6 +37,13 @@ personnalisé avant l'offre ; le code survit trois jours, à tout le tunnel et �
 l'aller-retour Google OAuth. Les liens déjà partagés vers `/sign-up?ref=`
 restent compatibles.
 
+Le bloc 5 ajoute au dashboard `/admin/business` une section Acquisition
+virale : liens personnels créés, filleuls inscrits (dont 30 jours), filleuls
+encore en essai et conversion payante. Ces métriques reposent exclusivement
+sur les relations et récompenses déjà persistées en base. Les interactions de
+partage restent mesurées dans GA4 et ne sont pas artificiellement assimilées
+aux liens simplement générés.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements
