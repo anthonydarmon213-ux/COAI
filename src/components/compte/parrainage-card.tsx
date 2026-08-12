@@ -67,7 +67,7 @@ export function ParrainageCard() {
       <SectionLabel>Parrainage</SectionLabel>
       <Card className="flex flex-col gap-4">
         <p className="text-sm text-graphite-300">
-          Partage ton lien — dès qu&apos;un filleul devient abonné payant (à la fin de son essai
+          Ton invité commence par son diagnostic gratuit. Dès qu&apos;il devient abonné payant (à la fin de son essai
           gratuit de 7 jours), tu reçois 1 mois offert sur ton propre abonnement.
         </p>
 

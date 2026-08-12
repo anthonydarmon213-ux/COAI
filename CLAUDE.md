@@ -30,6 +30,13 @@ le lien copié. La page Abonnement propose également un partage natif direct.
 Les événements `progress_shared` et `referral_link_shared` permettent de
 mesurer l'usage dans GA4, sans nouvel outil ni nouvelle donnée en base.
 
+Le bloc 4 remplace l'arrivée directe sur l'inscription par
+`/invitation/[code]`, qui mémorise le parrain puis redirige vers le diagnostic
+gratuit avec une attribution UTM dédiée. Le filleul voit donc le résultat
+personnalisé avant l'offre ; le code survit trois jours, à tout le tunnel et à
+l'aller-retour Google OAuth. Les liens déjà partagés vers `/sign-up?ref=`
+restent compatibles.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements
