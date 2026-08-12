@@ -1949,3 +1949,12 @@ emails normalisés déjà recueillis ; aucune nouvelle donnée ni plateforme n'e
 ajoutée. Deux liens Meta normalisés (`video_1` et `video_2`) sont fournis pour
 envoyer chaque publicité vers le diagnostic tout en conservant une attribution
 comparable dans GA4 et dans COAI.
+
+## Phase Revenus 4 — activation des essais (12/08/2026)
+
+Le dashboard suit désormais, parmi les essais actifs, la génération d'un
+programme et la première séance. Le cron quotidien relance une seule fois les
+essais actifs depuis plus de 24 heures qui n'ont encore aucun programme, puis
+les renvoie vers `/bienvenue` pour reprendre l'activation. Les essais déjà
+activés, annulés ou terminés sont exclus. Aucun nouvel outil d'email n'est
+ajouté : Resend et le cron existants sont réutilisés.

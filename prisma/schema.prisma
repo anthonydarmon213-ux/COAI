@@ -247,6 +247,9 @@ model Subscription {
   trialEnd             DateTime?
   // Rappel unique envoyé environ 48 h avant le premier prélèvement.
   trialReminderSentAt  DateTime?
+  // Relance d'activation unique pendant l'essai si aucun programme n'a été
+  // généré dans les 24 premières heures.
+  trialActivationReminderSentAt DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt

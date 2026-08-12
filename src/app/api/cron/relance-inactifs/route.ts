@@ -32,6 +32,7 @@ const JOUR_MS = 24 * 60 * 60 * 1000;
 const RAPPEL_ESSAI_AVANT_MS = 72 * 60 * 60 * 1000;
 const RELANCE_DIAGNOSTIC_APRES_MS = 24 * 60 * 60 * 1000;
 const RELANCE_DIAGNOSTIC_FENETRE_MS = 7 * JOUR_MS;
+const RELANCE_ACTIVATION_APRES_MS = 24 * 60 * 60 * 1000;
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Transformation) — gardés synchronisés à la main, les deux vivent dans des
@@ -331,6 +332,46 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
   return relancesDiagnostic;
 }
 
+// Filet de sécurité pour les nouveaux essais qui ont quitté l'onboarding
+// avant la génération du programme. Une seule relance, après 24 h, tant que
+// l'essai est actif. Dès qu'un programme existe, aucune relance n'est envoyée.
+async function relancerEssaisNonActives(appUrl: string): Promise<number> {
+  const maintenant = new Date();
+  const candidats = await prisma.subscription.findMany({
+    where: {
+      status: "ACTIVE",
+      cancelAtPeriodEnd: false,
+      trialEnd: { gt: maintenant },
+      trialActivationReminderSentAt: null,
+      createdAt: { lte: new Date(maintenant.getTime() - RELANCE_ACTIVATION_APRES_MS) },
+      user: { programmes: { none: {} } },
+    },
+    include: { user: { select: { email: true, prenom: true } } },
+  });
+
+  let relancesActivation = 0;
+  for (const subscription of candidats) {
+    const nom = subscription.user.prenom ? ` ${subscription.user.prenom}` : "";
+    const envoye = await sendEmail(
+      subscription.user.email,
+      "Ton programme COAI n'attend plus que toi",
+      `Bonjour${nom},\n\n` +
+        `Ton essai COAI est actif, mais ton programme personnalisé n'a pas encore été généré. ` +
+        `Il te suffit de reprendre ton profil : COAI prépare ensuite ton entraînement, ta nutrition et ta récupération.\n\n` +
+        `Terminer mon activation : ${appUrl}/bienvenue\n\n` +
+        `Tu disposes toujours de tes 7 jours d'essai, sans engagement.\n\n` +
+        `À bientôt,\nL'équipe COAI`
+    );
+    if (!envoye) continue;
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: { trialActivationReminderSentAt: new Date() },
+    });
+    relancesActivation++;
+  }
+  return relancesActivation;
+}
+
 export async function GET(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -338,12 +379,13 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic] = await Promise.all([
+  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
     rappelerFinEssai(appUrl),
     relancerDiagnosticsNonConvertis(appUrl),
+    relancerEssaisNonActives(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic });
+  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation });
 }
