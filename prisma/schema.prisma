@@ -206,6 +206,11 @@ enum SubscriptionPlan {
   PREMIUM
 }
 
+enum BillingInterval {
+  MONTHLY
+  ANNUAL
+}
+
 model Subscription {
   id                   String             @id @default(uuid())
   userId               String             @unique
@@ -214,6 +219,7 @@ model Subscription {
   stripeSubscriptionId String?            @unique
   status               SubscriptionStatus @default(INCOMPLETE)
   plan                 SubscriptionPlan   @default(STANDARD)
+  billingInterval      BillingInterval    @default(MONTHLY)
   currentPeriodEnd     DateTime?
   // Fin de la période d'essai Stripe (7 jours). Null
   // hors essai — status reste "ACTIVE" pendant l'essai (trialing y est

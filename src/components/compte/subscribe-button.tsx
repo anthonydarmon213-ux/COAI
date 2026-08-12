@@ -8,29 +8,31 @@ export function SubscribeButton({
   plan,
   label,
   className,
+  billing = "MONTHLY",
 }: {
   plan: "STANDARD" | "PREMIUM";
   label: string;
   className?: string;
+  billing?: "MONTHLY" | "ANNUAL";
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
-    trackFunnelEvent("plan_selected", { plan });
+    trackFunnelEvent("plan_selected", { plan, billing });
     setLoading(true);
     setError(null);
     try {
-      trackFunnelEvent("checkout_started", { plan });
+      trackFunnelEvent("checkout_started", { plan, billing });
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, billing }),
       });
       if (res.status === 401) {
         // Préserve l'intention (Transformation) à travers l'inscription —
         // sinon /sign-up créait toujours un abonnement Impulsion par défaut.
-        window.location.href = plan === "STANDARD" ? "/sign-up?plan=STANDARD" : "/sign-up";
+        window.location.href = `/sign-up?plan=${plan === "STANDARD" ? "STANDARD" : "GRATUIT"}&billing=${billing}`;
         return;
       }
       const data = await res.json();

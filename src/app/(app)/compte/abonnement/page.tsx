@@ -16,6 +16,7 @@ const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
 
 const PRIX_MENSUELS = { GRATUIT: 19, STANDARD: 49, PREMIUM: 199 } as const;
+const PRIX_ANNUELS = { GRATUIT: 190, STANDARD: 490, PREMIUM: 2388 } as const;
 
 const STATUT_LABELS: Record<string, string> = {
   ACTIVE: "Actif",
@@ -123,6 +124,7 @@ export default async function AbonnementPage() {
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
           {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
+          {user.subscription?.billingInterval === "ANNUAL" && <Badge tone="success">Facturation annuelle</Badge>}
         </div>
         <ul className="flex flex-col gap-1.5">
           {PLAN_FEATURES[plan].map((feature) => (
@@ -162,7 +164,7 @@ export default async function AbonnementPage() {
               month: "long",
               year: "numeric",
             })}{" "}
-            — passage automatique à {PRIX_MENSUELS[plan]}€/mois sauf résiliation avant cette date.
+            — passage automatique à {user.subscription?.billingInterval === "ANNUAL" ? `${PRIX_ANNUELS[plan]}€/an` : `${PRIX_MENSUELS[plan]}€/mois`} sauf résiliation avant cette date.
           </p>
         )}
         {statut && !finProgrammee && statut !== "PAST_DUE" ? (

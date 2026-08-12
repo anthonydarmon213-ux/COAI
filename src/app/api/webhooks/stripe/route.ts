@@ -32,8 +32,16 @@ function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus
 function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
   const priceId = subscription.items.data[0]?.price.id;
   if (priceId && priceId === process.env.STRIPE_PRICE_ID_PREMIUM) return "PREMIUM";
-  if (priceId && priceId === process.env.STRIPE_PRICE_ID_GRATUIT) return "GRATUIT";
+  if (
+    priceId &&
+    (priceId === process.env.STRIPE_PRICE_ID_GRATUIT ||
+      priceId === process.env.STRIPE_PRICE_ID_GRATUIT_ANNUAL)
+  ) return "GRATUIT";
   return "STANDARD";
+}
+
+function mapBillingInterval(subscription: Stripe.Subscription): "MONTHLY" | "ANNUAL" {
+  return subscription.items.data[0]?.price.recurring?.interval === "year" ? "ANNUAL" : "MONTHLY";
 }
 
 // Stripe a déplacé current_period_end du niveau abonnement vers chaque
@@ -60,6 +68,7 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
     stripeSubscriptionId: subscription.id,
     status: mapStripeStatus(subscription.status),
     plan: mapStripePlan(subscription),
+    billingInterval: mapBillingInterval(subscription),
     currentPeriodEnd: getCurrentPeriodEnd(subscription),
     trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
     cancelAtPeriodEnd: subscription.cancel_at_period_end,

@@ -26,19 +26,19 @@ export default function CgvPage() {
         <h2>2. Description des offres</h2>
         <ul>
           <li>
-            <strong>Impulsion (19€/mois après 7 jours offerts)</strong> — 7 jours d&apos;accès gratuit
+            <strong>Impulsion (19€/mois ou 190€/an après 7 jours offerts)</strong> — 7 jours d&apos;accès gratuit
             à compter de l&apos;inscription, carte bancaire requise dès la souscription ; sauf
             résiliation avant la fin de ces 7 jours, l&apos;abonnement bascule automatiquement sur
-            19€/mois. Inclut le journal de séances, le suivi des mesures, les graphiques de
+            19€/mois ou 190€/an selon la périodicité choisie. Inclut le journal de séances, le suivi des mesures, les graphiques de
             progression, ainsi que la génération d&apos;un programme d&apos;entraînement, de
             nutrition et de récupération par intelligence artificielle — ce programme n&apos;est
             pas relu par un coach humain.
           </li>
           <li>
-            <strong>Transformation (49€/mois après 7 jours offerts)</strong> — 7 jours
+            <strong>Transformation (49€/mois ou 490€/an après 7 jours offerts)</strong> — 7 jours
             d&apos;accès gratuit à compter de l&apos;inscription, carte bancaire requise dès la
             souscription ; sauf résiliation avant la fin de ces 7 jours, l&apos;abonnement bascule
-            automatiquement sur 49€/mois. Inclut le palier Impulsion, la génération d&apos;un
+            automatiquement sur 49€/mois ou 490€/an selon la périodicité choisie. Inclut le palier Impulsion, la génération d&apos;un
             programme d&apos;entraînement, de nutrition et de récupération par intelligence
             artificielle relu et validé par un coach diplômé d&apos;État, ainsi qu&apos;une
             séance visio individuelle de 30 minutes par mois avec Anthony Darmon, à réserver via
@@ -67,7 +67,7 @@ export default function CgvPage() {
         <p>
           Les prix sont indiqués en euros, toutes taxes comprises. Les abonnements Impulsion et
           Transformation sont payés par carte bancaire via notre prestataire Stripe, de manière récurrente et
-          automatique chaque mois à la date anniversaire de la souscription. COAI ne stocke aucune
+          automatique chaque mois ou chaque année, selon la périodicité choisie, à la date anniversaire de la souscription. COAI ne stocke aucune
           donnée bancaire : celles-ci sont traitées directement par Stripe. Les séances VIP sont
           réservées directement auprès d&apos;Anthony Darmon et réglées séance par séance, selon
           les modalités communiquées lors de la réservation.
@@ -78,9 +78,9 @@ export default function CgvPage() {
         <h2>4. Durée et résiliation</h2>
         <p>
           Les abonnements Impulsion et Transformation sont sans engagement de durée et se
-          renouvellent automatiquement chaque mois. L&apos;utilisateur peut résilier à tout moment depuis son espace personnel
+          se renouvellent automatiquement chaque mois ou chaque année selon l&apos;option choisie. L&apos;utilisateur peut résilier à tout moment depuis son espace personnel
           (Mon accompagnement → Gérer mon abonnement). La résiliation prend effet à la fin de la
-          période déjà payée ; aucun remboursement au prorata n&apos;est effectué pour le mois en
+          période déjà payée ; aucun remboursement au prorata n&apos;est effectué pour la période en
           cours, sauf disposition légale contraire. Les séances VIP, payées à l&apos;acte, ne sont
           pas concernées par cette clause.
         </p>

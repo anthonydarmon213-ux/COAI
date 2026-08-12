@@ -39,7 +39,7 @@ export default async function AdminBusinessPage() {
   const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
-      select: { plan: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
+      select: { plan: true, billingInterval: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
     }),
     prisma.programmeGenerated.count(),
     prisma.seanceLog.count(),
@@ -81,7 +81,11 @@ export default async function AdminBusinessPage() {
 
   // MRR conservateur : exclut les essais non encore facturés et inclut bien
   // Impulsion, qui était auparavant oubliée du calcul.
-  const mrr = nbImpulsion * PRIX_IMPULSION + nbStandard * PRIX_STANDARD + nbPremium * PRIX_PREMIUM;
+  const mrr = abonnesPayants.reduce((total, subscription) => {
+    const monthlyPrice = subscription.plan === "GRATUIT" ? PRIX_IMPULSION : subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM;
+    const annualPrice = subscription.plan === "GRATUIT" ? 190 : subscription.plan === "STANDARD" ? 490 : PRIX_PREMIUM * 12;
+    return total + (subscription.billingInterval === "ANNUAL" ? annualPrice / 12 : monthlyPrice);
+  }, 0);
   const arr = mrr * 12;
   const tauxConversion = totalUsers > 0 ? (abonnesPayants.length / totalUsers) * 100 : 0;
 
