@@ -4,6 +4,19 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Homepage — essai 7 jours et vidéo d'introduction (12/08/2026)
+
+L'essai de 7 jours est désormais visible dans le hero avant le titre, dans le
+CTA principal et sous forme d'une mention transparente : carte demandée, puis
+19 € ou 49 €/mois, annulation possible avant la fin de l'essai. Le diagnostic
+offert reste un CTA distinct pour ne pas confondre diagnostic sans inscription
+et essai Stripe.
+
+La vidéo COAI existante `public/hero-intro.mp4` est intégrée juste sous le hero
+avec contrôles natifs, lecture mobile inline et chargement différé des données
+vidéo (`preload="metadata"`). Aucun média générique ou contenu inventé n'a été
+ajouté.
+
 ## Phase 10 — COAI Coach / B2B, bloc 1 (12/08/2026)
 
 Le dashboard coach existant devient une file quotidienne réellement

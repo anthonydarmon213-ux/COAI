@@ -105,6 +105,28 @@ export default function LandingPage() {
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
 
+      <section aria-labelledby="video-presentation-title" className="mx-auto w-full max-w-5xl px-6 pb-16 sm:px-10">
+        <div className="mb-6 text-center">
+          <SectionLabel>Découvrir COAI</SectionLabel>
+          <h2 id="video-presentation-title" className="mt-4 font-display text-2xl font-semibold text-white sm:text-4xl">
+            Ton coaching, en images.
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-graphite-400">
+            Découvre comment COAI relie intelligence artificielle, suivi quotidien et validation humaine.
+          </p>
+        </div>
+        <div className="overflow-hidden rounded-3xl border border-laiton-400/20 bg-black shadow-[0_30px_90px_-45px_rgba(201,162,98,0.5)]">
+          <video controls playsInline preload="metadata" className="aspect-video w-full bg-black object-contain" aria-label="Vidéo de présentation de COAI">
+            <source src="/hero-intro.mp4" type="video/mp4" />
+            Ton navigateur ne peut pas lire cette vidéo. Découvre COAI avec le diagnostic offert.
+          </video>
+        </div>
+        <div className="mt-5 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
+          <Link href="/pricing"><Button>Essayer gratuitement pendant 7 jours</Button></Link>
+          <Link href="/diagnostic" className="text-sm text-laiton-300 underline hover:text-laiton-200">Faire mon diagnostic offert →</Link>
+        </div>
+      </section>
+
       {/* Aperçu produit — anciennement dupliquait le kicker/titre/sous-titre
           de CoaiIntro juste au-dessus (11/08/2026, fusion demandée par
           Anthony pour éviter la répétition). Ne garde que les mockups,

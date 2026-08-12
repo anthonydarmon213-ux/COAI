@@ -72,6 +72,9 @@ export function CoaiIntro() {
       </div>
 
       <div className="relative z-10 flex max-w-2xl flex-col items-center gap-5">
+        <Link href="/pricing" className="rounded-full border border-laiton-400/35 bg-laiton-400/[0.1] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-200 transition hover:bg-laiton-400/[0.16]">
+          7 jours offerts · sans engagement
+        </Link>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
           L&apos;humain valide. L&apos;IA personnalise.
         </p>
@@ -86,25 +89,25 @@ export function CoaiIntro() {
 
       <div className="relative z-10 mt-2 flex flex-col items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href="/diagnostic">
-            <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
+          <Link href="/pricing">
+            <Button className="px-7 py-3 uppercase tracking-wide">Essayer COAI 7 jours</Button>
           </Link>
-          <a href="#comment-ca-marche">
+          <Link href="/diagnostic">
             <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
-              Découvrir comment ça marche
+              Diagnostic offert
             </Button>
-          </a>
+          </Link>
         </div>
-        <p className="font-mono text-xs uppercase tracking-widest text-graphite-500">
-          2 min · Gratuit · Sans engagement
+        <p className="max-w-md text-xs leading-5 text-graphite-400">
+          7 jours offerts sur Impulsion et Transformation. Carte bancaire demandée, puis 19 € ou 49 €/mois selon la formule. Annulation possible avant la fin de l&apos;essai.
         </p>
         {/* Accès direct discret aux tarifs (11/08/2026, correction Anthony) :
             un prospect chaud doit pouvoir acheter sans passer par le
             diagnostic — volontairement en retrait pour ne pas concurrencer
             le CTA principal. */}
-        <Link href="/pricing" className="text-xs text-graphite-600 underline transition hover:text-graphite-400">
-          Voir les formules
-        </Link>
+        <a href="#comment-ca-marche" className="text-xs text-graphite-600 underline transition hover:text-graphite-400">
+          Découvrir comment ça marche
+        </a>
       </div>
     </section>
   );
