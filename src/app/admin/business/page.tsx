@@ -141,6 +141,11 @@ export default async function AdminBusinessPage() {
             value={String(revenue.failedPayments30d)}
             sublabel="À relancer ou surveiller"
           />
+          <StatCard
+            label="Conversion essai · 30 j"
+            value={`${revenue.trialConversionRate30d.toFixed(1)}%`}
+            sublabel={`${revenue.convertedTrials30d}/${revenue.endedTrials30d} essai(s) devenu(s) payant(s)`}
+          />
         </div>
 
         <GrowthChart label={`Croissance des inscriptions — ${NB_SEMAINES} dernières semaines`} points={croissance} />
