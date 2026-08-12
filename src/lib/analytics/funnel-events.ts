@@ -21,7 +21,9 @@ export type FunnelEventName =
   | "checkout_started"
   | "checkout_completed"
   | "first_programme_viewed"
-  | "first_workout_started";
+  | "first_workout_started"
+  | "progress_shared"
+  | "referral_link_shared";
 
 export function trackFunnelEvent(name: FunnelEventName, params?: Record<string, unknown>) {
   trackEvent(name, params);

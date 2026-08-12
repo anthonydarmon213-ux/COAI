@@ -24,6 +24,12 @@ photos, douleurs et objectifs personnels en sont volontairement exclus. Le
 visuel reprend l'axe de marque « Plus COAI me connaît, meilleur devient mon
 coaching » et renvoie vers le diagnostic public.
 
+Le bloc 3 relie les cartes au parrainage existant. Au partage mobile, le texte
+contient le lien personnel du membre ; sur desktop, l'image est téléchargée et
+le lien copié. La page Abonnement propose également un partage natif direct.
+Les événements `progress_shared` et `referral_link_shared` permettent de
+mesurer l'usage dans GA4, sans nouvel outil ni nouvelle donnée en base.
+
 ## Phase 8 — économie IA et vérité du revenu, bloc 1 (12/08/2026)
 
 Premier bloc volontairement sans modification des prix ni des abonnements

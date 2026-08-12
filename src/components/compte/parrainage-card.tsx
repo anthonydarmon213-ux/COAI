@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
 type Filleul = {
   prenom: string | null;
@@ -45,6 +46,22 @@ export function ParrainageCard() {
     setTimeout(() => setCopie(false), 2000);
   }
 
+  async function partagerLien() {
+    if (!lien) return;
+    const text = "Je progresse avec COAI. Fais ton diagnostic personnalisé et découvre ton programme.";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Découvre COAI", text, url: lien });
+        trackFunnelEvent("referral_link_shared", { support: "native" });
+        return;
+      } catch (caught) {
+        if (caught instanceof DOMException && caught.name === "AbortError") return;
+      }
+    }
+    await copierLien();
+    trackFunnelEvent("referral_link_shared", { support: "clipboard" });
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <SectionLabel>Parrainage</SectionLabel>
@@ -67,6 +84,13 @@ export function ParrainageCard() {
               className="rounded-lg bg-laiton-400 px-4 py-2 text-sm font-medium text-graphite-950 transition hover:bg-laiton-300"
             >
               {copie ? "Copié !" : "Copier"}
+            </button>
+            <button
+              type="button"
+              onClick={partagerLien}
+              className="rounded-lg border border-laiton-400/30 px-4 py-2 text-sm font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200"
+            >
+              Partager
             </button>
           </div>
         )}
