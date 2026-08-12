@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
 import { z } from "zod";
+import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
 
 // Le Q&A "coach IA" est limité (fenêtre glissante de 30 jours) uniquement
 // sur Impulsion (GRATUIT, 19€) — Transformation (STANDARD, 49€) et l'ancien
@@ -15,9 +16,6 @@ import { z } from "zod";
 // pour que la disponibilité H24/7j/7 promue sur la home soit un vrai
 // avantage du palier supérieur, pas juste une promesse marketing).
 export const maxDuration = 30;
-
-const QUOTA_LIMITE = 4;
-const QUOTA_FENETRE_MS = 30 * 24 * 60 * 60 * 1000;
 
 const contextSchema = z.object({
   source: z.literal("DAILY_WORKOUT"),
@@ -62,29 +60,36 @@ export async function POST(request: Request) {
   }
 
   const estLimite = getEffectivePlan(user.subscription) === "GRATUIT";
+  let quotaReserved = false;
 
   if (estLimite) {
-    const fenetreExpiree =
-      !user.coachQuestionsResetAt ||
-      Date.now() - user.coachQuestionsResetAt.getTime() >= QUOTA_FENETRE_MS;
-    const questionsUtilisees = fenetreExpiree ? 0 : user.coachQuestionsUsed;
+    const quota = getCoachQuotaState(user.coachQuestionsUsed, user.coachQuestionsResetAt);
 
-    if (questionsUtilisees >= QUOTA_LIMITE) {
+    if (quota.expired) {
+      // Le timestamp observé fait office de verrou optimiste : si une autre
+      // requête a déjà réinitialisé la fenêtre, celle-ci ne remet pas son
+      // compteur à zéro une seconde fois.
+      await prisma.user.updateMany({
+        where: { id: user.id, coachQuestionsResetAt: user.coachQuestionsResetAt },
+        data: { coachQuestionsUsed: 0, coachQuestionsResetAt: new Date() },
+      });
+    }
+
+    // Réservation atomique : deux onglets ne peuvent pas dépasser le quota.
+    const reserved = await prisma.user.updateMany({
+      where: { id: user.id, coachQuestionsUsed: { lt: COACH_QUOTA_LIMIT } },
+      data: { coachQuestionsUsed: { increment: 1 } },
+    });
+    if (reserved.count === 0) {
       return NextResponse.json(
         {
-          error: `Limite de ${QUOTA_LIMITE} questions/mois atteinte — contacte Anthony pour un accès illimité.`,
+          error: `Limite de ${COACH_QUOTA_LIMIT} questions/mois atteinte — passe à Transformation pour un accès illimité.`,
+          quotaRemaining: 0,
         },
         { status: 429 }
       );
     }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        coachQuestionsUsed: questionsUtilisees + 1,
-        ...(fenetreExpiree ? { coachQuestionsResetAt: new Date() } : {}),
-      },
-    });
+    quotaReserved = true;
   }
 
   const profil = {
@@ -112,8 +117,21 @@ export async function POST(request: Request) {
       buildCoachQuestionPrompt(profil, parsed.data.question, parsed.data.context, memory),
       { userId: user.id, feature: parsed.data.context ? "coach_daily" : "coach_chat" }
     );
-    return NextResponse.json({ answer });
+    const refreshedUser = estLimite
+      ? await prisma.user.findUnique({ where: { id: user.id }, select: { coachQuestionsUsed: true } })
+      : null;
+    const quotaRemaining = refreshedUser
+      ? Math.max(0, COACH_QUOTA_LIMIT - refreshedUser.coachQuestionsUsed)
+      : null;
+    return NextResponse.json({ answer, quotaRemaining });
   } catch (error) {
+    // Une panne IA ne consomme jamais une question payée par l'abonné.
+    if (quotaReserved) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { coachQuestionsUsed: { decrement: 1 } },
+      }).catch(() => undefined);
+    }
     console.error("[coach/ask]", error);
     return NextResponse.json({ error: "Échec de la génération de la réponse" }, { status: 502 });
   }

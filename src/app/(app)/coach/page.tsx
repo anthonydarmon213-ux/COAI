@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
 import { CoachMemoryStatus } from "@/components/coach/coach-memory-status";
+import { getCoachQuotaState } from "@/lib/subscription/coach-quota";
 
 export default async function CoachPage() {
   const user = await getCurrentAppUser();
@@ -13,6 +14,7 @@ export default async function CoachPage() {
 
   const plan = getEffectivePlan(user.subscription);
   const intelligence = await buildProfilIntelligence(user.id);
+  const quota = getCoachQuotaState(user.coachQuestionsUsed, user.coachQuestionsResetAt);
 
   return (
     <div className="flex flex-col gap-8">
@@ -26,11 +28,11 @@ export default async function CoachPage() {
           Darmon. Pour un suivi médical ou un ajustement personnalisé approfondi, un échange
           direct avec ton coach reste la meilleure option.
         </p>
-        {plan === "GRATUIT" && <Badge tone="warning">4 questions/mois</Badge>}
+        {plan === "GRATUIT" && <Badge tone="warning">{quota.remaining} question(s) restante(s) sur 4</Badge>}
         <CoachMemoryStatus progression={intelligence.progression} observations={intelligence.items.length} tendances={intelligence.tendances.length} />
       </div>
 
-      <AskCoach />
+      <AskCoach initialQuotaRemaining={plan === "GRATUIT" ? quota.remaining : null} />
 
       <div className="flex flex-col gap-3">
         <SectionLabel>Histoire</SectionLabel>
