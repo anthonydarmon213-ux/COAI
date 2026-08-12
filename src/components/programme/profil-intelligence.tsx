@@ -44,6 +44,26 @@ export function ProfilIntelligenceSection({ profil }: { profil: ProfilIntelligen
           ))}
         </div>
       )}
+
+      <div className="mt-4 flex flex-col gap-3">
+        <div>
+          <SectionLabel>Tendances observées</SectionLabel>
+          <p className="mt-2 text-xs leading-5 text-graphite-500">Des associations mesurées dans ton historique, jamais présentées comme des causes ou des prédictions.</p>
+        </div>
+        {profil.tendances.length === 0 ? (
+          <Card className="text-sm leading-6 text-graphite-400">Pas encore assez de recul pour comparer tes journées. Continue les check-ins et ressentis après séance.</Card>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2">
+            {profil.tendances.map((tendance) => (
+              <Card key={tendance.titre} className={`flex flex-col gap-2 border-l-2 ${tendance.ton === "POSITIF" ? "border-l-emerald-400" : tendance.ton === "ATTENTION" ? "border-l-amber-400" : "border-l-laiton-400"}`}>
+                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">{tendance.titre}</span>
+                <p className="text-sm font-medium leading-6 text-white">{tendance.constat}</p>
+                <p className="text-[10px] leading-4 text-graphite-500">Comparaison : {tendance.preuve}</p>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

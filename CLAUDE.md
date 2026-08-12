@@ -23,6 +23,23 @@ activité déjà enregistrés.
 - navigation renommée « Mémoire & évolution » ; programme source, adaptations,
   Stripe et abonnements inchangés.
 
+### Tendances longitudinales (suite Phase 7)
+
+Ajout d'un moteur déterministe séparé (`tendances-longitudinales.ts`) qui
+compare les check-ins Daily et ressentis post-séance. Il affiche uniquement :
+
+- taux de séances Daily terminées à partir de 5 check-ins ;
+- ressenti dominant à partir de 5 séances évaluées et d'une majorité ≥ 50 % ;
+- association récupération/ressenti seulement avec au moins 3 séances dans
+  chacun des deux groupes et un écart ≥ 25 points.
+
+Le texte parle explicitement d'association observée, jamais de causalité ou de
+prédiction. Quatre assertions couvrent les seuils, le dosage, la régularité et
+la comparaison récupération. Vérifié en navigateur 390×844 et 1440×1000,
+sans débordement, requête pendante, overlay ni loader. Captures :
+`test-results/phase-7-longitudinal-mobile.png` et
+`test-results/phase-7-longitudinal-desktop.png`.
+
 Vérifié avec TypeScript, ESLint, build Next.js et navigateur réel en 390×844
 et 1440×1000 : aucun débordement, overlay ou loader. Captures :
 `test-results/phase-7-memory-mobile.png` et
