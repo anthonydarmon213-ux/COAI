@@ -127,7 +127,7 @@ const TIERS: Tier[] = [
   },
 ];
 
-export default function PricingPage({ searchParams }: { searchParams?: { billing?: string; vip?: string } }) {
+export default function PricingPage({ searchParams }: { searchParams?: { billing?: string; vip?: string; checkout?: string } }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
   // L'annuel est présenté en premier pour privilégier l'engagement et la
   // trésorerie, sans retirer le mensuel (accessible en un clic).
@@ -165,6 +165,13 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
           <Link href="/pricing?billing=annual" className={`rounded-full px-4 py-2 text-sm ${annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Annuel · 2 mois offerts</Link>
         </div>
       </div>
+
+      {searchParams?.checkout === "cancel" && (
+        <Card className="w-full max-w-4xl border-laiton-400/30 bg-laiton-400/[0.06] px-6 py-5 text-center">
+          <p className="font-semibold text-white">Ton inscription n&apos;a pas été finalisée.</p>
+          <p className="mt-1 text-sm text-graphite-300">Aucun paiement n&apos;a été enregistré. Tu peux reprendre ci-dessous quand tu veux.</p>
+        </Card>
+      )}
 
       {/* Comparateur à 3 colonnes propres (Phase 5.1, correction responsive
           11/08/2026) — Entreprise sorti de ce grid (structurellement

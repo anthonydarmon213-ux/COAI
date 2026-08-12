@@ -33,6 +33,8 @@ const RAPPEL_ESSAI_AVANT_MS = 72 * 60 * 60 * 1000;
 const RELANCE_DIAGNOSTIC_APRES_MS = 24 * 60 * 60 * 1000;
 const RELANCE_DIAGNOSTIC_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_ACTIVATION_APRES_MS = 24 * 60 * 60 * 1000;
+const RELANCE_CHECKOUT_APRES_MS = 2 * 60 * 60 * 1000;
+const RELANCE_CHECKOUT_FENETRE_MS = 7 * JOUR_MS;
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Transformation) — gardés synchronisés à la main, les deux vivent dans des
@@ -372,6 +374,61 @@ async function relancerEssaisNonActives(appUrl: string): Promise<number> {
   return relancesActivation;
 }
 
+// Récupère une intention de Checkout restée sans abonnement actif. Une seule
+// relance par session commencée ; un nouveau Checkout réarme proprement le
+// rappel en remettant checkoutReminderSentAt à null.
+async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
+  const maintenant = Date.now();
+  const candidats = await prisma.user.findMany({
+    where: {
+      checkoutStartedAt: {
+        gte: new Date(maintenant - RELANCE_CHECKOUT_FENETRE_MS),
+        lte: new Date(maintenant - RELANCE_CHECKOUT_APRES_MS),
+      },
+      checkoutReminderSentAt: null,
+      OR: [
+        { subscription: null },
+        { subscription: { status: { in: ["INCOMPLETE", "CANCELED"] } } },
+      ],
+    },
+    select: {
+      id: true,
+      email: true,
+      prenom: true,
+      checkoutPlan: true,
+      checkoutBillingInterval: true,
+    },
+  });
+
+  let relancesCheckout = 0;
+  for (const user of candidats) {
+    const plan = user.checkoutPlan === "STANDARD" ? "Transformation" : "Impulsion";
+    const annuel = user.checkoutBillingInterval === "ANNUAL";
+    const prix = user.checkoutPlan === "STANDARD"
+      ? annuel ? "490 €/an" : "49 €/mois"
+      : annuel ? "190 €/an" : "19 €/mois";
+    const billingQuery = annuel ? "annual" : "monthly";
+    const nom = user.prenom ? ` ${user.prenom}` : "";
+    const envoye = await sendEmail(
+      user.email,
+      "Tu peux reprendre ton inscription COAI",
+      `Bonjour${nom},\n\n` +
+        `Ton inscription à la formule ${plan} (${prix}) n'a pas été finalisée. ` +
+        `Aucun paiement n'a été enregistré.\n\n` +
+        `Tu peux reprendre quand tu veux et profiter de tes 7 jours d'essai : ${appUrl}/pricing?billing=${billingQuery}\n\n` +
+        `Si tu as rencontré un problème, réponds simplement à cet email.\n\n` +
+        `À bientôt,\nL'équipe COAI`
+    );
+    if (!envoye) continue;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { checkoutReminderSentAt: new Date() },
+    });
+    relancesCheckout++;
+  }
+  return relancesCheckout;
+}
+
 export async function GET(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -379,13 +436,14 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation] = await Promise.all([
+  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
     rappelerFinEssai(appUrl),
     relancerDiagnosticsNonConvertis(appUrl),
     relancerEssaisNonActives(appUrl),
+    relancerCheckoutsAbandonnes(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation });
+  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout });
 }

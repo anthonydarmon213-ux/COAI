@@ -181,6 +181,10 @@ export async function POST(request: Request) {
           typeof session.subscription === "string" ? session.subscription : session.subscription.id;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         await upsertFromSubscription(subscription, userId);
+        await prisma.user.update({
+          where: { id: userId },
+          data: { checkoutReminderSentAt: new Date() },
+        });
 
         // Notifie Anthony à chaque nouvelle inscription — jusqu'ici seule la
         // file de validation de programme déclenchait une notification,

@@ -91,6 +91,10 @@ export default async function AdminBusinessPage() {
   const tauxActivationProgramme = essaisActifs.length > 0 ? (essaisAvecProgramme / essaisActifs.length) * 100 : 0;
   const tauxActivationSeance = essaisActifs.length > 0 ? (essaisAvecSeance / essaisActifs.length) * 100 : 0;
   const relancesActivationEnvoyees = subscriptions.filter((subscription) => subscription.trialActivationReminderSentAt).length;
+  const [checkoutsCommences30d, relancesCheckout30d] = await Promise.all([
+    prisma.user.count({ where: { checkoutStartedAt: { gte: ilYA30Jours } } }),
+    prisma.user.count({ where: { checkoutReminderSentAt: { gte: ilYA30Jours } } }),
+  ]);
   const churnFeedbackCount = churnReasons.reduce((total, item) => total + item._count._all, 0);
   const topChurnReason = churnReasons[0]?.reason ?? "Aucun retour";
   const churnReasonLabels: Record<string, string> = {
@@ -252,6 +256,18 @@ export default async function AdminBusinessPage() {
             <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
           </div>
           <p className="text-xs text-graphite-500">{relancesDiagnosticEnvoyees} relance{relancesDiagnosticEnvoyees > 1 ? "s" : ""} diagnostic envoyée{relancesDiagnosticEnvoyees > 1 ? "s" : ""} sur la période.</p>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <div>
+            <SectionLabel>Récupération Checkout · 30 jours</SectionLabel>
+            <p className="mt-2 text-xs text-graphite-500">Aucune donnée bancaire n'est stockée dans COAI.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <StatCard label="Checkouts commencés" value={String(checkoutsCommences30d)} sublabel="Sessions Stripe créées" />
+            <StatCard label="Relances envoyées" value={String(relancesCheckout30d)} sublabel="Après 2 h sans conversion" />
+            <StatCard label="Paiements échoués" value={String(revenue.failedPayments30d)} sublabel="Déjà relancés par webhook" />
+          </div>
         </section>
 
         <section className="flex flex-col gap-3">
