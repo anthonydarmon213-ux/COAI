@@ -10,6 +10,7 @@ import { ValidateProgrammeCard } from "@/components/admin/validate-programme-car
 import { computeFlags, buildWhatsAppContactLink, FLAG_LABELS } from "@/lib/admin/flags";
 import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
+import { CoachNotes } from "@/components/admin/coach-notes";
 
 const PILIER_LABEL: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
@@ -50,6 +51,7 @@ export default async function AdminClientPage({ params }: { params: { id: string
     dernierCheckin,
     dernieresMesures,
     flags,
+    coachNotes,
   ] = await Promise.all([
     prisma.programmeGenerated.findMany({
       where: { userId: client.id, statut: "EN_ATTENTE" },
@@ -67,6 +69,12 @@ export default async function AdminClientPage({ params }: { params: { id: string
     prisma.weeklyCheckin.findFirst({ where: { userId: client.id }, orderBy: { semaineDebut: "desc" } }),
     prisma.mesure.findMany({ where: { userId: client.id }, orderBy: { date: "desc" }, take: 3 }),
     computeFlags(client.id),
+    prisma.coachNote.findMany({
+      where: { clientId: client.id },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+      include: { author: { select: { prenom: true, email: true } } },
+    }),
   ]);
 
   const adaptations = await prisma.programmeAdaptation.findMany({
@@ -116,6 +124,21 @@ export default async function AdminClientPage({ params }: { params: { id: string
             </div>
           </div>
         )}
+
+        <div className="flex flex-col gap-3">
+          <SectionLabel>Notes internes du coach</SectionLabel>
+          <Card>
+            <CoachNotes
+              clientId={client.id}
+              notes={coachNotes.map((note) => ({
+                id: note.id,
+                content: note.content,
+                createdAt: note.createdAt.toISOString(),
+                authorName: note.author.prenom ?? note.author.email,
+              }))}
+            />
+          </Card>
+        </div>
 
         <div className="flex flex-col gap-3">
           <SectionLabel>Profil</SectionLabel>

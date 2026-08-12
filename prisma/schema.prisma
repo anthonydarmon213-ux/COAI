@@ -94,8 +94,27 @@ model User {
   dailySessions  DailySession[]
   aiUsageEvents  AiUsageEvent[]
   churnFeedback  ChurnFeedback?
+  coachNotesReceived CoachNote[] @relation("CoachNoteClient")
+  coachNotesAuthored CoachNote[] @relation("CoachNoteAuthor")
 
   @@map("users")
+}
+
+// Notes de travail privées de l'espace coach. Elles ne sont jamais servies
+// par les routes client et restent protégées par le contrôle isAdmin côté
+// serveur ainsi que par l'absence de politique Data API côté Supabase.
+model CoachNote {
+  id        String   @id @default(uuid())
+  clientId  String
+  client    User     @relation("CoachNoteClient", fields: [clientId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("CoachNoteAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, createdAt])
+  @@map("coach_notes")
 }
 
 // Motif facultatif donné après une résiliation programmée. Une seule réponse
