@@ -4,7 +4,6 @@ import { useState } from "react";
 
 const VIDEOS = [
   { src: "/coai-presentation-7.mp4", type: "video/mp4", label: "Ton évolution commence ici" },
-  { src: "/hero-intro.mp4", type: "video/mp4", label: "Découvre COAI" },
   { src: "/coai-presentation-2.mp4", type: "video/mp4", label: "Une autre facette de COAI" },
 ] as const;
 
