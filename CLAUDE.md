@@ -4,6 +4,20 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Phase 10 — COAI Coach / B2B, bloc 1 (12/08/2026)
+
+Le dashboard coach existant devient une file quotidienne réellement
+priorisée. Les signaux sont ordonnés par enjeu : douleur, baisse de
+performance, inactivité, puis mesure manquante. Les programmes en attente
+apparaissent dans la même file ; chaque client dispose d'un accès direct à son
+dossier et, si son numéro existe, d'un message WhatsApp prérempli adapté au
+signal prioritaire.
+
+Ce premier bloc réutilise strictement les comptes Transformation, validations,
+alertes et droits administrateur existants. Il n'ajoute ni rôle Coach, ni
+multi-tenant, ni marque blanche, ni facturation B2B. Le score sert uniquement
+à ordonner le travail humain et n'est jamais présenté comme un diagnostic.
+
 ## Phase 9 — cartes de progression partageables, bloc 1 (12/08/2026)
 
 Les records physiques et adaptations de programme disposent désormais d'un

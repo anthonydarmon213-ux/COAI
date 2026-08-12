@@ -6,7 +6,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AdminNav } from "@/components/admin/admin-nav";
-import { computeFlags, FLAG_LABELS } from "@/lib/admin/flags";
+import { buildWhatsAppContactLink, computeFlags, FLAG_LABELS, getFlagsPriority, getPriorityLabel } from "@/lib/admin/flags";
 
 // Dashboard coach (Phase 4, 11/08/2026 — "COAI HUMAN" de la vision produit)
 // — n'existait pas : les pages /admin/* étaient chacune accessibles
@@ -32,7 +32,7 @@ export default async function AdminDashboardPage() {
   );
   const aSuivre = avecFlags
     .filter((x) => x.flags.length > 0)
-    .sort((a, b) => b.flags.length - a.flags.length);
+    .sort((a, b) => getFlagsPriority(b.flags) - getFlagsPriority(a.flags));
   const totalFlags = aSuivre.reduce((acc, x) => acc + x.flags.length, 0);
 
   return (
@@ -81,17 +81,26 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <SectionLabel>Clients nécessitant attention</SectionLabel>
-          {aSuivre.length === 0 && <p className="text-sm text-graphite-400">Rien à signaler pour le moment.</p>}
-          {aSuivre.slice(0, 5).map(({ user, flags }) => (
-            <Link key={user.id} href={`/admin/clients/${user.id}`}>
-              <Card className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-graphite-50">
-                    {user.prenom ? `${user.prenom} — ` : ""}
-                    {user.email}
-                  </p>
-                  <span className="text-xs text-graphite-500">→</span>
+          <div>
+            <SectionLabel>File quotidienne du coach</SectionLabel>
+            <p className="mt-2 text-xs text-graphite-500">Sécurité, performance, inactivité, puis qualité des données.</p>
+          </div>
+          {aSuivre.length === 0 && programmesEnAttente === 0 && adaptationsEnAttenteCount === 0 && <p className="text-sm text-graphite-400">Rien à traiter pour le moment.</p>}
+          {(programmesEnAttente > 0 || adaptationsEnAttenteCount > 0) && (
+            <Link href="/admin/programmes">
+              <Card className="flex items-center justify-between gap-4 border-laiton-400/25">
+                <div><Badge tone="warning">Validation</Badge><p className="mt-2 text-sm font-medium text-white">{programmesEnAttente} programme{programmesEnAttente > 1 ? "s" : ""} à relire</p><p className="mt-1 text-xs text-graphite-500">Les plus anciens sont présentés en premier.</p></div><span className="text-laiton-300">Ouvrir →</span>
+              </Card>
+            </Link>
+          )}
+          {aSuivre.slice(0, 7).map(({ user, flags }) => {
+            const priority = getPriorityLabel(flags);
+            const contactLink = buildWhatsAppContactLink(user.phoneWhatsapp, user.prenom, flags);
+            return (
+              <Card key={user.id} className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div><Badge tone={priority.tone}>{priority.label}</Badge><p className="mt-2 text-sm font-medium text-graphite-50">{user.prenom ? `${user.prenom} — ` : ""}{user.email}</p></div>
+                  <div className="flex gap-2"><Link href={`/admin/clients/${user.id}`} className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-graphite-200 hover:border-laiton-400/30">Voir le dossier</Link>{contactLink && <a href={contactLink} target="_blank" rel="noopener noreferrer" className="rounded-full border border-laiton-400/25 bg-laiton-400/10 px-3 py-1.5 text-xs text-laiton-300">WhatsApp</a>}</div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {flags.map((flag, i) => (
@@ -101,9 +110,9 @@ export default async function AdminDashboardPage() {
                   ))}
                 </div>
               </Card>
-            </Link>
-          ))}
-          {aSuivre.length > 5 && (
+            );
+          })}
+          {aSuivre.length > 7 && (
             <Link href="/admin/suivi" className="text-sm text-laiton-400 underline">
               Voir les {aSuivre.length} clients à suivre →
             </Link>

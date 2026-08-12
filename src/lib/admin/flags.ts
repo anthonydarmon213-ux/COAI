@@ -43,6 +43,26 @@ export const FLAG_LABELS: Record<Flag["type"], { label: string; tone: "danger" |
   regression: { label: "Perf en baisse", tone: "warning" },
 };
 
+// Priorité métier de la file coach : sécurité avant performance, puis
+// engagement et enfin qualité des données. Ce score sert uniquement au tri
+// de l'espace coach ; il n'établit aucun diagnostic médical.
+const FLAG_PRIORITY: Record<Flag["type"], number> = {
+  douleur: 100,
+  regression: 60,
+  inactivite: 40,
+  mesure: 10,
+};
+
+export function getFlagsPriority(flags: Flag[]): number {
+  return flags.reduce((total, flag) => total + FLAG_PRIORITY[flag.type], 0);
+}
+
+export function getPriorityLabel(flags: Flag[]): { label: string; tone: "danger" | "warning" | "neutral" } {
+  if (flags.some((flag) => flag.type === "douleur")) return { label: "Priorité haute", tone: "danger" };
+  if (flags.some((flag) => flag.type === "regression" || flag.type === "inactivite")) return { label: "À traiter", tone: "warning" };
+  return { label: "À vérifier", tone: "neutral" };
+}
+
 export async function computeFlags(userId: string): Promise<Flag[]> {
   const maintenant = Date.now();
   const flags: Flag[] = [];
