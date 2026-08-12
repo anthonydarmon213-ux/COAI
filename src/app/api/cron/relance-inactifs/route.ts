@@ -30,6 +30,8 @@ const SEUIL_INACTIVITE_JOURS = 10;
 const RELANCE_COOLDOWN_JOURS = 14;
 const JOUR_MS = 24 * 60 * 60 * 1000;
 const RAPPEL_ESSAI_AVANT_MS = 72 * 60 * 60 * 1000;
+const RELANCE_DIAGNOSTIC_APRES_MS = 24 * 60 * 60 * 1000;
+const RELANCE_DIAGNOSTIC_FENETRE_MS = 7 * JOUR_MS;
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Transformation) — gardés synchronisés à la main, les deux vivent dans des
@@ -268,6 +270,67 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
   return rappels;
 }
 
+// Relance une seule fois les prospects ayant terminé leur diagnostic mais
+// n'ayant toujours pas créé de compte après 24 h. L'adresse a été recueillie
+// avec le consentement email explicite du quiz. Dès qu'un compte existe, la
+// personne sort définitivement de ce parcours prospect.
+async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> {
+  const maintenant = Date.now();
+  const candidats = await prisma.diagnosticLead.findMany({
+    where: {
+      conversionReminderSentAt: null,
+      resultEmailSentAt: { not: null },
+      createdAt: {
+        gte: new Date(maintenant - RELANCE_DIAGNOSTIC_FENETRE_MS),
+        lte: new Date(maintenant - RELANCE_DIAGNOSTIC_APRES_MS),
+      },
+    },
+    select: { email: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const emails = [...new Set(candidats.map((lead) => lead.email.toLowerCase()))];
+  if (emails.length === 0) return 0;
+
+  const comptesExistants = await prisma.user.findMany({
+    where: { email: { in: emails } },
+    select: { email: true },
+  });
+  const dejaInscrits = new Set(comptesExistants.map((user) => user.email.toLowerCase()));
+  let relancesDiagnostic = 0;
+
+  for (const email of emails) {
+    if (dejaInscrits.has(email)) {
+      await prisma.diagnosticLead.updateMany({
+        where: { email: { equals: email, mode: "insensitive" }, conversionReminderSentAt: null },
+        data: { conversionReminderSentAt: new Date() },
+      });
+      continue;
+    }
+
+    const envoye = await sendEmail(
+      email,
+      "Ton accompagnement COAI est prêt",
+      `Bonjour,\n\n` +
+        `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
+        `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
+        `Tu peux essayer COAI pendant 7 jours, sans engagement : ${appUrl}/pricing\n\n` +
+        `Impulsion : 19 €/mois ou 190 €/an.\n` +
+        `Transformation : 49 €/mois ou 490 €/an, avec validation par un coach diplômé d'État.\n\n` +
+        `À bientôt,\nL'équipe COAI`
+    );
+    if (!envoye) continue;
+
+    await prisma.diagnosticLead.updateMany({
+      where: { email: { equals: email, mode: "insensitive" }, conversionReminderSentAt: null },
+      data: { conversionReminderSentAt: new Date() },
+    });
+    relancesDiagnostic++;
+  }
+
+  return relancesDiagnostic;
+}
+
 export async function GET(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -275,11 +338,12 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur, rappelsFinEssai] = await Promise.all([
+  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
     rappelerFinEssai(appUrl),
+    relancerDiagnosticsNonConvertis(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai });
+  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic });
 }

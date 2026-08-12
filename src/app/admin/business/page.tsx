@@ -36,7 +36,7 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls] = await Promise.all([
+  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
       select: { plan: true, billingInterval: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, updatedAt: true },
@@ -60,6 +60,13 @@ export default async function AdminBusinessPage() {
         recompenseParrainageAppliquee: true,
         subscription: { select: { status: true, trialEnd: true } },
       },
+    }),
+    prisma.diagnosticLead.findMany({
+      where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+      select: { email: true, utmSource: true, conversionReminderSentAt: true },
+    }),
+    prisma.user.findMany({
+      select: { email: true, createdAt: true, subscription: { select: { status: true, trialEnd: true } } },
     }),
   ]);
 
@@ -103,6 +110,19 @@ export default async function AdminBusinessPage() {
     (f) => !f.recompenseParrainageAppliquee && f.subscription?.trialEnd && f.subscription.trialEnd > maintenant
   ).length;
   const conversionParrainage = filleuls.length > 0 ? (filleulsConvertis / filleuls.length) * 100 : 0;
+  const emailsLeads = new Set(diagnosticLeads30d.map((lead) => lead.email.toLowerCase()));
+  const inscritsDepuisDiagnostic = usersAvecAbonnement.filter((user) => emailsLeads.has(user.email.toLowerCase()));
+  const essaisDepuisDiagnostic = inscritsDepuisDiagnostic.filter((user) => user.subscription?.status === "ACTIVE");
+  const payantsDepuisDiagnostic = essaisDepuisDiagnostic.filter(
+    (user) => !user.subscription?.trialEnd || user.subscription.trialEnd <= maintenant
+  );
+  const leadsUniques = emailsLeads.size;
+  const tauxLeadInscription = leadsUniques > 0 ? (inscritsDepuisDiagnostic.length / leadsUniques) * 100 : 0;
+  const tauxInscriptionEssai = inscritsDepuisDiagnostic.length > 0 ? (essaisDepuisDiagnostic.length / inscritsDepuisDiagnostic.length) * 100 : 0;
+  const tauxLeadPayant = leadsUniques > 0 ? (payantsDepuisDiagnostic.length / leadsUniques) * 100 : 0;
+  const relancesDiagnosticEnvoyees = new Set(
+    diagnosticLeads30d.filter((lead) => lead.conversionReminderSentAt).map((lead) => lead.email.toLowerCase())
+  ).size;
 
   const semaineMs = 7 * 24 * 60 * 60 * 1000;
   const debut = new Date(Date.now() - (NB_SEMAINES - 1) * semaineMs);
@@ -188,6 +208,22 @@ export default async function AdminBusinessPage() {
         </div>
 
         <GrowthChart label={`Croissance des inscriptions — ${NB_SEMAINES} dernières semaines`} points={croissance} />
+
+        <section className="flex flex-col gap-3">
+          <div>
+            <SectionLabel>Tunnel revenus · 30 jours</SectionLabel>
+            <p className="mt-2 text-xs text-graphite-500">
+              Mesure interne par email : diagnostic terminé → compte → essai actif → premier paiement.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatCard label="Diagnostics" value={String(leadsUniques)} sublabel="Prospects uniques" highlight />
+            <StatCard label="Comptes créés" value={String(inscritsDepuisDiagnostic.length)} sublabel={`${tauxLeadInscription.toFixed(1)} % des diagnostics`} />
+            <StatCard label="Essais actifs" value={String(essaisDepuisDiagnostic.length)} sublabel={`${tauxInscriptionEssai.toFixed(1)} % des comptes`} />
+            <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
+          </div>
+          <p className="text-xs text-graphite-500">{relancesDiagnosticEnvoyees} relance{relancesDiagnosticEnvoyees > 1 ? "s" : ""} diagnostic envoyée{relancesDiagnosticEnvoyees > 1 ? "s" : ""} sur la période.</p>
+        </section>
 
         <section className="flex flex-col gap-3">
           <div>
