@@ -9,9 +9,12 @@ import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
+import Image from "next/image";
 
 const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
+
+const PRIX_MENSUELS = { GRATUIT: 19, STANDARD: 49, PREMIUM: 199 } as const;
 
 const STATUT_LABELS: Record<string, string> = {
   ACTIVE: "Actif",
@@ -50,9 +53,11 @@ export default async function AbonnementPage() {
         <SectionLabel>Mon histoire</SectionLabel>
         <Card className="flex flex-col gap-5 sm:flex-row sm:items-start">
           <div className="flex shrink-0 flex-col items-center gap-3 sm:items-stretch">
-            <img
+            <Image
               src="/anthony-darmon-portrait.jpg"
               alt="Anthony Darmon"
+              width={144}
+              height={192}
               className="h-40 w-32 rounded-xl object-cover sm:h-48 sm:w-36"
             />
             <div className="flex items-center justify-center gap-2.5">
@@ -127,15 +132,25 @@ export default async function AbonnementPage() {
           ))}
         </ul>
         {finProgrammee && (
-          <p className="text-sm text-laiton-400">
-            Résiliation programmée — ton accès se termine le{" "}
-            {user.subscription!.currentPeriodEnd!.toLocaleDateString("fr-FR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-            .
-          </p>
+          <div className="flex flex-col items-start gap-2 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.06] p-3">
+            <p className="text-sm text-laiton-300">
+              Résiliation programmée — ton accès se termine le{" "}
+              {user.subscription!.currentPeriodEnd!.toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}.
+            </p>
+            <p className="text-xs text-graphite-400">Tu peux annuler la résiliation depuis le portail tant que cette date n’est pas passée.</p>
+            <PortalButton label="Conserver mon abonnement" />
+          </div>
+        )}
+        {statut === "PAST_DUE" && (
+          <div className="flex flex-col items-start gap-2 rounded-lg border border-red-400/25 bg-red-400/[0.06] p-3">
+            <p className="text-sm text-red-300">Ton dernier paiement n’a pas abouti.</p>
+            <p className="text-xs text-graphite-400">Mets à jour ton moyen de paiement pour éviter une interruption de ton accompagnement.</p>
+            <PortalButton label="Mettre à jour mon paiement" />
+          </div>
         )}
         {!finProgrammee && enEssai && (
           <p className="text-sm text-graphite-400">
@@ -145,21 +160,21 @@ export default async function AbonnementPage() {
               month: "long",
               year: "numeric",
             })}{" "}
-            — passage automatique à 19€/mois sauf résiliation avant cette date.
+            — passage automatique à {PRIX_MENSUELS[plan]}€/mois sauf résiliation avant cette date.
           </p>
         )}
-        {statut ? (
+        {statut && !finProgrammee && statut !== "PAST_DUE" ? (
           <div className="flex flex-wrap items-center gap-4">
             <PortalButton />
             <a href="/pricing" className="text-sm text-laiton-400 underline">
               Voir les formules et les prix
             </a>
           </div>
-        ) : (
+        ) : !statut ? (
           <a href="/pricing" className="text-laiton-400 underline">
             Voir les offres — à partir de 19€/mois
           </a>
-        )}
+        ) : null}
       </Card>
 
       <ParrainageCard />
