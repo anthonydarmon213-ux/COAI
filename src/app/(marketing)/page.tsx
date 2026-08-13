@@ -222,7 +222,7 @@ export default function LandingPage() {
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
           <div className="relative h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80">
             <Image
-              src="/anthony-darmon-portrait.jpg"
+              src="/anthony-darmon-fondateur-coai.jpg"
               alt="Anthony Darmon, fondateur de COAI"
               fill
               priority
