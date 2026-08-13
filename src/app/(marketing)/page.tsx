@@ -218,9 +218,10 @@ export default function LandingPage() {
       {/* Crédibilité / Fondateur — juste sous le hero pour rassurer tout de
           suite sur l'humain derrière COAI (visage + nom), avant même le
           reste du pitch. */}
-      <section id="fondateur" className="mx-auto grid w-full max-w-5xl items-center gap-10 px-6 py-24 text-center md:grid-cols-2 md:text-left">
+      <section id="fondateur" className="coai-founder-stage relative mx-auto my-8 grid w-[calc(100%-2rem)] max-w-6xl items-center gap-10 overflow-hidden rounded-[2.5rem] border border-white/[0.08] px-6 py-16 text-center shadow-2xl sm:px-12 md:grid-cols-2 md:py-20 md:text-left">
+        <div className="coai-founder-orbit" aria-hidden="true" />
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
-          <div className="relative h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:h-96 sm:w-80">
+          <div className="relative h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-300/35 shadow-[0_28px_80px_rgba(0,0,0,.48),0_0_45px_rgba(201,162,98,.12)] sm:h-96 sm:w-80">
             <Image
               src="/anthony-darmon-fondateur-coai.jpg"
               alt="Anthony Darmon, fondateur de COAI"
@@ -251,7 +252,7 @@ export default function LandingPage() {
             </a>
           </div>
         </div>
-        <div className="flex flex-col items-center gap-5 md:items-start">
+        <div className="relative z-10 flex flex-col items-center gap-5 md:items-start">
           <SectionLabel>Fondateur</SectionLabel>
           <h2 className="font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
             Anthony Darmon.
@@ -422,15 +423,17 @@ export default function LandingPage() {
       </section>
 
       {/* CTA final */}
-      <section className="flex flex-col items-center gap-5 border-t border-white/[0.07] px-6 py-24 text-center">
-        <h2 className="font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Prêt à commencer ?</h2>
-        <p className="text-graphite-300">
+      <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center shadow-2xl sm:py-24">
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Ton prochain chapitre</span>
+        <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Un coaching conçu pour ta vraie vie.</h2>
+        <p className="max-w-2xl text-graphite-200">
           7 jours offerts, puis 19€/mois pour ton programme généré par IA — ou 49€/mois avec
           relecture et validation par un coach diplômé d&apos;État. Sans engagement.
         </p>
-        <Link href="/sign-up">
-          <Button>Commencer</Button>
-        </Link>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/diagnostic"><Button>Faire mon diagnostic offert</Button></Link>
+          <Link href="/pricing"><Button variant="secondary">Découvrir les offres</Button></Link>
+        </div>
       </section>
     </main>
   );

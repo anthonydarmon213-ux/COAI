@@ -19,15 +19,11 @@ export function CoaiIntro() {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-10 pt-28 text-center sm:pb-12 sm:pt-32">
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at 18% 15%, rgba(201,162,98,0.14), transparent 55%), radial-gradient(circle at 82% 25%, rgba(91,130,150,0.12), transparent 55%)",
-        }}
-        aria-hidden="true"
-      />
+    <section className="coai-future-hero relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-10 pt-28 text-center sm:pb-12 sm:pt-32">
+      <div className="coai-future-architecture" aria-hidden="true" />
+      <div className="coai-future-horizon" aria-hidden="true" />
+      <div className="coai-future-ring coai-future-ring-one" aria-hidden="true" />
+      <div className="coai-future-ring coai-future-ring-two" aria-hidden="true" />
 
       <svg
         ref={markRef}
@@ -71,8 +67,8 @@ export function CoaiIntro() {
         <span className="font-mono text-xs uppercase tracking-[0.32em] text-laiton-400">HI × AI™</span>
       </div>
 
-      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5">
-        <Link href="/pricing" className="rounded-full border border-laiton-400/35 bg-laiton-400/[0.1] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-200 transition hover:bg-laiton-400/[0.16]">
+      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.08] bg-black/20 px-5 py-8 shadow-2xl backdrop-blur-[2px] sm:px-10">
+        <Link href="/pricing" className="rounded-full border border-laiton-300/40 bg-laiton-300/[0.12] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-100 shadow-[0_0_28px_rgba(221,193,145,.12)] transition hover:bg-laiton-300/[0.2]">
           7 jours offerts · sans engagement
         </Link>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">

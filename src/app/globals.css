@@ -56,6 +56,99 @@ p {
   opacity: 0.15;
 }
 
+/* Univers premium futuriste : un club privé lumineux, pas un laboratoire froid. */
+.coai-future-hero {
+  background:
+    linear-gradient(180deg, rgba(6, 7, 8, 0.08), rgba(6, 7, 8, 0.82)),
+    radial-gradient(circle at 50% 18%, rgba(238, 216, 178, 0.2), transparent 28rem),
+    linear-gradient(120deg, #0a0b0c 0%, #171512 48%, #0b0d0f 100%);
+}
+
+.coai-future-architecture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background:
+    linear-gradient(90deg, transparent 8%, rgba(255,255,255,.05) 8.15%, transparent 8.3%, transparent 91.7%, rgba(255,255,255,.05) 91.85%, transparent 92%),
+    linear-gradient(115deg, transparent 0 22%, rgba(221,193,145,.08) 22.15%, transparent 22.35% 77%, rgba(221,193,145,.06) 77.15%, transparent 77.35%),
+    radial-gradient(ellipse at 50% 100%, rgba(189,154,96,.2), transparent 55%);
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,.8) 70%, transparent 100%);
+}
+
+.coai-future-horizon {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 9%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(221,193,145,.48), transparent);
+  box-shadow: 0 0 45px 10px rgba(201,162,98,.1);
+}
+
+.coai-future-ring {
+  position: absolute;
+  border: 1px solid rgba(221,193,145,.16);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.coai-future-ring-one { width: 38rem; height: 15rem; transform: rotate(-14deg); }
+.coai-future-ring-two { width: 48rem; height: 20rem; transform: rotate(22deg); border-color: rgba(100,145,166,.12); }
+
+.coai-founder-stage {
+  background:
+    radial-gradient(circle at 16% 24%, rgba(237,215,176,.16), transparent 28rem),
+    linear-gradient(118deg, rgba(34,31,26,.96), rgba(12,13,14,.98) 58%, rgba(24,27,28,.96));
+}
+.coai-founder-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.035) 50%, transparent);
+}
+.coai-founder-orbit {
+  position: absolute;
+  right: -7rem;
+  top: 50%;
+  width: 34rem;
+  height: 34rem;
+  border: 1px solid rgba(221,193,145,.18);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 0 70px rgba(201,162,98,.04);
+}
+.coai-founder-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 4rem;
+  border: 1px solid rgba(221,193,145,.1);
+  border-radius: 50%;
+}
+
+.coai-future-cta {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(236,211,169,.21), transparent 25rem),
+    linear-gradient(135deg, #191714 0%, #0c0d0e 55%, #152029 125%);
+}
+.coai-future-cta::before,
+.coai-future-cta::after {
+  content: "";
+  position: absolute;
+  width: 28rem;
+  height: 10rem;
+  border: 1px solid rgba(221,193,145,.13);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.coai-future-cta::before { left: -11rem; top: -4rem; transform: rotate(18deg); }
+.coai-future-cta::after { right: -11rem; bottom: -5rem; transform: rotate(-18deg); }
+
+@media (max-width: 640px) {
+  .coai-future-ring-one { width: 24rem; height: 10rem; }
+  .coai-future-ring-two { width: 30rem; height: 13rem; }
+  .coai-founder-orbit { right: -20rem; opacity: .65; }
+}
+
 .coai-orb {
   position: relative;
   width: min(64vw, 27rem);
