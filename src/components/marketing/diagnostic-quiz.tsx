@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/field";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
 import {
@@ -869,7 +870,7 @@ export function DiagnosticQuiz({
             <div className="flex flex-col gap-4">
               <div>
                 <h2 className="font-display text-xl font-semibold text-white">Tu pratiques déjà un sport ?</h2>
-                <p className="mt-1.5 text-sm text-graphite-400">Coche tout ce qui s&apos;applique, ou passe si aucun.</p>
+                <p className="mt-1.5 text-sm text-graphite-400">Coche tout ce qui s&apos;applique.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {SPORTS.map((s) => (
@@ -912,27 +913,25 @@ export function DiagnosticQuiz({
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="Âge"
-                />
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  value={tailleCm}
-                  onChange={(e) => setTailleCm(e.target.value)}
-                  placeholder="Taille (cm)"
-                />
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  value={poidsKg}
-                  onChange={(e) => setPoidsKg(e.target.value)}
-                  placeholder="Poids (kg)"
-                />
+                <Field label="Âge">
+                  <Input type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} />
+                </Field>
+                <Field label="Taille (cm)">
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    value={tailleCm}
+                    onChange={(e) => setTailleCm(e.target.value)}
+                  />
+                </Field>
+                <Field label="Poids (kg)">
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    value={poidsKg}
+                    onChange={(e) => setPoidsKg(e.target.value)}
+                  />
+                </Field>
               </div>
             </div>
           )}
