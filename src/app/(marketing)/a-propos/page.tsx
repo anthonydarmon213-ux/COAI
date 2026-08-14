@@ -25,8 +25,8 @@ export default function AProposPage() {
           <p>
             Anthony Darmon a passé dix-sept ans sur le terrain — en salle, en visio, à corriger un
             mouvement, ajuster un macro, entendre ce qu&apos;un chiffre sur la balance ne dit
-            jamais. De cette expérience est né THE METHOD : un accompagnement 1-to-1 exigeant,
-            construit séance après séance.
+            jamais. Cette expérience terrain, COAI la met directement dans l&apos;algorithme qui
+            construit chaque programme.
           </p>
           <p className="border-l-2 border-laiton-400 pl-6 italic text-white">
             Mais l&apos;expertise ne devrait pas être un luxe. Et un algorithme seul ne devrait

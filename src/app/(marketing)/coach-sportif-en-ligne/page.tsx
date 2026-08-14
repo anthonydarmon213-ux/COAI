@@ -46,7 +46,7 @@ const FAQ_ITEMS = [
   {
     question: "Est-ce aussi efficace qu'un coach en présentiel ?",
     reponse:
-      "COAI vise un accompagnement structuré et personnalisé à un prix accessible. Pour un suivi 1-to-1 complet en présentiel ou en visio, THE METHOD (l'offre de coaching individuel d'Anthony Darmon) reste disponible séparément.",
+      "COAI vise un accompagnement structuré et personnalisé à un prix accessible. Pour un suivi 1-to-1 complet avec Anthony Darmon, en présentiel ou en visio, l'offre VIP reste disponible séparément, à la séance.",
   },
   {
     question: "Combien ça coûte ?",

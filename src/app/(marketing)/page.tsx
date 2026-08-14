@@ -30,9 +30,14 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
+    question: "Pourquoi pas juste demander ça à une IA généraliste ?",
+    reponse:
+      "Une IA généraliste ne connaît pas la progression, les seuils de charge ou les précautions à prendre selon une contrainte de santé — elle invente une réponse plausible. COAI applique les règles concrètes qu'Anthony Darmon utilise depuis plus de 17 ans de coaching sportif réel (dosage, progression, prudence sur les blessures) pour construire ton programme, pas une réponse générique tirée d'internet.",
+  },
+  {
     question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
     reponse:
-      "Les deux : l'IA génère ton programme à partir de ton profil. En Transformation, chaque programme est en plus relu et validé par un coach diplômé d'État avant de t'arriver — tu ne reçois jamais de contenu IA brut à ce palier.",
+      "Les deux : l'IA génère ton programme à partir de ton profil selon les règles de coaching d'Anthony Darmon. En Transformation, chaque programme est en plus relu et validé par un coach diplômé d'État avant de t'arriver — tu ne reçois jamais de contenu IA brut à ce palier.",
   },
   {
     question: "C'est adapté si je suis débutant ?",
@@ -257,8 +262,8 @@ export default function LandingPage() {
           </p>
           <p className="max-w-md text-base leading-7 text-graphite-300">
             Coach diplômé d&apos;État, expert en coaching sportif depuis plus de 17 ans,
-            spécialiste des dirigeants et entrepreneurs. De cette expérience est né THE METHOD,
-            puis COAI — pour rendre cette expertise accessible à tous, sans attendre le
+            spécialiste des dirigeants et entrepreneurs. De cette expérience terrain est né
+            COAI — pour rendre cette expertise accessible à tous, sans attendre le
             coaching 1-to-1.
           </p>
           <p className="max-w-md text-sm leading-6 text-graphite-400">
@@ -280,8 +285,7 @@ export default function LandingPage() {
           <p>
             Anthony Darmon a passé dix-sept ans sur le terrain — en salle, en visio, à corriger
             un mouvement, ajuster un macro, entendre ce qu&apos;un chiffre sur la balance ne dit
-            jamais. De cette expérience est né THE METHOD : un accompagnement 1-to-1 exigeant,
-            réservé à ceux qui peuvent y consacrer 490 à 800€ par mois.
+            jamais. Un accompagnement 1-to-1 aussi exigeant coûte normalement 490 à 800€ par mois.
           </p>
           <p className="mt-7 border-l-2 border-laiton-400 pl-6 italic text-white">
             Mais l&apos;expertise ne devrait pas être un luxe. Et un algorithme seul ne devrait

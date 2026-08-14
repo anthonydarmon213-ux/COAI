@@ -44,7 +44,7 @@ export default function MentionsLegalesPage() {
         <h2>Propriété intellectuelle</h2>
         <p>
           L&apos;ensemble des contenus présents sur ce site (textes, marque COAI, logo,
-          méthodologie THE METHOD) sont la propriété d&apos;Anthony Darmon, sauf mention contraire.
+          méthodologie de coaching) sont la propriété d&apos;Anthony Darmon, sauf mention contraire.
           Toute reproduction sans autorisation préalable est interdite.
         </p>
       </section>
