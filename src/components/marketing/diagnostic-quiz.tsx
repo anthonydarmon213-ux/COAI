@@ -565,11 +565,13 @@ export function DiagnosticQuiz({
   // profil (appliquerAuProfil, visiteur déjà connecté — parcours D).
   function reponsesEnProfil() {
     const personaAutreResolue = personaAutreTexte.trim();
+    const personaResolue = resolveAutre(persona, personaAutreTexte);
     const objectifResolu = resolveObjectif(objectif, objectifAutreTexte);
     const santeReelle = resolveAutre(sante, santeAutreTexte).filter((s) => s !== AUCUNE_DOULEUR_LABEL);
     const sportResolu = resolveAutre(sport, sportAutreTexte);
     return {
       niveau: niveau ?? undefined,
+      persona: personaResolue.length ? personaResolue.join(", ") : undefined,
       objectifs: [objectifResolu, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
       lieuEntrainement: lieu ?? undefined,

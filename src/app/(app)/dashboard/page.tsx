@@ -11,6 +11,8 @@ import { computeProfilCompletion } from "@/lib/profil/completion";
 import { hasProgrammeAccess } from "@/lib/subscription/plan";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
+import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
+import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
 
 function today() {
   const now = new Date();
@@ -40,6 +42,7 @@ export default async function DashboardPage() {
   const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const objective = sourceSession?.nom ? `Aujourd’hui, on travaille ${String(sourceSession.nom).toLowerCase()}.` : "Une journée utile, adaptée à ton rythme.";
+  const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
 
   return (
     <div className="flex flex-col gap-7">
@@ -50,6 +53,8 @@ export default async function DashboardPage() {
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-300">{objective}</p>
       </header>
+
+      <BesoinsIdentifiesCard besoins={besoins} />
 
       {!completion.essentielComplet ? (
         <section className="rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6">

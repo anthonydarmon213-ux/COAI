@@ -319,6 +319,12 @@ model Profile {
   userId                String   @unique
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   objectifs             String?
+  // Frustrations/points de départ cochés au diagnostic (ex: "Je ne sais pas
+  // quoi faire à la salle", "Même programme depuis des années, sans
+  // résultat") — distinct de objectifs (le but visé) : sert à identifier le
+  // besoin réel plutôt que la destination, pour orienter vers le bon
+  // service COAI sur le dashboard (14/08/2026).
+  persona               String?
   niveau                String?
   equipementDisponible  String?
   // Lieu d'entraînement habituel — distinct de l'équipement (Phase 5,

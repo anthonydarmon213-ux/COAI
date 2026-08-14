@@ -30,7 +30,7 @@ export function CoaiIntro() {
           texte superposé par-dessus), titres à droite. Remplace l'ancien
           plein cadre avec texte centré par-dessus, qui masquait le visage
           derrière la carte de titre. */}
-      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
+      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-start lg:gap-16">
         <div className="relative aspect-[941/1672] w-full max-w-[19rem] shrink-0 overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:max-w-xs lg:w-[34%] lg:max-w-none">
           <Image
             src="/anthony-studio-premium.jpg"
@@ -95,14 +95,15 @@ export function CoaiIntro() {
               COAI
             </span>
             <span className="max-w-md text-balance font-mono text-xs font-bold uppercase tracking-[0.18em] text-[#4a9fc9]">
-              La première plateforme de coaching sportif hybride : IA + validation et suivi humain
+              Bienvenue sur la première plateforme de coaching sportif hybride : IA + validation et suivi humain
             </span>
           </div>
 
           <div className="flex w-full max-w-xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.08] bg-black/20 px-5 py-8 shadow-2xl backdrop-blur-[2px] sm:px-10 lg:items-start">
             <h1 className="w-full text-balance font-display text-[clamp(2.2rem,5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-              Sculptez votre corps et décuplez vos <span className="text-laiton-300">performances</span> avec
-              un coaching intelligent, sur-mesure.
+              <span className="text-laiton-300">Sculptez</span> votre corps et décuplez vos{" "}
+              <span className="text-laiton-300">performances</span> avec un coaching{" "}
+              <span className="text-laiton-300">intelligent</span>, sur-mesure.
             </h1>
             <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
               COAI associe la puissance d&apos;une intelligence artificielle de pointe à l&apos;expertise

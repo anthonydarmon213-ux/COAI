@@ -6,6 +6,7 @@ import { notifyMakeScenario } from "@/lib/whatsapp/client";
 
 const bodySchema = z.object({
   objectifs: z.string().max(1000).optional(),
+  persona: z.string().max(1000).optional(),
   niveau: z.string().max(100).optional(),
   equipementDisponible: z.string().max(1000).optional(),
   lieuEntrainement: z.string().max(200).optional(),

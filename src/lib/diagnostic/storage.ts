@@ -9,6 +9,7 @@ const STORAGE_KEY = "coai_diagnostic_pre_signup";
 export type DiagnosticAnswers = {
   niveau?: string;
   objectifs?: string;
+  persona?: string;
   equipementDisponible?: string;
   lieuEntrainement?: string;
   dureeSeanceMinutes?: number;

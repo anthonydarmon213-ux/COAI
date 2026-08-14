@@ -29,10 +29,7 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
     <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
       <Link href={hrefCompte} className="flex items-center gap-2.5">
         <CoaiMark size={22} />
-        <span className="flex flex-col leading-none">
-          <span className="font-display text-base font-semibold tracking-[0.2em] text-white">COAI</span>
-          <span className="font-mono text-[0.5rem] font-normal tracking-[0.2em] text-laiton-400">HI × AI™</span>
-        </span>
+        <span className="font-display text-base font-semibold tracking-[0.2em] text-white">COAI</span>
       </Link>
 
       <nav className="hidden items-center gap-7 lg:flex">
