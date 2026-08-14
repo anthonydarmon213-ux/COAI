@@ -9,19 +9,37 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
-import { clearParrainageCookie, readParrainageCookie, storeParrainageCookie } from "@/lib/parrainage/cookie";
-import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
-import { trackEvent, trackMetaEvent } from "@/lib/analytics";
+import { storeParrainageCookie } from "@/lib/parrainage/cookie";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
 // Nouveau modèle d'accès libre (13/08/2026) : l'inscription est gratuite et
 // ne déclenche plus aucun paiement — Impulsion (19€, one-shot) et
 // Transformation (49€/mois) se débloquent séparément, une fois dans
-// l'interface (cf. OffreConsentGate). Cette page n'a donc plus besoin de
-// connaître un plan visé ni de faire signer les conditions d'une offre
-// précise ; RGPD et aptitude sportive restent recueillis ici car ils
-// concernent l'usage de l'app en général, pas un paiement particulier.
+// l'interface (cf. OffreConsentGate).
+//
+// Vérification d'adresse email (14/08/2026, retour d'une testeuse — Elsa,
+// via Anthony : "on peut entrer des fausses adresses pour créer des
+// comptes") : jusqu'ici cette page créait la ligne User applicative tout de
+// suite après supabase.auth.signUp(), sans jamais s'assurer que l'email
+// saisi appartient réellement à la personne. Corrigé en s'appuyant sur la
+// vérification native de Supabase (email de confirmation avec lien) plutôt
+// que de la réinventer : le compte applicatif n'est désormais créé
+// qu'après que le lien reçu par email a été cliqué, sur /completer-inscription
+// (même écran de consentement RGPD/aptitude sportive que le flow Google
+// OAuth, qui a toujours fonctionné ainsi — juste jamais réutilisé ici avant
+// aujourd'hui). RGPD/santé ne sont donc plus demandés sur cet écran : les
+// redemander au moment réel de la création du compte est plus correct, pas
+// juste plus simple.
+//
+// Important côté Supabase : ceci ne bloque réellement une fausse adresse
+// que si "Confirm email" est activé dans Authentication → Providers → Email
+// sur le dashboard Supabase — un réglage de projet, pas quelque chose que ce
+// code peut forcer depuis l'application. Si ce réglage est déjà actif,
+// aucun changement de configuration n'est nécessaire. Sinon, Supabase
+// renvoie une session immédiatement après signUp() : le code gère les deux
+// cas (session déjà là → direction /completer-inscription tout de suite ;
+// pas de session → écran "vérifie ta boîte mail").
 export default function SignUpPage() {
   const searchParams = useSearchParams();
 
@@ -40,56 +58,59 @@ export default function SignUpPage() {
   // déjà l'email juste avant de rediriger ici — évite de le ressaisir.
   const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
-  const [consentRgpd, setConsentRgpd] = useState(false);
-  const [consentSante, setConsentSante] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [emailEnvoye, setEmailEnvoye] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-
-    if (!consentRgpd) {
-      setError("Le consentement au traitement des données de santé est requis.");
-      return;
-    }
-    if (!consentSante) {
-      setError("La certification d'aptitude sportive est requise.");
-      return;
-    }
-
     setLoading(true);
     try {
       const supabase = createSupabaseBrowserClient();
-      const { error: signUpError } = await supabase.auth.signUp({ email, password });
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: prenom ? { given_name: prenom } : undefined,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
       if (signUpError) throw signUpError;
 
-      const utm = readUtmCookie();
-      const res = await fetch("/api/compte/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          consentRgpd,
-          consentSante,
-          prenom: prenom || undefined,
-          parrainageCode: readParrainageCookie() || undefined,
-          ...utm,
-        }),
-      });
-      if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
-      clearParrainageCookie();
-      clearUtmCookie();
+      if (!data.session) {
+        // Confirmation par email requise avant de pouvoir créer le compte
+        // applicatif — cf. note en tête de fichier.
+        setEmailEnvoye(true);
+        setLoading(false);
+        return;
+      }
 
-      trackEvent("compte_cree", {});
-      trackMetaEvent("CompleteRegistration");
-      trackFunnelEvent("signup_completed", {});
-
-      window.location.href = "/bienvenue";
+      // Confirmation déjà effective (email confirmation désactivée côté
+      // Supabase) : le compte applicatif se crée sur /completer-inscription,
+      // qui recueille RGPD/aptitude sportive puis appelle /api/compte/register.
+      window.location.href = "/completer-inscription";
     } catch (err) {
       console.error("[sign-up]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
       setLoading(false);
     }
+  }
+
+  if (emailEnvoye) {
+    return (
+      <main className="bg-lab-grid flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+        <Card className="flex w-full max-w-sm flex-col gap-3 text-center">
+          <SectionLabel>Vérifie ta boîte mail</SectionLabel>
+          <h1 className="text-xl font-semibold text-graphite-50">Un lien t&apos;attend dans tes emails</h1>
+          <p className="text-sm text-graphite-400">
+            On a envoyé un lien de confirmation à <span className="text-graphite-200">{email}</span>.
+            Clique dessus pour activer ton compte — pense à vérifier tes spams si tu ne le vois pas
+            passer.
+          </p>
+        </Card>
+      </main>
+    );
   }
 
   return (
@@ -136,33 +157,9 @@ export default function SignUpPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Field>
-          <label className="flex items-start gap-2 text-sm text-graphite-300">
-            <input
-              type="checkbox"
-              checked={consentRgpd}
-              onChange={(e) => setConsentRgpd(e.target.checked)}
-              className="mt-1"
-            />
-            J&apos;ai lu la{" "}
-            <Link href="/confidentialite" target="_blank" className="underline">
-              politique de confidentialité
-            </Link>{" "}
-            et je consens au traitement de mes données de santé pour la personnalisation de mon
-            coaching (RGPD).
-          </label>
-          <label className="flex items-start gap-2 text-sm text-graphite-300">
-            <input
-              type="checkbox"
-              checked={consentSante}
-              onChange={(e) => setConsentSante(e.target.checked)}
-              className="mt-1"
-            />
-            Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de
-            doute ou d&apos;antécédent médical.
-          </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading ? "Création du compte…" : "Créer mon compte gratuit"}
+            {loading ? "Envoi du lien de confirmation…" : "Continuer"}
           </Button>
         </form>
         <p className="text-sm text-graphite-400">

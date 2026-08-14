@@ -5,11 +5,15 @@ import { CompleterInscriptionForm } from "@/components/auth/completer-inscriptio
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 
-// Étape obligatoire après une première connexion via Google (ou tout futur
-// provider OAuth) : la ligne User applicative n'existe pas encore tant que
-// les consentements RGPD/santé n'ont pas été recueillis explicitement.
-// Nouveau modèle d'accès libre (13/08/2026) : plus de plan à connaître ici,
-// l'inscription est gratuite quel que soit le point d'entrée.
+// Étape obligatoire après une première authentification réussie — Google
+// OAuth, ou email/mot de passe une fois le lien de confirmation cliqué
+// (14/08/2026, cf. sign-up/page.tsx) : la ligne User applicative n'existe
+// pas encore tant que les consentements RGPD/santé n'ont pas été recueillis
+// explicitement. prenomSuggere lit `given_name` dans les métadonnées
+// utilisateur Supabase, renseigné par Google ou par sign-up/page.tsx selon
+// le point d'entrée. Nouveau modèle d'accès libre (13/08/2026) : plus de
+// plan à connaître ici, l'inscription est gratuite quel que soit le point
+// d'entrée.
 export default async function CompleterInscriptionPage() {
   const authUser = await getCurrentUser();
   if (!authUser || !authUser.email) {
