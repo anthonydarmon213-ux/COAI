@@ -183,7 +183,7 @@ export default async function AbonnementPage() {
 
       <ParrainageCard />
 
-      <Card className="flex flex-col items-start gap-3 border-laiton-400/30">
+      <Card id="vip" className="flex scroll-mt-24 flex-col items-start gap-3 border-laiton-400/30">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
             Aller plus loin
