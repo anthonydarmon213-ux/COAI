@@ -379,9 +379,32 @@ model Profile {
   morphologieDetectee       String?
   observationsPosture       String?
   derniereAnalysePhoto      DateTime?
+  // Cycle menstruel / maternité (14/08/2026, demande Anthony suite à un
+  // retour utilisatrice) — opt-in explicite, jamais présumé à partir du
+  // sexe déclaré : cycleMenstruelSuivi doit être coché volontairement pour
+  // que COAI en tienne compte. La phase courante n'est jamais redemandée
+  // (deviendrait obsolète en quelques jours) : calculée en code à partir de
+  // dateDernieresRegles + dureeCycleJours (cf. src/lib/cycle/phase.ts),
+  // moteur déterministe, aucun appel IA.
+  cycleMenstruelSuivi   Boolean?
+  dateDernieresRegles   DateTime?
+  dureeCycleJours       Int?
+  reglesDouloureuses    Boolean?
+  // Grossesse / post-partum — garde-fou strict appliqué à la génération
+  // (cf. /api/programmes/generate) : jamais de programme livré sans
+  // relecture humaine pour ces statuts, quel que soit le palier choisi.
+  // dateReferenceMaternite = terme prévu si ENCEINTE, date d'accouchement
+  // si POST_PARTUM — sert à calculer trimestre / semaines post-partum.
+  statutMaternite         StatutMaternite?
+  dateReferenceMaternite  DateTime?
   updatedAt             DateTime @updatedAt
 
   @@map("profiles")
+}
+
+enum StatutMaternite {
+  ENCEINTE
+  POST_PARTUM
 }
 
 enum Pilier {

@@ -35,6 +35,15 @@ const bodySchema = z.object({
   consommationCafe: z.string().max(200).optional(),
   consommationAlcool: z.string().max(200).optional(),
   qualiteSommeil: z.string().max(500).optional(),
+  // Cycle menstruel / maternité (14/08/2026) — opt-in explicite, jamais
+  // déduit du sexe déclaré. dateDernieresRegles/dateReferenceMaternite
+  // arrivent en chaîne ISO depuis le client, converties ici.
+  cycleMenstruelSuivi: z.boolean().optional(),
+  dateDernieresRegles: z.string().datetime().optional(),
+  dureeCycleJours: z.number().int().min(15).max(60).optional(),
+  reglesDouloureuses: z.boolean().optional(),
+  statutMaternite: z.enum(["ENCEINTE", "POST_PARTUM"]).optional(),
+  dateReferenceMaternite: z.string().datetime().optional(),
 });
 
 export async function PUT(request: Request) {
@@ -53,10 +62,19 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
+  // dateDernieresRegles/dateReferenceMaternite arrivent en chaîne ISO
+  // (zod .datetime() valide déjà le format) — Prisma attend des Date.
+  const { dateDernieresRegles, dateReferenceMaternite, ...reste } = parsed.data;
+  const data = {
+    ...reste,
+    ...(dateDernieresRegles !== undefined && { dateDernieresRegles: new Date(dateDernieresRegles) }),
+    ...(dateReferenceMaternite !== undefined && { dateReferenceMaternite: new Date(dateReferenceMaternite) }),
+  };
+
   const profile = await prisma.profile.upsert({
     where: { userId: user.id },
-    update: parsed.data,
-    create: { userId: user.id, ...parsed.data },
+    update: data,
+    create: { userId: user.id, ...data },
   });
 
   if (user.phoneWhatsapp) {
