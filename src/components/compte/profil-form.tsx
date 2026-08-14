@@ -192,6 +192,90 @@ function parseMultiSelect(value?: string | null): string[] {
   return value.split(",").map((v) => v.trim()).filter(Boolean);
 }
 
+// Catégories OMS standard (kg/m²) — mêmes seuils que ImcCard (dashboard),
+// dupliqués ici volontairement plutôt que partagés : ce composant calcule en
+// direct depuis les champs texte du formulaire (pas encore enregistrés),
+// contrairement à ImcCard qui lit un profil déjà persistant.
+const CATEGORIES_IMC = [
+  { label: "Insuffisance pondérale", max: 18.5 },
+  { label: "Corpulence normale", max: 25 },
+  { label: "Surpoids", max: 30 },
+  { label: "Obésité", max: Infinity },
+] as const;
+
+// Lecture en direct du profil physique (14/08/2026, demande Anthony —
+// "montrer nos connaissances", "scientifique et pro") : plutôt qu'un vague
+// "âge métabolique" inventé sans base solide (aucune donnée de composition
+// corporelle fiable disponible ici), affiche deux calculs réellement
+// nommés et vérifiables — IMC (seuils OMS) et métabolisme de base par la
+// formule de Mifflin-St Jeor, la référence standard en nutrition sportive.
+// Se met à jour en direct pendant la saisie (avant tout enregistrement).
+function ProfilPhysiqueCalcule({
+  tailleCm,
+  poidsKg,
+  age,
+  sexe,
+  morphologie,
+}: {
+  tailleCm: string;
+  poidsKg: string;
+  age: string;
+  sexe: string;
+  morphologie: string;
+}) {
+  const taille = Number(tailleCm);
+  const poids = Number(poidsKg);
+  const ageNum = Number(age);
+
+  if (!taille || !poids) return null;
+
+  const tailleM = taille / 100;
+  const imc = poids / (tailleM * tailleM);
+  const categorieImc = CATEGORIES_IMC.find((c) => imc < c.max)?.label ?? "Obésité";
+
+  const bmr =
+    ageNum && (sexe === "Homme" || sexe === "Femme")
+      ? sexe === "Homme"
+        ? 10 * poids + 6.25 * taille - 5 * ageNum + 5
+        : 10 * poids + 6.25 * taille - 5 * ageNum - 161
+      : null;
+
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-4">
+      <span className="font-mono text-[10px] uppercase tracking-widest text-graphite-500">
+        Calculé à partir de ton profil
+      </span>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs text-graphite-500">IMC (indice de masse corporelle)</span>
+          <span className="font-editorial text-2xl text-graphite-50">{imc.toFixed(1)}</span>
+          <span className="text-xs text-laiton-300">{categorieImc}</span>
+        </div>
+        {bmr != null ? (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-graphite-500">Métabolisme de base estimé</span>
+            <span className="font-editorial text-2xl text-graphite-50">{Math.round(bmr)} kcal/j</span>
+            <span className="text-xs text-graphite-500">Formule de Mifflin-St Jeor</span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-graphite-500">Métabolisme de base estimé</span>
+            <span className="text-xs text-graphite-500">
+              Renseigne ton âge et ton sexe pour le calculer.
+            </span>
+          </div>
+        )}
+        {morphologie && (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-graphite-500">Morphotype</span>
+            <span className="font-editorial text-2xl text-graphite-50">{morphologie}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ProfilForm({ profil }: { profil: Profil }) {
   const router = useRouter();
   const [objectifs, setObjectifs] = useState(profil.objectifs ?? "");
@@ -558,6 +642,15 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             <option value="Mixte">Mixte / je ne sais pas</option>
           </Select>
         </Field>
+
+        <ProfilPhysiqueCalcule
+          tailleCm={tailleCm}
+          poidsKg={poidsKg}
+          age={age}
+          sexe={sexe}
+          morphologie={morphologie}
+        />
+
         <Field label="Pathologies & contraintes de santé">
           <Textarea
             placeholder="ex: scoliose, douleurs de dos, hypertension, blessure en cours de rééducation..."
@@ -636,7 +729,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
         </Field>
 
         {error && <p className="text-sm text-red-400">{error}</p>}
-        {saved && !error && <p className="text-sm text-laiton-400">Profil enregistré.</p>}
+        {saved && !error && (
+          <p className="animate-pulse-glow flex items-center gap-2 text-sm font-medium text-laiton-300">
+            <span className="text-laiton-400">✓</span> Profil enregistré.
+          </p>
+        )}
         <Button type="submit" disabled={loading}>
           {loading ? "Enregistrement…" : "Enregistrer mon profil"}
         </Button>
