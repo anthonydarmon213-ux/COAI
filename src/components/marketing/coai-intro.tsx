@@ -21,19 +21,23 @@ export function CoaiIntro() {
 
   return (
     <section className="coai-future-hero relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-10 pt-28 text-center sm:pb-12 sm:pt-32">
+      <div className="coai-future-architecture" aria-hidden="true" />
+      <div className="coai-future-horizon" aria-hidden="true" />
+      <div className="coai-future-ring coai-future-ring-one" aria-hidden="true" />
+      <div className="coai-future-ring coai-future-ring-two" aria-hidden="true" />
+      {/* Photo au-dessus des couches décoratives (13/08/2026) — placée avant,
+          l'ancienne "architecture" (opacity .9) la recouvrait presque
+          entièrement, la rendant quasi invisible malgré la balise Image
+          bien présente. */}
       <Image
         src="/anthony-studio-premium.jpg"
         alt="Anthony Darmon, fondateur de COAI, dans un studio de coaching premium"
         fill
         sizes="100vw"
-        className="object-cover object-top opacity-45"
+        className="object-cover object-top"
         priority
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0c0d]/70 via-[#0b0c0d]/85 to-[#0b0c0d]" aria-hidden="true" />
-      <div className="coai-future-architecture" aria-hidden="true" />
-      <div className="coai-future-horizon" aria-hidden="true" />
-      <div className="coai-future-ring coai-future-ring-one" aria-hidden="true" />
-      <div className="coai-future-ring coai-future-ring-two" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0c0d]/35 via-[#0b0c0d]/60 to-[#0b0c0d]/95" aria-hidden="true" />
 
       <svg
         ref={markRef}
