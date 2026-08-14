@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
-import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
-import { TIER_BY_SERVICE, VIP_MESSAGE, type ServiceKey } from "@/lib/pricing/tiers";
+import { TIER_BY_SERVICE, VIP_MESSAGE, vipReservationHref, type ServiceKey } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const SERVICES: ServiceKey[] = ["IMPULSION", "TRANSFORMATION", "VIP"];
@@ -117,12 +116,24 @@ export function ServiceDetailModal({
         {/* Bloc prix */}
         {tier.sessions ? (
           <div className="flex w-full flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 text-left">
-            {tier.sessions.map((session) => (
-              <div key={session.label} className="flex items-center justify-between gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
-                <span className="text-sm text-graphite-300">{session.label}</span>
-                <span className="font-semibold text-white">{session.prix}</span>
-              </div>
-            ))}
+            {tier.sessions.map((session) => {
+              const href = vipReservationHref(session.label, session.prix);
+              return (
+                <div key={session.label} className="flex flex-col gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-graphite-300">{session.label}</span>
+                    <span className="font-semibold text-white">{session.prix}</span>
+                  </div>
+                  {href && (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="w-full">
+                      <Button variant="secondary" size="compact" className="w-full">
+                        Réserver via WhatsApp
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="flex items-baseline gap-1.5">
@@ -134,19 +145,11 @@ export function ServiceDetailModal({
         {/* CTA */}
         <div className="flex w-full flex-col items-center gap-2">
           {tier.sessions ? (
-            <div className="flex w-full flex-col gap-2">
-              {tier.sessions.map(
-                (session) =>
-                  session.pack && (
-                    <VipCheckoutButton key={session.label} pack={session.pack} label={`Réserver — ${session.prix}`} />
-                  )
-              )}
-              {vipHref && (
-                <a href={vipHref} target="_blank" rel="noopener noreferrer" className="w-full">
-                  <Button variant="ghost" className="w-full">Une question ? Écrire sur WhatsApp</Button>
-                </a>
-              )}
-            </div>
+            vipHref && (
+              <a href={vipHref} target="_blank" rel="noopener noreferrer" className="w-full">
+                <Button variant="ghost" className="w-full">Une question ? Écrire sur WhatsApp</Button>
+              </a>
+            )
           ) : tier.oneShot ? (
             <OffreConsentGate
               resumeConditions={

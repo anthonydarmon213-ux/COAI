@@ -8,10 +8,9 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrustBadges } from "@/components/marketing/trust-badges";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
-import { TIERS, ENTREPRISE, VIP_MESSAGE, TIER_BY_SERVICE } from "@/lib/pricing/tiers";
+import { TIERS, ENTREPRISE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const TITLE = "Tarifs — COAI";
@@ -29,16 +28,9 @@ export const metadata: Metadata = {
 export default function PricingPage({
   searchParams,
 }: {
-  searchParams?: { billing?: string; vip?: string; checkout?: string; pack?: string };
+  searchParams?: { billing?: string; checkout?: string };
 }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
-  // Achat VIP confirmé (14/08/2026, audit tracking) : jusqu'ici aucun
-  // événement Meta n'était envoyé sur un vrai paiement VIP (100-720€),
-  // invisible pour l'optimisation des pubs. Le montant vient de la même
-  // source unique que l'affichage (TIER_BY_SERVICE.VIP.sessions), jamais
-  // dupliqué en dur ici.
-  const vipSessionAchetee = TIER_BY_SERVICE.VIP.sessions?.find((s) => s.pack === searchParams?.pack);
-  const vipValeur = vipSessionAchetee ? Number(vipSessionAchetee.prix.replace(/[^\d]/g, "")) : undefined;
   // L'annuel est présenté en premier pour privilégier l'engagement et la
   // trésorerie, sans retirer le mensuel (accessible en un clic).
   const annual = searchParams?.billing !== "monthly";
@@ -144,17 +136,27 @@ export default function PricingPage({
 
             {tier.sessions && (
               <div className="flex w-full flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-3 text-left text-sm">
-                {tier.sessions.map((session) => (
-                  <div key={session.label} className="flex flex-col gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-graphite-300">{session.label}</span>
-                      <span className="font-semibold text-white">{session.prix}</span>
+                {tier.sessions.map((session) => {
+                  const href = vipReservationHref(session.label, session.prix);
+                  return (
+                    <div key={session.label} className="flex flex-col gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-graphite-300">{session.label}</span>
+                        <span className="font-semibold text-white">{session.prix}</span>
+                      </div>
+                      {href && (
+                        <a href={href} target="_blank" rel="noopener noreferrer" className="w-full">
+                          <Button variant="secondary" size="compact" className="w-full">
+                            Réserver via WhatsApp
+                          </Button>
+                        </a>
+                      )}
                     </div>
-                    {session.pack && <VipCheckoutButton pack={session.pack} label={`Acheter — ${session.prix}`} variant="secondary" />}
-                  </div>
-                ))}
+                  );
+                })}
                 <p className="text-xs leading-5 text-graphite-400">
-                  Valable 3 mois. Report gratuit jusqu&apos;à 24 h avant la séance ; passé ce délai, la séance est due.
+                  Réservation directe avec Anthony. Valable 3 mois. Report gratuit jusqu&apos;à 24 h
+                  avant la séance ; passé ce délai, la séance est due.
                 </p>
               </div>
             )}
@@ -248,24 +250,11 @@ export default function PricingPage({
         </Card>
       </div>
 
-      {searchParams?.vip === "success" && (
-        <Card className="w-full max-w-4xl border-emerald-400/30 bg-emerald-400/[0.06] px-6 py-5 text-center">
-          <TrackConversion
-            name="vip_purchase_completed"
-            params={{ pack: searchParams.pack }}
-            metaEvent="Purchase"
-            metaParams={vipValeur ? { value: vipValeur, currency: "EUR" } : undefined}
-          />
-          <p className="font-semibold text-white">Paiement confirmé — ton pack VIP est réservé.</p>
-          <p className="mt-1 text-sm text-graphite-300">Contacte Anthony sur WhatsApp pour choisir les dates de tes séances.</p>
-        </Card>
-      )}
-
       <p className="max-w-xl text-center text-xs text-graphite-500">
         L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Impulsion est un
         paiement unique, sans abonnement. Transformation inclut 7 jours offerts, puis est facturée
         au choix chaque mois ou chaque année, sans engagement, résiliable à tout moment depuis ton
-        compte. Les packs VIP sont payés une fois, hors abonnement. En débloquant une offre, tu
+        compte. Les séances VIP se réservent directement avec Anthony sur WhatsApp. En débloquant une offre, tu
         acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">
           CGV

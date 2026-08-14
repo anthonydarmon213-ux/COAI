@@ -14,11 +14,7 @@ export type Tier = {
   plan?: "STANDARD" | "PREMIUM";
   mostPopular?: boolean;
   oneShot?: boolean;
-  sessions?: {
-    label: string;
-    prix: string;
-    pack?: "DECOUVERTE_VISIO" | "DECOUVERTE_PRESENTIEL" | "VISIO" | "PRESENTIEL";
-  }[];
+  sessions?: { label: string; prix: string }[];
   limitedSpots?: boolean;
 };
 
@@ -40,6 +36,17 @@ export const ENTREPRISE = {
 
 export const VIP_MESSAGE =
   "Bonjour Anthony, je suis sur COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
+
+// VIP redevient 100% réservation humaine (14/08/2026, demande explicite
+// d'Anthony) : le site affiche uniquement les prix, aucun paiement en
+// ligne — la réservation se fait directement avec lui sur WhatsApp,
+// message pré-rempli avec la séance précise choisie pour qu'il sache tout
+// de suite ce qui est demandé.
+export function vipReservationHref(sessionLabel: string, prix: string): string | null {
+  return buildWhatsAppLink(
+    `Bonjour Anthony, je suis sur COAI et j'aimerais réserver : ${sessionLabel} (${prix}).`
+  );
+}
 
 export const TIERS: Tier[] = [
   {
@@ -92,10 +99,10 @@ export const TIERS: Tier[] = [
       "Accessible à tous, quel que soit ton palier",
     ],
     sessions: [
-      { label: "Séance découverte — Visio", prix: "100€", pack: "DECOUVERTE_VISIO" },
-      { label: "Séance découverte — Présentiel", prix: "200€", pack: "DECOUVERTE_PRESENTIEL" },
-      { label: "Pack Visio — 4 séances", prix: "360€", pack: "VISIO" },
-      { label: "Pack Présentiel — 4 séances", prix: "720€", pack: "PRESENTIEL" },
+      { label: "Séance découverte — Visio", prix: "100€" },
+      { label: "Séance découverte — Présentiel", prix: "200€" },
+      { label: "Pack Visio — 4 séances", prix: "360€" },
+      { label: "Pack Présentiel — 4 séances", prix: "720€" },
     ],
     limitedSpots: true,
   },

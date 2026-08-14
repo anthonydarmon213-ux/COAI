@@ -169,13 +169,6 @@ export async function POST(request: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.client_reference_id;
-      if (session.mode === "payment" && session.metadata?.vipPack) {
-        const email = session.customer_details?.email ?? session.customer_email ?? "email non renseigné";
-        await sendAdminNotification(
-          "Nouveau pack VIP COAI",
-          `${email} vient d'acheter ${session.metadata.vipPackLabel ?? `le pack ${session.metadata.vipPack}`}. Contacte cette personne pour planifier les 4 séances.`
-        );
-      }
       // Déblocage Impulsion (13/08/2026) : paiement unique, pas
       // d'abonnement Stripe créé — géré à part de upsertFromSubscription
       // (qui suppose toujours session.subscription).
