@@ -21,6 +21,15 @@ export function CoaiIntro() {
 
   return (
     <section className="coai-future-hero relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-10 pt-28 text-center sm:pb-12 sm:pt-32">
+      <Image
+        src="/anthony-studio-premium.jpg"
+        alt="Anthony Darmon, fondateur de COAI, dans un studio de coaching premium"
+        fill
+        sizes="100vw"
+        className="object-cover object-top opacity-45"
+        priority
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0c0d]/70 via-[#0b0c0d]/85 to-[#0b0c0d]" aria-hidden="true" />
       <div className="coai-future-architecture" aria-hidden="true" />
       <div className="coai-future-horizon" aria-hidden="true" />
       <div className="coai-future-ring coai-future-ring-one" aria-hidden="true" />
@@ -79,14 +88,20 @@ export function CoaiIntro() {
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
           COAI associe la puissance d&apos;une intelligence artificielle de pointe à l&apos;expertise
           de coachs diplômés d&apos;État. Obtenez un programme d&apos;entraînement et de nutrition
-          ultra-personnalisé, 100 % adapté à votre rythme et validé par des professionnels.
+          ultra-personnalisé, 100 % adapté à votre rythme et validé par des professionnels. Un coach
+          humain te suit jusqu&apos;à l&apos;atteinte de tes objectifs.
         </p>
       </div>
 
       <div className="relative z-10 mt-2 flex flex-col items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/sign-up">
+            <Button className="px-7 py-3 uppercase tracking-wide">Commencer ma transformation</Button>
+          </Link>
           <Link href="/diagnostic">
-            <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
+            <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
+              Diagnostic offert
+            </Button>
           </Link>
         </div>
         <p className="max-w-md text-xs leading-5 text-graphite-400">
@@ -96,17 +111,6 @@ export function CoaiIntro() {
         <a href="#comment-ca-marche" className="text-xs text-graphite-600 underline transition hover:text-graphite-400">
           Découvrir comment ça marche
         </a>
-      </div>
-
-      <div className="relative z-10 mt-4 w-full max-w-xs overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:max-w-sm">
-        <Image
-          src="/anthony-studio-premium.jpg"
-          alt="Anthony Darmon, fondateur de COAI, dans un studio de coaching premium"
-          width={941}
-          height={1672}
-          className="h-auto w-full object-cover"
-          priority
-        />
       </div>
     </section>
   );
