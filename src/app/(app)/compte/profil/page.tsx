@@ -84,8 +84,23 @@ export default async function ProfilPage({
           />
         </Card>
 
-        <Link href="/programme" className="text-sm text-laiton-400 underline">
-          Voir votre programme →
+        {/* Programme mis en avant (14/08/2026, demande Anthony) : c'était un
+            simple lien texte souligné en bas de page, invisible à côté du
+            long formulaire — alors que le programme est le produit phare,
+            celui qui se facture. Vraie carte, pas juste un lien. */}
+        <Link
+          href="/programme"
+          className="flex items-center justify-between gap-4 rounded-2xl border border-laiton-400/30 bg-laiton-400/[0.08] px-6 py-5 transition hover:border-laiton-400/50 hover:bg-laiton-400/[0.12]"
+        >
+          <div className="flex flex-col gap-1">
+            <SectionLabel>Ton programme</SectionLabel>
+            <p className="text-sm text-graphite-300">
+              Entraînement, nutrition et récupération — ce que ce profil nourrit vraiment.
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950">
+            Voir mon programme →
+          </span>
         </Link>
       </div>
     </div>

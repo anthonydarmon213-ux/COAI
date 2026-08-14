@@ -10,6 +10,19 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Select } from "@/components/ui/select";
 
+// Badge "Nouveau" (14/08/2026, demande Anthony) : le bracelet connecté et
+// la photo morphologique sont des fonctionnalités récentes, faciles à
+// manquer noyées dans un long formulaire — les signaler explicitement pour
+// donner envie de les essayer plutôt que de les faire passer pour des
+// champs de formulaire ordinaires.
+function BadgeNouveau() {
+  return (
+    <span className="rounded-full border border-laiton-400/40 bg-laiton-400/[0.12] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-widest text-laiton-300">
+      Nouvelle fonctionnalité
+    </span>
+  );
+}
+
 function ToggleChips({
   options,
   selected,
@@ -140,22 +153,6 @@ const HYDRATATIONS = [
   "2L ou plus par jour",
 ];
 
-const ANTECEDENTS_MEDICAUX = [
-  "Scoliose",
-  "Douleurs / problèmes de dos",
-  "Douleurs / problèmes de genoux",
-  "Problèmes d'épaule",
-  "Hypertension",
-  "Problèmes cardiaques",
-  "Diabète",
-  "Asthme",
-  "Blessure en cours de rééducation",
-  "Grossesse / post-partum",
-  "Chirurgie récente",
-  "Apnée du sommeil",
-  "Autre",
-];
-
 type Profil = {
   objectifs?: string | null;
   niveau?: string | null;
@@ -206,9 +203,17 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   const [dureeSeance, setDureeSeance] = useState(
     profil.dureeSeanceMinutes ? MINUTES_EN_DUREE[profil.dureeSeanceMinutes] ?? "" : ""
   );
-  const [contraintesSante, setContraintesSante] = useState(profil.contraintesSante ?? "");
-  const [antecedentsMedicaux, setAntecedentsMedicaux] = useState<string[]>(
-    parseMultiSelect(profil.antecedentsMedicaux)
+  // Fusion pathologies + contraintes santé (14/08/2026, demande Anthony) : les
+  // pathologies étaient jusque-là une sélection de puces séparée
+  // (antecedentsMedicaux) — remplacée par un seul champ libre où la personne
+  // écrit tout elle-même. Pré-rempli avec l'ancien texte de pathologies s'il
+  // existe et que les contraintes n'ont encore rien de saisi, pour ne rien
+  // perdre visuellement pour qui avait déjà coché des puces avant ce
+  // changement — la valeur reste en base sur antecedentsMedicaux (toujours
+  // lue par les prompts IA), simplement plus jamais réécrite depuis ce
+  // formulaire.
+  const [contraintesSante, setContraintesSante] = useState(
+    profil.contraintesSante || profil.antecedentsMedicaux || ""
   );
   const [tailleCm, setTailleCm] = useState(profil.tailleCm ? String(profil.tailleCm) : "");
   const [poidsKg, setPoidsKg] = useState(profil.poidsKg ? String(profil.poidsKg) : "");
@@ -306,12 +311,6 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     }
   }
 
-  function toggleAntecedent(item: string) {
-    setAntecedentsMedicaux((prev) =>
-      prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
-    );
-  }
-
   function toggleSport(item: string) {
     setSportsPratiques((prev) =>
       prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
@@ -340,7 +339,6 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           lieuEntrainement: lieuEntrainement || undefined,
           dureeSeanceMinutes: dureeSeance ? DUREE_EN_MINUTES[dureeSeance] : undefined,
           contraintesSante,
-          antecedentsMedicaux: antecedentsMedicaux.length ? antecedentsMedicaux.join(", ") : undefined,
           tailleCm: tailleCm ? Number(tailleCm) : undefined,
           poidsKg: poidsKg ? Number(poidsKg) : undefined,
           age: age ? Number(age) : undefined,
@@ -370,8 +368,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <SectionLabel>Bracelet connecté</SectionLabel>
-        <div className="flex flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <SectionLabel>Bracelet connecté</SectionLabel>
+          <BadgeNouveau />
+        </div>
+        <div className="flex flex-col gap-3 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.04] p-4">
           <p className="text-sm text-graphite-300">
             Envoie un screenshot de ton bracelet ou app santé (Apple Watch, Garmin, Fitbit, Samsung
             Health...) — on en extrait automatiquement pas, fréquence cardiaque, sommeil, VO2 max
@@ -423,8 +424,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           )}
         </div>
 
-        <SectionLabel>Photo morphologique</SectionLabel>
-        <div className="flex flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <SectionLabel>Photo morphologique</SectionLabel>
+          <BadgeNouveau />
+        </div>
+        <div className="flex flex-col gap-3 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.04] p-4">
           <p className="text-sm text-graphite-300">
             Envoie une photo de toi en tenue de sport (legging, short, brassière, débardeur...),
             de face, en pied — on en extrait des observations de posture et de morphologie pour
@@ -554,16 +558,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             <option value="Mixte">Mixte / je ne sais pas</option>
           </Select>
         </Field>
-        <Field label="Pathologies (coche tout ce qui s'applique)">
-          <ToggleChips
-            options={ANTECEDENTS_MEDICAUX}
-            selected={antecedentsMedicaux}
-            onToggle={toggleAntecedent}
-          />
-        </Field>
-        <Field label="Contraintes de santé (précisions)">
+        <Field label="Pathologies & contraintes de santé">
           <Textarea
-            placeholder="ex: détails sur une douleur, autre chose non listée ci-dessus..."
+            placeholder="ex: scoliose, douleurs de dos, hypertension, blessure en cours de rééducation..."
             value={contraintesSante}
             onChange={(e) => setContraintesSante(e.target.value)}
           />
