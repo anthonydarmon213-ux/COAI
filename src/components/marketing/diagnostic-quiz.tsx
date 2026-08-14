@@ -15,6 +15,7 @@ import { readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { DiagnosticShareButton } from "@/components/marketing/diagnostic-share-button";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -1111,6 +1112,8 @@ export function DiagnosticQuiz({
                   <p className="mt-4 text-sm leading-6 text-laiton-200">{RESULTATS_TIMELINE}</p>
                 </div>
               )}
+
+              <DiagnosticShareButton connecte={connecte} objectif={diagnostic.profil.objectif} />
 
               <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
                 <VoletCard label="Entraînement">

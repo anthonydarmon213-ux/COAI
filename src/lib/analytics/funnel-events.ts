@@ -23,7 +23,8 @@ export type FunnelEventName =
   | "first_programme_viewed"
   | "first_workout_started"
   | "progress_shared"
-  | "referral_link_shared";
+  | "referral_link_shared"
+  | "diagnostic_result_shared";
 
 export function trackFunnelEvent(name: FunnelEventName, params?: Record<string, unknown>) {
   trackEvent(name, params);
