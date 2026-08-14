@@ -183,6 +183,7 @@ export function AppNav() {
           <Link href="/avis" className="hover:text-white">Donner mon avis</Link>
           <Link href="/compte/parametres" className="hover:text-white">Paramètres</Link>
           <Link href="/compte/abonnement" className="hover:text-white">Abonnement</Link>
+          <Link href="/a-propos" className="hover:text-white">À propos</Link>
         </div>
         <p className="text-xs leading-5 text-graphite-500">Une méthode conçue et supervisée par Anthony Darmon.</p>
       </div>

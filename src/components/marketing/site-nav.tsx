@@ -10,7 +10,7 @@ const LIENS = [
   // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
   { href: "/pricing", label: "Nos formules" },
   { href: "/#fondateur", label: "Coaching" },
-  { href: "/#histoire", label: "À propos" },
+  { href: "/a-propos", label: "À propos" },
 ];
 
 // Nav publique (11/08/2026, simplifiée sur mobile le 14/08/2026) — la liste
