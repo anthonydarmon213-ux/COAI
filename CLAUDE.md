@@ -4,6 +4,152 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Programmes adaptés au cycle menstruel / grossesse / post-partum (14/08/2026)
+
+Suite d'un retour utilisatrice (Elsa, relayé par Anthony) : « des programmes
+d'entraînement adaptés aux cycles féminins » — étendu par Anthony lui-même à
+la grossesse, au post-partum, à une nutrition anti-inflammatoire/sans
+gluten et aux intolérances alimentaires. Scope confirmé avec Anthony via
+question structurée avant de coder (4 données à collecter, notification
+admin systématique sur diagnostic connecté, double garde-fou de sécurité).
+
+**Nouveaux champs `Profile`** (opt-in, jamais déduits du sexe déclaré) :
+`cycleMenstruelSuivi`, `dateDernieresRegles`, `dureeCycleJours`,
+`reglesDouloureuses`, `statutMaternite` (`ENCEINTE`/`POST_PARTUM`),
+`dateReferenceMaternite` (terme prévu si enceinte, date d'accouchement si
+post-partum). Migration additive `20260814020000_add_cycle_maternite`.
+Les intolérances/anti-inflammatoire réutilisent le champ existant
+`allergiesAlimentaires` (déjà couvrant, pas de nouveau champ) — renforcé
+côté prompt nutrition avec une orientation anti-inflammatoire explicite
+quand pertinent.
+
+**Moteur déterministe** `src/lib/cycle/phase.ts` (aucun appel IA, même
+principe que `src/lib/neat/recommandation.ts`) : calcule la phase de cycle
+(menstruelle/folliculaire/ovulatoire/lutéale) ou l'état de grossesse
+(trimestre, semaines) / post-partum (semaines écoulées) à partir des dates
+réellement renseignées. `buildContexteFeminin()` traduit ça en une consigne
+textuelle prête à injecter dans les prompts IA (jamais de date brute
+envoyée à l'IA) — grossesse/post-partum prime toujours sur le cycle
+(jamais pertinents simultanément).
+
+**Collecte** : nouvelle étape "Cycle, grossesse ou post-partum ?" dans le
+quiz diagnostic public, affichée uniquement si "Femme" est sélectionné à
+l'étape sexe (jamais présumé sinon) — et mêmes champs répliqués dans
+`/compte/profil` (`ProfilForm`) pour une abonnée déjà inscrite.
+
+**Adaptation réelle du programme** : `contexteFeminin` injecté dans les 4
+prompts entraînement/nutrition (structure + détail par jour) — prudence
+spécifique grossesse (pas de décubitus dorsal prolongé au 3e trimestre, pas
+de manœuvre de Valsalva, feu vert médical rappelé explicitement), post-
+partum (reprise progressive, vigilance plancher pelvien/diastasis) et
+conseils par phase de cycle (intensité, fer, stabilité articulaire, besoins
+caloriques).
+
+**Garde-fou de sécurité (double point demandé par Anthony)** : grossesse ou
+post-partum force désormais le statut `EN_ATTENTE` (validation humaine
+obligatoire) à la génération, y compris sur Impulsion normalement
+instantané (`GENERE_IA`) — que ce soit à la génération initiale
+(`/api/programmes/generate`) ou lors d'une adaptation confirmée
+(`confirmerAdaptation`). Jamais de programme touchant ces sujets livré sans
+relecture d'un coach.
+
+**Notification admin manquante corrigée au passage** : en creusant le
+signalement d'Anthony (« je n'ai pas reçu de mail de notification sur le
+dernier diagnostic ») pour comprendre le lien avec le retour cycle
+menstruel d'Elsa, découvert qu'un utilisateur **déjà connecté** qui refait
+le diagnostic (parcours D) ne déclenchait aucune notification par
+construction (contrairement au diagnostic anonyme, qui envoie toujours un
+email) — pas un bug d'envoi, un cas jamais couvert. Nouvelle route
+`POST /api/diagnostic/notify-connecte`, appelée systématiquement à la fin
+du diagnostic pour un visiteur connecté.
+
+**Vérifié** : `tsc --noEmit`, `npx prisma validate` et `next build` réels,
+propres. Playwright réel (mobile 390px, desktop 1440px) sur la nouvelle
+étape du quiz : affichage conditionnel au sexe, bascule enceinte/post-
+partum/cycle mutuellement exclusive, aucun débordement.
+
+**Non testable depuis ce sandbox** (mêmes limites qu'habitude, pas d'accès
+Supabase/IA en conditions réelles) : le contenu réel généré par l'IA avec
+ce contexte (formulation exacte des précautions dans une vraie séance/
+repas), et le parcours `/compte/profil` en tant qu'abonnée authentifiée. À
+tester par Anthony : diagnostic avec "Femme" + grossesse/cycle → vérifier
+que le bon contexte apparaît sur le programme généré et que la validation
+coach est bien forcée pour une utilisatrice enceinte.
+
+## Corrections retours utilisatrice (Elsa) + nettoyage marketing (14/08/2026)
+
+Série de corrections livrées le même jour, à partir des retours d'une
+testeuse réelle (Elsa) relayés par Anthony par capture d'écran, plus
+quelques demandes directes d'Anthony dans la foulée.
+
+- **VIP — séance découverte** ajoutée aux offres à la séance (100€ en visio
+  / 200€ en présentiel), à côté des packs existants.
+- **VIP repassé 100% WhatsApp** (retour sur une itération Stripe faite puis
+  annulée dans la même session) : plus de checkout intégré pour VIP —
+  affichage des prix + réservation directe par WhatsApp
+  (`vipReservationHref()`, message pré-rempli par séance), sur `/pricing`,
+  le modal de détail service et `/compte/abonnement`.
+- **"THE METHOD" retiré de tout le site** (offre 1-to-1 historique
+  d'Anthony, jamais celle vendue par COAI) — remplacé partout par une mise
+  en avant explicite des **17 ans d'expérience terrain d'Anthony Darmon**
+  comme fondement de l'algorithme COAI (nouvelle question FAQ dédiée, bio
+  homepage/`à-propos`, mentions légales, et les 8 prompts IA système).
+- **Contraste du texte du hero renforcé** (`bg-black/30` → `bg-black/60` +
+  flou) suite à un retour de lisibilité sur mobile en plein soleil.
+- **Masque du logo du hero corrigé sur mobile** — trop large/sombre en haut
+  à gauche par rapport à l'ancien rendu ; recalculé par les vraies
+  dimensions de la photo (object-cover) plutôt qu'ajusté à l'œil.
+- **Anneau du "C○AI"** (logo géant du hero) réaligné et remis à la même
+  taille que les lettres environnantes (était visiblement plus petit).
+- **Kicker du hero allégé** : retiré "sportif" et "validation" du texte
+  bleu, sur demande directe d'Anthony.
+- **Quiz diagnostic — incohérences corrigées** (signalées par Elsa) :
+  consigne du step "sport" contradictoire avec la puce "Aucun actuellement"
+  déjà existante (retiré "ou passe si aucun") ; champs "Taille (cm)"/
+  "Poids (kg)" tronqués sur mobile faute de wrapper `<Field>`.
+- **"19€/mois" résiduel purgé sur tout le site** — Impulsion est un
+  paiement unique depuis une session précédente, mais le texte "19€/mois"
+  traînait encore : 4 pages SEO, `/compte/abonnement`, `PLAN_LABELS`,
+  l'email de relance diagnostic (cron), et une réécriture substantielle des
+  CGV (sections 1 à 5, plus de mention d'essai/renouvellement pour
+  Impulsion) — signalé comme nécessitant encore une relecture juridique,
+  gap déjà connu.
+- **"HI × AI™" retiré de la nav app authentifiée** (`app-nav.tsx`) —
+  répétait la même accroche que le kicker du hero à quelques centimètres
+  d'écart (déjà retiré de la nav publique lors d'une session précédente).
+- **Manifeste corrigé** (Elsa : « tu ne relis le programme que si on paie
+  l'abonnement... mais ce paragraphe dit que tu le relis toujours ») — le
+  texte affirmait à tort qu'Anthony relit systématiquement chaque
+  programme ; corrigé pour préciser que c'est vrai sur Transformation
+  uniquement, jamais sur Impulsion (généré par l'IA seule, sans relecture)
+  — homepage et `/a-propos`.
+- **Section vidéo retirée de la homepage** (vidéos générées par IA, pas
+  Anthony lui-même) — sur demande directe d'Anthony, en attendant une vraie
+  vidéo tournée par lui.
+- **Vérification d'email avant création de compte** (Elsa : « on peut
+  entrer des fausses adresses pour créer des comptes ») — `/sign-up`
+  (flow email/mot de passe) n'utilise plus une session Supabase immédiate :
+  si aucune session n'est retournée (email de confirmation en attente),
+  affiche un écran "Vérifie ta boîte mail" au lieu de continuer. Réutilise
+  entièrement l'infrastructure existante (`/auth/callback`,
+  `/completer-inscription`, déjà construits pour Google OAuth) — zéro code
+  nouveau côté confirmation, juste le bon déclenchement. **Dépend d'un
+  réglage Supabase côté dashboard** (Authentication → Providers → Email →
+  "Confirm email") — à activer par Anthony, sinon Supabase continue de
+  renvoyer une session immédiate et le comportement reste inchangé (aucune
+  régression si oublié, juste la protection pas encore active).
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres après chaque
+lot de changements. Playwright réel (mobile 390px, desktop 1440px/1440px)
+sur le hero (masque, anneau logo, contraste) à chaque itération.
+
+**Non testable depuis ce sandbox** : le flow de vérification email de bout
+en bout (pas d'accès Resend/Supabase réel) — logique vérifiée par lecture
+de code et par la réutilisation d'un chemin déjà éprouvé (Google OAuth). À
+confirmer par Anthony : activer "Confirm email" sur Supabase, puis créer un
+compte test et vérifier la réception du mail + le retour correct vers
+`/completer-inscription` après clic.
+
 ## Hero (photo studio) + vitrine personnalisée "besoins → services" (14/08/2026)
 
 Suite directe du nouveau modèle d'accès libre (section suivante) : Anthony a
