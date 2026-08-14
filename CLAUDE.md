@@ -4,6 +4,50 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Renfort SEO + calculateur gratuit (14/08/2026)
+
+Suite directe du blocage Meta (section suivante, plus bas) : Anthony a
+demandé de « s'attaquer à ramener du trafic » — scopé avec lui (question
+structurée) sur les deux leviers réellement dans le pouvoir du code (pas
+de pub payante ni de contenu organique possibles depuis cette session) :
+étendre le SEO et construire un outil gratuit.
+
+**2 nouvelles pages SEO longue traîne**, même gabarit exact que les 4
+pages existantes (`Card` + `SeoFaq` avec données structurées FAQPage +
+`RelatedSeoLinks`) :
+- `/programme-musculation-femme` — intention de recherche distincte,
+  jamais couverte ; met en avant la fonctionnalité cycle/grossesse/post-
+  partum livrée le même jour (section plus haut).
+- `/programme-perte-de-poids` — intention "objectif" à fort volume de
+  recherche, les 4 pages précédentes étaient toutes centrées lieu/format,
+  aucune sur l'objectif perte de poids/perte de gras.
+- CTA aligné sur le funnel diagnostic-first actuel (`/diagnostic` en
+  principal) plutôt que `/sign-up` comme les 4 pages plus anciennes
+  (incohérence pré-existante non corrigée sur les 4 anciennes, notée mais
+  hors scope de cette session).
+
+**Calculateur gratuit de calories/macros** (`/calculateur-calories`) —
+nouvel outil autonome, calcul 100% côté client (Mifflin-St Jeor + facteur
+d'activité pour le TDEE, répartition macros selon l'objectif), aucun
+compte ni email requis pour voir le résultat. Mot-clé à fort volume jamais
+couvert par le site. Le résultat inclut une transition explicite vers
+l'offre ("ce chiffre est un point de départ générique et figé, COAI
+s'ajuste réellement...") avec CTA vers `/diagnostic`.
+
+`RelatedSeoLinks` étendu à 7 pages (maillage interne automatique, rien à
+modifier page par page), `sitemap.ts` et `footer.tsx` mis à jour.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Playwright
+réel (mobile 390px, desktop 1440px) sur les 3 nouvelles pages : calcul du
+calculateur vérifié manuellement (valeurs cohérentes avec la formule),
+aucun débordement horizontal, maillage interne affiché correctement.
+
+**Explicitement pas fait** (hors du pouvoir du code depuis ce sandbox) :
+aucune publication organique (réseaux sociaux), aucune pub payante, aucun
+contenu vidéo/photo — reste entièrement entre les mains d'Anthony. Le
+renforcement du programme de parrainage (3e option proposée, non retenue
+cette fois) reste disponible si Anthony veut continuer sur ce levier.
+
 ## État acquisition : 0 vente, campagne Meta bloquée (14/08/2026)
 
 Anthony confirme 0 vente à date. Cause identifiée : la campagne Meta/
