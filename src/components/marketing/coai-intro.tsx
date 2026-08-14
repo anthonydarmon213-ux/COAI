@@ -56,7 +56,7 @@ export function CoaiIntro() {
           C
           <svg
             ref={markRef}
-            className="coai-intro-mark mx-[0.03em] inline-block h-[0.74em] w-[0.74em] translate-y-[0.02em] align-middle"
+            className="coai-intro-mark mx-[0.02em] inline-block h-[1em] w-[1em] align-middle"
             viewBox="0 0 120 120"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

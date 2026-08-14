@@ -48,18 +48,24 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         ))}
       </nav>
 
-      <Link
-        href={actionHref}
-        className="hidden rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300 lg:inline-block"
-      >
-        {actionLabel}
+      <Link href={actionHref} className="relative hidden lg:inline-block">
+        <span
+          className="animate-pulse-glow pointer-events-none absolute -inset-1.5 -z-10 rounded-full bg-laiton-400/70 blur-xl"
+          aria-hidden="true"
+        />
+        <span className="inline-block rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300">
+          {actionLabel}
+        </span>
       </Link>
 
-      <Link
-        href={actionHref}
-        className="rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950 lg:hidden"
-      >
-        {actionLabel}
+      <Link href={actionHref} className="relative lg:hidden">
+        <span
+          className="animate-pulse-glow pointer-events-none absolute -inset-1 -z-10 rounded-full bg-laiton-400/70 blur-lg"
+          aria-hidden="true"
+        />
+        <span className="inline-block rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950">
+          {actionLabel}
+        </span>
       </Link>
     </div>
   );
