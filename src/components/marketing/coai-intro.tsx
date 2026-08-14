@@ -123,13 +123,13 @@ export function CoaiIntro() {
         <p className="max-w-md text-xs leading-5 text-graphite-400">
           2 min, gratuit, sans engagement.
         </p>
-        <div className="flex flex-col items-center gap-1.5 text-xs text-graphite-400 sm:flex-row sm:gap-5">
-          <span className="flex items-center gap-1.5">
-            <span className="text-laiton-400">✓</span>
+        <div className="flex flex-col items-center gap-2.5 sm:flex-row sm:gap-3">
+          <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">
+            <span className="text-laiton-300">✓</span>
             Sans engagement · Résiliable à tout moment
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="text-laiton-400">✓</span>
+          <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">
+            <span className="text-laiton-300">✓</span>
             17+ ans d&apos;expertise terrain intégrés dans nos algorithmes
           </span>
         </div>
