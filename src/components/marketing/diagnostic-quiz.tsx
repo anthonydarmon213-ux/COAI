@@ -179,6 +179,7 @@ type Step =
   | "frequence"
   | "sport"
   | "sexe"
+  | "santeFeminine"
   | "profilPhysique"
   | "alimentation"
   | "sommeil"
@@ -196,6 +197,9 @@ type Step =
 // durée de séance visée — deux infos jusque-là jamais demandées.
 // "profilPhysique" regroupe âge/taille/poids en une seule étape, tous
 // facultatifs (peu de friction, mais utile pour un aperçu plus précis).
+// "santeFeminine" (14/08/2026, retour utilisatrice) : cycle menstruel /
+// grossesse / post-partum — n'apparaît que si sexe === "Femme" (filtré dans
+// questionSteps ci-dessous), jamais présumé, toujours opt-in.
 // "analyse" (Phase 5) : moment de transition avant la révélation, pas une
 // vraie question — exclu de la barre de progression comme "result".
 const QUESTION_STEPS: Step[] = [
@@ -208,6 +212,7 @@ const QUESTION_STEPS: Step[] = [
   "frequence",
   "sport",
   "sexe",
+  "santeFeminine",
   "profilPhysique",
   "alimentation",
   "sommeil",
@@ -278,14 +283,6 @@ export function DiagnosticQuiz({
   aDejaUnProgramme = false,
 }: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
-  // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
-  // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
-  // retirée de la liste des questions pour ce cas, sans dupliquer tout le
-  // reste du composant.
-  const questionSteps = useMemo(
-    () => (connecte ? QUESTION_STEPS.filter((s) => s !== "email") : QUESTION_STEPS),
-    [connecte]
-  );
   const [persona, setPersona] = useState<string[]>([]);
   const [niveau, setNiveau] = useState<string | null>(null);
   const [objectif, setObjectif] = useState<string | null>(null);
@@ -295,9 +292,31 @@ export function DiagnosticQuiz({
   const [frequence, setFrequence] = useState<string | null>(null);
   const [sport, setSport] = useState<string[]>([]);
   const [sexe, setSexe] = useState<string | null>(null);
+  // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
+  // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
+  // retirée de la liste des questions pour ce cas, sans dupliquer tout le
+  // reste du composant.
+  const questionSteps = useMemo(() => {
+    let steps = QUESTION_STEPS;
+    if (connecte) steps = steps.filter((s) => s !== "email");
+    // "santeFeminine" ne s'affiche que si "Femme" est déjà sélectionné —
+    // jamais présumé pour "Homme"/"Préfère ne pas dire".
+    if (sexe !== "Femme") steps = steps.filter((s) => s !== "santeFeminine");
+    return steps;
+  }, [connecte, sexe]);
   const [age, setAge] = useState("");
   const [tailleCm, setTailleCm] = useState("");
   const [poidsKg, setPoidsKg] = useState("");
+  // Cycle menstruel / maternité (14/08/2026) — opt-in explicite, jamais
+  // présumé. dateDernieresRegles/dateReferenceMaternite en "YYYY-MM-DD"
+  // (valeur brute d'un <input type="date">), converties en ISO complet
+  // uniquement au moment de reponsesEnProfil().
+  const [cycleMenstruelSuivi, setCycleMenstruelSuivi] = useState(false);
+  const [dateDernieresRegles, setDateDernieresRegles] = useState("");
+  const [dureeCycleJours, setDureeCycleJours] = useState("");
+  const [reglesDouloureuses, setReglesDouloureuses] = useState<boolean | null>(null);
+  const [statutMaternite, setStatutMaternite] = useState<"ENCEINTE" | "POST_PARTUM" | null>(null);
+  const [dateReferenceMaternite, setDateReferenceMaternite] = useState("");
   const [habitudesAlimentaires, setHabitudesAlimentaires] = useState<string | null>(null);
   const [qualiteSommeil, setQualiteSommeil] = useState<string | null>(null);
   const [sante, setSante] = useState<string[]>([]);
@@ -389,6 +408,12 @@ export function DiagnosticQuiz({
       sport,
       sportAutreTexte,
       sexe,
+      cycleMenstruelSuivi,
+      dateDernieresRegles,
+      dureeCycleJours,
+      reglesDouloureuses,
+      statutMaternite,
+      dateReferenceMaternite,
       age,
       tailleCm,
       poidsKg,
@@ -413,6 +438,12 @@ export function DiagnosticQuiz({
     sport,
     sportAutreTexte,
     sexe,
+    cycleMenstruelSuivi,
+    dateDernieresRegles,
+    dureeCycleJours,
+    reglesDouloureuses,
+    statutMaternite,
+    dateReferenceMaternite,
     age,
     tailleCm,
     poidsKg,
@@ -436,6 +467,14 @@ export function DiagnosticQuiz({
     if (Array.isArray(saved.sport)) setSport(saved.sport as string[]);
     if (typeof saved.sportAutreTexte === "string") setSportAutreTexte(saved.sportAutreTexte);
     if (typeof saved.sexe === "string") setSexe(saved.sexe);
+    if (typeof saved.cycleMenstruelSuivi === "boolean") setCycleMenstruelSuivi(saved.cycleMenstruelSuivi);
+    if (typeof saved.dateDernieresRegles === "string") setDateDernieresRegles(saved.dateDernieresRegles);
+    if (typeof saved.dureeCycleJours === "string") setDureeCycleJours(saved.dureeCycleJours);
+    if (typeof saved.reglesDouloureuses === "boolean") setReglesDouloureuses(saved.reglesDouloureuses);
+    if (saved.statutMaternite === "ENCEINTE" || saved.statutMaternite === "POST_PARTUM") {
+      setStatutMaternite(saved.statutMaternite);
+    }
+    if (typeof saved.dateReferenceMaternite === "string") setDateReferenceMaternite(saved.dateReferenceMaternite);
     if (typeof saved.age === "string") setAge(saved.age);
     if (typeof saved.tailleCm === "string") setTailleCm(saved.tailleCm);
     if (typeof saved.poidsKg === "string") setPoidsKg(saved.poidsKg);
@@ -511,6 +550,7 @@ export function DiagnosticQuiz({
     if (step === "frequence") return Boolean(frequence);
     if (step === "sport") return true; // peut n'en pratiquer aucun
     if (step === "sexe") return Boolean(sexe);
+    if (step === "santeFeminine") return true; // entièrement facultatif, opt-in
     if (step === "profilPhysique") return true; // âge/taille/poids facultatifs
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
@@ -580,6 +620,16 @@ export function DiagnosticQuiz({
       contraintesSante: santeReelle.length ? santeReelle.join(", ") : undefined,
       sexe: sexe ?? undefined,
       sportsPratiques: sportResolu.length ? sportResolu.join(", ") : undefined,
+      // Cycle/maternité opt-in : rien envoyé si jamais coché/renseigné, pour
+      // ne jamais écraser une valeur existante par une absence de choix.
+      cycleMenstruelSuivi: cycleMenstruelSuivi || undefined,
+      dateDernieresRegles:
+        cycleMenstruelSuivi && dateDernieresRegles ? new Date(dateDernieresRegles).toISOString() : undefined,
+      dureeCycleJours: cycleMenstruelSuivi && dureeCycleJours ? Number(dureeCycleJours) : undefined,
+      reglesDouloureuses: cycleMenstruelSuivi && reglesDouloureuses !== null ? reglesDouloureuses : undefined,
+      statutMaternite: statutMaternite ?? undefined,
+      dateReferenceMaternite:
+        statutMaternite && dateReferenceMaternite ? new Date(dateReferenceMaternite).toISOString() : undefined,
       habitudesAlimentaires: habitudesAlimentaires ?? undefined,
       qualiteSommeil: qualiteSommeil ?? undefined,
       age: age ? Number(age) : undefined,
@@ -678,10 +728,13 @@ export function DiagnosticQuiz({
   // Dernière question avant le résultat : capture le lead pour un visiteur
   // anonyme (email + consentement déjà validés par canContinue), ou avance
   // directement pour un visiteur connecté (parcours D — pas d'email à
-  // capturer, ce n'est pas un lead, c'est déjà un client).
+  // capturer, ce n'est pas un lead, c'est déjà un client). Anthony veut
+  // malgré tout être notifié dans les deux cas (14/08/2026) — best-effort,
+  // ne bloque jamais l'affichage du résultat si ça échoue.
   function finishQuestions() {
     if (connecte) {
       trackFunnelEvent("diagnostic_completed");
+      fetch("/api/diagnostic/notify-connecte", { method: "POST" }).catch(() => {});
       goNext();
       return;
     }
@@ -901,6 +954,110 @@ export function DiagnosticQuiz({
                   <OptionCard key={s} label={s} active={sexe === s} onClick={() => setSexe(s)} />
                 ))}
               </div>
+            </div>
+          )}
+
+          {step === "santeFeminine" && (
+            <div className="flex flex-col gap-6">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">
+                  Cycle, grossesse ou post-partum ?
+                </h2>
+                <p className="mt-1.5 text-sm text-graphite-400">
+                  Facultatif — uniquement si tu veux que COAI adapte ton entraînement et ta nutrition en conséquence.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                  Grossesse / post-partum
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  <Chip label="Non" active={statutMaternite === null} onClick={() => setStatutMaternite(null)} />
+                  <Chip
+                    label="Je suis enceinte"
+                    active={statutMaternite === "ENCEINTE"}
+                    onClick={() => setStatutMaternite("ENCEINTE")}
+                  />
+                  <Chip
+                    label="Je suis en post-partum"
+                    active={statutMaternite === "POST_PARTUM"}
+                    onClick={() => setStatutMaternite("POST_PARTUM")}
+                  />
+                </div>
+                {statutMaternite === "ENCEINTE" && (
+                  <Field label="Date prévue d'accouchement (terme)">
+                    <Input
+                      type="date"
+                      value={dateReferenceMaternite}
+                      onChange={(e) => setDateReferenceMaternite(e.target.value)}
+                    />
+                  </Field>
+                )}
+                {statutMaternite === "POST_PARTUM" && (
+                  <Field label="Date d'accouchement">
+                    <Input
+                      type="date"
+                      value={dateReferenceMaternite}
+                      onChange={(e) => setDateReferenceMaternite(e.target.value)}
+                    />
+                  </Field>
+                )}
+                {statutMaternite && (
+                  <p className="text-xs text-graphite-500">
+                    COAI adapte ton programme avec prudence, mais ne remplace jamais l&apos;avis de ta sage-femme ou
+                    de ton médecin.
+                  </p>
+                )}
+              </div>
+
+              {!statutMaternite && (
+                <div className="flex flex-col gap-2">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                    Cycle menstruel
+                  </span>
+                  <OptionCard
+                    label="Adapter mon programme à mon cycle menstruel"
+                    hint="COAI ajuste l'intensité et la nutrition selon la phase de ton cycle."
+                    active={cycleMenstruelSuivi}
+                    onClick={() => setCycleMenstruelSuivi((v) => !v)}
+                  />
+                  {cycleMenstruelSuivi && (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <Field label="Date des dernières règles">
+                          <Input
+                            type="date"
+                            value={dateDernieresRegles}
+                            onChange={(e) => setDateDernieresRegles(e.target.value)}
+                          />
+                        </Field>
+                        <Field label="Durée du cycle (jours)">
+                          <Input
+                            type="number"
+                            inputMode="numeric"
+                            placeholder="28"
+                            value={dureeCycleJours}
+                            onChange={(e) => setDureeCycleJours(e.target.value)}
+                          />
+                        </Field>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Chip
+                          label="Règles douloureuses"
+                          active={reglesDouloureuses === true}
+                          onClick={() => setReglesDouloureuses(reglesDouloureuses === true ? null : true)}
+                        />
+                        <Chip
+                          label="Pas de douleurs particulières"
+                          active={reglesDouloureuses === false}
+                          onClick={() => setReglesDouloureuses(reglesDouloureuses === false ? null : false)}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

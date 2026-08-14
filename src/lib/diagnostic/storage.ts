@@ -16,6 +16,14 @@ export type DiagnosticAnswers = {
   frequenceEntrainement?: string;
   contraintesSante?: string;
   sexe?: string;
+  // Cycle menstruel / maternité (14/08/2026) — opt-in, cf. reponsesEnProfil
+  // dans diagnostic-quiz.tsx pour la logique de construction de ces champs.
+  cycleMenstruelSuivi?: boolean;
+  dateDernieresRegles?: string;
+  dureeCycleJours?: number;
+  reglesDouloureuses?: boolean;
+  statutMaternite?: "ENCEINTE" | "POST_PARTUM";
+  dateReferenceMaternite?: string;
   sportsPratiques?: string;
   habitudesAlimentaires?: string;
   qualiteSommeil?: string;
