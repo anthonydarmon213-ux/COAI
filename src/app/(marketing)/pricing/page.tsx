@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrustBadges } from "@/components/marketing/trust-badges";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
+import { TIERS, ENTREPRISE, VIP_MESSAGE } from "@/lib/pricing/tiers";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
@@ -24,113 +25,6 @@ export const metadata: Metadata = {
   openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/pricing" },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
-
-type Tier = {
-  nom: string;
-  prix: string;
-  suffixe: string;
-  // Information d'essai affichée sous le CTA (ex: "7 jours offerts · puis
-  // 19€/mois") — Phase 5.1 (11/08/2026, correction responsive) : déplacée
-  // du haut de carte (peu visible, à côté du prix) vers directement sous le
-  // CTA, là où Anthony voulait qu'elle saute aux yeux.
-  essai?: string;
-  description: string;
-  features: string[];
-  plan?: "STANDARD" | "PREMIUM";
-  mostPopular?: boolean;
-  // Impulsion (13/08/2026, nouveau modèle d'accès libre) : paiement unique,
-  // ne participe plus au bascule mensuel/annuel ni au flux d'abonnement
-  // classique — cf. rendu du CTA plus bas.
-  oneShot?: boolean;
-  // Palier VIP : packs payés une fois plutôt qu'un abonnement mensuel.
-  sessions?: { label: string; prix: string; pack?: "VISIO" | "PRESENTIEL" }[];
-  limitedSpots?: boolean;
-};
-
-// Palier Entreprise : sur devis, hors Stripe, structurellement différent
-// (contact direct, pas d'abonnement) — sorti du comparateur à 3 colonnes
-// (Phase 5.1, correction responsive) plutôt que compressé en 4e colonne,
-// affiché en bandeau à part sous les 3 offres principales.
-const ENTREPRISE = {
-  nom: "Entreprise",
-  description: "Coaching pour vos équipes et collaborateurs — accompagnement sur-mesure, sur devis.",
-  features: [
-    "Programme adapté à vos équipes (mobilité au poste, gestion de l'énergie, prévention)",
-    "Formules flexibles — ponctuel, régulier, ou intégré à une démarche QVT",
-    "Devis personnalisé selon vos effectifs et vos objectifs",
-  ],
-  whatsappHref: buildWhatsAppLink(
-    "Bonjour Anthony, je vous contacte au sujet d'une offre coaching pour mon entreprise."
-  ),
-  mailHref: `mailto:anthonydarmon213@hotmail.com?subject=${encodeURIComponent("Offre coaching entreprise")}`,
-  siteHref:
-    "http://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/?utm_source=pricing&utm_medium=web&utm_content=carte_entreprise",
-};
-
-const VIP_MESSAGE =
-  "Bonjour Anthony, je suis sur COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
-
-const TIERS: Tier[] = [
-  {
-    nom: "Impulsion",
-    prix: "19€",
-    suffixe: "paiement unique",
-    oneShot: true,
-    // Nouveau modèle d'accès libre (13/08/2026) : l'inscription est
-    // gratuite et donne accès à toute l'interface — Impulsion débloque
-    // uniquement la génération du programme, en une fois, sans abonnement.
-    description:
-      "Crée ton compte gratuitement, explore l'interface, puis génère ton programme personnalisé en un seul paiement de 19€ — sans abonnement.",
-    features: [
-      "Journal de séances",
-      "Suivi des mesures et photos de progression",
-      "Graphiques de progression",
-      "Coach IA — 4 questions/mois",
-      "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
-      "Analyse de photo morphologique et posturale",
-      "Programme personnalisé généré par IA — sans relecture humaine",
-    ],
-  },
-  {
-    nom: "Transformation",
-    prix: "49€",
-    suffixe: "/mois",
-    essai: "7 jours offerts · puis 49€/mois",
-    description:
-      "Coaching hybride : IA + coach diplômé d'État, avec un suivi humain tout au long de l'accompagnement, jusqu'à l'atteinte de ton objectif.",
-    features: [
-      "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs — pas juste à la génération : ton coach revient vers toi si besoin (plateau, gêne, décrochage) pendant toute la durée de l'accompagnement",
-      "Programme personnalisé généré par IA — mobilité, nutrition, récupération, adapté à ton emploi du temps, ta morphologie, tes objectifs (à partir d'un questionnaire initial)",
-      "Validation humaine — chaque programme généré est relu et validé par un vrai coach avant de t'arriver (le principe \"AI generates, coaches validate\")",
-      "1 séance visio de 30 min/mois avec Anthony Darmon incluse, à réserver via WhatsApp",
-      "Suivi de progression — dashboard avec ton évolution",
-      "Coach IA — accès illimité, disponible 24h/24 pour ajuster ta routine à tout moment",
-      "Ajustements continus — le programme évolue selon tes retours",
-      "Assistant WhatsApp 24/7",
-      "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
-      "Analyse de photo morphologique et posturale",
-    ],
-    plan: "STANDARD" as const,
-    mostPopular: true,
-  },
-  {
-    nom: "VIP",
-    prix: "Sur réservation",
-    suffixe: "",
-    description:
-      "Coaching 100% humain avec Anthony Darmon — présentiel ou visio, en pack sans abonnement.",
-    features: [
-      "Coaching 1-to-1 avec Anthony Darmon",
-      "Pack de 4 séances, sans abonnement",
-      "Accessible à tous, quel que soit ton palier",
-    ],
-    sessions: [
-      { label: "Pack Visio — 4 séances", prix: "360€", pack: "VISIO" },
-      { label: "Pack Présentiel — 4 séances", prix: "720€", pack: "PRESENTIEL" },
-    ],
-    limitedSpots: true,
-  },
-];
 
 export default function PricingPage({ searchParams }: { searchParams?: { billing?: string; vip?: string; checkout?: string } }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
