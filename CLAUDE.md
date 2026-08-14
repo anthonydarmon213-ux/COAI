@@ -4,6 +4,26 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## État acquisition : 0 vente, campagne Meta bloquée (14/08/2026)
+
+Anthony confirme 0 vente à date. Cause identifiée : la campagne Meta/
+Instagram (ciblage Paris + fitness, budget prévu ~75-100€ sur 5-7 jours,
+mentionnée le 09/08) n'a en réalité **jamais été lancée** — Meta a refusé
+les vidéos publicitaires générées par IA à la validation. Donc 0 trafic
+payant à ce jour, ce qui explique mécaniquement le 0 vente : pas un
+problème de produit, de tunnel d'achat ou de prix, juste une absence totale
+de trafic acquis. Les seuls canaux réellement actifs sont l'organique
+(Reels/TikTok par Anthony) et le SEO (4 pages), dont le volume est
+probablement trop faible pour générer des ventes à ce stade.
+
+**À faire par Anthony pour débloquer** : remplacer les vidéos IA par du
+contenu réel (vidéo tournée par lui, même simple/smartphone) ou par des
+visuels statiques/carrousel — plus rapides à faire valider par Meta et
+plus cohérents avec la décision déjà prise sur la homepage (vidéos IA
+retirées le 14/08, en attendant une vraie vidéo). Les règles Meta sont de
+plus en plus strictes sur le contenu synthétique, en particulier sur les
+verticales fitness/transformation corporelle.
+
 ## Programmes adaptés au cycle menstruel / grossesse / post-partum (14/08/2026)
 
 Suite d'un retour utilisatrice (Elsa, relayé par Anthony) : « des programmes
