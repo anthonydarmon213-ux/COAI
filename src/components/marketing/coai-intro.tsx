@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -68,42 +69,45 @@ export function CoaiIntro() {
       </div>
 
       <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.08] bg-black/20 px-5 py-8 shadow-2xl backdrop-blur-[2px] sm:px-10">
-        <Link href="/pricing" className="rounded-full border border-laiton-300/40 bg-laiton-300/[0.12] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-100 shadow-[0_0_28px_rgba(221,193,145,.12)] transition hover:bg-laiton-300/[0.2]">
-          7 jours offerts · sans engagement
+        <Link href="/diagnostic" className="rounded-full border border-laiton-300/40 bg-laiton-300/[0.12] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-100 shadow-[0_0_28px_rgba(221,193,145,.12)] transition hover:bg-laiton-300/[0.2]">
+          Diagnostic offert · 2 min
         </Link>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
           L&apos;humain valide. L&apos;IA personnalise.
         </p>
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          Ton programme <span className="text-laiton-300">évolue</span> avec toi.
+          On crée ton programme <span className="text-laiton-300">sportif et nutritionnel</span>,
+          augmenté par l&apos;IA.
         </h1>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          Ton corps change. Ton emploi du temps change. Tes performances changent. COAI adapte
-          ton entraînement, ta nutrition et ta récupération au fil du temps.
+          Un coach te suit jusqu&apos;à l&apos;atteinte de tes objectifs.
         </p>
       </div>
 
       <div className="relative z-10 mt-2 flex flex-col items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href="/pricing">
-            <Button className="px-7 py-3 uppercase tracking-wide">Essayer COAI 7 jours</Button>
-          </Link>
           <Link href="/diagnostic">
-            <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
-              Diagnostic offert
-            </Button>
+            <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
           </Link>
         </div>
         <p className="max-w-md text-xs leading-5 text-graphite-400">
-          7 jours offerts sur Impulsion et Transformation. Carte bancaire demandée, puis 19 € ou 49 €/mois selon la formule. Annulation possible avant la fin de l&apos;essai.
+          2 min, gratuit, sans engagement. Ton compte se crée ensuite librement — débloque
+          Impulsion (19 €, paiement unique) ou Transformation (49 €/mois) quand tu es prêt.
         </p>
-        {/* Accès direct discret aux tarifs (11/08/2026, correction Anthony) :
-            un prospect chaud doit pouvoir acheter sans passer par le
-            diagnostic — volontairement en retrait pour ne pas concurrencer
-            le CTA principal. */}
         <a href="#comment-ca-marche" className="text-xs text-graphite-600 underline transition hover:text-graphite-400">
           Découvrir comment ça marche
         </a>
+      </div>
+
+      <div className="relative z-10 mt-4 w-full max-w-xs overflow-hidden rounded-[2rem] border border-laiton-400/25 shadow-2xl sm:max-w-sm">
+        <Image
+          src="/anthony-studio-premium.jpg"
+          alt="Anthony Darmon, fondateur de COAI, dans un studio de coaching premium"
+          width={941}
+          height={1672}
+          className="h-auto w-full object-cover"
+          priority
+        />
       </div>
     </section>
   );

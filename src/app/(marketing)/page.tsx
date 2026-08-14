@@ -42,7 +42,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "7 jours offerts dès l'inscription (carte bancaire demandée) sur les deux formules — 19€/mois ensuite pour ton programme généré par IA sans relecture, ou 49€/mois pour qu'un coach diplômé d'État le relise et le valide. Sans engagement dans les deux cas.",
+      "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion (19€, paiement unique, programme généré par IA sans relecture) ou Transformation (49€/mois, 7 jours offerts, un coach diplômé d'État relit et valide) quand tu es prêt.",
   },
   {
     question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
@@ -51,7 +51,7 @@ const FAQ = [
   },
   {
     question: "Je peux résilier quand je veux ?",
-    reponse: "Oui, l'abonnement est sans engagement — tu résilies à tout moment depuis ton compte.",
+    reponse: "Impulsion est un paiement unique, sans abonnement. Transformation est sans engagement — tu résilies à tout moment depuis ton compte.",
   },
   {
     question: "Et si mon programme ne me convient pas ?",
@@ -118,7 +118,7 @@ export default function LandingPage() {
         </div>
         <VideoShowcase />
         <div className="mt-5 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
-          <Link href="/pricing"><Button>Essayer gratuitement pendant 7 jours</Button></Link>
+          <Link href="/sign-up"><Button>Découvrir COAI</Button></Link>
           <Link href="/diagnostic" className="text-sm text-laiton-300 underline hover:text-laiton-200">Faire mon diagnostic offert →</Link>
         </div>
       </section>
@@ -394,9 +394,10 @@ export default function LandingPage() {
           Commence à ton rythme.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          7 jours offerts pour découvrir ton espace et ton suivi, puis 19€/mois pour ton programme
-          généré par IA. Passe à 49€/mois quand tu veux qu&apos;un coach diplômé d&apos;État le
-          relise et le valide. Sans engagement.
+          Inscription gratuite, sans carte bancaire — découvre ton espace et ton suivi. Débloque
+          ensuite Impulsion (19€, paiement unique) pour ton programme généré par IA, ou
+          Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et le
+          valide.
         </p>
         <Link href="/pricing">
           <Button>Découvrir les offres</Button>
@@ -427,8 +428,8 @@ export default function LandingPage() {
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Ton prochain chapitre</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Un coaching conçu pour ta vraie vie.</h2>
         <p className="max-w-2xl text-graphite-200">
-          7 jours offerts, puis 19€/mois pour ton programme généré par IA — ou 49€/mois avec
-          relecture et validation par un coach diplômé d&apos;État. Sans engagement.
+          Inscription gratuite. Débloque ensuite ton programme généré par IA (19€, paiement
+          unique) — ou avec relecture et validation par un coach diplômé d&apos;État (49€/mois).
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/diagnostic"><Button>Faire mon diagnostic offert</Button></Link>

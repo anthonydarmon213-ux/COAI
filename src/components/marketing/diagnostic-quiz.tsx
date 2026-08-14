@@ -14,12 +14,9 @@ import {
 } from "@/lib/diagnostic/progress-storage";
 import { readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
-import { Badge } from "@/components/ui/badge";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
-import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -276,100 +273,11 @@ function VoletCard({ label, children }: { label: string; children: ReactNode }) 
   );
 }
 
-// Présentation des 3 formules pour l'écran de résultat (11/08/2026, demande
-// d'Anthony) : la personne qui fait le quiz ne connaît pas les noms/offres
-// COAI, "Notre recommandation : Transformation" seul ne veut rien dire sans
-// contexte — on explique les 3 en même temps que la recommandation.
-const FORMULES = [
-  {
-    plan: "GRATUIT" as const,
-    nom: "Impulsion",
-    prix: "19€ · paiement unique",
-    prixAnnuel: null,
-    accroche: "Inscription gratuite, puis génère ton programme en un seul paiement.",
-    bullets: [
-      "Programme généré par IA (entraînement, nutrition, récupération)",
-      "Suivi séances, mesures, progression",
-      "Coach IA — 4 questions/mois",
-    ],
-  },
-  {
-    plan: "STANDARD" as const,
-    nom: "Transformation",
-    prix: "49€/mois",
-    prixAnnuel: "490€/an",
-    accroche: "L'IA génère, un coach diplômé d'État valide et te suit jusqu'à ton objectif.",
-    bullets: [
-      "Suivi de progression avec un coach diplômé d'État, jusqu'à l'atteinte de tes objectifs",
-      "Chaque programme relu et validé par un vrai coach",
-      "Coach IA illimité, disponible 24h/24, 7j/7",
-      "1 séance visio/mois avec Anthony Darmon incluse",
-    ],
-  },
-  {
-    plan: "VIP" as const,
-    nom: "VIP",
-    prix: "dès 360€ / 4 séances",
-    prixAnnuel: null,
-    accroche: "Coaching 100% humain avec Anthony, en pack sans abonnement.",
-    bullets: ["4 séances visio : 360€", "4 séances en présentiel : 720€", "Valable 3 mois"],
-  },
-];
-
-function FormuleCard({
-  formule,
-  recommandee,
-  cta,
-  annuel = false,
-}: {
-  formule: (typeof FORMULES)[number];
-  recommandee: boolean;
-  cta: ReactNode;
-  annuel?: boolean;
-}) {
-  return (
-    <div
-      className={`flex h-full flex-col gap-3 rounded-xl border p-5 text-left ${
-        recommandee ? "border-laiton-400/40 bg-laiton-400/[0.06]" : "border-graphite-800 bg-graphite-900/40"
-      }`}
-    >
-      {recommandee && <Badge tone="success">Recommandé pour toi</Badge>}
-      <div>
-        <p className="font-display text-lg font-semibold text-white">{formule.nom}</p>
-        <p className="font-mono text-sm text-laiton-300">
-          {annuel && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}
-        </p>
-        {annuel && formule.prixAnnuel && (
-          <p className="mt-1 text-[11px] font-medium text-laiton-200">2 mois offerts</p>
-        )}
-      </div>
-      <p className="text-xs leading-5 text-graphite-400">{formule.accroche}</p>
-      <ul className="flex flex-col gap-1.5 text-xs leading-5 text-graphite-300">
-        {formule.bullets.map((b) => (
-          <li key={b} className="flex items-start gap-1.5">
-            <span className="mt-0.5 text-laiton-400">✓</span>
-            <span>{b}</span>
-          </li>
-        ))}
-      </ul>
-      {/* Espace flexible : aligne les CTA en bas des cartes voisines, même
-          quand les listes de bullets ont des longueurs différentes (cf.
-          correction responsive /pricing, même principe ici). */}
-      <div className="flex-1" />
-      <div className="mt-1">{cta}</div>
-    </div>
-  );
-}
-
 export function DiagnosticQuiz({
   connecte = false,
   aDejaUnProgramme = false,
 }: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
-  // Après un diagnostic complet, on recommande l'engagement annuel (deux
-  // mois offerts) pour maximiser la valeur et la trésorerie. Le mensuel reste
-  // disponible immédiatement dans le même sélecteur.
-  const [facturationAnnuelle, setFacturationAnnuelle] = useState(true);
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
   // le diagnostic n'a pas besoin de ressaisir son email (déjà connu) — étape
   // retirée de la liste des questions pour ce cas, sans dupliquer tout le
@@ -645,18 +553,12 @@ export function DiagnosticQuiz({
     ]
   );
 
-  function signUpHref(standard: boolean): string {
+  function signUpHref(): string {
     const params = new URLSearchParams();
-    if (standard) params.set("plan", "STANDARD");
-    params.set("billing", facturationAnnuelle ? "ANNUAL" : "MONTHLY");
     if (email) params.set("email", email);
     const query = params.toString();
     return query ? `/sign-up?${query}` : "/sign-up";
   }
-
-  const vipHref = buildWhatsAppLink(
-    "Bonjour Anthony, je viens de faire le diagnostic sur coai.fr et je suis intéressé(e) par une séance VIP."
-  );
 
   // Réponses au format Profile — partagé entre le pont pré-inscription
   // (handleCreerCompte, visiteur anonyme) et la mise à jour directe du
@@ -684,8 +586,8 @@ export function DiagnosticQuiz({
     };
   }
 
-  function handleCreerCompte(plan: "GRATUIT" | "STANDARD") {
-    trackFunnelEvent("plan_selected", { plan });
+  function handleCreerCompte() {
+    trackFunnelEvent("plan_selected", { plan: "GRATUIT" });
     storeDiagnosticAnswers(reponsesEnProfil());
   }
 
@@ -1295,93 +1197,23 @@ export function DiagnosticQuiz({
                   )}
                 </div>
               ) : (
-                <div className="flex w-full flex-col gap-4">
-                  <SectionLabel>Nos formules</SectionLabel>
-                  <div className="flex justify-center">
-                    <div className="inline-flex rounded-full border border-white/10 bg-white/[0.03] p-1">
-                      <button
-                        type="button"
-                        onClick={() => setFacturationAnnuelle(false)}
-                        className={`rounded-full px-3 py-2 text-xs transition ${
-                          !facturationAnnuelle ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"
-                        }`}
-                      >
-                        Mensuel
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFacturationAnnuelle(true)}
-                        className={`rounded-full px-3 py-2 text-xs transition ${
-                          facturationAnnuelle ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"
-                        }`}
-                      >
-                        Annuel recommandé · 2 mois offerts
-                      </button>
-                    </div>
-                  </div>
-                  <div className="grid w-full grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
-                    {FORMULES.map((formule) => {
-                      const recommandee = formule.plan === diagnostic.recommandation.plan;
-                      if (formule.plan === "VIP") {
-                        return (
-                          <FormuleCard
-                            key={formule.nom}
-                            formule={formule}
-                            recommandee={recommandee}
-                            annuel={facturationAnnuelle}
-                            cta={<div className="flex flex-col gap-2">
-                              <VipCheckoutButton pack="VISIO" label="Acheter Visio — 360€" variant="secondary" />
-                              <VipCheckoutButton pack="PRESENTIEL" label="Acheter Présentiel — 720€" variant="secondary" />
-                              {vipHref && <a href={vipHref} target="_blank" rel="noopener noreferrer" onClick={() => trackFunnelEvent("plan_selected", { plan: "VIP" })} className="text-center text-xs text-laiton-300 underline">Une question ? WhatsApp</a>}
-                              <p className="text-[11px] leading-4 text-graphite-500">Valable 3 mois · report gratuit jusqu&apos;à 24 h avant</p>
-                            </div>}
-                          />
-                        );
-                      }
-                      return (
-                        <FormuleCard
-                          key={formule.nom}
-                          formule={formule}
-                          recommandee={recommandee}
-                          annuel={facturationAnnuelle}
-                          cta={
-                            <div className="flex flex-col items-center gap-1.5">
-                              <Link
-                                href={signUpHref(formule.plan === "STANDARD")}
-                                onClick={() => handleCreerCompte(formule.plan)}
-                                className="w-full"
-                              >
-                                {/* Libellé raccourci par rapport à /pricing ("Commencer
-                                    gratuitement") + size="compact" : cette carte est nettement
-                                    plus étroite (grille à 3 colonnes dans un conteneur max-w-3xl),
-                                    le texte complet débordait visuellement du bouton rounded-full
-                                    même en réduisant le padding. Même offre, même sens (l'essai
-                                    est détaillé juste en dessous), texte adapté à la largeur
-                                    réelle disponible ici. */}
-                                <Button
-                                  variant={recommandee ? "primary" : "secondary"}
-                                  size="compact"
-                                  className="w-full"
-                                >
-                                  Commencer
-                                </Button>
-                              </Link>
-                              <span className="text-center text-xs font-medium text-laiton-300">
-                                {formule.plan === "GRATUIT"
-                                  ? "Inscription gratuite · 19€ pour générer ton programme"
-                                  : `7 jours offerts · puis ${facturationAnnuelle && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}`}
-                              </span>
-                              {formule.plan !== "GRATUIT" && facturationAnnuelle && formule.prixAnnuel && (
-                                <span className="text-center text-[11px] font-medium text-emerald-300">
-                                  Économie de 98 € sur l&apos;année
-                                </span>
-                              )}
-                            </div>
-                          }
-                        />
-                      );
-                    })}
-                  </div>
+                // Nouveau modèle d'accès libre (13/08/2026, demande Anthony) :
+                // ne plus proposer les formules ici — un visiteur non connecté
+                // crée un compte gratuit et atterrit sur son dashboard, où
+                // toute l'interface est visible et chaque offre se débloque
+                // séparément quand il est prêt. Les réponses du diagnostic
+                // sont mémorisées (pont pré-inscription existant) et
+                // appliquées automatiquement à son profil dès la création du
+                // compte, exactement comme avant.
+                <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
+                  <SectionLabel>Ton profil est prêt</SectionLabel>
+                  <p className="max-w-md text-sm leading-6 text-graphite-300">
+                    Crée ton compte gratuitement pour voir ton tableau de bord personnalisé —
+                    aucune carte bancaire requise.
+                  </p>
+                  <Link href={signUpHref()} onClick={handleCreerCompte}>
+                    <Button className="px-8 py-3">Créer mon compte gratuit</Button>
+                  </Link>
                 </div>
               )}
 
