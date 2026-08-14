@@ -151,9 +151,6 @@ export function AppNav() {
             <CoaiMark size={26} />
             <span className="font-display text-xl font-semibold tracking-[0.18em] text-white">
               COAI
-              <span className="ml-2 font-mono text-[0.55rem] font-normal tracking-[0.2em] text-laiton-400">
-                HI × AI™
-              </span>
             </span>
           </div>
           <span className="text-[0.65rem] font-medium tracking-wide text-graphite-300">
