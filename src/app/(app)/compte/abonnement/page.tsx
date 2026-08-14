@@ -11,9 +11,8 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import Image from "next/image";
 import { ChurnFeedbackForm } from "@/components/compte/churn-feedback-form";
-
-const VIP_MESSAGE =
-  "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
+import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
+import { TIER_BY_SERVICE, VIP_MESSAGE } from "@/lib/pricing/tiers";
 
 const PRIX_MENSUELS = { GRATUIT: 19, STANDARD: 49, PREMIUM: 199 } as const;
 const PRIX_ANNUELS = { GRATUIT: 190, STANDARD: 490, PREMIUM: 2388 } as const;
@@ -183,7 +182,7 @@ export default async function AbonnementPage() {
 
       <ParrainageCard />
 
-      <Card id="vip" className="flex scroll-mt-24 flex-col items-start gap-3 border-laiton-400/30">
+      <Card id="vip" className="flex scroll-mt-24 flex-col items-start gap-4 border-laiton-400/30">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
             Aller plus loin
@@ -191,17 +190,32 @@ export default async function AbonnementPage() {
           <Badge tone="warning">Places limitées</Badge>
         </div>
         <h2 className="text-lg font-semibold text-graphite-50">Coaching VIP avec Anthony Darmon</h2>
-        <p className="text-sm text-graphite-300">
-          Une séance individuelle avec Anthony, en plus de ton programme — présentiel à Paris
-          centre, en club ou à domicile (200€/1h), ou en visio (100€/1h). Réservation à la
-          séance, sans abonnement.
-        </p>
-        {vipHref ? (
-          <a href={vipHref} target="_blank" rel="noopener noreferrer">
-            <Button>Réserver via WhatsApp</Button>
+        <p className="text-sm text-graphite-300">{TIER_BY_SERVICE.VIP.description}</p>
+
+        {TIER_BY_SERVICE.VIP.sessions && (
+          <div className="flex w-full flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-3 text-sm">
+            {TIER_BY_SERVICE.VIP.sessions.map((session) => (
+              <div key={session.label} className="flex flex-col gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-graphite-300">{session.label}</span>
+                  <span className="font-semibold text-white">{session.prix}</span>
+                </div>
+                {session.pack && (
+                  <VipCheckoutButton pack={session.pack} label={`Acheter — ${session.prix}`} variant="secondary" />
+                )}
+              </div>
+            ))}
+            <p className="text-xs leading-5 text-graphite-400">
+              Valable 3 mois. Report gratuit jusqu&apos;à 24 h avant la séance ; passé ce délai, la
+              séance est due.
+            </p>
+          </div>
+        )}
+
+        {vipHref && (
+          <a href={vipHref} target="_blank" rel="noopener noreferrer" className="w-full">
+            <Button variant="ghost" className="w-full">Une question ? Écrire sur WhatsApp</Button>
           </a>
-        ) : (
-          <Button disabled>Contacte ton coach pour réserver</Button>
         )}
       </Card>
     </div>
