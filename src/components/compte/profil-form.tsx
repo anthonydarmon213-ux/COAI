@@ -203,6 +203,20 @@ const CATEGORIES_IMC = [
   { label: "Obésité", max: Infinity },
 ] as const;
 
+// Tendance métabolique par morphotype (14/08/2026, demande Anthony,
+// option 2 retenue après discussion sur l'"âge métabolique") : un chiffre
+// précis ("âge métabolique : 27 ans") demanderait une table de référence
+// population par âge qu'on n'a pas et qu'on ne va pas inventer. Le
+// morphotype auto-déclaré (Ecto/Méso/Endomorphe) a en revanche une vraie
+// association physiologique connue avec la dépense énergétique de repos —
+// formulée ici de façon qualitative et prudente ("associé à", jamais
+// affirmatif), jamais comme un chiffre fabriqué.
+const TENDANCE_METABOLIQUE: Record<string, string> = {
+  Ectomorphe: "Morphotype associé à un métabolisme plutôt rapide — dépense énergétique de repos élevée.",
+  Mésomorphe: "Morphotype associé à un métabolisme plutôt efficace — bonne réponse à l'entraînement.",
+  Endomorphe: "Morphotype associé à un métabolisme plutôt lent — dépense énergétique de repos plus faible.",
+};
+
 // Lecture en direct du profil physique (14/08/2026, demande Anthony —
 // "montrer nos connaissances", "scientifique et pro") : plutôt qu'un vague
 // "âge métabolique" inventé sans base solide (aucune donnée de composition
@@ -269,6 +283,9 @@ function ProfilPhysiqueCalcule({
           <div className="flex flex-col gap-0.5">
             <span className="text-xs text-graphite-500">Morphotype</span>
             <span className="font-editorial text-2xl text-graphite-50">{morphologie}</span>
+            {TENDANCE_METABOLIQUE[morphologie] && (
+              <span className="text-xs leading-4 text-graphite-500">{TENDANCE_METABOLIQUE[morphologie]}</span>
+            )}
           </div>
         )}
       </div>
