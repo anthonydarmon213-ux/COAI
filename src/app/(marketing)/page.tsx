@@ -221,7 +221,7 @@ export default function LandingPage() {
       <section id="fondateur" className="coai-founder-stage relative mx-auto my-8 grid w-[calc(100%-2rem)] max-w-6xl items-center gap-10 overflow-hidden rounded-[2.5rem] border border-white/[0.08] px-6 py-16 text-center shadow-2xl sm:px-12 md:grid-cols-2 md:py-20 md:text-left">
         <div className="coai-founder-orbit" aria-hidden="true" />
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
-          <div className="relative h-72 w-64 overflow-hidden rounded-[2rem] border border-laiton-300/35 shadow-[0_28px_80px_rgba(0,0,0,.48),0_0_45px_rgba(201,162,98,.12)] sm:h-96 sm:w-80">
+          <div className="relative aspect-square w-64 overflow-hidden rounded-[2rem] border border-laiton-300/35 shadow-[0_28px_80px_rgba(0,0,0,.48),0_0_45px_rgba(201,162,98,.12)] sm:w-80">
             <Image
               src="/anthony-darmon-fondateur-coai.jpg"
               alt="Anthony Darmon, fondateur de COAI"
@@ -269,14 +269,9 @@ export default function LandingPage() {
           <p className="max-w-md text-sm leading-6 text-graphite-400">
             Tu peux aussi le croiser à Paris, à La Montgolfière Club ou au RITM Saint-Germain.
           </p>
-          <a
-            href="https://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-laiton-400 underline hover:text-laiton-300"
-          >
-            Découvrir THE METHOD (coaching 1-to-1 en présentiel ou à distance) →
-          </a>
+          <Link href="/pricing#vip" className="text-sm font-medium text-laiton-400 underline hover:text-laiton-300">
+            Découvrir notre formule VIP →
+          </Link>
         </div>
       </section>
 
@@ -399,8 +394,8 @@ export default function LandingPage() {
           Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et le
           valide.
         </p>
-        <Link href="/pricing">
-          <Button>Découvrir les offres</Button>
+        <Link href="/sign-up">
+          <Button>Commencer gratuitement</Button>
         </Link>
       </section>
 
@@ -433,7 +428,7 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/diagnostic"><Button>Faire mon diagnostic offert</Button></Link>
-          <Link href="/pricing"><Button variant="secondary">Découvrir les offres</Button></Link>
+          <Link href="/sign-up"><Button variant="secondary">Commencer gratuitement</Button></Link>
         </div>
       </section>
     </main>

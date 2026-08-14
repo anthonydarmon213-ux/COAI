@@ -74,17 +74,16 @@ export function CoaiIntro() {
         <circle className="coai-intro-dot" cx="58.5" cy="58.5" r="0.9" fill="#eaf4f8" />
       </svg>
 
-      <div className="relative z-10 flex flex-col items-center gap-2">
+      <div className="relative z-10 flex flex-col items-center gap-3">
         <span className="font-display text-[clamp(3.2rem,11vw,6.5rem)] font-bold leading-none tracking-tight text-white">
           COAI
         </span>
-        <span className="font-mono text-xs uppercase tracking-[0.32em] text-laiton-400">HI × AI™</span>
+        <span className="max-w-md text-balance font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
+          La première plateforme de coaching sportif hybride : IA + validation et suivi humain
+        </span>
       </div>
 
       <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.08] bg-black/20 px-5 py-8 shadow-2xl backdrop-blur-[2px] sm:px-10">
-        <span className="rounded-full border border-laiton-300/40 bg-laiton-300/[0.12] px-4 py-2 text-center font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-100 shadow-[0_0_28px_rgba(221,193,145,.12)]">
-          La première plateforme de coaching hybride : IA + validation et suivi humain
-        </span>
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
           Sculptez votre corps et décuplez vos <span className="text-laiton-300">performances</span> avec
           un coaching intelligent, sur-mesure.
@@ -92,29 +91,24 @@ export function CoaiIntro() {
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
           COAI associe la puissance d&apos;une intelligence artificielle de pointe à l&apos;expertise
           de coachs diplômés d&apos;État. Obtenez un programme d&apos;entraînement et de nutrition
-          ultra-personnalisé, 100 % adapté à votre rythme et validé par des professionnels. Un coach
-          humain te suit jusqu&apos;à l&apos;atteinte de tes objectifs.
+          ultra-personnalisé, 100 % adapté à votre rythme et validé par des professionnels.
         </p>
       </div>
 
       <div className="relative z-10 mt-2 flex flex-col items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href="/sign-up">
-            <Button className="px-7 py-3 uppercase tracking-wide">Commencer ma transformation</Button>
-          </Link>
           <Link href="/diagnostic">
+            <Button className="px-7 py-3 uppercase tracking-wide">Diagnostic offert</Button>
+          </Link>
+          <Link href="/sign-up">
             <Button variant="secondary" className="px-7 py-3 uppercase tracking-wide">
-              Diagnostic offert
+              Commencer ma transformation
             </Button>
           </Link>
         </div>
         <p className="max-w-md text-xs leading-5 text-graphite-400">
-          2 min, gratuit, sans engagement. Ton compte se crée ensuite librement — débloque
-          Impulsion (19 €, paiement unique) ou Transformation (49 €/mois) quand tu es prêt.
+          2 min, gratuit, sans engagement.
         </p>
-        <a href="#comment-ca-marche" className="text-xs text-graphite-600 underline transition hover:text-graphite-400">
-          Découvrir comment ça marche
-        </a>
       </div>
     </section>
   );
