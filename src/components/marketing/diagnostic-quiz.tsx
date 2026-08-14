@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,6 @@ import {
 } from "@/lib/diagnostic/progress-storage";
 import { readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
-import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
@@ -1218,53 +1216,6 @@ export function DiagnosticQuiz({
                   </Link>
                 </div>
               )}
-
-              <div className="flex w-full flex-col items-center gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-center sm:flex-row sm:text-left">
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-laiton-400/25">
-                  <Image
-                    src="/anthony-darmon-portrait.jpg"
-                    alt="Anthony Darmon, fondateur de COAI"
-                    fill
-                    sizes="6rem"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
-                    Derrière COAI
-                  </span>
-                  <p className="font-display text-lg font-semibold text-white">Anthony Darmon</p>
-                  <p className="text-xs leading-5 text-graphite-400">
-                    Coach diplômé d&apos;État, expert en coaching sportif depuis plus de 17 ans,
-                    spécialiste des dirigeants et entrepreneurs. Ton programme est toujours validé
-                    par lui ou un coach qu&apos;il a formé — jamais de l&apos;IA brute.
-                  </p>
-                  <p className="text-xs leading-5 text-graphite-500">
-                    Tu peux aussi le croiser à Paris, à La Montgolfière Club ou au RITM
-                    Saint-Germain.
-                  </p>
-                  <div className="flex items-center justify-center gap-2.5 sm:justify-start">
-                    <a
-                      href="https://instagram.com/anthonydarmoncoach"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Instagram"
-                      className="flex h-8 w-8 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
-                    >
-                      <InstagramIcon className="h-4 w-4" />
-                    </a>
-                    <a
-                      href="https://www.linkedin.com/in/darmon-anthony-7a1303101"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="LinkedIn"
-                      className="flex h-8 w-8 items-center justify-center rounded-full border border-graphite-700 text-graphite-300 transition hover:border-laiton-400/40 hover:text-laiton-300"
-                    >
-                      <LinkedinIcon className="h-4 w-4" />
-                    </a>
-                  </div>
-                </div>
-              </div>
 
               <p className="max-w-lg text-xs leading-5 text-graphite-500">
                 Cette expérience t&apos;a plu ? Parles-en à quelqu&apos;un qui a besoin de s&apos;y
