@@ -100,9 +100,10 @@ export function CoaiIntro() {
           <span className="text-laiton-300">intelligent</span>, sur-mesure.
         </h1>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          COAI associe la puissance d&apos;une intelligence artificielle de pointe à l&apos;expertise
-          de coachs diplômés d&apos;État. Obtenez un programme d&apos;entraînement et de nutrition
-          ultra-personnalisé, 100 % adapté à votre rythme et validé par des professionnels.
+          COAI, c&apos;est l&apos;algorithme construit à partir de plus de 17 ans d&apos;expérience
+          terrain d&apos;Anthony Darmon, coach diplômé d&apos;État. Ton programme d&apos;entraînement,
+          de nutrition et de récupération s&apos;ajuste vraiment, semaine après semaine, selon ta
+          forme et le temps dont tu disposes ce jour-là.
         </p>
       </div>
 

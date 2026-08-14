@@ -65,7 +65,7 @@ const FAQ = [
 ];
 
 const FONCTIONNALITES_HERO = [
-  { icon: AdaptatifIcon, titre: "Programme adaptatif", description: "Des ajustements basés sur tes données réelles." },
+  { icon: AdaptatifIcon, titre: "Programme adaptatif", description: "Ajusté chaque semaine selon ta forme, ton énergie et le temps dont tu disposes ce jour-là." },
   { icon: SuiviIcon, titre: "Suivi intelligent", description: "COAI analyse tes performances, ta récupération et ton quotidien." },
   { icon: ValidationIcon, titre: "Validation humaine", description: "Un coach vérifie et optimise là où l'IA a ses limites." },
   { icon: SecuriteIcon, titre: "Sécurisé & privé", description: "Tes données sont protégées, jamais revendues." },
@@ -73,7 +73,7 @@ const FONCTIONNALITES_HERO = [
 
 const COMMENT_CA_MARCHE = [
   ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
-  ["2", "L'IA personnalise ton programme", "Entraînement, nutrition et récupération adaptés à toi."],
+  ["2", "L'algorithme COAI personnalise ton programme", "Construit à partir de plus de 17 ans d'expérience terrain d'Anthony Darmon — entraînement, nutrition et récupération adaptés à toi, puis réajustés semaine après semaine."],
   ["3", "Ton coach vérifie, valide et démarre le suivi", "Un programme fiable, clair, prêt à suivre — et, selon ta formule, un coach qui te motive jusqu'à l'atteinte de ton objectif."],
 ];
 
@@ -82,13 +82,13 @@ const PILIERS = [
     numero: "01",
     titre: "Un programme vraiment personnel",
     description:
-      "Entraînement, nutrition et récupération (sauna, massage, mobilité, méditation, sommeil...) construits autour de ton niveau, de tes objectifs et de tes contraintes.",
+      "Entraînement, nutrition et récupération (sauna, massage, mobilité, méditation, sommeil...) construits par l'algorithme COAI, fondé sur plus de 17 ans d'expérience terrain d'Anthony Darmon, autour de ton niveau, tes objectifs et tes contraintes.",
   },
   {
     numero: "02",
     titre: "Une progression visible",
     description:
-      "Tes séances, tes mesures et tes progrès réunis dans un suivi simple qui évolue avec toi.",
+      "Chaque semaine, ton programme s'ajuste à ta forme, ton énergie et le temps dont tu disposes ce jour-là — tes séances, tes mesures et tes progrès réunis dans un suivi vivant, jamais figé.",
     visuel: true,
   },
   {
