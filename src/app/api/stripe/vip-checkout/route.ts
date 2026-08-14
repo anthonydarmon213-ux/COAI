@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${appUrl}/pricing?vip=success#vip`,
+    success_url: `${appUrl}/pricing?vip=success&pack=${pack}#vip`,
     cancel_url: `${appUrl}/pricing?vip=cancel#vip`,
     metadata: { vipPack: pack, vipPackLabel: configuration.label },
     payment_intent_data: { metadata: { vipPack: pack } },

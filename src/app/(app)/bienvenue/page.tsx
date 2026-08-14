@@ -95,20 +95,28 @@ export default async function BienvenuePage({
   const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
-  // Événement Meta : StartTrial si les 7 jours offerts de Transformation
-  // sont en cours (carte enregistrée, pas encore prélevée), Subscribe sinon
-  // (Impulsion one-shot : paiement immédiat, jamais d'essai). Valeur = prix
+  // Impulsion en paiement unique (unlock=programme) tombait dans le même
+  // calcul que les abonnements (plan="GRATUIT" par défaut → "Subscribe")
+  // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
+  // Meta standard pour une transaction unique (14/08/2026, audit tracking).
+  const unlockOneShot = searchParams.unlock === "programme";
+
+  // Événement Meta : Purchase pour Impulsion en paiement unique (pas un
+  // abonnement), StartTrial si les 7 jours offerts de Transformation sont
+  // en cours (carte enregistrée, pas encore prélevée), Subscribe sinon
+  // (Transformation souscrite directement, essai déjà sauté). Valeur = prix
   // réel de l'offre choisie, pour que l'algorithme Meta puisse optimiser
   // vers les conversions les plus rentables, pas juste les plus nombreuses.
   const enEssai = plan === "STANDARD" && searchParams.essai !== "0";
   const valeurMensuelle = plan === "STANDARD" ? 49 : 19;
+  const metaEventAchat = unlockOneShot ? "Purchase" : enEssai ? "StartTrial" : "Subscribe";
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
       <TrackConversion
         name="subscription_started"
         params={{ plan }}
-        metaEvent={enEssai ? "StartTrial" : "Subscribe"}
+        metaEvent={metaEventAchat}
         metaParams={{ value: valeurMensuelle, currency: "EUR" }}
       />
       <TrackConversion name="checkout_completed" params={{ plan }} />

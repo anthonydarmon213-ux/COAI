@@ -11,7 +11,7 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
-import { TIERS, ENTREPRISE, VIP_MESSAGE } from "@/lib/pricing/tiers";
+import { TIERS, ENTREPRISE, VIP_MESSAGE, TIER_BY_SERVICE } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const TITLE = "Tarifs — COAI";
@@ -26,8 +26,19 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export default function PricingPage({ searchParams }: { searchParams?: { billing?: string; vip?: string; checkout?: string } }) {
+export default function PricingPage({
+  searchParams,
+}: {
+  searchParams?: { billing?: string; vip?: string; checkout?: string; pack?: string };
+}) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
+  // Achat VIP confirmé (14/08/2026, audit tracking) : jusqu'ici aucun
+  // événement Meta n'était envoyé sur un vrai paiement VIP (100-720€),
+  // invisible pour l'optimisation des pubs. Le montant vient de la même
+  // source unique que l'affichage (TIER_BY_SERVICE.VIP.sessions), jamais
+  // dupliqué en dur ici.
+  const vipSessionAchetee = TIER_BY_SERVICE.VIP.sessions?.find((s) => s.pack === searchParams?.pack);
+  const vipValeur = vipSessionAchetee ? Number(vipSessionAchetee.prix.replace(/[^\d]/g, "")) : undefined;
   // L'annuel est présenté en premier pour privilégier l'engagement et la
   // trésorerie, sans retirer le mensuel (accessible en un clic).
   const annual = searchParams?.billing !== "monthly";
@@ -239,6 +250,12 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
 
       {searchParams?.vip === "success" && (
         <Card className="w-full max-w-4xl border-emerald-400/30 bg-emerald-400/[0.06] px-6 py-5 text-center">
+          <TrackConversion
+            name="vip_purchase_completed"
+            params={{ pack: searchParams.pack }}
+            metaEvent="Purchase"
+            metaParams={vipValeur ? { value: vipValeur, currency: "EUR" } : undefined}
+          />
           <p className="font-semibold text-white">Paiement confirmé — ton pack VIP est réservé.</p>
           <p className="mt-1 text-sm text-graphite-300">Contacte Anthony sur WhatsApp pour choisir les dates de tes séances.</p>
         </Card>
