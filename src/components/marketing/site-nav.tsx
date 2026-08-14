@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import { CoaiMark } from "@/components/brand/coai-mark";
 
@@ -16,15 +13,13 @@ const LIENS = [
   { href: "/#histoire", label: "À propos" },
 ];
 
-// Nav publique complète (11/08/2026) — remplace le header minimal
-// (logo + "Se connecter") par une vraie navigation avec ancres vers les
-// sections existantes de la homepage, cohérente sur toutes les pages
-// marketing (pricing, diagnostic, pages SEO...) puisque ce composant vit
-// dans le layout partagé. Les liens `/#section` fonctionnent depuis
-// n'importe quelle page marketing (retour à l'accueil puis scroll).
+// Nav publique (11/08/2026, simplifiée sur mobile le 14/08/2026) — la liste
+// de liens (ancres de la homepage) reste sur desktop, où elle a de la
+// place ; sur mobile, un menu déroulant entier pour y accéder ajoutait de
+// la friction pour peu de valeur — remplacé par les deux seules actions qui
+// comptent vraiment à ce stade (se connecter ou commencer), affichées
+// directement dans le header, sans bouton hamburger ni panneau à ouvrir.
 export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompte: string }) {
-  const [ouvert, setOuvert] = useState(false);
-
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
       <Link href={hrefCompte} className="flex items-center gap-2.5">
@@ -59,46 +54,20 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         </Link>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setOuvert((v) => !v)}
-        aria-label="Menu"
-        aria-expanded={ouvert}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white lg:hidden"
-      >
-        {ouvert ? "×" : "☰"}
-      </button>
-
-      {ouvert && (
-        <div className="absolute inset-x-0 top-full flex flex-col gap-1 border-t border-white/10 bg-[#0b0c0e] px-6 py-4 lg:hidden">
-          {LIENS.map((lien) => (
-            <Link
-              key={lien.label}
-              href={lien.href}
-              onClick={() => setOuvert(false)}
-              className="rounded-lg px-3 py-2.5 text-sm text-graphite-200 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              {lien.label}
-            </Link>
-          ))}
-          <div className="mt-2 flex flex-col gap-2 border-t border-white/[0.08] pt-3">
-            <Link
-              href={connecte ? "/dashboard" : "/sign-in"}
-              onClick={() => setOuvert(false)}
-              className="rounded-lg px-3 py-2.5 text-sm text-graphite-300 hover:bg-white/[0.04] hover:text-white"
-            >
-              {connecte ? "Mon compte" : "Se connecter"}
-            </Link>
-            <Link
-              href={connecte ? "/dashboard" : "/sign-up"}
-              onClick={() => setOuvert(false)}
-              className="rounded-full bg-laiton-400 px-4 py-2.5 text-center text-sm font-semibold text-graphite-950"
-            >
-              Commencer
-            </Link>
-          </div>
-        </div>
-      )}
+      <div className="flex items-center gap-2 lg:hidden">
+        <Link
+          href={connecte ? "/dashboard" : "/sign-in"}
+          className="font-mono text-[0.6rem] uppercase tracking-widest text-graphite-300"
+        >
+          {connecte ? "Mon compte" : "Se connecter"}
+        </Link>
+        <Link
+          href={connecte ? "/dashboard" : "/sign-up"}
+          className="rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950"
+        >
+          Commencer
+        </Link>
+      </div>
     </div>
   );
 }
