@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { CoaiMark } from "@/components/brand/coai-mark";
 
 // Écran d'ouverture de la landing page : rejoue la séquence du brand book
 // (arc humain qui se referme, anneau IA qui apparaît, point central) avant
@@ -87,15 +88,21 @@ export function CoaiIntro() {
       </svg>
 
       <div className="relative z-10 flex flex-col items-center gap-3">
-        <span className="font-display text-[clamp(3.2rem,11vw,6.5rem)] font-bold leading-none tracking-tight text-white">
-          COAI
+        <span className="inline-flex items-center font-display text-[clamp(3.2rem,11vw,6.5rem)] font-bold leading-none tracking-tight text-white">
+          C
+          <CoaiMark
+            size={64}
+            variant="detailed"
+            className="mx-[0.03em] inline-block h-[0.74em] w-[0.74em] translate-y-[0.02em] align-middle"
+          />
+          AI
         </span>
         <span className="max-w-md text-balance font-mono text-sm font-bold uppercase tracking-[0.16em] text-[#6fc3f0] [text-shadow:0_0_18px_rgba(74,159,201,0.65)]">
           Bienvenue sur la première plateforme de coaching sportif hybride : IA + validation et suivi humain
         </span>
       </div>
 
-      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.08] bg-black/20 px-5 py-8 shadow-2xl backdrop-blur-[2px] sm:px-10">
+      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.06] bg-black/30 px-5 py-8 shadow-md sm:px-10">
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
           <span className="text-laiton-300">Sculptez</span> votre corps et décuplez vos{" "}
           <span className="text-laiton-300">performances</span> avec un coaching{" "}
@@ -115,14 +122,14 @@ export function CoaiIntro() {
               className="animate-pulse-glow pointer-events-none absolute -inset-3 -z-10 rounded-full bg-laiton-400/70 blur-2xl"
               aria-hidden="true"
             />
-            <Button className="px-9 py-4 text-base uppercase tracking-wide shadow-[0_25px_70px_-18px_rgba(201,162,98,0.95)]">
-              Commencer ma transformation — Diagnostic offert
+            <Button className="flex flex-col items-center gap-1 px-9 py-4 text-base uppercase tracking-wide shadow-[0_25px_70px_-18px_rgba(201,162,98,0.95)]">
+              <span>Commencer ma transformation — Diagnostic offert</span>
+              <span className="text-[11px] font-medium normal-case tracking-normal text-graphite-950/70">
+                2 min · gratuit · sans engagement
+              </span>
             </Button>
           </Link>
         </div>
-        <p className="max-w-md text-xs leading-5 text-graphite-400">
-          2 min, gratuit, sans engagement.
-        </p>
         <div className="flex flex-col items-center gap-2.5 sm:flex-row sm:gap-3">
           <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">
             <span className="text-laiton-300">✓</span>

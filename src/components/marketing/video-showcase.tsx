@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 const VIDEOS = [
-  { src: "/coai-presentation-7.mp4", type: "video/mp4", label: "Ton évolution commence ici" },
   { src: "/coai-presentation-2.mp4", type: "video/mp4", label: "Une autre facette de COAI" },
   { src: "/coai-presentation-9.mp4", type: "video/mp4", label: "Découvre COAI autrement" },
   { src: "/coai-presentation-8.mp4", type: "video/mp4", label: "Découvre l'expérience COAI" },
