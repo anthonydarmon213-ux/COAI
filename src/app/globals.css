@@ -211,22 +211,20 @@ html {
   }
 }
 
-/* Halo du CTA "Commencer ma transformation" (hero) : vrai clignotement
-   on/off (steps, pas d'easing) plutôt qu'une respiration progressive — une
-   première version avait été posée par erreur sur le bouton "Commencer" de
-   la nav plutôt que sur ce CTA (retour Anthony, 14/08/2026) ; retirée de la
-   nav et réglée ici avec un contraste un peu plus discret, ce bouton étant
-   déjà mis en avant par ailleurs (glow doré, sous-texte). */
+/* Halo du CTA "Commencer ma transformation" (hero) : amplitude réduite et
+   easing doux plutôt que le on/off marqué de la première version — ce
+   bouton est déjà mis en avant par ailleurs (glow doré fixe, sous-texte),
+   le clignotement doit rester un léger appel discret, pas un effet
+   dominant (retour Anthony, 14/08/2026). */
 @keyframes halo-blink {
   0%,
-  45% {
-    opacity: 0.9;
-    transform: scale(1.12);
-  }
-  50%,
   100% {
-    opacity: 0.2;
-    transform: scale(0.94);
+    opacity: 0.55;
+    transform: scale(1.04);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(0.97);
   }
 }
 
@@ -271,7 +269,7 @@ html {
     animation: pulse-glow 5s ease-in-out infinite;
   }
   .animate-halo-blink {
-    animation: halo-blink 1.3s steps(1, end) infinite;
+    animation: halo-blink 1.8s ease-in-out infinite;
   }
   .coai-loader-arc {
     animation: spin-loader 1.6s linear infinite;
