@@ -44,8 +44,8 @@ export function CoaiIntro() {
       <div
         className="pointer-events-none absolute left-0 top-0"
         style={{
-          width: "clamp(260px, 34vw, 480px)",
-          height: "clamp(190px, 26vw, 300px)",
+          width: "clamp(120px, 32vw, 480px)",
+          height: "clamp(80px, 20vw, 300px)",
           background: "radial-gradient(ellipse at 0% 0%, rgba(6,7,8,1) 0%, rgba(6,7,8,1) 62%, rgba(6,7,8,0) 100%)",
         }}
         aria-hidden="true"
@@ -56,7 +56,7 @@ export function CoaiIntro() {
           C
           <svg
             ref={markRef}
-            className="coai-intro-mark mx-[0.02em] inline-block h-[1em] w-[1em] align-middle"
+            className="coai-intro-mark relative top-[-0.06em] mx-[0.04em] inline-block h-[1.28em] w-[1.28em] align-middle"
             viewBox="0 0 120 120"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
