@@ -109,6 +109,16 @@ export function CoaiIntro() {
         <p className="max-w-md text-xs leading-5 text-graphite-400">
           2 min, gratuit, sans engagement.
         </p>
+        <div className="flex flex-col items-center gap-1.5 text-xs text-graphite-400 sm:flex-row sm:gap-5">
+          <span className="flex items-center gap-1.5">
+            <span className="text-laiton-400">✓</span>
+            Sans engagement · Résiliable à tout moment
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-laiton-400">✓</span>
+            17+ ans d&apos;expertise terrain intégrés dans nos algorithmes
+          </span>
+        </div>
       </div>
     </section>
   );
