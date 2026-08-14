@@ -16,10 +16,19 @@ const LIENS = [
 // Nav publique (11/08/2026, simplifiée sur mobile le 14/08/2026) — la liste
 // de liens (ancres de la homepage) reste sur desktop, où elle a de la
 // place ; sur mobile, un menu déroulant entier pour y accéder ajoutait de
-// la friction pour peu de valeur — remplacé par les deux seules actions qui
-// comptent vraiment à ce stade (se connecter ou commencer), affichées
+// la friction pour peu de valeur — remplacé par une seule action, affichée
 // directement dans le header, sans bouton hamburger ni panneau à ouvrir.
+//
+// Un seul bouton d'action, pas deux (14/08/2026, correction Anthony) —
+// "Se connecter" et "Commencer" pointaient tous les deux vers /dashboard
+// une fois connecté (bug réel, pas juste une redondance visuelle) : gardé
+// uniquement le bouton qui a du sens dans chaque état. Un visiteur non
+// connecté qui clique "Commencer" et a déjà un compte retrouve "Se
+// connecter" directement sur /sign-up (lien déjà présent là-bas).
 export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompte: string }) {
+  const actionHref = connecte ? "/dashboard" : "/sign-up";
+  const actionLabel = connecte ? "Mon compte" : "Commencer";
+
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
       <Link href={hrefCompte} className="flex items-center gap-2.5">
@@ -39,35 +48,19 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         ))}
       </nav>
 
-      <div className="hidden items-center gap-3 lg:flex">
-        <Link
-          href={connecte ? "/dashboard" : "/sign-in"}
-          className="font-mono text-[0.65rem] uppercase tracking-widest text-graphite-400 transition hover:text-white"
-        >
-          {connecte ? "Mon compte" : "Se connecter"}
-        </Link>
-        <Link
-          href={connecte ? "/dashboard" : "/sign-up"}
-          className="rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300"
-        >
-          Commencer
-        </Link>
-      </div>
+      <Link
+        href={actionHref}
+        className="hidden rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300 lg:inline-block"
+      >
+        {actionLabel}
+      </Link>
 
-      <div className="flex items-center gap-2 lg:hidden">
-        <Link
-          href={connecte ? "/dashboard" : "/sign-in"}
-          className="font-mono text-[0.6rem] uppercase tracking-widest text-graphite-300"
-        >
-          {connecte ? "Mon compte" : "Se connecter"}
-        </Link>
-        <Link
-          href={connecte ? "/dashboard" : "/sign-up"}
-          className="rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950"
-        >
-          Commencer
-        </Link>
-      </div>
+      <Link
+        href={actionHref}
+        className="rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950 lg:hidden"
+      >
+        {actionLabel}
+      </Link>
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CoaiMark } from "@/components/brand/coai-mark";
 
 // Écran d'ouverture de la landing page : rejoue la séquence du brand book
 // (arc humain qui se referme, anneau IA qui apparaît, point central) avant
@@ -52,49 +51,41 @@ export function CoaiIntro() {
         aria-hidden="true"
       />
 
-      <svg
-        ref={markRef}
-        className="coai-intro-mark relative z-10"
-        width="96"
-        height="96"
-        viewBox="0 0 120 120"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <circle
-          className="coai-intro-arc-human"
-          cx="60"
-          cy="60"
-          r="44"
-          stroke="#c9a262"
-          strokeWidth="7"
-          strokeLinecap="round"
-          transform="rotate(-90 60 60)"
-        />
-        <circle
-          className="coai-intro-arc-ai"
-          cx="60"
-          cy="60"
-          r="28"
-          stroke="#6b7078"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray="3.2 3.6"
-        />
-        <circle className="coai-intro-dot" cx="60" cy="60" r="5.5" fill="#3d7a99" />
-        <circle className="coai-intro-dot" cx="60" cy="60" r="2.5" fill="#0d1b22" />
-        <circle className="coai-intro-dot" cx="58.5" cy="58.5" r="0.9" fill="#eaf4f8" />
-      </svg>
-
       <div className="relative z-10 flex flex-col items-center gap-3">
         <span className="inline-flex items-center font-display text-[clamp(3.2rem,11vw,6.5rem)] font-bold leading-none tracking-tight text-white">
           C
-          <CoaiMark
-            size={64}
-            variant="detailed"
-            className="mx-[0.03em] inline-block h-[0.74em] w-[0.74em] translate-y-[0.02em] align-middle"
-          />
+          <svg
+            ref={markRef}
+            className="coai-intro-mark mx-[0.03em] inline-block h-[0.74em] w-[0.74em] translate-y-[0.02em] align-middle"
+            viewBox="0 0 120 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle
+              className="coai-intro-arc-human"
+              cx="60"
+              cy="60"
+              r="44"
+              stroke="#c9a262"
+              strokeWidth="7"
+              strokeLinecap="round"
+              transform="rotate(-90 60 60)"
+            />
+            <circle
+              className="coai-intro-arc-ai"
+              cx="60"
+              cy="60"
+              r="28"
+              stroke="#6b7078"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeDasharray="3.2 3.6"
+            />
+            <circle className="coai-intro-dot" cx="60" cy="60" r="5.5" fill="#3d7a99" />
+            <circle className="coai-intro-dot" cx="60" cy="60" r="2.5" fill="#0d1b22" />
+            <circle className="coai-intro-dot" cx="58.5" cy="58.5" r="0.9" fill="#eaf4f8" />
+          </svg>
           AI
         </span>
         <span className="max-w-md text-balance font-mono text-sm font-bold uppercase tracking-[0.16em] text-[#6fc3f0] [text-shadow:0_0_18px_rgba(74,159,201,0.65)]">

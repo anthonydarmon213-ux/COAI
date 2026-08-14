@@ -155,7 +155,7 @@ export function AppNav() {
             </span>
           </div>
           <span className="text-[0.65rem] font-medium tracking-wide text-graphite-300">
-            L&apos;humain valide. L&apos;IA personnalise.
+            Coaching humain augmenté par l&apos;IA.
           </span>
         </Link>
         <div className="flex items-center gap-2 md:mt-5">
