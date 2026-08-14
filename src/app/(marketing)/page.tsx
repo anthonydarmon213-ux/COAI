@@ -45,11 +45,6 @@ const FAQ = [
       "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion (19€, paiement unique, programme généré par IA sans relecture) ou Transformation (49€/mois, 7 jours offerts, un coach diplômé d'État relit et valide) quand tu es prêt.",
   },
   {
-    question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
-    reponse:
-      "Avec Impulsion (19€, paiement unique), ton programme est généré par IA sans relecture ; avec Transformation (49€/mois), un coach diplômé d'État le relit et le valide. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Tu peux commencer avec l'un de ces deux formats, puis passer à THE METHOD quand tu veux aller plus loin.",
-  },
-  {
     question: "Je peux résilier quand je veux ?",
     reponse: "Impulsion est un paiement unique, sans abonnement. Transformation est sans engagement — tu résilies à tout moment depuis ton compte.",
   },
