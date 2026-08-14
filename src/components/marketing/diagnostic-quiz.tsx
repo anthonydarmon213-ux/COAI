@@ -1078,22 +1078,37 @@ export function DiagnosticQuiz({
               </div>
 
               {diagnostic.pointsATravailler.length > 0 && (
-                <div className="w-full rounded-xl border border-graphite-800 bg-graphite-900/50 px-5 py-4 text-left">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
-                    Ce qui freine ta progression aujourd&apos;hui
-                  </span>
-                  <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
-                    {diagnostic.pointsATravailler.map((p) => (
-                      <li key={p} className="flex items-start gap-2">
-                        <span className="mt-0.5 text-acier">✕</span>
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-3 text-sm leading-6 text-graphite-200">
-                    <span className="font-semibold text-white">COAI corrige ces points un par un</span> —
-                    voici comment, avec le programme ci-dessous.
-                  </p>
+                <div className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-5 text-left sm:px-6 sm:py-6">
+                  <SectionLabel>Aujourd&apos;hui → Avec COAI</SectionLabel>
+                  <div className="mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2 rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                        Aujourd&apos;hui
+                      </span>
+                      <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
+                        {diagnostic.pointsATravailler.map((p) => (
+                          <li key={p} className="flex items-start gap-2">
+                            <span className="mt-0.5 text-acier">✕</span>
+                            <span>{p}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="flex flex-col gap-2 rounded-xl border border-laiton-400/30 bg-laiton-400/[0.07] px-4 py-4">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-300">
+                        Avec COAI
+                      </span>
+                      <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-100">
+                        {diagnostic.pointsResolus.map((p) => (
+                          <li key={p} className="flex items-start gap-2">
+                            <span className="mt-0.5 text-laiton-300">✓</span>
+                            <span>{p}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-laiton-200">{RESULTATS_TIMELINE}</p>
                 </div>
               )}
 
@@ -1111,8 +1126,6 @@ export function DiagnosticQuiz({
 
                 {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
               </div>
-
-              <p className="max-w-lg text-sm leading-6 text-laiton-200">{RESULTATS_TIMELINE}</p>
 
               <div className="flex w-full flex-col gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
                 <SectionLabel>Ce que tu viens de voir n&apos;est qu&apos;un début</SectionLabel>

@@ -112,6 +112,7 @@ export type MiniDiagnostic = {
   accroche: string;
   alerte: string | null;
   pointsATravailler: string[];
+  pointsResolus: string[];
   split: string | null;
   exercices: string[];
   nutrition: string | null;
@@ -205,6 +206,34 @@ function calculerPointsATravailler(r: ReponsesDiagnostic, sante: string[]): stri
   return points.slice(0, 4);
 }
 
+// Miroir exact de calculerPointsATravailler (mêmes conditions, même ordre)
+// pour que les deux listes restent alignées point par point dans le bloc
+// "Aujourd'hui → Avec COAI" (demande d'Anthony du 14/08/2026 : montrer
+// clairement où la personne en est et où COAI peut l'emmener). Chaque
+// résolution reste ancrée dans ce que COAI fait réellement (programme
+// validé par un coach, moteur d'adaptation) — jamais un chiffre ou un délai
+// inventé, cf. RESULTATS_TIMELINE pour la seule promesse de délai, déjà
+// volontairement générique.
+function calculerPointsResolus(r: ReponsesDiagnostic, sante: string[]): string[] {
+  const points: string[] = [];
+  if (sante.length > 0) {
+    points.push("Un programme qui respecte cette contrainte, contrôlé par un vrai coach avant d'être appliqué.");
+  }
+  if ((r.persona ?? []).some((p) => STRUCTURE_PERSONAS.includes(p))) {
+    points.push("Un plan structuré, séance par séance, adapté à ton niveau et à ton matériel.");
+  }
+  if (r.habitudesAlimentaires && NUTRITION_A_AMELIORER.includes(r.habitudesAlimentaires)) {
+    points.push("Des repères nutrition clairs, alignés avec ton objectif.");
+  }
+  if (r.qualiteSommeil && SOMMEIL_A_AMELIORER.includes(r.qualiteSommeil)) {
+    points.push("Un accompagnement qui tient compte de ta récupération, pas seulement de l'entraînement.");
+  }
+  if (r.objectif) {
+    points.push(`Un programme construit précisément pour "${r.objectif.toLowerCase()}", qui s'ajuste à chaque étape.`);
+  }
+  return points.slice(0, 4);
+}
+
 export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | null {
   const { niveau, objectif, equipement = [], frequence, persona = [], sante: santeBrute = [] } = r;
   if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
@@ -237,6 +266,7 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
     accroche: accrochePour(persona),
     alerte: sante.length > 0 ? `Signalé : ${sante.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.` : null,
     pointsATravailler: calculerPointsATravailler(r, sante),
+    pointsResolus: calculerPointsResolus(r, sante),
     split: SPLIT_PAR_FREQUENCE[frequence] ?? null,
     exercices: exemples.map((nom) => `${nom} — ${series}`),
     nutrition: r.habitudesAlimentaires ? NUTRITION_TIPS[r.habitudesAlimentaires] ?? null : null,
@@ -268,7 +298,10 @@ export function miniDiagnosticEnTexte(
   ];
   if (d.alerte) lignes.push("", d.alerte);
   if (d.pointsATravailler.length > 0) {
-    lignes.push("", "CE QUI FREINE TA PROGRESSION AUJOURD'HUI", ...d.pointsATravailler.map((p) => `- ${p}`));
+    lignes.push("", "AUJOURD'HUI", ...d.pointsATravailler.map((p) => `- ${p}`));
+  }
+  if (d.pointsResolus.length > 0) {
+    lignes.push("", "AVEC COAI", ...d.pointsResolus.map((p) => `- ${p}`));
   }
   lignes.push(
     "",
