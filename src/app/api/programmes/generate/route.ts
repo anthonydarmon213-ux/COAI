@@ -5,7 +5,7 @@ import { prochaineVersion } from "@/lib/programmes/version";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
 import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
-import { canGenerateProgramme, getEffectivePlan } from "@/lib/subscription/plan";
+import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import type { Pilier } from "@prisma/client";
 
@@ -34,14 +34,13 @@ export async function POST() {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  // Génération bloquée en l'absence d'abonnement Stripe actif — sans ce
-  // garde-fou, quelqu'un qui n'a jamais payé (checkout Stripe abandonné,
-  // abonnement résilié/incomplet) était traité comme le palier Gratuit par
-  // défaut ailleurs dans le code et pouvait générer un programme complet
-  // sans jamais avoir de CB enregistrée.
-  if (!canGenerateProgramme(user.subscription)) {
+  // Génération bloquée tant que rien n'est débloqué (13/08/2026, nouveau
+  // modèle d'accès libre) : soit un achat Impulsion unique (19€), soit un
+  // abonnement Transformation actif (49€/mois, qui inclut la génération).
+  // L'inscription elle-même est gratuite et ne suffit plus.
+  if (!hasProgrammeAccess(user, user.subscription)) {
     return NextResponse.json(
-      { error: "Un abonnement actif (Impulsion ou Transformation) est nécessaire pour générer ton programme." },
+      { error: "Débloque la génération de ton programme (Impulsion, 19€) ou passe à Transformation pour générer ton programme." },
       { status: 403 }
     );
   }

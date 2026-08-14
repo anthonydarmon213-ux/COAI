@@ -4,6 +4,106 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Nouveau modèle d'accès libre — inscription gratuite, 4 offres indépendantes (13/08/2026)
+
+Changement de stratégie décidé par Anthony : l'inscription ne déclenche plus
+aucun paiement. Un compte se crée gratuitement, sans carte bancaire, et donne
+accès à toute l'interface (dashboard, pages de programme, suivi) — chaque
+section verrouillée affiche un aperçu explicatif et le bon bouton de
+déblocage au lieu d'un simple blocage. Remplace l'ancien modèle où
+`/sign-up` redirigeait systématiquement vers Stripe Checkout.
+
+Quatre offres indépendantes, déclenchables séparément depuis n'importe où
+dans l'interface (dashboard, page de pilier, `/pricing`) :
+
+- **Impulsion — 19€, paiement unique** (avant : 19€/mois avec essai 7 jours).
+  Change de nature : ce n'est plus un abonnement Stripe mais un `mode:
+  "payment"` classique (même pattern que les packs VIP), tracé sur
+  `User.programmeUnlockedAt` plutôt que sur le modèle `Subscription`
+  (pensé pour un cycle récurrent, pas adapté à un achat unique). Nouvelle
+  route `POST /api/stripe/checkout-programme` + nouveau cas dans le webhook
+  (`session.mode === "payment" && metadata.oneShotProgramme`).
+- **Transformation — 49€/mois, abonnement récurrent** (inchangé côté
+  Stripe/essai 7 jours) : programme évolutif, coach IA illimité, et une
+  visio incluse sur demande (déjà construites par une session précédente,
+  simplement rebranchées à ce nouveau parcours). Contenu confirmé par
+  Anthony : programme évolutif + coach IA illimité + coaching visio sur
+  demande — implémenté en V1 comme un simple bouton "Demander une visio"
+  qui notifie Anthony (pas de système de réservation/calendrier, décision
+  explicite d'Anthony pour rester simple à ce stade).
+- **VIP** : inchangé (séances à l'unité/pack, déjà fonctionnel).
+- **Entreprise** : redevient une 4e colonne à côté de VIP sur `/pricing`
+  (elle avait été sortie en bandeau séparé lors de la correction responsive
+  du 11/08) — sur devis, toujours hors Stripe.
+
+**Nouvelle fonction d'accès** (`src/lib/subscription/plan.ts`) :
+`hasProgrammeAccess(user, subscription)` — vrai si `programmeUnlockedAt` est
+renseigné OU si un abonnement Transformation est actif (qui inclut déjà la
+génération). `hasSuiviAccess(subscription)` — vrai uniquement pour
+Transformation actif (adaptation continue, coach IA illimité, visio).
+`canGenerateProgramme` (ancienne fonction) conservée telle quelle pour ne
+rien casser ailleurs, mais plus utilisée sur le nouveau chemin.
+
+**Consentement légal déplacé** — jusqu'ici recueilli une seule fois à
+l'inscription (en même temps que le paiement). Comme l'inscription ne paie
+plus rien, ce serait devenu un consentement sans objet réel à ce moment-là.
+Nouveau composant `OffreConsentGate`
+(`src/components/compte/offre-consent-gate.tsx`) : case à cocher avec le
+texte exact de l'offre concernée (paiement unique + renonciation au droit de
+rétractation pour Impulsion ; essai 7 jours + facturation automatique pour
+Transformation), affichée juste avant le bouton d'achat réel, où qu'il
+apparaisse (dashboard, page de pilier, `/pricing`, écran post-inscription).
+RGPD et aptitude sportive restent recueillis à l'inscription (ils concernent
+l'usage de l'app en général, pas un paiement précis).
+
+**Décalage webhook Stripe absorbé différemment** — `ActivationFlow`
+(`/bienvenue`) ne se base plus sur un accès pré-calculé au chargement de la
+page pour décider d'appeler la génération : elle tente directement
+`/api/programmes/generate` (qui revérifie l'accès en base à chaque appel),
+avec les 3 tentatives espacées déjà existantes pour laisser le temps au
+webhook Stripe d'arriver. Si toutes les tentatives renvoient 403 (vraiment
+rien débloqué), écran d'achat ; si ça échoue autrement, écran d'erreur
+générique. Évite qu'un achat qui vient de réussir affiche par erreur l'écran
+de déblocage à cause d'un webhook simplement pas encore arrivé.
+
+**`/bienvenue` sert désormais deux moments distincts** — juste après une
+inscription libre (aucun paramètre `plan`/`unlock` dans l'URL, accueil neutre
+sans les événements de conversion Meta/GA4) et juste après un vrai achat
+(paramètres posés uniquement par les routes Stripe elles-mêmes dans leur
+`success_url`, jamais déduits d'une intention côté client) — seul ce second
+cas garde la carte d'embarquement et déclenche `StartTrial`/`Subscribe`.
+
+**Migration** : `20260814000000_add_programme_one_shot_unlock` — additive,
+`ADD COLUMN "programmeUnlockedAt" TIMESTAMP(3)` sur `users`. Nouvelle
+variable d'environnement à renseigner sur Vercel avant déploiement :
+`STRIPE_PRICE_ID_PROGRAMME_ONE_SHOT` (price Stripe en mode paiement unique,
+19€ — à créer sur le dashboard Stripe, cf. `.env.example`).
+
+**Vérifié** : `npx tsc --noEmit` et `next build` réels, propres. Playwright
+réel (mobile 390px, desktop 1440px) sur `/pricing` : 4 colonnes sans
+débordement horizontal, case de consentement qui révèle le bon bouton
+d'achat une fois cochée, clic sur le bouton Impulsion en visiteur non
+connecté qui redirige bien vers `/sign-up` (jamais de paiement sans
+compte). `/sign-up` vérifié sans aucune trace de texte d'engagement de
+paiement, formulaire simplifié (prénom/email/mdp + RGPD + aptitude
+sportive uniquement).
+
+**Non testable depuis ce sandbox** (mêmes limites que d'habitude : pas
+d'accès à Supabase/Stripe en conditions réelles) : le parcours complet
+authentifié (inscription → dashboard verrouillé → clic déblocage → vrai
+paiement Stripe → webhook → programme généré) n'a pas pu être exécuté de
+bout en bout avec un vrai compte. À tester par Anthony après déploiement,
+dans l'ordre : créer un compte, vérifier qu'aucun paiement n'est demandé et
+que le dashboard affiche l'écran "programme pas encore débloqué", débloquer
+Impulsion (19€) et vérifier la génération, puis tester Transformation
+(abonnement + bouton "Demander une visio") séparément.
+
+**Explicitement pas fait** : bibliothèque vidéo d'exercices (dataset externe
+identifié — GIFs en français, licence à vérifier avant intégration — mais
+pas branché), corrections HeyGen/Meta Ads (hors périmètre code), coquille
+"texnika" mentionnée par Anthony — introuvable dans le dépôt à ce jour, sa
+localisation exacte reste à préciser.
+
 ## Homepage — essai 7 jours et vidéo d'introduction (12/08/2026)
 
 L'essai de 7 jours est désormais visible dans le hero avant le titre, dans le

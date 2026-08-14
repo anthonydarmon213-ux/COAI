@@ -284,9 +284,9 @@ const FORMULES = [
   {
     plan: "GRATUIT" as const,
     nom: "Impulsion",
-    prix: "19€/mois",
-    prixAnnuel: "190€/an",
-    accroche: "Coaching 100% IA pour démarrer sans attendre.",
+    prix: "19€ · paiement unique",
+    prixAnnuel: null,
+    accroche: "Inscription gratuite, puis génère ton programme en un seul paiement.",
     bullets: [
       "Programme généré par IA (entraînement, nutrition, récupération)",
       "Suivi séances, mesures, progression",
@@ -1367,11 +1367,13 @@ export function DiagnosticQuiz({
                                 </Button>
                               </Link>
                               <span className="text-center text-xs font-medium text-laiton-300">
-                                7 jours offerts · puis {facturationAnnuelle && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}
+                                {formule.plan === "GRATUIT"
+                                  ? "Inscription gratuite · 19€ pour générer ton programme"
+                                  : `7 jours offerts · puis ${facturationAnnuelle && formule.prixAnnuel ? formule.prixAnnuel : formule.prix}`}
                               </span>
-                              {facturationAnnuelle && formule.prixAnnuel && (
+                              {formule.plan !== "GRATUIT" && facturationAnnuelle && formule.prixAnnuel && (
                                 <span className="text-center text-[11px] font-medium text-emerald-300">
-                                  Économie de {formule.plan === "GRATUIT" ? "38 €" : "98 €"} sur l&apos;année
+                                  Économie de 98 € sur l&apos;année
                                 </span>
                               )}
                             </div>

@@ -14,7 +14,8 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { canGenerateProgramme, getEffectivePlan } from "@/lib/subscription/plan";
+import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
+import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import type { Pilier } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -65,7 +66,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
   const genereIA = dernier && dernier.statut === "GENERE_IA";
   const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
   const plan = getEffectivePlan(user.subscription);
-  const peutGenerer = canGenerateProgramme(user.subscription);
+  const peutGenerer = hasProgrammeAccess(user, user.subscription);
 
   return (
     <div className="flex flex-col gap-10">
@@ -173,13 +174,18 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
             if (!contenu) {
               if (!peutGenerer) {
                 return (
-                  <p className="text-sm text-graphite-400">
-                    Un abonnement actif est nécessaire pour générer ton programme.{" "}
-                    <Link href="/pricing" className="text-laiton-400 underline">
-                      Voir les formules
-                    </Link>
-                    .
-                  </p>
+                  <div className="flex flex-col items-start gap-4">
+                    <p className="text-sm text-graphite-400">
+                      Génère ton programme personnalisé — entraînement, nutrition et récupération —
+                      pour 19€, en un seul paiement. Ou passe à Transformation (49€/mois) pour un
+                      suivi continu avec un coach diplômé d&apos;État.{" "}
+                      <Link href="/pricing" className="text-laiton-400 underline">
+                        Voir les formules
+                      </Link>
+                      .
+                    </p>
+                    <OneShotProgrammeButton className="max-w-xs" />
+                  </div>
                 );
               }
               return <p className="text-sm text-graphite-400">Pas encore généré.</p>;

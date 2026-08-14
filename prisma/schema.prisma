@@ -86,6 +86,16 @@ model User {
   checkoutBillingInterval BillingInterval?
   checkoutReminderSentAt  DateTime?
 
+  // Nouveau modèle d'accès libre (13/08/2026) : l'inscription ne déclenche
+  // plus aucun paiement — le compte est gratuit, l'interface visible en
+  // entier, et chaque action à forte valeur se débloque indépendamment.
+  // Génération de programme (offre Impulsion) : paiement Stripe unique de
+  // 19€ (mode "payment", pas un abonnement) — horodaté ici plutôt que
+  // modélisé via Subscription, qui suppose un cycle de facturation
+  // récurrent. Transformation (abonnement 49€/mois) inclut déjà la
+  // génération et reste gérée par le modèle Subscription existant.
+  programmeUnlockedAt DateTime?
+
   subscription   Subscription?
   profile        Profile?
   programmes     ProgrammeGenerated[]

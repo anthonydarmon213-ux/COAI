@@ -3,18 +3,21 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { SectionLabel } from "@/components/ui/section-label";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
+import { hasSuiviAccess } from "@/lib/subscription/plan";
 
 // Écran d'accueil post-paiement (10/08/2026) : repensé façon "salon
-// d'embarquement" plutôt qu'un simple accusé de réception transactionnel —
-// demande explicite d'Anthony d'un moment mémorable ("effet waouh") juste
-// après le paiement, pas seulement un écran de confirmation.
+// d'embarquement" plutôt qu'un simple accusé de réception transactionnel.
 //
-// GRATUIT_SANS_ESSAI retiré (11/08/2026, correction Anthony) : Impulsion
-// n'offre plus de choix essai/paiement immédiat à l'inscription (cf.
-// sign-up/page.tsx) — cette branche ne peut plus être atteinte. GRATUIT
-// couvre maintenant le seul parcours Impulsion, avec un accès immédiat
-// pendant l'essai (ActivationFlow s'occupe de la génération, plus besoin
-// de l'annoncer ici de façon statique).
+// Nouveau modèle d'accès libre (13/08/2026) : cette page sert désormais deux
+// moments différents. (1) Juste après une inscription gratuite — aucun
+// paiement n'a eu lieu, la carte d'embarquement façon "confirmation d'achat"
+// n'a plus lieu d'être, remplacée par un accueil neutre qui explique que
+// tout est visible librement. (2) Juste après un vrai achat (Impulsion
+// one-shot ou abonnement Transformation, cf. success_url des deux routes
+// Stripe) — la carte d'embarquement reste affichée, avec les événements de
+// conversion. On distingue les deux à partir des paramètres d'URL posés par
+// les routes de paiement elles-mêmes (jamais par une simple intention côté
+// client) : ?plan=... (Transformation) ou ?unlock=programme (Impulsion).
 const CONTENU_PAR_PLAN: Record<
   "GRATUIT" | "STANDARD",
   {
@@ -25,11 +28,11 @@ const CONTENU_PAR_PLAN: Record<
 > = {
   GRATUIT: {
     formule: "Impulsion",
-    sousTitre: "7 jours offerts, puis 19€/mois. Ton programme est prêt dès maintenant.",
+    sousTitre: "Paiement unique de 19€. Ton programme est prêt dès maintenant.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
       { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
-      { titre: "Tu t'entraînes", texte: "Ton programme est prêt dès aujourd'hui, essai ou pas." },
+      { titre: "Tu t'entraînes", texte: "Ton programme est prêt dès aujourd'hui." },
       { titre: "On veille sur toi", texte: "Une relance automatique si on ne te voit plus — jamais vraiment seul." },
     ],
   },
@@ -48,28 +51,57 @@ const CONTENU_PAR_PLAN: Record<
 export default async function BienvenuePage({
   searchParams,
 }: {
-  searchParams: { plan?: string; essai?: string };
+  searchParams: { plan?: string; essai?: string; unlock?: string };
 }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const plan: "GRATUIT" | "STANDARD" = searchParams.plan !== "GRATUIT" ? "STANDARD" : "GRATUIT";
-  const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
+  const coachValidationRequise = hasSuiviAccess(user.subscription);
+
+  // Un vrai paiement vient de se terminer seulement si l'un de ces
+  // paramètres, posés uniquement par les routes Stripe elles-mêmes
+  // (success_url), est présent — jamais déduit d'une simple intention.
+  const achatConfirme = Boolean(searchParams.plan) || searchParams.unlock === "programme";
+
   const prenom = user.prenom ?? "";
+
+  if (!achatConfirme) {
+    return (
+      <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 py-10 text-center sm:py-16">
+        <div className="flex flex-col items-center gap-3">
+          <SectionLabel>Compte créé</SectionLabel>
+          <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
+            Bienvenue{prenom ? `, ${prenom}` : ""}.
+          </h1>
+          <p className="max-w-md text-sm leading-6 text-graphite-400">
+            Ton compte est gratuit — explore l&apos;interface, découvre les fonctionnalités. Tu
+            choisis ce que tu débloques, quand tu veux.
+          </p>
+        </div>
+
+        <ActivationFlow
+          coachValidationRequise={coachValidationRequise}
+          profilInitial={user.profile ?? null}
+        />
+
+        <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
+          Retour au tableau de bord
+        </Link>
+      </div>
+    );
+  }
+
+  const plan: "GRATUIT" | "STANDARD" = searchParams.plan === "STANDARD" ? "STANDARD" : "GRATUIT";
+  const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
-  // Événement Meta (11/08/2026) : StartTrial si les 7 jours offerts sont en
-  // cours (carte enregistrée, pas encore prélevée), Subscribe si le premier
-  // prélèvement a déjà eu lieu ("démarrer tout de suite", cf. sign-up).
-  // Valeur = prix mensuel réel de l'offre choisie, pour que l'algorithme Meta
-  // puisse optimiser vers les conversions les plus rentables, pas juste les
-  // plus nombreuses.
-  // PREMIUM (ancienne offre 199€, plus vendue) ne passe jamais par un essai
-  // Stripe (cf. /api/stripe/checkout) — toujours "Subscribe", jamais
-  // "StartTrial", même sans le paramètre essai=0 dans l'URL.
-  const enEssai = searchParams.plan !== "PREMIUM" && searchParams.essai !== "0";
-  const valeurMensuelle =
-    searchParams.plan === "GRATUIT" ? 19 : searchParams.plan === "PREMIUM" ? 199 : 49;
+  // Événement Meta : StartTrial si les 7 jours offerts de Transformation
+  // sont en cours (carte enregistrée, pas encore prélevée), Subscribe sinon
+  // (Impulsion one-shot : paiement immédiat, jamais d'essai). Valeur = prix
+  // réel de l'offre choisie, pour que l'algorithme Meta puisse optimiser
+  // vers les conversions les plus rentables, pas juste les plus nombreuses.
+  const enEssai = plan === "STANDARD" && searchParams.essai !== "0";
+  const valeurMensuelle = plan === "STANDARD" ? 49 : 19;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
@@ -158,7 +190,10 @@ export default async function BienvenuePage({
         ))}
       </div>
 
-      <ActivationFlow plan={plan} profilInitial={user.profile ?? null} />
+      <ActivationFlow
+        coachValidationRequise={coachValidationRequise}
+        profilInitial={user.profile ?? null}
+      />
 
       <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
         Retour au tableau de bord

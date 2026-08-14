@@ -176,6 +176,19 @@ export async function POST(request: Request) {
           `${email} vient d'acheter ${session.metadata.vipPackLabel ?? `le pack ${session.metadata.vipPack}`}. Contacte cette personne pour planifier les 4 séances.`
         );
       }
+      // Déblocage Impulsion (13/08/2026) : paiement unique, pas
+      // d'abonnement Stripe créé — géré à part de upsertFromSubscription
+      // (qui suppose toujours session.subscription).
+      if (userId && session.mode === "payment" && session.metadata?.oneShotProgramme === "IMPULSION") {
+        const user = await prisma.user.update({
+          where: { id: userId },
+          data: { programmeUnlockedAt: new Date() },
+        });
+        await sendAdminNotification(
+          "Programme Impulsion débloqué",
+          `${user.prenom ? user.prenom : "Un utilisateur"} (${user.email}) vient de débloquer la génération de son programme (19€, paiement unique).`
+        );
+      }
       if (userId && session.subscription) {
         const subscriptionId =
           typeof session.subscription === "string" ? session.subscription : session.subscription.id;

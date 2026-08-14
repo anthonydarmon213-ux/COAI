@@ -9,6 +9,8 @@ import { readDiagnosticProgress } from "@/lib/diagnostic/progress-storage";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { computeProfilCompletion, type CompletionProfil } from "@/lib/profil/completion";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
+import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
+import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 
 // Rendu sur /bienvenue, juste après l'activation Stripe (essai ou paiement
 // immédiat).
@@ -31,6 +33,7 @@ type Etat =
   | "sans_diagnostic"
   | "reprise_possible"
   | "completion"
+  | "debloquer"
   | "generation"
   | "pret"
   | "erreur";
@@ -41,11 +44,20 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Nouveau modèle d'accès libre (13/08/2026) : l'inscription est gratuite,
+// donc un profil essentiel complet ne suffit plus à déclencher la
+// génération automatiquement — il faut aussi avoir débloqué Impulsion ou
+// Transformation. La tentative de génération se base sur le vrai statut
+// HTTP de /api/programmes/generate (qui revérifie l'accès en base à chaque
+// appel) plutôt que sur un accès pré-calculé au chargement de la page : ça
+// absorbe naturellement le décalage du webhook Stripe juste après un achat
+// (quelques tentatives espacées, cf. RETRIES_GENERATION) sans jamais
+// afficher à tort l'écran de déblocage à quelqu'un qui vient de payer.
 export function ActivationFlow({
-  plan,
+  coachValidationRequise,
   profilInitial,
 }: {
-  plan: "GRATUIT" | "STANDARD";
+  coachValidationRequise: boolean;
   profilInitial: ProfilLike | null;
 }) {
   const [etat, setEtat] = useState<Etat>("verification");
@@ -56,21 +68,27 @@ export function ActivationFlow({
 
     async function lancerGeneration() {
       setEtat("generation");
-      // Best-effort contre le décalage webhook Stripe : l'abonnement peut ne
-      // pas être encore visible en base au moment exact où cette page se
-      // charge (redirection Stripe quasi instantanée, webhook parfois
-      // quelques secondes derrière) — quelques tentatives espacées avant
-      // d'abandonner, plutôt qu'un échec immédiat.
-      let ok = false;
-      for (let tentative = 0; tentative < RETRIES_GENERATION && !ok; tentative++) {
+      // Best-effort contre le décalage webhook Stripe : l'abonnement/achat
+      // peut ne pas être encore visible en base au moment exact où cette
+      // page se charge (redirection Stripe quasi instantanée, webhook
+      // parfois quelques secondes derrière) — quelques tentatives espacées
+      // avant d'abandonner, plutôt qu'un échec immédiat.
+      let dernierStatut = 0;
+      for (let tentative = 0; tentative < RETRIES_GENERATION && dernierStatut !== 201; tentative++) {
         if (tentative > 0) await sleep(DELAI_RETRY_MS);
         const res = await fetch("/api/programmes/generate", { method: "POST" });
-        ok = res.ok;
+        dernierStatut = res.status;
       }
       if (annule) return;
-      if (!ok) throw new Error("generation");
-      trackFunnelEvent("first_programme_viewed");
-      setEtat("pret");
+      if (dernierStatut === 201) {
+        trackFunnelEvent("first_programme_viewed");
+        setEtat("pret");
+        return;
+      }
+      // 403 = rien débloqué (jamais payé, ou webhook toujours pas arrivé
+      // après toutes les tentatives) — écran d'achat plutôt qu'une erreur
+      // technique opaque.
+      setEtat(dernierStatut === 403 ? "debloquer" : "erreur");
     }
 
     (async () => {
@@ -138,6 +156,36 @@ export function ActivationFlow({
     );
   }
 
+  if (etat === "debloquer") {
+    return (
+      <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
+        <SectionLabel>Ton profil est prêt</SectionLabel>
+        <p className="max-w-sm text-sm leading-6 text-graphite-300">
+          Génère ton programme personnalisé — entraînement, nutrition, récupération — pour 19€, en
+          un seul paiement. Ou passe à Transformation (49€/mois) pour un suivi continu avec un
+          coach diplômé d&apos;État.
+        </p>
+        <div className="w-full max-w-xs">
+          <OffreConsentGate
+            resumeConditions={
+              <>
+                Je reconnais avoir pris connaissance des conditions de l&apos;offre Impulsion :
+                paiement unique de 19€, programme généré immédiatement. Je demande le début
+                immédiat du service et reconnais renoncer à mon droit de rétractation de 14 jours
+                pour la partie du service déjà utilisée.
+              </>
+            }
+          >
+            <OneShotProgrammeButton />
+          </OffreConsentGate>
+        </div>
+        <Link href="/pricing" className="text-xs text-graphite-500 underline hover:text-laiton-400">
+          Voir toutes les formules
+        </Link>
+      </div>
+    );
+  }
+
   if (etat === "generation") {
     return (
       <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-9 text-center">
@@ -178,7 +226,7 @@ export function ActivationFlow({
     // coach (statut EN_ATTENTE existant, cf. StatutProgramme) — jamais
     // présentée comme définitive avant sa validation. Impulsion : 100% IA,
     // disponible immédiatement, rien à valider.
-    if (plan === "STANDARD") {
+    if (coachValidationRequise) {
       return (
         <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
           <SectionLabel>À valider par ton coach</SectionLabel>

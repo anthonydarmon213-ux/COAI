@@ -43,6 +43,28 @@ export function canGenerateProgramme(subscription?: Subscription | null): boolea
   return ACTIVE_STATUSES.has(subscription.status);
 }
 
+// Nouveau modèle d'accès libre (13/08/2026) : l'inscription est gratuite,
+// l'interface est visible en entier, et chaque offre se débloque
+// indépendamment plutôt que via un unique abonnement obligatoire dès le
+// départ. La génération de programme se débloque de deux façons : un achat
+// unique Impulsion (19€, hors abonnement, cf. programmeUnlockedAt) ou un
+// abonnement Transformation actif (49€/mois, qui inclut déjà la génération
+// en plus du suivi et du coach humain).
+export function hasProgrammeAccess(
+  user: { programmeUnlockedAt: Date | null },
+  subscription?: Subscription | null
+): boolean {
+  if (user.programmeUnlockedAt) return true;
+  return Boolean(subscription && subscription.plan === "STANDARD" && ACTIVE_STATUSES.has(subscription.status));
+}
+
+// Suivi (adaptation continue, timeline, coach IA illimité, visio incluse) —
+// exclusivement Transformation. Un achat Impulsion seul (programme généré
+// une fois) ne débloque jamais cette partie.
+export function hasSuiviAccess(subscription?: Subscription | null): boolean {
+  return Boolean(subscription && subscription.plan === "STANDARD" && ACTIVE_STATUSES.has(subscription.status));
+}
+
 // Noms marketing (08/08/2026) : GRATUIT = "Impulsion", STANDARD = "Transformation"
 // — à ne pas confondre avec l'enum PREMIUM (199€, ancienne offre, "VIP" à la
 // séance depuis ce renommage), qui n'est plus vendu comme abonnement — ce

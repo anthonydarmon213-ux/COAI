@@ -8,7 +8,8 @@ import { CoaiInsightCard } from "@/components/dashboard/coai-insight-card";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
-import { canGenerateProgramme } from "@/lib/subscription/plan";
+import { hasProgrammeAccess } from "@/lib/subscription/plan";
+import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 
 function today() {
@@ -58,7 +59,23 @@ export default async function DashboardPage() {
           <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
         </section>
       ) : !programme ? (
-        canGenerateProgramme(user.subscription) ? (
+        !hasProgrammeAccess(user, user.subscription) ? (
+          <section className="flex flex-col items-start gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme pas encore débloqué</p>
+              <h2 className="mt-2 text-2xl text-white">Ton profil est prêt — génère ton programme quand tu veux.</h2>
+              <p className="mt-2 max-w-lg text-sm leading-6 text-graphite-300">
+                19€ en un seul paiement pour générer ton programme complet (entraînement, nutrition,
+                récupération). Ou passe à Transformation (49€/mois) pour un suivi continu avec un
+                coach diplômé d&apos;État.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <OneShotProgrammeButton />
+              <Link href="/pricing" className="text-sm text-graphite-300 underline hover:text-white">Voir toutes les formules</Link>
+            </div>
+          </section>
+        ) : (
           <section className="flex flex-col gap-4">
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-6 text-center">
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme à préparer</p>
@@ -66,13 +83,6 @@ export default async function DashboardPage() {
               <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-graphite-300">Pendant la génération, COAI affiche un état explicite puis revient vers ton programme — aucun chargement ne tourne indéfiniment.</p>
             </div>
             <GenererProgrammeOnboarding />
-          </section>
-        ) : (
-          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-6">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Aucun programme</p>
-            <h2 className="mt-2 text-2xl text-white">Commençons par ton diagnostic.</h2>
-            <p className="mt-2 text-sm leading-6 text-graphite-300">Il permet à COAI de comprendre ton objectif, ton niveau et le temps dont tu disposes.</p>
-            <Link href="/diagnostic" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Faire mon diagnostic</Link>
           </section>
         )
       ) : sourceSession ? (

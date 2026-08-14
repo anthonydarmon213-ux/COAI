@@ -9,12 +9,13 @@ import { BackLink } from "@/components/marketing/back-link";
 import { TrustBadges } from "@/components/marketing/trust-badges";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { PlanSelectedLink } from "@/components/marketing/plan-selected-link";
 import { VipCheckoutButton } from "@/components/marketing/vip-checkout-button";
+import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
+import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
-  "Choisis le coaching qui te correspond : Impulsion (7 jours offerts), Transformation (programme IA validé par un coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
+  "Inscription gratuite, interface visible en entier. Débloque Impulsion (19€, paiement unique), Transformation (49€/mois, suivi coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,6 +38,10 @@ type Tier = {
   features: string[];
   plan?: "STANDARD" | "PREMIUM";
   mostPopular?: boolean;
+  // Impulsion (13/08/2026, nouveau modèle d'accès libre) : paiement unique,
+  // ne participe plus au bascule mensuel/annuel ni au flux d'abonnement
+  // classique — cf. rendu du CTA plus bas.
+  oneShot?: boolean;
   // Palier VIP : packs payés une fois plutôt qu'un abonnement mensuel.
   sessions?: { label: string; prix: string; pack?: "VISIO" | "PRESENTIEL" }[];
   limitedSpots?: boolean;
@@ -69,13 +74,13 @@ const TIERS: Tier[] = [
   {
     nom: "Impulsion",
     prix: "19€",
-    suffixe: "/mois",
-    essai: "7 jours offerts · puis 19€/mois",
-    // Correction Anthony (11/08/2026) : un seul parcours, accès immédiat
-    // pendant l'essai — plus de choix essai/paiement immédiat qui cassait
-    // la dynamique du diagnostic pour un trafic froid (pub TikTok/Instagram).
+    suffixe: "paiement unique",
+    oneShot: true,
+    // Nouveau modèle d'accès libre (13/08/2026) : l'inscription est
+    // gratuite et donne accès à toute l'interface — Impulsion débloque
+    // uniquement la génération du programme, en une fois, sans abonnement.
     description:
-      "Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement pendant 7 jours, puis 19€/mois. Résiliable avant la fin de l'essai.",
+      "Crée ton compte gratuitement, explore l'interface, puis génère ton programme personnalisé en un seul paiement de 19€ — sans abonnement.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
@@ -133,10 +138,8 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
   // trésorerie, sans retirer le mensuel (accessible en un clic).
   const annual = searchParams?.billing !== "monthly";
   const displayedTiers = TIERS.map((tier) => {
-    if (!annual || tier.sessions) return tier;
-    if (tier.nom === "Impulsion") {
-      return { ...tier, prix: "190€", suffixe: "/an", essai: "7 jours offerts · puis 190€/an", description: "Ton programme COAI est disponible immédiatement. Profite de COAI gratuitement pendant 7 jours, puis 190€/an — environ 2 mois offerts." };
-    }
+    // Impulsion (paiement unique) ne dépend jamais du bascule mensuel/annuel.
+    if (!annual || tier.sessions || tier.oneShot) return tier;
     if (tier.nom === "Transformation") {
       return { ...tier, prix: "490€", suffixe: "/an", essai: "7 jours offerts · puis 490€/an" };
     }
@@ -155,7 +158,8 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
           Choisis le coaching qui te correspond.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-graphite-400">
-          Commence simplement avec COAI. Tu pourras faire ton diagnostic personnalisé ensuite.
+          Crée ton compte gratuitement et explore toute l&apos;interface. Tu choisis ensuite ce que
+          tu débloques.
         </p>
         <div className="mt-6 flex justify-center">
           <TrustBadges />
@@ -173,11 +177,10 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
         </Card>
       )}
 
-      {/* Comparateur à 3 colonnes propres (Phase 5.1, correction responsive
-          11/08/2026) — Entreprise sorti de ce grid (structurellement
-          différent : devis, pas d'abonnement) et affiché en bandeau à part
-          plus bas, plutôt que compressé en 4e colonne. */}
-      <div className="grid w-full max-w-4xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Comparateur à 4 colonnes (13/08/2026, nouveau modèle d'accès libre)
+          — Entreprise réintégrée au grid, à côté de VIP, pour plus de
+          visibilité (elle était auparavant sortie en bandeau à part). */}
+      <div className="grid w-full max-w-6xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {displayedTiers.map((tier) => (
           <Card
             id={tier.sessions ? "vip" : undefined}
@@ -208,14 +211,14 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
                   <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
                   <span className="text-sm text-graphite-400">{tier.suffixe}</span>
                 </div>
-                {annual && (
+                {!tier.oneShot && annual && (
                   <p className="mt-2 text-xs font-medium text-emerald-300">
-                    Économie de {tier.nom === "Impulsion" ? "38 €" : "98 €"} par an
+                    Économie de 98 € par an
                   </p>
                 )}
-                {!annual && (
+                {!tier.oneShot && !annual && (
                   <Link href="/pricing?billing=annual" className="mt-2 block text-xs font-medium text-laiton-300 hover:text-laiton-200">
-                    ou {tier.nom === "Impulsion" ? "190€/an" : "490€/an"} · 2 mois offerts
+                    ou 490€/an · 2 mois offerts
                   </Link>
                 )}
               </div>
@@ -268,15 +271,76 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
                     Contacte ton coach pour réserver
                   </Button>
                 )
+              ) : tier.oneShot ? (
+                <OffreConsentGate
+                  resumeConditions={
+                    <>
+                      Je reconnais avoir pris connaissance des conditions de l&apos;offre
+                      Impulsion : paiement unique de 19€, programme généré immédiatement. Je
+                      demande le début immédiat du service et reconnais renoncer à mon droit de
+                      rétractation de 14 jours pour la partie du service déjà utilisée.
+                    </>
+                  }
+                >
+                  <OneShotProgrammeButton label="Générer mon programme — 19€" />
+                </OffreConsentGate>
               ) : tier.plan ? (
-                <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer gratuitement" className="w-full" />
-              ) : (
-                <PlanSelectedLink href={`/sign-up?billing=${annual ? "ANNUAL" : "MONTHLY"}`} plan="GRATUIT" billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer gratuitement" className="w-full" />
-              )}
+                <OffreConsentGate
+                  resumeConditions={
+                    <>
+                      Je reconnais avoir pris connaissance des conditions de l&apos;offre
+                      Transformation : 7 jours d&apos;accès gratuit à compter de ce jour, puis
+                      passage automatique à un abonnement de {annual ? "490€/an" : "49€/mois"},
+                      sauf résiliation avant la fin des 7 jours. Je demande le début immédiat du
+                      service et reconnais renoncer à mon droit de rétractation de 14 jours pour
+                      la partie du service déjà utilisée durant la période offerte.
+                    </>
+                  }
+                >
+                  <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer mes 7 jours offerts" className="w-full" />
+                </OffreConsentGate>
+              ) : null}
               {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
             </div>
           </Card>
         ))}
+
+        {/* Entreprise : structurellement différent (devis, pas d'abonnement)
+            — réintégré au grid (13/08/2026), juste à côté de VIP plutôt
+            qu'en bandeau séparé moins visible. */}
+        <Card className="flex h-full flex-col gap-5 px-6 py-8 text-center">
+          <div className="flex min-h-5 items-center justify-center" />
+          <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{ENTREPRISE.nom}</h2>
+          <p className="text-sm text-graphite-300">{ENTREPRISE.description}</p>
+          <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
+            {ENTREPRISE.features.map((feature) => (
+              <li key={feature} className="flex items-start gap-2">
+                <span className="mt-0.5 text-laiton-400">✓</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="flex-1" />
+          <div className="flex flex-col items-center gap-2">
+            {ENTREPRISE.whatsappHref ? (
+              <a href={ENTREPRISE.whatsappHref} target="_blank" rel="noopener noreferrer" className="w-full">
+                <Button className="w-full">Demander un devis via WhatsApp</Button>
+              </a>
+            ) : (
+              <a href={ENTREPRISE.mailHref} className="w-full">
+                <Button className="w-full">Demander un devis par mail</Button>
+              </a>
+            )}
+            <a
+              href={ENTREPRISE.siteHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-laiton-400 underline hover:text-laiton-300"
+            >
+              En savoir plus →
+            </a>
+          </div>
+        </Card>
       </div>
 
       {searchParams?.vip === "success" && (
@@ -286,47 +350,12 @@ export default function PricingPage({ searchParams }: { searchParams?: { billing
         </Card>
       )}
 
-      {/* Entreprise : structurellement différent (devis, pas d'abonnement) —
-          bandeau à part plutôt que compressé dans le comparateur 3 colonnes. */}
-      <Card className="flex w-full max-w-4xl flex-col items-center gap-4 px-6 py-8 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
-        <div className="flex flex-col gap-2 sm:max-w-md">
-          <h2 className="text-xl font-semibold tracking-[-0.02em] text-white">{ENTREPRISE.nom}</h2>
-          <p className="text-sm text-graphite-300">{ENTREPRISE.description}</p>
-          <ul className="flex flex-col gap-1.5 text-left text-xs leading-5 text-graphite-400">
-            {ENTREPRISE.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-2">
-                <span className="mt-0.5 text-laiton-400">✓</span>
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="flex shrink-0 flex-col items-center gap-2.5">
-          {ENTREPRISE.whatsappHref ? (
-            <a href={ENTREPRISE.whatsappHref} target="_blank" rel="noopener noreferrer">
-              <Button>Demander un devis via WhatsApp</Button>
-            </a>
-          ) : (
-            <a href={ENTREPRISE.mailHref}>
-              <Button>Demander un devis par mail</Button>
-            </a>
-          )}
-          <a
-            href={ENTREPRISE.siteHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-laiton-400 underline hover:text-laiton-300"
-          >
-            En savoir plus →
-          </a>
-        </div>
-      </Card>
-
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        Les offres Impulsion et Transformation incluent 7 jours offerts, puis sont facturées au choix chaque mois ou chaque année. Elles sont sans
-        engagement, résiliables à tout moment depuis ton compte. Les packs VIP sont payés une fois,
-        hors abonnement. THE METHOD (accompagnement 1-to-1 complet, 4 séances/mois) reste disponible
-        séparément pour qui veut aller plus loin. En t&apos;abonnant, tu acceptes nos{" "}
+        L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Impulsion est un
+        paiement unique, sans abonnement. Transformation inclut 7 jours offerts, puis est facturée
+        au choix chaque mois ou chaque année, sans engagement, résiliable à tout moment depuis ton
+        compte. Les packs VIP sont payés une fois, hors abonnement. En débloquant une offre, tu
+        acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">
           CGV
         </Link>
