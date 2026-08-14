@@ -1170,13 +1170,14 @@ export function DiagnosticQuiz({
                     </>
                   ) : applyStatus === "done" ? (
                     <>
-                      <SectionLabel>Mettre à jour ton profil</SectionLabel>
-                      <p className="text-sm text-laiton-300">
-                        Profil mis à jour ✓{" "}
-                        <Link href="/dashboard" className="underline hover:text-laiton-200">
-                          Retour au tableau de bord
-                        </Link>
+                      <SectionLabel>C&apos;est fait</SectionLabel>
+                      <p className="max-w-md text-sm leading-6 text-graphite-300">
+                        Profil mis à jour ✓ COAI en sait un peu plus sur toi — ton prochain
+                        programme en tiendra compte.
                       </p>
+                      <Link href="/dashboard">
+                        <Button className="px-8 py-3">Retour au tableau de bord</Button>
+                      </Link>
                     </>
                   ) : (
                     <>
