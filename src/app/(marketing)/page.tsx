@@ -10,7 +10,6 @@ import { AppPreviewPhones } from "@/components/marketing/app-preview-phones";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { VideoShowcase } from "@/components/marketing/video-showcase";
 
 const TITLE = "COAI — Ton programme évolue avec toi";
 const DESCRIPTION =
@@ -105,23 +104,6 @@ export default function LandingPage() {
     <main className="bg-lab-grid flex flex-col">
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
-
-      <section aria-labelledby="video-presentation-title" className="mx-auto w-full max-w-5xl px-6 pb-16 sm:px-10">
-        <div className="mb-6 text-center">
-          <SectionLabel>Découvrir COAI</SectionLabel>
-          <h2 id="video-presentation-title" className="mt-4 font-display text-2xl font-semibold text-white sm:text-4xl">
-            Ton coaching, en images.
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-graphite-400">
-            Découvre comment COAI relie intelligence artificielle, suivi quotidien et validation humaine.
-          </p>
-        </div>
-        <VideoShowcase />
-        <div className="mt-5 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
-          <Link href="/sign-up"><Button>Découvrir COAI</Button></Link>
-          <Link href="/diagnostic" className="text-sm text-laiton-300 underline hover:text-laiton-200">Faire mon diagnostic offert →</Link>
-        </div>
-      </section>
 
       {/* Aperçu produit — anciennement dupliquait le kicker/titre/sous-titre
           de CoaiIntro juste au-dessus (11/08/2026, fusion demandée par
