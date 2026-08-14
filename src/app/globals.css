@@ -211,6 +211,21 @@ html {
   }
 }
 
+/* Halo du bouton "Commencer" (nav) : cycle plus court et amplitude plus
+   large que pulse-glow (utilisé ailleurs pour une respiration discrète) —
+   ici l'effet doit se voir clairement comme un clignotement. */
+@keyframes halo-blink {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
 @keyframes spin-loader {
   from {
     transform: rotate(-90deg);
@@ -250,6 +265,9 @@ html {
   }
   .animate-pulse-glow {
     animation: pulse-glow 5s ease-in-out infinite;
+  }
+  .animate-halo-blink {
+    animation: halo-blink 1.4s ease-in-out infinite;
   }
   .coai-loader-arc {
     animation: spin-loader 1.6s linear infinite;
