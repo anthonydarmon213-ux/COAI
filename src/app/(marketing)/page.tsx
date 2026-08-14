@@ -289,8 +289,9 @@ export default function LandingPage() {
           </p>
           <p className="mt-7">
             COAI est né de cette tension. Un programme aussi précis qu&apos;une consultation
-            privée, généré en quelques secondes par l&apos;IA — mais jamais livré sans qu&apos;Anthony,
-            ou un coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé.
+            privée, généré en quelques secondes par l&apos;IA. Sur Transformation, jamais livré
+            sans qu&apos;Anthony, ou un coach qu&apos;il a formé, ne l&apos;ait relu, corrigé,
+            validé ; sur Impulsion, généré par l&apos;IA seule, sans relecture.
           </p>
         </div>
       </section>

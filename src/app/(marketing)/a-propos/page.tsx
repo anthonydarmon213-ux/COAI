@@ -36,8 +36,9 @@ export default function AProposPage() {
             COAI est né de cette tension. Donner à chacun un programme d&apos;entraînement, de
             nutrition et de récupération aussi précis qu&apos;une consultation privée — généré en
             quelques secondes par l&apos;IA, à partir d&apos;un vrai profil, pas d&apos;un modèle
-            générique. Mais jamais livré sans qu&apos;Anthony, ou un coach qu&apos;il a formé, ne
-            l&apos;ait relu, corrigé, validé.
+            générique. Sur Transformation, il n&apos;est jamais livré sans qu&apos;Anthony, ou un
+            coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé ; sur Impulsion, il
+            reste généré par l&apos;IA seule, sans relecture.
           </p>
           <p>
             L&apos;IA apporte la vitesse et la personnalisation à grande échelle. L&apos;humain
