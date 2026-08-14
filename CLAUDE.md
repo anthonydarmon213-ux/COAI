@@ -85,6 +85,41 @@ retenu ici : tout afficher, jamais plus de 6 règles ne peuvent se déclencher
 simultanément vu leur exclusivité relative) ; et si cette vitrine doit aussi
 apparaître ailleurs que le dashboard (page de pilier verrouillée ?).
 
+## Écran plein tarif par service, façon paywall d'app mobile (14/08/2026)
+
+Suite du bloc précédent : Anthony a montré en référence le paywall
+"SuperGrok" (nom de l'offre en grand, onglets pour comparer les paliers,
+liste de bénéfices avec icônes, bascule mensuel/annuel, un CTA plein). Il
+veut la même chose quand quelqu'un clique sur un service — pas juste un
+bouton isolé, un vrai écran comparatif avec tous les tarifs.
+
+Nouveau `ServiceDetailModal` (`src/components/marketing/service-detail-modal.tsx`) :
+plein écran, X pour fermer, onglets Impulsion/Transformation/VIP pour
+comparer sans quitter l'écran, liste des bénéfices avec puce dorée, bascule
+mensuel/annuel (Transformation), prix, puis le vrai bouton d'achat — même
+`OffreConsentGate`/texte légal que `/pricing`, jamais de paiement sans ce
+geste. Contenu des offres déplacé dans `src/lib/pricing/tiers.ts`, source
+unique réutilisée par `/pricing` (comportement inchangé, juste le contenu
+extrait) et par le nouveau modal — aucune divergence possible entre les
+deux endroits.
+
+Branché en premier sur `BesoinsIdentifiesCard` (dashboard) : chaque besoin
+identifié propose désormais "Voir les tarifs" (ouvre le modal, pré-
+sélectionné sur le service concerné) plutôt qu'un bouton d'achat direct
+isolé. Pas encore branché sur `/pricing` lui-même (les cartes existantes
+gardent leur CTA direct, qui fonctionne déjà) — à étendre si Anthony veut
+ce même écran partout où un service est cliqué.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Montage isolé
+par Playwright (mobile 390px, desktop 1200px) : bascule d'onglet
+Impulsion/Transformation/VIP, bascule mensuel/annuel, prix et CTA corrects
+par onglet, aucun débordement. `/pricing` revérifié fonctionnel après
+extraction du contenu (200 sur la route).
+
+**Non testable depuis ce sandbox** : le vrai clic "Voir les tarifs" depuis
+un dashboard authentifié (pas d'accès Supabase) — logique vérifiée par
+montage isolé du modal avec les mêmes props uniquement.
+
 ## Nouveau modèle d'accès libre — inscription gratuite, 4 offres indépendantes (13/08/2026)
 
 Changement de stratégie décidé par Anthony : l'inscription ne déclenche plus
