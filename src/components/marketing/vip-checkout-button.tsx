@@ -9,7 +9,7 @@ export function VipCheckoutButton({
   label,
   variant,
 }: {
-  pack: "VISIO" | "PRESENTIEL";
+  pack: "DECOUVERTE_VISIO" | "DECOUVERTE_PRESENTIEL" | "VISIO" | "PRESENTIEL";
   label: string;
   variant?: "primary" | "secondary" | "ghost";
 }) {

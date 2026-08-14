@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 
 const VIP_PACKS = {
+  DECOUVERTE_VISIO: {
+    priceEnv: "STRIPE_PRICE_ID_VIP_DECOUVERTE_VISIO",
+    label: "Séance découverte VIP — Visio",
+  },
+  DECOUVERTE_PRESENTIEL: {
+    priceEnv: "STRIPE_PRICE_ID_VIP_DECOUVERTE_PRESENTIEL",
+    label: "Séance découverte VIP — Présentiel",
+  },
   VISIO: {
     priceEnv: "STRIPE_PRICE_ID_VIP_VISIO_PACK",
     label: "Pack VIP Visio — 4 séances",
@@ -14,7 +22,7 @@ const VIP_PACKS = {
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const pack = body.pack === "PRESENTIEL" ? "PRESENTIEL" : body.pack === "VISIO" ? "VISIO" : null;
+  const pack = typeof body.pack === "string" && body.pack in VIP_PACKS ? (body.pack as keyof typeof VIP_PACKS) : null;
   if (!pack) {
     return NextResponse.json({ error: "Pack VIP invalide" }, { status: 400 });
   }

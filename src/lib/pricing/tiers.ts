@@ -14,7 +14,11 @@ export type Tier = {
   plan?: "STANDARD" | "PREMIUM";
   mostPopular?: boolean;
   oneShot?: boolean;
-  sessions?: { label: string; prix: string; pack?: "VISIO" | "PRESENTIEL" }[];
+  sessions?: {
+    label: string;
+    prix: string;
+    pack?: "DECOUVERTE_VISIO" | "DECOUVERTE_PRESENTIEL" | "VISIO" | "PRESENTIEL";
+  }[];
   limitedSpots?: boolean;
 };
 
@@ -81,13 +85,15 @@ export const TIERS: Tier[] = [
     nom: "VIP",
     prix: "Sur réservation",
     suffixe: "",
-    description: "Coaching 100% humain avec Anthony Darmon — présentiel ou visio, en pack sans abonnement.",
+    description: "Coaching 100% humain avec Anthony Darmon — présentiel ou visio, sans abonnement.",
     features: [
       "Coaching 1-to-1 avec Anthony Darmon",
-      "Pack de 4 séances, sans abonnement",
+      "Séance découverte à l'unité, ou pack de 4 séances",
       "Accessible à tous, quel que soit ton palier",
     ],
     sessions: [
+      { label: "Séance découverte — Visio", prix: "100€", pack: "DECOUVERTE_VISIO" },
+      { label: "Séance découverte — Présentiel", prix: "200€", pack: "DECOUVERTE_PRESENTIEL" },
       { label: "Pack Visio — 4 séances", prix: "360€", pack: "VISIO" },
       { label: "Pack Présentiel — 4 séances", prix: "720€", pack: "PRESENTIEL" },
     ],
