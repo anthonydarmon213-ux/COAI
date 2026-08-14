@@ -165,6 +165,12 @@ type Profil = {
   poidsKg?: number | null;
   age?: number | null;
   sexe?: string | null;
+  cycleMenstruelSuivi?: boolean | null;
+  dateDernieresRegles?: string | Date | null;
+  dureeCycleJours?: number | null;
+  reglesDouloureuses?: boolean | null;
+  statutMaternite?: "ENCEINTE" | "POST_PARTUM" | null;
+  dateReferenceMaternite?: string | Date | null;
   morphologie?: string | null;
   frequenceEntrainement?: string | null;
   sportsPratiques?: string | null;
@@ -320,6 +326,21 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   const [poidsKg, setPoidsKg] = useState(profil.poidsKg ? String(profil.poidsKg) : "");
   const [age, setAge] = useState(profil.age ? String(profil.age) : "");
   const [sexe, setSexe] = useState(profil.sexe ?? "");
+  // Cycle menstruel / maternité (14/08/2026) — opt-in explicite, jamais
+  // déduit du sexe. Dates stockées en "YYYY-MM-DD" (valeur brute d'un
+  // <input type="date">), converties en ISO complet à l'enregistrement.
+  const [cycleMenstruelSuivi, setCycleMenstruelSuivi] = useState(profil.cycleMenstruelSuivi ?? false);
+  const [dateDernieresRegles, setDateDernieresRegles] = useState(
+    profil.dateDernieresRegles ? new Date(profil.dateDernieresRegles).toISOString().slice(0, 10) : ""
+  );
+  const [dureeCycleJours, setDureeCycleJours] = useState(
+    profil.dureeCycleJours ? String(profil.dureeCycleJours) : ""
+  );
+  const [reglesDouloureuses, setReglesDouloureuses] = useState(profil.reglesDouloureuses ?? false);
+  const [statutMaternite, setStatutMaternite] = useState(profil.statutMaternite ?? "");
+  const [dateReferenceMaternite, setDateReferenceMaternite] = useState(
+    profil.dateReferenceMaternite ? new Date(profil.dateReferenceMaternite).toISOString().slice(0, 10) : ""
+  );
   const [morphologie, setMorphologie] = useState(profil.morphologie ?? "");
   const [frequenceEntrainement, setFrequenceEntrainement] = useState(
     profil.frequenceEntrainement ?? ""
@@ -444,6 +465,14 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           poidsKg: poidsKg ? Number(poidsKg) : undefined,
           age: age ? Number(age) : undefined,
           sexe: sexe || undefined,
+          cycleMenstruelSuivi: cycleMenstruelSuivi || undefined,
+          dateDernieresRegles:
+            cycleMenstruelSuivi && dateDernieresRegles ? new Date(dateDernieresRegles).toISOString() : undefined,
+          dureeCycleJours: cycleMenstruelSuivi && dureeCycleJours ? Number(dureeCycleJours) : undefined,
+          reglesDouloureuses: cycleMenstruelSuivi ? reglesDouloureuses : undefined,
+          statutMaternite: statutMaternite || undefined,
+          dateReferenceMaternite:
+            statutMaternite && dateReferenceMaternite ? new Date(dateReferenceMaternite).toISOString() : undefined,
           morphologie,
           frequenceEntrainement: frequenceEntrainement || undefined,
           sportsPratiques: sportsPratiques.length ? sportsPratiques.join(", ") : undefined,
@@ -659,6 +688,81 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             <option value="Mixte">Mixte / je ne sais pas</option>
           </Select>
         </Field>
+
+        {sexe === "Femme" && (
+          <>
+            <Field label="Grossesse / post-partum">
+              <Select
+                value={statutMaternite}
+                onChange={(e) => setStatutMaternite(e.target.value as "" | "ENCEINTE" | "POST_PARTUM")}
+              >
+                <option value="">Non concernée</option>
+                <option value="ENCEINTE">Je suis enceinte</option>
+                <option value="POST_PARTUM">Je suis en post-partum</option>
+              </Select>
+            </Field>
+            {statutMaternite === "ENCEINTE" && (
+              <Field label="Date prévue d'accouchement (terme)">
+                <Input
+                  type="date"
+                  value={dateReferenceMaternite}
+                  onChange={(e) => setDateReferenceMaternite(e.target.value)}
+                />
+              </Field>
+            )}
+            {statutMaternite === "POST_PARTUM" && (
+              <Field label="Date d'accouchement">
+                <Input
+                  type="date"
+                  value={dateReferenceMaternite}
+                  onChange={(e) => setDateReferenceMaternite(e.target.value)}
+                />
+              </Field>
+            )}
+            {!statutMaternite && (
+              <>
+                <Field label="Adapter mon programme à mon cycle menstruel">
+                  <Select
+                    value={cycleMenstruelSuivi ? "oui" : "non"}
+                    onChange={(e) => setCycleMenstruelSuivi(e.target.value === "oui")}
+                  >
+                    <option value="non">Non</option>
+                    <option value="oui">Oui</option>
+                  </Select>
+                </Field>
+                {cycleMenstruelSuivi && (
+                  <>
+                    <Field label="Date des dernières règles">
+                      <Input
+                        type="date"
+                        value={dateDernieresRegles}
+                        onChange={(e) => setDateDernieresRegles(e.target.value)}
+                      />
+                    </Field>
+                    <Field label="Durée du cycle (jours)">
+                      <Input
+                        type="number"
+                        step="1"
+                        placeholder="28"
+                        value={dureeCycleJours}
+                        onChange={(e) => setDureeCycleJours(e.target.value)}
+                      />
+                    </Field>
+                    <Field label="Règles douloureuses">
+                      <Select
+                        value={reglesDouloureuses ? "oui" : "non"}
+                        onChange={(e) => setReglesDouloureuses(e.target.value === "oui")}
+                      >
+                        <option value="non">Non</option>
+                        <option value="oui">Oui</option>
+                      </Select>
+                    </Field>
+                  </>
+                )}
+              </>
+            )}
+          </>
+        )}
 
         <ProfilPhysiqueCalcule
           tailleCm={tailleCm}
