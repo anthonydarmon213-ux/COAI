@@ -4,6 +4,87 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Hero (photo studio) + vitrine personnalisée "besoins → services" (14/08/2026)
+
+Suite directe du nouveau modèle d'accès libre (section suivante) : Anthony a
+d'abord itéré longuement sur le hero de la homepage (photo studio premium
+envoyée par ses soins, uploadée via l'UI GitHub dans `public/`), puis a
+formulé une direction produit plus large — « le SaaS doit être comme une
+boutique : facile d'entrer, on garde les gens dedans, on leur propose les
+services qui répondent aux besoins identifiés au diagnostic ».
+
+**Hero (`coai-intro.tsx`)** — plusieurs itérations dans la même session :
+- Photo repositionnée en corps entier (`aspect-[941/1672]`, le ratio natif
+  du fichier) à gauche, titres à droite (`lg:items-start` pour un alignement
+  net en haut plutôt que centré) — remplace l'ancien plein cadre avec texte
+  superposé, qui cachait le visage derrière la carte de titre.
+- La photo contient son propre logo "COAI" imprimé en haut à gauche (fichier
+  fourni par Anthony) — masqué par un dégradé radial opaque plutôt que
+  retouché dans le fichier source, pour ne pas doubler avec le logo de la
+  nav juste au-dessus.
+- Un seul CTA désormais : "Commencer ma transformation — Diagnostic offert"
+  → `/diagnostic` (remplace les deux boutons concurrents précédents).
+- Kicker : "Bienvenue sur la première plateforme de coaching sportif
+  hybride...", en bleu (`#4a9fc9`, ton distinct du doré déjà utilisé
+  ailleurs) — le "HI × AI™" sous le logo de la nav (`site-nav.tsx`) a été
+  retiré en échange, pour ne plus répéter deux fois la même accroche à
+  quelques centimètres d'écart.
+- "Sculptez" et "intelligent" mis en doré (`text-laiton-300`) comme
+  "performances" l'était déjà, pour homogénéiser l'accent visuel du titre.
+
+**Vitrine personnalisée sur le dashboard** — premier bloc concret de la
+direction "boutique" : le diagnostic identifie déjà des signaux réels
+(persona/frustration, objectif, contraintes santé, niveau, fréquence) mais
+rien n'en était fait après l'inscription. Nouveau moteur déterministe
+(`src/lib/dashboard/besoins-identifies.ts`, aucun appel IA) qui traduit ces
+signaux en besoins concrets, chacun associé au service COAI qui y répond :
+- Pas de structure ("Je ne sais pas quoi faire à la salle" / "sans
+  structure") → **Impulsion** (19€, programme généré tout de suite).
+- Plateau ("Même programme depuis des années, sans résultat") → **Transformation**
+  (le suivi qui adapte réellement dans le temps).
+- Contrainte santé cochée ou persona "sans me blesser" → **Transformation**
+  (validation humaine avant que ce soit définitif).
+- Niveau Avancé + objectif force/performances → **VIP** (1-to-1, optimisation
+  fine).
+- Fréquence 6×/semaine ou plus → **Transformation** (enjeu de suivi
+  charge/récupération à ce volume).
+- Objectif "Me sentir mieux au quotidien" / reprise de sport → **Impulsion**
+  suffit, pas de survente.
+
+Toute la liste des besoins détectés s'affiche (pas seulement le premier),
+filtrée pour ne jamais repousser un service déjà actif
+(`hasProgrammeAccess`/`hasSuiviAccess`, réutilisés tels quels). Chaque
+besoin a son propre CTA d'achat direct (`OneShotProgrammeButton`/
+`SubscribeButton`), avec le même geste de consentement légal
+(`OffreConsentGate`, texte identique à `/pricing`) que partout ailleurs où
+un vrai paiement se déclenche — jamais de bouton d'achat sans cette étape.
+
+**Nouveau champ** `Profile.persona` (les frustrations/points de départ
+cochés au diagnostic — ex: "Je ne sais pas quoi faire à la salle" — jusque-là
+capturées uniquement pour l'email de lead, jamais persistées sur le profil
+réel). Capturé dans `reponsesEnProfil()` (fonction déjà partagée entre le
+pont pré-inscription et la mise à jour directe pour un visiteur connecté),
+donc propagé automatiquement aux deux parcours sans duplication de logique.
+Migration `20260814010000_add_profile_persona`, additive.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. `BesoinsIdentifiesCard`
+testée par montage isolé avec données simulées (Playwright, mobile 390px et
+desktop 1200px, aucun débordement) — le dashboard réel nécessite une
+authentification que ce sandbox ne peut pas simuler. Hero revérifié mobile/
+desktop après chaque itération (photo, masque logo, alignement, CTA unique).
+
+**Non testable depuis ce sandbox** : le calcul réel des besoins sur un vrai
+profil (pas d'accès Supabase) — logique vérifiée par lecture de code et par
+le montage isolé du composant d'affichage uniquement. À confirmer par
+Anthony : faire le diagnostic avec une contrainte santé ou une persona de
+plateau, puis vérifier que le bon besoin/service apparaît sur `/dashboard`.
+
+**Reste ouvert, pas tranché par Anthony** : où mettre le curseur "combien de
+besoins afficher à la fois" si le diagnostic en détecte beaucoup (jugement
+retenu ici : tout afficher, jamais plus de 6 règles ne peuvent se déclencher
+simultanément vu leur exclusivité relative) ; et si cette vitrine doit aussi
+apparaître ailleurs que le dashboard (page de pilier verrouillée ?).
+
 ## Nouveau modèle d'accès libre — inscription gratuite, 4 offres indépendantes (13/08/2026)
 
 Changement de stratégie décidé par Anthony : l'inscription ne déclenche plus
