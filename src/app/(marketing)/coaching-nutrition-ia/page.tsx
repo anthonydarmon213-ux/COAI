@@ -50,7 +50,7 @@ const FAQ_ITEMS = [
   {
     question: "Le plan nutrition est-il relu par un professionnel ?",
     reponse:
-      "Sur le palier Transformation (49€/mois), ton programme nutrition généré par IA est relu et validé par un coach diplômé d'État avant de t'être présenté. Sur Impulsion (19€/mois), il est généré par IA sans relecture.",
+      "Sur le palier Transformation (49€/mois), ton programme nutrition généré par IA est relu et validé par un coach diplômé d'État avant de t'être présenté. Sur Impulsion (19€, paiement unique), il est généré par IA sans relecture.",
   },
   {
     question: "Est-ce lié à mon programme d'entraînement ?",

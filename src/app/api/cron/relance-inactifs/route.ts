@@ -318,9 +318,9 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
       `Bonjour,\n\n` +
         `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
         `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
-        `Tu peux essayer COAI pendant 7 jours, sans engagement : ${appUrl}/pricing?billing=annual\n\n` +
-        `Impulsion : 19 €/mois ou 190 €/an.\n` +
-        `Transformation : 49 €/mois ou 490 €/an, avec validation par un coach diplômé d'État.\n\n` +
+        `Choisis ta formule : ${appUrl}/pricing?billing=annual\n\n` +
+        `Impulsion : 19 €, paiement unique.\n` +
+        `Transformation : 7 jours offerts, puis 49 €/mois ou 490 €/an, avec validation par un coach diplômé d'État.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;

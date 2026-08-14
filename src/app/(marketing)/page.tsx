@@ -47,7 +47,7 @@ const FAQ = [
   {
     question: "Quelle est la différence avec THE METHOD (coaching 1-to-1) ?",
     reponse:
-      "À 19€/mois, ton programme est généré par IA sans relecture ; à 49€/mois, un coach diplômé d'État le relit et le valide. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Tu peux commencer avec l'un de ces deux formats, puis passer à THE METHOD quand tu veux aller plus loin.",
+      "Avec Impulsion (19€, paiement unique), ton programme est généré par IA sans relecture ; avec Transformation (49€/mois), un coach diplômé d'État le relit et le valide. THE METHOD est un accompagnement 1-to-1 complet avec Anthony. Tu peux commencer avec l'un de ces deux formats, puis passer à THE METHOD quand tu veux aller plus loin.",
   },
   {
     question: "Je peux résilier quand je veux ?",
