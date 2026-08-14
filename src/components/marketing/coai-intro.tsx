@@ -93,7 +93,7 @@ export function CoaiIntro() {
         </span>
       </div>
 
-      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.06] bg-black/30 px-5 pb-6 pt-8 shadow-md sm:px-10">
+      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.06] bg-black/60 px-5 pb-6 pt-8 shadow-md backdrop-blur-sm sm:px-10">
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
           <span className="text-laiton-300">Sculptez</span> votre corps et décuplez vos{" "}
           <span className="text-laiton-300">performances</span> avec un coaching{" "}
