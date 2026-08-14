@@ -20,6 +20,15 @@ export function Footer() {
           <Link href="/coach-sportif-paris" className="hover:text-laiton-400">
             Coach sportif Paris
           </Link>
+          <Link href="/programme-musculation-femme" className="hover:text-laiton-400">
+            Musculation pour femme
+          </Link>
+          <Link href="/programme-perte-de-poids" className="hover:text-laiton-400">
+            Perte de poids
+          </Link>
+          <Link href="/calculateur-calories" className="hover:text-laiton-400">
+            Calculateur de calories
+          </Link>
         </div>
         <div className="flex w-full flex-col items-center justify-between gap-4 text-xs text-graphite-500 sm:flex-row">
           <span>© {new Date().getFullYear()} COAI by Anthony Darmon</span>

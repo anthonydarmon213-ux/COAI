@@ -6,12 +6,15 @@ const PAGES = [
   { href: "/coach-sportif-en-ligne", label: "Coach sportif en ligne" },
   { href: "/programme-musculation-ia", label: "Programme de musculation par IA" },
   { href: "/coaching-nutrition-ia", label: "Coaching nutrition par IA" },
+  { href: "/programme-musculation-femme", label: "Musculation pour femme" },
+  { href: "/programme-perte-de-poids", label: "Perte de poids" },
+  { href: "/calculateur-calories", label: "Calculateur de calories" },
 ] as const;
 
-// Maillage interne entre les 4 pages SEO (11/08/2026) — jusqu'ici chacune
-// était une impasse (aucun lien vers les 3 autres), ce qui n'aidait ni le
-// visiteur à explorer les autres angles de COAI, ni Google à comprendre
-// qu'elles forment un ensemble thématique cohérent.
+// Maillage interne entre les pages SEO (11/08/2026, étendu 14/08/2026) —
+// jusqu'ici chacune était une impasse (aucun lien vers les autres), ce qui
+// n'aidait ni le visiteur à explorer les autres angles de COAI, ni Google à
+// comprendre qu'elles forment un ensemble thématique cohérent.
 export function RelatedSeoLinks({ currentPath }: { currentPath: (typeof PAGES)[number]["href"] }) {
   const autres = PAGES.filter((page) => page.href !== currentPath);
 
