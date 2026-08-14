@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/client";
 const LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/business", label: "Business" },
+  { href: "/admin/leads", label: "Diagnostics" },
   { href: "/admin/programmes", label: "Validation" },
   { href: "/admin/clients", label: "Clients" },
   { href: "/admin/suivi", label: "Suivi à risque" },
