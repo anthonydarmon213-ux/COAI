@@ -40,6 +40,7 @@ const LINKS: NavItem[] = [
   },
   { href: "/compte/profil", label: "Profil" },
   { href: "/coach", label: "Coach" },
+  { href: "/videos", label: "Bibliothèque" },
   { href: "/compte/abonnement#vip", label: "VIP" },
 ];
 
