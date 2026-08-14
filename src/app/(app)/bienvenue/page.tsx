@@ -4,6 +4,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
 import { hasSuiviAccess } from "@/lib/subscription/plan";
+import { ParrainageCard } from "@/components/compte/parrainage-card";
 
 // Écran d'accueil post-paiement (10/08/2026) : repensé façon "salon
 // d'embarquement" plutôt qu'un simple accusé de réception transactionnel.
@@ -83,6 +84,16 @@ export default async function BienvenuePage({
           coachValidationRequise={coachValidationRequise}
           profilInitial={user.profile ?? null}
         />
+
+        {/* Partage du lien de parrainage remonté ici (14/08/2026, test
+            acquisition) : jusque-là visible uniquement sur compte/abonnement,
+            donc jamais vu par quelqu'un qui explore encore gratuitement.
+            Réutilise ParrainageCard tel quel (même carte, même API) —
+            l'enthousiasme de l'inscription est le moment le plus favorable
+            pour proposer de partager, avant même un premier paiement. */}
+        <div className="w-full max-w-md text-left">
+          <ParrainageCard />
+        </div>
 
         <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
           Retour au tableau de bord
