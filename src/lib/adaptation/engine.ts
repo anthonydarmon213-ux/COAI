@@ -11,6 +11,7 @@ import {
 } from "@/lib/ai/prompts/programme-adaptation-decision";
 import { collecterSignaux, donneesSuffisantes, type SignauxAdaptation } from "@/lib/adaptation/signals";
 import { trackServerEvent } from "@/lib/analytics/product-events";
+import { buildContexteFeminin } from "@/lib/cycle/phase";
 import type { Pilier, User, Profile, Subscription } from "@prisma/client";
 
 const LIMITE_AUGMENTATION_CHARGE = 1.1; // +10% max par changement de charge
@@ -157,6 +158,7 @@ function buildProfilUtilisateur(
     resumeMontre: profile?.resumeMontre,
     morphologieDetectee: profile?.morphologieDetectee,
     observationsPosture: profile?.observationsPosture,
+    contexteFeminin: buildContexteFeminin(profile ?? {}),
     directivesAdaptation,
   };
 }
@@ -308,19 +310,24 @@ export async function confirmerAdaptation(
   ]);
 
   const plan = getEffectivePlan(user.subscription);
+  // Même garde-fou qu'à la génération initiale (route.ts) : jamais de
+  // programme livré sans relecture humaine en grossesse/post-partum, quel
+  // que soit le palier.
+  const enceinteOuPostPartum =
+    user.profile?.statutMaternite === "ENCEINTE" || user.profile?.statutMaternite === "POST_PARTUM";
   const nouveauProgramme = await prisma.programmeGenerated.create({
     data: {
       userId,
       pilier: adaptation.pilier,
       contenu: contenu as object,
-      statut: plan === "GRATUIT" ? "GENERE_IA" : "EN_ATTENTE",
+      statut: plan === "GRATUIT" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE",
       version,
       temporaire,
       finPrevue,
     },
   });
 
-  const statutFinal = plan === "GRATUIT" ? "APPLIQUEE" : "EN_ATTENTE";
+  const statutFinal = plan === "GRATUIT" && !enceinteOuPostPartum ? "APPLIQUEE" : "EN_ATTENTE";
   await prisma.programmeAdaptation.update({
     where: { id: adaptationId },
     data: { programmeSuivantId: nouveauProgramme.id, statut: statutFinal },

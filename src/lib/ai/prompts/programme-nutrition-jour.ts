@@ -18,11 +18,14 @@ Objectifs : ${profil.objectifs ?? "non renseignés"}
 Niveau : ${profil.niveau ?? "non renseigné"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Sexe : ${profil.sexe ?? "non renseigné"}
+Allergies, intolérances ou régime alimentaire particulier : ${profil.allergiesAlimentaires ?? "aucun connu"}
 Habitudes alimentaires actuelles : ${profil.habitudesAlimentaires ?? "non renseignées"}
 Repas par jour actuellement : ${profil.repasParJour ?? "non renseigné"}
+${profil.contexteFeminin ? `${profil.contexteFeminin}\n` : ""}
 
 Propose des repas variés et réalistes pour ce jour précis (varie les idées de plat d'un jour à
-l'autre sur la semaine plutôt que de répéter les mêmes plats).
+l'autre sur la semaine plutôt que de répéter les mêmes plats). Exclus strictement tout aliment lié
+à une allergie/intolérance déclarée ci-dessus — jamais une suggestion "à tester quand même".
 
 Réponds au format JSON avec : "jour" ("${jour.jour}"), et "repas" (tableau, un objet par repas de
 la journée : petit-déjeuner, déjeuner, dîner, et collation(s) si pertinent selon les habitudes

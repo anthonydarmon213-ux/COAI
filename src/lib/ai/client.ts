@@ -37,6 +37,10 @@ export type ProfilUtilisateur = {
   // Extraites automatiquement d'une photo en tenue de sport.
   morphologieDetectee?: string | null;
   observationsPosture?: string | null;
+  // Résumé cycle menstruel / grossesse / post-partum (14/08/2026), déjà
+  // formaté par src/lib/cycle/phase.ts#buildContexteFeminin — jamais de
+  // date brute envoyée à l'IA, uniquement un texte d'adaptation prêt.
+  contexteFeminin?: string | null;
   // Directive du moteur d'adaptation (11/08/2026, cf. src/lib/adaptation) —
   // présente uniquement lors d'une régénération suite à une adaptation
   // (pas à la toute première génération). Injectée dans les prompts de

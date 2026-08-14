@@ -43,6 +43,7 @@ ${
 }
 ${profil.morphologieDetectee ? `Morphologie détectée par photo : ${profil.morphologieDetectee}` : ""}
 ${profil.observationsPosture ? `Observations de posture (photo) : ${profil.observationsPosture} — adapte le programme en conséquence (exercices correctifs, prudence sur les mouvements concernés).` : ""}
+${profil.contexteFeminin ? `\n${profil.contexteFeminin}` : ""}
 ${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du programme précédent, pas une création depuis zéro. Directives à respecter impérativement : ${profil.directivesAdaptation}. Garde tout ce qui fonctionne déjà, ne change que ce que les directives demandent.` : ""}
 
 La fréquence d'entraînement indiquée est un engagement réel de la personne, pas un point de

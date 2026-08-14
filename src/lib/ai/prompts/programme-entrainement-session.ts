@@ -23,7 +23,7 @@ Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Sexe : ${profil.sexe ?? "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
-
+${profil.contexteFeminin ? `${profil.contexteFeminin}\n` : ""}
 Adapte le volume, l'intensité et le choix des exercices à la morphologie, à l'âge, au sexe (si
 renseigné — repères de force/récupération différents, sans stéréotyper) et au niveau. Adapte
 aussi et surtout les exercices pour éviter d'aggraver les antécédents médicaux listés (ex: éviter

@@ -7,6 +7,7 @@ import { sendAdminNotification } from "@/lib/email/client";
 import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { computeProfilCompletion } from "@/lib/profil/completion";
+import { buildContexteFeminin } from "@/lib/cycle/phase";
 import type { Pilier } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
@@ -65,8 +66,13 @@ export async function POST() {
   // Palier Gratuit (19€) : programme 100% IA, jamais envoyé en relecture au
   // coach (statut GENERE_IA, visible immédiatement). Standard/Premium :
   // comportement inchangé, en attente de validation humaine.
+  // Garde-fou grossesse/post-partum (14/08/2026, demande Anthony) : jamais
+  // de programme livré sans relecture humaine pour ces statuts, quel que
+  // soit le palier — même Impulsion, normalement instantané.
   const plan = getEffectivePlan(user.subscription);
-  const statutInitial = plan === "GRATUIT" ? "GENERE_IA" : "EN_ATTENTE";
+  const enceinteOuPostPartum =
+    user.profile?.statutMaternite === "ENCEINTE" || user.profile?.statutMaternite === "POST_PARTUM";
+  const statutInitial = plan === "GRATUIT" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE";
 
   const profil = {
     objectifs: user.profile?.objectifs,
@@ -98,6 +104,7 @@ export async function POST() {
     resumeMontre: user.profile?.resumeMontre,
     morphologieDetectee: user.profile?.morphologieDetectee,
     observationsPosture: user.profile?.observationsPosture,
+    contexteFeminin: buildContexteFeminin(user.profile ?? {}),
   };
 
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];

@@ -48,11 +48,18 @@ Consommation de café : ${profil.consommationCafe ?? "non renseignée"}
 Consommation d'alcool : ${profil.consommationAlcool ?? "non renseignée"}
 ${profil.caloriesMoyennesParJour ? `Calories moyennes dépensées/jour (montre connectée) : ${profil.caloriesMoyennesParJour}` : ""}
 ${profil.morphologieDetectee ? `Morphologie détectée par photo (à recouper avec la morphologie déclarée ci-dessus) : ${profil.morphologieDetectee}` : ""}
+${profil.contexteFeminin ? `\n${profil.contexteFeminin}` : ""}
 ${profil.directivesAdaptation ? `\nCeci est une ADAPTATION du plan précédent, pas une création depuis zéro. Directives à respecter impérativement : ${profil.directivesAdaptation}. Garde tout ce qui fonctionne déjà, ne change que ce que les directives demandent.` : ""}
 
 Si le sexe est renseigné, ajuste les repères caloriques et protéiques indicatifs en conséquence
 (besoins généralement différents entre hommes et femmes à gabarit/activité égale), sans jamais
 culpabiliser ni faire de commentaire sur l'apparence.
+
+Si des intolérances, un régime sans gluten, des douleurs abdominales ou un terrain inflammatoire
+sont mentionnés dans les allergies/contraintes de santé ci-dessus, privilégie une approche
+anti-inflammatoire (aliments entiers, oméga-3, légumes variés, épices comme le curcuma/gingembre,
+limitation des aliments ultra-transformés et du sucre raffiné) et exclus strictement l'aliment
+concerné de tous les repas — jamais une suggestion "à tester quand même".
 
 Réponds uniquement avec ce JSON (rien d'autre) :
 {
