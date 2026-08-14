@@ -110,7 +110,7 @@ export function CoaiIntro() {
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/diagnostic" className="relative">
             <span
-              className="animate-pulse-glow pointer-events-none absolute -inset-3 -z-10 rounded-full bg-laiton-400/70 blur-2xl"
+              className="animate-halo-blink pointer-events-none absolute -inset-3 -z-10 rounded-full bg-laiton-400 blur-2xl"
               aria-hidden="true"
             />
             <Button className="flex flex-col items-center gap-1 px-9 py-4 text-base uppercase tracking-wide shadow-[0_25px_70px_-18px_rgba(201,162,98,0.95)]">

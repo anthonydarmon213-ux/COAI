@@ -31,9 +31,14 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
 
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
-      <Link href={hrefCompte} className="flex items-center gap-2.5">
-        <CoaiMark size={22} />
-        <span className="font-display text-base font-semibold tracking-[0.2em] text-white">COAI</span>
+      <Link href={hrefCompte} className="flex flex-col gap-0.5">
+        <span className="flex items-center gap-2.5">
+          <CoaiMark size={22} />
+          <span className="font-display text-base font-semibold tracking-[0.2em] text-white">COAI</span>
+        </span>
+        <span className="text-[0.55rem] font-medium tracking-wide text-graphite-400">
+          Coaching humain augmenté par l&apos;IA.
+        </span>
       </Link>
 
       <nav className="hidden items-center gap-7 lg:flex">
@@ -48,24 +53,18 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         ))}
       </nav>
 
-      <Link href={actionHref} className="relative hidden lg:inline-block">
-        <span
-          className="animate-halo-blink pointer-events-none absolute -inset-2 -z-10 rounded-full bg-laiton-400 blur-xl"
-          aria-hidden="true"
-        />
-        <span className="inline-block rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300">
-          {actionLabel}
-        </span>
+      <Link
+        href={actionHref}
+        className="hidden rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300 lg:inline-block"
+      >
+        {actionLabel}
       </Link>
 
-      <Link href={actionHref} className="relative lg:hidden">
-        <span
-          className="animate-halo-blink pointer-events-none absolute -inset-1.5 -z-10 rounded-full bg-laiton-400 blur-lg"
-          aria-hidden="true"
-        />
-        <span className="inline-block rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950">
-          {actionLabel}
-        </span>
+      <Link
+        href={actionHref}
+        className="rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950 lg:hidden"
+      >
+        {actionLabel}
       </Link>
     </div>
   );
