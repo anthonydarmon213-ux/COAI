@@ -41,8 +41,8 @@ export function buildProgrammeAdaptationDecisionPrompt(
   contenuActuelResume: string,
   directiveUtilisateur?: string | null
 ): string {
-  return `Tu es le moteur d'adaptation de COAI, fondé sur la méthode d'Anthony Darmon (coach diplômé
-d'État, 17 ans d'expérience). Analyse si le programme de ${PILIER_LABEL[pilier]} de cet utilisateur
+  return `Tu es le moteur d'adaptation de COAI, construit à partir de plus de 17 ans d'expérience
+terrain d'Anthony Darmon (coach diplômé d'État). Analyse si le programme de ${PILIER_LABEL[pilier]} de cet utilisateur
 doit évoluer, à partir de signaux réels — jamais d'invention.
 
 PROFIL

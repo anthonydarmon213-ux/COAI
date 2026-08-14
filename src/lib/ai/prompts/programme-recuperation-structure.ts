@@ -17,7 +17,8 @@ export type StructureRecuperation = {
 // jours de repos (rapide). Le détail de chaque jour est généré séparément
 // ensuite (étape 2) pour rester sous la limite de temps d'une fonction Vercel.
 export function buildProgrammeRecuperationStructurePrompt(profil: ProfilUtilisateur): string {
-  return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon.
+  return `Tu es le coach IA de COAI, construit à partir de plus de 17 ans d'expérience terrain
+d'Anthony Darmon, coach diplômé d'État.
 Détermine les grands principes d'un plan de RÉCUPÉRATION personnalisé sur une semaine complète
 pour cet utilisateur (le détail de chaque jour sera généré séparément ensuite, ne le fais pas ici).
 

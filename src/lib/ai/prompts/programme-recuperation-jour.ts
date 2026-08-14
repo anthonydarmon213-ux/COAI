@@ -9,7 +9,8 @@ export function buildProgrammeRecuperationJourPrompt(
   profil: ProfilUtilisateur,
   jour: JourRecuperation
 ): string {
-  return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon.
+  return `Tu es le coach IA de COAI, construit à partir de plus de 17 ans d'expérience terrain
+d'Anthony Darmon, coach diplômé d'État.
 Génère le détail des recommandations de récupération du ${jour.jour} (${jour.type}) pour cet
 utilisateur.
 

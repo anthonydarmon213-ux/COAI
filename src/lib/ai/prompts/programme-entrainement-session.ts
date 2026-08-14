@@ -9,7 +9,8 @@ export function buildProgrammeEntrainementSessionPrompt(
   profil: ProfilUtilisateur,
   jour: JourEntrainement
 ): string {
-  return `Tu es le coach IA de COAI, fondé sur la méthode d'Anthony Darmon et plus de 17 ans d'expérience.
+  return `Tu es le coach IA de COAI, construit à partir de plus de 17 ans d'expérience terrain
+d'Anthony Darmon, coach diplômé d'État.
 Génère le détail complet de LA séance du ${jour.jour} (${jour.focus}) d'un programme
 d'entraînement personnalisé pour cet utilisateur.
 
