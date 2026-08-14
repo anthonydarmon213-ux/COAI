@@ -89,7 +89,7 @@ export function CoaiIntro() {
           AI
         </span>
         <span className="max-w-md text-balance font-mono text-sm font-bold uppercase tracking-[0.16em] text-[#6fc3f0] [text-shadow:0_0_18px_rgba(74,159,201,0.65)]">
-          Bienvenue sur la première plateforme de coaching sportif hybride : IA + validation et suivi humain
+          Bienvenue sur la première plateforme de coaching hybride : IA + suivi humain
         </span>
       </div>
 
