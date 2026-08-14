@@ -69,18 +69,17 @@ export function CoaiIntro() {
       </div>
 
       <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.08] bg-black/20 px-5 py-8 shadow-2xl backdrop-blur-[2px] sm:px-10">
-        <Link href="/diagnostic" className="rounded-full border border-laiton-300/40 bg-laiton-300/[0.12] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-100 shadow-[0_0_28px_rgba(221,193,145,.12)] transition hover:bg-laiton-300/[0.2]">
-          Diagnostic offert · 2 min
-        </Link>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-laiton-400">
-          L&apos;humain valide. L&apos;IA personnalise.
-        </p>
+        <span className="rounded-full border border-laiton-300/40 bg-laiton-300/[0.12] px-4 py-2 text-center font-mono text-[11px] uppercase tracking-[0.16em] text-laiton-100 shadow-[0_0_28px_rgba(221,193,145,.12)]">
+          La première plateforme de coaching hybride : IA + validation et suivi humain
+        </span>
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          On crée ton programme <span className="text-laiton-300">sportif et nutritionnel</span>,
-          augmenté par l&apos;IA.
+          Sculptez votre corps et décuplez vos <span className="text-laiton-300">performances</span> avec
+          un coaching intelligent, sur-mesure.
         </h1>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          Un coach te suit jusqu&apos;à l&apos;atteinte de tes objectifs.
+          COAI associe la puissance d&apos;une intelligence artificielle de pointe à l&apos;expertise
+          de coachs diplômés d&apos;État. Obtenez un programme d&apos;entraînement et de nutrition
+          ultra-personnalisé, 100 % adapté à votre rythme et validé par des professionnels.
         </p>
       </div>
 
