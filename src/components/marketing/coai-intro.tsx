@@ -36,13 +36,9 @@ export function CoaiIntro() {
 
       <div className="relative z-10 -mt-4 flex flex-col items-center gap-4">
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href="/diagnostic" className="relative">
-            <span
-              className="animate-halo-blink pointer-events-none absolute -inset-3 -z-10 rounded-full bg-laiton-400 blur-2xl"
-              aria-hidden="true"
-            />
+          <Link href="/diagnostic" className="coai-cta-pulse relative inline-flex rounded-full">
             <Button
-              className="px-9 py-4 text-base font-bold uppercase tracking-[0.04em] text-[#171817] shadow-[0_24px_55px_-18px_rgba(157,105,31,0.85)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105"
+              className="relative z-10 px-9 py-4 text-base font-bold uppercase tracking-[0.04em] text-[#171817] shadow-[0_24px_55px_-18px_rgba(157,105,31,0.85)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105"
               style={{
                 backgroundImage: "linear-gradient(110deg, #bd8d3f 0%, #e4c27e 48%, #c79a4c 100%)",
                 color: "#171817",

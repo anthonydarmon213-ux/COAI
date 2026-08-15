@@ -355,9 +355,16 @@ body {
 
 .coai-marketing-header {
   background:
-    radial-gradient(circle at 82% -120%, rgba(207, 162, 89, .2), transparent 32rem),
-    linear-gradient(105deg, rgba(18, 17, 16, .94), rgba(45, 31, 21, .92));
-  box-shadow: 0 12px 40px -30px rgba(24, 16, 9, .9);
+    radial-gradient(circle at 82% -120%, rgba(242, 213, 158, .34), transparent 32rem),
+    linear-gradient(105deg, rgba(102, 82, 64, .96), rgba(137, 112, 85, .94));
+  box-shadow: 0 12px 40px -30px rgba(70, 48, 29, .72);
+}
+
+.coai-cta-pulse {
+  box-shadow:
+    0 0 0 1px rgba(231, 194, 121, .32),
+    0 0 28px 7px rgba(199, 145, 63, .46),
+    0 18px 42px -14px rgba(132, 82, 19, .72);
 }
 
 .coai-landing-lux .coai-landing-hero-image {
@@ -859,6 +866,22 @@ html {
   }
 }
 
+@keyframes coai-cta-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(231, 194, 121, .3),
+      0 0 24px 6px rgba(199, 145, 63, .4),
+      0 18px 42px -14px rgba(132, 82, 19, .7);
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px rgba(231, 194, 121, .13),
+      0 0 42px 13px rgba(213, 164, 83, .62),
+      0 22px 52px -12px rgba(132, 82, 19, .82);
+  }
+}
+
 @keyframes spin-loader {
   from {
     transform: rotate(-90deg);
@@ -901,6 +924,9 @@ html {
   }
   .animate-halo-blink {
     animation: halo-blink 1.8s ease-in-out infinite;
+  }
+  .coai-cta-pulse {
+    animation: coai-cta-pulse 2.8s ease-in-out infinite;
   }
   .coai-loader-arc {
     animation: spin-loader 1.6s linear infinite;
