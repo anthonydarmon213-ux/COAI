@@ -25,7 +25,7 @@ export function CoaiIntro() {
 
       <div className="coai-landing-promise relative z-10 flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] border px-5 pb-7 pt-8 backdrop-blur-md sm:px-12 sm:py-10">
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          Ton entraînement. Ta nutrition. 100% toi — et ça évolue avec toi.
+          Ton entraînement. Ta nutrition. 100% sur-mesure — et toujours en mouvement.
         </h1>
         <p className="max-w-lg text-balance text-lg font-semibold text-laiton-200 sm:text-xl">
           Construit par un algorithme codé avec 17 ans d&apos;expérience terrain.
