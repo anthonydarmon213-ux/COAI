@@ -157,7 +157,7 @@ export default function SignUpPage() {
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field label="Prénom">
-              <Input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
+              <Input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} placeholder="Ton prénom" autoComplete="given-name" />
             </Field>
             <Field label="Email">
               <Input
@@ -165,6 +165,8 @@ export default function SignUpPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="prenom@exemple.fr"
+                autoComplete="email"
               />
             </Field>
             <Field label="Mot de passe">
@@ -174,6 +176,8 @@ export default function SignUpPage() {
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="8 caractères minimum"
+                autoComplete="new-password"
               />
             </Field>
             {error && <p className="text-sm text-red-400">{error}</p>}

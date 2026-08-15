@@ -117,6 +117,9 @@ body {
 }
 
 .coai-diagnostic-chip[aria-pressed="true"] {
+  color: #4d3516 !important;
+  border-color: rgba(167, 122, 55, .68) !important;
+  background: linear-gradient(145deg, rgba(221, 190, 139, .7), rgba(244, 229, 202, .88)) !important;
   box-shadow: 0 8px 20px -16px rgba(89, 61, 22, .85), inset 0 1px 0 rgba(255,255,255,.7);
 }
 

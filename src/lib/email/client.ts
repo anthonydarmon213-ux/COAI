@@ -23,9 +23,9 @@ function toAscii(value: string): string {
     .join("");
 }
 
-async function sendPushNotification(title: string, message: string): Promise<void> {
+async function sendPushNotification(title: string, message: string): Promise<boolean> {
   const topic = process.env.NTFY_TOPIC;
-  if (!topic) return;
+  if (!topic) return false;
   const server = process.env.NTFY_SERVER ?? "https://ntfy.sh";
   try {
     const res = await fetch(`${server}/${topic}`, {
@@ -35,9 +35,12 @@ async function sendPushNotification(title: string, message: string): Promise<voi
     });
     if (!res.ok) {
       console.error("[push] ntfy a répondu une erreur", res.status, await res.text());
+      return false;
     }
+    return true;
   } catch (err) {
     console.error("[push] Échec de l'envoi", err);
+    return false;
   }
 }
 
@@ -50,18 +53,32 @@ async function sendPushNotification(title: string, message: string): Promise<voi
 // clients mail affichent `html` s'il est présent, `text` sert de secours).
 // Envoie aussi une notification push (ci-dessus) en parallèle, indépendante
 // de l'email — l'une des deux peut échouer sans affecter l'autre.
-export async function sendAdminNotification(subject: string, text: string, html?: string): Promise<void> {
+export async function sendAdminNotification(
+  subject: string,
+  text: string,
+  html?: string
+): Promise<{ emailSent: boolean; pushSent: boolean }> {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.ADMIN_NOTIFICATION_EMAIL;
 
-  await Promise.all([
+  const [emailSent, pushSent] = await Promise.all([
     apiKey && to
       ? sendEmail(to, subject, text, html)
       : Promise.resolve(
-          console.warn("[email] RESEND_API_KEY ou ADMIN_NOTIFICATION_EMAIL non configuré, notification ignorée")
+          (console.warn("[email] RESEND_API_KEY ou ADMIN_NOTIFICATION_EMAIL non configuré, notification ignorée"), false)
         ),
     sendPushNotification(subject, text),
   ]);
+
+  console.log(JSON.stringify({
+    level: emailSent || pushSent ? "info" : "error",
+    message: "admin_notification_delivery",
+    subject,
+    emailSent,
+    pushSent,
+  }));
+
+  return { emailSent, pushSent };
 }
 
 // Envoi générique (destinataire quelconque), utilisé pour les emails vers

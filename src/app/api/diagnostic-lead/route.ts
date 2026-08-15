@@ -45,6 +45,8 @@ const bodySchema = z.object({
 // par nature (personne n'a encore de compte à ce stade). Best-effort côté
 // appelant : ne doit jamais bloquer l'affichage du résultat si ça échoue.
 export async function POST(request: Request) {
+  const startedAt = Date.now();
+  const requestId = request.headers.get("x-vercel-id");
   const parsed = bodySchema.safeParse(await request.json());
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
@@ -81,7 +83,21 @@ export async function POST(request: Request) {
     sendAdminNotification(
       "Nouveau lead — diagnostic COAI",
       `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`
-    ).catch((err) => console.error("[diagnostic-lead] admin notification :", err)),
+    ).then((delivery) => {
+      console.log(JSON.stringify({
+        level: delivery.emailSent || delivery.pushSent ? "info" : "error",
+        message: "diagnostic_admin_notification",
+        requestId,
+        leadId: lead.id,
+        ...delivery,
+      }));
+    }).catch((err) => console.error(JSON.stringify({
+      level: "error",
+      message: "diagnostic_admin_notification_failed",
+      requestId,
+      leadId: lead.id,
+      error: err instanceof Error ? err.message : String(err),
+    }))),
 
     // Envoie aussi le diagnostic à la personne elle-même — CTA final adapté
     // à son statut réel (prospect / abonné profil incomplet / abonné avec
@@ -122,5 +138,12 @@ export async function POST(request: Request) {
     })(),
   ]);
 
+  console.log(JSON.stringify({
+    level: "info",
+    message: "diagnostic_lead_saved",
+    requestId,
+    leadId: lead.id,
+    durationMs: Date.now() - startedAt,
+  }));
   return NextResponse.json(lead, { status: 201 });
 }
