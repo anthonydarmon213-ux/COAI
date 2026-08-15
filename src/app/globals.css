@@ -44,6 +44,44 @@ body {
   backdrop-filter: blur(24px);
 }
 
+/* Deux voix typographiques seulement dans le diagnostic : Playfair pour les
+   titres, Inter pour toute l'information et les commandes. */
+.coai-diagnostic-card .font-mono {
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+.coai-diagnostic-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  border: 1px solid rgba(122, 91, 42, .2);
+  border-radius: 999px;
+  background: linear-gradient(110deg, rgba(255,255,255,.88), rgba(236,229,216,.68));
+  box-shadow: 0 10px 30px -20px rgba(56, 44, 29, .7), inset 0 1px 0 rgba(255,255,255,.95);
+  padding: .55rem .85rem;
+  color: #4d453a;
+  font-family: var(--font-sans), sans-serif;
+  font-size: .78rem;
+  font-weight: 650;
+  letter-spacing: .015em;
+}
+
+.coai-diagnostic-kicker-status {
+  width: .45rem;
+  height: .45rem;
+  border-radius: 999px;
+  background: #b78943;
+  box-shadow: 0 0 0 4px rgba(183, 137, 67, .12);
+}
+
+.coai-diagnostic-kicker-separator {
+  width: 1px;
+  height: .9rem;
+  background: rgba(77, 69, 58, .2);
+}
+
 .coai-diagnostic-card .text-white,
 .coai-diagnostic-card .text-graphite-50,
 .coai-diagnostic-card .text-graphite-100,
@@ -69,8 +107,8 @@ body {
   background: rgba(255,255,255,.48);
   padding: .85rem;
 }
-.coai-diagnostic-proof strong { color: #171817; font-family: var(--font-display), serif; font-size: 1.25rem; }
-.coai-diagnostic-proof span { color: #74756e; font-size: .68rem; line-height: 1.25; }
+.coai-diagnostic-proof strong { color: #171817; font-family: var(--font-sans), sans-serif; font-size: 1.12rem; font-weight: 700; }
+.coai-diagnostic-proof span { color: #6d6f68; font-size: .74rem; line-height: 1.3; }
 
 .coai-diagnostic-result {
   background: rgba(255,255,255,.82);
