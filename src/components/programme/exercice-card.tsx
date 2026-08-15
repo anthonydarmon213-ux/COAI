@@ -31,7 +31,7 @@ export function ExerciceCard({ exercice }: { exercice: unknown }) {
   const nom = typeof exercice.nom === "string" ? exercice.nom : undefined;
 
   return (
-    <div className="group relative flex flex-col gap-3 overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 pl-5 transition duration-300 hover:border-laiton-400/25 hover:bg-white/[0.035]">
+    <div className="coai-exercise-card group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 pl-5 transition duration-300 hover:border-laiton-400/25 hover:bg-white/[0.035]">
       <div className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-laiton-400 via-laiton-500/70 to-transparent" />
       <div className="flex items-start justify-between gap-3">
         <h4 className="text-sm font-semibold text-graphite-50">{nom ?? "Exercice"}</h4>
@@ -40,7 +40,7 @@ export function ExerciceCard({ exercice }: { exercice: unknown }) {
             type="button"
             onClick={() => setVideoOuverte((v) => !v)}
             aria-expanded={videoOuverte}
-            className="shrink-0 whitespace-nowrap rounded-full border border-laiton-400/25 bg-laiton-400/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide text-laiton-300 transition hover:border-laiton-400/50 hover:bg-laiton-400/20"
+            className="coai-technique-button shrink-0 whitespace-nowrap rounded-full border border-laiton-400/25 bg-laiton-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-laiton-300 transition hover:border-laiton-400/50 hover:bg-laiton-400/20"
           >
             {videoOuverte ? "✕ Fermer" : "▶ Technique"}
           </button>
@@ -64,7 +64,7 @@ export function ExerciceCard({ exercice }: { exercice: unknown }) {
           return (
             <div
               key={cle}
-              className="rounded-lg border border-white/[0.05] bg-black/20 px-2.5 py-2"
+              className="coai-exercise-metric rounded-lg border border-white/[0.05] bg-black/20 px-2.5 py-2.5"
             >
               <span className="block font-mono text-[9px] uppercase tracking-widest text-graphite-500">
                 {label}

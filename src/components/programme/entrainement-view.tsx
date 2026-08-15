@@ -58,7 +58,7 @@ export function EntrainementView({
           return (
             <>
               {echauffement && (
-                <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+                <div className="coai-session-note rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
                     🔥 Échauffement
                   </span>
@@ -75,7 +75,7 @@ export function EntrainementView({
                 </div>
               )}
               {retourAuCalme && (
-                <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+                <div className="coai-session-note rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
                     🧘 Retour au calme
                   </span>

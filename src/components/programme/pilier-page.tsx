@@ -69,7 +69,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="coai-programme-page flex flex-col gap-8">
       {/* Funnel (Phase 5B, 11/08/2026) : "première fois qu'un programme est
           vu" approximé par la V1 du pilier Entraînement, page d'atterrissage
           par défaut après /programme (cf. "Embarquer" sur /bienvenue) — pas
@@ -77,10 +77,15 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
       {affiche && affiche.version === 1 && pilier === "ENTRAINEMENT" && (
         <TrackConversion name="first_programme_viewed" />
       )}
-      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
-        <SectionLabel>Votre programme</SectionLabel>
+      <div className="coai-programme-hero flex flex-col gap-4 px-6 py-7 sm:px-8 sm:py-9">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+          <span>Programme personnalisé</span>
+          <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
+          <span>{LABELS[pilier]}</span>
+        </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{LABELS[pilier]}.</h1>
-        <p className="max-w-2xl text-sm leading-6 text-graphite-400">{DESCRIPTIONS[pilier]}</p>
+        <p className="max-w-2xl text-base leading-7 text-graphite-400">{DESCRIPTIONS[pilier]}</p>
       </div>
 
       <p className="rounded-lg border border-graphite-800 bg-graphite-900/40 p-4 text-xs leading-5 text-graphite-400">
@@ -123,7 +128,7 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
           </div>
         </div>
 
-        <Card className="flex flex-col gap-5 p-6 sm:p-8">
+        <Card className="coai-programme-card flex flex-col gap-5 p-5 sm:p-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {valide && (
@@ -175,12 +180,12 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
               if (!peutGenerer) {
                 return (
                   <div className="flex flex-col items-start gap-4">
-                    <p className="text-sm text-graphite-400">
-                      Génère ton programme personnalisé — entraînement, nutrition et récupération —
-                      pour 19€, en un seul paiement. Ou passe à Transformation (49€/mois) pour un
-                      suivi continu avec un coach diplômé d&apos;État.{" "}
+                    <p className="text-sm leading-6 text-graphite-400">
+                      Ton profil est prêt. Lance la création de ton programme complet — entraînement,
+                      nutrition et récupération — ou découvre le suivi continu avec un coach diplômé
+                      d&apos;État.{" "}
                       <Link href="/pricing" className="text-laiton-400 underline">
-                        Voir les formules
+                        Comparer les accompagnements
                       </Link>
                       .
                     </p>

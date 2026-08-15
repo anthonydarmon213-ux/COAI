@@ -340,6 +340,68 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
 }
 
+/* Programme — lisible en mouvement, premium sans surcharge. */
+.coai-programme-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(101,78,43,.14);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(82,139,165,.15), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.82), rgba(242,236,226,.56));
+  box-shadow: 0 30px 70px -52px rgba(57,43,24,.58), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.coai-programme-hero::after {
+  content: "";
+  position: absolute;
+  right: -6rem;
+  bottom: -10rem;
+  width: 22rem;
+  height: 22rem;
+  border: 1px solid rgba(151,112,48,.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.coai-programme-card {
+  border-color: rgba(92,71,40,.14);
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 28px 70px -52px rgba(52,40,24,.55), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.coai-exercise-card {
+  border-color: rgba(90,70,40,.13);
+  background: linear-gradient(145deg, rgba(255,255,255,.8), rgba(242,238,230,.58));
+  box-shadow: 0 14px 32px -28px rgba(55,42,24,.62), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.coai-exercise-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 36px -28px rgba(55,42,24,.72), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.coai-exercise-metric {
+  border-color: rgba(90,70,40,.11);
+  background: rgba(255,255,255,.54);
+}
+
+.coai-technique-button {
+  background: linear-gradient(145deg, rgba(219,184,120,.22), rgba(255,255,255,.58));
+}
+
+.coai-session-note {
+  border-color: rgba(90,70,40,.12);
+  background: rgba(255,255,255,.5);
+}
+
+@media (max-width: 640px) {
+  .coai-programme-page { gap: 1.25rem; }
+  .coai-programme-hero { border-radius: 1.35rem; }
+  .coai-programme-card { border-radius: 1.25rem; }
+  .coai-exercise-card { padding: .9rem .9rem .9rem 1.1rem; }
+}
+
 .coai-diagnostic-result .coai-gradient-text {
   background: linear-gradient(105deg, #171817 5%, #8f672b 55%, #547d91 100%);
   background-clip: text;
