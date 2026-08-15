@@ -129,6 +129,16 @@ body {
 .coai-diagnostic-card .text-graphite-500,
 .coai-diagnostic-card .text-graphite-600 { color: #7b7d75; }
 .coai-diagnostic-card .text-laiton-200 { color: #815b23; }
+/* Variantes hover: (ex: hover:text-white) : nom de classe généré différent
+   de la classe de base, donc les règles ci-dessus ne les couvrent jamais —
+   sans ça, le texte d'une option devient invisible au survol de la souris
+   (blanc sur fond clair). Repéré le 15/08/2026 sur le questionnaire. */
+.coai-diagnostic-card .hover\:text-white:hover,
+.coai-diagnostic-card .hover\:text-graphite-50:hover,
+.coai-diagnostic-card .hover\:text-graphite-100:hover,
+.coai-diagnostic-card .hover\:text-graphite-200:hover { color: #171817; }
+.coai-diagnostic-card .hover\:text-laiton-200:hover,
+.coai-diagnostic-card .hover\:text-laiton-300:hover { color: #815b23; }
 .coai-diagnostic-card .bg-graphite-900\/40,
 .coai-diagnostic-card .bg-graphite-900\/50,
 .coai-diagnostic-card .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
@@ -266,6 +276,12 @@ body {
 .coai-access-page .text-graphite-400 { color: #64665f; }
 .coai-access-page .text-graphite-500 { color: #7b7d75; }
 .coai-access-page .text-laiton-200 { color: #815b23; }
+.coai-access-page .hover\:text-white:hover,
+.coai-access-page .hover\:text-graphite-50:hover,
+.coai-access-page .hover\:text-graphite-100:hover,
+.coai-access-page .hover\:text-graphite-200:hover { color: #171817; }
+.coai-access-page .hover\:text-laiton-200:hover,
+.coai-access-page .hover\:text-laiton-300:hover { color: #815b23; }
 .coai-access-page .border-graphite-700,
 .coai-access-page .border-graphite-800 { border-color: rgba(77,64,45,.16); }
 .coai-access-page .bg-graphite-900\/60,
@@ -329,6 +345,12 @@ body {
 .coai-app-shell .text-graphite-400 { color: #686a63; }
 .coai-app-shell .text-graphite-500 { color: #7d7f77; }
 .coai-app-shell .text-laiton-200 { color: #815b23; }
+.coai-app-shell .hover\:text-white:hover,
+.coai-app-shell .hover\:text-graphite-50:hover,
+.coai-app-shell .hover\:text-graphite-100:hover,
+.coai-app-shell .hover\:text-graphite-200:hover { color: #171817; }
+.coai-app-shell .hover\:text-laiton-200:hover,
+.coai-app-shell .hover\:text-laiton-300:hover { color: #815b23; }
 .coai-app-shell .border-white\/\[0\.07\],
 .coai-app-shell .border-white\/\[0\.08\],
 .coai-app-shell .border-graphite-800 { border-color: rgba(84,68,44,.14); }
@@ -383,6 +405,12 @@ body {
 .coai-landing-lux .text-graphite-500 { color: #7b7d75; }
 .coai-landing-lux .text-laiton-200,
 .coai-landing-lux .text-laiton-300 { color: #815b23; }
+.coai-landing-lux .hover\:text-white:hover,
+.coai-landing-lux .hover\:text-graphite-50:hover,
+.coai-landing-lux .hover\:text-graphite-100:hover,
+.coai-landing-lux .hover\:text-graphite-200:hover { color: #171817; }
+.coai-landing-lux .hover\:text-laiton-200:hover,
+.coai-landing-lux .hover\:text-laiton-300:hover { color: #815b23; }
 /* Couleurs posées via une variante arbitraire Tailwind (ex: [&_h2]:text-graphite-50)
    : le nom de classe généré contient le token complet, donc les sélecteurs
    ".text-graphite-50" ci-dessus ne matchent jamais — attrapé ici par sélecteur
