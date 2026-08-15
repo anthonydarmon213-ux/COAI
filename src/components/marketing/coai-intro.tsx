@@ -25,12 +25,15 @@ export function CoaiIntro() {
 
       <div className="coai-landing-promise relative z-10 flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] border px-5 pb-7 pt-8 backdrop-blur-md sm:px-12 sm:py-10">
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          17 ans d&apos;expérience terrain. Codés dans un algorithme qui apprend de toi.
+          Un corps faible, c&apos;est lui qui te contrôle. Un corps fort, c&apos;est toi qui le
+          contrôles.
         </h1>
+        <p className="max-w-2xl text-balance font-display text-lg font-semibold text-laiton-200 sm:text-xl">
+          17 ans d&apos;expérience terrain. Codés dans un algorithme qui apprend de toi.
+        </p>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          COAI transforme plus de 17 ans d&apos;expertise terrain en un accompagnement qui
-          comprend ton corps, s&apos;adapte à ta vraie vie et évolue avec toi. L&apos;IA personnalise.
-          Un coach diplômé suit, valide et reste disponible quand tu en as besoin.
+          COAI comprend ton corps, s&apos;adapte à ta vraie vie et évolue avec toi. L&apos;IA
+          personnalise. Un coach diplômé suit, valide et reste disponible quand tu en as besoin.
         </p>
       </div>
 
