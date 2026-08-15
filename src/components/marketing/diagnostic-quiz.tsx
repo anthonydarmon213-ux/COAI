@@ -742,8 +742,8 @@ export function DiagnosticQuiz({
   }
 
   return (
-    <div className={`mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-3xl" : "max-w-lg"}`}>
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_-48px_rgba(0,0,0,0.9)]">
+    <div className={`mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-5xl" : "max-w-2xl"}`}>
+      <div className={`coai-diagnostic-card overflow-hidden ${step === "result" ? "coai-diagnostic-result" : ""}`}>
         {step !== "intro" && step !== "result" && step !== "analyse" && (
           <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
@@ -760,23 +760,31 @@ export function DiagnosticQuiz({
 
         <div className="px-6 py-7 sm:px-8">
           {step === "intro" && (
-            <div className="flex flex-col items-center gap-4 py-4 text-center">
-              <SectionLabel>Diagnostic COAI</SectionLabel>
-              <h1 className="font-display text-2xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-3xl">
-                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Construisons ton profil."}
+            <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
+              <SectionLabel>Expérience personnalisée · 2 minutes</SectionLabel>
+              <h1 className="max-w-xl font-display text-4xl font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-6xl">
+                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Ton corps. Ta vie. Ton programme."}
               </h1>
-              <p className="max-w-sm text-sm leading-6 text-graphite-400">
+              <p className="max-w-lg text-base leading-7 text-graphite-400">
                 {resumable ? (
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    {questionSteps.length - (connecte ? 0 : 1)} questions rapides, aucune bonne ou
-                    mauvaise réponse. Chaque réponse compte : c&apos;est ce que COAI utilise pour
-                    construire ton profil, pas un simple formulaire. Gratuit
-                    {!connecte && ", sans inscription"}.
+                    Réponds à quelques questions. COAI révèle ce qui freine ta progression et te
+                    montre comment construire un accompagnement réellement adapté à ton quotidien.
                   </>
                 )}
               </p>
+              {!resumable && (
+                <div className="grid w-full max-w-xl grid-cols-3 gap-2 text-left sm:gap-3">
+                  {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "100 %", label: "personnalisé" }, { value: "0 €", label: "pour commencer" }].map((proof) => (
+                    <div key={proof.label} className="coai-diagnostic-proof">
+                      <strong>{proof.value}</strong>
+                      <span>{proof.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
               {resumable ? (
                 <div className="mt-2 flex flex-col items-center gap-2">
                   <Button onClick={resumeDiagnostic}>Continuer mon diagnostic</Button>
@@ -789,12 +797,12 @@ export function DiagnosticQuiz({
                   </button>
                 </div>
               ) : (
-                <Button onClick={startDiagnostic} className="mt-2">
-                  Commencer
+                <Button onClick={startDiagnostic} className="mt-2 px-8 py-3.5">
+                  Révéler mon profil →
                 </Button>
               )}
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-graphite-600">
-                ≈ 2 minutes
+              <span className="text-xs text-graphite-600">
+                Gratuit · sans carte bancaire · résultat immédiat
               </span>
             </div>
           )}
@@ -1202,9 +1210,9 @@ export function DiagnosticQuiz({
           {step === "result" && diagnostic && (
             <div className="flex flex-col items-center gap-7 py-2 text-center">
               <div className="flex flex-col items-center gap-3">
-                <SectionLabel>Ton diagnostic</SectionLabel>
+                <SectionLabel>Analyse personnalisée</SectionLabel>
                 <h2 className="coai-gradient-text font-display text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-4xl">
-                  Voici ce que COAI a compris de toi.
+                  Ton point de départ est clair. Voici la trajectoire.
                 </h2>
                 <p className="max-w-md text-sm leading-6 text-graphite-300">{diagnostic.profilParagraphe}</p>
                 {diagnostic.alerte && (
@@ -1236,11 +1244,19 @@ export function DiagnosticQuiz({
 
               {diagnostic.pointsATravailler.length > 0 && (
                 <div className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-5 text-left sm:px-6 sm:py-6">
-                  <SectionLabel>Aujourd&apos;hui → Avec COAI</SectionLabel>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <SectionLabel>Ton bilan stratégique</SectionLabel>
+                      <h3 className="mt-2 font-display text-2xl font-semibold text-white">
+                        {diagnostic.pointsATravailler.length} priorité{diagnostic.pointsATravailler.length > 1 ? "s" : ""} identifiée{diagnostic.pointsATravailler.length > 1 ? "s" : ""}
+                      </h3>
+                    </div>
+                    <p className="max-w-sm text-sm text-graphite-400">Chaque frein détecté reçoit une réponse concrète dans ton accompagnement.</p>
+                  </div>
                   <div className="mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-2 rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
-                        Aujourd&apos;hui
+                        Ce qui te freine aujourd&apos;hui
                       </span>
                       <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
                         {diagnostic.pointsATravailler.map((p) => (
@@ -1253,7 +1269,7 @@ export function DiagnosticQuiz({
                     </div>
                     <div className="flex flex-col gap-2 rounded-xl border border-laiton-400/30 bg-laiton-400/[0.07] px-4 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-300">
-                        Avec COAI
+                        La réponse COAI
                       </span>
                       <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-100">
                         {diagnostic.pointsResolus.map((p) => (
@@ -1287,7 +1303,7 @@ export function DiagnosticQuiz({
               </div>
 
               <div className="flex w-full flex-col gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
-                <SectionLabel>Ce que tu viens de voir n&apos;est qu&apos;un début</SectionLabel>
+                <SectionLabel>Une expérience qui évolue avec toi</SectionLabel>
                 <p className="text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
               </div>
 
@@ -1379,14 +1395,17 @@ export function DiagnosticQuiz({
                 // appliquées automatiquement à son profil dès la création du
                 // compte, exactement comme avant.
                 <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
-                  <SectionLabel>Ton profil est prêt</SectionLabel>
-                  <p className="max-w-md text-sm leading-6 text-graphite-300">
-                    Crée ton compte gratuitement pour voir ton tableau de bord personnalisé —
-                    aucune carte bancaire requise.
+                  <SectionLabel>Entre dans ton espace COAI</SectionLabel>
+                  <h3 className="font-display text-2xl font-semibold text-white">Découvre ton coaching avant de choisir.</h3>
+                  <p className="max-w-xl text-sm leading-6 text-graphite-300">
+                    Ton tableau de bord personnalisé t&apos;attend. Explore ton profil et ton futur
+                    accompagnement gratuitement. Le paiement ne sera proposé que lorsque tu voudras
+                    générer ton programme complet ou activer un suivi humain.
                   </p>
                   <Link href={signUpHref()} onClick={handleCreerCompte}>
-                    <Button className="px-8 py-3">Créer mon compte gratuit</Button>
+                    <Button className="px-8 py-3.5">Entrer dans mon espace COAI →</Button>
                   </Link>
+                  <span className="text-xs text-graphite-500">Aucune carte bancaire maintenant</span>
                 </div>
               )}
 

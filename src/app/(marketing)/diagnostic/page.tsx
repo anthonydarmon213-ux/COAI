@@ -38,9 +38,9 @@ export default async function DiagnosticPage({ searchParams }: { searchParams?: 
   const inviteParUnMembre = !user && searchParams?.utm_source === "parrainage";
 
   return (
-    <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-8 px-6 py-24">
+    <main className="coai-diagnostic-page flex min-h-screen flex-col items-center gap-8 px-5 py-8 sm:px-6 sm:py-14">
       {inviteParUnMembre && <TrackConversion name="referral_invitation_opened" />}
-      <div className="w-full max-w-lg">
+      <div className="relative z-10 w-full max-w-3xl">
         <BackLink />
       </div>
       {inviteParUnMembre && (
@@ -52,7 +52,9 @@ export default async function DiagnosticPage({ searchParams }: { searchParams?: 
           </p>
         </Card>
       )}
-      <DiagnosticQuiz connecte={!!user} aDejaUnProgramme={dejaUnProgramme} />
+      <div className="relative z-10 w-full">
+        <DiagnosticQuiz connecte={!!user} aDejaUnProgramme={dejaUnProgramme} />
+      </div>
     </main>
   );
 }

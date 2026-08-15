@@ -9,6 +9,85 @@ body {
     #090a0b;
 }
 
+/* Diagnostic — luxe technologique lumineux. Une page ivoire et champagne,
+   avec le noir utilisé comme encre et non comme décor dominant. */
+.coai-diagnostic-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 5%, rgba(216, 181, 119, 0.28), transparent 25rem),
+    radial-gradient(circle at 88% 18%, rgba(109, 154, 176, 0.18), transparent 28rem),
+    linear-gradient(145deg, #fffdf8 0%, #f5f0e7 48%, #eaf0f2 100%);
+}
+
+.coai-diagnostic-page::before,
+.coai-diagnostic-page::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 42rem;
+  height: 18rem;
+  border: 1px solid rgba(151, 112, 48, 0.16);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.coai-diagnostic-page::before { left: -20rem; top: 8rem; transform: rotate(28deg); }
+.coai-diagnostic-page::after { right: -22rem; bottom: 5rem; transform: rotate(-18deg); }
+
+.coai-diagnostic-card {
+  border: 1px solid rgba(94, 74, 43, 0.14);
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 30px 90px -46px rgba(56, 44, 29, 0.36), inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter: blur(24px);
+}
+
+.coai-diagnostic-card .text-white,
+.coai-diagnostic-card .text-graphite-50,
+.coai-diagnostic-card .text-graphite-100,
+.coai-diagnostic-card .text-graphite-200 { color: #171817; }
+.coai-diagnostic-card .text-graphite-300 { color: #444641; }
+.coai-diagnostic-card .text-graphite-400 { color: #64665f; }
+.coai-diagnostic-card .text-graphite-500,
+.coai-diagnostic-card .text-graphite-600 { color: #7b7d75; }
+.coai-diagnostic-card .bg-graphite-900\/40,
+.coai-diagnostic-card .bg-graphite-900\/50,
+.coai-diagnostic-card .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
+.coai-diagnostic-card .border-graphite-800,
+.coai-diagnostic-card .border-graphite-700 { border-color: rgba(77, 64, 45, .14); }
+
+.coai-diagnostic-proof {
+  display: flex;
+  min-height: 5.5rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: .2rem;
+  border: 1px solid rgba(110, 83, 40, .13);
+  border-radius: 1rem;
+  background: rgba(255,255,255,.48);
+  padding: .85rem;
+}
+.coai-diagnostic-proof strong { color: #171817; font-family: var(--font-display), serif; font-size: 1.25rem; }
+.coai-diagnostic-proof span { color: #74756e; font-size: .68rem; line-height: 1.25; }
+
+.coai-diagnostic-result {
+  background: rgba(255,255,255,.82);
+}
+
+.coai-diagnostic-result .coai-gradient-text {
+  background: linear-gradient(105deg, #171817 5%, #8f672b 55%, #547d91 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+@media (max-width: 640px) {
+  .coai-diagnostic-card { border-radius: 1.35rem; }
+  .coai-diagnostic-proof { min-height: 4.8rem; padding: .7rem; }
+  .coai-diagnostic-proof strong { font-size: 1.05rem; }
+}
+
 h1,
 h2,
 h3 {
