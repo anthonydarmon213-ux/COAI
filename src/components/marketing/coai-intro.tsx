@@ -24,15 +24,15 @@ export function CoaiIntro() {
       </div>
 
       <div className="coai-landing-promise relative z-10 flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] border px-5 pb-7 pt-8 backdrop-blur-md sm:px-12 sm:py-10">
-        <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          Ton entraînement. Ta nutrition. 100% sur-mesure — et toujours en mouvement.
+        <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.2rem,5.4vw,4rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-white">
+          Ton entraînement. Ta nutrition. Ta récupération. 100% sur-mesure.
         </h1>
         <p className="max-w-lg text-balance text-lg font-semibold text-laiton-200 sm:text-xl">
-          Construit par un algorithme codé avec 17 ans d&apos;expérience terrain.
+          Ajusté au jour le jour selon ta forme et ton emploi du temps — comme en coaching VIP.
         </p>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          L&apos;IA personnalise ton programme et ta nutrition. Un coach diplômé suit, valide et
-          reste disponible quand tu en as besoin.
+          Construit par un algorithme codé avec 17 ans d&apos;expérience terrain. Un coach diplômé
+          suit, valide et reste disponible quand tu en as besoin.
         </p>
       </div>
 
