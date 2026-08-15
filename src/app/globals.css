@@ -395,11 +395,57 @@ body {
   background: rgba(255,255,255,.5);
 }
 
+.coai-week-badge {
+  border-color: rgba(133,96,39,.18);
+  background: rgba(217,181,111,.16);
+  color: #785521;
+}
+
+.coai-week-overview {
+  border-color: rgba(105,80,42,.14);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(83,143,168,.12), transparent 13rem),
+    linear-gradient(140deg, rgba(235,215,177,.34), rgba(255,255,255,.66));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.coai-week-day {
+  border-color: rgba(88,69,42,.13);
+  background: rgba(255,255,255,.58);
+  box-shadow: 0 14px 32px -30px rgba(54,41,24,.62), inset 0 1px 0 rgba(255,255,255,.88);
+}
+
+.coai-week-day:hover {
+  border-color: rgba(159,114,48,.28);
+  background: rgba(255,255,255,.75);
+}
+
+.coai-meal-card,
+.coai-habit-card {
+  border-color: rgba(88,69,42,.12);
+  background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(243,238,229,.56));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.coai-recovery-view .coai-week-overview {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(86,145,171,.17), transparent 13rem),
+    linear-gradient(140deg, rgba(228,235,236,.68), rgba(255,255,255,.72));
+}
+
+.coai-nutrition-view .coai-week-overview {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(130,154,112,.14), transparent 13rem),
+    linear-gradient(140deg, rgba(238,225,194,.58), rgba(255,255,255,.72));
+}
+
 @media (max-width: 640px) {
   .coai-programme-page { gap: 1.25rem; }
   .coai-programme-hero { border-radius: 1.35rem; }
   .coai-programme-card { border-radius: 1.25rem; }
   .coai-exercise-card { padding: .9rem .9rem .9rem 1.1rem; }
+  .coai-week-overview { padding: 1rem; }
+  .coai-week-day summary { padding: .85rem; }
 }
 
 .coai-diagnostic-result .coai-gradient-text {

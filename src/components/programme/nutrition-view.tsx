@@ -44,7 +44,7 @@ export function NutritionView({
     : [];
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="coai-nutrition-view flex flex-col gap-5">
       {showContreIndications && <ContreIndications items={contreIndications} />}
       <SemainePlan
         titre={titre}
@@ -59,9 +59,9 @@ export function NutritionView({
             return <JsonView data={jourData} typeMedia="repas" />;
           }
           return (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               {repas.map((r, j) => (
-                <div key={j} className="rounded-lg border border-graphite-800 bg-graphite-950/60 p-3">
+                <div key={j} className="coai-meal-card rounded-xl border border-graphite-800 bg-graphite-950/60 p-4">
                   <JsonView data={r} typeMedia="repas" />
                 </div>
               ))}
@@ -76,7 +76,7 @@ export function NutritionView({
             💡 Conseils sur tes habitudes
           </span>
           {conseilsHabitudes.map((c, i) => (
-            <div key={i} className="rounded-lg border border-graphite-800 bg-graphite-900/40 p-3.5">
+            <div key={i} className="coai-habit-card rounded-xl border border-graphite-800 bg-graphite-900/40 p-4">
               {c.sujet && (
                 <span className="text-xs font-semibold uppercase tracking-wide text-laiton-300">
                   {c.sujet}

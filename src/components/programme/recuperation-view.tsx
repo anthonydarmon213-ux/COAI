@@ -26,7 +26,7 @@ export function RecuperationView({
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="coai-recovery-view flex flex-col gap-5">
       {showContreIndications && <ContreIndications items={contreIndications} />}
       <SemainePlan
         titre={titre}
