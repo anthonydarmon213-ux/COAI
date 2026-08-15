@@ -35,8 +35,12 @@ export async function POST() {
     line_items: [{ price: priceId, quantity: 1 }],
     customer_email: authUser.email,
     client_reference_id: user.id,
-    metadata: { oneShotProgramme: "IMPULSION" },
-    success_url: `${appUrl}/bienvenue?unlock=programme`,
+    metadata: {
+      oneShotProgramme: "IMPULSION",
+      checkoutKind: "PROGRAMME_ONE_SHOT",
+      plan: "GRATUIT",
+    },
+    success_url: `${appUrl}/bienvenue?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/dashboard?unlock=cancel`,
   });
 

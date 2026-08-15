@@ -73,11 +73,20 @@ export async function POST(request: Request) {
       ? { customer: user.subscription.stripeCustomerId }
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
-    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}${skipTrial ? "&essai=0" : ""}`,
+    metadata: {
+      checkoutKind: "SUBSCRIPTION",
+      plan,
+      billing,
+      skipTrial: skipTrial ? "1" : "0",
+    },
+    success_url: `${appUrl}/bienvenue?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
     ...(plan !== "PREMIUM" && !skipTrial
       ? {
-          subscription_data: { trial_period_days: 7 },
+          subscription_data: {
+            trial_period_days: 7,
+            metadata: { appUserId: user.id, plan, billing },
+          },
           payment_method_collection: "always" as const,
         }
       : {}),
