@@ -8,6 +8,8 @@ const PAGES = [
   { href: "/coaching-nutrition-ia", label: "Coaching nutrition par IA" },
   { href: "/programme-musculation-femme", label: "Musculation pour femme" },
   { href: "/programme-perte-de-poids", label: "Perte de poids" },
+  { href: "/programme-prise-de-masse", label: "Prise de masse" },
+  { href: "/programme-musculation-debutant", label: "Musculation débutant" },
   { href: "/calculateur-calories", label: "Calculateur de calories" },
 ] as const;
 

@@ -4,6 +4,65 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Corrections post-redesign (bugs UI en cascade) + industrialisation SEO (15/08/2026, suite)
+
+Suite directe de l'audit ci-dessous : après le premier lot de corrections,
+Anthony a testé en direct sur coai.fr et remonté une série de bugs visuels
+supplémentaires, tous de la même famille (composants jamais adaptés au
+nouveau thème clair par la session ChatGPT d'origine) :
+
+- **Champs de formulaire invisibles partout** (Âge/Taille/Poids du
+  diagnostic, et par extension tout `Input`/`Textarea`/`Select` du site) —
+  ces composants partagés utilisent une bordure et un fond blancs à faible
+  opacité (`border-white/10`, `bg-white/[0.045]`), pensés pour l'ancien
+  thème sombre. Seul `.coai-landing-lux` (thème de la homepage) couvrait
+  ces classes par overrides CSS ; les 3 autres scopes clairs
+  (`.coai-diagnostic-card`, `.coai-app-shell`, `.coai-access-page`) ne les
+  couvraient pas du tout — champs rendus comme des cases vides.
+- **Titre "Entraînement." illisible** sur `/programme/entrainement` — cause
+  différente : ce `<h1>` n'a aucune classe de couleur explicite, donc
+  hérite silencieusement du blanc quasi-invisible posé sur `body`. Les 3
+  scopes clairs incomplets n'avaient pas non plus de `color` de base sur
+  eux-mêmes (seul `.coai-landing-lux` en avait un). Ajouté aux 3 scopes.
+- **Lien "VIP" qui ne menait jamais à la bonne section** — Next.js ne
+  scrolle pas de façon fiable vers une ancre (`#vip`) lors d'une navigation
+  client vers une page Server Component. Nouveau composant `ScrollToHash`
+  (petit effet client, retry jusqu'à ce que la cible existe dans le DOM)
+  ajouté sur `/compte/abonnement`.
+- **Menu simplifié** — le lien "VIP" isolé (qui ne montrait qu'une offre
+  parmi les trois, sans comparaison) remplacé par un unique "Offres" →
+  `/pricing`, qui présente déjà Impulsion/Transformation/VIP côte à côte
+  avec le détail complet des fonctionnalités et le paiement — cohérent
+  avec la demande d'Anthony : « les gens n'ont pas envie de réfléchir, il
+  faut les guider ».
+- **Lisibilité renforcée** sur la carte "Ton plan de progression
+  personnalisé" (dashboard) — texte d'explication agrandi et assombri.
+
+**Audit demandé par Anthony** : les 7 automatisations de récupération de
+revenu (Phases Revenus 1-6 — relance essais inactifs, paiements en
+retard, checkouts abandonnés, diagnostics non convertis, activation essai,
+alerte douleur, rappel fin d'essai) sont vérifiées correctement câblées
+sur le cron quotidien `relance-inactifs`, avec garde-fous anti-doublon sur
+chacune. Rien à corriger — audit passé sans trouver de bug.
+
+**Industrialisation SEO** — 2 nouvelles pages sur des intentions de
+recherche à fort volume, jamais couvertes : `/programme-prise-de-masse`
+(objectif opposé à `/programme-perte-de-poids`, aucun chevauchement) et
+`/programme-musculation-debutant` (audience jamais ciblée jusqu'ici — les
+pages existantes visent la localisation, le format, l'IA, le sexe ou
+l'objectif perte de poids, aucune sur le niveau débutant). Même gabarit
+exact que les pages précédentes (`Card` + `SeoFaq` + `RelatedSeoLinks`),
+ajoutées au sitemap et au footer.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres à chaque
+commit. Playwright réel (mobile 390px, desktop 1280px) sur les 2 nouvelles
+pages SEO et le fix du survol diagnostic (`getComputedStyle` confirmé) —
+aucun débordement horizontal.
+
+**Non testable depuis ce sandbox** (limite habituelle) : le rendu réel en
+production, l'envoi effectif des relances par le cron (dépend de Resend/
+Supabase en conditions réelles).
+
 ## Audit visuel post-redesign taupe/champagne + corrections (15/08/2026)
 
 Suite du redesign taupe/champagne fait par une session ChatGPT séparée

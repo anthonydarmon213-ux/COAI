@@ -15,6 +15,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/coach-sportif-paris", priority: 0.8, changeFrequency: "monthly" },
     { path: "/programme-musculation-femme", priority: 0.8, changeFrequency: "monthly" },
     { path: "/programme-perte-de-poids", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/programme-prise-de-masse", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/programme-musculation-debutant", priority: 0.8, changeFrequency: "monthly" },
     { path: "/calculateur-calories", priority: 0.7, changeFrequency: "monthly" },
     { path: "/cgv", priority: 0.3, changeFrequency: "monthly" },
     { path: "/confidentialite", priority: 0.3, changeFrequency: "monthly" },

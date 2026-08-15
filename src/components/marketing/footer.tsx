@@ -26,6 +26,12 @@ export function Footer() {
           <Link href="/programme-perte-de-poids" className="hover:text-laiton-400">
             Perte de poids
           </Link>
+          <Link href="/programme-prise-de-masse" className="hover:text-laiton-400">
+            Prise de masse
+          </Link>
+          <Link href="/programme-musculation-debutant" className="hover:text-laiton-400">
+            Musculation débutant
+          </Link>
           <Link href="/calculateur-calories" className="hover:text-laiton-400">
             Calculateur de calories
           </Link>
