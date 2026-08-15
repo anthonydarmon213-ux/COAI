@@ -12,6 +12,7 @@ import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import Image from "next/image";
 import { ChurnFeedbackForm } from "@/components/compte/churn-feedback-form";
 import { TIER_BY_SERVICE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
+import { ScrollToHash } from "@/components/compte/scroll-to-hash";
 
 const PRIX_MENSUELS = { GRATUIT: 19, STANDARD: 49, PREMIUM: 199 } as const;
 const PRIX_ANNUELS = { GRATUIT: 190, STANDARD: 490, PREMIUM: 2388 } as const;
@@ -42,6 +43,7 @@ export default async function AbonnementPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <ScrollToHash />
       <div className="flex flex-col gap-1 border-b border-acier/25 pb-7">
         <SectionLabel>Compte</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
