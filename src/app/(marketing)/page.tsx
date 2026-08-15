@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
-import { AppPreviewPhones } from "@/components/marketing/app-preview-phones";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
@@ -105,12 +104,19 @@ export default function LandingPage() {
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
 
-      {/* Aperçu produit — anciennement dupliquait le kicker/titre/sous-titre
-          de CoaiIntro juste au-dessus (11/08/2026, fusion demandée par
-          Anthony pour éviter la répétition). Ne garde que les mockups,
-          sans re-décrire ce que CoaiIntro vient déjà de dire. */}
+      {/* Visuel diagnostic — incarne immédiatement l'expérience COAI et
+          remplace l'ancien mockup de téléphone sombre. */}
       <section id="apercu-produit" className="relative mx-auto flex w-full max-w-5xl justify-center px-6 pb-16 pt-8 sm:px-10">
-        <AppPreviewPhones />
+        <div className="relative aspect-square w-full max-w-3xl overflow-hidden rounded-[2rem] border border-laiton-400/25 bg-ivoire-50 shadow-[0_32px_90px_rgba(79,63,44,.18)] sm:rounded-[3rem]">
+          <Image
+            src="/coai-diagnostic.jpeg"
+            alt="Diagnostic COAI offert pour découvrir le programme qui te correspond"
+            fill
+            priority
+            sizes="(min-width: 1024px) 48rem, (min-width: 640px) 80vw, 100vw"
+            className="object-cover"
+          />
+        </div>
       </section>
 
       {/* Ligne de fonctionnalités sous le hero — reprend exactement les
@@ -148,6 +154,27 @@ export default function LandingPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* Relance au milieu de la page : le visiteur vient de comprendre la
+          méthode, c'est le meilleur moment pour lui proposer son bilan. */}
+      <section className="mx-auto w-full max-w-5xl px-6 pb-16 sm:px-10">
+        <div className="relative overflow-hidden rounded-[2rem] border border-laiton-400/25 bg-[linear-gradient(135deg,rgba(255,253,247,.96),rgba(239,232,216,.92))] px-6 py-10 text-center shadow-[0_24px_70px_rgba(79,63,44,.14)] sm:px-12 sm:py-14">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full border border-laiton-400/20" aria-hidden="true" />
+          <SectionLabel>Ton point de départ</SectionLabel>
+          <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-graphite-950 sm:text-4xl">
+            Découvre le programme qui te correspond vraiment.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-graphite-600">
+            Obtiens ton Score COAI, tes priorités d&apos;amélioration et une première recommandation personnalisée.
+          </p>
+          <Link href="/diagnostic" className="coai-cta-pulse relative mt-7 inline-flex rounded-full">
+            <Button className="min-w-0 px-7 py-4 sm:min-w-80">
+              Faire mon diagnostic offert
+            </Button>
+          </Link>
+          <p className="mt-3 text-sm text-graphite-500">2 min · gratuit · sans carte bancaire</p>
+        </div>
       </section>
 
       {/* Qualification — filtre honnête qui rassure (montre qu'on ne vend
