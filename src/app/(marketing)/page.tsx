@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
-import { AppPreviewPhones } from "@/components/marketing/app-preview-phones";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
@@ -105,12 +104,19 @@ export default function LandingPage() {
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
 
-      {/* Aperçu produit — anciennement dupliquait le kicker/titre/sous-titre
-          de CoaiIntro juste au-dessus (11/08/2026, fusion demandée par
-          Anthony pour éviter la répétition). Ne garde que les mockups,
-          sans re-décrire ce que CoaiIntro vient déjà de dire. */}
-      <section id="apercu-produit" className="relative mx-auto flex w-full max-w-5xl justify-center px-6 pb-16 pt-8 sm:px-10">
-        <AppPreviewPhones />
+      {/* Aperçu produit — anciennement les mockups de téléphone reconstruits
+          (AppPreviewPhones), remplacés le 15/08/2026 par un visuel fourni
+          par Anthony (déposé dans public/) sur demande explicite. */}
+      <section id="apercu-produit" className="relative mx-auto flex w-full max-w-3xl justify-center px-6 pb-16 pt-8 sm:px-10">
+        <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
+          <Image
+            src="/coai-diagnostic.JPEG"
+            alt="Quel programme te correspond vraiment ? Diagnostic COAI offert."
+            fill
+            sizes="(min-width: 640px) 48rem, 100vw"
+            className="object-cover"
+          />
+        </div>
       </section>
 
       {/* Ligne de fonctionnalités sous le hero — reprend exactement les
