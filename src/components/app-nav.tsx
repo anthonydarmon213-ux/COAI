@@ -41,7 +41,11 @@ const LINKS: NavItem[] = [
   { href: "/compte/profil", label: "Profil" },
   { href: "/coach", label: "Coach" },
   { href: "/videos", label: "Bibliothèque" },
-  { href: "/compte/abonnement#vip", label: "VIP" },
+  // Un seul point d'entrée guidé vers les 3 offres (Impulsion/Transformation/
+  // VIP) avec le détail complet des fonctionnalités et le bouton de paiement
+  // — /pricing couvre déjà exactement ça. Remplace l'ancien lien "VIP" isolé
+  // qui ne montrait qu'une offre parmi les trois, sans les comparer.
+  { href: "/pricing", label: "Offres" },
 ];
 
 const ACTIVE_CLASS =
