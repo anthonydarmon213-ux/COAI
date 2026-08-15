@@ -30,9 +30,9 @@ export function BesoinsIdentifiesCard({ besoins }: { besoins: BesoinIdentifie[] 
             className="flex flex-col gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <p className="text-sm font-semibold text-white">{b.besoin}</p>
-              <p className="mt-1 text-xs leading-5 text-graphite-400">{b.explication}</p>
-              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-400">
+              <p className="text-base font-semibold text-white">{b.besoin}</p>
+              <p className="mt-1.5 text-sm leading-6 text-graphite-300">{b.explication}</p>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-400">
                 {SERVICE_INFO[b.service].label}
               </p>
             </div>
