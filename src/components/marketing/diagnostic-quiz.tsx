@@ -240,14 +240,17 @@ function OptionCard({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex w-full flex-col items-start gap-0.5 rounded-xl border px-4 py-3 text-left text-sm transition ${
+      className={`coai-diagnostic-option flex w-full items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left text-sm transition ${
         active
           ? "border-laiton-400/50 bg-laiton-400/[0.08] text-laiton-200"
           : "border-graphite-800 bg-graphite-900/60 text-graphite-200 hover:border-graphite-600 hover:text-white"
       }`}
     >
-      <span className="font-medium">{label}</span>
-      {hint && <span className="text-xs text-graphite-500">{hint}</span>}
+      <span className="flex flex-col items-start gap-0.5">
+        <span className="font-medium">{label}</span>
+        {hint && <span className="text-xs text-graphite-500">{hint}</span>}
+      </span>
+      <span className="coai-diagnostic-option-mark" aria-hidden="true">{active ? "✓" : ""}</span>
     </button>
   );
 }
@@ -258,7 +261,7 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full border px-4 py-2 text-sm transition ${
+      className={`coai-diagnostic-chip rounded-full border px-4 py-2 text-sm transition ${
         active
           ? "border-laiton-400/50 bg-laiton-400/[0.1] text-laiton-200"
           : "border-graphite-800 bg-graphite-900/60 text-graphite-300 hover:border-graphite-600 hover:text-white"
@@ -745,11 +748,11 @@ export function DiagnosticQuiz({
     <div className={`mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-5xl" : "max-w-2xl"}`}>
       <div className={`coai-diagnostic-card overflow-hidden ${step === "result" ? "coai-diagnostic-result" : ""}`}>
         {step !== "intro" && step !== "result" && step !== "analyse" && (
-          <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
+          <div className="coai-diagnostic-progress flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
-              Étape {stepIndex + 1}/{questionSteps.length}
+              Profil {stepIndex + 1} sur {questionSteps.length}
             </span>
-            <div className="h-1 w-28 overflow-hidden rounded-full bg-graphite-800">
+            <div className="h-1.5 w-32 overflow-hidden rounded-full bg-graphite-800 sm:w-40">
               <div
                 className="h-full rounded-full bg-laiton-400 transition-all duration-300"
                 style={{ width: `${progressPct}%` }}
