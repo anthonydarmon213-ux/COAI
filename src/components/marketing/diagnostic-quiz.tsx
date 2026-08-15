@@ -1217,12 +1217,17 @@ export function DiagnosticQuiz({
 
           {step === "result" && diagnostic && (
             <div className="flex flex-col items-center gap-7 py-2 text-center">
-              <div className="flex flex-col items-center gap-3">
-                <SectionLabel>Analyse personnalisée</SectionLabel>
-                <h2 className="coai-gradient-text font-display text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-4xl">
+              <div className="coai-result-hero flex w-full flex-col items-center gap-3 px-5 py-7 sm:px-8 sm:py-9">
+                <div className="coai-diagnostic-kicker">
+                  <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+                  <span>Analyse COAI terminée</span>
+                  <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
+                  <span>Profil révélé</span>
+                </div>
+                <h2 className="coai-gradient-text max-w-2xl font-display text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
                   Ton point de départ est clair. Voici la trajectoire.
                 </h2>
-                <p className="max-w-md text-sm leading-6 text-graphite-300">{diagnostic.profilParagraphe}</p>
+                <p className="max-w-xl text-base leading-7 text-graphite-300">{diagnostic.profilParagraphe}</p>
                 {diagnostic.alerte && (
                   <p className="max-w-md rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
                     {diagnostic.alerte}
@@ -1240,7 +1245,7 @@ export function DiagnosticQuiz({
                 ].map((bloc) => (
                   <div
                     key={bloc.label}
-                    className="flex flex-col gap-1 rounded-xl border border-graphite-800 bg-graphite-900/40 px-3 py-3 text-left"
+                    className="coai-result-signal flex min-h-24 flex-col justify-center gap-1 rounded-xl border border-graphite-800 bg-graphite-900/40 px-4 py-3 text-left"
                   >
                     <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-graphite-500">
                       {bloc.label}
@@ -1251,7 +1256,7 @@ export function DiagnosticQuiz({
               </div>
 
               {diagnostic.pointsATravailler.length > 0 && (
-                <div className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-5 text-left sm:px-6 sm:py-6">
+                <div className="coai-result-strategy w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-5 text-left sm:px-6 sm:py-6">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                       <SectionLabel>Ton bilan stratégique</SectionLabel>
@@ -1264,7 +1269,7 @@ export function DiagnosticQuiz({
                   <div className="mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-2 rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
-                        Ce qui te freine aujourd&apos;hui
+                        Les points à améliorer
                       </span>
                       <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
                         {diagnostic.pointsATravailler.map((p) => (
@@ -1277,7 +1282,7 @@ export function DiagnosticQuiz({
                     </div>
                     <div className="flex flex-col gap-2 rounded-xl border border-laiton-400/30 bg-laiton-400/[0.07] px-4 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-300">
-                        La réponse COAI
+                        Ce que COAI met en place
                       </span>
                       <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-100">
                         {diagnostic.pointsResolus.map((p) => (
@@ -1335,7 +1340,7 @@ export function DiagnosticQuiz({
                 // sur la génération et "Ton programme est prêt" — avec un
                 // programme déjà en place, reste au geste explicite habituel
                 // (jamais de régénération silencieuse).
-                <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
+                <div className="coai-result-entry flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-7 text-center sm:py-9">
                   {applyStatus === "pret" ? (
                     <>
                       <SectionLabel>Ton programme est prêt</SectionLabel>
@@ -1403,8 +1408,11 @@ export function DiagnosticQuiz({
                 // appliquées automatiquement à son profil dès la création du
                 // compte, exactement comme avant.
                 <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
-                  <SectionLabel>Entre dans ton espace COAI</SectionLabel>
-                  <h3 className="font-display text-2xl font-semibold text-white">Découvre ton coaching avant de choisir.</h3>
+                  <div className="coai-diagnostic-kicker">
+                    <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+                    <span>Ton espace est prêt</span>
+                  </div>
+                  <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">Découvre ton coaching avant de choisir.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
                     Ton tableau de bord personnalisé t&apos;attend. Explore ton profil et ton futur
                     accompagnement gratuitement. Le paiement ne sera proposé que lorsque tu voudras
