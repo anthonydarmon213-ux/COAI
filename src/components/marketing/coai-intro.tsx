@@ -33,8 +33,11 @@ export function CoaiIntro() {
               className="animate-halo-blink pointer-events-none absolute -inset-3 -z-10 rounded-full bg-laiton-400 blur-2xl"
               aria-hidden="true"
             />
-            <Button className="bg-[#171817] px-9 py-4 text-base font-bold uppercase tracking-[0.04em] text-white shadow-[0_25px_60px_-22px_rgba(23,24,23,0.85)] hover:bg-[#292b29]">
-              <span>Découvrir mon potentiel — Diagnostic offert</span>
+            <Button
+              className="px-9 py-4 text-base font-bold uppercase tracking-[0.04em] text-white shadow-[0_25px_60px_-22px_rgba(23,24,23,0.85)]"
+              style={{ backgroundColor: "#171817", color: "#ffffff" }}
+            >
+              <span>Faire mon bilan personnalisé gratuit</span>
             </Button>
           </Link>
           <span className="w-full text-center text-sm font-medium text-[#5f605b]">
