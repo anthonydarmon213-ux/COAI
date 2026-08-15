@@ -177,9 +177,15 @@ export async function POST(request: Request) {
           where: { id: userId },
           data: { programmeUnlockedAt: new Date() },
         });
+        const montant = session.amount_total
+          ? `${(session.amount_total / 100).toLocaleString("fr-FR", {
+              style: "currency",
+              currency: session.currency?.toUpperCase() ?? "EUR",
+            })}`
+          : "paiement confirmé";
         await sendAdminNotification(
           "Programme Impulsion débloqué",
-          `${user.prenom ? user.prenom : "Un utilisateur"} (${user.email}) vient de débloquer la génération de son programme (19€, paiement unique).`
+          `${user.prenom ? user.prenom : "Un utilisateur"} (${user.email}) vient de débloquer la génération de son programme (${montant}, paiement unique).`
         );
       }
       if (userId && session.subscription) {
