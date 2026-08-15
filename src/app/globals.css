@@ -194,6 +194,71 @@ body {
   box-shadow: 0 28px 65px -46px rgba(62, 46, 24, .65), inset 0 1px 0 rgba(255,255,255,.9);
 }
 
+/* Transition diagnostic → espace personnel. */
+.coai-access-page {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(216, 181, 119, .28), transparent 25rem),
+    radial-gradient(circle at 90% 84%, rgba(96, 151, 176, .2), transparent 28rem),
+    linear-gradient(145deg, #fffdf8, #f3eee5 52%, #e9f0f2);
+}
+
+.coai-access-shell {
+  border: 1px solid rgba(94, 74, 43, .15);
+  background: rgba(255,255,255,.75);
+  box-shadow: 0 38px 100px -54px rgba(55, 42, 25, .48), inset 0 1px 0 rgba(255,255,255,.95);
+  backdrop-filter: blur(24px);
+}
+
+.coai-access-intro {
+  background:
+    radial-gradient(circle at 5% 0%, rgba(210, 171, 99, .2), transparent 18rem),
+    linear-gradient(145deg, rgba(255,255,255,.68), rgba(236,231,222,.45));
+}
+
+.coai-access-card {
+  background: rgba(255,255,255,.84);
+  box-shadow: none;
+}
+
+.coai-access-page .text-graphite-50,
+.coai-access-page .text-graphite-100,
+.coai-access-page .text-graphite-200,
+.coai-access-page .text-white { color: #171817; }
+.coai-access-page .text-graphite-300 { color: #484a45; }
+.coai-access-page .text-graphite-400 { color: #64665f; }
+.coai-access-page .text-graphite-500 { color: #7b7d75; }
+.coai-access-page .border-graphite-700,
+.coai-access-page .border-graphite-800 { border-color: rgba(77,64,45,.16); }
+.coai-access-page .bg-graphite-900\/60,
+.coai-access-page .bg-graphite-900\/80 { background-color: rgba(255,255,255,.7); }
+.coai-access-page .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .08em; }
+
+.coai-access-back { color: #625b50; }
+
+.coai-access-proof {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  border: 1px solid rgba(104,82,47,.13);
+  border-radius: .9rem;
+  background: rgba(255,255,255,.5);
+  padding: .75rem .85rem;
+  color: #4e4c46;
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.coai-access-proof span {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #b78943;
+  color: white;
+  font-size: .7rem;
+}
+
 .coai-diagnostic-result .coai-gradient-text {
   background: linear-gradient(105deg, #171817 5%, #8f672b 55%, #547d91 100%);
   background-clip: text;

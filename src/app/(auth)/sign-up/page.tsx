@@ -99,10 +99,10 @@ export default function SignUpPage() {
 
   if (emailEnvoye) {
     return (
-      <main className="bg-lab-grid flex min-h-screen flex-col items-center justify-center gap-6 px-6">
-        <Card className="flex w-full max-w-sm flex-col gap-3 text-center">
+      <main className="coai-access-page flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+        <Card className="coai-access-card flex w-full max-w-md flex-col gap-4 text-center">
           <SectionLabel>Vérifie ta boîte mail</SectionLabel>
-          <h1 className="text-xl font-semibold text-graphite-50">Un lien t&apos;attend dans tes emails</h1>
+          <h1 className="font-display text-3xl font-semibold text-graphite-50">Ton espace est presque prêt.</h1>
           <p className="text-sm text-graphite-400">
             On a envoyé un lien de confirmation à <span className="text-graphite-200">{email}</span>.
             Clique dessus pour activer ton compte — pense à vérifier tes spams si tu ne le vois pas
@@ -114,61 +114,81 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="bg-lab-grid flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+    <main className="coai-access-page flex min-h-screen flex-col items-center justify-center gap-6 px-5 py-10 sm:px-8">
       <Link
         href="/"
-        className="font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"
+        className="coai-access-back text-xs font-semibold text-graphite-400 transition hover:text-white"
       >
         ← Retour à l&apos;accueil
       </Link>
-      <Card className="flex w-full max-w-sm flex-col gap-5">
-        <div className="flex flex-col gap-1">
-          <SectionLabel>Inscription</SectionLabel>
-          <h1 className="text-xl font-semibold text-graphite-50">Créer un compte gratuit</h1>
+      <div className="coai-access-shell grid w-full max-w-4xl overflow-hidden rounded-[2rem] lg:grid-cols-[1.05fr_.95fr]">
+        <section className="coai-access-intro flex flex-col justify-between gap-10 px-7 py-8 sm:px-10 sm:py-10">
+          <div>
+            <div className="coai-diagnostic-kicker">
+              <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+              <span>Diagnostic enregistré</span>
+            </div>
+            <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
+              Entre dans ton espace COAI.
+            </h1>
+            <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
+              Retrouve ton profil, visualise ton accompagnement et avance à ton rythme. Tu ne paies
+              que lorsque tu décides de générer ton programme ou d&apos;activer le suivi humain.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            {["Ton diagnostic conservé", "Accès immédiat à l'interface", "Aucune carte bancaire"].map((item) => (
+              <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
+            ))}
+          </div>
+        </section>
+
+        <Card className="coai-access-card flex w-full flex-col gap-5 rounded-none border-0">
+          <div className="flex flex-col gap-1">
+            <SectionLabel>Accès personnel</SectionLabel>
+            <h2 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h2>
+            <p className="text-sm leading-6 text-graphite-400">Une minute suffit pour retrouver ton analyse.</p>
+          </div>
+          <GoogleSignInButton />
+          <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
+            <div className="h-px flex-1 bg-graphite-800" />
+            ou
+            <div className="h-px flex-1 bg-graphite-800" />
+          </div>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Field label="Prénom">
+              <Input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
+            </Field>
+            <Field label="Email">
+              <Input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Field>
+            <Field label="Mot de passe">
+              <Input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Field>
+            {error && <p className="text-sm text-red-400">{error}</p>}
+            <Button type="submit" disabled={loading}>
+              {loading ? "Envoi du lien de confirmation…" : "Entrer dans mon espace →"}
+            </Button>
+          </form>
           <p className="text-sm text-graphite-400">
-            Découvre l&apos;interface COAI et toutes ses fonctionnalités. Aucune carte bancaire
-            requise — tu choisis ce que tu débloques, quand tu veux.
+            Déjà un compte ?{" "}
+            <Link href="/sign-in" className="underline">
+              Se connecter
+            </Link>
           </p>
-        </div>
-        <GoogleSignInButton />
-        <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
-          <div className="h-px flex-1 bg-graphite-800" />
-          ou
-          <div className="h-px flex-1 bg-graphite-800" />
-        </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field label="Prénom">
-            <Input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
-          </Field>
-          <Field label="Email">
-            <Input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Field>
-          <Field label="Mot de passe">
-            <Input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Field>
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit" disabled={loading}>
-            {loading ? "Envoi du lien de confirmation…" : "Continuer"}
-          </Button>
-        </form>
-        <p className="text-sm text-graphite-400">
-          Déjà un compte ?{" "}
-          <Link href="/sign-in" className="underline">
-            Se connecter
-          </Link>
-        </p>
-      </Card>
+        </Card>
+      </div>
     </main>
   );
 }
