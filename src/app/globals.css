@@ -353,6 +353,13 @@ body {
     linear-gradient(150deg, #fbfaf7 0%, #f2eee6 52%, #e8eff1 100%);
 }
 
+.coai-marketing-header {
+  background:
+    radial-gradient(circle at 82% -120%, rgba(207, 162, 89, .2), transparent 32rem),
+    linear-gradient(105deg, rgba(18, 17, 16, .94), rgba(45, 31, 21, .92));
+  box-shadow: 0 12px 40px -30px rgba(24, 16, 9, .9);
+}
+
 .coai-landing-lux .coai-landing-hero-image {
   filter: brightness(1.17) saturate(.82) contrast(.92);
   transform: scale(1.015);
