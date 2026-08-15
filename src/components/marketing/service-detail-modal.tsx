@@ -155,13 +155,13 @@ export function ServiceDetailModal({
               resumeConditions={
                 <>
                   Je reconnais avoir pris connaissance des conditions de l&apos;offre Impulsion :
-                  paiement unique de 19€, programme généré immédiatement. Je demande le début
+                  paiement unique de 9€, programme généré immédiatement. Je demande le début
                   immédiat du service et reconnais renoncer à mon droit de rétractation de 14
                   jours pour la partie du service déjà utilisée.
                 </>
               }
             >
-              <OneShotProgrammeButton label="Générer mon programme — 19€" className="w-full" />
+              <OneShotProgrammeButton label="Générer mon programme — 9€" className="w-full" />
             </OffreConsentGate>
           ) : tier.plan ? (
             <OffreConsentGate

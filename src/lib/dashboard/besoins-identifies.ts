@@ -15,7 +15,7 @@ export type BesoinIdentifie = {
 };
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
-  IMPULSION: { label: "Impulsion — 19€, paiement unique", href: "/pricing" },
+  IMPULSION: { label: "Impulsion — dès 9€", href: "/pricing" },
   TRANSFORMATION: { label: "Transformation — 49€/mois", href: "/pricing" },
   VIP: { label: "VIP — coaching 1-to-1", href: "/pricing#vip" },
 };

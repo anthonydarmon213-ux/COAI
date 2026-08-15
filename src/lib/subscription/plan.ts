@@ -63,12 +63,19 @@ export function hasSuiviAccess(subscription?: Subscription | null): boolean {
   return Boolean(subscription && subscription.plan === "STANDARD" && ACTIVE_STATUSES.has(subscription.status));
 }
 
+// Le Coach IA est désormais une option Impulsion indépendante à 9€/mois.
+// Une ligne Subscription réelle et active est donc obligatoire. Transformation
+// et les anciens abonnements Premium conservent naturellement cet accès.
+export function hasCoachIaAccess(subscription?: Subscription | null): boolean {
+  return Boolean(subscription && ACTIVE_STATUSES.has(subscription.status));
+}
+
 // Noms marketing (08/08/2026) : GRATUIT = "Impulsion", STANDARD = "Transformation"
 // — à ne pas confondre avec l'enum PREMIUM (199€, ancienne offre, "VIP" à la
 // séance depuis ce renommage), qui n'est plus vendu comme abonnement — ce
 // label ne concerne que d'éventuels abonnés déjà sur l'ancienne offre.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
-  GRATUIT: "Impulsion — 19€, paiement unique",
+  GRATUIT: "Coach IA — 9€/mois",
   STANDARD: "Transformation — 49€/mois après 7 jours offerts",
   PREMIUM: "Ancien Premium — 199€/mois",
 };

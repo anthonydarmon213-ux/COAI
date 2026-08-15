@@ -46,7 +46,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion (19€, paiement unique, programme généré par IA sans relecture) ou Transformation (49€/mois, 7 jours offerts, un coach diplômé d'État relit et valide) quand tu es prêt.",
+      "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion dès 9€ ou Transformation (49€/mois, 7 jours offerts, un coach diplômé d'État relit et valide) quand tu es prêt.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -372,7 +372,7 @@ export default function LandingPage() {
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
           Inscription gratuite, sans carte bancaire — découvre ton espace et ton suivi. Débloque
-          ensuite Impulsion (19€, paiement unique) pour ton programme généré par IA, ou
+          ensuite Impulsion dès 9€ pour ton programme généré par les algorithmes COAI, ou
           Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et le
           valide.
         </p>
@@ -405,7 +405,7 @@ export default function LandingPage() {
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Ton prochain chapitre</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Un coaching conçu pour ta vraie vie.</h2>
         <p className="max-w-2xl text-graphite-200">
-          Inscription gratuite. Débloque ensuite ton programme généré par IA (19€, paiement
+          Inscription gratuite. Débloque ensuite ton programme COAI (9€, paiement
           unique) — ou avec relecture et validation par un coach diplômé d&apos;État (49€/mois).
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">

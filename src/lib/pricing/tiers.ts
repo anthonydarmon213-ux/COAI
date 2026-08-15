@@ -51,16 +51,18 @@ export function vipReservationHref(sessionLabel: string, prix: string): string |
 export const TIERS: Tier[] = [
   {
     nom: "Impulsion",
-    prix: "19€",
-    suffixe: "paiement unique",
+    prix: "dès 9€",
+    suffixe: "à la carte",
     oneShot: true,
     description:
-      "Les algorithmes COAI construisent ton programme personnalisé à partir de ton diagnostic et de plus de 17 ans d'expérience terrain — en un seul paiement, sans abonnement.",
+      "Choisis uniquement ce dont tu as besoin : ton programme, le Coach IA, ou le pack complet.",
     features: [
       "Journal de séances",
       "Suivi des mesures et photos de progression",
       "Graphiques de progression",
-      "Coach IA — 4 questions/mois",
+      "Programme personnalisé à 9€ — paiement unique",
+      "Coach IA à 9€/mois — 4 questions par mois",
+      "Pack complet à 15€ aujourd'hui, puis 9€/mois",
       "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
       "Analyse de photo morphologique et posturale",
       "Programme personnalisé construit par les algorithmes COAI — sans relecture humaine",

@@ -41,7 +41,7 @@ export async function POST() {
   // L'inscription elle-même est gratuite et ne suffit plus.
   if (!hasProgrammeAccess(user, user.subscription)) {
     return NextResponse.json(
-      { error: "Débloque la génération de ton programme (Impulsion, 19€) ou passe à Transformation pour générer ton programme." },
+      { error: "Débloque la génération de ton programme (Impulsion, 9€) ou passe à Transformation pour générer ton programme." },
       { status: 403 }
     );
   }

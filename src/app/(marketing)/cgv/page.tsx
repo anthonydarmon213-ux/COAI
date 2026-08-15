@@ -27,7 +27,7 @@ export default function CgvPage() {
         <h2>2. Description des offres</h2>
         <ul>
           <li>
-            <strong>Impulsion (19€, paiement unique)</strong> — achat ponctuel, sans abonnement
+            <strong>Impulsion</strong> — programme à 9€ en paiement unique ; Coach IA à 9€/mois ; pack à 15€ aujourd&apos;hui puis 9€/mois. Les abonnements sont sans engagement et résiliables à tout moment.
             ni renouvellement, débloquant de façon permanente la génération d&apos;un programme
             d&apos;entraînement, de nutrition et de récupération par intelligence artificielle —
             ce programme n&apos;est pas relu par un coach humain. Inclut aussi le journal de

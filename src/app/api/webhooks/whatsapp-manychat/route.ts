@@ -5,7 +5,7 @@ import { isValidWhatsappWebhookRequest } from "@/lib/whatsapp/client";
 import { generateTextWithAI } from "@/lib/ai/client";
 import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getEffectivePlan, hasCoachIaAccess } from "@/lib/subscription/plan";
 
 // Appelé par ManyChat (étape "External Request" du flow WhatsApp) à chaque
 // message reçu d'un abonné — remplace l'ancienne hypothèse Make.com/Twilio,
@@ -52,6 +52,15 @@ export async function POST(request: Request) {
       payload: { message } as Prisma.InputJsonValue,
     },
   });
+
+  if (!hasCoachIaAccess(user.subscription)) {
+    const reply =
+      "L'option Coach IA n'est pas encore active sur ton compte. Tu peux l'activer pour 9€/mois sur coai.fr/pricing.";
+    await prisma.whatsAppEvent.create({
+      data: { userId: user.id, direction: "OUTBOUND", payload: { reply } as Prisma.InputJsonValue },
+    });
+    return NextResponse.json({ reply });
+  }
 
   // Même quota que le coach IA sur le site (4 questions/mois, Impulsion
   // uniquement) — sans ça WhatsApp serait une voie de contournement du

@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { generateTextWithAI } from "@/lib/ai/client";
 import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getEffectivePlan, hasCoachIaAccess } from "@/lib/subscription/plan";
 import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
 import { z } from "zod";
 import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
@@ -57,6 +57,13 @@ export async function POST(request: Request) {
   });
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+  }
+
+  if (!hasCoachIaAccess(user.subscription)) {
+    return NextResponse.json(
+      { error: "Active l'option Coach IA pour poser tes questions." },
+      { status: 402 }
+    );
   }
 
   const estLimite = getEffectivePlan(user.subscription) === "GRATUIT";

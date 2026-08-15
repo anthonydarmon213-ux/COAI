@@ -34,7 +34,8 @@ function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
   if (priceId && priceId === process.env.STRIPE_PRICE_ID_PREMIUM) return "PREMIUM";
   if (
     priceId &&
-    (priceId === process.env.STRIPE_PRICE_ID_GRATUIT ||
+    (priceId === process.env.STRIPE_PRICE_ID_COACH_IA_MONTHLY ||
+      priceId === process.env.STRIPE_PRICE_ID_GRATUIT ||
       priceId === process.env.STRIPE_PRICE_ID_GRATUIT_ANNUAL)
   ) return "GRATUIT";
   return "STANDARD";
@@ -193,6 +194,12 @@ export async function POST(request: Request) {
           typeof session.subscription === "string" ? session.subscription : session.subscription.id;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         await upsertFromSubscription(subscription, userId);
+        if (session.metadata?.includesProgramme === "1") {
+          await prisma.user.update({
+            where: { id: userId },
+            data: { programmeUnlockedAt: new Date() },
+          });
+        }
         await prisma.user.update({
           where: { id: userId },
           data: { checkoutReminderSentAt: new Date() },

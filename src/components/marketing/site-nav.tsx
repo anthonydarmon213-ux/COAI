@@ -23,11 +23,11 @@ const LIENS = [
 // "Se connecter" et "Commencer" pointaient tous les deux vers /dashboard
 // une fois connecté (bug réel, pas juste une redondance visuelle) : gardé
 // uniquement le bouton qui a du sens dans chaque état. Un visiteur non
-// connecté qui clique "Commencer" et a déjà un compte retrouve "Se
-// connecter" directement sur /sign-up (lien déjà présent là-bas).
+// Le visiteur retrouve une entrée de connexion discrète ; le CTA principal
+// du hero reste ainsi la seule action forte de l'écran d'ouverture.
 export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompte: string }) {
-  const actionHref = connecte ? "/dashboard" : "/sign-up";
-  const actionLabel = connecte ? "Mon compte" : "Commencer";
+  const actionHref = connecte ? "/dashboard" : "/login";
+  const actionLabel = connecte ? "Mon compte" : "Se connecter";
 
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
@@ -55,14 +55,14 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
 
       <Link
         href={actionHref}
-        className="hidden rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300 lg:inline-block"
+        className="hidden rounded-full border border-white/25 bg-white/10 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-white transition hover:border-white/45 hover:bg-white/15 lg:inline-block"
       >
         {actionLabel}
       </Link>
 
       <Link
         href={actionHref}
-        className="rounded-full bg-laiton-400 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-graphite-950 lg:hidden"
+        className="rounded-full border border-white/25 bg-white/10 px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-white lg:hidden"
       >
         {actionLabel}
       </Link>

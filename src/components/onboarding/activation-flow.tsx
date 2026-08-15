@@ -161,7 +161,7 @@ export function ActivationFlow({
       <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
         <SectionLabel>Ton profil est prêt</SectionLabel>
         <p className="max-w-sm text-sm leading-6 text-graphite-300">
-          Génère ton programme personnalisé — entraînement, nutrition, récupération — pour 19€, en
+          Génère ton programme personnalisé — entraînement, nutrition, récupération — pour 9€, en
           un seul paiement. Ou passe à Transformation (49€/mois) pour un suivi continu avec un
           coach diplômé d&apos;État.
         </p>
@@ -170,7 +170,7 @@ export function ActivationFlow({
             resumeConditions={
               <>
                 Je reconnais avoir pris connaissance des conditions de l&apos;offre Impulsion :
-                paiement unique de 19€, programme généré immédiatement. Je demande le début
+                paiement unique de 9€, programme généré immédiatement. Je demande le début
                 immédiat du service et reconnais renoncer à mon droit de rétractation de 14 jours
                 pour la partie du service déjà utilisée.
               </>

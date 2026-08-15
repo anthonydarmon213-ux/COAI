@@ -102,7 +102,7 @@ export default function CoachSportifParisPage() {
         <Card className="flex flex-col gap-3 text-center">
           <h2 className="text-lg font-semibold text-white">Accompagnement COAI à distance</h2>
           <p className="text-sm leading-6 text-graphite-300">
-            Programme généré par IA dès 19€ (paiement unique), ou avec relecture et validation
+            Programme construit par les algorithmes COAI dès 9€ (paiement unique), ou avec relecture et validation
             par un coach diplômé d&apos;État à 49€/mois — accessible depuis n&apos;importe où.
           </p>
         </Card>

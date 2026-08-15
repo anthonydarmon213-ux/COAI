@@ -4,35 +4,38 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
-// Déblocage Impulsion (13/08/2026, nouveau modèle d'accès libre) : paiement
-// unique de 19€ pour générer son programme, déclenchable depuis n'importe
-// quelle page où l'utilisateur voit son interface verrouillée (dashboard,
-// page de pilier) ou depuis /pricing avant inscription. Si l'appel échoue
-// faute d'authentification (visiteur pas encore inscrit), redirige vers
-// l'inscription libre plutôt que d'afficher une erreur — le paiement se
-// termine dès qu'il revient, sans reperdre son intention.
-export function OneShotProgrammeButton({
-  label = "Générer mon programme — 19€",
+export type ImpulsionOffer = "PROGRAMME" | "COACH" | "BUNDLE";
+
+export function ImpulsionCheckoutButton({
+  offer,
+  label,
   className,
 }: {
-  label?: string;
+  offer: ImpulsionOffer;
+  label: string;
   className?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
-    trackFunnelEvent("checkout_started", { plan: "GRATUIT" });
+    trackFunnelEvent("checkout_started", { plan: "GRATUIT", offer });
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/stripe/checkout-programme", { method: "POST" });
+      const response = await fetch("/api/stripe/checkout-programme", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ offer }),
+      });
       if (response.status === 401) {
-        window.location.href = "/sign-up";
+        window.location.href = `/sign-up?offer=${offer}`;
         return;
       }
       const data = await response.json();
-      if (!response.ok || !data.url) throw new Error(data.error ?? "Impossible de démarrer le paiement.");
+      if (!response.ok || !data.url) {
+        throw new Error(data.error ?? "Impossible de démarrer le paiement.");
+      }
       window.location.href = data.url;
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Une erreur est survenue.");
@@ -47,5 +50,21 @@ export function OneShotProgrammeButton({
       </Button>
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
+  );
+}
+
+export function OneShotProgrammeButton({
+  label = "Générer mon programme — 9€",
+  className,
+}: {
+  label?: string;
+  className?: string;
+}) {
+  return (
+    <ImpulsionCheckoutButton
+      offer="PROGRAMME"
+      label={label}
+      className={className}
+    />
   );
 }

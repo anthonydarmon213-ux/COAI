@@ -8,14 +8,14 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrustBadges } from "@/components/marketing/trust-badges";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
+import { ImpulsionCheckoutButton } from "@/components/programme/one-shot-programme-button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { TIERS, ENTREPRISE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
-  "Inscription gratuite, interface visible en entier. Débloque Impulsion (19€, paiement unique), Transformation (49€/mois, suivi coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
+  "Inscription gratuite. Impulsion dès 9€, Transformation à 49€/mois avec suivi coach, VIP à la séance avec Anthony Darmon, ou offre Entreprise sur mesure.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -205,18 +205,35 @@ export default function PricingPage({
                   </Button>
                 )
               ) : tier.oneShot ? (
-                <OffreConsentGate
-                  resumeConditions={
-                    <>
-                      Je reconnais avoir pris connaissance des conditions de l&apos;offre
-                      Impulsion : paiement unique de 19€, programme généré immédiatement. Je
-                      demande le début immédiat du service et reconnais renoncer à mon droit de
-                      rétractation de 14 jours pour la partie du service déjà utilisée.
-                    </>
-                  }
-                >
-                  <OneShotProgrammeButton label="Générer mon programme avec COAI — 19€" />
-                </OffreConsentGate>
+                <div className="flex w-full flex-col gap-3 text-left">
+                  <OffreConsentGate
+                    resumeConditions={
+                      <>Programme COAI personnalisé : paiement unique de 9€, génération immédiate après paiement.</>
+                    }
+                  >
+                    <ImpulsionCheckoutButton offer="PROGRAMME" label="Mon programme COAI — 9€" />
+                  </OffreConsentGate>
+                  <OffreConsentGate
+                    resumeConditions={
+                      <>Coach IA : abonnement de 9€/mois, sans engagement, résiliable à tout moment depuis ton compte.</>
+                    }
+                  >
+                    <ImpulsionCheckoutButton offer="COACH" label="Coach IA — 9€/mois" />
+                  </OffreConsentGate>
+                  <div className="rounded-xl border border-laiton-400/35 bg-laiton-400/[0.08] p-3">
+                    <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-laiton-300">
+                      Le meilleur départ
+                    </p>
+                    <OffreConsentGate
+                      resumeConditions={
+                        <>Pack Impulsion : 15€ aujourd&apos;hui (programme + premier mois du Coach IA), puis 9€/mois. Sans engagement, résiliable à tout moment.</>
+                      }
+                    >
+                      <ImpulsionCheckoutButton offer="BUNDLE" label="Programme + Coach IA — 15€" />
+                    </OffreConsentGate>
+                    <p className="mt-2 text-center text-xs text-graphite-400">puis 9€/mois · sans engagement</p>
+                  </div>
+                </div>
               ) : tier.plan ? (
                 <OffreConsentGate
                   resumeConditions={
@@ -277,8 +294,8 @@ export default function PricingPage({
       </div>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Impulsion est un
-        paiement unique, sans abonnement. Transformation inclut 7 jours offerts, puis est facturée
+        L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Le programme Impulsion est
+        un paiement unique. L&apos;option Coach IA et le pack complet incluent un abonnement mensuel résiliable à tout moment. Transformation inclut 7 jours offerts, puis est facturée
         au choix chaque mois ou chaque année, sans engagement, résiliable à tout moment depuis ton
         compte. Les séances VIP se réservent directement avec Anthony sur WhatsApp. En débloquant une offre, tu
         acceptes nos{" "}

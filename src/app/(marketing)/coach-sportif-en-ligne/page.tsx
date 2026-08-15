@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Inscription gratuite. 19€ en paiement unique pour un programme généré par IA sans relecture, ou 49€/mois (7 jours offerts) pour un programme relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
+      "Inscription gratuite. 9€ en paiement unique pour un programme construit par les algorithmes COAI sans relecture, ou 49€/mois (7 jours offerts) pour un programme relu et validé par un coach diplômé d'État.",
   },
   {
     question: "Je peux poser des questions à un coach entre deux programmes ?",
