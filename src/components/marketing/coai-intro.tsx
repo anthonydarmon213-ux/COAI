@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CoaiMark } from "@/components/brand/coai-mark";
 import { Button } from "@/components/ui/button";
 
 // Écran d'ouverture de la landing page : rejoue la séquence du brand book
@@ -15,9 +16,10 @@ export function CoaiIntro() {
       <div className="coai-future-ring coai-future-ring-two" aria-hidden="true" />
       <div className="coai-landing-hero-overlay absolute inset-0" aria-hidden="true" />
 
-      <div className="relative z-10 flex flex-col items-center">
-        <span className="coai-landing-eyebrow max-w-xl text-balance font-display text-xl font-medium italic tracking-[-0.01em] sm:text-2xl">
-          Le coaching intelligent. L&apos;expertise humaine.
+      <div className="relative z-10 flex items-center gap-3" aria-label="COAI">
+        <CoaiMark size={58} variant="detailed" animated />
+        <span className="font-display text-2xl font-semibold tracking-[0.22em] text-[#171817] sm:text-3xl">
+          COAI
         </span>
       </div>
 
@@ -47,14 +49,14 @@ export function CoaiIntro() {
             2 min · gratuit · sans engagement
           </span>
         </div>
-        <div className="flex flex-col items-center gap-2.5 sm:flex-row sm:gap-3">
-          <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">
-            <span className="text-laiton-300">✓</span>
-            Sans engagement · Résiliable à tout moment
-          </span>
+        <div className="flex flex-col items-center gap-2.5">
           <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">
             <span className="text-laiton-300">✓</span>
             17+ ans d&apos;expertise terrain intégrés dans nos algorithmes
+          </span>
+          <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">
+            <span className="text-laiton-300">✓</span>
+            Sans engagement · Résiliable à tout moment
           </span>
         </div>
       </div>

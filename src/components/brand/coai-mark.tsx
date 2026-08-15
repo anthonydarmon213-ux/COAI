@@ -8,20 +8,31 @@
 // premium"). Chaque instance a ses propres ids de gradient (suffixés par un
 // id unique) pour rester correcte si plusieurs <CoaiMark /> sont montés en
 // même temps sur une page (les ids de <defs> SVG sont globaux au document).
-import { useId } from "react";
+"use client";
+
+import { useEffect, useId, useState } from "react";
 
 export function CoaiMark({
   size = 32,
   variant = "simple",
+  animated = false,
   className,
 }: {
   size?: number;
   variant?: "simple" | "detailed";
+  animated?: boolean;
   className?: string;
 }) {
   const uid = useId();
+  const [isIn, setIsIn] = useState(!animated);
   const goldId = `coai-gold-${uid}`;
   const eyeId = `coai-eye-${uid}`;
+
+  useEffect(() => {
+    if (!animated) return;
+    const frame = window.requestAnimationFrame(() => setIsIn(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [animated]);
 
   return (
     <svg
@@ -31,7 +42,9 @@ export function CoaiMark({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      className={className}
+      className={[animated ? "coai-intro-mark" : "", isIn ? "in" : "", className]
+        .filter(Boolean)
+        .join(" ")}
     >
       <defs>
         <linearGradient id={goldId} x1="18" y1="14" x2="102" y2="106" gradientUnits="userSpaceOnUse">
@@ -54,13 +67,16 @@ export function CoaiMark({
         strokeLinecap="round"
         strokeDasharray="228 36"
         transform="rotate(-90 60 60)"
+        className={animated ? "coai-intro-arc-human" : undefined}
       />
       {variant === "detailed" && (
-        <circle cx="60" cy="60" r="24" stroke="#6b7078" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3.2 3.6" />
+        <circle className={animated ? "coai-intro-arc-ai" : undefined} cx="60" cy="60" r="24" stroke="#6b7078" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3.2 3.6" />
       )}
-      <circle cx="60" cy="60" r="11" fill={`url(#${eyeId})`} />
-      <circle cx="60" cy="60" r="5" fill="#0d1b22" />
-      <circle cx="57" cy="57" r="1.8" fill="#eaf4f8" />
+      <g className={animated ? "coai-intro-dot" : undefined}>
+        <circle cx="60" cy="60" r="11" fill={`url(#${eyeId})`} />
+        <circle cx="60" cy="60" r="5" fill="#0d1b22" />
+        <circle cx="57" cy="57" r="1.8" fill="#eaf4f8" />
+      </g>
     </svg>
   );
 }

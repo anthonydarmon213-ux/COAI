@@ -139,6 +139,17 @@ export default function PricingPage({
             {/* 4. Description */}
             <p className="text-sm text-graphite-300">{tier.description}</p>
 
+            {tier.nom === "Transformation" && (
+              <div className="rounded-xl border border-laiton-400/30 bg-laiton-400/[0.08] px-4 py-3 text-left">
+                <p className="text-xs font-bold uppercase tracking-[0.08em] text-laiton-300">
+                  Tout Impulsion inclus, plus
+                </p>
+                <p className="mt-1 text-sm font-semibold leading-5 text-white">
+                  L&apos;adaptation continue et la présence d&apos;un coach diplômé.
+                </p>
+              </div>
+            )}
+
             {/* 5. Liste des bénéfices */}
             <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
               {tier.features.map((feature) => (
