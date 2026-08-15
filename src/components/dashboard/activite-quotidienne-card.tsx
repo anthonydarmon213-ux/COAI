@@ -196,10 +196,10 @@ export function ActiviteQuotidienneCard() {
           </div>
           <p className="text-sm leading-6 text-graphite-200">{resume.recommandation.message}</p>
           <Link
-            href="/programme/evolution#neat"
+              href="/videos/neat"
             className="mt-1 inline-flex w-fit items-center gap-1.5 text-xs text-laiton-300 hover:underline"
           >
-            Voir l&apos;explication complète →
+              Lire le guide NEAT →
           </Link>
         </div>
       )}
