@@ -25,7 +25,7 @@ export function CoaiIntro() {
 
       <div className="coai-landing-promise relative z-10 flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] border px-5 pb-7 pt-8 backdrop-blur-md sm:px-12 sm:py-10">
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          Le corps que tu imagines. Le niveau que tu pensais inaccessible.
+          17 ans d&apos;expérience terrain. Codés dans un algorithme qui apprend de toi.
         </h1>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
           COAI transforme plus de 17 ans d&apos;expertise terrain en un accompagnement qui
