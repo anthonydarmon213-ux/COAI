@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BackLink } from "@/components/marketing/back-link";
+import Link from "next/link";
 import { DiagnosticQuiz } from "@/components/marketing/diagnostic-quiz";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
@@ -40,8 +40,19 @@ export default async function DiagnosticPage({ searchParams }: { searchParams?: 
   return (
     <main className="coai-diagnostic-page flex min-h-screen flex-col items-center gap-8 px-5 py-8 sm:px-6 sm:py-14">
       {inviteParUnMembre && <TrackConversion name="referral_invitation_opened" />}
-      <div className="relative z-10 w-full max-w-3xl">
-        <BackLink />
+      <div className="relative z-10 flex w-full max-w-3xl items-center justify-between gap-4">
+        <Link
+          href="/"
+          className="font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"
+        >
+          ← Accueil
+        </Link>
+        <Link
+          href="/sign-in?returnTo=%2Fdiagnostic"
+          className="rounded-full border border-laiton-400/35 bg-white/[0.04] px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300 transition hover:border-laiton-300 hover:bg-laiton-400/[0.08]"
+        >
+          Se connecter
+        </Link>
       </div>
       {inviteParUnMembre && (
         <Card className="w-full max-w-lg border-laiton-400/30 bg-laiton-400/[0.05] px-5 py-4 text-center">

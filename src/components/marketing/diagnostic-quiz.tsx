@@ -507,8 +507,38 @@ export function DiagnosticQuiz({
 
   function restartDiagnostic() {
     clearDiagnosticProgress();
+    setPersona([]);
+    setPersonaAutreTexte("");
+    setNiveau(null);
+    setObjectif(null);
+    setObjectifAutreTexte("");
+    setEquipement([]);
+    setLieu(null);
+    setDuree(null);
+    setFrequence(null);
+    setSport([]);
+    setSportAutreTexte("");
+    setSexe(null);
+    setCycleMenstruelSuivi(false);
+    setDateDernieresRegles("");
+    setDureeCycleJours("");
+    setReglesDouloureuses(null);
+    setStatutMaternite(null);
+    setDateReferenceMaternite("");
+    setAge("");
+    setTailleCm("");
+    setPoidsKg("");
+    setHabitudesAlimentaires(null);
+    setQualiteSommeil(null);
+    setSante([]);
+    setSanteAutreTexte("");
+    setEmail("");
+    setConsentEmail(false);
+    setLeadEnvoi("idle");
+    setApplyStatus("idle");
     setResumable(false);
-    startDiagnostic();
+    trackFunnelEvent("diagnostic_started", { resumed: false, restarted: true });
+    setStep(questionSteps[0] ?? "persona");
   }
 
   // "COAI analyse ton profil" (Phase 5, 11/08/2026) : moment de transition
@@ -1468,6 +1498,13 @@ export function DiagnosticQuiz({
                 Cette expérience t&apos;a plu ? Parles-en à quelqu&apos;un qui a besoin de s&apos;y
                 mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage.
               </p>
+              <button
+                type="button"
+                onClick={restartDiagnostic}
+                className="font-mono text-[11px] uppercase tracking-[0.12em] text-graphite-400 underline underline-offset-4 transition hover:text-white"
+              >
+                Refaire mon diagnostic
+              </button>
             </div>
           )}
         </div>
