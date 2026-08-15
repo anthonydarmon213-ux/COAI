@@ -20,7 +20,7 @@ export function CoaiIntro() {
   }, []);
 
   return (
-    <section className="coai-future-hero relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-10 pt-28 text-center sm:pb-12 sm:pt-32">
+    <section className="coai-future-hero coai-landing-hero relative flex min-h-screen flex-col items-center justify-center gap-8 overflow-hidden px-6 pb-12 pt-28 text-center sm:pb-16 sm:pt-32">
       <div className="coai-future-architecture" aria-hidden="true" />
       <div className="coai-future-horizon" aria-hidden="true" />
       <div className="coai-future-ring coai-future-ring-one" aria-hidden="true" />
@@ -34,10 +34,10 @@ export function CoaiIntro() {
         alt="Anthony Darmon, fondateur de COAI, dans un studio de coaching premium"
         fill
         sizes="100vw"
-        className="object-cover object-top"
+        className="coai-landing-hero-image object-cover object-top"
         priority
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0c0d]/35 via-[#0b0c0d]/60 to-[#0b0c0d]/95" aria-hidden="true" />
+      <div className="coai-landing-hero-overlay absolute inset-0" aria-hidden="true" />
       {/* La photo contient son propre logo "COAI" imprimé en haut à gauche —
           masqué ici plutôt que retouché dans le fichier, pour ne pas
           doubler avec le logo de la nav juste au-dessus. */}
@@ -46,13 +46,13 @@ export function CoaiIntro() {
         style={{
           width: "clamp(120px, 32vw, 480px)",
           height: "clamp(80px, 20vw, 300px)",
-          background: "radial-gradient(ellipse at 0% 0%, rgba(6,7,8,1) 0%, rgba(6,7,8,1) 62%, rgba(6,7,8,0) 100%)",
+          background: "radial-gradient(ellipse at 0% 0%, rgba(246,242,233,.96) 0%, rgba(246,242,233,.92) 58%, rgba(246,242,233,0) 100%)",
         }}
         aria-hidden="true"
       />
 
       <div className="relative z-10 flex flex-col items-center gap-3">
-        <span className="inline-flex items-center font-display text-[clamp(3.2rem,11vw,6.5rem)] font-bold leading-none tracking-tight text-white">
+        <span className="coai-landing-wordmark inline-flex items-center font-display text-[clamp(3.2rem,11vw,6.5rem)] font-bold leading-none tracking-tight text-white">
           C
           <svg
             ref={markRef}
@@ -88,22 +88,19 @@ export function CoaiIntro() {
           </svg>
           AI
         </span>
-        <span className="max-w-md text-balance font-mono text-sm font-bold uppercase tracking-[0.16em] text-[#6fc3f0] [text-shadow:0_0_18px_rgba(74,159,201,0.65)]">
-          Bienvenue sur la première plateforme de coaching hybride : IA + suivi humain
+        <span className="coai-landing-eyebrow max-w-xl text-balance font-mono text-sm font-bold uppercase tracking-[0.16em]">
+          Le studio de coaching premium du futur
         </span>
       </div>
 
-      <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-5 rounded-[2rem] border border-white/[0.06] bg-black/60 px-5 pb-6 pt-8 shadow-md backdrop-blur-sm sm:px-10">
+      <div className="coai-landing-promise relative z-10 flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] border px-5 pb-7 pt-8 backdrop-blur-md sm:px-12 sm:py-10">
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.4rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
-          <span className="text-laiton-300">Sculptez</span> votre corps et décuplez vos{" "}
-          <span className="text-laiton-300">performances</span> avec un coaching{" "}
-          <span className="text-laiton-300">intelligent</span>, sur-mesure.
+          Le corps que tu imagines. Le niveau que tu pensais inaccessible.
         </h1>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          COAI, c&apos;est l&apos;algorithme construit à partir de plus de 17 ans d&apos;expérience
-          terrain d&apos;Anthony Darmon, coach diplômé d&apos;État. Ton programme d&apos;entraînement,
-          de nutrition et de récupération s&apos;ajuste vraiment, semaine après semaine, selon ta
-          forme et le temps dont tu disposes ce jour-là.
+          COAI transforme plus de 17 ans d&apos;expertise terrain en un accompagnement qui
+          comprend ton corps, s&apos;adapte à ta vraie vie et évolue avec toi. L&apos;IA personnalise.
+          Un coach diplômé suit, valide et reste disponible quand tu en as besoin.
         </p>
       </div>
 
@@ -115,7 +112,7 @@ export function CoaiIntro() {
               aria-hidden="true"
             />
             <Button className="flex flex-col items-center gap-1 px-9 py-4 text-base uppercase tracking-wide shadow-[0_25px_70px_-18px_rgba(201,162,98,0.95)]">
-              <span>Commencer ma transformation — Diagnostic offert</span>
+              <span>Découvrir mon potentiel — Diagnostic offert</span>
               <span className="text-[11px] font-medium normal-case tracking-normal text-graphite-950/70">
                 2 min · gratuit · sans engagement
               </span>

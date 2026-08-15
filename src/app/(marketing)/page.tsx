@@ -101,7 +101,7 @@ const PILIERS = [
 
 export default function LandingPage() {
   return (
-    <main className="bg-lab-grid flex flex-col">
+    <main className="coai-landing-lux flex flex-col">
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
 
@@ -347,7 +347,7 @@ export default function LandingPage() {
         <div className="mt-2 grid grid-cols-1 gap-4 text-left sm:grid-cols-3">
           {[
             "Disponible 24h/24, 7j/7 — jamais d'attente",
-            "Répond en quelques secondes, dans l'esprit de la méthode d'Anthony",
+            "Répond en quelques secondes grâce à 17 ans d'expérience terrain structurée",
             "Ton coach humain reste dans la boucle pour ce qui compte vraiment",
           ].map((item) => (
             <div key={item} className="flex items-start gap-2.5 text-sm leading-6 text-graphite-300">
