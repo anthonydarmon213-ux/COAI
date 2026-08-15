@@ -11,9 +11,9 @@ import { AppNav } from "@/components/app-nav";
 // tableaux) qui reste la priorité de ces pages.
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-lab-grid flex min-h-screen flex-col text-graphite-50 md:flex-row">
+    <div className="coai-app-shell flex min-h-screen flex-col text-graphite-50 md:flex-row">
       <AppNav />
-      <main className="relative min-w-0 flex-1 overflow-hidden">
+      <main className="coai-app-main relative min-w-0 flex-1 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div className="animate-pulse-glow absolute -right-40 -top-48 h-[32rem] w-[32rem] rounded-full bg-laiton-400/[0.07] blur-3xl" />
           <div className="absolute -bottom-56 -left-40 h-[30rem] w-[30rem] rounded-full bg-[#4a9fc9]/[0.05] blur-3xl" />

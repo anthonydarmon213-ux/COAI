@@ -259,6 +259,87 @@ body {
   font-size: .7rem;
 }
 
+/* Espace abonné — cockpit lumineux, précis et calme. */
+.coai-app-shell {
+  background:
+    radial-gradient(circle at 24% 0%, rgba(214,177,110,.22), transparent 28rem),
+    radial-gradient(circle at 94% 72%, rgba(87,145,172,.16), transparent 34rem),
+    linear-gradient(145deg, #fbf9f4, #f0ece4 52%, #e8eff1);
+}
+
+.coai-app-nav {
+  border-color: rgba(84,68,44,.13);
+  background: rgba(255,253,248,.82);
+  box-shadow: 12px 0 45px -38px rgba(47,38,25,.4);
+}
+
+.coai-app-nav-dropdown {
+  border-color: rgba(84,68,44,.14);
+  background: rgba(255,253,248,.97);
+  box-shadow: 0 20px 50px -30px rgba(47,38,25,.55);
+}
+
+.coai-app-nav-dropdown a { color: #55574f; }
+.coai-app-nav-dropdown a:hover { background: rgba(183,137,67,.09); color: #171817; }
+
+.coai-app-shell .text-white,
+.coai-app-shell .text-graphite-50,
+.coai-app-shell .text-graphite-100,
+.coai-app-shell .text-graphite-200 { color: #171817; }
+.coai-app-shell .text-graphite-300 { color: #4e504a; }
+.coai-app-shell .text-graphite-400 { color: #686a63; }
+.coai-app-shell .text-graphite-500 { color: #7d7f77; }
+.coai-app-shell .border-white\/\[0\.07\],
+.coai-app-shell .border-white\/\[0\.08\],
+.coai-app-shell .border-graphite-800 { border-color: rgba(84,68,44,.14); }
+.coai-app-shell .bg-white\/\[0\.02\],
+.coai-app-shell .bg-white\/\[0\.025\],
+.coai-app-shell .bg-white\/\[0\.03\],
+.coai-app-shell .bg-white\/\[0\.035\],
+.coai-app-shell .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,.55); }
+.coai-app-shell .bg-graphite-900\/40,
+.coai-app-shell .bg-graphite-900\/50,
+.coai-app-shell .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
+.coai-app-shell .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .08em; }
+
+.coai-app-main > .pointer-events-none { opacity: .38; }
+
+.coai-dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(101,78,43,.14);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(91,143,166,.14), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.8), rgba(244,238,228,.58));
+  box-shadow: 0 30px 70px -52px rgba(57,43,24,.58), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.coai-dashboard-hero::after {
+  content: "";
+  position: absolute;
+  right: -5rem;
+  top: -8rem;
+  width: 20rem;
+  height: 20rem;
+  border: 1px solid rgba(151,112,48,.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.coai-dashboard-status {
+  border: 1px solid rgba(99,79,48,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.52);
+  padding: .45rem .7rem;
+  color: #5c574e;
+}
+
+.coai-dashboard > section,
+.coai-dashboard > .grid > * {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+}
+
 .coai-diagnostic-result .coai-gradient-text {
   background: linear-gradient(105deg, #171817 5%, #8f672b 55%, #547d91 100%);
   background-clip: text;

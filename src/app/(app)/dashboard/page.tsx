@@ -45,13 +45,25 @@ export default async function DashboardPage() {
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
 
   return (
-    <div className="flex flex-col gap-7">
-      <header className="flex flex-col gap-2 border-b border-acier/25 pb-6">
-        <SectionLabel>Aujourd&apos;hui</SectionLabel>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
-          {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
-        </h1>
-        <p className="max-w-2xl text-sm leading-6 text-graphite-300">{objective}</p>
+    <div className="coai-dashboard flex flex-col gap-7">
+      <header className="coai-dashboard-hero flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+          <span>Ton espace personnel</span>
+          <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
+          <span>Aujourd&apos;hui</span>
+        </div>
+        <div>
+          <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
+            {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-graphite-300">{objective}</p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+          <span className="coai-dashboard-status">Profil analysé</span>
+          <span className="coai-dashboard-status">Programme adaptatif</span>
+          <span className="coai-dashboard-status">Suivi centralisé</span>
+        </div>
       </header>
 
       <BesoinsIdentifiesCard besoins={besoins} />
@@ -70,14 +82,14 @@ export default async function DashboardPage() {
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme pas encore débloqué</p>
               <h2 className="mt-2 text-2xl text-white">Ton profil est prêt — génère ton programme quand tu veux.</h2>
               <p className="mt-2 max-w-lg text-sm leading-6 text-graphite-300">
-                19€ en un seul paiement pour générer ton programme complet (entraînement, nutrition,
-                récupération). Ou passe à Transformation (49€/mois) pour un suivi continu avec un
-                coach diplômé d&apos;État.
+                Découvre d&apos;abord ce que COAI a compris de ton profil. Lorsque tu seras prêt, tu
+                pourras générer ton programme complet ou choisir un suivi continu avec un coach
+                diplômé d&apos;État.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <OneShotProgrammeButton />
-              <Link href="/pricing" className="text-sm text-graphite-300 underline hover:text-white">Voir toutes les formules</Link>
+              <Link href="/pricing" className="text-sm text-graphite-300 underline hover:text-white">Comparer les accompagnements</Link>
             </div>
           </section>
         ) : (

@@ -20,9 +20,9 @@ export function BesoinsIdentifiesCard({ besoins }: { besoins: BesoinIdentifie[] 
   return (
     <section className="rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.05] p-6">
       <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">
-        Ce que COAI a identifié pour toi
+        Lecture de ton diagnostic
       </p>
-      <h2 className="mt-2 text-2xl text-white">Les services qui répondent à ton profil.</h2>
+      <h2 className="mt-2 font-display text-2xl text-white">Ton plan de progression personnalisé.</h2>
       <div className="mt-5 flex flex-col gap-4">
         {besoins.map((b) => (
           <div
@@ -38,7 +38,7 @@ export function BesoinsIdentifiesCard({ besoins }: { besoins: BesoinIdentifie[] 
             </div>
             <div className="w-full sm:w-56 sm:flex-none">
               <Button className="w-full" onClick={() => setServiceOuvert(b.service)}>
-                Voir les tarifs
+                Découvrir la solution
               </Button>
             </div>
           </div>

@@ -118,7 +118,7 @@ function NavGroupDropdown({ item, active }: { item: NavGroup; active: boolean })
           <div
             ref={panelRef}
             style={{ position: "fixed", top: coords.top, left: coords.left, minWidth: Math.max(coords.width, 176) }}
-            className="z-50 flex flex-col gap-0.5 rounded-xl border border-white/10 bg-[#14161a] p-1.5 shadow-2xl shadow-black/60"
+            className="coai-app-nav-dropdown z-50 flex flex-col gap-0.5 rounded-xl border border-white/10 bg-[#14161a] p-1.5 shadow-2xl shadow-black/60"
           >
             {item.children.map((child) => {
               const childActive = isActive(pathname, child.href);
@@ -144,7 +144,7 @@ export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="z-20 shrink-0 border-b border-white/[0.07] bg-[#0b0c0e]/95 px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-b-0 md:border-r md:px-6 md:py-8">
+    <aside className="coai-app-nav z-20 shrink-0 border-b border-white/[0.07] bg-[#0b0c0e]/95 px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-b-0 md:border-r md:px-6 md:py-8">
       <div className="flex items-center justify-between md:block">
         <Link href="/dashboard" className="flex flex-col gap-1">
           <div className="flex items-center gap-2.5">
