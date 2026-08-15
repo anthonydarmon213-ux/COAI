@@ -100,12 +100,14 @@ body {
   display: flex;
   min-height: 5.5rem;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: .2rem;
   border: 1px solid rgba(110, 83, 40, .13);
   border-radius: 1rem;
   background: rgba(255,255,255,.48);
   padding: .85rem;
+  text-align: center;
 }
 .coai-diagnostic-proof strong { color: #171817; font-family: var(--font-sans), sans-serif; font-size: 1.12rem; font-weight: 700; }
 .coai-diagnostic-proof span { color: #6d6f68; font-size: .74rem; line-height: 1.3; }
