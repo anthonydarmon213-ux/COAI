@@ -13,7 +13,7 @@ export function LegalPage({
   children: React.ReactNode;
 }) {
   return (
-    <main className="bg-lab-grid min-h-screen px-6 py-20">
+    <main className="coai-landing-lux min-h-screen px-6 py-20">
       <div className="mx-auto flex max-w-2xl flex-col gap-8">
         <div className="flex flex-col gap-2">
           <SectionLabel>{label}</SectionLabel>

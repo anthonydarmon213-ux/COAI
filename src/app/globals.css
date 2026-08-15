@@ -128,6 +128,7 @@ body {
 .coai-diagnostic-card .text-graphite-400 { color: #64665f; }
 .coai-diagnostic-card .text-graphite-500,
 .coai-diagnostic-card .text-graphite-600 { color: #7b7d75; }
+.coai-diagnostic-card .text-laiton-200 { color: #815b23; }
 .coai-diagnostic-card .bg-graphite-900\/40,
 .coai-diagnostic-card .bg-graphite-900\/50,
 .coai-diagnostic-card .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
@@ -264,6 +265,7 @@ body {
 .coai-access-page .text-graphite-300 { color: #484a45; }
 .coai-access-page .text-graphite-400 { color: #64665f; }
 .coai-access-page .text-graphite-500 { color: #7b7d75; }
+.coai-access-page .text-laiton-200 { color: #815b23; }
 .coai-access-page .border-graphite-700,
 .coai-access-page .border-graphite-800 { border-color: rgba(77,64,45,.16); }
 .coai-access-page .bg-graphite-900\/60,
@@ -326,6 +328,7 @@ body {
 .coai-app-shell .text-graphite-300 { color: #4e504a; }
 .coai-app-shell .text-graphite-400 { color: #686a63; }
 .coai-app-shell .text-graphite-500 { color: #7d7f77; }
+.coai-app-shell .text-laiton-200 { color: #815b23; }
 .coai-app-shell .border-white\/\[0\.07\],
 .coai-app-shell .border-white\/\[0\.08\],
 .coai-app-shell .border-graphite-800 { border-color: rgba(84,68,44,.14); }
@@ -380,12 +383,32 @@ body {
 .coai-landing-lux .text-graphite-500 { color: #7b7d75; }
 .coai-landing-lux .text-laiton-200,
 .coai-landing-lux .text-laiton-300 { color: #815b23; }
+/* Couleurs posées via une variante arbitraire Tailwind (ex: [&_h2]:text-graphite-50)
+   : le nom de classe généré contient le token complet, donc les sélecteurs
+   ".text-graphite-50" ci-dessus ne matchent jamais — attrapé ici par sélecteur
+   d'attribut sur toute classe qui CONTIENT ce token. */
+.coai-landing-lux [class*="text-graphite-50"] h2,
+.coai-landing-lux [class*="text-graphite-50"] h3 { color: #171817; }
 .coai-landing-lux .border-white\/\[0\.06\],
 .coai-landing-lux .border-white\/\[0\.07\],
 .coai-landing-lux .border-white\/\[0\.08\],
-.coai-landing-lux .border-graphite-700 { border-color: rgba(84,68,44,.14); }
+.coai-landing-lux .border-white\/5,
+.coai-landing-lux .border-white\/\[0\.05\] { border-color: rgba(84,68,44,.1); }
+.coai-landing-lux .border-white\/10,
+.coai-landing-lux .border-white\/20,
+.coai-landing-lux .border-graphite-700,
+.coai-landing-lux .border-graphite-800 { border-color: rgba(84,68,44,.16); }
 .coai-landing-lux .bg-white\/\[0\.02\],
-.coai-landing-lux .bg-white\/\[0\.035\] { background-color: rgba(255,255,255,.62); }
+.coai-landing-lux .bg-white\/\[0\.03\],
+.coai-landing-lux .bg-white\/\[0\.035\],
+.coai-landing-lux .bg-white\/\[0\.045\],
+.coai-landing-lux .bg-white\/\[0\.06\],
+.coai-landing-lux .bg-white\/\[0\.065\] { background-color: rgba(255,255,255,.6); }
+.coai-landing-lux .bg-graphite-900,
+.coai-landing-lux .bg-graphite-400,
+.coai-landing-lux .bg-graphite-900\/40,
+.coai-landing-lux .bg-graphite-900\/50,
+.coai-landing-lux .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
 .coai-landing-lux .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .09em; }
 
 /* Système typographique volontairement réduit : display pour les titres,

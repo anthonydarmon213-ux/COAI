@@ -4,6 +4,64 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Audit visuel post-redesign taupe/champagne + corrections (15/08/2026)
+
+Suite du redesign taupe/champagne fait par une session ChatGPT séparée
+(13 commits, jamais audité). Anthony a demandé un audit complet de coai.fr
+sans modification, puis a validé les corrections.
+
+**Audit** (lecture seule, `tsc`/`build` réels + Playwright sur dev local —
+accès réseau direct à coai.fr bloqué côté sandbox, jamais contourné) :
+identifié que le redesign n'avait touché que la homepage/diagnostic/app
+authentifiée — `/pricing`, les 6 pages SEO, `/calculateur-calories`,
+`/a-propos` et les 3 pages légales (CGV/confidentialité/mentions légales)
+étaient restées sur l'ancien thème sombre `bg-lab-grid`.
+
+**Bug critique trouvé** : sur le questionnaire diagnostic (et partout où
+`.coai-app-shell`/`.coai-diagnostic-card`/`.coai-access-page` s'appliquent),
+le texte d'une réponse sélectionnée devenait invisible (texte quasi-blanc
+sur fond quasi-blanc). Cause réelle : `text-laiton-200` était utilisé dans
+des dizaines de composants sans que cette couleur n'ait jamais été définie
+dans `tailwind.config.ts` (seuls 300/400/500/600 existaient) — Tailwind ne
+génère alors aucun CSS pour cette classe, le texte hérite silencieusement
+de la couleur ambiante. Sur l'ancien thème sombre ça passait inaperçu
+(blanc hérité sur fond sombre) ; sur le nouveau thème clair, invisible.
+Corrigé par l'ajout d'un vrai `laiton-200` à la palette + des règles
+`.text-laiton-200` dans les 3 scopes concernés.
+
+**Harmonisation** : classe `coai-landing-lux` (déjà utilisée par la
+homepage, gère son propre fond clair + réassigne les couleurs Tailwind
+héritées de l'ancien thème sombre) appliquée aux 11 pages encore sombres
+listées ci-dessus. Un second bug découvert en vérifiant `/cgv` : les
+titres de section utilisaient une variante Tailwind arbitraire
+(`[&_h2]:text-graphite-50`) — le nom de classe généré contient ce token
+complet, donc les sélecteurs `.text-graphite-50` ne le matchent jamais ;
+ajouté un sélecteur d'attribut dédié (`[class*="text-graphite-50"] h2`)
+pour l'attraper aussi.
+
+**Correction de contenu** : la séance visio de 30 min Anthony Darmon
+incluse dans Transformation était décrite comme récurrente ("chaque mois"/
+"par mois") à 4 endroits (`/pricing` via `tiers.ts`, `compte/abonnement`
+via `plan-features.ts`, les CGV, et le CTA in-app `CoachingVisioCta`) —
+corrigé partout pour refléter la règle réelle : offerte une seule fois,
+toute séance suivante passe par l'offre VIP payante à la séance.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Playwright
+réel sur dev local (mobile 390px, desktop 1440px) : texte de l'option
+sélectionnée du diagnostic lisible (`getComputedStyle` confirmé,
+`rgb(129,91,35)` sur fond crème), `/pricing` sans débordement horizontal
+avec la nouvelle copy visio, `/cgv` avec titres de section maintenant
+visibles, `/a-propos`, `/calculateur-calories` et
+`/programme-perte-de-poids` entièrement passées au thème clair sans
+régression.
+
+**Non testable depuis ce sandbox** : accès réseau direct à coai.fr bloqué
+par la politique du sandbox (jamais contourné, conforme à la consigne) —
+toute la vérification visuelle a été faite sur un serveur de dev local
+exécutant le code réellement poussé, pas sur le site en production. À
+confirmer par Anthony une fois déployé : que les pages listées s'affichent
+bien identiquement en prod.
+
 ## Renfort SEO + calculateur gratuit (14/08/2026)
 
 Suite directe du blocage Meta (section suivante, plus bas) : Anthony a

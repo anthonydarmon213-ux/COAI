@@ -62,7 +62,7 @@ const FAQ_ITEMS = [
 
 export default function ProgrammeMusculationFemmePage() {
   return (
-    <main className="bg-lab-grid flex min-h-screen flex-col items-center gap-10 px-6 py-24">
+    <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-10 px-6 py-24">
       <div className="w-full max-w-3xl pt-8">
         <BackLink />
       </div>

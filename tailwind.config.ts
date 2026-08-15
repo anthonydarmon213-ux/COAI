@@ -30,6 +30,14 @@ const config: Config = {
           500: "#b0873c",
           400: "#c9a262",
           300: "#ddc191",
+          // 200 n'existait pas (14/08/2026, corrigé) : "text-laiton-200" est
+          // utilisé dans des dizaines de composants sans qu'aucune couleur
+          // ne soit jamais générée pour cette classe — le texte héritait
+          // silencieusement de la couleur ambiante (blanc sur fond sombre,
+          // ce qui passait inaperçu). Sur les nouveaux écrans clairs
+          // (diagnostic, app, landing), ce même texte devenait invisible
+          // (blanc sur fond clair). Complète la suite au lieu du blanc.
+          200: "#e9dcc0",
         },
         // Bleu-acier du point central du logomark (le repère "IA" du duo
         // humain/IA) — touche d'accent secondaire, utilisée avec parcimonie.

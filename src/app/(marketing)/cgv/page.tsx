@@ -41,8 +41,9 @@ export default function CgvPage() {
             automatiquement sur 49€/mois ou 490€/an selon la périodicité choisie. Inclut le palier Impulsion, la génération d&apos;un
             programme d&apos;entraînement, de nutrition et de récupération par intelligence
             artificielle relu et validé par un coach diplômé d&apos;État, ainsi qu&apos;une
-            séance visio individuelle de 30 minutes par mois avec Anthony Darmon, à réserver via
-            WhatsApp.
+            séance visio individuelle de 30 minutes offerte avec Anthony Darmon (une fois, à
+            réserver via WhatsApp) — toute séance supplémentaire relève de l&apos;offre VIP, à la
+            séance.
           </li>
           <li>
             <strong>VIP (à la séance)</strong> — coaching individuel avec Anthony Darmon,

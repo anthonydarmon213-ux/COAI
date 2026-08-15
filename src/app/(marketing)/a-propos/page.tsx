@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function AProposPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-16 px-6 py-24 sm:py-28">
+    <div className="coai-landing-lux mx-auto flex w-full max-w-3xl flex-col gap-16 px-6 py-24 sm:py-28">
       <section>
         <SectionLabel>Histoire</SectionLabel>
         <h1 className="mt-6 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
