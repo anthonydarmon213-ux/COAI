@@ -385,6 +385,15 @@ export function DiagnosticQuiz({
   // recommencer à zéro. Ne s'applique qu'une fois, pas à chaque changement
   // d'étape (sinon on écraserait resumable=false dès le premier goNext).
   useEffect(() => {
+    const doitRecommencer = new URLSearchParams(window.location.search).get("restart") === "1";
+    if (doitRecommencer) {
+      clearDiagnosticProgress();
+      setResumable(false);
+      // L'URL redevient propre après avoir consommé l'intention. Un simple
+      // rechargement ne doit pas effacer une nouvelle progression en cours.
+      window.history.replaceState(null, "", window.location.pathname);
+      return;
+    }
     const saved = readDiagnosticProgress<Record<string, unknown>>();
     if (saved && typeof saved.step === "string" && saved.step !== "intro") {
       setResumable(true);
