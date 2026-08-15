@@ -357,12 +357,13 @@ body {
 
 .coai-landing-hero-overlay {
   background:
-    linear-gradient(90deg, rgba(248,245,238,.9) 0%, rgba(248,245,238,.48) 48%, rgba(237,241,241,.3) 100%),
-    linear-gradient(180deg, rgba(248,245,238,.18), rgba(244,240,232,.72) 78%, #f7f4ee 100%);
+    radial-gradient(circle at 50% 18%, rgba(105,164,188,.17), transparent 23rem),
+    radial-gradient(circle at 18% 70%, rgba(211,170,95,.19), transparent 28rem),
+    linear-gradient(145deg, #fbfaf7 0%, #f3eee4 52%, #e7eff1 100%);
 }
 
 .coai-landing-wordmark { color: #171817; text-shadow: 0 1px 0 rgba(255,255,255,.7); }
-.coai-landing-eyebrow { color: #567d90; text-shadow: none; }
+.coai-landing-eyebrow { color: #49788f; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
 
 .coai-landing-promise {
   border-color: rgba(99,76,42,.16);
@@ -454,6 +455,17 @@ body {
 }
 .coai-marketing-footer .text-graphite-500 { color: #64665f; }
 .coai-marketing-footer a { transition: color .2s ease; }
+
+.coai-pricing-algorithm {
+  border: 1px solid rgba(99,76,42,.15);
+  background:
+    radial-gradient(circle at 90% 8%, rgba(82,142,167,.14), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.8), rgba(240,233,221,.62));
+  box-shadow: 0 30px 70px -52px rgba(52,39,22,.62), inset 0 1px 0 rgba(255,255,255,.94);
+}
+.coai-pricing-algorithm .text-white { color: #171817; }
+.coai-pricing-algorithm .text-graphite-300 { color: #4f514c; }
+.coai-pricing-algorithm .text-laiton-300 { color: #7f5d27; }
 
 @media (max-width: 640px) {
   .coai-landing-hero { min-height: auto; padding-top: 7rem; }

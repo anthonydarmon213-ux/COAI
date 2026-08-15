@@ -31,9 +31,9 @@ export default function PricingPage({
   searchParams?: { billing?: string; checkout?: string };
 }) {
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
-  // L'annuel est présenté en premier pour privilégier l'engagement et la
-  // trésorerie, sans retirer le mensuel (accessible en un clic).
-  const annual = searchParams?.billing !== "monthly";
+  // Le mensuel rassure davantage au premier contact. L'annuel reste une
+  // option avantageuse, mais n'est plus imposé à l'arrivée sur la page.
+  const annual = searchParams?.billing === "annual";
   const displayedTiers = TIERS.map((tier) => {
     // Impulsion (paiement unique) ne dépend jamais du bascule mensuel/annuel.
     if (!annual || tier.sessions || tier.oneShot) return tier;
@@ -55,8 +55,8 @@ export default function PricingPage({
           Choisis le coaching qui te correspond.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-graphite-400">
-          Crée ton compte gratuitement et explore toute l&apos;interface. Tu choisis ensuite ce que
-          tu débloques.
+          Dans les deux formules, ton programme personnalisé est inclus. Choisis simplement le
+          niveau d&apos;accompagnement que tu souhaites.
         </p>
         <div className="mt-6 flex justify-center">
           <TrustBadges />
@@ -74,10 +74,25 @@ export default function PricingPage({
         </Card>
       )}
 
+      <div className="coai-pricing-algorithm w-full max-w-4xl rounded-2xl px-6 py-6 text-center sm:px-10">
+        <SectionLabel>La différence COAI</SectionLabel>
+        <h2 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">
+          Bien plus qu&apos;un programme généré par une IA classique.
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-graphite-300">
+          Ton programme n&apos;est pas produit à partir d&apos;un simple prompt. Les algorithmes COAI
+          traduisent plus de 17 ans d&apos;expérience terrain en décisions d&apos;entraînement, de
+          nutrition et de récupération adaptées à ton profil.
+        </p>
+        <p className="mt-4 text-sm font-semibold text-laiton-300">
+          L&apos;IA personnalise. Les algorithmes COAI structurent et adaptent. L&apos;expertise humaine valide et accompagne.
+        </p>
+      </div>
+
       {/* Comparateur à 4 colonnes (13/08/2026, nouveau modèle d'accès libre)
           — Entreprise réintégrée au grid, à côté de VIP, pour plus de
           visibilité (elle était auparavant sortie en bandeau à part). */}
-      <div className="grid w-full max-w-6xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid w-full max-w-5xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2">
         {displayedTiers.map((tier) => (
           <Card
             id={tier.sessions ? "vip" : undefined}
@@ -189,7 +204,7 @@ export default function PricingPage({
                     </>
                   }
                 >
-                  <OneShotProgrammeButton label="Générer mon programme — 19€" />
+                  <OneShotProgrammeButton label="Générer mon programme avec COAI — 19€" />
                 </OffreConsentGate>
               ) : tier.plan ? (
                 <OffreConsentGate
@@ -204,7 +219,7 @@ export default function PricingPage({
                     </>
                   }
                 >
-                  <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer mes 7 jours offerts" className="w-full" />
+                  <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Générer mon programme + activer mon suivi" className="w-full" />
                 </OffreConsentGate>
               ) : null}
               {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
