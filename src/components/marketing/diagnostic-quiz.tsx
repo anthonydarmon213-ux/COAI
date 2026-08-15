@@ -242,13 +242,13 @@ function OptionCard({
       aria-pressed={active}
       className={`coai-diagnostic-option flex w-full items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-left text-sm transition ${
         active
-          ? "border-laiton-400/50 bg-laiton-400/[0.08] text-laiton-200"
+          ? "border-laiton-400/50 bg-laiton-400/[0.08] text-graphite-950"
           : "border-graphite-800 bg-graphite-900/60 text-graphite-200 hover:border-graphite-600 hover:text-white"
       }`}
     >
       <span className="flex flex-col items-start gap-0.5">
         <span className="font-medium">{label}</span>
-        {hint && <span className="text-xs text-graphite-500">{hint}</span>}
+        {hint && <span className={`text-xs ${active ? "text-graphite-400" : "text-graphite-500"}`}>{hint}</span>}
       </span>
       <span className="coai-diagnostic-option-mark" aria-hidden="true">{active ? "✓" : ""}</span>
     </button>
@@ -845,7 +845,7 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="mt-2 px-8 py-3.5">
-                  Révéler mon profil →
+                  Commencer mon diagnostic →
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
@@ -1124,14 +1124,21 @@ export function DiagnosticQuiz({
                   Facultatif — sert à affiner tes repères caloriques et de charge. Tu peux passer.
                 </p>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <Field label="Âge">
-                  <Input type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} />
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="Ex. 42"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                  />
                 </Field>
                 <Field label="Taille (cm)">
                   <Input
                     type="number"
                     inputMode="numeric"
+                    placeholder="Ex. 175"
                     value={tailleCm}
                     onChange={(e) => setTailleCm(e.target.value)}
                   />
@@ -1140,6 +1147,7 @@ export function DiagnosticQuiz({
                   <Input
                     type="number"
                     inputMode="numeric"
+                    placeholder="Ex. 72"
                     value={poidsKg}
                     onChange={(e) => setPoidsKg(e.target.value)}
                   />

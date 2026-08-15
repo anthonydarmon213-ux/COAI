@@ -116,6 +116,17 @@ body {
   transform: scale(1.04);
 }
 
+.coai-diagnostic-option[aria-pressed="true"] {
+  border-color: rgba(167, 122, 55, .55) !important;
+  background: linear-gradient(145deg, rgba(229, 204, 161, .55), rgba(255, 251, 243, .92)) !important;
+  color: #211c15 !important;
+}
+
+.coai-diagnostic-option[aria-pressed="true"] .text-graphite-400,
+.coai-diagnostic-option[aria-pressed="true"] .text-graphite-500 {
+  color: #665b4b !important;
+}
+
 .coai-diagnostic-chip[aria-pressed="true"] {
   color: #4d3516 !important;
   border-color: rgba(167, 122, 55, .68) !important;
@@ -136,6 +147,35 @@ body {
 .coai-diagnostic-card .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
 .coai-diagnostic-card .border-graphite-800,
 .coai-diagnostic-card .border-graphite-700 { border-color: rgba(77, 64, 45, .14); }
+
+.coai-diagnostic-card input,
+.coai-diagnostic-card textarea,
+.coai-diagnostic-card select {
+  min-height: 3.25rem;
+  border: 1px solid rgba(96, 75, 44, .24) !important;
+  background: rgba(255, 255, 255, .82) !important;
+  color: #171817 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 8px 22px -20px rgba(58, 45, 27, .65);
+}
+
+.coai-diagnostic-card input::placeholder,
+.coai-diagnostic-card textarea::placeholder {
+  color: #969087 !important;
+  opacity: 1;
+}
+
+.coai-diagnostic-card input:hover,
+.coai-diagnostic-card textarea:hover,
+.coai-diagnostic-card select:hover {
+  border-color: rgba(167, 122, 55, .42) !important;
+}
+
+.coai-diagnostic-card input:focus,
+.coai-diagnostic-card textarea:focus,
+.coai-diagnostic-card select:focus {
+  border-color: rgba(167, 122, 55, .72) !important;
+  box-shadow: 0 0 0 4px rgba(183, 137, 67, .12) !important;
+}
 
 .coai-diagnostic-proof {
   display: flex;
@@ -258,6 +298,19 @@ body {
 .coai-access-card {
   background: rgba(255,255,255,.84);
   box-shadow: none;
+}
+
+.coai-access-card :is(input, textarea, select) {
+  min-height: 3.25rem;
+  border: 1px solid rgba(143, 103, 43, 0.38) !important;
+  background: #fffdf8 !important;
+  color: #171817 !important;
+  box-shadow: 0 8px 24px rgba(63, 49, 29, 0.06);
+}
+
+.coai-access-card :is(input, textarea)::placeholder {
+  color: #707269 !important;
+  opacity: 1;
 }
 
 .coai-access-page .text-graphite-50,
@@ -503,15 +556,29 @@ body {
 }
 
 .coai-dashboard-hero::after {
-  content: "";
-  position: absolute;
-  right: -5rem;
-  top: -8rem;
-  width: 20rem;
-  height: 20rem;
-  border: 1px solid rgba(151,112,48,.12);
-  border-radius: 50%;
-  pointer-events: none;
+  content: none;
+}
+
+.coai-app-shell .coai-gradient-text {
+  background: none !important;
+  color: #171817 !important;
+  -webkit-text-fill-color: #171817 !important;
+}
+
+.coai-app-shell :is(input, textarea, select) {
+  border-color: rgba(143, 103, 43, 0.38) !important;
+  background: #fffdf8 !important;
+  color: #171817 !important;
+}
+
+.coai-app-shell :is(input, textarea)::placeholder {
+  color: #707269 !important;
+  opacity: 1;
+}
+
+.coai-app-shell .text-laiton-200,
+.coai-app-shell .text-laiton-300 {
+  color: #7a551f !important;
 }
 
 .coai-dashboard-status {

@@ -54,7 +54,7 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
         type="button"
         onClick={partager}
         disabled={loading}
-        className="rounded-full border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200 disabled:opacity-50"
+        className="rounded-full border border-graphite-950 bg-graphite-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-graphite-800 disabled:opacity-50"
       >
         {loading ? "…" : "Partager mon Indice COAI →"}
       </button>

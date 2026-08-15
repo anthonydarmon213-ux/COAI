@@ -31,11 +31,11 @@ export default async function CompleterInscriptionPage() {
     "";
 
   return (
-    <main className="bg-lab-grid flex min-h-screen items-center justify-center px-6">
-      <Card className="flex w-full max-w-sm flex-col gap-5">
+    <main className="coai-access-page flex min-h-screen items-center justify-center px-6">
+      <Card className="coai-access-card flex w-full max-w-sm flex-col gap-5">
         <div className="flex flex-col gap-1">
           <SectionLabel>Dernière étape</SectionLabel>
-          <h1 className="text-xl font-semibold text-graphite-50">
+          <h1 className="text-xl font-semibold text-graphite-950">
             Finalise ton compte
           </h1>
           <p className="text-sm text-graphite-400">{authUser.email}</p>
