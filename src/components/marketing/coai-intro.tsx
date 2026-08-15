@@ -88,8 +88,8 @@ export function CoaiIntro() {
           </svg>
           AI
         </span>
-        <span className="coai-landing-eyebrow max-w-xl text-balance font-mono text-sm font-bold uppercase tracking-[0.16em]">
-          Le studio de coaching premium du futur
+        <span className="coai-landing-eyebrow max-w-xl text-balance text-sm font-semibold tracking-[0.04em] sm:text-base">
+          Le coaching intelligent. L&apos;expertise humaine.
         </span>
       </div>
 
@@ -111,13 +111,13 @@ export function CoaiIntro() {
               className="animate-halo-blink pointer-events-none absolute -inset-3 -z-10 rounded-full bg-laiton-400 blur-2xl"
               aria-hidden="true"
             />
-            <Button className="flex flex-col items-center gap-1 px-9 py-4 text-base uppercase tracking-wide shadow-[0_25px_70px_-18px_rgba(201,162,98,0.95)]">
+            <Button className="px-9 py-4 text-base font-bold uppercase tracking-[0.04em] shadow-[0_25px_70px_-18px_rgba(201,162,98,0.95)]">
               <span>Découvrir mon potentiel — Diagnostic offert</span>
-              <span className="text-[11px] font-medium normal-case tracking-normal text-graphite-950/70">
-                2 min · gratuit · sans engagement
-              </span>
             </Button>
           </Link>
+          <span className="w-full text-center text-sm font-medium text-[#5f605b]">
+            2 min · gratuit · sans engagement
+          </span>
         </div>
         <div className="flex flex-col items-center gap-2.5 sm:flex-row sm:gap-3">
           <span className="flex items-center gap-2 rounded-full border border-laiton-400/40 bg-laiton-400/10 px-4 py-2 text-sm font-semibold text-laiton-200 shadow-[0_0_24px_-8px_rgba(201,162,98,0.6)]">

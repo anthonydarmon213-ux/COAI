@@ -1227,6 +1227,23 @@ export function DiagnosticQuiz({
                 <h2 className="coai-gradient-text max-w-2xl font-display text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
                   Ton point de départ est clair. Voici la trajectoire.
                 </h2>
+                <div className="coai-index-reveal mt-2 grid w-full max-w-2xl gap-5 rounded-2xl p-5 text-left sm:grid-cols-[auto_1fr] sm:items-center sm:p-7">
+                  <div className="coai-index-ring" style={{ "--coai-score": `${diagnostic.indiceCoai.score * 3.6}deg` } as React.CSSProperties}>
+                    <div>
+                      <strong>{diagnostic.indiceCoai.score}</strong>
+                      <span>/100</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="coai-index-label">Indice COAI · Potentiel d&apos;évolution</p>
+                    <h3 className="mt-1 font-display text-2xl font-semibold text-white sm:text-3xl">
+                      Potentiel {diagnostic.indiceCoai.niveau.toLowerCase()}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-graphite-300">
+                      Ton score révèle la qualité de ton terrain actuel et les leviers qui peuvent accélérer ta progression.
+                    </p>
+                  </div>
+                </div>
                 <p className="max-w-xl text-base leading-7 text-graphite-300">{diagnostic.profilParagraphe}</p>
                 {diagnostic.alerte && (
                   <p className="max-w-md rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
@@ -1298,7 +1315,29 @@ export function DiagnosticQuiz({
                 </div>
               )}
 
-              <DiagnosticShareButton connecte={connecte} objectif={diagnostic.profil.objectif} />
+              <div className="coai-index-actions w-full rounded-2xl p-5 text-left sm:p-6">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <SectionLabel>Améliorer ton Indice COAI</SectionLabel>
+                    <h3 className="mt-2 font-display text-2xl font-semibold text-white">Tes 3 prochains leviers</h3>
+                  </div>
+                  <p className="text-xs text-graphite-500">Plan d&apos;action initial · 7 jours</p>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {diagnostic.indiceCoai.actions.map((action, index) => (
+                    <div key={action.titre} className="coai-index-action-card">
+                      <span>{index + 1}</span>
+                      <p>{action.titre}</p>
+                      <strong>{action.impact}</strong>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-[11px] leading-5 text-graphite-500">
+                  Indicateur de coaching calculé à partir de tes réponses. Il ne constitue pas une mesure médicale.
+                </p>
+              </div>
+
+              <DiagnosticShareButton connecte={connecte} objectif={diagnostic.profil.objectif} score={diagnostic.indiceCoai.score} />
 
               <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
                 <VoletCard label="Entraînement">

@@ -121,6 +121,11 @@ export type MiniDiagnostic = {
   profil: ProfilStructure;
   profilParagraphe: string;
   pitchEvolution: string;
+  indiceCoai: {
+    score: number;
+    niveau: "À révéler" | "Prometteur" | "Élevé" | "Très élevé";
+    actions: Array<{ titre: string; impact: string }>;
+  };
 };
 
 // Reprend l'axe de marque retenu par Anthony (11/08/2026, en mémoire dans
@@ -234,6 +239,70 @@ function calculerPointsResolus(r: ReponsesDiagnostic, sante: string[]): string[]
   return points.slice(0, 4);
 }
 
+// Indice propriétaire de coaching, volontairement explicable et stable :
+// il mesure la qualité du terrain disponible pour évoluer (régularité,
+// récupération, habitudes et structure), jamais une aptitude génétique ou
+// un état médical. Le score reste borné pour éviter toute fausse précision.
+function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnostic["indiceCoai"] {
+  const frequence: Record<string, number> = {
+    "1 fois par semaine": 10,
+    "2 fois par semaine": 15,
+    "3 fois par semaine": 20,
+    "4 fois par semaine": 22,
+    "5 fois par semaine": 21,
+    "6 fois ou plus par semaine": 18,
+  };
+  const sommeil: Record<string, number> = {
+    "Mauvaise (moins de 5h, sommeil agité)": 7,
+    "Moyenne (5-6h, réveils fréquents)": 13,
+    "Bonne (7-8h, plutôt réparateur)": 20,
+    "Excellente (8h ou plus, réparateur)": 22,
+  };
+  const nutrition: Record<string, number> = {
+    "Grignotage fréquent / repas irréguliers": 10,
+    "Beaucoup de plats préparés ou fast-food": 9,
+    "Jeûne intermittent": 16,
+    "Repas structurés et équilibrés": 21,
+    "Déjà suivi par un nutritionniste": 22,
+  };
+  const structureFragile = (r.persona ?? []).some((p) => STRUCTURE_PERSONAS.includes(p));
+  const base = 24;
+  const score = Math.max(45, Math.min(92,
+    base +
+    (frequence[r.frequence ?? ""] ?? 12) +
+    (sommeil[r.qualiteSommeil ?? ""] ?? 12) +
+    (nutrition[r.habitudesAlimentaires ?? ""] ?? 12) +
+    (structureFragile ? 7 : 13) -
+    (sante.length > 0 ? 4 : 0)
+  ));
+
+  const actions: Array<{ titre: string; impact: string }> = [];
+  if (r.qualiteSommeil && SOMMEIL_A_AMELIORER.includes(r.qualiteSommeil)) {
+    actions.push({ titre: "Gagner 30 à 45 minutes de sommeil", impact: "+4 à 6 points" });
+  }
+  if (r.habitudesAlimentaires && NUTRITION_A_AMELIORER.includes(r.habitudesAlimentaires)) {
+    actions.push({ titre: "Structurer trois repas réguliers", impact: "+3 à 5 points" });
+  }
+  if (structureFragile) {
+    actions.push({ titre: "Suivre un plan clair séance après séance", impact: "+4 à 7 points" });
+  }
+  if ((r.persona ?? []).includes("Je suis plutôt sédentaire")) {
+    actions.push({ titre: "Ajouter 2 000 pas par jour", impact: "+2 à 4 points" });
+  }
+  if (sante.length > 0) {
+    actions.push({ titre: "Adapter les mouvements à ta contrainte", impact: "progression sécurisée" });
+  }
+  if (actions.length < 3) {
+    actions.push({ titre: `Tenir ton rythme de ${r.frequence?.toLowerCase() ?? "séances"}`, impact: "+3 à 5 points" });
+  }
+  if (actions.length < 3) {
+    actions.push({ titre: "Compléter ton check-in chaque semaine", impact: "adaptation plus précise" });
+  }
+
+  const niveau = score >= 82 ? "Très élevé" : score >= 72 ? "Élevé" : score >= 60 ? "Prometteur" : "À révéler";
+  return { score, niveau, actions: actions.slice(0, 3) };
+}
+
 export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | null {
   const { niveau, objectif, equipement = [], frequence, persona = [], sante: santeBrute = [] } = r;
   if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
@@ -275,6 +344,7 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
     profil,
     profilParagraphe: construireProfilParagraphe(r, profil),
     pitchEvolution: PITCH_EVOLUTION,
+    indiceCoai: calculerIndiceCoai(r, sante),
   };
 }
 

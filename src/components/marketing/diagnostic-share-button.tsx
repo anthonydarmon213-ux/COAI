@@ -13,7 +13,7 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 // lien de parrainage (chargé à la demande, pas au montage, pour ne jamais
 // appeler /api/parrainage pour un visiteur anonyme qui n'en a pas) ; un
 // visiteur anonyme partage simplement le diagnostic public.
-export function DiagnosticShareButton({ connecte, objectif }: { connecte: boolean; objectif: string }) {
+export function DiagnosticShareButton({ connecte, objectif, score }: { connecte: boolean; objectif: string; score: number }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -27,7 +27,7 @@ export function DiagnosticShareButton({ connecte, objectif }: { connecte: boolea
         const data = res?.ok ? await res.json() : null;
         if (typeof data?.lien === "string") lien = data.lien;
       }
-      const text = `COAI vient de m'expliquer où j'en suis et où il peut m'emmener pour ${objectif.toLowerCase()}. Fais ton diagnostic gratuit :`;
+      const text = `Mon Indice COAI est de ${score}/100. COAI vient de révéler mes leviers pour ${objectif.toLowerCase()}. Découvre gratuitement le tien :`;
 
       if (navigator.share) {
         try {
@@ -56,7 +56,7 @@ export function DiagnosticShareButton({ connecte, objectif }: { connecte: boolea
         disabled={loading}
         className="rounded-full border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200 disabled:opacity-50"
       >
-        {loading ? "…" : "Partager mon diagnostic →"}
+        {loading ? "…" : "Partager mon Indice COAI →"}
       </button>
       {message && <span className="text-xs text-graphite-500">{message}</span>}
     </div>

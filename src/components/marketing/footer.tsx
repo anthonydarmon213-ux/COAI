@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.07] px-6 py-8">
+    <footer className="coai-marketing-footer px-6 py-10">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-6">
         <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-graphite-500">
           <Link href="/pricing" className="hover:text-laiton-400">

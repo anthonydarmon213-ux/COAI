@@ -1,5 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-
 // Aperçu du produit dans le hero — reconstruit avec les mêmes composants
 // et libellés que le vrai dashboard/la vraie page évolution (pas une
 // capture d'écran figée, mais pas non plus des fonctionnalités inventées :
@@ -11,7 +9,7 @@ function PhoneFrame({ children, className = "" }: { children: React.ReactNode; c
       className={`relative w-64 rounded-[2.5rem] border border-white/15 bg-[#0b0c0e] p-2.5 shadow-2xl ${className}`}
     >
       <div className="absolute left-1/2 top-2.5 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
-      <div className="flex flex-col gap-3 overflow-hidden rounded-[2rem] border border-white/10 bg-[#111214] px-4 pb-5 pt-8">
+      <div className="coai-phone-screen flex min-h-[410px] flex-col gap-3 overflow-hidden rounded-[2rem] px-4 pb-5 pt-8">
         {children}
       </div>
     </div>
@@ -22,53 +20,77 @@ export function AppPreviewPhones({ prenom = "Anthony" }: { prenom?: string }) {
   return (
     <div className="relative flex items-center justify-center">
       <PhoneFrame className="hidden sm:block sm:-mr-16 sm:translate-y-6 sm:rotate-[-4deg]">
-        <p className="text-xs text-graphite-400">Bonjour {prenom}</p>
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <p className="font-mono text-[9px] uppercase tracking-wider text-graphite-500">
-            Ta prochaine séance
-          </p>
-          <p className="mt-1 text-sm font-semibold text-white">Push — Force</p>
-          <p className="mt-1 text-[11px] text-graphite-400">60 min · Renforcement haut du corps</p>
-          <div className="mt-3 rounded-full bg-laiton-400 px-3 py-1.5 text-center text-[11px] font-semibold text-graphite-950">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="coai-phone-kicker">Cockpit COAI</p>
+            <p className="coai-phone-heading">Bonjour {prenom}</p>
+          </div>
+          <span className="coai-phone-status">Prêt</span>
+        </div>
+        <div className="coai-phone-card p-3">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="coai-phone-label">Séance du jour</p>
+              <p className="coai-phone-title mt-1">Push — Force</p>
+            </div>
+            <span className="coai-phone-score">92</span>
+          </div>
+          <p className="coai-phone-copy mt-1">60 min · Adaptée à ta forme</p>
+          <div className="coai-phone-action mt-3">
             Commencer la séance
           </div>
         </div>
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <p className="text-xs font-medium text-white">Cette semaine</p>
-          <p className="mt-1 text-[11px] text-graphite-400">4 / 4 séances réalisées</p>
-          <div className="mt-2 h-1.5 w-full rounded-full bg-graphite-800">
-            <div className="h-1.5 w-full rounded-full bg-laiton-400" />
+        <div className="coai-phone-card p-3">
+          <div className="flex items-center justify-between">
+            <p className="coai-phone-title">Ta semaine</p>
+            <p className="coai-phone-accent">4 / 4</p>
+          </div>
+          <div className="coai-phone-progress mt-2">
+            <div className="h-full w-full rounded-full bg-[#cba45f]" />
           </div>
         </div>
-        <div className="rounded-xl border border-laiton-400/20 bg-laiton-400/[0.06] p-3">
-          <Badge tone="success">COAI Insight</Badge>
-          <p className="mt-2 text-[11px] leading-4 text-graphite-300">
-            Tes performances progressent et ta récupération est bonne. Augmentation progressive de
-            la charge recommandée.
+        <div className="coai-phone-insight p-3">
+          <p className="coai-phone-label">✦ Insight COAI</p>
+          <p className="coai-phone-copy mt-2 leading-4">
+            Ta récupération est bonne. Ton programme peut progresser en toute sécurité.
           </p>
         </div>
       </PhoneFrame>
 
       <PhoneFrame className="translate-y-2 rotate-[3deg] shadow-[0_40px_100px_-30px_rgba(0,0,0,0.7)]">
-        <p className="text-xs text-graphite-400">Progression</p>
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <p className="font-mono text-[9px] uppercase tracking-wider text-graphite-500">
-            Développé couché
-          </p>
-          <p className="mt-1 text-lg font-semibold text-white">102,5 kg</p>
-          <p className="mt-0.5 text-[11px] font-medium text-laiton-300">+5,2 kg ce mois-ci</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="coai-phone-kicker">Ton évolution</p>
+            <p className="coai-phone-heading">Progression</p>
+          </div>
+          <div className="coai-phone-orb" aria-hidden="true"><span>87</span></div>
         </div>
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <p className="font-mono text-[9px] uppercase tracking-wider text-graphite-500">
-            Poids du corps
-          </p>
-          <p className="mt-1 text-sm font-semibold text-white">78,4 kg</p>
-          <p className="mt-0.5 text-[11px] text-graphite-400">-1,3 kg</p>
+        <div className="coai-phone-card p-3">
+          <p className="coai-phone-label">Développé couché</p>
+          <div className="mt-1 flex items-end justify-between">
+            <p className="coai-phone-metric">102,5 <span>kg</span></p>
+            <p className="coai-phone-accent">+5,2 kg</p>
+          </div>
+          <svg className="mt-3 h-9 w-full" viewBox="0 0 180 36" fill="none" aria-hidden="true">
+            <path d="M2 31C24 28 35 29 51 22C68 15 78 21 96 16C113 11 126 13 144 7C157 3 168 6 178 2" stroke="#c29a54" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M2 31C24 28 35 29 51 22C68 15 78 21 96 16C113 11 126 13 144 7C157 3 168 6 178 2V36H2Z" fill="url(#phoneChart)" opacity=".32" />
+            <defs><linearGradient id="phoneChart" x1="90" y1="0" x2="90" y2="36"><stop stopColor="#c29a54"/><stop offset="1" stopColor="#c29a54" stopOpacity="0"/></linearGradient></defs>
+          </svg>
         </div>
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <p className="text-xs font-medium text-white">Ton programme évolue</p>
-          <p className="mt-1 text-[11px] leading-4 text-graphite-400">
-            V3 — adapté après ton dernier check-in hebdomadaire.
+        <div className="grid grid-cols-2 gap-2">
+          <div className="coai-phone-card p-3">
+            <p className="coai-phone-label">Énergie</p>
+            <p className="coai-phone-title mt-1">8 / 10</p>
+          </div>
+          <div className="coai-phone-card p-3">
+            <p className="coai-phone-label">Régularité</p>
+            <p className="coai-phone-title mt-1">94%</p>
+          </div>
+        </div>
+        <div className="coai-phone-insight p-3">
+          <p className="coai-phone-label">Programme V3 · Aujourd&apos;hui</p>
+          <p className="coai-phone-copy mt-1 leading-4">
+            Ajusté après ton check-in : volume maintenu, charge progressive.
           </p>
         </div>
       </PhoneFrame>

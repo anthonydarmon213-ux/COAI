@@ -154,6 +154,43 @@ body {
   background: rgba(255,255,255,.82);
 }
 
+.coai-index-reveal,
+.coai-index-actions {
+  border: 1px solid rgba(96,75,44,.15);
+  background: linear-gradient(135deg, rgba(255,255,255,.86), rgba(232,241,243,.7));
+  box-shadow: 0 30px 70px -46px rgba(44,35,22,.62), inset 0 1px 0 rgba(255,255,255,.96);
+}
+.coai-index-ring {
+  --coai-score: 250deg;
+  display: grid;
+  width: 8rem;
+  height: 8rem;
+  place-items: center;
+  border-radius: 999px;
+  background: conic-gradient(#c49a52 0 var(--coai-score), rgba(70,121,143,.14) var(--coai-score) 360deg);
+  padding: .48rem;
+  box-shadow: 0 22px 45px -28px rgba(122,78,19,.8);
+  animation: coai-index-arrival .9s cubic-bezier(.2,.85,.25,1) both;
+}
+.coai-index-ring::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(145deg,#fffdf8,#eef2f2); }
+.coai-index-ring > div { z-index: 1; grid-area: 1/1; display: flex; align-items: baseline; color: #171817; }
+.coai-index-ring strong { font-family: var(--font-display), serif; font-size: 2.45rem; line-height: 1; }
+.coai-index-ring span { color: #6e706a; font-size: .72rem; font-weight: 700; }
+.coai-index-label { color: #7b5b29; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.coai-index-action-card { display: grid; grid-template-columns: 1.6rem 1fr; gap: .35rem .65rem; border: 1px solid rgba(96,75,44,.12); border-radius: .9rem; background: rgba(255,255,255,.68); padding: .9rem; }
+.coai-index-action-card > span { grid-row: 1 / 3; display: grid; width: 1.55rem; height: 1.55rem; place-items: center; border-radius: 999px; background: #171817; color: #f5ddb0; font-size: .7rem; font-weight: 800; }
+.coai-index-action-card p { color: #272824; font-size: .78rem; font-weight: 700; line-height: 1.35; }
+.coai-index-action-card strong { grid-column: 2; color: #7b5b29; font-size: .68rem; }
+
+@keyframes coai-index-arrival {
+  from { opacity: 0; transform: scale(.72) rotate(-10deg); filter: blur(5px); }
+  to { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coai-index-ring { animation: none; }
+}
+
 .coai-result-hero {
   position: relative;
   overflow: hidden;
@@ -350,6 +387,14 @@ body {
 .coai-landing-lux .bg-white\/\[0\.035\] { background-color: rgba(255,255,255,.62); }
 .coai-landing-lux .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .09em; }
 
+/* Système typographique volontairement réduit : display pour les titres,
+   sans-serif pour tout le contenu, sans troisième voix visuelle. */
+.coai-landing-lux :is(p, a, button, span, li) { font-family: var(--font-sans), sans-serif; }
+.coai-landing-lux :is(h1, h2, h3) { letter-spacing: -.025em; }
+.coai-landing-lux h2 { line-height: 1.08; }
+.coai-landing-lux p { line-height: 1.65; }
+.coai-landing-eyebrow { line-height: 1.35; }
+
 .coai-landing-lux section:not(.coai-landing-hero) .rounded-2xl {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 24px 60px -52px rgba(54,41,24,.58);
 }
@@ -362,6 +407,53 @@ body {
     linear-gradient(135deg, rgba(255,255,255,.82), rgba(239,232,220,.67));
   box-shadow: 0 34px 90px -58px rgba(54,39,20,.6), inset 0 1px 0 rgba(255,255,255,.95);
 }
+
+/* Aperçu du vrai cockpit COAI dans le téléphone de la landing. */
+.coai-phone-screen {
+  border: 1px solid rgba(255,255,255,.75);
+  background:
+    radial-gradient(circle at 92% 4%, rgba(91,145,169,.18), transparent 10rem),
+    linear-gradient(155deg, #fffdf9 0%, #f1eee7 58%, #e7eff1 100%);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.coai-phone-card,
+.coai-phone-insight {
+  border: 1px solid rgba(96,75,44,.13);
+  border-radius: .9rem;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 12px 30px -24px rgba(48,36,20,.55), inset 0 1px 0 rgba(255,255,255,.95);
+}
+.coai-phone-insight {
+  border-color: rgba(75,126,148,.22);
+  background: linear-gradient(135deg, rgba(235,244,247,.9), rgba(255,252,246,.82));
+}
+.coai-phone-kicker,
+.coai-phone-label { color: #7f673f; font-size: 9px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.coai-phone-heading { color: #171817; font-size: 13px; font-weight: 700; }
+.coai-phone-title { color: #171817; font-size: 12px; font-weight: 700; }
+.coai-phone-copy { color: #5b5d58; font-size: 10.5px; }
+.coai-phone-accent { color: #8d682d; font-size: 10.5px; font-weight: 700; }
+.coai-phone-action { border-radius: 999px; background: linear-gradient(135deg, #d7b36f, #bd9148); padding: .45rem .65rem; color: #171817; text-align: center; font-size: 10.5px; font-weight: 800; box-shadow: 0 10px 24px -14px rgba(137,91,23,.75); }
+.coai-phone-status { border: 1px solid rgba(56,124,151,.23); border-radius: 999px; background: rgba(224,240,245,.85); padding: .2rem .45rem; color: #366c83; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.coai-phone-score { display: grid; width: 2rem; height: 2rem; place-items: center; border: 2px solid #c9a25f; border-radius: 999px; color: #7c5b25; font-size: 10px; font-weight: 800; }
+.coai-phone-progress { height: .35rem; overflow: hidden; border-radius: 999px; background: rgba(58,59,55,.1); }
+.coai-phone-metric { color: #171817; font-size: 20px; font-weight: 750; line-height: 1; }
+.coai-phone-metric span { color: #686a63; font-size: 9px; font-weight: 600; }
+.coai-phone-orb { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border-radius: 999px; background: conic-gradient(#c9a25f 0 87%, rgba(83,124,143,.16) 87% 100%); padding: 3px; }
+.coai-phone-orb::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: #f7f6f1; }
+.coai-phone-orb span { z-index: 1; grid-area: 1/1; color: #171817; font-size: 9px; font-weight: 800; }
+
+/* Le footer prolonge la lumière de la landing au lieu de retomber dans le noir. */
+.coai-marketing-footer {
+  border-top: 1px solid rgba(92,72,44,.13);
+  color: #64665f;
+  background:
+    radial-gradient(circle at 82% 0%, rgba(92,151,175,.14), transparent 24rem),
+    linear-gradient(135deg, #f7f3eb 0%, #eef1ef 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.92);
+}
+.coai-marketing-footer .text-graphite-500 { color: #64665f; }
+.coai-marketing-footer a { transition: color .2s ease; }
 
 @media (max-width: 640px) {
   .coai-landing-hero { min-height: auto; padding-top: 7rem; }
