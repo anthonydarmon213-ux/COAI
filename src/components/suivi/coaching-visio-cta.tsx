@@ -4,17 +4,17 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 const MESSAGE_VIP =
   "Bonjour Anthony, je suis sur mon espace COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
 
-// Transformation (11/08/2026) : 1 séance visio de 30 min/mois est incluse
-// dans l'abonnement, à ne pas confondre avec la VIP payante à la séance —
+// Transformation : 1 séance visio de 30 min est incluse une fois pendant
+// l'accompagnement, à ne pas confondre avec la VIP payante à la séance —
 // message dédié qui rappelle que c'est déjà inclus, pas une vente
 // supplémentaire.
 const MESSAGE_INCLUSE =
-  "Bonjour Anthony, je suis abonné Transformation sur COAI et j'aimerais réserver ma séance visio de 30 min incluse ce mois-ci.";
+  "Bonjour Anthony, je suis abonné Transformation sur COAI et j'aimerais réserver ma séance visio de 30 min incluse dans mon accompagnement.";
 
 // Les séances de coaching individuel (VIP) sont réservées et payées à la
 // séance, hors abonnement — accessibles à tous les paliers, y compris
-// Gratuit. Transformation a en plus une séance visio de 30 min/mois déjà
-// incluse dans son prix, d'où le message et le lien WhatsApp différents.
+// Gratuit. Transformation a en plus une séance visio de 30 min incluse une
+// fois ; toute séance suivante passe par la formule VIP.
 export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
   const estTransformation = plan === "STANDARD";
   const href = buildWhatsAppLink(estTransformation ? MESSAGE_INCLUSE : MESSAGE_VIP);
@@ -29,8 +29,8 @@ export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
       <p className="text-sm text-graphite-200">
         {estTransformation ? (
           <>
-            Ta formule Transformation inclut 1 séance visio de 30 min par mois avec Anthony
-            Darmon — profites-en pour faire un point sur ta progression.
+            Ta formule Transformation inclut 1 séance visio de 30 min avec Anthony Darmon pendant
+            ton accompagnement. Pour une deuxième séance, réserve directement via la formule VIP.
           </>
         ) : (
           <>
@@ -48,6 +48,11 @@ export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
       >
         Réserver via WhatsApp →
       </a>
+      {estTransformation && (
+        <a href="/pricing#vip" className="text-sm text-graphite-400 underline hover:text-laiton-300">
+          Besoin d&apos;une séance supplémentaire ? Voir VIP →
+        </a>
+      )}
     </div>
   );
 }
