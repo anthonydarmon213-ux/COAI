@@ -70,7 +70,7 @@ export default async function BienvenuePage({
   if (!achatConfirme) {
     return (
       <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 py-10 text-center sm:py-16">
-        <div className="flex flex-col items-center gap-3">
+        <div className="animate-reveal flex flex-col items-center gap-3">
           <SectionLabel>Compte créé</SectionLabel>
           <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
             Bienvenue{prenom ? `, ${prenom}` : ""}.
@@ -85,12 +85,17 @@ export default async function BienvenuePage({
             un palace, plutôt qu'un texte plat suivi d'une tentative de
             génération/paiement immédiate). Même esthétique que la version
             post-achat plus bas sur cette page, contenu adapté : pas de
-            formule à afficher puisque rien n'est encore débloqué. */}
-        <div className="w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] text-left shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex">
+            formule à afficher puisque rien n'est encore débloqué. Révélée en
+            fondu/glissement après le titre, comme si on nous la tendait. */}
+        <div
+          className="animate-reveal w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] text-left shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex"
+          style={{ animationDelay: "150ms" }}
+        >
           <div className="flex flex-1 flex-col gap-6 p-7 sm:p-9">
             <div className="flex items-center justify-between">
               <span className="font-display text-lg font-semibold tracking-tight text-white">COAI</span>
-              <span className="rounded-full border border-laiton-400/30 bg-laiton-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
+              <span className="flex items-center gap-1.5 rounded-full border border-laiton-400/30 bg-laiton-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
+                <span className="animate-status-pulse h-1.5 w-1.5 rounded-full bg-laiton-300" aria-hidden="true" />
                 Compte créé
               </span>
             </div>
@@ -131,7 +136,8 @@ export default async function BienvenuePage({
           ].map((etape, i) => (
             <div
               key={etape.titre}
-              className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
+              className="animate-reveal flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
+              style={{ animationDelay: `${300 + i * 120}ms` }}
             >
               <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-xs font-semibold text-laiton-300">
                 {i + 1}
@@ -144,7 +150,7 @@ export default async function BienvenuePage({
           ))}
         </div>
 
-        <Link href="/dashboard">
+        <Link href="/dashboard" className="animate-reveal" style={{ animationDelay: "780ms" }}>
           <Button className="px-8 py-3">Entrer dans mon espace →</Button>
         </Link>
 

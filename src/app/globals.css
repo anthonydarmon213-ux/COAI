@@ -966,10 +966,41 @@ html {
   }
 }
 
+@keyframes coai-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes coai-status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(183, 137, 67, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(183, 137, 67, 0);
+  }
+}
+
 /* Halo animé du hero : désactivé si l'utilisateur préfère moins d'animations. */
 @media (prefers-reduced-motion: no-preference) {
   .animate-spin-slow {
     animation: spin-slow 50s linear infinite;
+  }
+  /* Arrivée sur la carte d'embarquement (16/08/2026, "il faut faire rêver
+     les gens") : la carte et chaque point de la visite guidée apparaissent
+     en fondu/glissement plutôt que d'un bloc — délai posé en JSX
+     (animationDelay) pour un effet de révélation progressive. */
+  .animate-reveal {
+    animation: coai-reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-status-pulse {
+    animation: coai-status-pulse 2.2s ease-out infinite;
   }
   .animate-pulse-glow {
     animation: pulse-glow 5s ease-in-out infinite;
