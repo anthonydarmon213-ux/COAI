@@ -30,7 +30,7 @@ export type DiagnosticAnswers = {
   age?: number;
   tailleCm?: number;
   poidsKg?: number;
-  coachPreference?: "IA_HOMME" | "IA_FEMME" | "ANTHONY";
+  coachPreference?: "FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL";
 };
 
 export function storeDiagnosticAnswers(answers: DiagnosticAnswers): void {

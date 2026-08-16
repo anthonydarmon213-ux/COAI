@@ -89,13 +89,19 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
   // Choix du style d'accompagnement au diagnostic (16/08/2026, modèle
   // Future demandé par Anthony) — n'assigne aucun coach réel, oriente juste
   // le service mis en avant dans la vitrine du dashboard.
-  if (profile.coachPreference === "ANTHONY") {
+  if (profile.coachPreference === "VIP_PRESENTIEL") {
     besoins.push({
-      besoin: "Tu as choisi d'être accompagné par Anthony",
-      explication: "Transformation inclut la validation humaine de ton programme par Anthony Darmon, coach diplômé d'État.",
+      besoin: "Tu recherches un coaching privé en présentiel",
+      explication: "L'offre VIP te permet d'être accompagné directement par Anthony avec un suivi très personnalisé.",
+      service: "VIP",
+    });
+  } else if (profile.coachPreference === "HYBRIDE") {
+    besoins.push({
+      besoin: "Tu veux combiner IA et expertise humaine",
+      explication: "Transformation associe un programme évolutif à la validation et aux ajustements d'un coach diplômé.",
       service: "TRANSFORMATION",
     });
-  } else if (profile.coachPreference === "IA_HOMME" || profile.coachPreference === "IA_FEMME") {
+  } else if (profile.coachPreference === "FULL_IA") {
     besoins.push({
       besoin: "Tu as choisi un accompagnement 100% IA",
       explication: "Un programme complet généré immédiatement par les algorithmes COAI, sans attendre de validation humaine.",

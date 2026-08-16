@@ -343,7 +343,7 @@ export function DiagnosticQuiz({
   // Choix du style d'accompagnement (16/08/2026, modèle Future demandé par
   // Anthony) — n'assigne aucun coach réel, sert juste à orienter la formule
   // mise en avant sur l'écran résultat.
-  const [coachPreference, setCoachPreference] = useState<"IA_HOMME" | "IA_FEMME" | "ANTHONY" | null>(null);
+  const [coachPreference, setCoachPreference] = useState<"FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL" | null>(null);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
@@ -516,9 +516,9 @@ export function DiagnosticQuiz({
     if (Array.isArray(saved.sante)) setSante(saved.sante as string[]);
     if (typeof saved.santeAutreTexte === "string") setSanteAutreTexte(saved.santeAutreTexte);
     if (
-      saved.coachPreference === "IA_HOMME" ||
-      saved.coachPreference === "IA_FEMME" ||
-      saved.coachPreference === "ANTHONY"
+      saved.coachPreference === "FULL_IA" ||
+      saved.coachPreference === "HYBRIDE" ||
+      saved.coachPreference === "VIP_PRESENTIEL"
     ) {
       setCoachPreference(saved.coachPreference);
     }
@@ -1227,29 +1227,29 @@ export function DiagnosticQuiz({
           {step === "coach" && (
             <div className="flex flex-col gap-4">
               <div>
-                <h2 className="font-display text-xl font-semibold text-white">Quel accompagnement te conviendrait le mieux ?</h2>
+                <h2 className="font-display text-xl font-semibold text-white">Comment veux-tu être accompagné ?</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">
                   Ce choix sert uniquement à te recommander la bonne formule. Il ne t&apos;engage à rien.
                 </p>
               </div>
               <div className="flex flex-col gap-2">
                 <OptionCard
-                  label="Je veux un programme immédiatement"
-                  hint="Coach IA à voix masculine, disponible 24h/24."
-                  active={coachPreference === "IA_HOMME"}
-                  onClick={() => chooseSingle(setCoachPreference, "IA_HOMME")}
+                  label="100 % IA — avancer en autonomie"
+                  hint="Programme personnalisé immédiat et Coach IA disponible 24h/24."
+                  active={coachPreference === "FULL_IA"}
+                  onClick={() => chooseSingle(setCoachPreference, "FULL_IA")}
                 />
                 <OptionCard
-                  label="Je préfère une Coach IA à voix féminine"
-                  hint="Programme immédiat et accompagnement disponible 24h/24."
-                  active={coachPreference === "IA_FEMME"}
-                  onClick={() => chooseSingle(setCoachPreference, "IA_FEMME")}
+                  label="Hybride — IA + coach humain"
+                  hint="La rapidité de l'IA avec la validation et les ajustements d'un coach diplômé."
+                  active={coachPreference === "HYBRIDE"}
+                  onClick={() => chooseSingle(setCoachPreference, "HYBRIDE")}
                 />
                 <OptionCard
-                  label="Je veux un suivi humain"
-                  hint="Anthony Darmon ou un coach diplômé valide et ajuste mon programme."
-                  active={coachPreference === "ANTHONY"}
-                  onClick={() => chooseSingle(setCoachPreference, "ANTHONY")}
+                  label="VIP — coaching privé en présentiel"
+                  hint="Un accompagnement très personnalisé avec Anthony, principalement en face-à-face à Paris."
+                  active={coachPreference === "VIP_PRESENTIEL"}
+                  onClick={() => chooseSingle(setCoachPreference, "VIP_PRESENTIEL")}
                 />
               </div>
             </div>

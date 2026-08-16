@@ -91,9 +91,11 @@ export async function POST(request: Request) {
   const objectifLead = typeof reponsesLead.objectif === "string" ? reponsesLead.objectif : "Non renseigné";
   const niveauLead = typeof reponsesLead.niveau === "string" ? reponsesLead.niveau : "Non renseigné";
   const coachPreference = reponsesLead.coachPreference;
-  const offreRecommandee = coachPreference === "ANTHONY"
-    ? "Transformation — suivi humain"
-    : "Impulsion — programme immédiat";
+  const offreRecommandee = coachPreference === "VIP_PRESENTIEL"
+    ? "VIP — coaching privé en présentiel"
+    : coachPreference === "HYBRIDE"
+      ? "Transformation — IA + coach humain"
+      : "Impulsion — accompagnement 100 % IA";
 
   const notifText = [
     `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`,
