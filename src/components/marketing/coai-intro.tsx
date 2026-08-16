@@ -20,14 +20,14 @@ export function CoaiIntro() {
         fill
         priority
         sizes="100vw"
-        className="coai-palace-image object-cover object-[42%_center]"
+        className="coai-palace-image object-cover object-center"
         aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,9,.96)_0%,rgba(8,9,9,.82)_38%,rgba(8,9,9,.34)_68%,rgba(8,9,9,.58)_100%)]" aria-hidden="true" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,9,9,.48)_0%,rgba(8,9,9,.08)_45%,rgba(8,9,9,.92)_100%)]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,9,.12)_0%,rgba(8,9,9,.08)_43%,rgba(8,9,9,.48)_67%,rgba(8,9,9,.78)_100%)]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,9,9,.22)_0%,transparent_48%,rgba(8,9,9,.72)_100%)]" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center md:min-h-[650px]">
-        <div className="max-w-2xl animate-reveal rounded-[2rem] border border-white/[0.1] bg-black/40 p-6 text-left shadow-[0_35px_110px_rgba(0,0,0,.5)] backdrop-blur-md sm:p-9 lg:p-12">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-end justify-end md:min-h-[650px] md:items-center">
+        <div className="max-w-xl animate-reveal rounded-[2rem] border border-white/[0.12] bg-black/55 p-6 text-left shadow-[0_35px_110px_rgba(0,0,0,.42)] backdrop-blur-sm sm:p-8 lg:p-10">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2">
             <span className="h-1.5 w-1.5 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-laiton-200">
@@ -35,7 +35,7 @@ export function CoaiIntro() {
             </span>
           </div>
 
-          <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
             Ton corps n&apos;a pas besoin de plus d&apos;informations.
             <span className="mt-2 block text-laiton-200">Il a besoin du bon plan.</span>
           </h1>
