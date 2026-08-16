@@ -325,6 +325,13 @@ model Profile {
   // besoin réel plutôt que la destination, pour orienter vers le bon
   // service COAI sur le dashboard (14/08/2026).
   persona               String?
+  // Style d'accompagnement choisi au diagnostic (16/08/2026, modèle
+  // "Future" demandé par Anthony) — "IA" ou "ANTHONY" (nom du coach, pas un
+  // enum rigide : d'autres coachs viendront s'ajouter si le modèle marche,
+  // cf. section CLAUDE.md du même jour). Sert uniquement à orienter la
+  // formule mise en avant sur l'écran résultat, jamais à assigner
+  // automatiquement un vrai coach humain (aucun système de ce type existe).
+  coachPreference       String?
   niveau                String?
   equipementDisponible  String?
   // Lieu d'entraînement habituel — distinct de l'équipement (Phase 5,

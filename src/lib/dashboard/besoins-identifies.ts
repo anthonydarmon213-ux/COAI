@@ -24,7 +24,10 @@ function contient(valeur: string | null | undefined, motif: string): boolean {
   return Boolean(valeur && valeur.toLowerCase().includes(motif.toLowerCase()));
 }
 
-type ProfilSignaux = Pick<Profile, "persona" | "objectifs" | "contraintesSante" | "niveau" | "frequenceEntrainement">;
+type ProfilSignaux = Pick<
+  Profile,
+  "persona" | "objectifs" | "contraintesSante" | "niveau" | "frequenceEntrainement" | "coachPreference"
+>;
 
 export function detecterBesoins(profile: ProfilSignaux | null | undefined): BesoinIdentifie[] {
   if (!profile) return [];
@@ -79,6 +82,23 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
     besoins.push({
       besoin: "Une reprise en douceur, sans pression de performance",
       explication: "Un programme simple généré immédiatement suffit pour démarrer.",
+      service: "IMPULSION",
+    });
+  }
+
+  // Choix du style d'accompagnement au diagnostic (16/08/2026, modèle
+  // Future demandé par Anthony) — n'assigne aucun coach réel, oriente juste
+  // le service mis en avant dans la vitrine du dashboard.
+  if (profile.coachPreference === "ANTHONY") {
+    besoins.push({
+      besoin: "Tu as choisi d'être accompagné par Anthony",
+      explication: "Transformation inclut la validation humaine de ton programme par Anthony Darmon, coach diplômé d'État.",
+      service: "TRANSFORMATION",
+    });
+  } else if (profile.coachPreference === "IA") {
+    besoins.push({
+      besoin: "Tu as choisi un accompagnement 100% IA",
+      explication: "Un programme complet généré immédiatement par les algorithmes COAI, sans attendre de validation humaine.",
       service: "IMPULSION",
     });
   }

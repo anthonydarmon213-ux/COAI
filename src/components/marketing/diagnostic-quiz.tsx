@@ -184,6 +184,7 @@ type Step =
   | "alimentation"
   | "sommeil"
   | "sante"
+  | "coach"
   | "email"
   | "analyse"
   | "result";
@@ -217,6 +218,7 @@ const QUESTION_STEPS: Step[] = [
   "alimentation",
   "sommeil",
   "sante",
+  "coach",
   "email",
 ];
 
@@ -323,6 +325,10 @@ export function DiagnosticQuiz({
   const [habitudesAlimentaires, setHabitudesAlimentaires] = useState<string | null>(null);
   const [qualiteSommeil, setQualiteSommeil] = useState<string | null>(null);
   const [sante, setSante] = useState<string[]>([]);
+  // Choix du style d'accompagnement (16/08/2026, modèle Future demandé par
+  // Anthony) — n'assigne aucun coach réel, sert juste à orienter la formule
+  // mise en avant sur l'écran résultat.
+  const [coachPreference, setCoachPreference] = useState<"IA" | "ANTHONY" | null>(null);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
@@ -424,6 +430,7 @@ export function DiagnosticQuiz({
       qualiteSommeil,
       sante,
       santeAutreTexte,
+      coachPreference,
       email,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -454,6 +461,7 @@ export function DiagnosticQuiz({
     qualiteSommeil,
     sante,
     santeAutreTexte,
+    coachPreference,
     email,
   ]);
 
@@ -485,6 +493,9 @@ export function DiagnosticQuiz({
     if (typeof saved.qualiteSommeil === "string") setQualiteSommeil(saved.qualiteSommeil);
     if (Array.isArray(saved.sante)) setSante(saved.sante as string[]);
     if (typeof saved.santeAutreTexte === "string") setSanteAutreTexte(saved.santeAutreTexte);
+    if (saved.coachPreference === "IA" || saved.coachPreference === "ANTHONY") {
+      setCoachPreference(saved.coachPreference);
+    }
     if (typeof saved.email === "string") setEmail(saved.email);
   }
 
@@ -558,6 +569,7 @@ export function DiagnosticQuiz({
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
+    if (step === "coach") return Boolean(coachPreference);
     if (step === "email") return isValidEmail(email) && consentEmail;
     return true;
   }, [step, persona, niveau, objectif, equipement, lieu, duree, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
@@ -638,6 +650,7 @@ export function DiagnosticQuiz({
       age: age ? Number(age) : undefined,
       tailleCm: tailleCm ? Number(tailleCm) : undefined,
       poidsKg: poidsKg ? Number(poidsKg) : undefined,
+      coachPreference: coachPreference ?? undefined,
     };
   }
 
@@ -708,6 +721,7 @@ export function DiagnosticQuiz({
             habitudesAlimentaires,
             qualiteSommeil,
             sante: resolveAutre(sante, santeAutreTexte),
+            coachPreference,
           },
         }),
       });
@@ -1156,6 +1170,31 @@ export function DiagnosticQuiz({
                   placeholder="Précise en quelques mots..."
                 />
               )}
+            </div>
+          )}
+
+          {step === "coach" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Qui veux-tu comme coach ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">
+                  Tu pourras changer d&apos;avis à tout moment, ce choix n&apos;engage à rien.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <OptionCard
+                  label="Coach IA"
+                  hint="Rapide, disponible 24h/24, programme généré immédiatement."
+                  active={coachPreference === "IA"}
+                  onClick={() => setCoachPreference("IA")}
+                />
+                <OptionCard
+                  label="Anthony Darmon"
+                  hint="Coach diplômé d'État, 17 ans d'expérience terrain, valide et ajuste ton programme."
+                  active={coachPreference === "ANTHONY"}
+                  onClick={() => setCoachPreference("ANTHONY")}
+                />
+              </div>
             </div>
           )}
 
