@@ -38,7 +38,7 @@ export default function PricingPage({
     // Impulsion (paiement unique) ne dépend jamais du bascule mensuel/annuel.
     if (!annual || tier.sessions || tier.oneShot) return tier;
     if (tier.nom === "Transformation") {
-      return { ...tier, prix: "490€", suffixe: "/an", essai: "7 jours offerts · puis 490€/an" };
+      return { ...tier, prix: "490€", suffixe: "/an", essai: "7 jours d'essai · puis 490€/an" };
     }
     return tier;
   });
@@ -278,7 +278,7 @@ export default function PricingPage({
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
         L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Impulsion est un
-        paiement unique, sans abonnement. Transformation inclut 7 jours offerts, puis est facturée
+        paiement unique, sans abonnement. Transformation inclut 7 jours d&apos;essai, puis est facturée
         au choix chaque mois ou chaque année, sans engagement, résiliable à tout moment depuis ton
         compte. Les séances VIP se réservent directement avec Anthony sur WhatsApp. En débloquant une offre, tu
         acceptes nos{" "}

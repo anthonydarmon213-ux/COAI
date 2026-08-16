@@ -45,7 +45,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion (19€, paiement unique, programme généré par IA sans relecture) ou Transformation (49€/mois, 7 jours offerts, un coach diplômé d'État relit et valide) quand tu es prêt.",
+      "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion (19€, paiement unique, programme généré par IA sans relecture) ou Transformation (49€/mois, 7 jours d'essai, un coach diplômé d'État relit et valide) quand tu es prêt.",
   },
   {
     question: "Je peux résilier quand je veux ?",

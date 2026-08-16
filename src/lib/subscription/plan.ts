@@ -12,7 +12,7 @@ export function getEffectivePlan(subscription?: Subscription | null): EffectiveP
   return subscription.plan;
 }
 
-// Tant que l'essai Stripe (7 jours offerts) n'est pas terminé, aucun
+// Tant que l'essai Stripe (7 jours d'essai) n'est pas terminé, aucun
 // prélèvement n'a encore eu lieu — status reste "ACTIVE" pendant l'essai
 // (trialing y est mappé), donc c'est trialEnd qui permet de distinguer
 // "encore en essai, jamais payé" de "déjà facturé". Purement informatif
@@ -69,6 +69,6 @@ export function hasSuiviAccess(subscription?: Subscription | null): boolean {
 // label ne concerne que d'éventuels abonnés déjà sur l'ancienne offre.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
   GRATUIT: "Impulsion — 19€, paiement unique",
-  STANDARD: "Transformation — 49€/mois après 7 jours offerts",
+  STANDARD: "Transformation — 49€/mois après 7 jours d'essai",
   PREMIUM: "Ancien Premium — 199€/mois",
 };

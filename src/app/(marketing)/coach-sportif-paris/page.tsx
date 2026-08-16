@@ -77,7 +77,7 @@ export default function CoachSportifParisPage() {
               </Link>
             )}
             <Link href="/sign-up">
-              <Button variant="secondary">Essayer COAI — 7 jours offerts</Button>
+              <Button variant="secondary">Essayer COAI — 7 jours d&apos;essai</Button>
             </Link>
           </div>
         </div>

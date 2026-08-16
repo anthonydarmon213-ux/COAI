@@ -46,7 +46,7 @@ export function ServiceDetailModal({
   const prixAffiche = !tier.oneShot && !tier.sessions && annual && tier.nom === "Transformation" ? "490€" : tier.prix;
   const suffixeAffiche = !tier.oneShot && !tier.sessions && annual && tier.nom === "Transformation" ? "/an" : tier.suffixe;
   const essaiAffiche =
-    tier.nom === "Transformation" ? (annual ? "7 jours offerts · puis 490€/an" : "7 jours offerts · puis 49€/mois") : tier.essai;
+    tier.nom === "Transformation" ? (annual ? "7 jours d'essai · puis 490€/an" : "7 jours d'essai · puis 49€/mois") : tier.essai;
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#0b0c0e]" role="dialog" aria-modal="true">
@@ -179,7 +179,7 @@ export function ServiceDetailModal({
               <SubscribeButton
                 plan={tier.plan}
                 billing={annual ? "ANNUAL" : "MONTHLY"}
-                label="Commencer mes 7 jours offerts"
+                label="Commencer mes 7 jours d'essai"
                 className="w-full"
               />
             </OffreConsentGate>

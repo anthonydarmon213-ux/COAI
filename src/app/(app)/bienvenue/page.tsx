@@ -113,7 +113,7 @@ export default async function BienvenuePage({
   const unlockOneShot = searchParams.unlock === "programme";
 
   // Événement Meta : Purchase pour Impulsion en paiement unique (pas un
-  // abonnement), StartTrial si les 7 jours offerts de Transformation sont
+  // abonnement), StartTrial si les 7 jours d'essai de Transformation sont
   // en cours (carte enregistrée, pas encore prélevée), Subscribe sinon
   // (Transformation souscrite directement, essai déjà sauté). Valeur = prix
   // réel de l'offre choisie, pour que l'algorithme Meta puisse optimiser

@@ -35,7 +35,7 @@ export default function CgvPage() {
             gratuitement dès l&apos;inscription.
           </li>
           <li>
-            <strong>Transformation (49€/mois ou 490€/an après 7 jours offerts)</strong> — 7 jours
+            <strong>Transformation (49€/mois ou 490€/an après 7 jours d&apos;essai)</strong> — 7 jours
             d&apos;accès gratuit à compter de la souscription, carte bancaire requise dès la
             souscription ; sauf résiliation avant la fin de ces 7 jours, l&apos;abonnement bascule
             automatiquement sur 49€/mois ou 490€/an selon la périodicité choisie. Inclut le palier Impulsion, la génération d&apos;un

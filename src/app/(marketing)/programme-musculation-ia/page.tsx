@@ -9,7 +9,7 @@ import { RelatedSeoLinks } from "@/components/marketing/related-seo-links";
 
 const TITLE = "Programme de musculation généré par IA — COAI";
 const DESCRIPTION =
-  "Un programme de musculation personnalisé, généré en quelques secondes par intelligence artificielle à partir de ton profil, ton matériel et tes objectifs. Sans engagement, 7 jours offerts.";
+  "Un programme de musculation personnalisé, généré en quelques secondes par intelligence artificielle à partir de ton profil, ton matériel et tes objectifs. Sans engagement, 7 jours d'essai.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -80,7 +80,7 @@ export default function ProgrammeMusculationIaPage() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/sign-up">
-            <Button>Créer mon programme — 7 jours offerts</Button>
+            <Button>Créer mon programme — 7 jours d&apos;essai</Button>
           </Link>
           <Link href="/pricing">
             <Button variant="secondary">Voir les tarifs</Button>
@@ -118,7 +118,7 @@ export default function ProgrammeMusculationIaPage() {
           Prêt à voir ton programme ?
         </h2>
         <Link href="/sign-up">
-          <Button>Commencer — 7 jours offerts</Button>
+          <Button>Commencer — 7 jours d&apos;essai</Button>
         </Link>
       </section>
     </main>

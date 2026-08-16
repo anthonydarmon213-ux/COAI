@@ -15,8 +15,8 @@ const ANNUAL_PRICE_ENV_BY_PLAN = {
 } as const;
 
 // Crée une session Stripe Checkout. GRATUIT (affiché "Impulsion", offre
-// d'appel, 7 jours offerts puis 19€/mois) et STANDARD (affiché
-// "Transformation", 7 jours offerts puis 49€/mois) passent par un essai
+// d'appel, 7 jours d'essai puis 19€/mois) et STANDARD (affiché
+// "Transformation", 7 jours d'essai puis 49€/mois) passent par un essai
 // Stripe avec carte obligatoire dès l'inscription —
 // payment_method_collection: "always" force la saisie de la CB même si la
 // première facture est à 0€.

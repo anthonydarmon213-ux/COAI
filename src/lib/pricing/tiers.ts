@@ -70,7 +70,7 @@ export const TIERS: Tier[] = [
     nom: "Transformation",
     prix: "49€",
     suffixe: "/mois",
-    essai: "7 jours offerts · puis 49€/mois",
+    essai: "7 jours d'essai · puis 49€/mois",
     description:
       "Ton programme COAI complet, enrichi d'adaptations continues et d'un vrai suivi humain jusqu'à l'atteinte de ton objectif.",
     features: [

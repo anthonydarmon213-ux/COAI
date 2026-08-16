@@ -158,7 +158,7 @@ export default async function AbonnementPage() {
         )}
         {!finProgrammee && enEssai && (
           <p className="text-sm text-graphite-400">
-            Tes 7 jours offerts se terminent le{" "}
+            Tes 7 jours d&apos;essai se terminent le{" "}
             {user.subscription!.trialEnd!.toLocaleDateString("fr-FR", {
               day: "numeric",
               month: "long",

@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Inscription gratuite. 19€ en paiement unique pour un programme généré par IA sans relecture, ou 49€/mois (7 jours offerts) pour un programme relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
+      "Inscription gratuite. 19€ en paiement unique pour un programme généré par IA sans relecture, ou 49€/mois (7 jours d'essai) pour un programme relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
   },
   {
     question: "Je peux poser des questions à un coach entre deux programmes ?",
@@ -79,7 +79,7 @@ export default function CoachSportifEnLignePage() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/sign-up">
-            <Button>Démarrer — 7 jours offerts</Button>
+            <Button>Démarrer — 7 jours d&apos;essai</Button>
           </Link>
           <Link href="/pricing">
             <Button variant="secondary">Voir les tarifs</Button>
@@ -114,7 +114,7 @@ export default function CoachSportifEnLignePage() {
           Prêt à commencer ton accompagnement ?
         </h2>
         <Link href="/sign-up">
-          <Button>Commencer — 7 jours offerts</Button>
+          <Button>Commencer — 7 jours d&apos;essai</Button>
         </Link>
       </section>
     </main>

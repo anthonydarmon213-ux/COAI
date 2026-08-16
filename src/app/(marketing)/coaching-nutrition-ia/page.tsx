@@ -78,7 +78,7 @@ export default function CoachingNutritionIaPage() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/sign-up">
-            <Button>Créer mon plan — 7 jours offerts</Button>
+            <Button>Créer mon plan — 7 jours d&apos;essai</Button>
           </Link>
           <Link href="/pricing">
             <Button variant="secondary">Voir les tarifs</Button>
@@ -104,7 +104,7 @@ export default function CoachingNutritionIaPage() {
           Prêt à voir ton plan nutritionnel ?
         </h2>
         <Link href="/sign-up">
-          <Button>Commencer — 7 jours offerts</Button>
+          <Button>Commencer — 7 jours d&apos;essai</Button>
         </Link>
       </section>
     </main>

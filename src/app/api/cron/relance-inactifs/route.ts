@@ -320,7 +320,7 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
         `Choisis ta formule : ${appUrl}/pricing?billing=annual\n\n` +
         `Impulsion : 19 €, paiement unique.\n` +
-        `Transformation : 7 jours offerts, puis 49 €/mois ou 490 €/an, avec validation par un coach diplômé d'État.\n\n` +
+        `Transformation : 7 jours d'essai, puis 49 €/mois ou 490 €/an, avec validation par un coach diplômé d'État.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;
