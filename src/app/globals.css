@@ -169,7 +169,14 @@ body {
   text-align: center;
 }
 .coai-diagnostic-proof strong { color: #171817; font-family: var(--font-sans), sans-serif; font-size: 1.12rem; font-weight: 700; }
-.coai-diagnostic-proof span { color: #6d6f68; font-size: .74rem; line-height: 1.3; }
+.coai-diagnostic-proof span {
+  display: flex;
+  align-items: flex-start;
+  min-height: 1.95rem;
+  color: #6d6f68;
+  font-size: .74rem;
+  line-height: 1.3;
+}
 
 .coai-diagnostic-result {
   background: rgba(255,255,255,.82);

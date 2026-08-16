@@ -764,11 +764,9 @@ export function DiagnosticQuiz({
         <div className="px-6 py-7 sm:px-8">
           {step === "intro" && (
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
-              <div className="coai-diagnostic-kicker" aria-label="Diagnostic personnalisé, durée deux minutes">
+              <div className="coai-diagnostic-kicker" aria-label="Découvre ton score COAI">
                 <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
-                <span>Diagnostic personnalisé</span>
-                <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
-                <span>2 min</span>
+                <span>Découvre ton score COAI</span>
               </div>
               <h1 className="max-w-xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl">
                 {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Ton corps. Ta vie. Ton programme."}
@@ -806,7 +804,7 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="mt-2 px-8 py-3.5">
-                  Révéler mon profil →
+                  Commencer le diagnostic — 2 min
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
