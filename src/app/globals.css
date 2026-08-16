@@ -359,18 +359,19 @@ body {
 }
 
 .coai-app-nav {
-  border-color: rgba(221,193,145,.14);
-  background: linear-gradient(180deg, rgba(17,18,19,.98), rgba(27,25,21,.97));
-  box-shadow: 18px 0 55px -38px rgba(20,15,8,.75);
+  border-color: rgba(84,68,44,.13);
+  background: rgba(244,240,231,.74);
+  box-shadow: 16px 0 45px -38px rgba(47,38,25,.42);
 }
 
-.coai-app-nav .text-white { color: #fffdf8; }
-.coai-app-nav .text-graphite-300 { color: #d8d8d3; }
-.coai-app-nav .text-graphite-400 { color: #b9bbb6; }
-.coai-app-nav .text-graphite-500 { color: #8f918c; }
-.coai-app-nav .text-laiton-300 { color: #e5c993; }
+.coai-app-nav .text-white,
+.coai-app-nav .text-graphite-50 { color: #171817; }
+.coai-app-nav .text-graphite-300 { color: #55574f; }
+.coai-app-nav .text-graphite-400 { color: #6c6e67; }
+.coai-app-nav .text-graphite-500 { color: #777970; }
+.coai-app-nav .text-laiton-300 { color: #7c5720; }
 .coai-app-nav a:hover,
-.coai-app-nav button:hover { color: #fffdf8; }
+.coai-app-nav button:hover { color: #171817; }
 
 .coai-app-nav nav > a,
 .coai-app-nav nav > button { font-weight: 650; letter-spacing: -.01em; }
@@ -382,9 +383,16 @@ body {
 .coai-app-shell .coai-boarding-card .text-laiton-300 { color: #e5c993; }
 
 .coai-rainbow-cta {
-  background: linear-gradient(105deg, #f6c66f 0%, #f48fa8 27%, #b596f4 52%, #79c8ef 76%, #8ee0c1 100%);
-  background-size: 160% 160%;
-  animation: coai-rainbow-shift 8s ease infinite;
+  border: 1px solid rgba(201,162,98,.48);
+  background: linear-gradient(115deg, #171817 0%, #29261f 68%, #4b3820 100%);
+  color: #fffdf8 !important;
+  box-shadow: 0 14px 30px -20px rgba(75,56,32,.72), inset 0 1px rgba(255,255,255,.09);
+}
+
+.coai-rainbow-cta:hover {
+  background: linear-gradient(115deg, #222321 0%, #373126 70%, #654923 100%);
+  color: #fffdf8 !important;
+  transform: translateY(-1px);
 }
 
 .coai-welcome button {

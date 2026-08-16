@@ -22,12 +22,12 @@ export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="coai-app-nav z-20 shrink-0 border-b px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-64 md:flex-col md:border-b-0 md:border-r md:px-6 md:py-8">
+    <aside className="coai-app-nav z-20 shrink-0 border-b px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:px-5 md:py-7">
       <div className="flex items-center justify-between">
         <Link href="/dashboard" className="flex flex-col gap-1">
           <div className="flex items-center gap-2.5">
             <CoaiMark size={26} />
-            <span className="font-display text-xl font-extrabold tracking-[0.16em] text-white">COAI</span>
+            <span className="font-display text-xl font-extrabold tracking-[0.16em] text-graphite-50">COAI</span>
           </div>
           <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-graphite-300">Performance · Santé · Longévité</span>
         </Link>
@@ -39,7 +39,7 @@ export function AppNav() {
         {LINKS.map((item) => {
           const active = isActive(pathname, item.href);
           return (
-            <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/25 bg-laiton-400/[0.11] text-laiton-300" : "border-transparent text-graphite-300 hover:bg-white/[0.055] hover:text-white"}`}>
+            <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/30 bg-white/[0.65] text-graphite-50 shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.45] hover:text-graphite-50"}`}>
               <span className="w-4 text-center text-xs opacity-80" aria-hidden="true">{item.icon}</span>
               {item.label}
             </Link>
@@ -48,7 +48,7 @@ export function AppNav() {
       </nav>
 
       <div className="mt-6 hidden border-t border-white/[0.09] pt-5 md:block">
-        <Link href="/pricing" className="coai-rainbow-cta flex items-center justify-center rounded-xl px-4 py-3 text-sm font-extrabold text-[#111216]">Choisir mon accompagnement</Link>
+        <Link href="/pricing" className="coai-rainbow-cta flex items-center justify-center rounded-xl px-4 py-3 text-sm font-extrabold text-white">Choisir mon accompagnement</Link>
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-graphite-400">
           <Link href="/compte/profil" className="hover:text-white">Mon profil</Link>
           <Link href="/compte/parametres" className="hover:text-white">Réglages</Link>
