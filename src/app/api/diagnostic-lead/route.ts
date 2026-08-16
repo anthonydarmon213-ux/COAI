@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification, sendEmail } from "@/lib/email/client";
+import { buildNouveauLeadEmailHtml, buildWhatsAppLinkVersLead } from "@/lib/email/lead-notification";
 import { buildMiniDiagnostic, miniDiagnosticEnTexte, type ReponsesDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
 import { trackServerEvent } from "@/lib/analytics/product-events";
 
@@ -32,6 +33,10 @@ async function resoudreCta(email: string): Promise<{ label: string; href: string
 
 const bodySchema = z.object({
   email: z.string().email().max(320),
+  // Format international requis (16/08/2026, demande Anthony : pouvoir
+  // contacter le lead par téléphone/WhatsApp), même règle que le formulaire
+  // côté client — cf. isValidTelephone dans diagnostic-quiz.tsx.
+  telephone: z.string().regex(/^\+[1-9]\d{6,14}$/).optional(),
   reponses: z.record(z.unknown()),
   utmSource: z.string().max(200).optional(),
   utmMedium: z.string().max(200).optional(),
@@ -53,6 +58,7 @@ export async function POST(request: Request) {
   const lead = await prisma.diagnosticLead.create({
     data: {
       email: parsed.data.email,
+      telephone: parsed.data.telephone,
       reponses: parsed.data.reponses as Prisma.InputJsonValue,
       utmSource: parsed.data.utmSource,
       utmMedium: parsed.data.utmMedium,
@@ -73,14 +79,54 @@ export async function POST(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
   const diagnostic = buildMiniDiagnostic(parsed.data.reponses as ReponsesDiagnostic);
 
+  // Source de la visite (16/08/2026, demande Anthony : "savoir d'où il
+  // vient... pour accentuer ce moyen de prospection") — réutilise l'UTM déjà
+  // capturé (Phase 5B, 11/08/2026), rien de nouveau à tracker. Vide quand le
+  // visiteur arrive sans lien traqué (accès direct, favori...).
+  const source = parsed.data.utmSource
+    ? [parsed.data.utmSource, parsed.data.utmMedium, parsed.data.utmCampaign].filter(Boolean).join(" · ")
+    : "Direct (pas de lien traqué)";
+
+  const reponsesLead = parsed.data.reponses as Record<string, unknown>;
+  const objectifLead = typeof reponsesLead.objectif === "string" ? reponsesLead.objectif : "Non renseigné";
+  const niveauLead = typeof reponsesLead.niveau === "string" ? reponsesLead.niveau : "Non renseigné";
+
+  const notifText = [
+    `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`,
+    parsed.data.telephone ? `Téléphone : ${parsed.data.telephone}` : "Téléphone : non renseigné",
+    diagnostic ? `Score COAI : ${diagnostic.indiceCoai.score}/100 — ${diagnostic.indiceCoai.niveau}` : null,
+    `Objectif : ${objectifLead}`,
+    `Niveau : ${niveauLead}`,
+    `Source : ${source}`,
+    parsed.data.telephone
+      ? `WhatsApp : ${buildWhatsAppLinkVersLead(parsed.data.telephone, parsed.data.email)}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   await Promise.all([
     // Notifie Anthony à chaque lead capturé sur le diagnostic public — ce
     // trou existait depuis la création du quiz (09/08/2026), jusqu'ici
     // invisible sans requête SQL manuelle (repéré le 10/08 via un test d'un
-    // ami d'Anthony).
+    // ami d'Anthony). Enrichi le 16/08/2026 (téléphone, score, objectif,
+    // niveau, source publicitaire, lien WhatsApp direct) — le lead ne se
+    // limitait jusqu'ici qu'à une adresse email, insuffisant pour un vrai
+    // suivi commercial.
     sendAdminNotification(
       "Nouveau lead — diagnostic COAI",
-      `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`
+      notifText,
+      diagnostic
+        ? buildNouveauLeadEmailHtml({
+            email: parsed.data.email,
+            telephone: parsed.data.telephone ?? null,
+            score: diagnostic.indiceCoai.score,
+            niveauScore: diagnostic.indiceCoai.niveau,
+            objectif: objectifLead,
+            niveau: niveauLead,
+            source,
+          })
+        : undefined
     ).catch((err) => console.error("[diagnostic-lead] admin notification :", err)),
 
     // Envoie aussi le diagnostic à la personne elle-même — CTA final adapté

@@ -5,6 +5,8 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
+import { MarqueeBanner } from "@/components/marketing/marquee-banner";
+import { Reveal } from "@/components/marketing/reveal";
 import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
@@ -100,24 +102,40 @@ const PILIERS = [
 
 export default function LandingPage() {
   return (
-    <main className="coai-landing-lux flex flex-col">
+    <main className="bg-lab-grid flex flex-col">
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
+      <MarqueeBanner />
 
       {/* Aperçu produit — anciennement les mockups de téléphone reconstruits
           (AppPreviewPhones), remplacés le 15/08/2026 par un visuel fourni
-          par Anthony (déposé dans public/) sur demande explicite. */}
-      <section id="apercu-produit" className="relative mx-auto flex w-full max-w-3xl justify-center px-6 pb-16 pt-8 sm:px-10">
-        <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
-          <Image
-            src="/coai-diagnostic.JPEG"
-            alt="Quel programme te correspond vraiment ? Diagnostic COAI offert."
-            fill
-            sizes="(min-width: 640px) 48rem, 100vw"
-            className="object-cover"
-          />
-        </div>
-      </section>
+          par Anthony (déposé dans public/) sur demande explicite. Cartes
+          flottantes ajoutées le 16/08/2026 (référence Future) : reprennent
+          les vrais bénéfices déjà en avant ailleurs, jamais un chiffre
+          inventé. */}
+      <Reveal>
+        <section id="apercu-produit" className="relative mx-auto flex w-full max-w-3xl flex-col items-center justify-center gap-6 px-6 pb-16 pt-8 sm:px-10">
+          <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
+            <Image
+              src="/coai-diagnostic.JPEG"
+              alt="Quel programme te correspond vraiment ? Diagnostic COAI offert."
+              fill
+              sizes="(min-width: 640px) 48rem, 100vw"
+              className="object-cover"
+            />
+            <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
+              <div className="flex-1 rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-md">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300">Algorithme</p>
+                <p className="mt-1 text-sm text-white">Programme généré en quelques secondes</p>
+              </div>
+              <div className="flex-1 rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-md">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a9c6d4]">Si besoin</p>
+                <p className="mt-1 text-sm text-white">Validé par un coach diplômé d&apos;État</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </Reveal>
 
       {/* Ligne de fonctionnalités sous le hero — reprend exactement les
           garde-fous déjà mis en avant ailleurs sur la page (adaptatif,
@@ -206,6 +224,7 @@ export default function LandingPage() {
       {/* Crédibilité / Fondateur — juste sous le hero pour rassurer tout de
           suite sur l'humain derrière COAI (visage + nom), avant même le
           reste du pitch. */}
+      <Reveal>
       <section id="fondateur" className="coai-founder-stage relative mx-auto my-8 grid w-[calc(100%-2rem)] max-w-6xl items-center gap-10 overflow-hidden rounded-[2.5rem] border border-white/[0.08] px-6 py-16 text-center shadow-2xl sm:px-12 md:grid-cols-2 md:py-20 md:text-left">
         <div className="coai-founder-orbit" aria-hidden="true" />
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
@@ -262,6 +281,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
+      </Reveal>
 
       {/* L'histoire */}
       <section id="histoire" className="mx-auto w-full max-w-3xl px-6 py-24 sm:py-28">
@@ -302,7 +322,33 @@ export default function LandingPage() {
         </p>
       </section>
 
+      {/* Bande photo (16/08/2026, référence Future : "il faut plus
+          d'images") — photo studio d'Anthony fournie par ses soins, jamais
+          utilisée jusqu'ici, avec une carte glass superposée reprenant le
+          positionnement algorithme d'abord / humain si besoin. */}
+      <Reveal>
+        <section className="mx-auto w-full max-w-6xl px-6 pb-8">
+          <div className="relative aspect-[16/8] w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:aspect-[16/6]">
+            <Image
+              src="/anthony-studio-premium.jpg"
+              alt="Anthony Darmon, fondateur de COAI"
+              fill
+              sizes="(min-width: 1280px) 72rem, 100vw"
+              className="object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6 sm:left-8 sm:right-auto sm:max-w-md">
+              <p className="font-editorial text-xl italic text-white sm:text-2xl">
+                « L&apos;algorithme applique ce que j&apos;ai appris en 17 ans de terrain. »
+              </p>
+              <p className="mt-2 text-sm text-graphite-300">Anthony Darmon, coach diplômé d&apos;État</p>
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
       {/* Les 3 piliers */}
+      <Reveal>
       <section id="piliers" className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-6 py-24">
         <div className="text-center">
           <SectionLabel>Ce que tu obtiens</SectionLabel>
@@ -334,6 +380,7 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+      </Reveal>
 
       {/* Coach IA 24/7 — différenciateur qu'aucun concurrent 100% manuel
           (type TrueCoach) ne peut proposer : une vraie présence permanente,
@@ -341,6 +388,7 @@ export default function LandingPage() {
           Impulsion garde un quota (4 questions/mois) — Transformation est
           illimité (cf. /api/coach/ask), donc "disponible 24/7" est un vrai
           avantage du palier supérieur, pas qu'une promesse marketing. */}
+      <Reveal>
       <section className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 px-6 py-24 text-center">
         <SectionLabel>Coach IA</SectionLabel>
         <h2 className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
@@ -366,8 +414,10 @@ export default function LandingPage() {
           <Button>Essayer le Coach IA</Button>
         </Link>
       </section>
+      </Reveal>
 
       {/* Accès aux offres */}
+      <Reveal>
       <section
         id="offres"
         className="mx-auto my-16 flex w-[calc(100%-3rem)] max-w-3xl flex-col items-center gap-6 rounded-[2rem] border border-laiton-400/20 bg-white/[0.035] px-6 py-12 text-center shadow-[0_40px_120px_-60px_rgba(201,162,98,0.35)] backdrop-blur sm:px-12 sm:py-16"
@@ -386,6 +436,7 @@ export default function LandingPage() {
           <Button>Commencer gratuitement</Button>
         </Link>
       </section>
+      </Reveal>
 
       {/* FAQ */}
       <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-24">
@@ -407,6 +458,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA final */}
+      <Reveal>
       <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center shadow-2xl sm:py-24">
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Ton prochain chapitre</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Un coaching conçu pour ta vraie vie.</h2>
@@ -419,6 +471,7 @@ export default function LandingPage() {
           <Link href="/sign-up"><Button variant="secondary">Commencer gratuitement</Button></Link>
         </div>
       </section>
+      </Reveal>
     </main>
   );
 }

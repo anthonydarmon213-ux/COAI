@@ -226,6 +226,14 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+// Format international requis (16/08/2026, demande Anthony : pouvoir
+// contacter le lead par téléphone/WhatsApp) — même règle que
+// /api/compte/telephone (phoneWhatsapp), pour rester compatible avec un
+// lien wa.me construit derrière.
+function isValidTelephone(value: string): boolean {
+  return /^\+[1-9]\d{6,14}$/.test(value.replace(/[\s.-]/g, ""));
+}
+
 function OptionCard({
   label,
   hint,
@@ -328,12 +336,13 @@ export function DiagnosticQuiz({
   // Choix du style d'accompagnement (16/08/2026, modèle Future demandé par
   // Anthony) — n'assigne aucun coach réel, sert juste à orienter la formule
   // mise en avant sur l'écran résultat.
-  const [coachPreference, setCoachPreference] = useState<"IA" | "ANTHONY" | null>(null);
+  const [coachPreference, setCoachPreference] = useState<"IA_HOMME" | "IA_FEMME" | "ANTHONY" | null>(null);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
   const [sportAutreTexte, setSportAutreTexte] = useState("");
   const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [consentEmail, setConsentEmail] = useState(false);
   const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading">("idle");
   const [applyStatus, setApplyStatus] = useState<
@@ -432,6 +441,7 @@ export function DiagnosticQuiz({
       santeAutreTexte,
       coachPreference,
       email,
+      telephone,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -463,6 +473,7 @@ export function DiagnosticQuiz({
     santeAutreTexte,
     coachPreference,
     email,
+    telephone,
   ]);
 
   function applySavedProgress(saved: Record<string, unknown>) {
@@ -493,10 +504,15 @@ export function DiagnosticQuiz({
     if (typeof saved.qualiteSommeil === "string") setQualiteSommeil(saved.qualiteSommeil);
     if (Array.isArray(saved.sante)) setSante(saved.sante as string[]);
     if (typeof saved.santeAutreTexte === "string") setSanteAutreTexte(saved.santeAutreTexte);
-    if (saved.coachPreference === "IA" || saved.coachPreference === "ANTHONY") {
+    if (
+      saved.coachPreference === "IA_HOMME" ||
+      saved.coachPreference === "IA_FEMME" ||
+      saved.coachPreference === "ANTHONY"
+    ) {
       setCoachPreference(saved.coachPreference);
     }
     if (typeof saved.email === "string") setEmail(saved.email);
+    if (typeof saved.telephone === "string") setTelephone(saved.telephone);
   }
 
   function startDiagnostic() {
@@ -570,7 +586,7 @@ export function DiagnosticQuiz({
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
     if (step === "coach") return Boolean(coachPreference);
-    if (step === "email") return isValidEmail(email) && consentEmail;
+    if (step === "email") return isValidEmail(email) && isValidTelephone(telephone) && consentEmail;
     return true;
   }, [step, persona, niveau, objectif, equipement, lieu, duree, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
 
@@ -704,6 +720,7 @@ export function DiagnosticQuiz({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
+          telephone: telephone || undefined,
           ...utm,
           reponses: {
             persona: resolveAutre(persona, personaAutreTexte),
@@ -1183,10 +1200,16 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 <OptionCard
-                  label="Coach IA"
+                  label="Coach IA — voix masculine"
                   hint="Rapide, disponible 24h/24, programme généré immédiatement."
-                  active={coachPreference === "IA"}
-                  onClick={() => setCoachPreference("IA")}
+                  active={coachPreference === "IA_HOMME"}
+                  onClick={() => setCoachPreference("IA_HOMME")}
+                />
+                <OptionCard
+                  label="Coach IA — voix féminine"
+                  hint="Rapide, disponible 24h/24, programme généré immédiatement."
+                  active={coachPreference === "IA_FEMME"}
+                  onClick={() => setCoachPreference("IA_FEMME")}
                 />
                 <OptionCard
                   label="Anthony Darmon"
@@ -1213,6 +1236,20 @@ export function DiagnosticQuiz({
                 placeholder="toi@exemple.fr"
                 autoComplete="email"
               />
+              <div>
+                <Input
+                  type="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                  placeholder="+33612345678"
+                  autoComplete="tel"
+                  inputMode="tel"
+                />
+                <p className="mt-1.5 text-xs text-graphite-500">
+                  Ton numéro (format international, ex : +33612345678) — pour qu&apos;un coach
+                  puisse te recontacter si besoin.
+                </p>
+              </div>
               <label className="flex items-start gap-2 text-xs leading-5 text-graphite-400">
                 <input
                   type="checkbox"

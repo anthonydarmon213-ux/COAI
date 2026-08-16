@@ -95,7 +95,7 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
       explication: "Transformation inclut la validation humaine de ton programme par Anthony Darmon, coach diplômé d'État.",
       service: "TRANSFORMATION",
     });
-  } else if (profile.coachPreference === "IA") {
+  } else if (profile.coachPreference === "IA_HOMME" || profile.coachPreference === "IA_FEMME") {
     besoins.push({
       besoin: "Tu as choisi un accompagnement 100% IA",
       explication: "Un programme complet généré immédiatement par les algorithmes COAI, sans attendre de validation humaine.",

@@ -44,7 +44,7 @@ const bodySchema = z.object({
   reglesDouloureuses: z.boolean().optional(),
   statutMaternite: z.enum(["ENCEINTE", "POST_PARTUM"]).optional(),
   dateReferenceMaternite: z.string().datetime().optional(),
-  coachPreference: z.enum(["IA", "ANTHONY"]).optional(),
+  coachPreference: z.enum(["IA_HOMME", "IA_FEMME", "ANTHONY"]).optional(),
 });
 
 export async function PUT(request: Request) {

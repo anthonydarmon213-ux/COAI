@@ -412,20 +412,23 @@ body {
   transform: scale(1.015);
 }
 
-.coai-landing-hero-overlay {
+/* Halo de couleur du hero (16/08/2026, référence Future demandée par
+   Anthony : "il y a de la couleur c'est animé") — deux teintes de marque
+   (or + acier) plutôt qu'une seule, pour casser le monochrome doré. */
+.coai-hero-accent-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
-    radial-gradient(circle at 50% 18%, rgba(105,164,188,.17), transparent 23rem),
-    radial-gradient(circle at 18% 70%, rgba(211,170,95,.19), transparent 28rem),
-    linear-gradient(145deg, #fbfaf7 0%, #f3eee4 52%, #e7eff1 100%);
+    radial-gradient(circle at 82% 12%, rgba(91,130,150,.16), transparent 26rem),
+    radial-gradient(circle at 10% 82%, rgba(201,162,98,.14), transparent 30rem);
 }
 
-.coai-landing-wordmark { color: #171817; text-shadow: 0 1px 0 rgba(255,255,255,.7); }
-.coai-landing-eyebrow { color: #49788f; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
-
 .coai-landing-promise {
-  border-color: rgba(99,76,42,.16);
-  background: rgba(255,253,248,.76);
-  box-shadow: 0 34px 90px -48px rgba(54,39,20,.55), inset 0 1px 0 rgba(255,255,255,.96);
+  border-color: rgba(221,193,145,.16);
+  background: linear-gradient(160deg, rgba(24,25,27,.72), rgba(13,14,16,.6));
+  box-shadow: 0 34px 90px -48px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-landing-lux .text-white,
@@ -987,6 +990,34 @@ html {
   }
 }
 
+/* Bandeau déroulant (16/08/2026, demande Anthony : "ça attire l'œil") — la
+   piste contient les items dupliqués deux fois (cf. MarqueeBanner), on
+   translate exactement de -50% pour boucler sans à-coup. */
+@keyframes coai-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.coai-marquee {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(221, 193, 145, 0.14);
+  border-bottom: 1px solid rgba(221, 193, 145, 0.14);
+  background: linear-gradient(90deg, rgba(201, 162, 98, 0.08), rgba(91, 130, 150, 0.08));
+  mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+}
+
+.coai-marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
+
 /* Halo animé du hero : désactivé si l'utilisateur préfère moins d'animations. */
 @media (prefers-reduced-motion: no-preference) {
   .animate-spin-slow {
@@ -1007,6 +1038,9 @@ html {
   }
   .animate-halo-blink {
     animation: halo-blink 1.8s ease-in-out infinite;
+  }
+  .animate-marquee {
+    animation: coai-marquee-scroll 32s linear infinite;
   }
   .coai-loader-arc {
     animation: spin-loader 1.6s linear infinite;
