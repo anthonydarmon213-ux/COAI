@@ -5,11 +5,42 @@ import { usePathname } from "next/navigation";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
-const LINKS = [
+const NAVIGATION = [
   { href: "/dashboard", label: "Aujourd’hui", icon: "◉" },
-  { href: "/programme/entrainement", label: "Mon programme", icon: "◇" },
-  { href: "/suivi/progression", label: "Mon suivi", icon: "↗" },
-  { href: "/coach", label: "Mon coach", icon: "✦" },
+  {
+    label: "Mon programme",
+    icon: "◇",
+    match: "/programme",
+    children: [
+      { href: "/programme/entrainement", label: "Entraînement" },
+      { href: "/programme/alimentation", label: "Nutrition" },
+      { href: "/programme/recuperation", label: "Récupération" },
+      { href: "/programme/evolution", label: "Évolution du programme" },
+      { href: "/videos", label: "Vidéos techniques" },
+    ],
+  },
+  {
+    label: "Mon suivi",
+    icon: "↗",
+    match: "/suivi",
+    children: [
+      { href: "/suivi/progression", label: "Vue d’ensemble" },
+      { href: "/suivi/mesures", label: "Mes mesures" },
+      { href: "/suivi/seances", label: "Mes séances" },
+      { href: "/suivi/alimentation", label: "Mon alimentation" },
+      { href: "/suivi/tests-maxi", label: "Mes performances" },
+    ],
+  },
+  {
+    label: "Mon coach",
+    icon: "✦",
+    match: "/coach",
+    children: [
+      { href: "/coach", label: "Poser une question" },
+      { href: "/pricing", label: "Comparer les formules" },
+      { href: "/compte/abonnement", label: "Mon abonnement" },
+    ],
+  },
 ];
 
 function isActive(pathname: string | null, href: string) {
@@ -29,20 +60,34 @@ export function AppNav() {
             <CoaiMark size={26} />
             <span className="font-display text-xl font-extrabold tracking-[0.16em] text-graphite-50">COAI</span>
           </div>
-          <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-graphite-300">Performance · Santé · Longévité</span>
+          <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300">Coaching humain augmenté par l&apos;IA</span>
         </Link>
         <SignOutButton variant="icon" />
       </div>
 
       <p className="mt-10 hidden text-[0.6rem] font-bold uppercase tracking-[0.18em] text-graphite-500 md:block">Ton parcours</p>
       <nav aria-label="Navigation principale" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-3 md:flex-1 md:flex-col md:overflow-visible">
-        {LINKS.map((item) => {
-          const active = isActive(pathname, item.href);
+        {NAVIGATION.map((item) => {
+          if ("href" in item && item.href) {
+            const active = isActive(pathname, item.href);
+            return <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/30 bg-white/[0.75] text-graphite-50 shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.55] hover:text-graphite-50"}`}><span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>{item.label}</Link>;
+          }
+
+          const groupActive = Boolean(pathname?.startsWith(item.match ?? "")) || item.children?.some((child) => isActive(pathname, child.href));
           return (
-            <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/30 bg-white/[0.65] text-graphite-50 shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.45] hover:text-graphite-50"}`}>
-              <span className="w-4 text-center text-xs opacity-80" aria-hidden="true">{item.icon}</span>
-              {item.label}
-            </Link>
+            <details key={item.label} className="coai-nav-group" open={groupActive}>
+              <summary className={`flex cursor-pointer list-none items-center gap-3 rounded-xl border px-3.5 py-3 font-semibold transition ${groupActive ? "border-laiton-400/30 bg-white/[0.75] text-graphite-50 shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.55] hover:text-graphite-50"}`}>
+                <span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>
+                <span className="flex-1">{item.label}</span>
+                <span className="coai-nav-chevron text-[10px]" aria-hidden="true">⌄</span>
+              </summary>
+              <div className="ml-5 mt-1 flex flex-col border-l border-laiton-500/25 pl-3">
+                {item.children?.map((child) => {
+                  const active = isActive(pathname, child.href);
+                  return <Link key={child.href} href={child.href} className={`rounded-lg px-3 py-2 text-[0.78rem] font-bold transition ${active ? "bg-white/80 text-graphite-950" : "text-graphite-300 hover:bg-white/55 hover:text-graphite-950"}`}>{child.label}</Link>;
+                })}
+              </div>
+            </details>
           );
         })}
       </nav>

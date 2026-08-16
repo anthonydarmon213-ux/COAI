@@ -121,13 +121,9 @@ export async function PilierPage() {
             </li>
           </ul>
           <OneShotProgrammeButton className="max-w-xs" />
-          <p className="text-xs leading-5 text-graphite-400">
-            Un suivi humain continu t&apos;intéresse ?{" "}
-            <Link href="/pricing" className="text-laiton-400 underline">
-              Comparer les accompagnements
-            </Link>
-            .
-          </p>
+          <Link href="/pricing" className="inline-flex w-fit items-center rounded-xl border border-graphite-700/20 bg-white/70 px-5 py-3 text-sm font-extrabold text-graphite-950 shadow-sm transition hover:border-laiton-500/50 hover:bg-white">
+            Comparer les accompagnements →
+          </Link>
         </Card>
       )}
 

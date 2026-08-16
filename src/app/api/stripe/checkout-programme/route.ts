@@ -24,15 +24,27 @@ export async function POST() {
     return NextResponse.json({ error: "Déjà débloqué" }, { status: 400 });
   }
 
-  const priceId = process.env.STRIPE_PRICE_ID_PROGRAMME_ONE_SHOT;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  if (!priceId || !appUrl) {
+  if (!appUrl) {
     return NextResponse.json({ error: "Configuration Stripe manquante" }, { status: 500 });
   }
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    line_items: [{ price: priceId, quantity: 1 }],
+    // Le montant est défini ici afin que le libellé affiché et le paiement ne
+    // puissent plus diverger à cause d'un ancien Price ID Stripe resté dans
+    // l'environnement de production.
+    line_items: [{
+      price_data: {
+        currency: "eur",
+        unit_amount: 1900,
+        product_data: {
+          name: "COAI — Programme personnalisé",
+          description: "Programme personnalisé complet — paiement unique.",
+        },
+      },
+      quantity: 1,
+    }],
     customer_email: authUser.email,
     client_reference_id: user.id,
     metadata: { oneShotProgramme: "IMPULSION" },

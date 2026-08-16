@@ -36,20 +36,16 @@ export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
             séance, réserve via l&apos;offre VIP, à la séance.
           </>
         ) : (
-          <>
-            Un besoin plus poussé que ce que le programme couvre ? Réserve une séance
-            individuelle avec Anthony Darmon — présentiel à Paris centre (200€/1h) ou en visio
-            (100€/1h), sans abonnement.
-          </>
+          <>Un accompagnement humain, précis et adapté à ta progression.</>
         )}
       </p>
       <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-1 text-sm font-medium text-laiton-300 hover:text-laiton-200"
+        className="mt-2 inline-flex w-fit rounded-xl bg-graphite-950 px-5 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-graphite-800 hover:text-white"
       >
-        Réserver via WhatsApp →
+        Réserver avec Anthony · Visio 100€ / Paris 200€ →
       </a>
     </div>
   );

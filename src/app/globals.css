@@ -352,6 +352,7 @@ body {
    sombre) — un cran plus doux que le fond d'origine, pas deux. */
 .coai-app-shell {
   color: #171817;
+  font-family: var(--font-display), system-ui, sans-serif;
   background:
     radial-gradient(circle at 24% 0%, rgba(214,177,110,.22), transparent 28rem),
     radial-gradient(circle at 94% 72%, rgba(87,145,172,.16), transparent 34rem),
@@ -375,6 +376,10 @@ body {
 
 .coai-app-nav nav > a,
 .coai-app-nav nav > button { font-weight: 650; letter-spacing: -.01em; }
+
+.coai-nav-group summary::-webkit-details-marker { display: none; }
+.coai-nav-group[open] .coai-nav-chevron { transform: rotate(180deg); }
+.coai-nav-chevron { transition: transform .2s ease; }
 
 .coai-boarding-card { background: linear-gradient(135deg, #111315, #1d1b17); }
 .coai-app-shell .coai-boarding-card .text-white { color: #fffdf8; }
