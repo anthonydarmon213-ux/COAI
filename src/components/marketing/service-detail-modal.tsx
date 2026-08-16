@@ -9,16 +9,19 @@ import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { TIER_BY_SERVICE, VIP_MESSAGE, vipReservationHref, type ServiceKey } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
-const SERVICES: ServiceKey[] = ["IMPULSION", "TRANSFORMATION", "VIP"];
-
-// Modal plein écran (14/08/2026) — inspiré des paywalls d'app mobile (nom
-// de l'offre en grand, onglets pour comparer, liste de bénéfices, prix,
-// un seul CTA) : quand quelqu'un clique sur un service (ex: depuis la
-// vitrine "besoins identifiés" du dashboard), il voit tous les tarifs sur
-// un même écran plutôt qu'un simple bouton isolé. Contenu et logique
-// d'achat réutilisés tels quels depuis /pricing (src/lib/pricing/tiers.ts,
-// mêmes composants de checkout, même consentement légal) — jamais dupliqués
-// ni réinventés ici.
+// Modal plein écran (14/08/2026, simplifié le 16/08/2026 — demande Anthony :
+// "il faut mettre une seule formule et ce qu'elle propose exactement et à la
+// fin on demande le prix") : une seule offre à la fois, présentée
+// pédagogiquement (ce que ça comprend, expliqué simplement) puis le prix en
+// tout dernier, comme une réponse à "cette formule te correspond ?" plutôt
+// qu'un tableau à comparer. Avant, des onglets permettaient de basculer
+// entre Impulsion/Transformation/VIP dans la même fenêtre — retiré : le menu
+// (Impulsion/Transformation/VIP en entrées séparées) et les vitrines
+// personnalisées (besoins identifiés, "ta formule") choisissent déjà la
+// bonne offre à l'ouverture, jamais besoin de comparer les 3 au même endroit.
+// Contenu et logique d'achat réutilisés tels quels depuis /pricing
+// (src/lib/pricing/tiers.ts, mêmes composants de checkout, même
+// consentement légal) — jamais dupliqués ni réinventés ici.
 export function ServiceDetailModal({
   initialService,
   onClose,
@@ -26,9 +29,8 @@ export function ServiceDetailModal({
   initialService: ServiceKey;
   onClose: () => void;
 }) {
-  const [service, setService] = useState<ServiceKey>(initialService);
   const [annual, setAnnual] = useState(true);
-  const tier = TIER_BY_SERVICE[service];
+  const tier = TIER_BY_SERVICE[initialService];
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
   useEffect(() => {
@@ -63,24 +65,11 @@ export function ServiceDetailModal({
         <h1 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">{tier.nom}</h1>
         <p className="max-w-sm text-sm leading-6 text-graphite-300">{tier.description}</p>
 
-        {/* Onglets — comparer les 3 services sans quitter l'écran */}
-        <div className="inline-flex rounded-full border border-white/10 bg-white/[0.03] p-1">
-          {SERVICES.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setService(s)}
-              className={`rounded-full px-4 py-2 text-sm transition ${
-                s === service ? "bg-laiton-400 text-graphite-950" : "text-graphite-300 hover:text-white"
-              }`}
-            >
-              {TIER_BY_SERVICE[s].nom}
-            </button>
-          ))}
-        </div>
-
-        {/* Liste des bénéfices */}
+        {/* Liste des bénéfices, présentée pédagogiquement */}
         <div className="w-full rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 text-left">
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">
+            Ce que {tier.nom} comprend exactement
+          </p>
           <ul className="flex flex-col gap-4">
             {tier.features.map((feature) => (
               <li key={feature} className="flex items-start gap-3">
@@ -113,7 +102,12 @@ export function ServiceDetailModal({
           </div>
         )}
 
-        {/* Bloc prix */}
+        {/* Bloc prix — volontairement la dernière chose montrée : la
+            personne a déjà compris ce que la formule fait avant de voir le
+            prix, jamais l'inverse. */}
+        <p className="text-sm font-medium text-graphite-300">
+          Cette formule te correspond ? Voici le prix.
+        </p>
         {tier.sessions ? (
           <div className="flex w-full flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 text-left">
             {tier.sessions.map((session) => {
