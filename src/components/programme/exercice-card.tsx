@@ -47,12 +47,14 @@ export function ExerciceCard({ exercice }: { exercice: unknown }) {
         )}
       </div>
       {videoOuverte && nom && (
-        <div className="w-full max-w-[220px] overflow-hidden rounded-lg border border-white/[0.08] bg-black">
+        <div className="w-40 overflow-hidden rounded-lg border border-white/[0.08] bg-black">
           <iframe
             src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${nom} technique musculation`)}`}
             title={`Aperçu technique : ${nom}`}
             className="aspect-square w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         </div>

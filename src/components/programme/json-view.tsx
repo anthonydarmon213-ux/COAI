@@ -120,9 +120,24 @@ export function JsonView({
               <span className="font-mono text-[10px] uppercase tracking-widest text-graphite-500">
                 {label}
               </span>
-              <span className="text-right text-sm font-medium text-graphite-50">
+              <div className="text-right text-sm font-medium text-graphite-50">
                 {String(value)}
-                {media && (
+                {media && typeMedia === "exercice" ? (
+                  <details className="ml-auto mt-2 w-40 overflow-hidden rounded-lg border border-white/[0.08] bg-black text-left">
+                    <summary className="cursor-pointer px-3 py-2 font-mono text-[10px] uppercase tracking-wide text-laiton-400">
+                      ▶ Technique
+                    </summary>
+                    <iframe
+                      src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${String(value)} technique musculation`)}`}
+                      title={`Technique : ${String(value)}`}
+                      className="aspect-square w-full"
+                      sandbox="allow-scripts allow-same-origin allow-presentation"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </details>
+                ) : media ? (
                   <a
                     href={media.searchUrl(value as string)}
                     target="_blank"
@@ -131,8 +146,8 @@ export function JsonView({
                   >
                     {media.label}
                   </a>
-                )}
-              </span>
+                ) : null}
+              </div>
             </div>
           );
         })}

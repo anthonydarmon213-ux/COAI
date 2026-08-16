@@ -63,12 +63,12 @@ export function CoaiIntro() {
           <div className="relative overflow-hidden rounded-[2.2rem] border border-white/[0.12] bg-white/[0.035] p-3 shadow-[0_35px_110px_rgba(0,0,0,.55)] backdrop-blur-xl">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[1.65rem]">
               <Image
-                src="/anthony-studio-premium.jpg"
+                src="/anthony-trx-studio-premium.jpg"
                 alt="Anthony Darmon, coach diplômé d'État et fondateur de COAI"
                 fill
                 priority
                 sizes="(min-width: 1024px) 34rem, 90vw"
-                className="object-cover object-[center_18%]"
+                className="object-cover object-[center_32%]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-7 text-left sm:p-9">
@@ -80,7 +80,7 @@ export function CoaiIntro() {
               </div>
             </div>
           </div>
-          <div className="absolute -bottom-5 -left-3 rounded-2xl border border-laiton-300/20 bg-[#11110f]/95 px-5 py-4 text-left shadow-2xl backdrop-blur sm:-left-8">
+          <div className="relative mt-4 rounded-2xl border border-laiton-300/20 bg-[#11110f]/95 px-5 py-4 text-left shadow-2xl backdrop-blur sm:absolute sm:-bottom-5 sm:-left-8 sm:mt-0">
             <p className="text-[10px] uppercase tracking-[0.16em] text-graphite-500">Votre première étape</p>
             <p className="mt-1 text-sm font-semibold text-white">Comprendre avant de prescrire.</p>
           </div>
