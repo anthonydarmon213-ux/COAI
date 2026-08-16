@@ -9,6 +9,15 @@ body {
     #090a0b;
 }
 
+/* En-tête marketing : voile fumé suffisamment dense pour rester lisible
+   au-dessus des pages sombres comme des pages ivoire du diagnostic. */
+.coai-public-header {
+  border-color: rgba(221, 193, 145, 0.16);
+  background:
+    linear-gradient(90deg, rgba(17, 16, 14, 0.94), rgba(29, 27, 23, 0.9) 52%, rgba(14, 17, 18, 0.94));
+  box-shadow: 0 16px 42px rgba(29, 24, 17, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.035);
+}
+
 /* Diagnostic — luxe technologique lumineux. Une page ivoire et champagne,
    avec le noir utilisé comme encre et non comme décor dominant. */
 .coai-diagnostic-page {

@@ -15,7 +15,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
   return (
     <div className="relative">
       <UtmCapture />
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.07] bg-[#090a0b]/82 shadow-[0_12px_35px_rgba(0,0,0,.18)] backdrop-blur-xl">
+      <header className="coai-public-header fixed inset-x-0 top-0 z-50 border-b shadow-[0_12px_35px_rgba(0,0,0,.18)] backdrop-blur-xl">
         <SiteNav connecte={!!user} hrefCompte={user ? "/dashboard" : "/"} />
       </header>
       {children}
