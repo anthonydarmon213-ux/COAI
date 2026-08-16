@@ -552,6 +552,22 @@ model DiagnosticLead {
   // Relance commerciale unique, envoyée 24 h après le diagnostic uniquement
   // si aucun compte ne correspond encore à cette adresse.
   conversionReminderSentAt DateTime?
+  // Séquence de nurture post-diagnostic (16/08/2026, "machine d'acquisition
+  // COAI" demandée par Anthony) — même garde-fou anti-doublon que
+  // conversionReminderSentAt, un étage par palier temporel : J+3 (pourquoi
+  // COAI n'est pas une IA générique), J+5 (offre Impulsion 19€), J+7
+  // (invitation à échanger avec Anthony pour Transformation/VIP). Chacun ne
+  // part jamais si un compte existe déjà pour cette adresse (même logique
+  // stop-on-convert que conversionReminderSentAt) ni si optedOutAt est posé.
+  drip3SentAt DateTime?
+  drip5SentAt DateTime?
+  drip7SentAt DateTime?
+  // Désinscription (RGPD/anti-spam) — posé sur toutes les lignes de cette
+  // adresse dès qu'un clic sur le lien de désabonnement est vérifié
+  // (cf. /api/diagnostic-lead/unsubscribe). Bloque tout envoi futur de la
+  // séquence de nurture ; n'affecte jamais l'email de résultat lui-même
+  // (transactionnel, déjà envoyé au moment où ce champ peut être posé).
+  optedOutAt DateTime?
   // Attribution publicitaire (Phase 5B, 11/08/2026) — même principe que
   // User.utmSource et consorts, mais capturée dès le lead (avant même la
   // création de compte) : un visiteur qui ne convertit jamais reste
@@ -565,6 +581,9 @@ model DiagnosticLead {
   @@index([email])
   @@index([createdAt])
   @@index([conversionReminderSentAt, createdAt])
+  @@index([drip3SentAt, createdAt])
+  @@index([drip5SentAt, createdAt])
+  @@index([drip7SentAt, createdAt])
   @@map("diagnostic_leads")
 }
 

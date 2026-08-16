@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/bilan-mensuel",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/drip-diagnostic",
+      "schedule": "0 10 * * *"
     }
   ]
 }
