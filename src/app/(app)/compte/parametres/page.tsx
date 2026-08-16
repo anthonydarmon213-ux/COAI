@@ -12,9 +12,12 @@ export default async function ParametresPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <SectionLabel>Compte</SectionLabel>
-        <h1 className="text-2xl font-semibold">Paramètres</h1>
+      <div className="animate-reveal flex flex-col gap-3">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+          <span>Compte</span>
+        </div>
+        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Paramètres.</h1>
       </div>
       <Card className="flex flex-col gap-2">
         <SectionLabel>Identité</SectionLabel>

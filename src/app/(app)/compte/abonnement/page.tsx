@@ -44,8 +44,11 @@ export default async function AbonnementPage() {
   return (
     <div className="flex flex-col gap-6">
       <ScrollToHash />
-      <div className="flex flex-col gap-1 border-b border-acier/25 pb-7">
-        <SectionLabel>Compte</SectionLabel>
+      <div className="animate-reveal flex flex-col gap-3 border-b border-acier/25 pb-7">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+          <span>Compte</span>
+        </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
           Votre coach humain.
         </h1>

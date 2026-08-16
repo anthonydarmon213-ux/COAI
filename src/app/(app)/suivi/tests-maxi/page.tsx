@@ -33,9 +33,12 @@ export default async function TestsMaxiPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <SectionLabel>Suivi</SectionLabel>
-        <h1 className="text-2xl font-semibold">Tests physiques</h1>
+      <div className="animate-reveal flex flex-col gap-3">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+          <span>Suivi</span>
+        </div>
+        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Tests physiques.</h1>
         <p className="text-sm text-graphite-400">
           Force, vitesse, puissance, souplesse, équilibre, endurance — enregistre tes résultats
           pour voir ta progression sur les qualités physiques de référence.

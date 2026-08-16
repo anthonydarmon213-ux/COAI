@@ -17,7 +17,7 @@ export default async function VideosPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
+      <div className="animate-reveal flex flex-col gap-2 border-b border-acier/25 pb-7">
         <SectionLabel>Bibliothèque</SectionLabel>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Streaming.</h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">

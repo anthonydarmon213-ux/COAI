@@ -74,8 +74,11 @@ export default async function EvolutionPage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
-        <SectionLabel>Ton évolution</SectionLabel>
+      <div className="animate-reveal flex flex-col gap-3 border-b border-acier/25 pb-7">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+          <span>Ton évolution</span>
+        </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
           Ton programme évolue.
         </h1>

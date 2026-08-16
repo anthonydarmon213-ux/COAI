@@ -39,8 +39,11 @@ export default async function ProfilPage({
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
-        <SectionLabel>Coaching</SectionLabel>
+      <div className="animate-reveal flex flex-col gap-3 border-b border-acier/25 pb-7">
+        <div className="coai-diagnostic-kicker self-start">
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+          <span>Coaching</span>
+        </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Votre profil.</h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">
           {enOnboarding
