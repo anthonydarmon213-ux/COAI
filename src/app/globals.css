@@ -359,9 +359,45 @@ body {
 }
 
 .coai-app-nav {
-  border-color: rgba(84,68,44,.13);
-  background: rgba(247,244,235,.84);
-  box-shadow: 12px 0 45px -38px rgba(47,38,25,.4);
+  border-color: rgba(221,193,145,.14);
+  background: linear-gradient(180deg, rgba(17,18,19,.98), rgba(27,25,21,.97));
+  box-shadow: 18px 0 55px -38px rgba(20,15,8,.75);
+}
+
+.coai-app-nav .text-white { color: #fffdf8; }
+.coai-app-nav .text-graphite-300 { color: #d8d8d3; }
+.coai-app-nav .text-graphite-400 { color: #b9bbb6; }
+.coai-app-nav .text-graphite-500 { color: #8f918c; }
+.coai-app-nav .text-laiton-300 { color: #e5c993; }
+.coai-app-nav a:hover,
+.coai-app-nav button:hover { color: #fffdf8; }
+
+.coai-app-nav nav > a,
+.coai-app-nav nav > button { font-weight: 650; letter-spacing: -.01em; }
+
+.coai-boarding-card { background: linear-gradient(135deg, #111315, #1d1b17); }
+.coai-app-shell .coai-boarding-card .text-white { color: #fffdf8; }
+.coai-app-shell .coai-boarding-card .text-graphite-300 { color: #d4d5d1; }
+.coai-app-shell .coai-boarding-card .text-graphite-500 { color: #a8aaa4; }
+.coai-app-shell .coai-boarding-card .text-laiton-300 { color: #e5c993; }
+
+.coai-rainbow-cta {
+  background: linear-gradient(105deg, #f6c66f 0%, #f48fa8 27%, #b596f4 52%, #79c8ef 76%, #8ee0c1 100%);
+  background-size: 160% 160%;
+  animation: coai-rainbow-shift 8s ease infinite;
+}
+
+.coai-welcome button {
+  border-color: rgba(25, 27, 29, .18);
+  background: #1b1d20;
+  color: #fffdf8;
+}
+
+.coai-welcome button:hover { background: #2a2d30; }
+
+@keyframes coai-rainbow-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .coai-app-nav-dropdown {

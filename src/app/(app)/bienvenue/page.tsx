@@ -69,7 +69,7 @@ export default async function BienvenuePage({
 
   if (!achatConfirme) {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 py-10 text-center sm:py-16">
+      <div className="coai-welcome mx-auto flex max-w-2xl flex-col items-center gap-8 py-10 text-center sm:py-16">
         <div className="animate-reveal flex flex-col items-center gap-3">
           <SectionLabel>Compte créé</SectionLabel>
           <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
@@ -80,6 +80,14 @@ export default async function BienvenuePage({
           </p>
         </div>
 
+        <Link
+          href="/dashboard"
+          className="coai-rainbow-cta animate-reveal inline-flex min-h-14 w-full max-w-md items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-20px_rgba(102,126,255,.75)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_65px_-18px_rgba(228,92,150,.65)]"
+          style={{ animationDelay: "100ms" }}
+        >
+          Entrer dans mon espace&nbsp; →
+        </Link>
+
         {/* Carte d'embarquement, version accès libre (16/08/2026, demande
             Anthony — un "effet whaou", pris en main dès l'arrivée, comme dans
             un palace, plutôt qu'un texte plat suivi d'une tentative de
@@ -88,7 +96,7 @@ export default async function BienvenuePage({
             formule à afficher puisque rien n'est encore débloqué. Révélée en
             fondu/glissement après le titre, comme si on nous la tendait. */}
         <div
-          className="animate-reveal w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] text-left shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex"
+          className="coai-boarding-card animate-reveal w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] text-left shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex"
           style={{ animationDelay: "150ms" }}
         >
           <div className="flex flex-1 flex-col gap-6 p-7 sm:p-9">
@@ -149,10 +157,6 @@ export default async function BienvenuePage({
             </div>
           ))}
         </div>
-
-        <Link href="/dashboard" className="animate-reveal" style={{ animationDelay: "780ms" }}>
-          <Button className="px-8 py-3">Entrer dans mon espace →</Button>
-        </Link>
 
         {/* Le diagnostic reste appliqué au profil en silence si des réponses
             attendent en localStorage — mais plus aucune tentative de
@@ -220,7 +224,7 @@ export default async function BienvenuePage({
 
       {/* Carte d'embarquement COAI — écho volontaire au "salon privé avant
           d'embarquer" évoqué par Anthony comme référence d'expérience. */}
-      <div className="w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex">
+      <div className="coai-boarding-card w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex">
         <div className="flex flex-1 flex-col gap-6 p-7 text-left sm:p-9">
           <div className="flex items-center justify-between">
             <span className="font-display text-lg font-semibold tracking-tight text-white">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -230,8 +230,15 @@ function isValidEmail(value: string): boolean {
 // contacter le lead par téléphone/WhatsApp) — même règle que
 // /api/compte/telephone (phoneWhatsapp), pour rester compatible avec un
 // lien wa.me construit derrière.
+function normalizeTelephone(value: string): string {
+  const compact = value.replace(/[\s().-]/g, "");
+  if (/^0[67]\d{8}$/.test(compact)) return `+33${compact.slice(1)}`;
+  if (/^33[67]\d{8}$/.test(compact)) return `+${compact}`;
+  return compact;
+}
+
 function isValidTelephone(value: string): boolean {
-  return /^\+[1-9]\d{6,14}$/.test(value.replace(/[\s.-]/g, ""));
+  return /^\+[1-9]\d{6,14}$/.test(normalizeTelephone(value));
 }
 
 function OptionCard({
@@ -349,7 +356,6 @@ export function DiagnosticQuiz({
     "idle" | "loading" | "done" | "generation" | "pret" | "erreur"
   >("idle");
   const [resumable, setResumable] = useState(false);
-  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stepIndex = questionSteps.indexOf(step);
   const progressPct = stepIndex >= 0 ? Math.round((stepIndex / questionSteps.length) * 100) : 0;
@@ -389,16 +395,7 @@ export function DiagnosticQuiz({
 
   function chooseSingle<T>(setter: (value: T) => void, value: T) {
     setter(value);
-    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
-    autoAdvanceTimer.current = setTimeout(goNext, 320);
   }
-
-  useEffect(
-    () => () => {
-      if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
-    },
-    []
-  );
   function goBack() {
     const i = STEP_ORDER.indexOf(step);
     // "analyse" n'est pas une vraie étape (rien à corriger) : "Retour" depuis
@@ -750,7 +747,7 @@ export function DiagnosticQuiz({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          telephone: telephone || undefined,
+          telephone: normalizeTelephone(telephone) || undefined,
           ...utm,
           reponses: {
             persona: resolveAutre(persona, personaAutreTexte),
@@ -1278,12 +1275,13 @@ export function DiagnosticQuiz({
                   type="tel"
                   value={telephone}
                   onChange={(e) => setTelephone(e.target.value)}
-                  placeholder="+33612345678"
+                  onBlur={() => setTelephone(normalizeTelephone(telephone))}
+                  placeholder="06 12 34 56 78"
                   autoComplete="tel"
                   inputMode="tel"
                 />
                 <p className="mt-1.5 text-xs text-graphite-500">
-                  Ton numéro (ex. +33612345678) — pour recevoir un conseil personnalisé ou être
+                  Ton numéro (ex. 06 12 34 56 78) — le format français est accepté. Pour recevoir un conseil personnalisé ou être
                   recontacté sur WhatsApp. Jamais partagé.
                 </p>
               </div>

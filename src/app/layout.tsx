@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Manrope, Inter, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "../../sentry.client.config";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
 
-const cormorantGaramond = Cormorant_Garamond({
+const manrope = Manrope({
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
   variable: "--font-display",
   display: "swap",
 });
@@ -51,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="fr"
       translate="no"
-      className={`notranslate ${cormorantGaramond.variable} ${inter.variable} ${plexMono.variable}`}
+      className={`notranslate ${manrope.variable} ${inter.variable} ${plexMono.variable}`}
     >
       <body>
         {children}
