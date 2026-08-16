@@ -122,7 +122,7 @@ export default async function BienvenuePage({
               ce soit.
             </p>
           </div>
-          <div className="relative flex flex-row items-center gap-0 border-t border-dashed border-white/15 bg-white/[0.02] px-7 py-6 sm:w-56 sm:flex-col sm:justify-center sm:border-l sm:border-t-0 sm:px-6 sm:py-9">
+          <div className="coai-boarding-next relative flex flex-row items-center gap-0 border-t border-dashed border-white/15 px-7 py-6 sm:w-56 sm:flex-col sm:justify-center sm:border-l sm:border-t-0 sm:px-6 sm:py-9">
             <span className="pointer-events-none absolute -left-2.5 -top-2.5 hidden h-5 w-5 rounded-full bg-lab-notch sm:block" aria-hidden="true" />
             <span className="pointer-events-none absolute -bottom-2.5 -left-2.5 hidden h-5 w-5 rounded-full bg-lab-notch sm:block" aria-hidden="true" />
             <div className="flex flex-1 flex-col items-center gap-1 sm:gap-2">

@@ -135,7 +135,7 @@ export default async function DashboardPage() {
               <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Photo non conservée</span>
             </div>
           </div>
-          <Link href="/compte/profil#diagnostic-high-tech" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-[#202622] px-6 text-sm font-bold text-white transition hover:bg-[#354039]">Affiner mon diagnostic →</Link>
+          <Link href="/compte/profil#diagnostic-high-tech" className="coai-diagnostic-enrich-cta inline-flex min-h-12 shrink-0 items-center justify-center rounded-full px-6 text-sm font-bold transition">Affiner mon diagnostic →</Link>
         </div>
       </section>
 

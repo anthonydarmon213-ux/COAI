@@ -157,10 +157,11 @@ export default function SignUpPage() {
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field label="Prénom">
-              <Input type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
+              <Input className="coai-access-input" type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
             </Field>
             <Field label="Email">
               <Input
+                className="coai-access-input"
                 type="email"
                 required
                 value={email}
@@ -169,6 +170,7 @@ export default function SignUpPage() {
             </Field>
             <Field label="Mot de passe">
               <Input
+                className="coai-access-input"
                 type="password"
                 required
                 minLength={8}

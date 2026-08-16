@@ -295,6 +295,19 @@ body {
   box-shadow: none;
 }
 
+.coai-access-card .coai-access-input {
+  min-height: 3.5rem;
+  border: 1.5px solid #c9c4ba !important;
+  background: #fff !important;
+  color: #171817 !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 1px rgba(255,255,255,.55);
+}
+
+.coai-access-card .coai-access-input:focus {
+  border-color: #9b7338 !important;
+  box-shadow: 0 0 0 4px rgba(183,137,67,.14);
+}
+
 .coai-access-page .text-graphite-50,
 .coai-access-page .text-graphite-100,
 .coai-access-page .text-graphite-200,
@@ -386,6 +399,28 @@ body {
 .coai-app-shell .coai-boarding-card .text-graphite-300 { color: #d4d5d1; }
 .coai-app-shell .coai-boarding-card .text-graphite-500 { color: #a8aaa4; }
 .coai-app-shell .coai-boarding-card .text-laiton-300 { color: #e5c993; }
+
+.coai-app-shell .coai-boarding-card .coai-boarding-next {
+  background: #24231f !important;
+  color: #fffdf8;
+}
+
+.coai-app-shell .coai-boarding-card .coai-boarding-next .text-graphite-500 {
+  color: #d4d5d1;
+}
+
+.coai-diagnostic-enrich-cta {
+  border: 1px solid #151816;
+  background: #202622 !important;
+  color: #fffdf8 !important;
+  box-shadow: 0 14px 28px -20px rgba(22,35,29,.7);
+}
+
+.coai-diagnostic-enrich-cta:hover {
+  background: #354039 !important;
+  color: #fffdf8 !important;
+  transform: translateY(-1px);
+}
 
 .coai-rainbow-cta {
   border: 1px solid rgba(201,162,98,.48);
