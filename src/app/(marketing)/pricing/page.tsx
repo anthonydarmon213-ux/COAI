@@ -10,13 +10,13 @@ import { TrustBadges } from "@/components/marketing/trust-badges";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
-import { TIERS, ENTREPRISE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
+import { TIERS, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { ScrollToHash } from "@/components/compte/scroll-to-hash";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
-  "Inscription gratuite, interface visible en entier. Débloque Impulsion (19€, paiement unique), Transformation (49€/mois, suivi coach), VIP à la séance avec Anthony Darmon, ou une offre Entreprise sur mesure.";
+  "Découvre Transformation : le programme COAI qui évolue avec toi, avec 7 jours d'essai puis 49€/mois, sans engagement.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -35,7 +35,7 @@ export default function PricingPage({
   // Le mensuel rassure davantage au premier contact. L'annuel reste une
   // option avantageuse, mais n'est plus imposé à l'arrivée sur la page.
   const annual = searchParams?.billing === "annual";
-  const displayedTiers = TIERS.map((tier) => {
+  const displayedTiers = TIERS.filter((tier) => tier.nom === "Transformation").map((tier) => {
     // Impulsion (paiement unique) ne dépend jamais du bascule mensuel/annuel.
     if (!annual || tier.sessions || tier.oneShot) return tier;
     if (tier.nom === "Transformation") {
@@ -52,13 +52,13 @@ export default function PricingPage({
         <BackLink />
       </div>
       <div className="text-center">
-        <SectionLabel>Tarifs</SectionLabel>
+        <SectionLabel>Ta recommandation</SectionLabel>
         <h1 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-          Choisis le coaching qui te correspond.
+          Ton plan ne doit jamais rester figé.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-graphite-400">
-          Dans les deux formules, ton programme personnalisé est inclus. Choisis simplement le
-          niveau d&apos;accompagnement que tu souhaites.
+          COAI construit ton programme, observe tes progrès et l&apos;adapte avec toi. Un coach
+          diplômé valide les décisions importantes.
         </p>
         <div className="mt-6 flex justify-center">
           <TrustBadges />
@@ -91,10 +91,7 @@ export default function PricingPage({
         </p>
       </div>
 
-      {/* Comparateur à 4 colonnes (13/08/2026, nouveau modèle d'accès libre)
-          — Entreprise réintégrée au grid, à côté de VIP, pour plus de
-          visibilité (elle était auparavant sortie en bandeau à part). */}
-      <div className="grid w-full max-w-5xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2">
+      <div className="grid w-full max-w-2xl grid-cols-1 items-stretch gap-5">
         {displayedTiers.map((tier) => (
           <Card
             id={tier.nom.toLowerCase()}
@@ -236,7 +233,7 @@ export default function PricingPage({
                     </>
                   }
                 >
-                  <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Générer mon programme + activer mon suivi" className="w-full" />
+                  <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer mes 7 jours d'essai" className="coai-rainbow-cta w-full border-0 text-[#111216]" />
                 </OffreConsentGate>
               ) : null}
               {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
@@ -244,35 +241,22 @@ export default function PricingPage({
           </Card>
         ))}
 
-        {/* Entreprise : structurellement différent (devis, pas d'abonnement)
-            — réintégré au grid (13/08/2026), juste à côté de VIP plutôt
-            qu'en bandeau séparé moins visible. */}
-        <Card className="flex h-full flex-col gap-5 px-6 py-8 text-center">
-          <div className="flex min-h-5 items-center justify-center" />
-          <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{ENTREPRISE.nom}</h2>
-          <p className="text-sm text-graphite-300">{ENTREPRISE.description}</p>
-          <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
-            {ENTREPRISE.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-2">
-                <span className="mt-0.5 text-laiton-400">✓</span>
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="flex-1" />
-          <div className="flex flex-col items-center gap-2">
-            <Link href="/entreprise" className="w-full">
-              <Button className="w-full">Découvrir COAI Entreprise</Button>
-            </Link>
-          </div>
-        </Card>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-graphite-400">
+        <span>Besoin d&apos;un accompagnement différent ?</span>
+        <Link href="/vip" className="underline decoration-white/20 underline-offset-4 hover:text-white">
+          Coaching VIP avec Anthony
+        </Link>
+        <Link href="/entreprise" className="underline decoration-white/20 underline-offset-4 hover:text-white">
+          Solution Entreprise
+        </Link>
       </div>
 
       <p className="max-w-xl text-center text-xs text-graphite-500">
-        L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Impulsion est un
-        paiement unique, sans abonnement. Transformation inclut 7 jours d&apos;essai, puis est facturée
-        au choix chaque mois ou chaque année, sans engagement, résiliable à tout moment depuis ton
-        compte. COAI Privé fait l&apos;objet d&apos;une candidature et d&apos;un échange préalable. En débloquant une offre, tu
+        Transformation inclut 7 jours d&apos;essai, puis est facturée au choix chaque mois ou chaque
+        année. L&apos;abonnement est sans engagement et résiliable à tout moment depuis ton compte. En
+        débloquant l&apos;offre, tu
         acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">
           CGV

@@ -29,7 +29,9 @@ export function ServiceDetailModal({
   initialService: ServiceKey;
   onClose: () => void;
 }) {
-  const [annual, setAnnual] = useState(true);
+  // Le mensuel réduit la friction au premier achat. L'annuel reste visible
+  // comme économie, sans être imposé au prospect.
+  const [annual, setAnnual] = useState(false);
   const tier = TIER_BY_SERVICE[initialService];
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
@@ -174,7 +176,7 @@ export function ServiceDetailModal({
                 plan={tier.plan}
                 billing={annual ? "ANNUAL" : "MONTHLY"}
                 label="Commencer mes 7 jours d'essai"
-                className="w-full"
+                className="coai-rainbow-cta w-full border-0 text-[#111216]"
               />
             </OffreConsentGate>
           ) : null}
