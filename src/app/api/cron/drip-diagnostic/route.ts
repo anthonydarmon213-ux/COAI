@@ -46,31 +46,30 @@ const ETAPES: Etape[] = [
   {
     champ: "drip5SentAt",
     joursApres: 5,
-    sujet: "Débloque ton programme complet — 19€",
+    sujet: "Ton programme doit évoluer avec toi",
     corps: (appUrl, unsubscribe) =>
       `Bonjour,\n\n` +
-      `Impulsion débloque ton programme complet généré par les algorithmes COAI à partir de ton diagnostic : ` +
-      `entraînement, nutrition et récupération — un seul paiement de 19€, sans abonnement, accès immédiat.\n\n` +
-      `Débloquer mon programme : ${appUrl}/pricing#impulsion\n\n` +
-      `Besoin d'un vrai suivi humain qui s'adapte dans la durée ? Transformation (49€/mois, 7 jours d'essai) ` +
-      `ajoute un coach diplômé d'État qui valide et fait évoluer ton programme.\n\n` +
+      `Un programme figé devient vite inutile. Transformation adapte ton entraînement, ta nutrition ` +
+      `et ta récupération à tes progrès — avec la validation d'un coach diplômé.\n\n` +
+      `Tu peux l'essayer pendant 7 jours, puis continuer pour 49€/mois, sans engagement.\n\n` +
+      `Commencer mon essai : ${appUrl}/pricing\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),
   },
   {
     champ: "drip7SentAt",
     joursApres: 7,
-    sujet: "Envie d'un vrai suivi avec un coach ?",
+    sujet: "Prêt à passer de ton diagnostic à l'action ?",
     corps: (appUrl, unsubscribe) => {
       const whatsapp = buildWhatsAppLink(
         "Bonjour Anthony, j'ai fait le diagnostic COAI et j'aimerais échanger sur Transformation ou VIP."
       );
       return (
         `Bonjour,\n\n` +
-        `Si ton objectif demande un accompagnement plus poussé qu'un programme généré une seule fois, deux options :\n\n` +
-        `Transformation (49€/mois, 7 jours d'essai) — programme évolutif, validation humaine, coach IA illimité : ${appUrl}/pricing#transformation\n` +
-        `VIP — coaching 1-to-1 avec Anthony Darmon, présentiel ou visio, sans abonnement : ${appUrl}/pricing#vip\n\n` +
-        (whatsapp ? `Tu peux aussi lui écrire directement : ${whatsapp}\n\n` : "") +
+        `Ton diagnostic a identifié le point de départ. Transformation construit maintenant le plan ` +
+        `et l'adapte semaine après semaine.\n\n` +
+        `Commencer mes 7 jours d'essai : ${appUrl}/pricing\n\n` +
+        (whatsapp ? `Tu préfères un accompagnement VIP ? Écris directement à Anthony : ${whatsapp}\n\n` : "") +
         `À bientôt,\nL'équipe COAI` +
         (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : "")
       );
