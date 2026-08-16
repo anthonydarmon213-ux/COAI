@@ -330,24 +330,25 @@ body {
   font-size: .7rem;
 }
 
-/* Espace abonné — cockpit lumineux, précis et calme. */
+/* Espace abonné — cockpit lumineux, précis et calme. Tamisé le 16/08/2026
+   (Anthony : "c'est trop clair") — mêmes teintes, fond assombri d'un cran. */
 .coai-app-shell {
   color: #171817;
   background:
-    radial-gradient(circle at 24% 0%, rgba(214,177,110,.22), transparent 28rem),
-    radial-gradient(circle at 94% 72%, rgba(87,145,172,.16), transparent 34rem),
-    linear-gradient(145deg, #fbf9f4, #f0ece4 52%, #e8eff1);
+    radial-gradient(circle at 24% 0%, rgba(214,177,110,.24), transparent 28rem),
+    radial-gradient(circle at 94% 72%, rgba(87,145,172,.18), transparent 34rem),
+    linear-gradient(145deg, #f2ede2, #e7e0d2 52%, #dde5e7);
 }
 
 .coai-app-nav {
   border-color: rgba(84,68,44,.13);
-  background: rgba(255,253,248,.82);
+  background: rgba(240,235,222,.86);
   box-shadow: 12px 0 45px -38px rgba(47,38,25,.4);
 }
 
 .coai-app-nav-dropdown {
   border-color: rgba(84,68,44,.14);
-  background: rgba(255,253,248,.97);
+  background: rgba(240,235,222,.98);
   box-shadow: 0 20px 50px -30px rgba(47,38,25,.55);
 }
 
