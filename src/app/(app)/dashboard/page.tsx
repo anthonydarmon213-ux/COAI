@@ -145,7 +145,12 @@ export default async function DashboardPage() {
       </div>
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
-        <Link href="/programme" className="text-laiton-300 hover:underline">Voir le programme source →</Link>
+        <Link
+          href="/programme"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#a87831]/35 bg-white/75 px-6 py-3 text-sm font-bold text-[#4d3516] shadow-[0_14px_34px_-24px_rgba(72,48,18,.7)] transition hover:-translate-y-0.5 hover:bg-white"
+        >
+          Voir mon programme complet →
+        </Link>
         <Link href="/suivi/progression" className="text-graphite-300 hover:text-white">Voir mon suivi →</Link>
       </div>
     </div>

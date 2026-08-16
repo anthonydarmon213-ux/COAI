@@ -18,8 +18,24 @@ export function CoaiIntro() {
       <div className="coai-future-horizon" aria-hidden="true" />
       <div className="coai-hero-accent-glow" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
-        <div className="text-left animate-reveal">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-10 md:grid-cols-[1.08fr_.92fr] lg:gap-16">
+        <div className="relative order-1 mx-auto w-full animate-reveal md:order-none" style={{ animationDelay: "80ms" }}>
+          <div className="absolute -inset-8 rounded-full bg-laiton-300/[0.08] blur-3xl" aria-hidden="true" />
+          <div className="relative overflow-hidden rounded-[2.2rem] border border-white/[0.12] bg-white/[0.035] p-3 shadow-[0_35px_110px_rgba(0,0,0,.55)] backdrop-blur-xl">
+            <div className="relative aspect-square overflow-hidden rounded-[1.65rem]">
+              <Image
+                src="/coai-diagnostic.JPEG"
+                alt="Diagnostic COAI offert pour trouver le programme qui vous correspond"
+                fill
+                priority
+                sizes="(min-width: 768px) 54vw, 92vw"
+                className="coai-palace-image object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="order-2 text-left animate-reveal md:order-none">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2">
             <span className="h-1.5 w-1.5 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-laiton-200">
@@ -59,25 +75,6 @@ export function CoaiIntro() {
           <p className="mt-3 text-xs text-graphite-500">3 minutes · résultat personnalisé · aucune carte bancaire</p>
         </div>
 
-        <div className="relative mx-auto w-full max-w-xl animate-reveal" style={{ animationDelay: "140ms" }}>
-          <div className="absolute -inset-8 rounded-full bg-laiton-300/[0.08] blur-3xl" aria-hidden="true" />
-          <div className="relative overflow-hidden rounded-[2.2rem] border border-white/[0.12] bg-white/[0.035] p-3 shadow-[0_35px_110px_rgba(0,0,0,.55)] backdrop-blur-xl">
-            <div className="relative aspect-square overflow-hidden rounded-[1.65rem]">
-              <Image
-                src="/coai-diagnostic.JPEG"
-                alt="Diagnostic COAI offert pour trouver le programme qui vous correspond"
-                fill
-                priority
-                sizes="(min-width: 1024px) 34rem, 90vw"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          <div className="relative mt-4 rounded-2xl border border-laiton-300/20 bg-[#11110f]/95 px-5 py-4 text-left shadow-2xl backdrop-blur sm:absolute sm:-bottom-5 sm:-left-8 sm:mt-0">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-graphite-500">Votre première étape</p>
-            <p className="mt-1 text-sm font-semibold text-white">Comprendre avant de prescrire.</p>
-          </div>
-        </div>
       </div>
 
       <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">

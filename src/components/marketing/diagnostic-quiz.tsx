@@ -1526,11 +1526,15 @@ export function DiagnosticQuiz({
                           ? "Applique ces réponses à ton profil COAI pour que ton prochain programme en tienne compte."
                           : "Applique ces réponses et génère ton programme personnalisé."}
                       </p>
-                      <Button onClick={appliquerAuProfil} disabled={applyStatus === "loading"}>
+                      <Button
+                        onClick={appliquerAuProfil}
+                        disabled={applyStatus === "loading"}
+                        className="coai-rainbow-cta min-w-[17rem] border-0 px-8 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-18px_rgba(201,162,98,.8)]"
+                      >
                         {applyStatus === "loading"
                           ? "…"
                           : aDejaUnProgramme
-                            ? "Mettre à jour mon profil"
+                            ? "Appliquer à mon futur programme →"
                             : "Générer mon programme"}
                       </Button>
                     </>

@@ -45,8 +45,16 @@ export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
         rel="noopener noreferrer"
         className="coai-vip-button mt-2 inline-flex w-fit rounded-xl px-5 py-3 text-sm font-extrabold shadow-sm transition"
       >
-        Réserver avec Anthony · Visio 100€ / Paris 200€ →
+        {estTransformation
+          ? "Réserver ma séance visio offerte →"
+          : "Voir les disponibilités avec Anthony →"}
       </a>
+      {estTransformation && (
+        <p className="mt-1 text-xs leading-5 text-graphite-400">
+          Première séance incluse dans Transformation. Les tarifs VIP s&apos;appliquent uniquement
+          si tu souhaites réserver d&apos;autres séances ensuite.
+        </p>
+      )}
     </div>
   );
 }

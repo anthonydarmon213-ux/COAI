@@ -16,6 +16,9 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 export function DiagnosticShareButton({ connecte, objectif, score }: { connecte: boolean; objectif: string; score: number }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const whatsappText = encodeURIComponent(
+    `Mon Indice COAI est de ${score}/100. COAI vient de révéler mes leviers pour ${objectif.toLowerCase()}. Fais ton diagnostic gratuitement : https://coai.fr/diagnostic`
+  );
 
   async function partager() {
     setLoading(true);
@@ -54,14 +57,24 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
         Tu es sur la bonne voie. Continue ta transformation — partage-la.
       </p>
       <p className="max-w-sm text-sm text-graphite-300">Compare ta forme avec tes proches.</p>
-      <button
-        type="button"
-        onClick={partager}
-        disabled={loading}
-        className="rounded-full bg-laiton-400 px-6 py-3 text-sm font-bold text-graphite-950 shadow-[0_12px_38px_-14px_rgba(201,162,98,0.75)] transition hover:-translate-y-0.5 hover:bg-laiton-300 disabled:opacity-50"
-      >
-        {loading ? "…" : "Partager mon Indice COAI →"}
-      </button>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <a
+          href={`https://wa.me/?text=${whatsappText}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full bg-[#25D366] px-6 py-3 text-sm font-bold text-[#0b2916] shadow-[0_12px_38px_-14px_rgba(37,211,102,.8)] transition hover:-translate-y-0.5 hover:bg-[#35df75]"
+        >
+          Partager sur WhatsApp →
+        </a>
+        <button
+          type="button"
+          onClick={partager}
+          disabled={loading}
+          className="rounded-full border border-laiton-300/30 bg-white/[0.05] px-6 py-3 text-sm font-bold text-white transition hover:bg-white/[0.1] disabled:opacity-50"
+        >
+          {loading ? "…" : "Autres options"}
+        </button>
+      </div>
       {message && <span className="text-xs text-graphite-500">{message}</span>}
     </div>
   );

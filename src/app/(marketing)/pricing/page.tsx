@@ -35,7 +35,7 @@ export default function PricingPage({
   // Le mensuel rassure davantage au premier contact. L'annuel reste une
   // option avantageuse, mais n'est plus imposé à l'arrivée sur la page.
   const annual = searchParams?.billing === "annual";
-  const displayedTiers = ["Transformation", "Impulsion"].flatMap((nom) => TIERS.filter((tier) => tier.nom === nom)).map((tier) => {
+  const displayedTiers = ["Impulsion", "Transformation", "VIP"].flatMap((nom) => TIERS.filter((tier) => tier.nom === nom)).map((tier) => {
     // Impulsion (paiement unique) ne dépend jamais du bascule mensuel/annuel.
     if (!annual || tier.sessions || tier.oneShot) return tier;
     if (tier.nom === "Transformation") {
@@ -76,7 +76,7 @@ export default function PricingPage({
         </Card>
       )}
 
-      <div className="grid w-full max-w-5xl grid-cols-1 items-stretch gap-5 md:grid-cols-2">
+      <div className="grid w-full max-w-7xl grid-cols-1 items-stretch gap-5 md:grid-cols-3">
         {displayedTiers.map((tier) => (
           <Card
             id={tier.nom.toLowerCase()}

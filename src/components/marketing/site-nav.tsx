@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 
 const LIENS = [
@@ -26,6 +29,7 @@ const LIENS = [
 // connecté qui clique "Commencer" et a déjà un compte retrouve "Se
 // connecter" directement sur /sign-up (lien déjà présent là-bas).
 export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompte: string }) {
+  const [menuOuvert, setMenuOuvert] = useState(false);
   const actionHref = connecte ? "/dashboard" : "/sign-up";
   const actionLabel = connecte ? "Mon compte" : "Commencer";
 
@@ -60,17 +64,23 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         {actionLabel}
       </Link>
 
-      <details className="group relative lg:hidden">
-        <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-white/[0.12] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white marker:hidden">
-          Menu <span className="text-laiton-300 transition group-open:rotate-45">＋</span>
-        </summary>
-        <nav className="coai-public-menu absolute right-0 top-12 flex w-64 flex-col overflow-hidden rounded-2xl border p-2 shadow-2xl" aria-label="Navigation mobile">
+      <div className="relative lg:hidden">
+        <button
+          type="button"
+          aria-expanded={menuOuvert}
+          aria-controls="navigation-mobile"
+          onClick={() => setMenuOuvert((ouvert) => !ouvert)}
+          className="flex items-center gap-2 rounded-full border border-white/[0.12] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white"
+        >
+          Menu <span className={`text-laiton-300 transition ${menuOuvert ? "rotate-45" : ""}`}>＋</span>
+        </button>
+        {menuOuvert && <nav id="navigation-mobile" className="coai-public-menu absolute right-0 top-12 flex w-64 flex-col overflow-hidden rounded-2xl border p-2 shadow-2xl" aria-label="Navigation mobile">
           {LIENS.map((lien) => (
-            <Link key={lien.label} href={lien.href} className="coai-public-menu-link rounded-xl px-4 py-3 text-sm font-semibold transition">{lien.label}</Link>
+            <Link onClick={() => setMenuOuvert(false)} key={lien.label} href={lien.href} className="coai-public-menu-link rounded-xl px-4 py-3 text-sm font-semibold transition">{lien.label}</Link>
           ))}
-          <Link href={actionHref} className="coai-public-menu-action mt-2 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em]">{actionLabel}</Link>
-        </nav>
-      </details>
+          <Link onClick={() => setMenuOuvert(false)} href={actionHref} className="coai-public-menu-action mt-2 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em]">{actionLabel}</Link>
+        </nav>}
+      </div>
     </div>
   );
 }

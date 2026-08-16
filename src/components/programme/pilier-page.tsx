@@ -45,13 +45,14 @@ const PDF_SLUG: Record<Pilier, string> = {
 // et rendent toutes ce même composant — les liens existants ailleurs dans
 // l'app (email coach, onboarding, dashboard...) continuent de fonctionner
 // sans devoir être réécrits un par un.
-export async function PilierPage() {
+export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
+  const piliersAffiches: Pilier[] = [pilierActif];
   const [valides, derniers] = await Promise.all([
     Promise.all(
-      PILIERS.map((pilier) =>
+      piliersAffiches.map((pilier) =>
         prisma.programmeGenerated.findFirst({
           where: { userId: user.id, pilier, statut: "VALIDE" },
           orderBy: { generatedAt: "desc" },
@@ -59,7 +60,7 @@ export async function PilierPage() {
       )
     ),
     Promise.all(
-      PILIERS.map((pilier) =>
+      piliersAffiches.map((pilier) =>
         prisma.programmeGenerated.findFirst({
           where: { userId: user.id, pilier },
           orderBy: { generatedAt: "desc" },
@@ -127,7 +128,7 @@ export async function PilierPage() {
         </Card>
       )}
 
-      {PILIERS.map((pilier, i) => {
+      {piliersAffiches.map((pilier, i) => {
         const valide = valides[i];
         const dernier = derniers[i];
         const enAttente = dernier && dernier.statut === "EN_ATTENTE";

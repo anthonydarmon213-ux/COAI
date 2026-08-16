@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 };
 
 const INCLUS = [
-  ["Stratégie", "Un bilan complet pour identifier les vrais leviers de ta transformation."],
-  ["Exécution", "Un protocole précis d'entraînement, de nutrition et de récupération."],
-  ["Pilotage", "Des ajustements réguliers fondés sur tes résultats et ton quotidien."],
-  ["Présence", "Anthony pour les décisions clés, COAI pour t'accompagner chaque jour."],
+  ["Diagnostic privé", "Objectif, contraintes, douleurs, habitudes et données : Anthony construit le point de départ avec toi."],
+  ["Plan sur mesure", "Entraînement, nutrition et récupération organisés autour de ton agenda et de ton résultat à 90 jours."],
+  ["Ajustements continus", "Le plan évolue chaque semaine selon ta forme, tes retours, tes mesures et tes progrès."],
+  ["Accès direct", "Anthony pilote les décisions importantes ; COAI t'accompagne et te guide chaque jour entre les rendez-vous."],
 ];
 
 export default function VipPage() {
   return (
-    <main className="coai-future-hero min-h-screen overflow-hidden px-6 pb-24 pt-32 sm:px-10">
+    <main className="coai-vip-page coai-future-hero min-h-screen overflow-hidden px-6 pb-24 pt-32 sm:px-10">
       <TrackConversion name="vip_page_viewed" />
       <div className="coai-future-architecture" aria-hidden="true" />
       <div className="relative z-10 mx-auto max-w-6xl">
@@ -32,8 +32,18 @@ export default function VipPage() {
               Ta transformation ne sera plus laissée au hasard.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-graphite-300">
-              Un accompagnement confidentiel et entièrement piloté pour les personnes qui veulent un résultat important, sans perdre des mois à tester seules.
+              Pendant 90 jours, Anthony pilote personnellement ta transformation : bilan initial,
+              programme sur mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI.
+              Tu sais quoi faire, quand le faire et pourquoi.
             </p>
+
+            <div className="mt-8 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-6 py-5">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-laiton-200">Concrètement, pendant 90 jours</p>
+              <p className="mt-2 text-base font-semibold leading-7 text-white">
+                Un objectif chiffré, une feuille de route claire, des points réguliers avec Anthony
+                et un programme qui s&apos;adapte à ta vraie vie jusqu&apos;au résultat.
+              </p>
+            </div>
 
             <div className="mt-10 grid gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2">
               {INCLUS.map(([titre, texte], index) => (
@@ -57,6 +67,9 @@ export default function VipPage() {
               <span className="pb-1 text-sm text-graphite-500">pour 90 jours</span>
             </div>
             <p className="mt-2 text-sm text-laiton-200">Nombre de nouveaux accompagnements volontairement limité.</p>
+            <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
+              Vérifier si COAI Privé est fait pour moi
+            </a>
           </div>
 
           <div id="candidature" className="lg:sticky lg:top-28">
