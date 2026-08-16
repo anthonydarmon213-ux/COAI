@@ -4,6 +4,89 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Homepage façon Future (dark) + coach IA femme + lead enrichi (16/08/2026, suite)
+
+Anthony a envoyé 5 captures réelles de future.co (jamais eu accès à leur
+interface avant ça, seulement des descriptions textuelles d'articles) :
+fond noir, accent couleur (vert chez eux), cartes glass superposées sur
+des photos, bandeau d'annonce en haut, animations. « On refait dans ce
+style ! J'aime bien il y a de la couleur c'est animé... il faut plus
+d'images. »
+
+**Scope volontairement limité à la homepage seule** (`/`) — pas le reste
+du site (`/pricing`, `/diagnostic`, dashboard, pages SEO/légales), qui
+reste sur le thème clair "champagne" construit sur plusieurs sessions
+précédentes (beaucoup de corrections de bugs investies là-dessus,
+cf. sections plus bas). `.coai-landing-lux` (remap clair, partagé par 15
+pages) n'a pas été touché ; la homepage utilise maintenant `.bg-lab-grid`
+directement (fond sombre déjà existant, utilisé sur `/admin/*`), qui ne
+remape rien — les classes `text-white`/`text-laiton-*` de la homepage
+retrouvent leur teinte native sombre sans changement de JSX.
+
+- **Nouvel accent bleu-acier** (`acier: #5b8296`, déjà dans
+  `tailwind.config.ts` mais sous-utilisé) mis en avant à côté du doré —
+  répond à « il y a de la couleur », jamais un simple monochrome.
+- **Bandeau déroulant** (`MarqueeBanner`, nouveau) — piste dupliquée x2,
+  boucle par translation -50%, respecte `prefers-reduced-motion` (reste
+  fixe si désactivé).
+- **`Reveal`** (nouveau composant client, `IntersectionObserver`) — révèle
+  chaque section au scroll plutôt qu'un délai fixe au chargement (qui
+  n'aurait rejoué aucune animation en scrollant sur une page longue).
+  Réutilise le keyframe `coai-reveal-up` déjà existant.
+- **Cartes glass superposées** sur la photo `apercu-produit` (diagnostic)
+  et nouvelle bande photo studio d'Anthony (`anthony-studio-premium.jpg`,
+  jamais utilisée jusqu'ici) — reprend le même geste que les cartes
+  "Schedule"/"Equipment" de Future, avec du vrai contenu COAI, jamais une
+  donnée inventée.
+- **Hero recentré "algorithme d'abord"** — suite à deux retours directs
+  d'Anthony pendant la session ("c'est puissant de proposer un coach...
+  mais ce n'est plus puissant que proposer un simple programme", puis
+  "mettre en avant notre algorithme. Et que si besoin, on peut être suivi
+  par un coach humain diplômé d'État") : le H1 devient "Un algorithme
+  construit par 17 ans de coaching terrain", le coach humain positionné
+  explicitement comme une option "si besoin", pas un choix à parité 50/50.
+
+**Coach IA femme** (« j'aimerais qu'on mette en place un coach IA femme
+aussi ») — l'étape "Qui veux-tu comme coach ?" du diagnostic passe de 2 à
+3 choix : "Coach IA — voix masculine", "Coach IA — voix féminine",
+"Anthony Darmon". `Profile.coachPreference` passe de `"IA"/"ANTHONY"` à
+`"IA_HOMME"/"IA_FEMME"/"ANTHONY"` — toujours une string libre (pas
+d'enum), donc **aucune migration nécessaire** pour ce changement (le champ
+avait été ajouté plus tôt cette même session). `besoins-identifies.ts`
+traite les deux variantes IA de façon identique (renforcent Impulsion).
+
+**Lead diagnostic enrichi** (« je viens de recevoir un lead... j'ai juste
+son mail. Je veux avoir plus d'informations... numéro de téléphone,
+objectifs, score... et pouvoir le contacter par WhatsApp ») — la
+notification admin ("Nouveau lead — diagnostic COAI") se limitait jusqu'ici
+à une phrase avec l'email. Refondue :
+- **Nouveau champ `DiagnosticLead.telephone`** (migration
+  `20260816020000_add_diagnostic_lead_telephone`, additive) — collecté sur
+  la dernière étape du quiz, juste à côté de l'email, format international
+  obligatoire (même règle que `phoneWhatsapp` existant côté profil
+  authentifié) pour rester compatible avec un lien wa.me.
+- **Notification enrichie** (texte + HTML, nouveau
+  `src/lib/email/lead-notification.ts`) : email, téléphone, score COAI
+  (`indiceCoai.score`/`.niveau`, déjà calculé pour l'email au lead — zéro
+  coût IA supplémentaire), objectif, niveau, source publicitaire (UTM déjà
+  capturé depuis la Phase 5B du 11/08, jamais surfacé avant aujourd'hui),
+  plus un bouton "Contacter sur WhatsApp" (lien `wa.me` construit avec le
+  numéro du lead — distinct de `buildWhatsAppLink`, qui pointe vers le
+  numéro fixe d'Anthony) et un bouton "Appeler" (`tel:`).
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Playwright
+réel (mobile 390px, desktop 1440px) sur la homepage sombre : aucun
+débordement horizontal (`scrollWidth` mesuré), bandeau déroulant visible,
+cartes glass lisibles, animations de révélation déclenchées au scroll.
+Captures envoyées à Anthony pour validation avant qu'il ne teste en
+production.
+
+**Non testable depuis ce sandbox** : la réception réelle de la
+notification enrichie (email + push ntfy, pas d'accès réseau sortant vers
+Resend/ntfy depuis ce sandbox) et le clic réel sur le bouton WhatsApp avec
+un vrai numéro de lead. À confirmer par Anthony sur un vrai diagnostic
+soumis avec numéro de téléphone.
+
 ## Choix de coach au diagnostic — modèle Future (16/08/2026)
 
 Anthony a demandé, après une recherche sur les concurrents (Future, Fitbod,
