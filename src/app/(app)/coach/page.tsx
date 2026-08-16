@@ -6,6 +6,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { buildProfilIntelligence } from "@/lib/insight/profil-appris";
 import { CoachMemoryStatus } from "@/components/coach/coach-memory-status";
 import { getCoachQuotaState } from "@/lib/subscription/coach-quota";
+import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 
 export default async function CoachPage() {
   const user = await getCurrentAppUser();
@@ -32,6 +33,16 @@ export default async function CoachPage() {
       </div>
 
       <AskCoach initialQuotaRemaining={plan === "GRATUIT" ? quota.remaining : null} />
+
+      <div className="flex flex-col gap-4 border-t border-acier/25 pt-8">
+        <div className="flex flex-col gap-2">
+          <SectionLabel>Coach humain</SectionLabel>
+          <h2 className="font-editorial text-2xl font-normal tracking-tight sm:text-3xl">
+            Un vrai coach, quand tu en as besoin.
+          </h2>
+        </div>
+        <CoachingVisioCta plan={plan} />
+      </div>
     </div>
   );
 }

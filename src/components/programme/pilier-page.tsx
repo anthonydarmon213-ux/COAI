@@ -180,16 +180,38 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
               if (!peutGenerer) {
                 return (
                   <div className="flex flex-col items-start gap-4">
-                    <p className="text-sm leading-6 text-graphite-400">
-                      Ton profil est prêt. Lance la création de ton programme complet — entraînement,
-                      nutrition et récupération — ou découvre le suivi continu avec un coach diplômé
-                      d&apos;État.{" "}
+                    <p className="text-sm font-semibold leading-6 text-graphite-200">
+                      Ton profil est prêt. Un seul programme, tout inclus — pas juste
+                      l&apos;entraînement.
+                    </p>
+                    <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-200">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 text-laiton-300">✓</span>
+                        <span>Ton entraînement personnalisé</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 text-laiton-300">✓</span>
+                        <span>
+                          <span className="font-semibold">Ton programme nutrition offert avec</span> —
+                          pas une option à part
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 text-laiton-300">✓</span>
+                        <span>
+                          <span className="font-semibold">Ta récupération optimisée</span> — sommeil,
+                          repos, gestion de la fatigue
+                        </span>
+                      </li>
+                    </ul>
+                    <OneShotProgrammeButton className="max-w-xs" />
+                    <p className="text-xs leading-5 text-graphite-400">
+                      Un suivi humain continu t&apos;intéresse ?{" "}
                       <Link href="/pricing" className="text-laiton-400 underline">
                         Comparer les accompagnements
                       </Link>
                       .
                     </p>
-                    <OneShotProgrammeButton className="max-w-xs" />
                   </div>
                 );
               }

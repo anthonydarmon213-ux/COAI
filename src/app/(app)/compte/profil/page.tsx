@@ -4,9 +4,12 @@ import { prisma } from "@/lib/db/client";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
+import { MaFormuleCard } from "@/components/compte/ma-formule-card";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { computeProfilCompletion } from "@/lib/profil/completion";
+import { hasSuiviAccess } from "@/lib/subscription/plan";
+import type { ServiceKey } from "@/lib/pricing/tiers";
 
 export default async function ProfilPage({
   searchParams,
@@ -28,6 +31,12 @@ export default async function ProfilPage({
     ? Boolean(await prisma.programmeGenerated.findFirst({ where: { userId: user.id }, select: { id: true } }))
     : true;
 
+  const formuleActuelle: ServiceKey | null = hasSuiviAccess(user.subscription)
+    ? "TRANSFORMATION"
+    : user.programmeUnlockedAt
+      ? "IMPULSION"
+      : null;
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2 border-b border-acier/25 pb-7">
@@ -38,6 +47,28 @@ export default async function ProfilPage({
             ? "Ton diagnostic nous a donné les bases. Complète maintenant les quelques informations qui permettront à COAI de construire un programme vraiment précis."
             : "Ces informations nourrissent votre programme IA — entraînement, alimentation, récupération — relu et validé par votre coach."}
         </p>
+      </div>
+
+      {/* Programme mis en avant, tout en haut (16/08/2026, demande Anthony —
+          "c'est notre produit !") : avant en bas de page sous le long
+          formulaire, remonté ici pour rester la première chose vue. */}
+      <div className="flex flex-col gap-3">
+        <Link
+          href="/programme"
+          className="flex items-center justify-between gap-4 rounded-2xl border border-laiton-400/30 bg-laiton-400/[0.08] px-6 py-5 transition hover:border-laiton-400/50 hover:bg-laiton-400/[0.12]"
+        >
+          <div className="flex flex-col gap-1">
+            <SectionLabel>Ton programme</SectionLabel>
+            <p className="text-sm text-graphite-300">
+              Entraînement, nutrition et récupération — ce que ce profil nourrit vraiment.
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950">
+            Voir mon programme →
+          </span>
+        </Link>
+
+        <MaFormuleCard formuleActuelle={formuleActuelle} />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -89,25 +120,6 @@ export default async function ProfilPage({
             }}
           />
         </Card>
-
-        {/* Programme mis en avant (14/08/2026, demande Anthony) : c'était un
-            simple lien texte souligné en bas de page, invisible à côté du
-            long formulaire — alors que le programme est le produit phare,
-            celui qui se facture. Vraie carte, pas juste un lien. */}
-        <Link
-          href="/programme"
-          className="flex items-center justify-between gap-4 rounded-2xl border border-laiton-400/30 bg-laiton-400/[0.08] px-6 py-5 transition hover:border-laiton-400/50 hover:bg-laiton-400/[0.12]"
-        >
-          <div className="flex flex-col gap-1">
-            <SectionLabel>Ton programme</SectionLabel>
-            <p className="text-sm text-graphite-300">
-              Entraînement, nutrition et récupération — ce que ce profil nourrit vraiment.
-            </p>
-          </div>
-          <span className="shrink-0 rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950">
-            Voir mon programme →
-          </span>
-        </Link>
       </div>
     </div>
   );

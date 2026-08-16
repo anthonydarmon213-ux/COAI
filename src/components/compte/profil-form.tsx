@@ -503,7 +503,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <BadgeNouveau />
         </div>
         <div className="flex flex-col gap-3 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.04] p-4">
-          <p className="text-sm text-graphite-300">
+          <p className="text-sm font-medium leading-6 text-graphite-200">
             Envoie un screenshot de ton bracelet ou app santé (Apple Watch, Garmin, Fitbit, Samsung
             Health...) — on en extrait automatiquement pas, fréquence cardiaque, sommeil, VO2 max
             et calories pour affiner ton programme.
@@ -532,7 +532,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             montreData.vo2Max ||
             montreData.caloriesMoyennesParJour ||
             montreData.hrv) && (
-            <div className="flex flex-col gap-1.5 text-sm text-graphite-300">
+            <div className="flex flex-col gap-1.5 text-sm text-graphite-200">
               {montreData.pasMoyenParJour != null && (
                 <p>Pas moyen/jour : {montreData.pasMoyenParJour.toLocaleString("fr-FR")}</p>
               )}
@@ -559,7 +559,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <BadgeNouveau />
         </div>
         <div className="flex flex-col gap-3 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.04] p-4">
-          <p className="text-sm text-graphite-300">
+          <p className="text-sm font-medium leading-6 text-graphite-200">
             Envoie une photo de toi en tenue de sport (legging, short, brassière, débardeur...),
             de face, en pied — on en extrait des observations de posture et de morphologie pour
             affiner ton programme d&apos;entraînement. Photo jamais conservée, uniquement les
@@ -584,7 +584,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           {photoError && <p className="text-sm text-red-400">{photoError}</p>}
           {photoRejected && <p className="text-sm text-graphite-400">{photoRejected}</p>}
           {(photoData.morphologieDetectee || photoData.observationsPosture) && (
-            <div className="flex flex-col gap-1.5 text-sm text-graphite-300">
+            <div className="flex flex-col gap-1.5 text-sm text-graphite-200">
               {photoData.morphologieDetectee && <p>Morphologie détectée : {photoData.morphologieDetectee}</p>}
               {photoData.observationsPosture && (
                 <p className="italic text-graphite-400">{photoData.observationsPosture}</p>
