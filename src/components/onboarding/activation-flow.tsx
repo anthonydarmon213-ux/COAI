@@ -56,9 +56,19 @@ async function sleep(ms: number) {
 export function ActivationFlow({
   coachValidationRequise,
   profilInitial,
+  declencherGenerationAuto = true,
 }: {
   coachValidationRequise: boolean;
   profilInitial: ProfilLike | null;
+  // Faux pour un accès libre (16/08/2026, demande Anthony — "pas directement
+  // sur payer, générer le programme alors qu'on n'a même pas visité
+  // l'interface") : les réponses du diagnostic sont quand même appliquées au
+  // profil, mais plus aucune tentative de génération ni d'écran de
+  // déblocage ne s'affiche automatiquement à l'arrivée — /bienvenue montre
+  // d'abord la carte d'embarquement + un accès direct au tableau de bord.
+  // Toujours vrai après un vrai paiement (essai ou achat immédiat) : là,
+  // l'utilisateur vient de payer, il attend son programme tout de suite.
+  declencherGenerationAuto?: boolean;
 }) {
   const [etat, setEtat] = useState<Etat>("verification");
   const [completion, setCompletion] = useState<CompletionProfil | null>(null);
@@ -110,7 +120,9 @@ export function ActivationFlow({
         if (annule) return;
 
         if (calc.essentielComplet) {
-          await lancerGeneration();
+          if (declencherGenerationAuto) {
+            await lancerGeneration();
+          }
           return;
         }
 

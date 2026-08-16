@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { SectionLabel } from "@/components/ui/section-label";
+import { Button } from "@/components/ui/button";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
 import { hasSuiviAccess } from "@/lib/subscription/plan";
@@ -75,14 +76,86 @@ export default async function BienvenuePage({
             Bienvenue{prenom ? `, ${prenom}` : ""}.
           </h1>
           <p className="max-w-md text-sm leading-6 text-graphite-400">
-            Ton compte est gratuit — explore l&apos;interface, découvre les fonctionnalités. Tu
-            choisis ce que tu débloques, quand tu veux.
+            Ton espace personnel est prêt. On te guide, étape par étape.
           </p>
         </div>
 
+        {/* Carte d'embarquement, version accès libre (16/08/2026, demande
+            Anthony — un "effet whaou", pris en main dès l'arrivée, comme dans
+            un palace, plutôt qu'un texte plat suivi d'une tentative de
+            génération/paiement immédiate). Même esthétique que la version
+            post-achat plus bas sur cette page, contenu adapté : pas de
+            formule à afficher puisque rien n'est encore débloqué. */}
+        <div className="w-full overflow-hidden rounded-[1.75rem] border border-laiton-400/25 bg-[#0f1113] text-left shadow-[0_40px_100px_-40px_rgba(0,0,0,0.85)] sm:flex">
+          <div className="flex flex-1 flex-col gap-6 p-7 sm:p-9">
+            <div className="flex items-center justify-between">
+              <span className="font-display text-lg font-semibold tracking-tight text-white">COAI</span>
+              <span className="rounded-full border border-laiton-400/30 bg-laiton-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
+                Compte créé
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Passager</p>
+                <p className="mt-1 text-sm font-medium text-white">{prenom || user.email}</p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Accès</p>
+                <p className="mt-1 text-sm font-medium text-white">Libre — tu choisis</p>
+              </div>
+            </div>
+            <p className="text-sm leading-6 text-graphite-300">
+              Concierge personnel pendant ta visite : découvre ton espace avant de choisir quoi que
+              ce soit.
+            </p>
+          </div>
+          <div className="relative flex flex-row items-center gap-0 border-t border-dashed border-white/15 bg-white/[0.02] px-7 py-6 sm:w-56 sm:flex-col sm:justify-center sm:border-l sm:border-t-0 sm:px-6 sm:py-9">
+            <span className="pointer-events-none absolute -left-2.5 -top-2.5 hidden h-5 w-5 rounded-full bg-lab-notch sm:block" aria-hidden="true" />
+            <span className="pointer-events-none absolute -bottom-2.5 -left-2.5 hidden h-5 w-5 rounded-full bg-lab-notch sm:block" aria-hidden="true" />
+            <div className="flex flex-1 flex-col items-center gap-1 sm:gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">
+                Prochaine étape
+              </span>
+              <span className="font-display text-base font-semibold text-laiton-300">Ton espace</span>
+              <span className="text-xs text-graphite-500">Visite guidée</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-2">
+          {[
+            { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de ton futur programme." },
+            { titre: "Ton programme", texte: "Généré quand tu es prêt — Impulsion (19€) ou Transformation (suivi humain)." },
+            { titre: "Ton Coach IA", texte: "Pose tes questions, 24h/24, dans l'esprit de la méthode d'Anthony." },
+            { titre: "Ton suivi", texte: "Séances, mesures, progression — tout au même endroit." },
+          ].map((etape, i) => (
+            <div
+              key={etape.titre}
+              className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
+            >
+              <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-xs font-semibold text-laiton-300">
+                {i + 1}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-white">{etape.titre}</p>
+                <p className="mt-0.5 text-xs leading-5 text-graphite-400">{etape.texte}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Link href="/dashboard">
+          <Button className="px-8 py-3">Entrer dans mon espace →</Button>
+        </Link>
+
+        {/* Le diagnostic reste appliqué au profil en silence si des réponses
+            attendent en localStorage — mais plus aucune tentative de
+            génération/paiement ne s'affiche automatiquement ici (cf. prop
+            declencherGenerationAuto). */}
         <ActivationFlow
           coachValidationRequise={coachValidationRequise}
           profilInitial={user.profile ?? null}
+          declencherGenerationAuto={false}
         />
 
         {/* Partage du lien de parrainage remonté ici (14/08/2026, test
@@ -94,10 +167,6 @@ export default async function BienvenuePage({
         <div className="w-full max-w-md text-left">
           <ParrainageCard />
         </div>
-
-        <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
-          Retour au tableau de bord
-        </Link>
       </div>
     );
   }
