@@ -45,17 +45,14 @@ const LINKS: NavItem[] = [
   { href: "/videos", label: "Bibliothèque" },
   // Boutique (16/08/2026, demande Anthony — "une partie impulsion avec tout
   // ce que ça comprend quand on clique dessus, une partie transformation et
-  // une partie VIP dans le menu") : au lieu d'un lien "Offres" unique vers le
-  // haut de /pricing, 3 entrées distinctes qui amènent directement sur la
-  // carte complète (specs + prix + achat) de l'offre choisie.
-  {
-    label: "Offres",
-    children: [
-      { href: "/pricing#impulsion", label: "Impulsion" },
-      { href: "/pricing#transformation", label: "Transformation" },
-      { href: "/pricing#vip", label: "VIP" },
-    ],
-  },
+  // une partie VIP dans le menu"), remis à plat le même jour ("je ne vois
+  // toujours pas mon menu demandé dans la colonne de gauche" — un sous-menu
+  // "Offres" replié ne suffisait pas, il fallait les 3 entrées directement
+  // visibles) : chacune amène directement sur la carte complète (specs, prix,
+  // achat) de l'offre choisie sur /pricing.
+  { href: "/pricing#impulsion", label: "Impulsion" },
+  { href: "/pricing#transformation", label: "Transformation" },
+  { href: "/pricing#vip", label: "VIP" },
 ];
 
 const ACTIVE_CLASS =
