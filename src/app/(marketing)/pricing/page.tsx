@@ -12,6 +12,7 @@ import { OneShotProgrammeButton } from "@/components/programme/one-shot-programm
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { TIERS, ENTREPRISE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { ScrollToHash } from "@/components/compte/scroll-to-hash";
 
 const TITLE = "Tarifs — COAI";
 const DESCRIPTION =
@@ -46,6 +47,7 @@ export default function PricingPage({
   return (
     <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-10 px-6 py-24">
       <TrackConversion name="pricing_viewed" />
+      <ScrollToHash />
       <div className="w-full max-w-5xl pt-8">
         <BackLink />
       </div>
@@ -95,7 +97,7 @@ export default function PricingPage({
       <div className="grid w-full max-w-5xl grid-cols-1 items-stretch gap-5 sm:grid-cols-2">
         {displayedTiers.map((tier) => (
           <Card
-            id={tier.sessions ? "vip" : undefined}
+            id={tier.nom.toLowerCase()}
             key={tier.nom}
             className={`flex h-full flex-col gap-5 px-6 py-8 text-center ${
               tier.mostPopular ? "border-laiton-400/40" : ""

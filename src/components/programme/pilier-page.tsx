@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
-import type { Pilier } from "@prisma/client";
+import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
@@ -24,22 +24,12 @@ const LABELS: Record<Pilier, string> = {
   RECUPERATION: "Récupération",
 };
 
-const DESCRIPTIONS: Record<Pilier, string> = {
-  ENTRAINEMENT: "Ton programme d’entraînement, adapté à ton niveau et tes objectifs.",
-  NUTRITION: "Ton plan alimentaire, coordonné avec ton entraînement.",
-  RECUPERATION: "Mobilité, sommeil, récupération — pour progresser sans te blesser.",
-};
-
 const TYPE_MEDIA: Partial<Record<Pilier, "exercice" | "repas">> = {
   ENTRAINEMENT: "exercice",
   NUTRITION: "repas",
 };
 
-const AUTRES_PILIERS: { pilier: Pilier; href: string }[] = [
-  { pilier: "ENTRAINEMENT", href: "/programme/entrainement" },
-  { pilier: "NUTRITION", href: "/programme/alimentation" },
-  { pilier: "RECUPERATION", href: "/programme/recuperation" },
-];
+const PILIERS: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
 
 const PDF_SLUG: Record<Pilier, string> = {
   ENTRAINEMENT: "entrainement",
@@ -47,45 +37,54 @@ const PDF_SLUG: Record<Pilier, string> = {
   RECUPERATION: "recuperation",
 };
 
-export async function PilierPage({ pilier }: { pilier: Pilier }) {
+// Programme regroupé en une seule page (16/08/2026, demande Anthony — "je ne
+// veux plus qu'on sépare les 3 piliers") : entraînement, nutrition et
+// récupération s'affichent désormais empilés sur une même page au lieu de 3
+// pages distinctes avec un sélecteur d'onglets. Les 3 anciennes routes
+// (/programme/entrainement, /alimentation, /recuperation) restent en place
+// et rendent toutes ce même composant — les liens existants ailleurs dans
+// l'app (email coach, onboarding, dashboard...) continuent de fonctionner
+// sans devoir être réécrits un par un.
+export async function PilierPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const [valide, dernier] = await Promise.all([
-    prisma.programmeGenerated.findFirst({
-      where: { userId: user.id, pilier, statut: "VALIDE" },
-      orderBy: { generatedAt: "desc" },
-    }),
-    prisma.programmeGenerated.findFirst({
-      where: { userId: user.id, pilier },
-      orderBy: { generatedAt: "desc" },
-    }),
+  const [valides, derniers] = await Promise.all([
+    Promise.all(
+      PILIERS.map((pilier) =>
+        prisma.programmeGenerated.findFirst({
+          where: { userId: user.id, pilier, statut: "VALIDE" },
+          orderBy: { generatedAt: "desc" },
+        })
+      )
+    ),
+    Promise.all(
+      PILIERS.map((pilier) =>
+        prisma.programmeGenerated.findFirst({
+          where: { userId: user.id, pilier },
+          orderBy: { generatedAt: "desc" },
+        })
+      )
+    ),
   ]);
 
-  const enAttente = dernier && dernier.statut === "EN_ATTENTE";
-  const genereIA = dernier && dernier.statut === "GENERE_IA";
-  const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
   const plan = getEffectivePlan(user.subscription);
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
+  const aUnContenu = valides.some(Boolean) || derniers.some(Boolean);
 
   return (
     <div className="coai-programme-page flex flex-col gap-8">
-      {/* Funnel (Phase 5B, 11/08/2026) : "première fois qu'un programme est
-          vu" approximé par la V1 du pilier Entraînement, page d'atterrissage
-          par défaut après /programme (cf. "Embarquer" sur /bienvenue) — pas
-          besoin d'un nouveau flag en base pour ça. */}
-      {affiche && affiche.version === 1 && pilier === "ENTRAINEMENT" && (
-        <TrackConversion name="first_programme_viewed" />
-      )}
+      {derniers[0] && derniers[0].version === 1 && <TrackConversion name="first_programme_viewed" />}
+
       <div className="coai-programme-hero flex flex-col gap-4 px-6 py-7 sm:px-8 sm:py-9">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
           <span>Programme personnalisé</span>
-          <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
-          <span>{LABELS[pilier]}</span>
         </div>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{LABELS[pilier]}.</h1>
-        <p className="max-w-2xl text-base leading-7 text-graphite-400">{DESCRIPTIONS[pilier]}</p>
+        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Ton programme.</h1>
+        <p className="max-w-2xl text-base leading-7 text-graphite-400">
+          Entraînement, nutrition et récupération — un seul programme, coordonné.
+        </p>
       </div>
 
       <p className="rounded-lg border border-graphite-800 bg-graphite-900/40 p-4 text-xs leading-5 text-graphite-400">
@@ -96,149 +95,143 @@ export async function PilierPage({ pilier }: { pilier: Pilier }) {
         et de son adéquation avec ton état de santé, y compris en cas de blessure.
       </p>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {AUTRES_PILIERS.map((p) => (
-          <Link
-            key={p.pilier}
-            href={p.href}
-            className={`rounded-lg border px-3 py-1.5 text-sm transition ${
-              p.pilier === pilier
-                ? "border-laiton-400/20 bg-laiton-400/[0.08] text-laiton-300"
-                : "border-graphite-800 text-graphite-400 hover:text-white"
-            }`}
-          >
-            {LABELS[p.pilier]}
-          </Link>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <SectionLabel>{LABELS[pilier]}</SectionLabel>
-          <div className="flex items-center gap-2">
-            {affiche && (
-              <a
-                href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
-                className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-              >
-                Télécharger en PDF
-              </a>
-            )}
-            {peutGenerer && <RegenerateButton hasExisting={Boolean(dernier)} />}
-          </div>
-        </div>
-
-        <Card className="coai-programme-card flex flex-col gap-5 p-5 sm:p-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {valide && (
-                <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
-              )}
-              {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
-              {!valide && genereIA && <Badge tone="neutral">Généré par l&apos;IA — non relu par un coach</Badge>}
-            </div>
-            {affiche && <Badge tone="neutral">V{affiche.version}</Badge>}
-          </div>
-
-          {affiche && (
-            <p className="text-xs text-graphite-500">
-              Généré le{" "}
-              {affiche.generatedAt.toLocaleDateString("fr-FR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-              {affiche.version > 1 && (
-                <>
-                  {" — "}
-                  <Link href="/programme/evolution" className="underline hover:text-laiton-400">
-                    voir comment ton programme a évolué
-                  </Link>
-                </>
-              )}
-            </p>
-          )}
-
-          {enAttente && (
-            <p className="text-sm text-laiton-400">
-              Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
-              détails peuvent encore être ajustés.
-            </p>
-          )}
-
-          {genereIA && (
-            <p className="text-sm text-graphite-400">
-              Programme généré à 100% par IA, sans relecture humaine. Passe à l&apos;offre
-              Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et
-              l&apos;ajuste.
-            </p>
-          )}
-
-          {(() => {
-            const contenu = affiche?.contenu ?? null;
-            if (!contenu) {
-              if (!peutGenerer) {
-                return (
-                  <div className="flex flex-col items-start gap-4">
-                    <p className="text-sm font-semibold leading-6 text-graphite-200">
-                      Ton profil est prêt. Un seul programme, tout inclus — pas juste
-                      l&apos;entraînement.
-                    </p>
-                    <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-200">
-                      <li className="flex items-start gap-2">
-                        <span className="mt-0.5 text-laiton-300">✓</span>
-                        <span>Ton entraînement personnalisé</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="mt-0.5 text-laiton-300">✓</span>
-                        <span>
-                          <span className="font-semibold">Ton programme nutrition offert avec</span> —
-                          pas une option à part
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="mt-0.5 text-laiton-300">✓</span>
-                        <span>
-                          <span className="font-semibold">Ta récupération optimisée</span> — sommeil,
-                          repos, gestion de la fatigue
-                        </span>
-                      </li>
-                    </ul>
-                    <OneShotProgrammeButton className="max-w-xs" />
-                    <p className="text-xs leading-5 text-graphite-400">
-                      Un suivi humain continu t&apos;intéresse ?{" "}
-                      <Link href="/pricing" className="text-laiton-400 underline">
-                        Comparer les accompagnements
-                      </Link>
-                      .
-                    </p>
-                  </div>
-                );
-              }
-              return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-            }
-            if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
-            if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
-            if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
-            return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
-          })()}
-
-          {pilier === "NUTRITION" && <FicheMacros />}
+      {!peutGenerer && !aUnContenu && (
+        <Card className="flex flex-col items-start gap-4 p-5 sm:p-8">
+          <p className="text-sm font-semibold leading-6 text-graphite-200">
+            Ton profil est prêt. Un seul programme, tout inclus — pas juste l&apos;entraînement.
+          </p>
+          <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-200">
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-laiton-300">✓</span>
+              <span>Ton entraînement personnalisé</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-laiton-300">✓</span>
+              <span>
+                <span className="font-semibold">Ton programme nutrition offert avec</span> — pas une
+                option à part
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-laiton-300">✓</span>
+              <span>
+                <span className="font-semibold">Ta récupération optimisée</span> — sommeil, repos,
+                gestion de la fatigue
+              </span>
+            </li>
+          </ul>
+          <OneShotProgrammeButton className="max-w-xs" />
+          <p className="text-xs leading-5 text-graphite-400">
+            Un suivi humain continu t&apos;intéresse ?{" "}
+            <Link href="/pricing" className="text-laiton-400 underline">
+              Comparer les accompagnements
+            </Link>
+            .
+          </p>
         </Card>
+      )}
 
-        {affiche?.temporaire && (
-          <ReprendreProgrammeButton
-            pilierSlug={PDF_SLUG[pilier]}
-            finPrevue={affiche.finPrevue ? affiche.finPrevue.toISOString() : null}
-          />
-        )}
+      {PILIERS.map((pilier, i) => {
+        const valide = valides[i];
+        const dernier = derniers[i];
+        const enAttente = dernier && dernier.statut === "EN_ATTENTE";
+        const genereIA = dernier && dernier.statut === "GENERE_IA";
+        const affiche: ProgrammeGenerated | null = valide ? valide : enAttente || genereIA ? dernier : null;
 
-        {affiche && peutGenerer && <AnalyserAdaptationButton pilierSlug={PDF_SLUG[pilier]} />}
+        if (!affiche && (!peutGenerer || !aUnContenu)) return null;
 
-        <Link href="/compte/profil" className="text-sm text-laiton-400 underline">
-          Modifier votre profil →
-        </Link>
-      </div>
+        return (
+          <div key={pilier} className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <SectionLabel>{LABELS[pilier]}</SectionLabel>
+              <div className="flex items-center gap-2">
+                {affiche && (
+                  <a
+                    href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
+                    className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+                  >
+                    Télécharger en PDF
+                  </a>
+                )}
+                {peutGenerer && <RegenerateButton hasExisting={Boolean(dernier)} />}
+              </div>
+            </div>
+
+            <Card className="coai-programme-card flex flex-col gap-5 p-5 sm:p-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {valide && (
+                    <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
+                  )}
+                  {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
+                  {!valide && genereIA && (
+                    <Badge tone="neutral">Généré par l&apos;IA — non relu par un coach</Badge>
+                  )}
+                </div>
+                {affiche && <Badge tone="neutral">V{affiche.version}</Badge>}
+              </div>
+
+              {affiche && (
+                <p className="text-xs text-graphite-500">
+                  Généré le{" "}
+                  {affiche.generatedAt.toLocaleDateString("fr-FR", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                  {affiche.version > 1 && (
+                    <>
+                      {" — "}
+                      <Link href="/programme/evolution" className="underline hover:text-laiton-400">
+                        voir comment ton programme a évolué
+                      </Link>
+                    </>
+                  )}
+                </p>
+              )}
+
+              {enAttente && (
+                <p className="text-sm text-laiton-400">
+                  Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
+                  détails peuvent encore être ajustés.
+                </p>
+              )}
+
+              {genereIA && (
+                <p className="text-sm text-graphite-400">
+                  Programme généré à 100% par IA, sans relecture humaine. Passe à l&apos;offre
+                  Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et
+                  l&apos;ajuste.
+                </p>
+              )}
+
+              {(() => {
+                const contenu = affiche?.contenu ?? null;
+                if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+                if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
+                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
+                return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
+              })()}
+
+              {pilier === "NUTRITION" && <FicheMacros />}
+            </Card>
+
+            {affiche?.temporaire && (
+              <ReprendreProgrammeButton
+                pilierSlug={PDF_SLUG[pilier]}
+                finPrevue={affiche.finPrevue ? affiche.finPrevue.toISOString() : null}
+              />
+            )}
+
+            {affiche && peutGenerer && <AnalyserAdaptationButton pilierSlug={PDF_SLUG[pilier]} />}
+          </div>
+        );
+      })}
+
+      <Link href="/compte/profil" className="text-sm text-laiton-400 underline">
+        Modifier votre profil →
+      </Link>
 
       <CoachingVisioCta plan={plan} />
     </div>

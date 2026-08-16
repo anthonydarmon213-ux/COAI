@@ -22,9 +22,11 @@ const LINKS: NavItem[] = [
   {
     label: "Programme",
     children: [
-      { href: "/programme/entrainement", label: "Entraînement" },
-      { href: "/programme/alimentation", label: "Alimentation" },
-      { href: "/programme/recuperation", label: "Récupération" },
+      // Les 3 piliers (entraînement/nutrition/récupération) sont regroupés en
+      // une seule page depuis le 16/08/2026 (demande Anthony) — les 3 routes
+      // existent toujours (liens email/onboarding existants) et rendent
+      // toutes le même contenu complet.
+      { href: "/programme/entrainement", label: "Mon programme" },
       { href: "/programme/evolution", label: "Mémoire & évolution" },
     ],
   },
@@ -41,11 +43,19 @@ const LINKS: NavItem[] = [
   { href: "/compte/profil", label: "Profil" },
   { href: "/coach", label: "Coach" },
   { href: "/videos", label: "Bibliothèque" },
-  // Un seul point d'entrée guidé vers les 3 offres (Impulsion/Transformation/
-  // VIP) avec le détail complet des fonctionnalités et le bouton de paiement
-  // — /pricing couvre déjà exactement ça. Remplace l'ancien lien "VIP" isolé
-  // qui ne montrait qu'une offre parmi les trois, sans les comparer.
-  { href: "/pricing", label: "Offres" },
+  // Boutique (16/08/2026, demande Anthony — "une partie impulsion avec tout
+  // ce que ça comprend quand on clique dessus, une partie transformation et
+  // une partie VIP dans le menu") : au lieu d'un lien "Offres" unique vers le
+  // haut de /pricing, 3 entrées distinctes qui amènent directement sur la
+  // carte complète (specs + prix + achat) de l'offre choisie.
+  {
+    label: "Offres",
+    children: [
+      { href: "/pricing#impulsion", label: "Impulsion" },
+      { href: "/pricing#transformation", label: "Transformation" },
+      { href: "/pricing#vip", label: "VIP" },
+    ],
+  },
 ];
 
 const ACTIVE_CLASS =
