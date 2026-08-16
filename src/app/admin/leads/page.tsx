@@ -5,6 +5,8 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { buildMiniDiagnostic, type ReponsesDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
+import { buildWhatsAppLinkVersLead } from "@/lib/email/lead-notification";
 
 const NB_RECENTS = 100;
 
@@ -54,10 +56,30 @@ export default async function AdminLeadsPage() {
           {leads.length === 0 ? (
             <p className="p-6 text-sm text-graphite-400">Aucun diagnostic capturé pour l&apos;instant.</p>
           ) : (
-            leads.map((lead) => (
-              <div key={lead.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm font-medium text-graphite-50">{lead.email}</span>
+            leads.map((lead) => {
+              const reponses = lead.reponses as ReponsesDiagnostic;
+              const diagnostic = buildMiniDiagnostic(reponses);
+              const objectif = typeof reponses.objectif === "string" ? reponses.objectif : "Objectif non renseigné";
+              const source = lead.utmSource
+                ? [lead.utmSource, lead.utmMedium, lead.utmCampaign].filter(Boolean).join(" · ")
+                : "Accès direct";
+
+              return (
+              <div key={lead.id} className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
+                <div className="flex min-w-0 flex-col gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-semibold text-graphite-50">{lead.email}</span>
+                    {diagnostic && (
+                      <Badge tone="success">Score {diagnostic.indiceCoai.score}/100</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-graphite-300">{objectif}</p>
+                  {diagnostic && (
+                    <div className="grid gap-1 text-xs leading-5 text-graphite-400 sm:grid-cols-2 sm:gap-4">
+                      <p><strong className="text-graphite-200">Besoins :</strong> {diagnostic.pointsATravailler.slice(0, 2).join(" · ") || "À préciser"}</p>
+                      <p><strong className="text-graphite-200">Solutions :</strong> {diagnostic.pointsResolus.slice(0, 2).join(" · ") || "Diagnostic COAI"}</p>
+                    </div>
+                  )}
                   <span className="font-mono text-xs text-graphite-500">
                     {lead.createdAt.toLocaleString("fr-FR", {
                       day: "2-digit",
@@ -66,17 +88,33 @@ export default async function AdminLeadsPage() {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
-                    {lead.utmSource ? ` · ${lead.utmSource}${lead.utmCampaign ? `/${lead.utmCampaign}` : ""}` : " · direct"}
+                    {` · ${source}`}
                   </span>
+                  {lead.telephone && (
+                    <a href={`tel:${lead.telephone}`} className="w-fit text-sm font-medium text-laiton-300 hover:underline">
+                      {lead.telephone}
+                    </a>
+                  )}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                   <Badge tone={lead.resultEmailSentAt ? "success" : "warning"}>
                     {lead.resultEmailSentAt ? "Email résultat envoyé" : "Email résultat non envoyé"}
                   </Badge>
                   {emailsAvecCompte.has(lead.email) && <Badge tone="success">Compte créé</Badge>}
+                  {lead.telephone && (
+                    <a
+                      href={buildWhatsAppLinkVersLead(lead.telephone, lead.email)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full bg-[#25d366] px-4 py-2 text-xs font-bold text-graphite-950"
+                    >
+                      WhatsApp
+                    </a>
+                  )}
                 </div>
               </div>
-            ))
+              );
+            })
           )}
         </Card>
       </div>

@@ -107,6 +107,20 @@ export const TIERS: Tier[] = [
     ],
     limitedSpots: true,
   },
+  {
+    nom: "COAI Privé",
+    prix: "À partir de 2 500€",
+    suffixe: "pour 90 jours",
+    description: "Une transformation entièrement pilotée par Anthony Darmon, avec COAI entre chaque échange.",
+    features: [
+      "Bilan stratégique complet et objectifs chiffrés",
+      "Plan entraînement, nutrition et récupération sur mesure",
+      "Points privés réguliers avec Anthony Darmon",
+      "Suivi COAI quotidien entre les rendez-vous",
+      "Places limitées pour garantir la qualité du suivi",
+    ],
+    limitedSpots: true,
+  },
 ];
 
 export type ServiceKey = "IMPULSION" | "TRANSFORMATION" | "VIP";

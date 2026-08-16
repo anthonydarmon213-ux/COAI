@@ -90,6 +90,10 @@ export async function POST(request: Request) {
   const reponsesLead = parsed.data.reponses as Record<string, unknown>;
   const objectifLead = typeof reponsesLead.objectif === "string" ? reponsesLead.objectif : "Non renseigné";
   const niveauLead = typeof reponsesLead.niveau === "string" ? reponsesLead.niveau : "Non renseigné";
+  const coachPreference = reponsesLead.coachPreference;
+  const offreRecommandee = coachPreference === "ANTHONY"
+    ? "Transformation — suivi humain"
+    : "Impulsion — programme immédiat";
 
   const notifText = [
     `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`,
@@ -98,6 +102,9 @@ export async function POST(request: Request) {
     `Objectif : ${objectifLead}`,
     `Niveau : ${niveauLead}`,
     `Source : ${source}`,
+    `Besoins : ${diagnostic?.pointsATravailler.join(" · ") || "À préciser"}`,
+    `Solutions : ${diagnostic?.pointsResolus.join(" · ") || "Diagnostic COAI"}`,
+    `Offre recommandée : ${offreRecommandee}`,
     parsed.data.telephone
       ? `WhatsApp : ${buildWhatsAppLinkVersLead(parsed.data.telephone, parsed.data.email)}`
       : null,
@@ -125,6 +132,9 @@ export async function POST(request: Request) {
             objectif: objectifLead,
             niveau: niveauLead,
             source,
+            besoins: diagnostic.pointsATravailler,
+            solutions: diagnostic.pointsResolus,
+            offreRecommandee,
           })
         : undefined
     ).catch((err) => console.error("[diagnostic-lead] admin notification :", err)),

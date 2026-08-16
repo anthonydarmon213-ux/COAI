@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Cormorant_Garamond, Inter, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "../../sentry.client.config";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
 
-const playfairDisplay = Playfair_Display({
+const cormorantGaramond = Cormorant_Garamond({
   subsets: ["latin"],
   style: ["normal", "italic"],
   weight: ["400", "500", "600", "700"],
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="fr"
       translate="no"
-      className={`notranslate ${playfairDisplay.variable} ${inter.variable} ${plexMono.variable}`}
+      className={`notranslate ${cormorantGaramond.variable} ${inter.variable} ${plexMono.variable}`}
     >
       <body>
         {children}

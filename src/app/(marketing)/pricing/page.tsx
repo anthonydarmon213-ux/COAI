@@ -206,6 +206,10 @@ export default function PricingPage({
                     Contacte ton coach pour réserver
                   </Button>
                 )
+              ) : tier.nom === "COAI Privé" ? (
+                <Link href="/vip" className="w-full">
+                  <Button className="w-full">Découvrir COAI Privé</Button>
+                </Link>
               ) : tier.oneShot ? (
                 <OffreConsentGate
                   resumeConditions={
@@ -257,23 +261,9 @@ export default function PricingPage({
           </ul>
           <div className="flex-1" />
           <div className="flex flex-col items-center gap-2">
-            {ENTREPRISE.whatsappHref ? (
-              <a href={ENTREPRISE.whatsappHref} target="_blank" rel="noopener noreferrer" className="w-full">
-                <Button className="w-full">Demander un devis via WhatsApp</Button>
-              </a>
-            ) : (
-              <a href={ENTREPRISE.mailHref} className="w-full">
-                <Button className="w-full">Demander un devis par mail</Button>
-              </a>
-            )}
-            <a
-              href={ENTREPRISE.siteHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-laiton-400 underline hover:text-laiton-300"
-            >
-              En savoir plus →
-            </a>
+            <Link href="/entreprise" className="w-full">
+              <Button className="w-full">Découvrir COAI Entreprise</Button>
+            </Link>
           </div>
         </Card>
       </div>
@@ -282,7 +272,7 @@ export default function PricingPage({
         L&apos;inscription est gratuite et donne accès à toute l&apos;interface. Impulsion est un
         paiement unique, sans abonnement. Transformation inclut 7 jours d&apos;essai, puis est facturée
         au choix chaque mois ou chaque année, sans engagement, résiliable à tout moment depuis ton
-        compte. Les séances VIP se réservent directement avec Anthony sur WhatsApp. En débloquant une offre, tu
+        compte. COAI Privé fait l&apos;objet d&apos;une candidature et d&apos;un échange préalable. En débloquant une offre, tu
         acceptes nos{" "}
         <Link href="/cgv" className="underline hover:text-laiton-400">
           CGV

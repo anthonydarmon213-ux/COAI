@@ -5,7 +5,7 @@
 // simplement fixe, avec le premier passage des items visible.
 const ITEMS = [
   "Algorithme construit sur 17 ans de coaching terrain",
-  "Diagnostic offert en 2 minutes",
+  "Diagnostic personnalisé en 3 minutes",
   "Coach diplômé d'État disponible si besoin",
   "Entraînement, nutrition et récupération réunis",
   "Programme généré en quelques secondes",

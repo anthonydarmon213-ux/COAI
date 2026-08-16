@@ -29,6 +29,9 @@ export function buildNouveauLeadEmailHtml({
   objectif,
   niveau,
   source,
+  besoins,
+  solutions,
+  offreRecommandee,
 }: {
   email: string;
   telephone: string | null;
@@ -37,6 +40,9 @@ export function buildNouveauLeadEmailHtml({
   objectif: string;
   niveau: string;
   source: string;
+  besoins: string[];
+  solutions: string[];
+  offreRecommandee: string;
 }): string {
   const whatsappHref = telephone ? buildWhatsAppLinkVersLead(telephone, email) : null;
 
@@ -47,6 +53,7 @@ export function buildNouveauLeadEmailHtml({
     ["Objectif", objectif],
     ["Niveau", niveau],
     ["Source", source],
+    ["Offre recommandée", offreRecommandee],
   ];
 
   return `
@@ -69,6 +76,12 @@ export function buildNouveauLeadEmailHtml({
         )
         .join("")}
     </table>
+    <div style="margin:0 0 24px;padding:18px;border-radius:12px;background:#f4f0e8;color:#171817;">
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a6428;">Besoins identifiés</p>
+      <p style="margin:0 0 14px;font-size:14px;line-height:1.6;">${besoins.map(escapeHtml).join(" · ") || "À préciser lors du premier échange"}</p>
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a6428;">Solutions à proposer</p>
+      <p style="margin:0;font-size:14px;line-height:1.6;">${solutions.map(escapeHtml).join(" · ") || "Diagnostic personnalisé COAI"}</p>
+    </div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;">
       ${
         whatsappHref

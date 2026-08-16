@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -349,6 +349,7 @@ export function DiagnosticQuiz({
     "idle" | "loading" | "done" | "generation" | "pret" | "erreur"
   >("idle");
   const [resumable, setResumable] = useState(false);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stepIndex = questionSteps.indexOf(step);
   const progressPct = stepIndex >= 0 ? Math.round((stepIndex / questionSteps.length) * 100) : 0;
@@ -385,6 +386,19 @@ export function DiagnosticQuiz({
     const target = STEP_ORDER[i + 1];
     if (target) setStep(target);
   }
+
+  function chooseSingle<T>(setter: (value: T) => void, value: T) {
+    setter(value);
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    autoAdvanceTimer.current = setTimeout(goNext, 320);
+  }
+
+  useEffect(
+    () => () => {
+      if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    },
+    []
+  );
   function goBack() {
     const i = STEP_ORDER.indexOf(step);
     // "analyse" n'est pas une vraie étape (rien à corriger) : "Retour" depuis
@@ -588,7 +602,23 @@ export function DiagnosticQuiz({
     if (step === "coach") return Boolean(coachPreference);
     if (step === "email") return isValidEmail(email) && isValidTelephone(telephone) && consentEmail;
     return true;
-  }, [step, persona, niveau, objectif, equipement, lieu, duree, frequence, sexe, habitudesAlimentaires, qualiteSommeil, email, consentEmail]);
+  }, [
+    step,
+    persona,
+    niveau,
+    objectif,
+    equipement,
+    lieu,
+    duree,
+    frequence,
+    sexe,
+    habitudesAlimentaires,
+    qualiteSommeil,
+    coachPreference,
+    email,
+    telephone,
+    consentEmail,
+  ]);
 
   // Même logique que l'email envoyé au lead (/api/diagnostic-lead) — extraite
   // dans lib/diagnostic/mini-diagnostic.ts pour garantir que les deux disent
@@ -807,8 +837,8 @@ export function DiagnosticQuiz({
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    Réponds à quelques questions. COAI révèle ce qui freine ta progression et te
-                    montre comment construire un accompagnement réellement adapté à ton quotidien.
+                    En 3 minutes, découvre ton profil sportif, tes priorités et le coaching COAI
+                    le plus adapté à ton quotidien.
                   </>
                 )}
               </p>
@@ -835,7 +865,7 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="mt-2 px-8 py-3.5">
-                  Commencer le diagnostic — 2 min
+                  Obtenir mon diagnostic personnalisé — 3 min
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
@@ -875,7 +905,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {NIVEAUX.map((n) => (
-                  <OptionCard key={n.value} label={n.value} hint={n.hint} active={niveau === n.value} onClick={() => setNiveau(n.value)} />
+                  <OptionCard key={n.value} label={n.value} hint={n.hint} active={niveau === n.value} onClick={() => chooseSingle(setNiveau, n.value)} />
                 ))}
               </div>
             </div>
@@ -889,7 +919,14 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {OBJECTIFS.map((o) => (
-                  <OptionCard key={o} label={o} active={objectif === o} onClick={() => setObjectif(o)} />
+                  <OptionCard
+                    key={o}
+                    label={o}
+                    active={objectif === o}
+                    onClick={() =>
+                      o === OBJECTIF_AUTRE_LABEL ? setObjectif(o) : chooseSingle(setObjectif, o)
+                    }
+                  />
                 ))}
               </div>
               {objectif === OBJECTIF_AUTRE_LABEL && (
@@ -928,7 +965,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {LIEUX.map((l) => (
-                  <OptionCard key={l} label={l} active={lieu === l} onClick={() => setLieu(l)} />
+                  <OptionCard key={l} label={l} active={lieu === l} onClick={() => chooseSingle(setLieu, l)} />
                 ))}
               </div>
             </div>
@@ -942,7 +979,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {DUREES.map((d) => (
-                  <OptionCard key={d} label={d} active={duree === d} onClick={() => setDuree(d)} />
+                  <OptionCard key={d} label={d} active={duree === d} onClick={() => chooseSingle(setDuree, d)} />
                 ))}
               </div>
             </div>
@@ -958,7 +995,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {FREQUENCES.map((f) => (
-                  <OptionCard key={f} label={f} active={frequence === f} onClick={() => setFrequence(f)} />
+                  <OptionCard key={f} label={f} active={frequence === f} onClick={() => chooseSingle(setFrequence, f)} />
                 ))}
               </div>
             </div>
@@ -1146,7 +1183,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {HABITUDES_ALIMENTAIRES.map((h) => (
-                  <OptionCard key={h} label={h} active={habitudesAlimentaires === h} onClick={() => setHabitudesAlimentaires(h)} />
+                  <OptionCard key={h} label={h} active={habitudesAlimentaires === h} onClick={() => chooseSingle(setHabitudesAlimentaires, h)} />
                 ))}
               </div>
             </div>
@@ -1160,7 +1197,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {QUALITES_SOMMEIL.map((s) => (
-                  <OptionCard key={s} label={s} active={qualiteSommeil === s} onClick={() => setQualiteSommeil(s)} />
+                  <OptionCard key={s} label={s} active={qualiteSommeil === s} onClick={() => chooseSingle(setQualiteSommeil, s)} />
                 ))}
               </div>
             </div>
@@ -1193,29 +1230,29 @@ export function DiagnosticQuiz({
           {step === "coach" && (
             <div className="flex flex-col gap-4">
               <div>
-                <h2 className="font-display text-xl font-semibold text-white">Qui veux-tu comme coach ?</h2>
+                <h2 className="font-display text-xl font-semibold text-white">Quel accompagnement te conviendrait le mieux ?</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">
-                  Tu pourras changer d&apos;avis à tout moment, ce choix n&apos;engage à rien.
+                  Ce choix sert uniquement à te recommander la bonne formule. Il ne t&apos;engage à rien.
                 </p>
               </div>
               <div className="flex flex-col gap-2">
                 <OptionCard
-                  label="Coach IA — voix masculine"
-                  hint="Rapide, disponible 24h/24, programme généré immédiatement."
+                  label="Je veux un programme immédiatement"
+                  hint="Coach IA à voix masculine, disponible 24h/24."
                   active={coachPreference === "IA_HOMME"}
-                  onClick={() => setCoachPreference("IA_HOMME")}
+                  onClick={() => chooseSingle(setCoachPreference, "IA_HOMME")}
                 />
                 <OptionCard
-                  label="Coach IA — voix féminine"
-                  hint="Rapide, disponible 24h/24, programme généré immédiatement."
+                  label="Je préfère une Coach IA à voix féminine"
+                  hint="Programme immédiat et accompagnement disponible 24h/24."
                   active={coachPreference === "IA_FEMME"}
-                  onClick={() => setCoachPreference("IA_FEMME")}
+                  onClick={() => chooseSingle(setCoachPreference, "IA_FEMME")}
                 />
                 <OptionCard
-                  label="Anthony Darmon"
-                  hint="Coach diplômé d'État, 17 ans d'expérience terrain, valide et ajuste ton programme."
+                  label="Je veux un suivi humain"
+                  hint="Anthony Darmon ou un coach diplômé valide et ajuste mon programme."
                   active={coachPreference === "ANTHONY"}
-                  onClick={() => setCoachPreference("ANTHONY")}
+                  onClick={() => chooseSingle(setCoachPreference, "ANTHONY")}
                 />
               </div>
             </div>
@@ -1246,8 +1283,8 @@ export function DiagnosticQuiz({
                   inputMode="tel"
                 />
                 <p className="mt-1.5 text-xs text-graphite-500">
-                  Ton numéro (format international, ex : +33612345678) — pour qu&apos;un coach
-                  puisse te recontacter si besoin.
+                  Ton numéro (ex. +33612345678) — pour recevoir un conseil personnalisé ou être
+                  recontacté sur WhatsApp. Jamais partagé.
                 </p>
               </div>
               <label className="flex items-start gap-2 text-xs leading-5 text-graphite-400">

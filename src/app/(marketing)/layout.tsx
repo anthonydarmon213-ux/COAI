@@ -15,7 +15,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
   return (
     <div className="relative">
       <UtmCapture />
-      <header className="absolute inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#0b0c0e]/40 backdrop-blur-md">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.07] bg-[#090a0b]/82 shadow-[0_12px_35px_rgba(0,0,0,.18)] backdrop-blur-xl">
         <SiteNav connecte={!!user} hrefCompte={user ? "/dashboard" : "/"} />
       </header>
       {children}
