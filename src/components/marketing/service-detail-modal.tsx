@@ -73,7 +73,15 @@ export function ServiceDetailModal({
             Ce que {tier.nom} comprend exactement
           </p>
           <ul className="flex flex-col gap-4">
-            {tier.features.map((feature) => (
+            {(tier.nom === "Transformation"
+              ? [
+                  "Ton programme complet, prêt immédiatement",
+                  "Des ajustements selon tes progrès chaque semaine",
+                  "Les décisions importantes validées par un coach diplômé",
+                  "Ton Coach IA disponible 24h/24",
+                ]
+              : tier.features
+            ).map((feature) => (
               <li key={feature} className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-xs text-laiton-300">
                   ✓

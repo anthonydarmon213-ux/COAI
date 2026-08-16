@@ -76,21 +76,6 @@ export default function PricingPage({
         </Card>
       )}
 
-      <div className="coai-pricing-algorithm w-full max-w-4xl rounded-2xl px-6 py-6 text-center sm:px-10">
-        <SectionLabel>La différence COAI</SectionLabel>
-        <h2 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">
-          Bien plus qu&apos;un programme généré par une IA classique.
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-graphite-300">
-          Ton programme n&apos;est pas produit à partir d&apos;un simple prompt. Les algorithmes COAI
-          traduisent plus de 17 ans d&apos;expérience terrain en décisions d&apos;entraînement, de
-          nutrition et de récupération adaptées à ton profil.
-        </p>
-        <p className="mt-4 text-sm font-semibold text-laiton-300">
-          L&apos;IA personnalise. Les algorithmes COAI structurent et adaptent. L&apos;expertise humaine valide et accompagne.
-        </p>
-      </div>
-
       <div className="grid w-full max-w-2xl grid-cols-1 items-stretch gap-5">
         {displayedTiers.map((tier) => (
           <Card
@@ -151,7 +136,15 @@ export default function PricingPage({
 
             {/* 5. Liste des bénéfices */}
             <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
-              {tier.features.map((feature) => (
+              {(tier.nom === "Transformation"
+                ? [
+                    "Ton programme complet, prêt immédiatement",
+                    "Des ajustements selon tes progrès chaque semaine",
+                    "Les décisions importantes validées par un coach diplômé",
+                    "Ton Coach IA disponible 24h/24",
+                  ]
+                : tier.features
+              ).map((feature) => (
                 <li key={feature} className="flex items-start gap-2">
                   <span className="mt-0.5 text-laiton-400">✓</span>
                   <span>{feature}</span>
