@@ -95,6 +95,7 @@ export const TIERS: Tier[] = [
       "Coaching 1-to-1 avec Anthony Darmon",
       "Séance découverte à l'unité, ou pack de 4 séances",
       "Accessible à tous, quel que soit ton palier",
+      "Coaching spécialisé sur demande — musculation, boxe, yoga",
     ],
     sessions: [
       { label: "Séance découverte — Visio", prix: "100€" },
