@@ -14,28 +14,20 @@ const BENEFICES = [
 export function CoaiIntro() {
   return (
     <section className="coai-future-hero coai-landing-hero relative min-h-screen overflow-hidden px-6 pb-16 pt-28 sm:px-10 sm:pt-36">
-      <div className="coai-future-architecture" aria-hidden="true" />
-      <div className="coai-future-horizon" aria-hidden="true" />
-      <div className="coai-hero-accent-glow" aria-hidden="true" />
+      <Image
+        src="/coai-diagnostic.JPEG"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="coai-palace-image object-cover object-[42%_center]"
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,9,.96)_0%,rgba(8,9,9,.82)_38%,rgba(8,9,9,.34)_68%,rgba(8,9,9,.58)_100%)]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,9,9,.48)_0%,rgba(8,9,9,.08)_45%,rgba(8,9,9,.92)_100%)]" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-10 md:grid-cols-[1.08fr_.92fr] lg:gap-16">
-        <div className="relative order-1 mx-auto w-full animate-reveal md:order-none" style={{ animationDelay: "80ms" }}>
-          <div className="absolute -inset-8 rounded-full bg-laiton-300/[0.08] blur-3xl" aria-hidden="true" />
-          <div className="relative overflow-hidden rounded-[2.2rem] border border-white/[0.12] bg-white/[0.035] p-3 shadow-[0_35px_110px_rgba(0,0,0,.55)] backdrop-blur-xl">
-            <div className="relative aspect-square overflow-hidden rounded-[1.65rem]">
-              <Image
-                src="/coai-diagnostic.JPEG"
-                alt="Diagnostic COAI offert pour trouver le programme qui vous correspond"
-                fill
-                priority
-                sizes="(min-width: 768px) 54vw, 92vw"
-                className="coai-palace-image object-cover"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="order-2 text-left animate-reveal md:order-none">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center md:min-h-[650px]">
+        <div className="max-w-2xl animate-reveal rounded-[2rem] border border-white/[0.1] bg-black/40 p-6 text-left shadow-[0_35px_110px_rgba(0,0,0,.5)] backdrop-blur-md sm:p-9 lg:p-12">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2">
             <span className="h-1.5 w-1.5 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-laiton-200">
@@ -74,7 +66,6 @@ export function CoaiIntro() {
           </div>
           <p className="mt-3 text-xs text-graphite-500">3 minutes · résultat personnalisé · aucune carte bancaire</p>
         </div>
-
       </div>
 
       <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
