@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { VipApplicationForm } from "@/components/marketing/vip-application-form";
 import { TrackConversion } from "@/components/analytics/track-conversion";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "COAI Privé — Transformation 90 jours",
@@ -18,6 +19,10 @@ const INCLUS = [
 ];
 
 export default function VipPage() {
+  const whatsappHref = buildWhatsAppLink(
+    "Bonjour Anthony, je souhaite échanger avec vous au sujet de l’accompagnement COAI Privé sur 90 jours."
+  );
+
   return (
     <main className="coai-vip-page coai-future-hero min-h-screen overflow-hidden px-6 pb-24 pt-32 sm:px-10">
       <TrackConversion name="vip_page_viewed" />
@@ -74,6 +79,19 @@ export default function VipPage() {
 
           <div id="candidature" className="lg:sticky lg:top-28">
             <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-200">Demande confidentielle</p>
+            {whatsappHref && (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-5 flex min-h-14 w-full items-center justify-center rounded-full border border-[#70c989]/40 bg-[#1f7a43] px-6 py-4 text-center text-sm font-extrabold uppercase tracking-[0.04em] text-white shadow-[0_18px_45px_-22px_rgba(37,211,102,.7)] transition hover:-translate-y-0.5 hover:bg-[#176b39]"
+              >
+                Échanger directement avec Anthony sur WhatsApp →
+              </a>
+            )}
+            <p className="mb-5 text-center text-xs leading-5 text-graphite-400">
+              Tu préfères expliquer ton objectif par message ? Écris-moi directement.
+            </p>
             <VipApplicationForm />
           </div>
         </div>

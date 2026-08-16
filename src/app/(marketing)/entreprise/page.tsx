@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { EnterpriseLeadForm } from "@/components/marketing/enterprise-lead-form";
 import { TrackConversion } from "@/components/analytics/track-conversion";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "COAI Entreprise — Santé et performance des équipes",
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function EntreprisePage() {
+  const whatsappHref = buildWhatsAppLink(
+    "Bonjour Anthony, je souhaite échanger avec vous au sujet d’un dispositif COAI pour mon entreprise."
+  );
+
   return (
     <main className="coai-future-hero min-h-screen px-6 pb-24 pt-32 sm:px-10">
       <TrackConversion name="enterprise_page_viewed" />
@@ -34,7 +39,23 @@ export default function EntreprisePage() {
               <p className="mt-2 text-sm leading-6 text-graphite-300">Licence par collaborateur, onboarding automatisé et accompagnement premium des dirigeants : le dispositif s&apos;adapte de 10 à plusieurs centaines de personnes.</p>
             </div>
           </div>
-          <div className="lg:sticky lg:top-28 lg:self-start"><p className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-200">Préparer votre pilote</p><EnterpriseLeadForm /></div>
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-200">Préparer votre pilote</p>
+            {whatsappHref && (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-5 flex min-h-14 w-full items-center justify-center rounded-full border border-[#70c989]/40 bg-[#1f7a43] px-6 py-4 text-center text-sm font-extrabold uppercase tracking-[0.04em] text-white shadow-[0_18px_45px_-22px_rgba(37,211,102,.7)] transition hover:-translate-y-0.5 hover:bg-[#176b39]"
+              >
+                Échanger sur votre projet via WhatsApp →
+              </a>
+            )}
+            <p className="mb-5 text-center text-xs leading-5 text-graphite-400">
+              Un projet précis ? Présentez-le directement à Anthony par message.
+            </p>
+            <EnterpriseLeadForm />
+          </div>
         </div>
       </div>
     </main>
