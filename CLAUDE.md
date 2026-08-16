@@ -4,6 +4,47 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Choix de coach au diagnostic — modèle Future (16/08/2026)
+
+Anthony a demandé, après une recherche sur les concurrents (Future, Fitbod,
+Freeletics...) : « je veux metre ca en place et tu proposes soit le coach IA
+soit moi », avec Future explicitement désigné comme modèle de référence
+(« je veux que futur soit notre model » / « j'aime ce qu il propose »).
+Future fait choisir un style de coaching humain parmi plusieurs profils
+disponibles ; COAI n'a qu'un seul coach humain à ce jour (Anthony), donc le
+choix est réduit à 2 options : Coach IA (rapide, disponible 24h/24,
+génération immédiate) ou Anthony Darmon (coach diplômé d'État, 17 ans
+d'expérience, validation humaine).
+
+Nouvelle étape "Qui veux-tu comme coach ?" ajoutée au quiz `/diagnostic`,
+juste avant l'email (dernière question, position volontairement
+inchangée — effet IKEA déjà documenté ailleurs dans ce fichier). Nouveau
+champ `Profile.coachPreference` (`String?`, pas un enum Prisma) : décision
+explicite d'Anthony — « et plutard si ca marche on recrute d autre coach » —
+un enum aurait demandé une migration à chaque nouveau coach recruté, une
+string reste extensible sans y toucher. Migration additive
+`20260816010000_add_profile_coach_preference`. Câblé dans
+`reponsesEnProfil()` (donc propagé au pont pré-inscription ET au parcours
+connecté, comme toute la logique de mapping diagnostic→profil), dans la
+sauvegarde de progression (reprise du diagnostic) et dans le payload du
+lead email.
+
+**N'assigne aucun coach humain réel** — aucun système d'affectation
+n'existe, ce serait prématuré avant même un seul coach pilote. Utilisé
+uniquement pour orienter la vitrine personnalisée du dashboard
+(`src/lib/dashboard/besoins-identifies.ts`, moteur déterministe existant
+depuis le 14/08) : "Anthony" fait remonter un besoin pointant vers
+Transformation (validation humaine), "IA" renforce Impulsion (génération
+IA seule, sans attente). Écran de résultat du diagnostic non touché : il
+ne montre plus de formules du tout depuis le nouveau modèle d'accès libre
+du 13/08 — rien à y biaiser.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres.
+
+**Non testable depuis ce sandbox** (limite habituelle) : le rendu réel de
+la nouvelle étape en conditions réelles, et l'effet sur la vitrine du
+dashboard avec un vrai profil. À confirmer par Anthony une fois déployé.
+
 ## Corrections post-redesign (bugs UI en cascade) + industrialisation SEO (15/08/2026, suite)
 
 Suite directe de l'audit ci-dessous : après le premier lot de corrections,
