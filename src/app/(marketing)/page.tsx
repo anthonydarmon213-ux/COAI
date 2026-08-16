@@ -200,8 +200,8 @@ export default function LandingPage() {
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
           <div className="relative aspect-square w-64 overflow-hidden rounded-[2rem] border border-laiton-300/35 shadow-[0_28px_80px_rgba(0,0,0,.48),0_0_45px_rgba(201,162,98,.12)] sm:w-80">
             <Image
-              src="/anthony-darmon-fondateur-coai.jpg"
-              alt="Anthony Darmon, fondateur de COAI"
+              src="/anthony-trx-studio-premium.jpg"
+              alt="Anthony Darmon en séance TRX dans un studio de coaching premium"
               fill
               priority
               sizes="(min-width: 640px) 20rem, 16rem"
@@ -292,27 +292,17 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* Bande photo (16/08/2026, référence Future : "il faut plus
-          d'images") — photo studio d'Anthony fournie par ses soins, jamais
-          utilisée jusqu'ici, avec une carte glass superposée reprenant le
-          positionnement algorithme d'abord / humain si besoin. */}
+      {/* Le programme s'adapte à la vraie vie : visuel fourni par Anthony. */}
       <Reveal>
         <section className="mx-auto flex w-full max-w-6xl justify-center px-6 pb-8">
-          <div className="relative aspect-[2/3] w-full max-w-sm overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:max-w-md">
+          <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
             <Image
-              src="/anthony-grand-ecart.jpg"
-              alt="Anthony Darmon en grand écart, fondateur de COAI"
+              src="/coai-programme-adaptatif.jpg"
+              alt="Le programme COAI adapte entraînement, nutrition et récupération à la vie de chacun"
               fill
-              sizes="(min-width: 640px) 28rem, 90vw"
+              sizes="(min-width: 1280px) 72rem, 94vw"
               className="object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6">
-              <p className="font-editorial text-lg italic text-white sm:text-xl">
-                « L&apos;algorithme applique ce que j&apos;ai appris en 17 ans de terrain. »
-              </p>
-              <p className="mt-2 text-sm text-graphite-300">Anthony Darmon, coach diplômé d&apos;État</p>
-            </div>
           </div>
         </section>
       </Reveal>
