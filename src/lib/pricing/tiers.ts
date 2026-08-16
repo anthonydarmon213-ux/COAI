@@ -93,11 +93,13 @@ export const TIERS: Tier[] = [
     description: "Coaching 100% humain avec Anthony Darmon — présentiel ou visio, sans abonnement.",
     features: [
       "Coaching 1-to-1 avec Anthony Darmon",
+      "Appel découverte gratuit de 15 min, sans engagement",
       "Séance découverte à l'unité, ou pack de 4 séances",
       "Accessible à tous, quel que soit ton palier",
       "Coaching spécialisé sur demande — musculation, boxe, yoga",
     ],
     sessions: [
+      { label: "Appel découverte — 15 min", prix: "Offert" },
       { label: "Séance découverte — Visio", prix: "100€" },
       { label: "Séance découverte — Présentiel", prix: "200€" },
       { label: "Pack Visio — 4 séances", prix: "360€" },
