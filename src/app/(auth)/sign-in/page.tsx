@@ -48,7 +48,7 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="bg-lab-grid flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+    <main className="coai-access-page flex min-h-screen flex-col items-center justify-center gap-6 px-6">
       <Link
         href="/"
         className="font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"

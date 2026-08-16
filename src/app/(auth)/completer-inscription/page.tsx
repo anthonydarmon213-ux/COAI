@@ -31,7 +31,7 @@ export default async function CompleterInscriptionPage() {
     "";
 
   return (
-    <main className="bg-lab-grid flex min-h-screen items-center justify-center px-6">
+    <main className="coai-access-page flex min-h-screen items-center justify-center px-6">
       <Card className="flex w-full max-w-sm flex-col gap-5">
         <div className="flex flex-col gap-1">
           <SectionLabel>Dernière étape</SectionLabel>

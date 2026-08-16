@@ -701,7 +701,9 @@ body {
   .coai-week-day summary { padding: .85rem; }
 }
 
-.coai-diagnostic-result .coai-gradient-text {
+.coai-diagnostic-result .coai-gradient-text,
+.coai-app-shell .coai-gradient-text {
+  color: #171817;
   background: linear-gradient(105deg, #171817 5%, #8f672b 55%, #547d91 100%);
   background-clip: text;
   -webkit-background-clip: text;
