@@ -49,12 +49,16 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
   }
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div className="flex flex-col items-center gap-2.5 text-center">
+      <p className="max-w-sm text-base font-semibold text-white">
+        Tu es sur la bonne voie. Continue ta transformation — partage-la.
+      </p>
+      <p className="max-w-sm text-sm text-graphite-300">Compare ta forme avec tes proches.</p>
       <button
         type="button"
         onClick={partager}
         disabled={loading}
-        className="rounded-full border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200 disabled:opacity-50"
+        className="rounded-full bg-laiton-400 px-6 py-3 text-sm font-bold text-graphite-950 shadow-[0_12px_38px_-14px_rgba(201,162,98,0.75)] transition hover:-translate-y-0.5 hover:bg-laiton-300 disabled:opacity-50"
       >
         {loading ? "…" : "Partager mon Indice COAI →"}
       </button>

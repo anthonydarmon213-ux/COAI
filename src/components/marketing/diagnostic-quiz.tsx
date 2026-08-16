@@ -1244,6 +1244,7 @@ export function DiagnosticQuiz({
                     </p>
                   </div>
                 </div>
+                <DiagnosticShareButton connecte={connecte} objectif={diagnostic.profil.objectif} score={diagnostic.indiceCoai.score} />
                 <p className="max-w-xl text-base leading-7 text-graphite-300">{diagnostic.profilParagraphe}</p>
                 {diagnostic.alerte && (
                   <p className="max-w-md rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">
@@ -1262,26 +1263,23 @@ export function DiagnosticQuiz({
                 ].map((bloc) => (
                   <div
                     key={bloc.label}
-                    className="coai-result-signal flex min-h-24 flex-col justify-center gap-1 rounded-xl border border-graphite-800 bg-graphite-900/40 px-4 py-3 text-left"
+                    className="coai-result-signal flex min-h-24 flex-col justify-start gap-1.5 rounded-xl border border-graphite-800 bg-graphite-900/40 px-4 py-3 text-left"
                   >
-                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-graphite-500">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-400">
                       {bloc.label}
                     </span>
-                    <span className="text-xs font-medium leading-5 text-white">{bloc.valeur}</span>
+                    <span className="text-sm font-medium leading-5 text-white">{bloc.valeur}</span>
                   </div>
                 ))}
               </div>
 
               {diagnostic.pointsATravailler.length > 0 && (
                 <div className="coai-result-strategy w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-5 text-left sm:px-6 sm:py-6">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <SectionLabel>Ton bilan stratégique</SectionLabel>
-                      <h3 className="mt-2 font-display text-2xl font-semibold text-white">
-                        {diagnostic.pointsATravailler.length} priorité{diagnostic.pointsATravailler.length > 1 ? "s" : ""} identifiée{diagnostic.pointsATravailler.length > 1 ? "s" : ""}
-                      </h3>
-                    </div>
-                    <p className="max-w-sm text-sm text-graphite-400">Chaque frein détecté reçoit une réponse concrète dans ton accompagnement.</p>
+                  <div>
+                    <SectionLabel>Points à améliorer → Solutions COAI</SectionLabel>
+                    <h3 className="mt-2 font-display text-2xl font-semibold text-white">
+                      {diagnostic.pointsATravailler.length} priorité{diagnostic.pointsATravailler.length > 1 ? "s" : ""} identifiée{diagnostic.pointsATravailler.length > 1 ? "s" : ""}, une réponse concrète pour chacune
+                    </h3>
                   </div>
                   <div className="mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-2 rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4">
@@ -1312,62 +1310,54 @@ export function DiagnosticQuiz({
                     </div>
                   </div>
                   <p className="mt-4 text-sm leading-6 text-laiton-200">{RESULTATS_TIMELINE}</p>
+
+                  <div className="mt-5 border-t border-white/[0.07] pt-5">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                        Tes 3 premiers pas · 7 jours
+                      </span>
+                    </div>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                      {diagnostic.indiceCoai.actions.map((action, index) => (
+                        <div key={action.titre} className="coai-index-action-card">
+                          <span>{index + 1}</span>
+                          <p>{action.titre}</p>
+                          <strong>{action.impact}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="mt-4 text-[11px] leading-5 text-graphite-500">
+                    Indicateur de coaching calculé à partir de tes réponses. Il ne constitue pas une mesure médicale.
+                  </p>
                 </div>
               )}
 
-              <div className="coai-index-actions w-full rounded-2xl p-5 text-left sm:p-6">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <SectionLabel>Améliorer ton Indice COAI</SectionLabel>
-                    <h3 className="mt-2 font-display text-2xl font-semibold text-white">Tes 3 prochains leviers</h3>
-                  </div>
-                  <p className="text-xs text-graphite-500">Plan d&apos;action initial · 7 jours</p>
+              <div className="flex w-full flex-col gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
+                <div>
+                  <SectionLabel>Aperçu de ton programme</SectionLabel>
+                  <p className="mt-2 text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  {diagnostic.indiceCoai.actions.map((action, index) => (
-                    <div key={action.titre} className="coai-index-action-card">
-                      <span>{index + 1}</span>
-                      <p>{action.titre}</p>
-                      <strong>{action.impact}</strong>
-                    </div>
-                  ))}
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+                  <VoletCard label="Entraînement">
+                    {diagnostic.split && <p>{diagnostic.split}</p>}
+                    <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
+                      {diagnostic.exercices.map((ex) => (
+                        <li key={ex}>• {ex}</li>
+                      ))}
+                    </ul>
+                  </VoletCard>
+
+                  {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
+
+                  {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
                 </div>
-                <p className="mt-4 text-[11px] leading-5 text-graphite-500">
-                  Indicateur de coaching calculé à partir de tes réponses. Il ne constitue pas une mesure médicale.
-                </p>
-              </div>
-
-              <DiagnosticShareButton connecte={connecte} objectif={diagnostic.profil.objectif} score={diagnostic.indiceCoai.score} />
-
-              <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
-                <VoletCard label="Entraînement">
-                  {diagnostic.split && <p>{diagnostic.split}</p>}
-                  <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
-                    {diagnostic.exercices.map((ex) => (
-                      <li key={ex}>• {ex}</li>
-                    ))}
-                  </ul>
-                </VoletCard>
-
-                {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
-
-                {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
-              </div>
-
-              <div className="flex w-full flex-col gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
-                <SectionLabel>Une expérience qui évolue avec toi</SectionLabel>
-                <p className="text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
-              </div>
-
-              <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-5 text-left sm:flex-row sm:items-center sm:gap-5">
-                <span className="text-2xl">🎯</span>
-                <p className="text-sm leading-6 text-graphite-200">
+                <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
                   Transformation, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
-                  valide ton programme et te suit dans la durée — pas juste à la génération, à chaque
-                  plateau ou gêne — pendant que ton{" "}
+                  valide ton programme et te suit dans la durée, pendant que ton{" "}
                   <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
-                  séances. La vraie différence, ce n&apos;est pas la validation, c&apos;est le suivi.
+                  séances.
                 </p>
               </div>
 
@@ -1464,7 +1454,7 @@ export function DiagnosticQuiz({
                 </div>
               )}
 
-              <p className="max-w-lg text-xs leading-5 text-graphite-500">
+              <p className="max-w-lg text-sm leading-6 text-graphite-300">
                 Cette expérience t&apos;a plu ? Parles-en à quelqu&apos;un qui a besoin de s&apos;y
                 mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage.
               </p>
