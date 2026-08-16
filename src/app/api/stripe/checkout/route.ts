@@ -60,13 +60,31 @@ export async function POST(request: Request) {
     : PRICE_ENV_BY_PLAN[plan];
   const priceId = process.env[priceEnv];
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  if (!priceId || !appUrl) {
+  if ((!priceId && plan !== "STANDARD") || !appUrl) {
     return NextResponse.json({ error: "Configuration Stripe manquante" }, { status: 500 });
   }
 
+  // Transformation est l'offre principale. Son montant est défini côté
+  // serveur pour empêcher qu'un ancien Price ID Stripe affiche un tarif
+  // différent de celui annoncé sur le site.
+  const lineItem = plan === "STANDARD"
+    ? {
+        price_data: {
+          currency: "eur",
+          unit_amount: billing === "ANNUAL" ? 49000 : 4900,
+          recurring: { interval: billing === "ANNUAL" ? "year" as const : "month" as const },
+          product_data: {
+            name: "COAI — Transformation",
+            description: "Coaching humain augmenté par l'IA — 7 jours d'essai.",
+          },
+        },
+        quantity: 1,
+      }
+    : { price: priceId as string, quantity: 1 };
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    line_items: [{ price: priceId, quantity: 1 }],
+    line_items: [lineItem],
     // Réutilise le client Stripe déjà rattaché au compte. Sans cela, chaque
     // nouvelle ouverture de Checkout pouvait créer un doublon client.
     ...(user.subscription?.stripeCustomerId
@@ -77,7 +95,7 @@ export async function POST(request: Request) {
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
     ...(plan !== "PREMIUM" && !skipTrial
       ? {
-          subscription_data: { trial_period_days: 7 },
+          subscription_data: { trial_period_days: 7, metadata: { plan, billing } },
           payment_method_collection: "always" as const,
         }
       : {}),

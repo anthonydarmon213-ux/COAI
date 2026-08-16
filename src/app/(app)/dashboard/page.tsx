@@ -88,8 +88,8 @@ export default async function DashboardPage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <OneShotProgrammeButton />
-              <Link href="/pricing" className="inline-flex rounded-xl border border-graphite-700/20 bg-white/75 px-5 py-3 text-sm font-extrabold text-graphite-950 shadow-sm transition hover:border-laiton-500/50 hover:bg-white">Comparer les accompagnements →</Link>
+              <Link href="/pricing" className="coai-rainbow-cta inline-flex rounded-xl px-6 py-3 text-sm font-extrabold text-white">Commencer Transformation · 49€/mois →</Link>
+              <OneShotProgrammeButton label="Programme seul · 19€" />
             </div>
           </section>
         ) : (

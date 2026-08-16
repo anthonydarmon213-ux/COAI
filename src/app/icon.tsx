@@ -13,20 +13,20 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0d0e10",
-          borderRadius: 7,
+          background: "#f7f3ea",
+          border: "2px solid #c9a262",
+          borderRadius: 999,
         }}
       >
         <span
           style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: "#c9a262",
-            fontFamily: "system-ui, sans-serif",
+            width: 10,
+            height: 10,
+            borderRadius: 999,
+            background: "#5b8296",
+            boxShadow: "0 0 0 4px #f7f3ea, 0 0 0 6px #8f672b",
           }}
-        >
-          C
-        </span>
+        />
       </div>
     ),
     size

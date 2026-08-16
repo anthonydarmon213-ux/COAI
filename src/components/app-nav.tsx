@@ -93,7 +93,7 @@ export function AppNav() {
       </nav>
 
       <div className="mt-6 hidden border-t border-white/[0.09] pt-5 md:block">
-        <Link href="/pricing" className="coai-rainbow-cta flex items-center justify-center rounded-xl px-4 py-3 text-sm font-extrabold text-white">Choisir mon accompagnement</Link>
+        <Link href="/pricing" className="coai-rainbow-cta flex items-center justify-center rounded-xl px-4 py-3 text-center text-sm font-extrabold text-white">Transformation · 49€/mois</Link>
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-graphite-400">
           <Link href="/compte/profil" className="hover:text-white">Mon profil</Link>
           <Link href="/compte/parametres" className="hover:text-white">Réglages</Link>
