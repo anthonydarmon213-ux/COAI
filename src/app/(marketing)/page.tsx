@@ -107,36 +107,6 @@ export default function LandingPage() {
       <CoaiIntro />
       <MarqueeBanner />
 
-      {/* Aperçu produit — anciennement les mockups de téléphone reconstruits
-          (AppPreviewPhones), remplacés le 15/08/2026 par un visuel fourni
-          par Anthony (déposé dans public/) sur demande explicite. Cartes
-          flottantes ajoutées le 16/08/2026 (référence Future) : reprennent
-          les vrais bénéfices déjà en avant ailleurs, jamais un chiffre
-          inventé. */}
-      <Reveal>
-        <section id="apercu-produit" className="relative mx-auto flex w-full max-w-3xl flex-col items-center justify-center gap-6 px-6 pb-16 pt-8 sm:px-10">
-          <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
-            <Image
-              src="/coai-diagnostic.JPEG"
-              alt="Quel programme te correspond vraiment ? Diagnostic COAI offert."
-              fill
-              sizes="(min-width: 640px) 48rem, 100vw"
-              className="object-cover"
-            />
-            <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
-              <div className="flex-1 rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-md">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300">Algorithme</p>
-                <p className="mt-1 text-sm text-white">Programme généré en quelques secondes</p>
-              </div>
-              <div className="flex-1 rounded-2xl border border-white/10 bg-black/55 px-4 py-3 backdrop-blur-md">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a9c6d4]">Si besoin</p>
-                <p className="mt-1 text-sm text-white">Validé par un coach diplômé d&apos;État</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Reveal>
-
       {/* Ligne de fonctionnalités sous le hero — reprend exactement les
           garde-fous déjà mis en avant ailleurs sur la page (adaptatif,
           suivi, validation humaine, sécurité), condensés en un coup d'œil. */}
