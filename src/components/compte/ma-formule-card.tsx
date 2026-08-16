@@ -12,6 +12,18 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
   VIP: [],
 };
 
+// Résumés courts et distincts par formule (16/08/2026, correction Anthony —
+// "on ne comprend pas les différentes formules") : afficher la première
+// feature brute de tiers.ts (ex: "Journal de séances" pour Impulsion, "Tout
+// ce qui est inclus dans Impulsion" pour Transformation) ne dit rien de
+// distinctif sur chaque palier. Ces phrases sont écrites spécifiquement pour
+// comparer d'un coup d'œil — le détail complet reste dans ServiceDetailModal.
+const RESUME_COMPARATIF: Record<ServiceKey, string> = {
+  IMPULSION: "Programme complet généré par IA, en un seul paiement de 19€",
+  TRANSFORMATION: "+ suivi humain, adaptation continue et coach IA illimité",
+  VIP: "Coaching 1-to-1 avec Anthony Darmon, présentiel ou visio",
+};
+
 // Carte "Ta formule" (16/08/2026, demande Anthony) : jusqu'ici rien sur
 // /compte/profil n'expliquait à l'abonné ce que sa formule actuelle couvre
 // ni ce que les formules supérieures ajoutent — juste un lien vers son
@@ -63,9 +75,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
                 className="flex flex-1 flex-col items-start gap-1 rounded-xl border border-laiton-400/25 bg-laiton-400/[0.05] px-4 py-3 text-left transition hover:border-laiton-400/45 hover:bg-laiton-400/[0.09]"
               >
                 <span className="font-semibold text-white">{TIER_BY_SERVICE[service].nom}</span>
-                <span className="text-xs leading-5 text-graphite-300">
-                  {TIER_BY_SERVICE[service].features[0]}
-                </span>
+                <span className="text-xs leading-5 text-graphite-300">{RESUME_COMPARATIF[service]}</span>
               </button>
             ))}
           </div>
