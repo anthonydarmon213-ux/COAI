@@ -43,7 +43,7 @@ export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-2 inline-flex w-fit rounded-xl bg-graphite-950 px-5 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-graphite-800 hover:text-white"
+        className="coai-vip-button mt-2 inline-flex w-fit rounded-xl px-5 py-3 text-sm font-extrabold shadow-sm transition"
       >
         Réserver avec Anthony · Visio 100€ / Paris 200€ →
       </a>

@@ -454,6 +454,39 @@ body {
 .coai-app-shell .bg-white\/\[0\.065\] { background-color: rgba(255,255,255,.65); }
 .coai-app-shell .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .08em; }
 
+/* Contraste autonome pour les éléments sombres placés dans l'univers clair. */
+.coai-app-shell .coai-service-modal { color: #fffdf8; }
+.coai-app-shell .coai-service-modal .text-white,
+.coai-app-shell .coai-service-modal .text-graphite-50,
+.coai-app-shell .coai-service-modal .text-graphite-100,
+.coai-app-shell .coai-service-modal .text-graphite-200 { color: #fffdf8 !important; }
+.coai-app-shell .coai-service-modal .text-graphite-300 { color: #d4d2cb !important; }
+.coai-app-shell .coai-service-modal .text-graphite-400,
+.coai-app-shell .coai-service-modal .text-graphite-500 { color: #aaa9a4 !important; }
+
+.coai-vip-button {
+  border: 1px solid rgba(77,61,38,.3);
+  background: #252724;
+  color: #fffdf8 !important;
+}
+.coai-vip-button:hover { background: #353832; color: #fffdf8 !important; }
+
+.coai-public-menu {
+  border-color: rgba(221,193,145,.22) !important;
+  background: #171817 !important;
+  box-shadow: 0 28px 70px -28px rgba(0,0,0,.72);
+}
+.coai-public-menu-link { color: #f2eee5 !important; }
+.coai-public-menu-link:hover { background: rgba(255,255,255,.08) !important; color: #fff !important; }
+.coai-public-menu-action { background: #d1aa64 !important; color: #171817 !important; }
+
+/* Mouvement lent et feutré : profondeur de palace, jamais animation gadget. */
+@keyframes coai-palace-drift {
+  0%, 100% { transform: scale(1.01) translate3d(0, 0, 0); }
+  50% { transform: scale(1.045) translate3d(-.4%, -.3%, 0); }
+}
+.coai-palace-image { animation: coai-palace-drift 18s ease-in-out infinite; }
+
 .coai-app-main > .pointer-events-none { opacity: .38; }
 
 /* Landing — luxe lumineux, émotion cinématographique et précision tech. */

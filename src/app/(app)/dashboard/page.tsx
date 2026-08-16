@@ -112,11 +112,11 @@ export default async function DashboardPage() {
         />
       ) : (
         <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#28715c]">Journée de récupération</p>
           <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
-          {pendingCoach && <p className="mt-4 text-sm text-amber-200">Programme V{programme.version} — à valider par ton coach.</p>}
-          <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-white/15 px-5 py-2.5 text-sm text-white">Voir ma récupération</Link>
+          {pendingCoach && <p className="mt-4 text-sm font-semibold text-[#76531f]">Programme V{programme.version} — à valider par ton coach.</p>}
+          <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
         </section>
       )}
 

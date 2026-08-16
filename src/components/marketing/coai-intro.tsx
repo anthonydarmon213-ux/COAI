@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const BENEFICES = [
   "Un plan adapté à ton corps et à ton emploi du temps",
+  "Chaque séance s'ajuste au temps disponible et à ta forme du jour",
   "Entraînement, nutrition et récupération réunis",
   "Une recommandation claire, sans engagement",
 ];
@@ -61,23 +62,15 @@ export function CoaiIntro() {
         <div className="relative mx-auto w-full max-w-xl animate-reveal" style={{ animationDelay: "140ms" }}>
           <div className="absolute -inset-8 rounded-full bg-laiton-300/[0.08] blur-3xl" aria-hidden="true" />
           <div className="relative overflow-hidden rounded-[2.2rem] border border-white/[0.12] bg-white/[0.035] p-3 shadow-[0_35px_110px_rgba(0,0,0,.55)] backdrop-blur-xl">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.65rem]">
+            <div className="relative aspect-square overflow-hidden rounded-[1.65rem]">
               <Image
-                src="/anthony-trx-studio-premium.jpg"
-                alt="Anthony Darmon, coach diplômé d'État et fondateur de COAI"
+                src="/coai-diagnostic.JPEG"
+                alt="Diagnostic COAI offert pour trouver le programme qui vous correspond"
                 fill
                 priority
                 sizes="(min-width: 1024px) 34rem, 90vw"
-                className="object-cover object-[center_32%]"
+                className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-7 text-left sm:p-9">
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-laiton-200">La méthode COAI</p>
-                <p className="mt-3 max-w-sm font-editorial text-xl italic leading-7 text-white sm:text-2xl">
-                  « 17 ans d&apos;expertise terrain, rendus disponibles à chaque décision. »
-                </p>
-                <p className="mt-3 text-xs text-graphite-300">Anthony Darmon · Coach diplômé d&apos;État</p>
-              </div>
             </div>
           </div>
           <div className="relative mt-4 rounded-2xl border border-laiton-300/20 bg-[#11110f]/95 px-5 py-4 text-left shadow-2xl backdrop-blur sm:absolute sm:-bottom-5 sm:-left-8 sm:mt-0">

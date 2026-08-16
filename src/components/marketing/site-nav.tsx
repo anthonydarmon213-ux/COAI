@@ -64,11 +64,11 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-white/[0.12] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white marker:hidden">
           Menu <span className="text-laiton-300 transition group-open:rotate-45">＋</span>
         </summary>
-        <nav className="absolute right-0 top-12 flex w-64 flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-[#101112]/98 p-2 shadow-2xl backdrop-blur-xl" aria-label="Navigation mobile">
+        <nav className="coai-public-menu absolute right-0 top-12 flex w-64 flex-col overflow-hidden rounded-2xl border p-2 shadow-2xl" aria-label="Navigation mobile">
           {LIENS.map((lien) => (
-            <Link key={lien.label} href={lien.href} className="rounded-xl px-4 py-3 text-sm font-medium text-graphite-200 transition hover:bg-white/[0.06] hover:text-white">{lien.label}</Link>
+            <Link key={lien.label} href={lien.href} className="coai-public-menu-link rounded-xl px-4 py-3 text-sm font-semibold transition">{lien.label}</Link>
           ))}
-          <Link href={actionHref} className="mt-2 rounded-xl bg-laiton-400 px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em] text-graphite-950">{actionLabel}</Link>
+          <Link href={actionHref} className="coai-public-menu-action mt-2 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em]">{actionLabel}</Link>
         </nav>
       </details>
     </div>

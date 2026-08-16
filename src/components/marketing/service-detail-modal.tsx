@@ -53,7 +53,7 @@ export function ServiceDetailModal({
     tier.nom === "Transformation" ? (annual ? "7 jours d'essai · puis 490€/an" : "7 jours d'essai · puis 49€/mois") : tier.essai;
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#0b0c0e]" role="dialog" aria-modal="true">
+    <div className="coai-service-modal fixed inset-0 z-[100] overflow-y-auto bg-[#0b0c0e]" role="dialog" aria-modal="true">
       <button
         type="button"
         onClick={onClose}

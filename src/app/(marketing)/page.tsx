@@ -298,13 +298,13 @@ export default function LandingPage() {
           positionnement algorithme d'abord / humain si besoin. */}
       <Reveal>
         <section className="mx-auto flex w-full max-w-6xl justify-center px-6 pb-8">
-          <div className="relative aspect-[3/4] w-full max-w-sm overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:max-w-md">
+          <div className="relative aspect-[2/3] w-full max-w-sm overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:max-w-md">
             <Image
-              src="/anthony-studio-premium.jpg"
-              alt="Anthony Darmon, fondateur de COAI"
+              src="/anthony-grand-ecart.jpg"
+              alt="Anthony Darmon en grand écart, fondateur de COAI"
               fill
               sizes="(min-width: 640px) 28rem, 90vw"
-              className="object-cover object-[center_18%]"
+              className="object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
@@ -350,6 +350,28 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+      </Reveal>
+
+      <Reveal>
+        <section className="relative mx-auto my-10 aspect-[16/9] w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/[0.1] shadow-[0_38px_100px_-45px_rgba(0,0,0,.8)]">
+          <Image
+            src="/coai-recovery-palace.png"
+            alt="Une séance de récupération adaptée à la forme et au temps disponible"
+            fill
+            sizes="(min-width: 1280px) 72rem, 96vw"
+            className="coai-palace-image object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent" />
+          <div className="absolute inset-y-0 left-0 flex max-w-xl flex-col justify-end p-7 sm:p-12">
+            <SectionLabel>Une méthode qui vit avec toi</SectionLabel>
+            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight text-white sm:text-5xl">
+              Aujourd&apos;hui n&apos;est jamais une journée standard.
+            </h2>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-white/80 sm:text-lg sm:leading-8">
+              COAI adapte chaque séance à ton agenda, au temps dont tu disposes et à ta forme du jour — effort, récupération ou repos.
+            </p>
+          </div>
+        </section>
       </Reveal>
 
       {/* Coach IA 24/7 — différenciateur qu'aucun concurrent 100% manuel
