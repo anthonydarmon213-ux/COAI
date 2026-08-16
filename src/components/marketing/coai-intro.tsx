@@ -28,14 +28,14 @@ export function CoaiIntro() {
         style={{ animationDelay: "120ms" }}
       >
         <h1 className="mx-auto w-full text-balance font-display text-[clamp(2.2rem,5.4vw,4rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-white">
-          <span className="coai-gradient-text">Un algorithme</span> construit par 17 ans de coaching terrain.
+          Ton entraînement. Ta nutrition. Ta récupération. <span className="coai-gradient-text">100% sur-mesure.</span>
         </h1>
         <p className="max-w-lg text-balance text-lg font-semibold text-laiton-200 sm:text-xl">
-          Entraînement, nutrition et récupération ajustés au jour le jour — comme en coaching VIP.
+          Ajusté au jour le jour selon ta forme et ton emploi du temps — comme en coaching VIP.
         </p>
         <p className="max-w-lg text-base leading-7 text-graphite-300 sm:text-lg">
-          Et si besoin, un coach diplômé d&apos;État valide ton programme et te suit
-          personnellement.
+          Construit par un algorithme codé avec 17 ans d&apos;expérience terrain. Un coach diplômé
+          suit, valide et reste disponible quand tu en as besoin.
         </p>
       </div>
 
@@ -63,6 +63,35 @@ export function CoaiIntro() {
             <span className="text-[#a9c6d4]">✓</span>
             Sans engagement · Résiliable à tout moment
           </span>
+        </div>
+      </div>
+
+      {/* Explication du parcours (16/08/2026, demande Anthony : "simple,
+          efficace, une phrase pour expliquer chacun") — diagnostic d'abord,
+          puis le choix du coach/formule, jamais l'inverse. */}
+      <div className="relative z-10 flex w-full max-w-4xl flex-col items-center gap-5 animate-reveal" style={{ animationDelay: "400ms" }}>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-graphite-500">
+          1. Ton diagnostic offert <span className="text-laiton-300">→</span> 2. Tu choisis ton coach et ta formule
+        </p>
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-5 py-4 text-left backdrop-blur-md">
+            <p className="text-sm font-semibold text-white">Impulsion</p>
+            <p className="mt-1 text-xs leading-5 text-graphite-400">
+              Ton programme généré par l&apos;algorithme, en un seul paiement de 19€.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-5 py-4 text-left backdrop-blur-md">
+            <p className="text-sm font-semibold text-laiton-200">Transformation — hybride</p>
+            <p className="mt-1 text-xs leading-5 text-graphite-400">
+              L&apos;IA génère, un coach diplômé d&apos;État valide et te suit dans la durée.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-acier/25 bg-acier/[0.06] px-5 py-4 text-left backdrop-blur-md">
+            <p className="text-sm font-semibold text-[#a9c6d4]">VIP</p>
+            <p className="mt-1 text-xs leading-5 text-graphite-400">
+              Coaching 100% humain avec Anthony Darmon, présentiel ou visio.
+            </p>
+          </div>
         </div>
       </div>
     </section>

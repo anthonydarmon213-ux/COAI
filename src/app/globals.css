@@ -542,6 +542,21 @@ body {
 .coai-marketing-footer .text-graphite-500 { color: #64665f; }
 .coai-marketing-footer a { transition: color .2s ease; }
 
+/* Le footer est un sibling de <main> (posé une fois dans le layout marketing
+   partagé par les 15 pages), donc une classe sur <main> ne peut pas cascader
+   jusqu'à lui en CSS classique — :has() cible le footer uniquement quand la
+   homepage sombre est active, sans toucher aux 14 autres pages restées
+   claires (16/08/2026, suite du passage de la homepage en dark). */
+body:has(main.bg-lab-grid) .coai-marketing-footer {
+  border-top: 1px solid rgba(221,193,145,.12);
+  color: #8a8d92;
+  background:
+    radial-gradient(circle at 82% 0%, rgba(91,130,150,.14), transparent 24rem),
+    linear-gradient(135deg, #0d0e10 0%, #16181b 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+body:has(main.bg-lab-grid) .coai-marketing-footer .text-graphite-500 { color: #8a8d92; }
+
 .coai-pricing-algorithm {
   border: 1px solid rgba(99,76,42,.15);
   background:

@@ -327,18 +327,18 @@ export default function LandingPage() {
           utilisée jusqu'ici, avec une carte glass superposée reprenant le
           positionnement algorithme d'abord / humain si besoin. */}
       <Reveal>
-        <section className="mx-auto w-full max-w-6xl px-6 pb-8">
-          <div className="relative aspect-[16/8] w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:aspect-[16/6]">
+        <section className="mx-auto flex w-full max-w-6xl justify-center px-6 pb-8">
+          <div className="relative aspect-[3/4] w-full max-w-sm overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl sm:max-w-md">
             <Image
               src="/anthony-studio-premium.jpg"
               alt="Anthony Darmon, fondateur de COAI"
               fill
-              sizes="(min-width: 1280px) 72rem, 100vw"
-              className="object-cover object-top"
+              sizes="(min-width: 640px) 28rem, 90vw"
+              className="object-cover object-[center_18%]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6 sm:left-8 sm:right-auto sm:max-w-md">
-              <p className="font-editorial text-xl italic text-white sm:text-2xl">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6">
+              <p className="font-editorial text-lg italic text-white sm:text-xl">
                 « L&apos;algorithme applique ce que j&apos;ai appris en 17 ans de terrain. »
               </p>
               <p className="mt-2 text-sm text-graphite-300">Anthony Darmon, coach diplômé d&apos;État</p>
