@@ -765,7 +765,7 @@ export function DiagnosticQuiz({
           {step === "intro" && (
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
               <div className="coai-diagnostic-kicker" aria-label="Découvre ton score COAI">
-                <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+                <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
                 <span>Découvre ton score COAI</span>
               </div>
               <h1 className="max-w-xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl">
@@ -1217,7 +1217,7 @@ export function DiagnosticQuiz({
             <div className="flex flex-col items-center gap-7 py-2 text-center">
               <div className="coai-result-hero flex w-full flex-col items-center gap-3 px-5 py-7 sm:px-8 sm:py-9">
                 <div className="coai-diagnostic-kicker">
-                  <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+                  <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
                   <span>Analyse COAI terminée</span>
                   <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
                   <span>Profil révélé</span>
@@ -1436,7 +1436,7 @@ export function DiagnosticQuiz({
                 // compte, exactement comme avant.
                 <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
                   <div className="coai-diagnostic-kicker">
-                    <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+                    <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
                     <span>Ton espace est prêt</span>
                   </div>
                   <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">Découvre ton coaching avant de choisir.</h3>

@@ -76,9 +76,9 @@ export async function PilierPage() {
     <div className="coai-programme-page flex flex-col gap-8">
       {derniers[0] && derniers[0].version === 1 && <TrackConversion name="first_programme_viewed" />}
 
-      <div className="coai-programme-hero flex flex-col gap-4 px-6 py-7 sm:px-8 sm:py-9">
+      <div className="coai-programme-hero animate-reveal flex flex-col gap-4 px-6 py-7 sm:px-8 sm:py-9">
         <div className="coai-diagnostic-kicker self-start">
-          <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Programme personnalisé</span>
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Ton programme.</h1>

@@ -125,7 +125,7 @@ export default function SignUpPage() {
         <section className="coai-access-intro flex flex-col justify-between gap-10 px-7 py-8 sm:px-10 sm:py-10">
           <div>
             <div className="coai-diagnostic-kicker">
-              <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+              <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
               <span>Diagnostic enregistré</span>
             </div>
             <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">

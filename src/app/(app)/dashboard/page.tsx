@@ -46,9 +46,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="coai-dashboard flex flex-col gap-7">
-      <header className="coai-dashboard-hero flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
+      <header className="coai-dashboard-hero animate-reveal flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
         <div className="coai-diagnostic-kicker self-start">
-          <span className="coai-diagnostic-kicker-status" aria-hidden="true" />
+          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Ton espace personnel</span>
           <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
           <span>Aujourd&apos;hui</span>
