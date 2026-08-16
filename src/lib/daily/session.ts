@@ -9,6 +9,7 @@ export type WorkoutSession = Record<string, unknown> & {
 export type DailyCheckinInput = {
   sleep: "TRES_MAUVAIS" | "MAUVAIS" | "CORRECT" | "BON" | "EXCELLENT";
   energy: "TRES_BASSE" | "BASSE" | "NORMALE" | "HAUTE" | "TRES_HAUTE";
+  food: "PAS_ENCORE" | "LEGER" | "EQUILIBRE" | "LOURD";
   pain: boolean;
   painArea?: string;
   availableMinutes: 15 | 25 | 40 | 60 | 75;
@@ -122,6 +123,7 @@ export function adaptWorkout(
 
   const lowRecovery = ["TRES_MAUVAIS", "MAUVAIS"].includes(checkin.sleep) ||
     ["TRES_BASSE", "BASSE"].includes(checkin.energy);
+  const needsFuelCaution = checkin.food === "PAS_ENCORE" || checkin.food === "LOURD";
   let adaptedExercises = [...exercices];
 
   if (checkin.availableMinutes < expectedMinutes && exercices.length > 0) {
@@ -138,10 +140,17 @@ export function adaptWorkout(
     changes.push("Volume réduit d'une série par exercice et méthodes d'intensification retirées");
   }
 
+  if (needsFuelCaution) {
+    changes.push(checkin.food === "PAS_ENCORE"
+      ? "Départ progressif prévu : hydrate-toi et évite l’intensité si tu manques d’énergie"
+      : "Échauffement progressif conseillé après un repas lourd");
+  }
+
   const adapted = changes.length > 0;
   const reasonParts = [];
   if (checkin.availableMinutes < expectedMinutes) reasonParts.push(`tu disposes de ${checkin.availableMinutes === 75 ? "60+" : checkin.availableMinutes} minutes`);
   if (lowRecovery) reasonParts.push("ton sommeil ou ton énergie est faible aujourd'hui");
+  if (needsFuelCaution) reasonParts.push(checkin.food === "PAS_ENCORE" ? "tu n'as pas encore mangé" : "tu viens de faire un repas lourd");
 
   return {
     session: { ...completeSource, exercices: adaptedExercises },

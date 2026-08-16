@@ -43,13 +43,17 @@ const ENERGY = [
   ["TRES_BASSE", "Très basse"], ["BASSE", "Basse"], ["NORMALE", "Normale"],
   ["HAUTE", "Haute"], ["TRES_HAUTE", "Très haute"],
 ] as const;
+const FOOD = [
+  ["PAS_ENCORE", "Pas encore mangé"], ["LEGER", "Plutôt léger"],
+  ["EQUILIBRE", "Équilibré"], ["LOURD", "Repas lourd"],
+] as const;
 const TIMES = [[15, "15 min"], [25, "25 min"], [40, "40 min"], [60, "60 min"], [75, "60+ min"]] as const;
 const FEEDBACK = [["TROP_FACILE", "Trop facile"], ["BIEN_DOSEE", "Bien dosée"], ["TROP_DURE", "Trop dure"]] as const;
 const AREAS = ["Dos", "Épaule", "Genou", "Cheville", "Poignet", "Hanche", "Cou", "Autre"];
 
 function Chip({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-10 rounded-full border px-3 py-2 text-xs transition ${active ? "border-laiton-400/60 bg-laiton-400/15 text-laiton-200" : "border-white/10 bg-white/[0.025] text-graphite-300 hover:border-white/25 hover:text-white"}`}>
+    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition ${active ? "border-[#b98b43] bg-[#27241f] text-white shadow-sm" : "border-[#d9d2c4] bg-white/80 text-[#4a4842] hover:border-[#9c7945] hover:bg-white"}`}>
       {children}
     </button>
   );
@@ -120,6 +124,7 @@ export function DailyExperience({
   const [daily, setDaily] = useState<Daily>(initialDaily);
   const [sleep, setSleep] = useState(initialDaily?.sleep ?? "");
   const [energy, setEnergy] = useState(initialDaily?.energy ?? "");
+  const [food, setFood] = useState("");
   const [pain, setPain] = useState(initialDaily?.pain ?? false);
   const [painArea, setPainArea] = useState(initialDaily?.painArea ?? "");
   const [availableMinutes, setAvailableMinutes] = useState(initialDaily?.availableMinutes ?? defaultTime);
@@ -177,9 +182,9 @@ export function DailyExperience({
   }
 
   async function submitCheckin() {
-    if (!sleep || !energy) return setError("Choisis ton sommeil et ton énergie pour continuer.");
+    if (!sleep || !energy || !food) return setError("Réponds aux cinq repères pour adapter ta séance.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
-    await post({ action: "checkin", sleep, energy, pain, painArea: pain ? painArea : undefined, availableMinutes });
+    await post({ action: "checkin", sleep, energy, food, pain, painArea: pain ? painArea : undefined, availableMinutes });
   }
 
   async function completeWorkout() {
@@ -203,35 +208,38 @@ export function DailyExperience({
       )}
 
       {!checkinDone && (
-        <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5 sm:p-6">
+        <section className="relative overflow-hidden rounded-[2rem] border border-[#d9c9ac] bg-[linear-gradient(145deg,#fffdf8_0%,#f4eee3_70%,#eef4f3_100%)] p-5 text-[#171713] shadow-[0_30px_90px_-55px_rgba(44,35,22,.55)] sm:p-8">
+          <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-[#c9a96b]/25" />
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Check-in · 10 secondes</p>
-              <h2 className="mt-2 text-xl font-semibold text-white">Comment tu te sens aujourd’hui ?</h2>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9a6d2f]">Embarquement · Aujourd’hui</p>
+              <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Ta séance s’adapte à ta journée.</h2>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-[#666159]">Comme avec ton coach en face à face : un check-up rapide, puis une séance ajustée à ton objectif et à ton état réel.</p>
             </div>
-            <span className="text-2xl">◎</span>
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c9a96b]/45 bg-white/75 text-xl text-[#9a6d2f]">◎</span>
           </div>
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div><p className="mb-2 text-xs text-graphite-400">Sommeil</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
-            <div><p className="mb-2 text-xs text-graphite-400">Énergie</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
-            <div><p className="mb-2 text-xs text-graphite-400">Temps disponible</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
-            <div><p className="mb-2 text-xs text-graphite-400">Douleur ou gêne</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Aucune</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-2 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
+          <div className="mt-7 grid gap-3">
+            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">01</span> Combien de temps as-tu ?</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">02</span> Comment est ta forme ?</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">03</span> Comment as-tu dormi ?</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">04</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">05</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
           </div>
-          {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
-          <Button onClick={submitCheckin} disabled={loading} className="mt-5 w-full sm:w-auto">{loading ? "Adaptation…" : "Voir ma séance du jour"}</Button>
+          {error && <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>}
+          <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-[#20211e] py-6 text-base font-bold text-white hover:bg-[#343630] sm:w-auto sm:px-8">{loading ? "COAI adapte ta séance…" : "Adapter ma séance →"}</Button>
         </section>
       )}
 
-      {adaptation?.adapted && (
-        <section className="rounded-2xl border border-laiton-400/30 bg-gradient-to-br from-laiton-400/[0.12] to-transparent p-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{adaptation.title}</p>
-          <h3 className="mt-2 text-lg text-white">Pourquoi ?</h3>
-          <p className="mt-1 text-sm leading-6 text-graphite-200">{adaptation.reason}</p>
-          {adaptation.changes.length > 0 && <ul className="mt-3 space-y-1 text-xs text-graphite-300">{adaptation.changes.map((change) => <li key={change}>✓ {change}</li>)}</ul>}
+      {checkinDone && adaptation && (
+        <section className="rounded-2xl border border-[#b8d8cb] bg-[#edf7f2] p-5 text-[#18372d]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#28715c]">✓ Check-in analysé</p>
+          <h3 className="mt-2 text-xl font-bold">{adaptation.title}</h3>
+          <p className="mt-1 text-sm leading-6 text-[#355f52]">{adaptation.reason}</p>
+          {adaptation.changes.length > 0 && <ul className="mt-3 space-y-1 text-sm font-medium">{adaptation.changes.map((change) => <li key={change}>✓ {change}</li>)}</ul>}
         </section>
       )}
 
-      <section className="relative overflow-hidden rounded-3xl border border-laiton-400/25 bg-gradient-to-br from-white/[0.07] via-white/[0.025] to-laiton-400/[0.08] p-5 shadow-[0_32px_100px_-50px_rgba(201,162,98,.55)] sm:p-7">
+      {checkinDone && <section className="relative overflow-hidden rounded-3xl border border-laiton-400/25 bg-gradient-to-br from-white/[0.07] via-white/[0.025] to-laiton-400/[0.08] p-5 shadow-[0_32px_100px_-50px_rgba(201,162,98,.55)] sm:p-7">
         <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-laiton-400/10 blur-3xl" />
         <div className="relative">
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-laiton-400">Séance du jour</p>
@@ -287,7 +295,6 @@ export function DailyExperience({
           {checkinDone && !daily?.completedAt && !pain && !started && <Button onClick={() => { setStarted(true); setActiveExercise(0); }} className="mt-6 w-full">Commencer ma séance</Button>}
           {checkinDone && !daily?.completedAt && !pain && started && <Button onClick={completeWorkout} disabled={loading} className="mt-6 w-full">{loading ? "Enregistrement…" : "Terminer ma séance"}</Button>}
           {checkinDone && pain && <p className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm leading-6 text-amber-100">Ne t’entraîne pas à travers une douleur. Si elle persiste, s’intensifie ou t’inquiète, demande l’avis d’un professionnel de santé.</p>}
-          {!checkinDone && <p className="mt-6 text-sm text-graphite-400">Complète le check-in pour afficher le détail et confirmer l’adaptation.</p>}
           {checkinDone && (
             <DailyCoach context={{
               source: "DAILY_WORKOUT",
@@ -308,7 +315,7 @@ export function DailyExperience({
             }} />
           )}
         </div>
-      </section>
+      </section>}
 
       {feedbackOpen && (
         <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5 sm:p-6">

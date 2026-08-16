@@ -14,6 +14,8 @@ const bodySchema = z.object({
   poidsKg: z.number().positive().optional(),
   douleurs: z.boolean().optional(),
   seancesRealisees: z.number().int().min(0).max(14).optional(),
+  repasMaison: z.number().int().min(0).max(21).optional(),
+  repasRestaurant: z.number().int().min(0).max(21).optional(),
   commentaire: z.string().max(1000).optional(),
 });
 
@@ -68,10 +70,17 @@ export async function POST(request: Request) {
 
   const semaineDebut = lundiDeSemaine(new Date());
 
+  const contexteRepas = [
+    parsed.data.repasMaison != null ? `Repas maison : ${parsed.data.repasMaison}` : null,
+    parsed.data.repasRestaurant != null ? `Repas restaurant/extérieur : ${parsed.data.repasRestaurant}` : null,
+  ].filter(Boolean).join(" · ");
+  const commentaire = [contexteRepas, parsed.data.commentaire].filter(Boolean).join(" — ") || undefined;
+  const { repasMaison: _repasMaison, repasRestaurant: _repasRestaurant, ...checkinData } = parsed.data;
+
   const checkin = await prisma.weeklyCheckin.upsert({
     where: { userId_semaineDebut: { userId: user.id, semaineDebut } },
-    create: { userId: user.id, semaineDebut, ...parsed.data },
-    update: parsed.data,
+    create: { userId: user.id, semaineDebut, ...checkinData, commentaire },
+    update: { ...checkinData, commentaire },
   });
 
   trackServerEvent("weekly_checkin_completed", user.id);

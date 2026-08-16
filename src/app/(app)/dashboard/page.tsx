@@ -13,6 +13,7 @@ import { OneShotProgrammeButton } from "@/components/programme/one-shot-programm
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
 import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
+import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 
 function today() {
   const now = new Date();
@@ -49,7 +50,7 @@ export default async function DashboardPage() {
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-          <span>Ton espace personnel</span>
+          <span>Personal training, reimagined</span>
           <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
           <span>Aujourd&apos;hui</span>
         </div>
@@ -119,6 +120,24 @@ export default async function DashboardPage() {
           <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
         </section>
       )}
+
+      {programme && <WeeklyCheckinCard />}
+
+      <section className="rounded-3xl border border-[#c9d7d4] bg-[linear-gradient(135deg,#f8f4eb,#edf5f4)] p-6 text-[#1c211f] shadow-[0_24px_70px_-50px_rgba(25,52,46,.5)] sm:p-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#28715c]">Diagnostic enrichi · Optionnel</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight">COAI peut encore mieux te connaître.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#58635f]">Envoie une capture de ton bracelet connecté ou une photo en tenue de sport. L’IA enrichit ton profil pour affiner les prochaines adaptations.</p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-[#355f52]">
+              <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Sommeil, pas, fréquence cardiaque</span>
+              <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Morphologie et posture</span>
+              <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Photo non conservée</span>
+            </div>
+          </div>
+          <Link href="/compte/profil#diagnostic-high-tech" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-[#202622] px-6 text-sm font-bold text-white transition hover:bg-[#354039]">Affiner mon diagnostic →</Link>
+        </div>
+      </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <CoaiInsightCard insight={insight} />

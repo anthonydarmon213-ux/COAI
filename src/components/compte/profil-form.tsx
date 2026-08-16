@@ -496,7 +496,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
   }
 
   return (
-    <Card>
+    <Card id="diagnostic-high-tech" className="scroll-mt-6">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <SectionLabel>Bracelet connecté</SectionLabel>

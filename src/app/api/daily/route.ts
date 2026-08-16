@@ -39,6 +39,7 @@ const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("checkin"),
     sleep: z.enum(["TRES_MAUVAIS", "MAUVAIS", "CORRECT", "BON", "EXCELLENT"]),
     energy: z.enum(["TRES_BASSE", "BASSE", "NORMALE", "HAUTE", "TRES_HAUTE"]),
+    food: z.enum(["PAS_ENCORE", "LEGER", "EQUILIBRE", "LOURD"]),
     pain: z.boolean(),
     painArea: z.string().trim().max(100).optional(),
     availableMinutes: z.union([z.literal(15), z.literal(25), z.literal(40), z.literal(60), z.literal(75)]),

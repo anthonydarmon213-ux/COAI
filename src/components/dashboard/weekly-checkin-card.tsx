@@ -39,10 +39,11 @@ export function WeeklyCheckinCard() {
 
   return (
     <>
-      <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <Card className="flex flex-col gap-3 border-[#d9c9ac] bg-[#fffdf8] text-[#171713] sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-white">Ton check-in de la semaine</h2>
-          <p className="mt-1 text-sm text-graphite-400">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9a6d2f]">Bilan hebdomadaire</p>
+          <h2 className="mt-1 text-lg font-bold">Ta semaine en 60 secondes.</h2>
+          <p className="mt-1 text-sm text-[#666159]">
             Moins d&apos;une minute — ça aide COAI à ajuster ton programme.
           </p>
         </div>
@@ -64,6 +65,8 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
   const [poidsKg, setPoidsKg] = useState("");
   const [douleurs, setDouleurs] = useState<boolean | null>(null);
   const [seancesRealisees, setSeancesRealisees] = useState("");
+  const [repasMaison, setRepasMaison] = useState("");
+  const [repasRestaurant, setRepasRestaurant] = useState("");
   const [commentaire, setCommentaire] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,6 +87,8 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
           poidsKg: poidsKg ? Number(poidsKg) : undefined,
           douleurs: douleurs ?? undefined,
           seancesRealisees: seancesRealisees ? Number(seancesRealisees) : undefined,
+          repasMaison: repasMaison ? Number(repasMaison) : undefined,
+          repasRestaurant: repasRestaurant ? Number(repasRestaurant) : undefined,
           commentaire: commentaire || undefined,
         }),
       });
@@ -98,16 +103,16 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-6">
-      <div className="flex max-h-[90vh] w-full flex-col gap-5 overflow-y-auto rounded-t-3xl border border-white/[0.08] bg-[#0f1113] p-6 sm:max-w-md sm:rounded-3xl sm:p-8">
+      <div className="flex max-h-[90vh] w-full flex-col gap-5 overflow-y-auto rounded-t-3xl border border-[#d9c9ac] bg-[#fffdf8] p-6 text-[#171713] shadow-2xl sm:max-w-md sm:rounded-3xl sm:p-8">
         <div className="flex items-start justify-between">
           <div>
             <SectionLabel>Bilan de la semaine</SectionLabel>
-            <h2 className="mt-1 text-xl font-semibold text-white">Ton check-in de la semaine</h2>
+            <h2 className="mt-1 text-xl font-bold">Ton check-in de la semaine</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-2xl leading-none text-graphite-500 transition hover:text-white"
+            className="text-2xl leading-none text-[#756f66] transition hover:text-black"
             aria-label="Fermer"
           >
             ×
@@ -194,6 +199,15 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
             onChange={(e) => setSeancesRealisees(e.target.value)}
           />
         </Field>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Repas à la maison">
+            <Input type="number" min="0" max="21" placeholder="ex : 10" value={repasMaison} onChange={(e) => setRepasMaison(e.target.value)} />
+          </Field>
+          <Field label="Repas au restaurant / dehors">
+            <Input type="number" min="0" max="21" placeholder="ex : 3" value={repasRestaurant} onChange={(e) => setRepasRestaurant(e.target.value)} />
+          </Field>
+        </div>
 
         <Field label="Comment s'est passée ta semaine ? (facultatif)">
           <Input
