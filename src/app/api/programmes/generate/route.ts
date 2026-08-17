@@ -36,12 +36,12 @@ export async function POST() {
   }
 
   // Génération bloquée tant que rien n'est débloqué (13/08/2026, nouveau
-  // modèle d'accès libre) : soit un achat Impulsion unique (19€), soit un
-  // abonnement Transformation actif (49€/mois, qui inclut la génération).
+  // modèle d'abonnement) : la génération est disponible avec une formule
+  // Impulsion, Transformation ou VIP active.
   // L'inscription elle-même est gratuite et ne suffit plus.
   if (!hasProgrammeAccess(user, user.subscription)) {
     return NextResponse.json(
-      { error: "Débloque la génération de ton programme (Impulsion, 19€) ou passe à Transformation pour générer ton programme." },
+      { error: "Choisis ton accompagnement Impulsion, Transformation ou VIP pour générer et faire évoluer ton programme." },
       { status: 403 }
     );
   }
@@ -63,7 +63,7 @@ export async function POST() {
     );
   }
 
-  // Palier Gratuit (19€) : programme 100% IA, jamais envoyé en relecture au
+  // Palier Impulsion : programme 100% IA, jamais envoyé en relecture au
   // coach (statut GENERE_IA, visible immédiatement). Standard/Premium :
   // comportement inchangé, en attente de validation humaine.
   // Garde-fou grossesse/post-partum (14/08/2026, demande Anthony) : jamais

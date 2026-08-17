@@ -9,7 +9,7 @@ import { z } from "zod";
 import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
 
 // Le Q&A "coach IA" est limité (fenêtre glissante de 30 jours) uniquement
-// sur Impulsion (GRATUIT, 19€) — Transformation (STANDARD, 49€) et l'ancien
+// sur Impulsion (GRATUIT, 49€) — Transformation (STANDARD, 89€) et
 // palier PREMIUM (199€) ont un accès illimité (11/08/2026 : avant ce
 // changement, Transformation partageait le même quota qu'Impulsion, sans
 // palier payant pour le lever puisque PREMIUM n'est plus vendu — corrigé

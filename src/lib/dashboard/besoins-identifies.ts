@@ -15,9 +15,9 @@ export type BesoinIdentifie = {
 };
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
-  IMPULSION: { label: "Impulsion — 19€, paiement unique", href: "/pricing" },
-  TRANSFORMATION: { label: "Transformation — 49€/mois", href: "/pricing" },
-  VIP: { label: "VIP — coaching 1-to-1", href: "/pricing#vip" },
+  IMPULSION: { label: "Impulsion — 49€/mois", href: "/pricing#impulsion" },
+  TRANSFORMATION: { label: "Transformation — 89€/mois", href: "/pricing#transformation" },
+  VIP: { label: "VIP — dès 199€/mois", href: "/pricing#vip" },
 };
 
 function contient(valeur: string | null | undefined, motif: string): boolean {

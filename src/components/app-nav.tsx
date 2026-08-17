@@ -59,7 +59,7 @@ export function AppNav() {
             <CoaiMark size={26} />
             <span className="font-display text-xl font-extrabold tracking-[0.16em] text-graphite-50">COAI</span>
           </div>
-          <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300">Coaching humain augmenté par l&apos;IA</span>
+          <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300">Ton Personal Trainer, toujours avec toi</span>
         </Link>
         <SignOutButton variant="icon" />
       </div>

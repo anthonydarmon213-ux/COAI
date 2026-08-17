@@ -1227,27 +1227,27 @@ export function DiagnosticQuiz({
           {step === "coach" && (
             <div className="flex flex-col gap-4">
               <div>
-                <h2 className="font-display text-xl font-semibold text-white">Comment veux-tu être accompagné ?</h2>
+                <h2 className="font-display text-xl font-semibold text-white">Quel niveau d&apos;attention veux-tu recevoir ?</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">
-                  Ce choix sert uniquement à te recommander la bonne formule. Il ne t&apos;engage à rien.
+                  Comme en personal training, nous adaptons aussi l&apos;encadrement à ton autonomie et à ton objectif.
                 </p>
               </div>
               <div className="flex flex-col gap-2">
                 <OptionCard
-                  label="100 % IA — avancer en autonomie"
-                  hint="Programme personnalisé immédiat et Coach IA disponible 24h/24."
+                  label="Impulsion — mon Personal Trainer IA toujours avec moi"
+                  hint="Pour suivre un plan précis à ton rythme, avec une réponse disponible 24h/24 et 7j/7."
                   active={coachPreference === "FULL_IA"}
                   onClick={() => chooseSingle(setCoachPreference, "FULL_IA")}
                 />
                 <OptionCard
-                  label="Hybride — IA + coach humain"
-                  hint="La rapidité de l'IA avec la validation et les ajustements d'un coach diplômé."
+                  label="Transformation — la disponibilité de l'IA, l'œil du coach"
+                  hint="Pour être autonome au quotidien tout en bénéficiant d'une validation et d'ajustements humains."
                   active={coachPreference === "HYBRIDE"}
                   onClick={() => chooseSingle(setCoachPreference, "HYBRIDE")}
                 />
                 <OptionCard
-                  label="VIP — coaching privé en présentiel"
-                  hint="Un accompagnement très personnalisé avec Anthony, principalement en face-à-face à Paris."
+                  label="VIP — une attention maximale"
+                  hint="Pour un objectif précis ou complexe : accompagnement ultra limité avec Anthony, à Paris centre ou à distance."
                   active={coachPreference === "VIP_PRESENTIEL"}
                   onClick={() => chooseSingle(setCoachPreference, "VIP_PRESENTIEL")}
                 />
@@ -1463,7 +1463,7 @@ export function DiagnosticQuiz({
                 </div>
                 <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
-                  Transformation, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
+                  Transformation ou VIP, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
                   valide ton programme et te suit dans la durée, pendant que ton{" "}
                   <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
                   séances.

@@ -212,9 +212,9 @@ export function DailyExperience({
           <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-[#c9a96b]/25" />
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9a6d2f]">Embarquement · Aujourd’hui</p>
-              <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Ta séance s’adapte à ta journée.</h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-[#666159]">Comme avec ton coach en face à face : un check-up rapide, puis une séance ajustée à ton objectif et à ton état réel.</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9a6d2f]">Ton coach est prêt · Check-in du jour</p>
+              <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Comment te sens-tu aujourd’hui ?</h2>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-[#666159]">45 secondes suffisent. Comme en personal training, ta réponse détermine la durée, l’intensité et les précautions de ta séance.</p>
             </div>
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c9a96b]/45 bg-white/75 text-xl text-[#9a6d2f]">◎</span>
           </div>
@@ -226,7 +226,7 @@ export function DailyExperience({
             <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">05</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
           </div>
           {error && <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>}
-          <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-[#20211e] py-6 text-base font-bold text-white hover:bg-[#343630] sm:w-auto sm:px-8">{loading ? "COAI adapte ta séance…" : "Adapter ma séance →"}</Button>
+          <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-[#20211e] py-6 text-base font-bold text-white hover:bg-[#343630] sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>
         </section>
       )}
 

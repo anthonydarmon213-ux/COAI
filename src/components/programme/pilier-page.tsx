@@ -15,7 +15,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
-import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -121,9 +120,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               </span>
             </li>
           </ul>
-          <OneShotProgrammeButton className="max-w-xs" />
-          <Link href="/pricing" className="inline-flex w-fit items-center rounded-xl border border-graphite-700/20 bg-white/70 px-5 py-3 text-sm font-extrabold text-graphite-950 shadow-sm transition hover:border-laiton-500/50 hover:bg-white">
-            Comparer les accompagnements →
+          <Link href="/pricing" className="inline-flex w-fit items-center rounded-xl bg-laiton-400 px-6 py-3 text-sm font-extrabold text-graphite-950 shadow-sm transition hover:bg-laiton-300">
+            Choisir mon accompagnement →
           </Link>
         </Card>
       )}
@@ -196,9 +194,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
 
               {genereIA && (
                 <p className="text-sm text-graphite-400">
-                  Programme généré à 100% par IA, sans relecture humaine. Passe à l&apos;offre
-                  Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et
-                  l&apos;ajuste.
+                  Ton programme est piloté par ton Personal Trainer IA. Passe à Transformation (89€/mois)
+                  pour ajouter le regard et les ajustements d&apos;un coach humain.
                 </p>
               )}
 

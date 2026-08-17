@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
-import { clearIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
+import { clearIntendedPlanCookie, readIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
 import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
@@ -49,6 +49,7 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
         }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
+      const intendedPlan = readIntendedPlanCookie();
       clearParrainageCookie();
       clearIntendedPlanCookie();
       clearUtmCookie();
@@ -57,7 +58,9 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       trackMetaEvent("CompleteRegistration");
       trackFunnelEvent("signup_completed", {});
 
-      window.location.href = "/bienvenue";
+      window.location.href = intendedPlan
+        ? `/pricing#${intendedPlan === "GRATUIT" ? "autonome" : intendedPlan === "STANDARD" ? "hybride" : "vip"}`
+        : "/bienvenue";
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");

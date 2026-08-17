@@ -14,8 +14,7 @@ import { ChurnFeedbackForm } from "@/components/compte/churn-feedback-form";
 import { TIER_BY_SERVICE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { ScrollToHash } from "@/components/compte/scroll-to-hash";
 
-const PRIX_MENSUELS = { GRATUIT: 19, STANDARD: 49, PREMIUM: 199 } as const;
-const PRIX_ANNUELS = { GRATUIT: 190, STANDARD: 490, PREMIUM: 2388 } as const;
+const PRIX_MENSUELS = { GRATUIT: 49, STANDARD: 89, PREMIUM: 199 } as const;
 
 const STATUT_LABELS: Record<string, string> = {
   ACTIVE: "Actif",
@@ -167,7 +166,7 @@ export default async function AbonnementPage() {
               month: "long",
               year: "numeric",
             })}{" "}
-            — passage automatique à {user.subscription?.billingInterval === "ANNUAL" ? `${PRIX_ANNUELS[plan]}€/an` : `${PRIX_MENSUELS[plan]}€/mois`} sauf résiliation avant cette date.
+            — passage automatique à {PRIX_MENSUELS[plan]}€/mois sauf résiliation avant cette date.
           </p>
         )}
         {statut && !finProgrammee && statut !== "PAST_DUE" ? (
@@ -179,7 +178,7 @@ export default async function AbonnementPage() {
           </div>
         ) : !statut ? (
           <a href="/pricing" className="text-laiton-400 underline">
-            Voir les offres — à partir de 19€
+            Voir les offres — à partir de 49€/mois
           </a>
         ) : null}
       </Card>
@@ -217,8 +216,8 @@ export default async function AbonnementPage() {
               );
             })}
             <p className="text-xs leading-5 text-graphite-400">
-              Réservation directe avec Anthony. Valable 3 mois. Report gratuit jusqu&apos;à 24 h
-              avant la séance ; passé ce délai, la séance est due.
+              Abonnement mensuel résiliable à tout moment. Les créneaux sont confirmés directement
+              avec Anthony ; report gratuit jusqu&apos;à 24 h avant la séance.
             </p>
           </div>
         )}

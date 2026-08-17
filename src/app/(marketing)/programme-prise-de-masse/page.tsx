@@ -56,7 +56,7 @@ const FAQ_ITEMS = [
   {
     question: "Est-ce payant dès le départ ?",
     reponse:
-      "Non — l'inscription est gratuite, sans carte bancaire. Tu débloques ensuite Impulsion (19€, paiement unique) ou Transformation (49€/mois, 7 jours d'essai, avec relecture par un coach diplômé d'État) quand tu es prêt.",
+      "Non — le diagnostic est offert. Tu choisis ensuite Impulsion (49€/mois, 7 jours d'essai) ou Transformation (89€/mois, 7 jours d'essai, avec le regard d'un coach humain).",
   },
 ];
 

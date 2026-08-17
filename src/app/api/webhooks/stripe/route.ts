@@ -7,9 +7,9 @@ import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  GRATUIT: "Impulsion",
-  STANDARD: "Transformation",
-  PREMIUM: "Ancien Premium",
+  GRATUIT: "Impulsion — 49€/mois",
+  STANDARD: "Transformation — 89€/mois",
+  PREMIUM: "VIP — à partir de 199€/mois",
 };
 
 function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
@@ -30,6 +30,10 @@ function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus
 // Déduit le palier (STANDARD/PREMIUM) à partir du price Stripe de la ligne
 // d'abonnement, en comparant aux ids configurés en env.
 function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
+  const metadataPlan = subscription.metadata?.plan;
+  if (metadataPlan === "GRATUIT" || metadataPlan === "STANDARD" || metadataPlan === "PREMIUM") {
+    return metadataPlan;
+  }
   const priceId = subscription.items.data[0]?.price.id;
   if (priceId && priceId === process.env.STRIPE_PRICE_ID_PREMIUM) return "PREMIUM";
   if (
@@ -198,11 +202,13 @@ export async function POST(request: Request) {
         // Benzaken le 09/08, cf. demande du 10/08 de ne plus reproduire ça).
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (user) {
-          const plan = PLAN_LABELS[mapStripePlan(subscription)];
+          const planCode = mapStripePlan(subscription);
+          const plan = PLAN_LABELS[planCode];
           const enEssai = Boolean(subscription.trial_end);
+          const sessions = planCode === "PREMIUM" ? subscription.items.data[0]?.quantity ?? 1 : null;
           await sendAdminNotification(
             "Nouvelle inscription COAI",
-            `${user.prenom ? user.prenom : "Un nouvel abonné"} (${user.email}) vient de s'inscrire — palier ${plan}${enEssai ? ", en essai 7 jours" : ""}.`
+            `${user.prenom ? user.prenom : "Un nouvel abonné"} (${user.email}) vient de s'inscrire — palier ${plan}${sessions ? `, ${sessions} séance${sessions > 1 ? "s" : ""} privée${sessions > 1 ? "s" : ""}/mois` : ""}${enEssai ? ", en essai 7 jours" : ""}.`
           );
         }
       }

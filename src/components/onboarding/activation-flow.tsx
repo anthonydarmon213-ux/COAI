@@ -9,8 +9,6 @@ import { readDiagnosticProgress } from "@/lib/diagnostic/progress-storage";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { computeProfilCompletion, type CompletionProfil } from "@/lib/profil/completion";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
-import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
-import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 
 // Rendu sur /bienvenue, juste après l'activation Stripe (essai ou paiement
 // immédiat).
@@ -172,27 +170,12 @@ export function ActivationFlow({
     return (
       <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
         <SectionLabel>Ton profil est prêt</SectionLabel>
-        <p className="max-w-sm text-sm leading-6 text-graphite-300">
-          Génère ton programme personnalisé — entraînement, nutrition, récupération — pour 19€, en
-          un seul paiement. Ou passe à Transformation (49€/mois) pour un suivi continu avec un
-          coach diplômé d&apos;État.
+        <p className="max-w-md text-sm leading-6 text-graphite-300">
+          Choisis le niveau d&apos;attention qui te correspond : Personal Trainer autonome à 49€,
+          accompagnement hybride à 89€, ou coaching privé dès 199€ par mois.
         </p>
-        <div className="w-full max-w-xs">
-          <OffreConsentGate
-            resumeConditions={
-              <>
-                Je reconnais avoir pris connaissance des conditions de l&apos;offre Impulsion :
-                paiement unique de 19€, programme généré immédiatement. Je demande le début
-                immédiat du service et reconnais renoncer à mon droit de rétractation de 14 jours
-                pour la partie du service déjà utilisée.
-              </>
-            }
-          >
-            <OneShotProgrammeButton />
-          </OffreConsentGate>
-        </div>
-        <Link href="/pricing" className="text-xs text-graphite-500 underline hover:text-laiton-400">
-          Voir toutes les formules
+        <Link href="/pricing">
+          <Button className="px-8 py-3">Choisir mon accompagnement</Button>
         </Link>
       </div>
     );

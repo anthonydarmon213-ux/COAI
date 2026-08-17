@@ -12,9 +12,9 @@ import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/compon
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 
-const TITLE = "COAI — Ton programme évolue avec toi";
+const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
 const DESCRIPTION =
-  "Ton entraînement, ta nutrition et ta récupération personnalisés par IA et adaptés à ton quotidien. En Transformation, un coach diplômé valide ton programme.";
+  "Personal Training, Reimagined. Une expérience de coaching personnalisée, disponible 24h/24, avec la rapidité de l’IA et la précision d’un coach humain.";
 
 // 11/08/2026 : sans ce bloc openGraph/twitter dédié, chaque page publique
 // affichait le titre/description génériques du layout racine ("COAI — HI ×
@@ -37,7 +37,7 @@ const FAQ = [
   {
     question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
     reponse:
-      "Les deux : l'IA génère ton programme à partir de ton profil selon les règles de coaching d'Anthony Darmon. En Transformation, chaque programme est en plus relu et validé par un coach diplômé d'État avant de t'arriver — tu ne reçois jamais de contenu IA brut à ce palier.",
+      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Transformation et en VIP, l'humain apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
   },
   {
     question: "C'est adapté si je suis débutant ?",
@@ -47,16 +47,16 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Non — l'inscription est gratuite, sans carte bancaire, et te donne accès à toute l'interface. Tu débloques ensuite Impulsion (19€, paiement unique, programme généré par IA sans relecture) ou Transformation (49€/mois, 7 jours d'essai, un coach diplômé d'État relit et valide) quand tu es prêt.",
+      "Le diagnostic est offert. Ensuite, Impulsion coûte 49€/mois, Transformation 89€/mois et VIP démarre à 199€/mois. Les deux premières formules incluent 7 jours d'essai.",
   },
   {
     question: "Je peux résilier quand je veux ?",
-    reponse: "Impulsion est un paiement unique, sans abonnement. Transformation est sans engagement — tu résilies à tout moment depuis ton compte.",
+    reponse: "Oui. Les trois formules sont des abonnements mensuels sans engagement, résiliables à tout moment depuis ton compte.",
   },
   {
     question: "Et si mon programme ne me convient pas ?",
     reponse:
-      "Il évolue avec tes retours (charge, disponibilité, gêne...) — en Transformation, ton coach ajuste directement ; en Impulsion, tu régénères depuis ton profil mis à jour. Et si ça ne te convient toujours pas, tu résilies à tout moment depuis ton compte, sans justification.",
+      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Transformation et en VIP, l'humain peut aussi intervenir pour affiner les décisions importantes.",
   },
   {
     question: "Mes données sont-elles en sécurité ?",
@@ -73,9 +73,9 @@ const FONCTIONNALITES_HERO = [
 ];
 
 const COMMENT_CA_MARCHE = [
-  ["1", "Tu renseignes ton profil", "Objectifs, niveau, contraintes et rythme de vie."],
-  ["2", "L'algorithme COAI personnalise ton programme", "Construit à partir de plus de 17 ans d'expérience terrain d'Anthony Darmon — entraînement, nutrition et récupération adaptés à toi, puis réajustés semaine après semaine."],
-  ["3", "Ton coach vérifie, valide et démarre le suivi", "Un programme fiable, clair, prêt à suivre — et, selon ta formule, un coach qui te motive jusqu'à l'atteinte de ton objectif."],
+  ["1", "Ton coach apprend à te connaître", "Objectifs, niveau, antécédents, douleurs, habitudes et attention souhaitée."],
+  ["2", "Tu fais ton check-in du jour", "Temps disponible, sommeil, forme, alimentation et éventuelles gênes — en moins d'une minute."],
+  ["3", "Tu suis la séance adaptée", "Échauffement, exercices, retour au calme et suivi : chaque retour améliore la prochaine séance."],
 ];
 
 const PILIERS = [
@@ -83,7 +83,7 @@ const PILIERS = [
     numero: "01",
     titre: "Un programme vraiment personnel",
     description:
-      "Entraînement, nutrition et récupération (sauna, massage, mobilité, méditation, sommeil...) construits par l'algorithme COAI, fondé sur plus de 17 ans d'expérience terrain d'Anthony Darmon, autour de ton niveau, tes objectifs et tes contraintes.",
+      "Entraînement, nutrition et récupération (sauna, massage, mobilité, méditation, sommeil...) construits à partir de milliers de données analysées et de plus de 17 ans d'expérience terrain d'Anthony Darmon, autour de ton niveau, tes objectifs et tes contraintes.",
   },
   {
     numero: "02",
@@ -270,10 +270,9 @@ export default function LandingPage() {
             jamais avoir le dernier mot sur un corps.
           </p>
           <p className="mt-7">
-            COAI est né de cette tension. Un programme aussi précis qu&apos;une consultation
-            privée, généré en quelques secondes par l&apos;IA. Sur Transformation, jamais livré
-            sans qu&apos;Anthony, ou un coach qu&apos;il a formé, ne l&apos;ait relu, corrigé,
-            validé ; sur Impulsion, généré par l&apos;IA seule, sans relecture.
+            COAI est né de cette tension : le Personal Training réimaginé. L&apos;IA apporte la
+            rapidité et une présence 24h/24 ; l&apos;humain apporte le regard, la subtilité et les
+            ajustements décisifs. Tu choisis une expérience Impulsion, Transformation ou VIP.
           </p>
         </div>
       </section>
@@ -409,13 +408,11 @@ export default function LandingPage() {
           Commence à ton rythme.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Inscription gratuite, sans carte bancaire — découvre ton espace et ton suivi. Débloque
-          ensuite Impulsion (19€, paiement unique) pour ton programme généré par IA, ou
-          Transformation (49€/mois) pour qu&apos;un coach diplômé d&apos;État le relise et le
-          valide.
+          Impulsion à 49€/mois, Transformation à 89€/mois ou VIP dès 199€/mois. Trois niveaux
+          d&apos;attention, un même objectif : te guider simplement jusqu&apos;au résultat.
         </p>
-        <Link href="/sign-up">
-          <Button>Commencer gratuitement</Button>
+        <Link href="/pricing">
+          <Button>Comparer les accompagnements</Button>
         </Link>
       </section>
       </Reveal>
@@ -445,12 +442,12 @@ export default function LandingPage() {
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Ton prochain chapitre</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Un coaching conçu pour ta vraie vie.</h2>
         <p className="max-w-2xl text-graphite-200">
-          Inscription gratuite. Débloque ensuite ton programme généré par IA (19€, paiement
-          unique) — ou avec relecture et validation par un coach diplômé d&apos;État (49€/mois).
+          Ton Personal Trainer, toujours avec toi. Commence avec Impulsion, ajoute le regard humain
+          avec Transformation, ou choisis l&apos;attention maximale du VIP.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/diagnostic"><Button>Faire mon diagnostic offert</Button></Link>
-          <Link href="/sign-up"><Button variant="secondary">Commencer gratuitement</Button></Link>
+          <Link href="/pricing"><Button variant="secondary">Voir les formules</Button></Link>
         </div>
       </section>
       </Reveal>

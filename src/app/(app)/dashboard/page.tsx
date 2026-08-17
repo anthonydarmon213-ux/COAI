@@ -9,7 +9,6 @@ import { GenererProgrammeOnboarding } from "@/components/compte/generer-programm
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { hasProgrammeAccess } from "@/lib/subscription/plan";
-import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
 import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
@@ -58,13 +57,19 @@ export default async function DashboardPage() {
           <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
             {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-graphite-300">{objective}</p>
+          <p className="mt-3 text-xl font-bold text-graphite-50">Ton Personal Trainer, toujours avec toi.</p>
+          <p className="mt-2 max-w-2xl text-base leading-7 text-graphite-300">{objective}</p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="coai-dashboard-status">Profil analysé</span>
           <span className="coai-dashboard-status">Programme adaptatif</span>
           <span className="coai-dashboard-status">Suivi centralisé</span>
         </div>
+        {programme && sourceSession && !daily?.sleep && (
+          <a href="#check-in-du-jour" className="inline-flex min-h-14 w-full items-center justify-center rounded-full bg-[#20211e] px-7 py-3.5 text-base font-bold text-white shadow-[0_20px_55px_-28px_rgba(32,33,30,.8)] transition hover:-translate-y-0.5 hover:bg-[#343630] sm:w-fit">
+            Faire mon check-in · 45 sec →
+          </a>
+        )}
       </header>
 
       <BesoinsIdentifiesCard besoins={besoins} />
@@ -80,18 +85,15 @@ export default async function DashboardPage() {
         !hasProgrammeAccess(user, user.subscription) ? (
           <section className="flex flex-col items-start gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme pas encore débloqué</p>
-              <h2 className="mt-2 text-2xl text-white">Ton profil est prêt — génère ton programme quand tu veux.</h2>
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Ton Personal Trainer est prêt</p>
+              <h2 className="mt-2 text-2xl text-white">Choisis maintenant ton niveau d&apos;accompagnement.</h2>
               <p className="mt-2 max-w-lg text-sm leading-6 text-graphite-300">
                 Découvre d&apos;abord ce que COAI a compris de ton profil. Lorsque tu seras prêt, tu
-                pourras générer ton programme complet ou choisir un suivi continu avec un coach
-                diplômé d&apos;État.
+                pourras choisir une expérience autonome, hybride ou VIP, toutes conçues pour
+                évoluer avec ton emploi du temps, ta forme et tes objectifs.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link href="/pricing" className="coai-rainbow-cta inline-flex rounded-xl px-6 py-3 text-sm font-extrabold text-white">Commencer Transformation · 49€/mois →</Link>
-              <OneShotProgrammeButton label="Programme seul · 19€" />
-            </div>
+            <Link href="/pricing" className="coai-rainbow-cta inline-flex rounded-xl px-6 py-3 text-sm font-extrabold text-white">Choisir mon accompagnement →</Link>
           </section>
         ) : (
           <section className="flex flex-col gap-4">
@@ -104,13 +106,15 @@ export default async function DashboardPage() {
           </section>
         )
       ) : sourceSession ? (
-        <DailyExperience
-          sourceSession={sourceSession as WorkoutSession}
-          initialDaily={daily}
-          expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
-          pendingCoach={pendingCoach}
-          programmeVersion={programme.version}
-        />
+        <div id="check-in-du-jour" className="scroll-mt-6">
+          <DailyExperience
+            sourceSession={sourceSession as WorkoutSession}
+            initialDaily={daily}
+            expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
+            pendingCoach={pendingCoach}
+            programmeVersion={programme.version}
+          />
+        </div>
       ) : (
         <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#28715c]">Journée de récupération</p>

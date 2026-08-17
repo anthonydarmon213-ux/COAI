@@ -325,7 +325,7 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
     : {
         plan: "GRATUIT" as const,
         label: "Impulsion",
-        raison: "Ton profil n'a pas de signal particulier — de quoi démarrer efficacement, sans surpayer.",
+        raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
       };
 
   const profil = calculerProfilStructure(r, sante);

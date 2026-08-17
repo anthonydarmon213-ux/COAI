@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Inscription gratuite. 19€ en paiement unique pour un programme généré par IA sans relecture, ou 49€/mois (7 jours d'essai) pour un programme relu et validé par un coach diplômé d'État. Sans engagement dans les deux cas.",
+      "Impulsion coûte 49€/mois avec 7 jours d'essai et un Personal Trainer IA disponible 24h/24. Transformation coûte 89€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain. Les deux sont sans engagement.",
   },
   {
     question: "Je peux poser des questions à un coach entre deux programmes ?",

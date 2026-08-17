@@ -318,9 +318,10 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
       `Bonjour,\n\n` +
         `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
         `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
-        `Choisis ta formule : ${appUrl}/pricing?billing=annual\n\n` +
-        `Impulsion : 19 €, paiement unique.\n` +
-        `Transformation : 7 jours d'essai, puis 49 €/mois ou 490 €/an, avec validation par un coach diplômé d'État.\n\n` +
+        `Choisis ta formule : ${appUrl}/pricing\n\n` +
+        `Impulsion : 7 jours d'essai, puis 49 €/mois, avec ton Personal Trainer IA disponible 24h/24.\n` +
+        `Transformation : 7 jours d'essai, puis 89 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
+        `VIP : à partir de 199 €/mois, avec une séance privée mensuelle.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;
@@ -404,11 +405,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
   let relancesCheckout = 0;
   for (const user of candidats) {
     const plan = user.checkoutPlan === "STANDARD" ? "Transformation" : "Impulsion";
-    const annuel = user.checkoutBillingInterval === "ANNUAL";
-    const prix = user.checkoutPlan === "STANDARD"
-      ? annuel ? "490 €/an" : "49 €/mois"
-      : annuel ? "190 €/an" : "19 €/mois";
-    const billingQuery = annuel ? "annual" : "monthly";
+    const prix = user.checkoutPlan === "STANDARD" ? "89 €/mois" : "49 €/mois";
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const envoye = await sendEmail(
       user.email,
@@ -416,7 +413,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
       `Bonjour${nom},\n\n` +
         `Ton inscription à la formule ${plan} (${prix}) n'a pas été finalisée. ` +
         `Aucun paiement n'a été enregistré.\n\n` +
-        `Tu peux reprendre quand tu veux et profiter de tes 7 jours d'essai : ${appUrl}/pricing?billing=${billingQuery}\n\n` +
+        `Tu peux reprendre quand tu veux et profiter de tes 7 jours d'essai : ${appUrl}/pricing\n\n` +
         `Si tu as rencontré un problème, réponds simplement à cet email.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );

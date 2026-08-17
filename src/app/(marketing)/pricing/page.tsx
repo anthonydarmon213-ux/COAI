@@ -2,259 +2,94 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
-import { TrustBadges } from "@/components/marketing/trust-badges";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { OneShotProgrammeButton } from "@/components/programme/one-shot-programme-button";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
-import { TIERS, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
-import { ScrollToHash } from "@/components/compte/scroll-to-hash";
-
-const TITLE = "Tarifs — COAI";
-const DESCRIPTION =
-  "Découvre Transformation : le programme COAI qui évolue avec toi, avec 7 jours d'essai puis 49€/mois, sans engagement.";
+import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
 
 export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
+  title: "Tarifs — Personal Training réimaginé | COAI",
+  description: "Choisis le niveau d'attention dont tu as besoin : Impulsion, Transformation ou VIP.",
   alternates: { canonical: "/pricing" },
-  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: "/pricing" },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export default function PricingPage({
-  searchParams,
-}: {
-  searchParams?: { billing?: string; checkout?: string };
-}) {
-  const vipHref = buildWhatsAppLink(VIP_MESSAGE);
-  // Le mensuel rassure davantage au premier contact. L'annuel reste une
-  // option avantageuse, mais n'est plus imposé à l'arrivée sur la page.
-  const annual = searchParams?.billing === "annual";
-  const displayedTiers = ["Impulsion", "Transformation", "VIP"].flatMap((nom) => TIERS.filter((tier) => tier.nom === nom)).map((tier) => {
-    // Impulsion (paiement unique) ne dépend jamais du bascule mensuel/annuel.
-    if (!annual || tier.sessions || tier.oneShot) return tier;
-    if (tier.nom === "Transformation") {
-      return { ...tier, prix: "490€", suffixe: "/an", essai: "7 jours d'essai · puis 490€/an" };
-    }
-    return tier;
-  });
-
+export default function PricingPage({ searchParams }: { searchParams?: { checkout?: string } }) {
   return (
     <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-10 px-6 py-24">
       <TrackConversion name="pricing_viewed" />
-      <ScrollToHash />
-      <div className="w-full max-w-5xl pt-8">
-        <BackLink />
-      </div>
-      <div className="text-center">
-        <SectionLabel>Ta recommandation</SectionLabel>
-        <h1 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
-          Ton plan ne doit jamais rester figé.
+      <div className="w-full max-w-6xl pt-8"><BackLink /></div>
+      <div className="max-w-4xl text-center">
+        <SectionLabel>Personal Training, Reimagined</SectionLabel>
+        <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
+          Ton Personal Trainer, toujours avec toi.
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-graphite-400">
-          COAI construit ton programme, observe tes progrès et l&apos;adapte avec toi. Un coach
-          diplômé valide les décisions importantes.
+        <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
+          Même exigence, trois niveaux d&apos;attention. L&apos;IA apporte la disponibilité et la rapidité ;
+          l&apos;humain apporte le regard, la subtilité et les décisions importantes.
         </p>
-        <div className="mt-6 flex justify-center">
-          <TrustBadges />
-        </div>
-        <div className="mt-6 inline-flex rounded-full border border-white/10 bg-white/[0.03] p-1">
-          <Link href="/pricing?billing=monthly" className={`rounded-full px-4 py-2 text-sm ${!annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Mensuel</Link>
-          <Link href="/pricing?billing=annual" className={`rounded-full px-4 py-2 text-sm ${annual ? "bg-laiton-400 text-graphite-950" : "text-graphite-300"}`}>Annuel · 2 mois offerts</Link>
-        </div>
+        <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold text-laiton-300">
+          Des milliers de données analysées, enrichies par 17 ans d&apos;expertise terrain.
+        </p>
       </div>
 
       {searchParams?.checkout === "cancel" && (
-        <Card className="w-full max-w-4xl border-laiton-400/30 bg-laiton-400/[0.06] px-6 py-5 text-center">
-          <p className="font-semibold text-white">Ton inscription n&apos;a pas été finalisée.</p>
-          <p className="mt-1 text-sm text-graphite-300">Aucun paiement n&apos;a été enregistré. Tu peux reprendre ci-dessous quand tu veux.</p>
+        <Card className="w-full max-w-4xl border-laiton-400/30 px-6 py-5 text-center">
+          <p className="font-semibold text-white">Aucun abonnement n&apos;a été créé.</p>
+          <p className="mt-1 text-sm text-graphite-300">Tu peux reprendre quand tu veux.</p>
         </Card>
       )}
 
-      <div className="grid w-full max-w-7xl grid-cols-1 items-stretch gap-5 md:grid-cols-3">
-        {displayedTiers.map((tier) => (
-          <Card
-            id={tier.nom.toLowerCase()}
-            key={tier.nom}
-            className={`flex h-full flex-col gap-5 px-6 py-8 text-center ${
-              tier.mostPopular ? "border-laiton-400/40" : ""
-            }`}
-          >
-            {/* 1. Badge éventuel */}
-            <div className="flex min-h-5 items-center justify-center">
-              {tier.mostPopular && (
-                <span className="font-mono text-[10px] uppercase tracking-widest text-laiton-400">
-                  Le plus choisi
-                </span>
-              )}
-              {tier.limitedSpots && <Badge tone="warning">Places limitées</Badge>}
+      <div className="grid w-full max-w-7xl grid-cols-1 gap-5 lg:grid-cols-3">
+        {TIERS.map((tier) => (
+          <Card key={tier.nom} id={tier.nom.toLowerCase()} className={`flex flex-col gap-5 px-6 py-8 ${tier.mostPopular ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)] lg:-translate-y-3" : ""}`}>
+            <div className="flex min-h-6 items-center justify-between gap-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
+              {tier.mostPopular && <Badge tone="warning">Offre phare</Badge>}
             </div>
-
-            {/* 2. Nom */}
-            <h2 className="text-2xl font-semibold tracking-[-0.025em] text-white">{tier.nom}</h2>
-
-            {/* 3. Prix */}
-            {tier.sessions ? (
-              <p className="text-lg font-semibold text-white">{tier.prix}</p>
-            ) : (
-              <div>
-                <div className="flex items-baseline justify-center gap-1">
-                  <p className="text-5xl font-semibold tracking-[-0.045em] text-white">{tier.prix}</p>
-                  <span className="text-sm text-graphite-400">{tier.suffixe}</span>
-                </div>
-                {!tier.oneShot && annual && (
-                  <p className="mt-2 text-xs font-medium text-emerald-300">
-                    Économie de 98 € par an
-                  </p>
-                )}
-                {!tier.oneShot && !annual && (
-                  <Link href="/pricing?billing=annual" className="mt-2 block text-xs font-medium text-laiton-300 hover:text-laiton-200">
-                    ou 490€/an · 2 mois offerts
-                  </Link>
-                )}
+            <div>
+              <h2 className="text-3xl font-semibold text-white">{tier.nom}</h2>
+              <div className="mt-4 flex items-baseline gap-1">
+                <strong className="text-5xl tracking-[-0.05em] text-white">{tier.prix}</strong>
+                <span className="text-sm text-graphite-400">{tier.suffixe}</span>
               </div>
-            )}
-
-            {/* 4. Description */}
-            <p className="text-sm text-graphite-300">{tier.description}</p>
-
-            {tier.nom === "Transformation" && (
-              <div className="rounded-xl border border-laiton-400/30 bg-laiton-400/[0.08] px-4 py-3 text-left">
-                <p className="text-xs font-bold uppercase tracking-[0.08em] text-laiton-300">
-                  Tout Impulsion inclus, plus
-                </p>
-                <p className="mt-1 text-sm font-semibold leading-5 text-white">
-                  L&apos;adaptation continue et la présence d&apos;un coach diplômé.
-                </p>
-              </div>
-            )}
-
-            {/* 5. Liste des bénéfices */}
-            <ul className="flex w-full flex-col gap-2 text-left text-sm text-graphite-300">
-              {(tier.nom === "Transformation"
-                ? [
-                    "Ton programme complet, prêt immédiatement",
-                    "Des ajustements selon tes progrès chaque semaine",
-                    "Les décisions importantes validées par un coach diplômé",
-                    "Ton Coach IA disponible 24h/24",
-                  ]
-                : tier.features
-              ).map((feature) => (
-                <li key={feature} className="flex items-start gap-2">
-                  <span className="mt-0.5 text-laiton-400">✓</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
+              {tier.trial && <p className="mt-2 text-sm font-medium text-laiton-300">7 jours d&apos;essai</p>}
+            </div>
+            <p className="min-h-20 text-sm leading-6 text-graphite-300">{tier.description}</p>
+            <ul className="space-y-3 text-sm leading-6 text-graphite-200">
+              {tier.features.map((feature) => <li key={feature} className="flex gap-3"><span className="text-laiton-400">✓</span><span>{feature}</span></li>)}
             </ul>
 
             {tier.sessions && (
-              <div className="flex w-full flex-col gap-3 rounded-lg border border-graphite-800 bg-graphite-900/40 p-3 text-left text-sm">
-                {tier.sessions.map((session) => {
-                  const href = vipReservationHref(session.label, session.prix);
-                  return (
-                    <div key={session.label} className="flex flex-col gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-graphite-300">{session.label}</span>
-                        <span className="font-semibold text-white">{session.prix}</span>
-                      </div>
-                      {href && (
-                        <a href={href} target="_blank" rel="noopener noreferrer" className="w-full">
-                          <Button variant="secondary" size="compact" className="w-full">
-                            Réserver via WhatsApp
-                          </Button>
-                        </a>
-                      )}
-                    </div>
-                  );
-                })}
-                <p className="text-xs leading-5 text-graphite-400">
-                  Réservation directe avec Anthony. Valable 3 mois. Report gratuit jusqu&apos;à 24 h
-                  avant la séance ; passé ce délai, la séance est due.
-                </p>
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs uppercase tracking-widest text-laiton-300">Choisis ton rythme</p>
+                {tier.sessions.map((session) => (
+                  <OffreConsentGate key={session.count} resumeConditions={<>Abonnement VIP COAI de {session.prix}, résiliable à tout moment. Il inclut {session.label}. Les créneaux sont confirmés avec Anthony.</>}>
+                    <SubscribeButton plan="PREMIUM" vipSessions={session.count} label={`${session.label} — ${session.prix}`} className="w-full" />
+                  </OffreConsentGate>
+                ))}
               </div>
             )}
 
-            {/* 6. Espace flexible — pousse le CTA en bas, aligné entre
-                cartes voisines de longueurs de contenu différentes, sans
-                jamais imposer de hauteur fixe qui couperait le contenu. */}
             <div className="flex-1" />
+            {!tier.sessions && (
+              <OffreConsentGate resumeConditions={<>Abonnement COAI {tier.nom} à {tier.prix}/mois, résiliable à tout moment. {tier.trial ? "Les 7 premiers jours constituent une période d'essai ; la facturation mensuelle commence ensuite sauf résiliation." : "La facturation commence immédiatement."}</>}>
+                <SubscribeButton plan={tier.plan} label={tier.trial ? (tier.mostPopular ? "Essayer Impulsion pendant 7 jours" : "Commencer mes 7 jours d'essai") : `Choisir ${tier.nom}`} className="coai-rainbow-cta w-full border-0 text-[#111216]" />
+              </OffreConsentGate>
+            )}
 
-            {/* 7. CTA + 8. information essai */}
-            <div className="flex flex-col items-center gap-2">
-              {tier.sessions ? (
-                vipHref ? (
-                  <a href={vipHref} target="_blank" rel="noopener noreferrer" className="w-full">
-                    <Button variant="ghost" className="w-full">Une question ? Écrire sur WhatsApp</Button>
-                  </a>
-                ) : (
-                  <Button className="w-full" disabled>
-                    Contacte ton coach pour réserver
-                  </Button>
-                )
-              ) : tier.nom === "COAI Privé" ? (
-                <Link href="/vip" className="w-full">
-                  <Button className="w-full">Découvrir COAI Privé</Button>
-                </Link>
-              ) : tier.oneShot ? (
-                <OffreConsentGate
-                  resumeConditions={
-                    <>
-                      Je reconnais avoir pris connaissance des conditions de l&apos;offre
-                      Impulsion : paiement unique de 19€, programme généré immédiatement. Je
-                      demande le début immédiat du service et reconnais renoncer à mon droit de
-                      rétractation de 14 jours pour la partie du service déjà utilisée.
-                    </>
-                  }
-                >
-                  <OneShotProgrammeButton label="Générer mon programme avec COAI — 19€" />
-                </OffreConsentGate>
-              ) : tier.plan ? (
-                <OffreConsentGate
-                  resumeConditions={
-                    <>
-                      Je reconnais avoir pris connaissance des conditions de l&apos;offre
-                      Transformation : 7 jours d&apos;accès gratuit à compter de ce jour, puis
-                      passage automatique à un abonnement de {annual ? "490€/an" : "49€/mois"},
-                      sauf résiliation avant la fin des 7 jours. Je demande le début immédiat du
-                      service et reconnais renoncer à mon droit de rétractation de 14 jours pour
-                      la partie du service déjà utilisée durant la période offerte.
-                    </>
-                  }
-                >
-                  <SubscribeButton plan={tier.plan} billing={annual ? "ANNUAL" : "MONTHLY"} label="Commencer mes 7 jours d'essai" className="coai-rainbow-cta w-full border-0 text-[#111216]" />
-                </OffreConsentGate>
-              ) : null}
-              {tier.essai && <span className="text-sm font-medium text-laiton-300">{tier.essai}</span>}
-            </div>
+            {tier.plan === "PREMIUM" && (
+              <a className="text-center text-sm font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("une transformation privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer">
+                Parler d&apos;une transformation privée plus longue
+              </a>
+            )}
           </Card>
         ))}
-
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-graphite-400">
-        <span>Besoin d&apos;un accompagnement différent ?</span>
-        <Link href="/vip" className="underline decoration-white/20 underline-offset-4 hover:text-white">
-          Coaching VIP avec Anthony
-        </Link>
-        <Link href="/entreprise" className="underline decoration-white/20 underline-offset-4 hover:text-white">
-          Solution Entreprise
-        </Link>
-      </div>
-
-      <p className="max-w-xl text-center text-xs text-graphite-500">
-        Transformation inclut 7 jours d&apos;essai, puis est facturée au choix chaque mois ou chaque
-        année. L&apos;abonnement est sans engagement et résiliable à tout moment depuis ton compte. En
-        débloquant l&apos;offre, tu
-        acceptes nos{" "}
-        <Link href="/cgv" className="underline hover:text-laiton-400">
-          CGV
-        </Link>
-        .
+      <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
+        Abonnements mensuels sans engagement, résiliables à tout moment. VIP : visio partout ou présentiel à Paris centre, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
       </p>
     </main>
   );

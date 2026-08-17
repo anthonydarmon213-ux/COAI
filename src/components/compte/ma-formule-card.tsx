@@ -6,7 +6,7 @@ import { ServiceDetailModal } from "@/components/marketing/service-detail-modal"
 import { TIER_BY_SERVICE, type ServiceKey } from "@/lib/pricing/tiers";
 
 const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
-  AUCUNE: ["IMPULSION", "TRANSFORMATION"],
+  AUCUNE: ["IMPULSION", "TRANSFORMATION", "VIP"],
   IMPULSION: ["TRANSFORMATION", "VIP"],
   TRANSFORMATION: ["VIP"],
   VIP: [],
@@ -19,9 +19,9 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
 // distinctif sur chaque palier. Ces phrases sont écrites spécifiquement pour
 // comparer d'un coup d'œil — le détail complet reste dans ServiceDetailModal.
 const RESUME_COMPARATIF: Record<ServiceKey, string> = {
-  IMPULSION: "Programme complet généré par IA, en un seul paiement de 19€",
-  TRANSFORMATION: "+ suivi humain, adaptation continue et coach IA illimité",
-  VIP: "Coaching 1-to-1 avec Anthony Darmon, présentiel ou visio",
+  IMPULSION: "Personal Trainer autonome et adaptatif — 49€/mois",
+  TRANSFORMATION: "IA 24/7 + regard et ajustements humains — 89€/mois",
+  VIP: "1 à 4 séances privées par mois, présentiel ou visio — dès 199€/mois",
 };
 
 // Carte "Ta formule" (16/08/2026, demande Anthony) : jusqu'ici rien sur
@@ -55,8 +55,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
           </>
         ) : (
           <p className="mt-2 text-sm leading-6 text-graphite-300">
-            Tu n&apos;as pas encore débloqué de formule — choisis Impulsion ou Transformation pour
-            générer ton programme.
+            Choisis ton niveau d&apos;attention : Impulsion, Transformation ou VIP.
           </p>
         )}
       </div>

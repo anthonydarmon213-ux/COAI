@@ -9,11 +9,13 @@ export function SubscribeButton({
   label,
   className,
   billing = "MONTHLY",
+  vipSessions = 1,
 }: {
-  plan: "STANDARD" | "PREMIUM";
+  plan: "GRATUIT" | "STANDARD" | "PREMIUM";
   label: string;
   className?: string;
   billing?: "MONTHLY" | "ANNUAL";
+  vipSessions?: 1 | 2 | 3 | 4;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,12 +29,12 @@ export function SubscribeButton({
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, billing }),
+        body: JSON.stringify({ plan, billing, vipSessions }),
       });
       if (res.status === 401) {
         // Préserve l'intention (Transformation) à travers l'inscription —
         // sinon /sign-up créait toujours un abonnement Impulsion par défaut.
-        window.location.href = `/sign-up?plan=${plan === "STANDARD" ? "STANDARD" : "GRATUIT"}&billing=${billing}`;
+        window.location.href = `/sign-up?plan=${plan}&vipSessions=${vipSessions}`;
         return;
       }
       const data = await res.json();

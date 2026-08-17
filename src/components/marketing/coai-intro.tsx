@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const BENEFICES = [
-  "Un plan adapté à ton corps et à ton emploi du temps",
-  "Chaque séance s'ajuste au temps disponible et à ta forme du jour",
-  "Entraînement, nutrition et récupération réunis",
-  "Une recommandation claire, sans engagement",
+  "Un check-in rapide avant chaque séance",
+  "Une séance ajustée à ton temps, ta forme et tes douleurs",
+  "L'IA disponible 24h/24, l'humain pour les décisions qui comptent",
+  "Trois niveaux d'attention : autonome, hybride ou privé",
 ];
 
 export function CoaiIntro() {
@@ -32,18 +32,19 @@ export function CoaiIntro() {
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2">
             <span className="h-1.5 w-1.5 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-laiton-200">
-              Coaching intelligent · expertise humaine
+              Personal Training, Reimagined.
             </span>
           </div>
 
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
-            Ton corps n&apos;a pas besoin de plus d&apos;informations.
-            <span className="mt-2 block text-laiton-200">Il a besoin du bon plan.</span>
+            Ton Personal Trainer,
+            <span className="mt-2 block text-laiton-200">toujours avec toi.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-            COAI identifie ce qui bloque ta progression et construit la stratégie la plus adaptée
-            pour atteindre ton objectif — avec le niveau d&apos;accompagnement dont tu as réellement besoin.
+            Avant chaque séance, COAI fait le point comme un vrai coach : disponibilité, sommeil,
+            énergie, alimentation et douleurs. Ta séance évolue immédiatement, puis un coach humain
+            prend le relais dès que son regard apporte plus de valeur.
           </p>
 
           <ul className="mt-7 space-y-3" aria-label="Ce que comprend le diagnostic">
@@ -65,15 +66,15 @@ export function CoaiIntro() {
               Découvrir l&apos;accompagnement privé →
             </Link>
           </div>
-          <p className="mt-3 text-xs text-graphite-500">3 minutes · résultat personnalisé · aucune carte bancaire</p>
+          <p className="mt-3 text-xs text-graphite-500">Diagnostic en 3 minutes · résultat personnalisé · aucune carte bancaire</p>
         </div>
       </div>
 
       <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
         {[
-          ["01", "Diagnostic", "Nous trouvons les vrais freins."],
-          ["02", "Prescription", "COAI recommande la bonne stratégie."],
-          ["03", "Progression", "Le plan évolue avec tes résultats."],
+          ["01", "Bilan personnel", "Objectifs, niveau, antécédents et contraintes."],
+          ["02", "Séance du jour", "Ton coach l'adapte à ton état réel."],
+          ["03", "Suivi continu", "Tes retours font évoluer le plan."],
         ].map(([numero, titre, texte]) => (
           <div key={numero} className="border-white/[0.08] px-6 py-6 text-left sm:border-r sm:last:border-r-0">
             <span className="font-mono text-[10px] tracking-[0.18em] text-laiton-300">{numero}</span>

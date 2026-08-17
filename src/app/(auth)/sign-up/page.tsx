@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { storeParrainageCookie } from "@/lib/parrainage/cookie";
+import { storeIntendedPlanCookie, type IntendedPlan } from "@/lib/checkout/intended-plan-cookie";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
@@ -46,6 +47,14 @@ export default function SignUpPage() {
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) storeParrainageCookie(ref);
+    const requestedPlan = searchParams.get("plan");
+    if (requestedPlan === "GRATUIT" || requestedPlan === "STANDARD" || requestedPlan === "PREMIUM") {
+      const requestedSessions = Number(searchParams.get("vipSessions"));
+      const vipSessions = requestedSessions === 2 || requestedSessions === 3 || requestedSessions === 4
+        ? requestedSessions
+        : 1;
+      storeIntendedPlanCookie(requestedPlan as IntendedPlan, vipSessions);
+    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -132,8 +141,8 @@ export default function SignUpPage() {
               Entre dans ton espace COAI.
             </h1>
             <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
-              Retrouve ton profil, visualise ton accompagnement et avance à ton rythme. Tu ne paies
-              que lorsque tu décides de générer ton programme ou d&apos;activer le suivi humain.
+              Retrouve ton profil et le niveau d&apos;accompagnement que tu viens de choisir. Après
+              cette étape, tu pourras démarrer ton abonnement en toute sécurité.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">

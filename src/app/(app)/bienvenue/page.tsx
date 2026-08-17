@@ -21,7 +21,7 @@ import { ParrainageCard } from "@/components/compte/parrainage-card";
 // les routes de paiement elles-mêmes (jamais par une simple intention côté
 // client) : ?plan=... (Transformation) ou ?unlock=programme (Impulsion).
 const CONTENU_PAR_PLAN: Record<
-  "GRATUIT" | "STANDARD",
+  "GRATUIT" | "STANDARD" | "PREMIUM",
   {
     formule: string;
     sousTitre: string;
@@ -30,22 +30,32 @@ const CONTENU_PAR_PLAN: Record<
 > = {
   GRATUIT: {
     formule: "Impulsion",
-    sousTitre: "Paiement unique de 19€. Ton programme est prêt dès maintenant.",
+    sousTitre: "Ton Personal Trainer IA reste disponible 24h/24 et fait évoluer ton programme.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
-      { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
-      { titre: "Tu t'entraînes", texte: "Ton programme est prêt dès aujourd'hui." },
-      { titre: "On veille sur toi", texte: "Une relance automatique si on ne te voit plus — jamais vraiment seul." },
+      { titre: "Ton check-in", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
+      { titre: "Ta séance s'adapte", texte: "Entraînement, nutrition et récupération évoluent avec ta vraie vie." },
+      { titre: "Ton PT IA", texte: "Une réponse immédiate, même le soir et le week-end." },
     ],
   },
   STANDARD: {
     formule: "Transformation",
-    sousTitre: "Ton coach diplômé d'État prend le relais avec l'IA, jusqu'à l'atteinte de ton objectif.",
+    sousTitre: "L'IA apporte la disponibilité ; le coach humain apporte le regard et la subtilité.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
-      { titre: "Ton programme, généré par l'IA", texte: "Entraînement, nutrition, récupération, en quelques secondes." },
-      { titre: "Validé par ton coach", texte: "Un coach diplômé d'État relit et ajuste avant que ce soit définitif." },
+      { titre: "Ton check-in", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
+      { titre: "Validé par ton coach", texte: "Un regard humain relit, nuance et ajuste les décisions importantes." },
       { titre: "Suivi jusqu'à ton objectif", texte: "Ton coach revient vers toi si besoin — jusqu'à ce que tu y sois." },
+    ],
+  },
+  PREMIUM: {
+    formule: "VIP",
+    sousTitre: "L'attention maximale : ton système COAI et tes séances privées avec Anthony.",
+    etapes: [
+      { titre: "Bilan premium", texte: "Objectif, antécédents, mobilité, posture et contraintes analysés en profondeur." },
+      { titre: "Programme ultra-précis", texte: "Chaque détail est construit autour de ton corps, de ton rythme et de ta vie." },
+      { titre: "Séance privée mensuelle", texte: "De 1 à 4 séances par mois, en visio ou à Paris centre." },
+      { titre: "Ajustements prioritaires", texte: "Un accompagnement volontairement limité pour préserver sa qualité." },
     ],
   },
 };
@@ -138,7 +148,7 @@ export default async function BienvenuePage({
         <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-2">
           {[
             { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de ton futur programme." },
-            { titre: "Ton programme", texte: "Généré quand tu es prêt — Impulsion (19€) ou Transformation (suivi humain)." },
+            { titre: "Ton programme", texte: "Impulsion, Transformation ou VIP : le niveau d'attention qui te correspond." },
             { titre: "Ton Coach IA", texte: "Pose tes questions, 24h/24, dans l'esprit de la méthode d'Anthony." },
             { titre: "Ton suivi", texte: "Séances, mesures, progression — tout au même endroit." },
           ].map((etape, i) => (
@@ -181,7 +191,8 @@ export default async function BienvenuePage({
     );
   }
 
-  const plan: "GRATUIT" | "STANDARD" = searchParams.plan === "STANDARD" ? "STANDARD" : "GRATUIT";
+  const plan: "GRATUIT" | "STANDARD" | "PREMIUM" =
+    searchParams.plan === "PREMIUM" ? "PREMIUM" : searchParams.plan === "STANDARD" ? "STANDARD" : "GRATUIT";
   const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -189,17 +200,9 @@ export default async function BienvenuePage({
   // calcul que les abonnements (plan="GRATUIT" par défaut → "Subscribe")
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).
-  const unlockOneShot = searchParams.unlock === "programme";
-
-  // Événement Meta : Purchase pour Impulsion en paiement unique (pas un
-  // abonnement), StartTrial si les 7 jours d'essai de Transformation sont
-  // en cours (carte enregistrée, pas encore prélevée), Subscribe sinon
-  // (Transformation souscrite directement, essai déjà sauté). Valeur = prix
-  // réel de l'offre choisie, pour que l'algorithme Meta puisse optimiser
-  // vers les conversions les plus rentables, pas juste les plus nombreuses.
-  const enEssai = plan === "STANDARD" && searchParams.essai !== "0";
-  const valeurMensuelle = plan === "STANDARD" ? 49 : 19;
-  const metaEventAchat = unlockOneShot ? "Purchase" : enEssai ? "StartTrial" : "Subscribe";
+  const enEssai = plan !== "PREMIUM" && searchParams.essai !== "0";
+  const valeurMensuelle = plan === "PREMIUM" ? 199 : plan === "STANDARD" ? 89 : 49;
+  const metaEventAchat = enEssai ? "StartTrial" : "Subscribe";
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">

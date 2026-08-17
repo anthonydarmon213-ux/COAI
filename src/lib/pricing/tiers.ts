@@ -1,138 +1,112 @@
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
-// Source unique des offres (14/08/2026) — extrait de /pricing pour être
-// réutilisé tel quel par le nouveau modal "détail d'un service"
-// (ServiceDetailModal), sans jamais dupliquer/faire diverger le contenu
-// réel des offres entre les deux endroits où il s'affiche.
+export type PlanCode = "GRATUIT" | "STANDARD" | "PREMIUM";
+
 export type Tier = {
   nom: string;
+  eyebrow: string;
   prix: string;
   suffixe: string;
-  essai?: string;
   description: string;
   features: string[];
-  plan?: "STANDARD" | "PREMIUM";
+  plan: PlanCode;
   mostPopular?: boolean;
-  oneShot?: boolean;
-  sessions?: { label: string; prix: string }[];
   limitedSpots?: boolean;
+  trial?: boolean;
+  sessions?: { count: 1 | 2 | 3 | 4; label: string; prix: string }[];
 };
 
 export const ENTREPRISE = {
   nom: "Entreprise",
-  description: "Coaching pour vos équipes et collaborateurs — accompagnement sur-mesure, sur devis.",
+  description: "Coaching pour vos équipes et collaborateurs — accompagnement sur mesure, sur devis.",
   features: [
-    "Programme adapté à vos équipes (mobilité au poste, gestion de l'énergie, prévention)",
-    "Formules flexibles — ponctuel, régulier, ou intégré à une démarche QVT",
-    "Devis personnalisé selon vos effectifs et vos objectifs",
+    "Programme adapté aux contraintes de vos équipes",
+    "Interventions ponctuelles ou accompagnement régulier",
+    "Devis personnalisé selon vos effectifs et objectifs",
   ],
   whatsappHref: buildWhatsAppLink(
-    "Bonjour Anthony, je vous contacte au sujet d'une offre coaching pour mon entreprise."
+    "Bonjour Anthony, je souhaite échanger au sujet d'un accompagnement COAI pour mon entreprise."
   ),
   mailHref: `mailto:anthonydarmon213@hotmail.com?subject=${encodeURIComponent("Offre coaching entreprise")}`,
-  siteHref:
-    "http://coaching-hybride-anthony.anthonydarmon213.chatgpt.site/?utm_source=pricing&utm_medium=web&utm_content=carte_entreprise",
 };
 
 export const VIP_MESSAGE =
-  "Bonjour Anthony, je suis sur COAI et j'aimerais réserver une séance VIP (présentiel ou visio).";
+  "Bonjour Anthony, je souhaite échanger sur l'accompagnement VIP COAI et mes objectifs.";
 
-// VIP redevient 100% réservation humaine (14/08/2026, demande explicite
-// d'Anthony) : le site affiche uniquement les prix, aucun paiement en
-// ligne — la réservation se fait directement avec lui sur WhatsApp,
-// message pré-rempli avec la séance précise choisie pour qu'il sache tout
-// de suite ce qui est demandé.
-export function vipReservationHref(sessionLabel: string, prix: string): string | null {
+export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "sur mesure"): string | null {
   return buildWhatsAppLink(
-    `Bonjour Anthony, je suis sur COAI et j'aimerais réserver : ${sessionLabel} (${prix}).`
+    `Bonjour Anthony, je souhaite échanger sur ${sessionLabel} (${prix}) et sur mes objectifs à plus long terme.`
   );
 }
 
 export const TIERS: Tier[] = [
   {
     nom: "Impulsion",
-    prix: "19€",
-    suffixe: "paiement unique",
-    oneShot: true,
+    eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24",
+    prix: "49€",
+    suffixe: "/mois",
     description:
-      "Les algorithmes COAI construisent ton programme personnalisé à partir de ton diagnostic et de plus de 17 ans d'expérience terrain — en un seul paiement, sans abonnement.",
+      "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
     features: [
-      "Journal de séances",
-      "Suivi des mesures et photos de progression",
-      "Graphiques de progression",
-      "Coach IA — 4 questions/mois",
-      "Analyse de bracelet connecté (pas, fréquence cardiaque, sommeil, VO2 max...)",
-      "Analyse de photo morphologique et posturale",
-      "Programme personnalisé construit par les algorithmes COAI — sans relecture humaine",
+      "Bilan initial et programme ultra personnalisé",
+      "Check-in quotidien : sommeil, forme, douleurs et temps disponible",
+      "Séance adaptée chaque jour à tes réponses",
+      "Entraînement, nutrition et récupération réunis",
+      "Coach IA disponible 24h/24 et 7j/7",
+      "Suivi des séances, mesures et progrès",
     ],
+    plan: "GRATUIT",
+    mostPopular: true,
+    trial: true,
   },
   {
     nom: "Transformation",
-    prix: "49€",
+    eyebrow: "IA + REGARD HUMAIN",
+    prix: "89€",
     suffixe: "/mois",
-    essai: "7 jours d'essai · puis 49€/mois",
     description:
-      "Ton programme COAI complet, enrichi d'adaptations continues et d'un vrai suivi humain jusqu'à l'atteinte de ton objectif.",
+      "La rapidité de l'IA et la subtilité d'un coach humain : le bon niveau d'attention pour progresser sans rester seul.",
     features: [
-      "Tout ce qui est inclus dans Impulsion",
-      "Programme évolutif — ajusté selon tes séances, check-ins, progrès et changements de semaine",
-      "Validation humaine — ton programme est relu et validé par un coach diplômé d'État",
-      "Suivi proactif — ton coach intervient en cas de plateau, gêne ou décrochage",
-      "1 séance visio de 30 min offerte avec Anthony Darmon (une fois) — ensuite via VIP",
-      "Coach IA illimité, disponible 24h/24 pour t'accompagner entre deux échanges humains",
-      "Assistant WhatsApp 24/7",
-      "Entraînement, mobilité, nutrition et récupération adaptés ensemble",
+      "Tout l'accompagnement Impulsion",
+      "Programme relu et supervisé par un coach diplômé d'État",
+      "Retour humain sur tes progrès et tes difficultés",
+      "Ajustements en cas de plateau, gêne ou changement d'objectif",
+      "Coach IA 24h/24 entre les échanges humains",
+      "Priorité aux décisions sûres, réalistes et durables",
     ],
-    plan: "STANDARD" as const,
-    mostPopular: true,
+    plan: "STANDARD",
+    trial: true,
   },
   {
     nom: "VIP",
-    prix: "Sur réservation",
-    suffixe: "",
-    description: "Coaching 100% humain avec Anthony Darmon — présentiel ou visio, sans abonnement.",
+    eyebrow: "ATTENTION MAXIMALE · PLACES ULTRA LIMITÉES",
+    prix: "199€",
+    suffixe: "/mois",
+    description:
+      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau.",
     features: [
-      "Coaching 1-to-1 avec Anthony Darmon",
-      "Appel découverte gratuit de 15 min, sans engagement",
-      "Séance découverte à l'unité, ou pack de 4 séances",
-      "Accessible à tous, quel que soit ton palier",
-      "Coaching spécialisé sur demande — musculation, boxe, yoga",
+      "Tout l'accompagnement Transformation",
+      "1 séance privée de Personal Training par mois incluse",
+      "Visio partout ou présentiel à Paris centre",
+      "Analyse approfondie des objectifs, douleurs et contraintes",
+      "Ajustements prioritaires et attention maximale",
+      "Créneaux et accompagnements volontairement ultra limités",
     ],
+    plan: "PREMIUM",
+    limitedSpots: true,
     sessions: [
-      { label: "Appel découverte — 15 min", prix: "Offert" },
-      { label: "Séance découverte — Visio", prix: "100€" },
-      { label: "Séance découverte — Présentiel", prix: "200€" },
-      { label: "Pack Visio — 4 séances", prix: "360€" },
-      { label: "Pack Présentiel — 4 séances", prix: "720€" },
+      { count: 1, label: "1 séance privée / mois", prix: "199€/mois" },
+      { count: 2, label: "2 séances privées / mois", prix: "398€/mois" },
+      { count: 3, label: "3 séances privées / mois", prix: "597€/mois" },
+      { count: 4, label: "4 séances privées / mois", prix: "796€/mois" },
     ],
-    limitedSpots: true,
-  },
-  {
-    nom: "COAI Privé",
-    prix: "À partir de 2 500€",
-    suffixe: "pour 90 jours",
-    description: "Une transformation entièrement pilotée par Anthony Darmon, avec COAI entre chaque échange.",
-    features: [
-      "Bilan stratégique complet et objectifs chiffrés",
-      "Plan entraînement, nutrition et récupération sur mesure",
-      "Points privés réguliers avec Anthony Darmon",
-      "Suivi COAI quotidien entre les rendez-vous",
-      "Places limitées pour garantir la qualité du suivi",
-    ],
-    limitedSpots: true,
   },
 ];
 
 export type ServiceKey = "IMPULSION" | "TRANSFORMATION" | "VIP";
 
-function tierParNom(nom: string): Tier {
-  const tier = TIERS.find((t) => t.nom === nom);
-  if (!tier) throw new Error(`Tier introuvable : ${nom}`);
-  return tier;
-}
-
 export const TIER_BY_SERVICE: Record<ServiceKey, Tier> = {
-  IMPULSION: tierParNom("Impulsion"),
-  TRANSFORMATION: tierParNom("Transformation"),
-  VIP: tierParNom("VIP"),
+  IMPULSION: TIERS[0]!,
+  TRANSFORMATION: TIERS[1]!,
+  VIP: TIERS[2]!,
 };

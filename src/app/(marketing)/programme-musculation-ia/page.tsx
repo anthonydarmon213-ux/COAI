@@ -47,7 +47,7 @@ const FAQ_ITEMS = [
   {
     question: "Le programme est-il vérifié par un humain ?",
     reponse:
-      "Sur le palier Impulsion (19€, paiement unique), ton programme est généré par IA sans relecture. Sur Transformation (49€/mois), chaque programme est en plus relu et validé par un coach diplômé d'État avant de t'être présenté.",
+      "Avec Impulsion (49€/mois), ton programme évolue grâce au Personal Trainer IA disponible 24h/24. Transformation (89€/mois) ajoute le regard et les ajustements d'un coach humain.",
   },
   {
     question: "Le programme s'adapte-t-il à mon matériel (salle, maison, sans matériel) ?",

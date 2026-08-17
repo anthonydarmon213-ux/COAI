@@ -94,8 +94,8 @@ export async function POST(request: Request) {
   const offreRecommandee = coachPreference === "VIP_PRESENTIEL"
     ? "VIP — coaching privé en présentiel"
     : coachPreference === "HYBRIDE"
-      ? "Transformation — IA + coach humain"
-      : "Impulsion — accompagnement 100 % IA";
+      ? "Transformation — IA 24/7 + regard humain"
+      : "Impulsion — Personal Trainer IA 24/7";
 
   const notifText = [
     `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`,
