@@ -15,7 +15,7 @@ export function CoaiIntro() {
   return (
     <section className="coai-future-hero coai-landing-hero relative min-h-screen overflow-hidden px-6 pb-16 pt-28 sm:px-10 sm:pt-36">
       <Image
-        src="/coai-diagnostic.JPEG"
+        src="/coai-diagnostic-clean.png"
         alt=""
         fill
         priority
