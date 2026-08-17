@@ -39,6 +39,31 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
     setLoading(false);
   }
 
+  async function partagerStory() {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const url = `/api/diagnostic/carte-story?score=${score}&objectif=${encodeURIComponent(objectif)}`;
+      const [response, lien] = await Promise.all([fetch(url), getShareLink()]);
+      if (!response.ok) throw new Error("Carte indisponible");
+      const blob = await response.blob();
+      const file = new File([blob], `score-coai-${score}.png`, { type: "image/png" });
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({ title: `Mon Score COAI · ${score}/100`, text: `Fais ton bilan et compare ton score : ${lien}`, files: [file] });
+        trackFunnelEvent("diagnostic_result_shared", { support: "story_native", referral: connecte, challenge: "compare_score" });
+      } else {
+        const href = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = href; anchor.download = file.name; anchor.click(); URL.revokeObjectURL(href);
+        if (navigator.clipboard) await navigator.clipboard.writeText(lien);
+        setMessage("Story téléchargée · ajoute-la sur Instagram ou TikTok.");
+        trackFunnelEvent("diagnostic_result_shared", { support: "story_download", referral: connecte, challenge: "compare_score" });
+      }
+    } catch (caught) {
+      if (!(caught instanceof DOMException && caught.name === "AbortError")) setMessage("Impossible de créer la Story pour le moment.");
+    } finally { setLoading(false); }
+  }
+
   async function partager() {
     setLoading(true);
     setMessage(null);
@@ -71,13 +96,14 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       <p className="max-w-sm text-lg font-semibold text-white">Qui de tes proches fera mieux que toi ?</p>
       <p className="max-w-md text-sm leading-6 text-graphite-300">Partage ton Score COAI. Ils font le même bilan gratuitement, puis vous comparez vos points de départ et votre progression.</p>
       <div className="flex flex-col gap-2 sm:flex-row">
+        <button type="button" onClick={partagerStory} disabled={loading} className="coai-story-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Créer ma Story 9:16</button>
         <button
           type="button"
           onClick={partagerWhatsApp}
           disabled={loading}
           className="rounded-full bg-[#25D366] px-6 py-3 text-sm font-bold text-[#0b2916] shadow-[0_12px_38px_-14px_rgba(37,211,102,.8)] transition hover:-translate-y-0.5 hover:bg-[#35df75]"
         >
-          Défier sur WhatsApp →
+          WhatsApp →
         </button>
         <button
           type="button"
@@ -85,7 +111,7 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
           disabled={loading}
           className="rounded-full border border-laiton-300/30 bg-white/[0.05] px-6 py-3 text-sm font-bold text-white transition hover:bg-white/[0.1] disabled:opacity-50"
         >
-          {loading ? "…" : "Partager mon score"}
+          {loading ? "Création…" : "Autres options"}
         </button>
       </div>
       {message && <span className="text-xs text-graphite-500">{message}</span>}
