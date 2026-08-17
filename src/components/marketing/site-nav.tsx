@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 
 const LIENS = [
@@ -30,8 +30,30 @@ const LIENS = [
 // connecter" directement sur /sign-up (lien déjà présent là-bas).
 export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompte: string }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
+  const menuMobileRef = useRef<HTMLDivElement>(null);
   const actionHref = connecte ? "/dashboard" : "/sign-up";
   const actionLabel = connecte ? "Mon compte" : "Commencer";
+
+  useEffect(() => {
+    if (!menuOuvert) return;
+
+    const fermerHorsMenu = (event: PointerEvent) => {
+      if (!menuMobileRef.current?.contains(event.target as Node)) {
+        setMenuOuvert(false);
+      }
+    };
+    const fermerAvecEchap = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOuvert(false);
+    };
+
+    document.addEventListener("pointerdown", fermerHorsMenu);
+    document.addEventListener("keydown", fermerAvecEchap);
+
+    return () => {
+      document.removeEventListener("pointerdown", fermerHorsMenu);
+      document.removeEventListener("keydown", fermerAvecEchap);
+    };
+  }, [menuOuvert]);
 
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-10">
@@ -64,7 +86,7 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
         {actionLabel}
       </Link>
 
-      <div className="relative lg:hidden">
+      <div ref={menuMobileRef} className="relative lg:hidden">
         <button
           type="button"
           aria-expanded={menuOuvert}

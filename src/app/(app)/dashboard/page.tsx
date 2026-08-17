@@ -14,6 +14,7 @@ import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoi
 import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
+import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
 import { getSignedProgressPhotoUrl } from "@/lib/storage/progress-photos";
 
 const MANTRAS = [
@@ -111,6 +112,8 @@ export default async function DashboardPage() {
           </a>
         )}
       </header>
+
+      {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
 
       <section className="coai-week-overview" aria-labelledby="week-title">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -242,7 +245,7 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <CoaiInsightCard insight={insight} />
-        <ActiviteQuotidienneCard />
+        <div id="activite-quotidienne" className="scroll-mt-6"><ActiviteQuotidienneCard /></div>
       </div>
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">

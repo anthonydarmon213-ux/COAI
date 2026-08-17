@@ -16,6 +16,7 @@ function santeReelle(sante: string[]): string[] {
 
 export type ReponsesDiagnostic = {
   persona?: string[];
+  activiteQuotidienne?: string | null;
   niveau?: string | null;
   objectif?: string | null;
   equipement?: string[];
@@ -245,35 +246,42 @@ function calculerPointsResolus(r: ReponsesDiagnostic, sante: string[]): string[]
 // un état médical. Le score reste borné pour éviter toute fausse précision.
 function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnostic["indiceCoai"] {
   const frequence: Record<string, number> = {
-    "1 fois par semaine": 10,
-    "2 fois par semaine": 15,
-    "3 fois par semaine": 20,
-    "4 fois par semaine": 22,
-    "5 fois par semaine": 21,
-    "6 fois ou plus par semaine": 18,
+    "1 fois par semaine": 8,
+    "2 fois par semaine": 12,
+    "3 fois par semaine": 16,
+    "4 fois par semaine": 18,
+    "5 fois par semaine": 17,
+    "6 fois ou plus par semaine": 15,
   };
   const sommeil: Record<string, number> = {
-    "Mauvaise (moins de 5h, sommeil agité)": 7,
-    "Moyenne (5-6h, réveils fréquents)": 13,
-    "Bonne (7-8h, plutôt réparateur)": 20,
-    "Excellente (8h ou plus, réparateur)": 22,
+    "Mauvaise (moins de 5h, sommeil agité)": 5,
+    "Moyenne (5-6h, réveils fréquents)": 10,
+    "Bonne (7-8h, plutôt réparateur)": 16,
+    "Excellente (8h ou plus, réparateur)": 18,
   };
   const nutrition: Record<string, number> = {
-    "Grignotage fréquent / repas irréguliers": 10,
-    "Beaucoup de plats préparés ou fast-food": 9,
-    "Jeûne intermittent": 16,
-    "Repas structurés et équilibrés": 21,
-    "Déjà suivi par un nutritionniste": 22,
+    "Grignotage fréquent / repas irréguliers": 7,
+    "Beaucoup de plats préparés ou fast-food": 6,
+    "Jeûne intermittent": 13,
+    "Repas structurés et équilibrés": 17,
+    "Déjà suivi par un nutritionniste": 18,
   };
   const structureFragile = (r.persona ?? []).some((p) => STRUCTURE_PERSONAS.includes(p));
-  const base = 24;
-  const score = Math.max(45, Math.min(92,
+  const activiteQuotidienne = r.activiteQuotidienne?.startsWith("Assis") ? -4 : r.activiteQuotidienne?.includes("physique") ? 2 : 0;
+  // Recalibrage commercial du score initial (17/08/2026) : l'ancienne
+  // échelle amenait trop facilement un profil solide à 90-92/100, ce qui
+  // laissait artificiellement très peu de marge de progression. Un bon
+  // terrain de départ se situe désormais autour de 70-78 ; seuls les profils
+  // exceptionnellement complets dépassent 80.
+  const base = 16;
+  const score = Math.max(38, Math.min(84,
     base +
-    (frequence[r.frequence ?? ""] ?? 12) +
-    (sommeil[r.qualiteSommeil ?? ""] ?? 12) +
-    (nutrition[r.habitudesAlimentaires ?? ""] ?? 12) +
-    (structureFragile ? 7 : 13) -
-    (sante.length > 0 ? 4 : 0)
+    (frequence[r.frequence ?? ""] ?? 10) +
+    (sommeil[r.qualiteSommeil ?? ""] ?? 9) +
+    (nutrition[r.habitudesAlimentaires ?? ""] ?? 10) +
+    (structureFragile ? 6 : 11) -
+    (sante.length > 0 ? 4 : 0) +
+    activiteQuotidienne
   ));
 
   const actions: Array<{ titre: string; impact: string }> = [];
@@ -299,7 +307,7 @@ function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
     actions.push({ titre: "Compléter ton check-in chaque semaine", impact: "adaptation plus précise" });
   }
 
-  const niveau = score >= 82 ? "Très élevé" : score >= 72 ? "Élevé" : score >= 60 ? "Prometteur" : "À révéler";
+  const niveau = score >= 78 ? "Très élevé" : score >= 68 ? "Élevé" : score >= 55 ? "Prometteur" : "À révéler";
   return { score, niveau, actions: actions.slice(0, 3) };
 }
 

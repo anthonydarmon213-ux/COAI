@@ -188,7 +188,7 @@ export default function SignUpPage() {
             </Field>
             {error && <p className="text-sm text-red-400">{error}</p>}
             <Button type="submit" disabled={loading}>
-              {loading ? "Envoi du lien de confirmation…" : "Entrer dans mon espace →"}
+              {loading ? "Création de ton espace…" : "Créer mon espace personnalisé →"}
             </Button>
           </form>
           <p className="text-sm text-graphite-400">

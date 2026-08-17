@@ -48,15 +48,19 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       if (!response.ok) throw new Error("Carte indisponible");
       const blob = await response.blob();
       const file = new File([blob], `score-coai-${score}.png`, { type: "image/png" });
-      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        await navigator.share({ title: `Mon Score COAI · ${score}/100`, text: `Fais ton bilan et compare ton score : ${lien}`, files: [file] });
+      // Instagram reçoit plus fiablement l'image quand elle est partagée seule :
+      // l'ajout simultané d'un texte/URL peut faire disparaître l'option Story
+      // de la feuille de partage iOS. Le lien reste déjà imprimé sur la carte.
+      if (platform === "instagram" && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({ files: [file] });
+        setMessage("Dans Instagram, choisis « Story » pour publier ta carte.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_native`, referral: connecte, challenge: "compare_score" });
       } else {
         const href = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = href; anchor.download = file.name; anchor.click(); URL.revokeObjectURL(href);
         if (navigator.clipboard) await navigator.clipboard.writeText(lien);
-        setMessage(`Story téléchargée · ouvre ${platform === "instagram" ? "Instagram" : "TikTok"} sur ton téléphone pour la publier.`);
+        setMessage(`Carte enregistrée · ouvre ${platform === "instagram" ? "Instagram" : "TikTok"}, crée une Story et sélectionne l’image.`);
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_download`, referral: connecte, challenge: "compare_score" });
       }
     } catch (caught) {
@@ -96,8 +100,6 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       <p className="max-w-sm text-lg font-semibold text-white">Qui de tes proches fera mieux que toi ?</p>
       <p className="max-w-md text-sm leading-6 text-graphite-300">Partage ton Score COAI. Ils font le même bilan gratuitement, puis vous comparez vos points de départ et votre progression.</p>
       <div className="flex flex-col gap-2 sm:flex-row">
-        <button type="button" onClick={() => partagerStory("instagram")} disabled={loading} className="coai-instagram-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Story Instagram</button>
-        <button type="button" onClick={() => partagerStory("tiktok")} disabled={loading} className="coai-tiktok-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Story TikTok</button>
         <button
           type="button"
           onClick={partagerWhatsApp}
@@ -106,6 +108,8 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
         >
           WhatsApp →
         </button>
+        <button type="button" onClick={() => partagerStory("instagram")} disabled={loading} className="coai-instagram-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Partager sur Instagram</button>
+        <button type="button" onClick={() => partagerStory("tiktok")} disabled={loading} className="coai-tiktok-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Télécharger pour TikTok</button>
         <button
           type="button"
           onClick={partager}
