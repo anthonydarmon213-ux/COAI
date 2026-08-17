@@ -451,20 +451,28 @@ body {
 .coai-nav-group[open] .coai-nav-chevron { transform: rotate(180deg); }
 .coai-nav-chevron { transition: transform .2s ease; }
 
-.coai-boarding-card { background: linear-gradient(135deg, #111315, #1d1b17); }
-.coai-app-shell .coai-boarding-card .text-white { color: #fffdf8; }
-.coai-app-shell .coai-boarding-card .text-graphite-300 { color: #d4d5d1; }
-.coai-app-shell .coai-boarding-card .text-graphite-500 { color: #a8aaa4; }
-.coai-app-shell .coai-boarding-card .text-laiton-300 { color: #e5c993; }
+.coai-boarding-card {
+  border-color: rgba(126,96,49,.18) !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(215,181,119,.16), transparent 19rem),
+    linear-gradient(135deg, #fffdf8, #f3eee4);
+  box-shadow: 0 30px 75px -48px rgba(66,48,23,.48), inset 0 1px #fff !important;
+}
+.coai-app-shell .coai-boarding-card .text-white { color: #191b19; }
+.coai-app-shell .coai-boarding-card .text-graphite-300 { color: #50544f; }
+.coai-app-shell .coai-boarding-card .text-graphite-500 { color: #747872; }
+.coai-app-shell .coai-boarding-card .text-laiton-300 { color: #875f25; }
 
 .coai-app-shell .coai-boarding-card .coai-boarding-next {
-  background: #24231f !important;
-  color: #fffdf8;
+  border-color: rgba(76,126,148,.2) !important;
+  background: linear-gradient(145deg, #edf4f5, #e4edef) !important;
+  color: #1d2424;
 }
 
 .coai-app-shell .coai-boarding-card .coai-boarding-next .text-graphite-500 {
-  color: #d4d5d1;
+  color: #607176;
 }
+.coai-app-shell .coai-boarding-card .bg-lab-notch { background: #f3eee4; border-color: rgba(126,96,49,.14); }
 
 .coai-diagnostic-enrich-cta {
   border: 1px solid #151816;
@@ -499,6 +507,13 @@ body {
 }
 
 .coai-welcome button:hover { background: #2a2d30; }
+.coai-welcome .coai-rainbow-cta {
+  border-color: #bd9148;
+  background: linear-gradient(115deg, #efd9ad, #d2a757 65%, #bd8d3f);
+  color: #191713 !important;
+  box-shadow: 0 20px 50px -28px rgba(137,91,23,.75);
+}
+.coai-welcome .coai-rainbow-cta:hover { background: linear-gradient(115deg, #f5e4c3, #dbb56b 65%, #c99a4e); }
 
 @keyframes coai-rainbow-shift {
   0%, 100% { background-position: 0% 50%; }
