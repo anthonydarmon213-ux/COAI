@@ -81,13 +81,13 @@ const COMMENT_CA_MARCHE = [
 const PARCOURS_PERSONAL_TRAINING = [
   {
     plage: "01—03",
-    offre: "Offert",
-    titre: "Bilan initial",
-    description: "On comprend avant de prescrire et on te donne un repère concret.",
+    offre: "Gratuit · Sans carte",
+    titre: "Comprendre ton point de départ",
+    description: "Tu découvres ton profil et tes priorités avant de choisir un accompagnement.",
     etapes: [
-      "01 · Bilan : objectifs, niveau, antécédents, douleurs et habitudes",
-      "02 · Évaluation : mobilité, posture, cardio, force et mouvements",
-      "03 · Objectif : précis, mesurable, réaliste et daté + Score COAI",
+      "01 · Bilan initial : objectifs, niveau, antécédents, douleurs et habitudes",
+      "02 · Évaluation physique : mobilité, posture, cardio, force et mouvements",
+      "03 · Définition des objectifs : précis, mesurables, réalistes et datés",
     ],
     href: "/diagnostic",
     cta: "Faire mon bilan offert",
@@ -96,8 +96,8 @@ const PARCOURS_PERSONAL_TRAINING = [
   {
     plage: "04—07",
     offre: "Impulsion · 49€/mois",
-    titre: "Ton programme démarre",
-    description: "Le point de départ recommandé pour avancer simplement, séance après séance.",
+    titre: "Commencer avec Impulsion",
+    description: "Si tu veux commencer, COAI crée ton programme et te guide pendant chaque séance.",
     etapes: [
       "04 · Programme personnalisé et progressif",
       "05 · Échauffement : 5 à 10 min de mobilité et d’activation",
@@ -111,8 +111,8 @@ const PARCOURS_PERSONAL_TRAINING = [
   {
     plage: "08",
     offre: "Transformation · 89€/mois",
-    titre: "Le regard humain en plus",
-    description: "Tu évolues vers l'hybride uniquement si tu veux davantage de retours et d'ajustements.",
+    titre: "Ajouter le suivi humain",
+    description: "Tu passes à Transformation seulement si tu veux un regard extérieur, des retours et des ajustements.",
     etapes: ["08 · Suivi : performances, sensations et douleurs consignées après chaque séance"],
     href: "/pricing#transformation",
     cta: "Découvrir Transformation",
@@ -121,11 +121,11 @@ const PARCOURS_PERSONAL_TRAINING = [
   {
     plage: "09—10",
     offre: "VIP · dès 199€/mois",
-    titre: "L'attention maximale",
-    description: "Pour les objectifs les plus exigeants, avec des disponibilités volontairement limitées.",
+    titre: "Atteindre un objectif exigeant",
+    description: "Le VIP intervient uniquement si ton objectif demande une attention maximale et des ajustements approfondis.",
     etapes: [
       "09 · Ajustements et réévaluation structurée toutes les 4 à 6 semaines",
-      "10 · Atteinte de ton objectif et définition de la suite",
+      "10 · Atteindre ton objectif et définir la suite",
     ],
     href: "/pricing#vip",
     cta: "Voir le niveau VIP",
