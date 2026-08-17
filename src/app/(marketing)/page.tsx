@@ -78,6 +78,61 @@ const COMMENT_CA_MARCHE = [
   ["3", "Tu suis la séance adaptée", "Échauffement, exercices, retour au calme et suivi : chaque retour améliore la prochaine séance."],
 ];
 
+const PARCOURS_PERSONAL_TRAINING = [
+  {
+    plage: "01—03",
+    offre: "Offert",
+    titre: "Bilan initial",
+    description: "On comprend avant de prescrire et on te donne un repère concret.",
+    etapes: [
+      "01 · Bilan : objectifs, niveau, antécédents, douleurs et habitudes",
+      "02 · Évaluation : mobilité, posture, cardio, force et mouvements",
+      "03 · Objectif : précis, mesurable, réaliste et daté + Score COAI",
+    ],
+    href: "/diagnostic",
+    cta: "Faire mon bilan offert",
+    miseEnAvant: false,
+  },
+  {
+    plage: "04—07",
+    offre: "Impulsion · 49€/mois",
+    titre: "Ton programme démarre",
+    description: "Le point de départ recommandé pour avancer simplement, séance après séance.",
+    etapes: [
+      "04 · Programme personnalisé et progressif",
+      "05 · Échauffement adapté à ta séance",
+      "06 · Séance principale guidée et expliquée",
+      "07 · Retour au calme et récupération",
+    ],
+    href: "/pricing#impulsion",
+    cta: "Commencer avec Impulsion",
+    miseEnAvant: true,
+  },
+  {
+    plage: "08",
+    offre: "Transformation · 89€/mois",
+    titre: "Le regard humain en plus",
+    description: "Tu évolues vers l'hybride uniquement si tu veux davantage de retours et d'ajustements.",
+    etapes: ["08 · Suivi des performances, sensations et douleurs avec validation humaine"],
+    href: "/pricing#transformation",
+    cta: "Découvrir Transformation",
+    miseEnAvant: false,
+  },
+  {
+    plage: "09—10",
+    offre: "VIP · dès 199€/mois",
+    titre: "L'attention maximale",
+    description: "Pour les objectifs les plus exigeants, avec des disponibilités volontairement limitées.",
+    etapes: [
+      "09 · Ajustements approfondis et réévaluations régulières",
+      "10 · Atteinte de ton objectif et définition de la suite",
+    ],
+    href: "/pricing#vip",
+    cta: "Voir le niveau VIP",
+    miseEnAvant: false,
+  },
+];
+
 const PILIERS = [
   {
     numero: "01",
@@ -142,6 +197,56 @@ export default function LandingPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-6 py-20 sm:px-10" aria-labelledby="parcours-pt-title">
+        <div className="text-center">
+          <SectionLabel>Ton parcours Personal Training</SectionLabel>
+          <h2 id="parcours-pt-title" className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+            Du bilan initial à l&apos;atteinte de ton objectif.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
+            Tu commences gratuitement. Impulsion te donne tout le nécessaire pour avancer. Tu ajoutes ensuite de l&apos;attention humaine seulement si ton objectif le demande.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-5 lg:grid-cols-4">
+          {PARCOURS_PERSONAL_TRAINING.map((phase) => (
+            <article
+              key={phase.plage}
+              className={`flex flex-col rounded-[1.75rem] border p-6 ${phase.miseEnAvant ? "border-laiton-300/70 bg-laiton-300/[0.10] shadow-[0_28px_80px_-35px_rgba(201,162,98,.65)]" : "border-white/[0.09] bg-white/[0.035]"}`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-mono text-xs tracking-[0.16em] text-laiton-300">{phase.plage}</span>
+                <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-semibold text-graphite-200">{phase.offre}</span>
+              </div>
+              <h3 className="mt-6 text-xl font-semibold text-white">{phase.titre}</h3>
+              <p className="mt-3 text-sm leading-6 text-graphite-300">{phase.description}</p>
+              <ul className="mt-5 space-y-3 text-sm leading-6 text-graphite-200">
+                {phase.etapes.map((etape) => (
+                  <li key={etape} className="flex items-start gap-2.5">
+                    <span className="mt-0.5 text-laiton-300">✓</span>
+                    <span>{etape}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex-1" />
+              <Link href={phase.href} className={`mt-7 inline-flex min-h-12 items-center justify-center rounded-full px-5 text-center text-sm font-semibold transition ${phase.miseEnAvant ? "bg-laiton-400 text-graphite-950 hover:bg-laiton-300" : "border border-white/15 text-white hover:border-laiton-300/50 hover:text-laiton-200"}`}>
+                {phase.cta}
+              </Link>
+            </article>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-8 flex max-w-3xl flex-col items-center justify-between gap-4 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.06] px-6 py-5 text-center sm:flex-row sm:text-left">
+          <div>
+            <p className="font-semibold text-white">Ton Score COAI reste ton fil rouge.</p>
+            <p className="mt-1 text-sm text-graphite-300">Un point de départ mesurable, puis un repère concret pour voir le chemin parcouru.</p>
+          </div>
+          <Link href="/diagnostic" className="shrink-0 text-sm font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4">
+            Découvrir mon Score COAI →
+          </Link>
+        </div>
       </section>
 
       {/* Qualification — filtre honnête qui rassure (montre qu'on ne vend

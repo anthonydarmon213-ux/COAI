@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const BENEFICES = [
+  "Ton Score COAI : un repère concret pour mesurer ta progression",
   "Un check-in rapide avant chaque séance",
   "Une séance ajustée à ton temps, ta forme et tes douleurs",
   "L'IA disponible 24h/24, l'humain pour les décisions qui comptent",
-  "Trois niveaux d'attention : autonome, hybride ou privé",
 ];
 
 export function CoaiIntro() {
@@ -59,22 +59,22 @@ export function CoaiIntro() {
           <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             <Link href="/diagnostic">
               <Button className="px-8 py-4 text-sm font-bold uppercase tracking-[0.055em] shadow-[0_22px_65px_-18px_rgba(201,162,98,.75)] sm:text-base">
-                Faire mon diagnostic offert
+                Faire mon bilan initial offert
               </Button>
             </Link>
-            <Link href="/vip" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
-              Découvrir l&apos;accompagnement privé →
+            <Link href="/pricing#impulsion" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
+              Découvrir les accompagnements →
             </Link>
           </div>
-          <p className="mt-3 text-xs text-graphite-500">Diagnostic en 3 minutes · résultat personnalisé · aucune carte bancaire</p>
+          <p className="mt-3 text-xs text-graphite-500">Bilan en 3 minutes · Score COAI personnalisé · aucune carte bancaire</p>
         </div>
       </div>
 
       <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
         {[
-          ["01", "Bilan personnel", "Objectifs, niveau, antécédents et contraintes."],
-          ["02", "Séance du jour", "Ton coach l'adapte à ton état réel."],
-          ["03", "Suivi continu", "Tes retours font évoluer le plan."],
+          ["01", "Bilan initial offert", "Tes besoins, ton niveau et ton Score COAI."],
+          ["02", "Impulsion pour commencer", "Ton programme et tes séances adaptatives."],
+          ["03", "Tu évolues si nécessaire", "Transformation ou VIP selon l'attention souhaitée."],
         ].map(([numero, titre, texte]) => (
           <div key={numero} className="border-white/[0.08] px-6 py-6 text-left sm:border-r sm:last:border-r-0">
             <span className="font-mono text-[10px] tracking-[0.18em] text-laiton-300">{numero}</span>

@@ -822,9 +822,9 @@ export function DiagnosticQuiz({
         <div className="px-6 py-7 sm:px-8">
           {step === "intro" && (
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
-              <div className="coai-diagnostic-kicker" aria-label="Découvre ton score COAI">
+              <div className="coai-diagnostic-kicker" aria-label="Ton bilan initial et ton Score COAI">
                 <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                <span>Découvre ton score COAI</span>
+                <span>Bilan initial offert · Score COAI</span>
               </div>
               <h1 className="max-w-xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl">
                 {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Ton corps. Ta vie. Ton programme."}
@@ -834,8 +834,8 @@ export function DiagnosticQuiz({
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    En 3 minutes, découvre ton profil sportif, tes priorités et le coaching COAI
-                    le plus adapté à ton quotidien.
+                    En 3 minutes, fais le point comme avec un Personal Trainer : besoins, niveau,
+                    contraintes, objectif et Score COAI mesurable.
                   </>
                 )}
               </p>
@@ -862,7 +862,7 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="mt-2 px-8 py-3.5">
-                  Obtenir mon diagnostic personnalisé — 3 min
+                  Commencer mon bilan initial — 3 min
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
@@ -1234,20 +1234,20 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 <OptionCard
-                  label="Impulsion — mon Personal Trainer IA toujours avec moi"
-                  hint="Pour suivre un plan précis à ton rythme, avec une réponse disponible 24h/24 et 7j/7."
+                  label="Impulsion — le point de départ recommandé"
+                  hint="Commence ici : ton programme évolutif et ton Personal Trainer IA disponible 24h/24. Tu pourras évoluer seulement si tu en as besoin."
                   active={coachPreference === "FULL_IA"}
                   onClick={() => chooseSingle(setCoachPreference, "FULL_IA")}
                 />
                 <OptionCard
                   label="Transformation — la disponibilité de l'IA, l'œil du coach"
-                  hint="Pour être autonome au quotidien tout en bénéficiant d'une validation et d'ajustements humains."
+                  hint="L'étape suivante si tu veux ajouter une validation et des ajustements humains à ton suivi quotidien."
                   active={coachPreference === "HYBRIDE"}
                   onClick={() => chooseSingle(setCoachPreference, "HYBRIDE")}
                 />
                 <OptionCard
                   label="VIP — une attention maximale"
-                  hint="Pour un objectif précis ou complexe : accompagnement ultra limité avec Anthony, à Paris centre ou à distance."
+                  hint="La dernière étape pour un objectif précis ou complexe : attention maximale avec Anthony, à Paris centre ou à distance."
                   active={coachPreference === "VIP_PRESENTIEL"}
                   onClick={() => chooseSingle(setCoachPreference, "VIP_PRESENTIEL")}
                 />
