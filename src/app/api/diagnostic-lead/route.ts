@@ -89,6 +89,12 @@ export async function POST(request: Request) {
 
   const reponsesLead = parsed.data.reponses as Record<string, unknown>;
   const objectifLead = typeof reponsesLead.objectif === "string" ? reponsesLead.objectif : "Non renseigné";
+  const objectifPrincipalLibre = typeof reponsesLead.objectifPrincipalLibre === "string" ? reponsesLead.objectifPrincipalLibre : "Non renseigné";
+  const activiteQuotidienne = typeof reponsesLead.activiteQuotidienne === "string" ? reponsesLead.activiteQuotidienne : "Non renseignée";
+  const objectifSecondaire = typeof reponsesLead.objectifSecondaire === "string" ? reponsesLead.objectifSecondaire : "Non renseigné";
+  const importanceObjectif = typeof reponsesLead.importanceObjectif === "string" ? reponsesLead.importanceObjectif : "Non renseignée";
+  const freinPrincipalLibre = typeof reponsesLead.freinPrincipalLibre === "string" ? reponsesLead.freinPrincipalLibre : "Non renseigné";
+  const attentesCoai = typeof reponsesLead.attentesCoai === "string" ? reponsesLead.attentesCoai : "Non renseignées";
   const niveauLead = typeof reponsesLead.niveau === "string" ? reponsesLead.niveau : "Non renseigné";
   const echeanceLead = typeof reponsesLead.echeance === "string" ? reponsesLead.echeance : "Non renseignée";
   const evaluationLead = [
@@ -109,6 +115,12 @@ export async function POST(request: Request) {
     parsed.data.telephone ? `Téléphone : ${parsed.data.telephone}` : "Téléphone : non renseigné",
     diagnostic ? `Score COAI : ${diagnostic.indiceCoai.score}/100 — ${diagnostic.indiceCoai.niveau}` : null,
     `Objectif : ${objectifLead}`,
+    `Objectif précisé : ${objectifPrincipalLibre}`,
+    `Activité quotidienne : ${activiteQuotidienne}`,
+    `Objectif secondaire : ${objectifSecondaire}`,
+    `Pourquoi maintenant : ${importanceObjectif}`,
+    `Frein principal : ${freinPrincipalLibre}`,
+    `Attentes envers COAI : ${attentesCoai}`,
     `Échéance : ${echeanceLead}`,
     `Niveau : ${niveauLead}`,
     `Évaluation : ${evaluationLead}`,
@@ -141,6 +153,12 @@ export async function POST(request: Request) {
             score: diagnostic.indiceCoai.score,
             niveauScore: diagnostic.indiceCoai.niveau,
             objectif: objectifLead,
+            activiteQuotidienne,
+            objectifPrincipalLibre,
+            objectifSecondaire,
+            importanceObjectif,
+            freinPrincipalLibre,
+            attentesCoai,
             echeance: echeanceLead,
             evaluation: evaluationLead,
             niveau: niveauLead,
