@@ -32,6 +32,31 @@ export async function getSignedProgressPhotoUrl(path: string): Promise<string | 
   return data.signedUrl;
 }
 
+export async function uploadAvatar(
+  userId: string,
+  file: File
+): Promise<{ path: string } | { error: string }> {
+  const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
+  const path = `${userId}/avatar.${ext}`;
+  const admin = createSupabaseAdminClient();
+
+  const { data: existing } = await admin.storage.from(PROGRESS_PHOTOS_BUCKET).list(userId, {
+    search: "avatar.",
+  });
+  if (existing?.length) {
+    await admin.storage.from(PROGRESS_PHOTOS_BUCKET).remove(
+      existing.map((item) => `${userId}/${item.name}`)
+    );
+  }
+
+  const { error } = await admin.storage
+    .from(PROGRESS_PHOTOS_BUCKET)
+    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: true });
+
+  if (error) return { error: error.message };
+  return { path };
+}
+
 export async function deleteAllProgressPhotos(userId: string): Promise<void> {
   const admin = createSupabaseAdminClient();
   const { data: files } = await admin.storage.from(PROGRESS_PHOTOS_BUCKET).list(userId);

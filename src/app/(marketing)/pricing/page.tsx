@@ -62,13 +62,18 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
             </ul>
 
             {tier.sessions && (
-              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs uppercase tracking-widest text-laiton-300">Choisis ton rythme</p>
-                {tier.sessions.map((session) => (
-                  <OffreConsentGate key={session.count} resumeConditions={<>Abonnement VIP COAI de {session.prix}, résiliable à tout moment. Il inclut {session.label}. Les créneaux sont confirmés avec Anthony.</>}>
-                    <SubscribeButton plan="PREMIUM" vipSessions={session.count} label={`${session.label} — ${session.prix}`} className="w-full" />
-                  </OffreConsentGate>
-                ))}
+              <div className="space-y-4 rounded-2xl border border-laiton-300/20 bg-laiton-300/[0.05] p-5">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-laiton-300">L’essentiel du VIP</p>
+                  <p className="mt-2 text-sm font-semibold text-white">1 séance privée chaque mois</p>
+                  <p className="mt-1 text-xs leading-5 text-graphite-400">En visio partout ou en présentiel à Paris centre.</p>
+                </div>
+                <OffreConsentGate resumeConditions={<>Abonnement VIP COAI de 199€/mois, résiliable à tout moment. Il inclut 1 séance privée par mois. Les créneaux sont confirmés avec Anthony.</>}>
+                  <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP — 199€/mois" className="coai-rainbow-cta w-full border-0" />
+                </OffreConsentGate>
+                <a className="block text-center text-xs font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("un rythme VIP de 2 à 4 séances par mois", "sur mesure") ?? "/vip"} target="_blank" rel="noreferrer">
+                  Besoin de 2 à 4 séances par mois ? Parlons-en
+                </a>
               </div>
             )}
 

@@ -210,8 +210,8 @@ body {
 .coai-index-ring {
   --coai-score: 250deg;
   display: grid;
-  width: 8rem;
-  height: 8rem;
+  width: 9.5rem;
+  height: 9.5rem;
   place-items: center;
   border-radius: 999px;
   background: conic-gradient(#c49a52 0 var(--coai-score), rgba(70,121,143,.14) var(--coai-score) 360deg);
@@ -221,7 +221,7 @@ body {
 }
 .coai-index-ring::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(145deg,#fffdf8,#eef2f2); }
 .coai-index-ring > div { z-index: 1; grid-area: 1/1; display: flex; align-items: baseline; color: #171817; }
-.coai-index-ring strong { font-family: var(--font-display), serif; font-size: 2.45rem; line-height: 1; }
+.coai-index-ring strong { font-family: var(--font-display), serif; font-size: 3.35rem; line-height: 1; }
 .coai-index-ring span { color: #6e706a; font-size: .72rem; font-weight: 700; }
 .coai-index-label { color: #7b5b29; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .coai-score-challenge { width: 100%; border: 1px solid rgba(183,137,67,.2); border-radius: 1.35rem; background: linear-gradient(145deg,rgba(30,31,28,.98),rgba(48,41,30,.96)); padding: 1.4rem; box-shadow: 0 26px 60px -40px rgba(80,55,20,.8), inset 0 1px rgba(255,255,255,.08); }
@@ -280,6 +280,32 @@ body {
     radial-gradient(circle at 50% 0%, rgba(211, 174, 106, .2), transparent 17rem),
     linear-gradient(145deg, rgba(255,255,255,.82), rgba(235,231,222,.58));
   box-shadow: 0 28px 65px -46px rgba(62, 46, 24, .65), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.coai-analysis-proof { display: flex; width: 100%; max-width: 42rem; flex-wrap: wrap; justify-content: center; gap: .55rem; margin-top: .55rem; }
+.coai-analysis-proof span { display: inline-flex; align-items: center; gap: .42rem; border: 1px solid rgba(73,123,145,.18); border-radius: 999px; background: rgba(235,244,247,.72); padding: .42rem .68rem; color: #496a78; font-size: .62rem; font-weight: 750; letter-spacing: .035em; }
+.coai-analysis-proof i { width: .35rem; height: .35rem; border-radius: 999px; background: #5890a8; box-shadow: 0 0 0 3px rgba(88,144,168,.1); }
+
+.coai-value-loop {
+  border: 1px solid rgba(91,145,169,.2);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(91,145,169,.18), transparent 20rem),
+    linear-gradient(135deg, #171817, #111719);
+  box-shadow: 0 34px 80px -48px rgba(37,78,96,.72), inset 0 1px rgba(255,255,255,.07);
+}
+.coai-diagnostic-card .coai-value-loop :is(h3, strong) { color: #fffdf8; }
+.coai-diagnostic-card .coai-value-loop p { color: #c8cbc7; }
+.coai-value-loop ol { counter-reset: coai-loop; }
+.coai-value-loop li { position: relative; min-height: 9.5rem; border: 1px solid rgba(255,255,255,.08); border-radius: 1rem; background: rgba(255,255,255,.035); padding: 1rem; }
+.coai-value-loop li > span { color: #79aabd; font-size: .62rem; font-weight: 800; letter-spacing: .15em; }
+.coai-value-loop li strong { display: block; margin-top: .75rem; font-size: .82rem; line-height: 1.35; }
+.coai-value-loop li p { margin-top: .45rem; font-size: .7rem; line-height: 1.5; }
+.coai-value-loop li:not(:last-child)::after { content: "→"; position: absolute; z-index: 2; right: -.75rem; top: 50%; color: #c9a262; font-size: .8rem; transform: translateY(-50%); }
+
+@media (max-width: 639px) {
+  .coai-index-ring { width: 8.5rem; height: 8.5rem; }
+  .coai-value-loop li { min-height: 0; }
+  .coai-value-loop li:not(:last-child)::after { right: 50%; top: auto; bottom: -.8rem; transform: translateX(50%) rotate(90deg); }
 }
 
 /* Transition diagnostic → espace personnel. */
@@ -1009,6 +1035,49 @@ p {
   background-size: 20px 20px;
   mask-image: linear-gradient(to bottom, black, transparent 60%);
   opacity: 0.15;
+}
+
+/* Signature COAI : une lecture corporelle lente, présente seulement par
+   touches. Le graphite reste dominant, le laiton guide l'action et le bleu
+   minéral signale la donnée vivante. */
+.bg-lab-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(91, 145, 169, .055) 49.8%, rgba(91, 145, 169, .16) 50%, transparent 50.25%);
+  background-size: 100% 42rem;
+  opacity: .6;
+}
+
+.coai-score-signature {
+  position: relative;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(91,145,169,.13), transparent 16rem),
+    linear-gradient(135deg, rgba(25,24,21,.96), rgba(12,15,17,.96));
+  box-shadow: 0 30px 80px -52px rgba(201,162,98,.55), inset 0 1px rgba(255,255,255,.06);
+}
+.coai-score-signature::after {
+  content: "ANALYSE ACTIVE";
+  position: absolute;
+  right: 1.25rem;
+  top: .85rem;
+  color: rgba(116,169,192,.75);
+  font-size: .52rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+}
+.coai-live-metrics > div { padding-block: 1.35rem; }
+.coai-live-metrics strong { color: #f4ead7; letter-spacing: -.03em; }
+.coai-live-metrics > div:nth-child(2) strong { color: #8bb6c8; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .bg-lab-grid::after { animation: coai-body-scan 22s linear infinite; }
+}
+@keyframes coai-body-scan {
+  from { background-position: 0 -42rem; }
+  to { background-position: 0 42rem; }
 }
 
 /* Univers premium futuriste : un club privé lumineux, pas un laboratoire froid. */

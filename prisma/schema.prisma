@@ -17,6 +17,9 @@ model User {
   nom            String?
   dateNaissance  DateTime? @db.Date
   phoneWhatsapp  String?   @unique
+  // Photo choisie pour personnaliser l'accueil du dashboard. Stockée dans
+  // le bucket privé progress-photos et servie uniquement par URL signée.
+  avatarPath     String?
   consentRgpdAt  DateTime?
   // Certification santé recueillie à l'inscription : l'utilisateur déclare
   // être apte à la pratique sportive ou avoir consulté un médecin.

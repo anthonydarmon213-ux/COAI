@@ -238,7 +238,7 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="mx-auto mt-8 flex max-w-3xl flex-col items-center justify-between gap-4 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.06] px-6 py-5 text-center sm:flex-row sm:text-left">
+        <div className="coai-score-signature mx-auto mt-10 flex max-w-3xl flex-col items-center justify-between gap-5 overflow-hidden rounded-[1.75rem] border border-laiton-300/25 bg-laiton-300/[0.06] px-7 py-7 text-center sm:flex-row sm:text-left">
           <div>
             <p className="font-semibold text-white">Ton Score COAI reste ton fil rouge.</p>
             <p className="mt-1 text-sm text-graphite-300">Un point de départ mesurable, puis un repère concret pour voir le chemin parcouru.</p>
@@ -248,17 +248,17 @@ export default function LandingPage() {
           </Link>
         </div>
 
-        <div className="mx-auto mt-5 grid max-w-3xl gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
+        <div className="coai-live-metrics mx-auto mt-5 grid max-w-3xl gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
           <div className="bg-[#111210] px-5 py-4 text-center">
-            <strong className="block text-lg text-white">45–60 min</strong>
+            <strong className="block font-display text-2xl text-white">45–60</strong>
             <span className="mt-1 block text-xs text-graphite-400">durée habituelle d’une séance</span>
           </div>
           <div className="bg-[#111210] px-5 py-4 text-center">
-            <strong className="block text-lg text-white">2–3 séances</strong>
+            <strong className="block font-display text-2xl text-white">2–3</strong>
             <span className="mt-1 block text-xs text-graphite-400">par semaine pour débuter</span>
           </div>
           <div className="bg-[#111210] px-5 py-4 text-center">
-            <strong className="block text-lg text-white">4–6 semaines</strong>
+            <strong className="block font-display text-2xl text-white">4–6</strong>
             <span className="mt-1 block text-xs text-graphite-400">avant chaque réévaluation</span>
           </div>
         </div>

@@ -13,6 +13,8 @@ import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/li
 import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
 import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
+import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
+import { getSignedProgressPhotoUrl } from "@/lib/storage/progress-photos";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -57,7 +59,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight] = await Promise.all([
+  const [validated, latest, daily, insight, avatarUrl] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -68,6 +70,7 @@ export default async function DashboardPage() {
     }),
     prisma.dailySession.findUnique({ where: { userId_date: { userId: user.id, date } } }),
     getCoaiInsight(user.id),
+    user.avatarPath ? getSignedProgressPhotoUrl(user.avatarPath) : Promise.resolve(null),
   ]);
 
   const programme = validated ?? latest;
@@ -87,12 +90,15 @@ export default async function DashboardPage() {
           <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
           <span>Aujourd&apos;hui</span>
         </div>
-        <div>
-          <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
-            {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
-          </h1>
-          <p className="mt-3 text-xl font-bold text-graphite-50">Ton Personal Trainer, toujours avec toi.</p>
-          <p className="mt-2 max-w-2xl text-base leading-7 text-graphite-300">{objective}</p>
+        <div className="flex items-center gap-5 sm:gap-7">
+          <DashboardAvatar initialUrl={avatarUrl} prenom={user.prenom} />
+          <div>
+            <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
+              {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
+            </h1>
+            <p className="mt-3 text-xl font-bold text-graphite-50">Ton Personal Trainer, toujours avec toi.</p>
+            <p className="mt-2 max-w-2xl text-base leading-7 text-graphite-300">{objective}</p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="coai-dashboard-status">Profil analysé</span>

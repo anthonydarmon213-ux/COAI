@@ -90,11 +90,19 @@ export function ServiceDetailModal({
         {/* CTA */}
         <div className="flex w-full flex-col items-center gap-2">
           {tier.sessions ? (
-            tier.sessions.map((session) => (
-              <OffreConsentGate key={session.count} resumeConditions={<>Abonnement VIP de {session.prix}, résiliable à tout moment, incluant {session.label}.</>}>
-                <SubscribeButton plan="PREMIUM" vipSessions={session.count} label={`${session.label} — ${session.prix}`} className="w-full" />
+            <>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-display text-4xl font-semibold text-white">199€</span>
+                <span className="text-sm text-graphite-400">/mois</span>
+              </div>
+              <p className="text-sm text-graphite-300">1 séance privée mensuelle incluse</p>
+              <OffreConsentGate resumeConditions={<>Abonnement VIP de 199€/mois, résiliable à tout moment, incluant 1 séance privée par mois.</>}>
+                <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP" className="coai-rainbow-cta w-full border-0" />
               </OffreConsentGate>
-            ))
+              <a href={vipReservationHref("un rythme VIP de 2 à 4 séances par mois", "sur mesure") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">
+                Besoin de davantage de séances ? Parlons-en
+              </a>
+            </>
           ) : (
             <OffreConsentGate
               resumeConditions={

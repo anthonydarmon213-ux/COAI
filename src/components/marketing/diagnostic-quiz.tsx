@@ -1446,6 +1446,11 @@ export function DiagnosticQuiz({
                 <h2 className="coai-gradient-text max-w-2xl font-display text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
                   Ton point de départ est clair. Voici la trajectoire.
                 </h2>
+                <div className="coai-analysis-proof" aria-label="Analyse personnalisée terminée">
+                  <span><i />16 dimensions explorées</span>
+                  <span><i />4 capacités physiques évaluées</span>
+                  <span><i />1 trajectoire personnelle</span>
+                </div>
                 <div className="coai-index-reveal mt-2 grid w-full max-w-2xl gap-5 rounded-2xl p-5 text-left sm:grid-cols-[auto_1fr] sm:items-center sm:p-7">
                   <div className="coai-index-ring" style={{ "--coai-score": `${diagnostic.indiceCoai.score * 3.6}deg` } as React.CSSProperties}>
                     <div>
@@ -1459,7 +1464,7 @@ export function DiagnosticQuiz({
                       Potentiel {diagnostic.indiceCoai.niveau.toLowerCase()}
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-graphite-300">
-                      Ton score révèle la qualité de ton terrain actuel et les leviers qui peuvent accélérer ta progression.
+                      Ce n&apos;est pas une note. C&apos;est ton point zéro personnel : celui auquel COAI comparera chacune de tes prochaines évolutions.
                     </p>
                   </div>
                 </div>
@@ -1577,6 +1582,36 @@ export function DiagnosticQuiz({
                   valide ton programme et te suit dans la durée, pendant que ton{" "}
                   <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
                   séances.
+                </p>
+              </div>
+
+              <div className="coai-value-loop w-full rounded-[1.75rem] p-6 text-left sm:p-8">
+                <div className="max-w-2xl">
+                  <SectionLabel>La différence COAI</SectionLabel>
+                  <h3 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">
+                    Un programme générique te donne un plan. COAI prend une décision avec toi, chaque jour.
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-graphite-300">
+                    Ton objectif reste le cap. Ton sommeil, ton énergie, tes douleurs, ton temps disponible et tes résultats déterminent le chemin réel.
+                  </p>
+                </div>
+                <ol className="mt-6 grid gap-3 sm:grid-cols-5">
+                  {[
+                    ["01", "COAI t’observe", "Bilan, niveau, mobilité et contraintes"],
+                    ["02", "Tu fais ton check-in", "Forme, sommeil, temps et douleurs"],
+                    ["03", "La séance se recalcule", "Volume, intensité et exercices utiles"],
+                    ["04", "Tu donnes ton retour", "Performances et sensations enregistrées"],
+                    ["05", "Le plan évolue", "Progression ajustée, humain si nécessaire"],
+                  ].map(([numero, titre, texte]) => (
+                    <li key={numero}>
+                      <span>{numero}</span>
+                      <strong>{titre}</strong>
+                      <p>{texte}</p>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-6 border-t border-white/10 pt-5 text-center text-sm font-semibold text-laiton-200">
+                  Ton programme n&apos;est jamais terminé : il apprend de toi.
                 </p>
               </div>
 
