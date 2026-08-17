@@ -27,6 +27,12 @@ export function buildNouveauLeadEmailHtml({
   score,
   niveauScore,
   objectif,
+  activiteQuotidienne,
+  objectifPrincipalLibre,
+  objectifSecondaire,
+  importanceObjectif,
+  freinPrincipalLibre,
+  attentesCoai,
   echeance,
   evaluation,
   niveau,
@@ -40,6 +46,12 @@ export function buildNouveauLeadEmailHtml({
   score: number;
   niveauScore: string;
   objectif: string;
+  activiteQuotidienne: string;
+  objectifPrincipalLibre: string;
+  objectifSecondaire: string;
+  importanceObjectif: string;
+  freinPrincipalLibre: string;
+  attentesCoai: string;
   echeance: string;
   evaluation: string;
   niveau: string;
@@ -55,6 +67,12 @@ export function buildNouveauLeadEmailHtml({
     ["Téléphone", telephone ?? "Non renseigné"],
     ["Score COAI", `${score}/100 — ${niveauScore}`],
     ["Objectif", objectif],
+    ["Activité quotidienne", activiteQuotidienne],
+    ["Objectif précisé", objectifPrincipalLibre],
+    ["Objectif secondaire", objectifSecondaire],
+    ["Pourquoi maintenant", importanceObjectif],
+    ["Frein principal", freinPrincipalLibre],
+    ["Attentes envers COAI", attentesCoai],
     ["Échéance", echeance],
     ["Niveau", niveau],
     ["Évaluation physique", evaluation],
