@@ -27,6 +27,8 @@ export function buildNouveauLeadEmailHtml({
   score,
   niveauScore,
   objectif,
+  echeance,
+  evaluation,
   niveau,
   source,
   besoins,
@@ -38,6 +40,8 @@ export function buildNouveauLeadEmailHtml({
   score: number;
   niveauScore: string;
   objectif: string;
+  echeance: string;
+  evaluation: string;
   niveau: string;
   source: string;
   besoins: string[];
@@ -51,7 +55,9 @@ export function buildNouveauLeadEmailHtml({
     ["Téléphone", telephone ?? "Non renseigné"],
     ["Score COAI", `${score}/100 — ${niveauScore}`],
     ["Objectif", objectif],
+    ["Échéance", echeance],
     ["Niveau", niveau],
+    ["Évaluation physique", evaluation],
     ["Source", source],
     ["Offre recommandée", offreRecommandee],
   ];

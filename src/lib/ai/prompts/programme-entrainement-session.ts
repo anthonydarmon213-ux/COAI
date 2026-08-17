@@ -38,9 +38,11 @@ repli explicite.`
     : ""
 }
 
-Reste concis et efficace : 5 à 7 exercices maximum par séance (l'essentiel, pas une liste
-exhaustive) — mieux vaut une séance courte et réalisable qu'un plan interminable que personne ne
-suit jusqu'au bout. Parmi ces exercices, termine la séance par 1 à 2 exercices d'abdominaux/gainage
+Reste simple, concis et efficace : chaque exercice doit avoir une utilité directe pour l'objectif,
+le niveau et les résultats de l'évaluation physique de cette personne. Pour 30 minutes, propose 4 à
+5 exercices maximum ; pour 45 à 60 minutes, 5 à 7 maximum. N'ajoute jamais un exercice seulement
+pour remplir la séance — mieux vaut un plan court, clair et réalisable qu'une liste interminable.
+Parmi ces exercices, termine la séance par 1 à 2 exercices d'abdominaux/gainage
 en dernière position dans le tableau "exercices" — sauf si la séance cible déjà principalement les
 abdominaux, ou si c'est un jour de sport existant/cardio pur où ça n'a pas de sens.
 

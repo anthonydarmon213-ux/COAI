@@ -90,6 +90,13 @@ export async function POST(request: Request) {
   const reponsesLead = parsed.data.reponses as Record<string, unknown>;
   const objectifLead = typeof reponsesLead.objectif === "string" ? reponsesLead.objectif : "Non renseigné";
   const niveauLead = typeof reponsesLead.niveau === "string" ? reponsesLead.niveau : "Non renseigné";
+  const echeanceLead = typeof reponsesLead.echeance === "string" ? reponsesLead.echeance : "Non renseignée";
+  const evaluationLead = [
+    typeof reponsesLead.mobiliteRepere === "string" ? `Mobilité : ${reponsesLead.mobiliteRepere}` : null,
+    typeof reponsesLead.cardioRepere === "string" ? `Cardio : ${reponsesLead.cardioRepere}` : null,
+    typeof reponsesLead.forceRepere === "string" ? `Force : ${reponsesLead.forceRepere}` : null,
+    typeof reponsesLead.mouvementRepere === "string" ? `Mouvement : ${reponsesLead.mouvementRepere}` : null,
+  ].filter(Boolean).join(" · ") || "Non renseignée";
   const coachPreference = reponsesLead.coachPreference;
   const offreRecommandee = coachPreference === "VIP_PRESENTIEL"
     ? "VIP — coaching privé en présentiel"
@@ -102,7 +109,9 @@ export async function POST(request: Request) {
     parsed.data.telephone ? `Téléphone : ${parsed.data.telephone}` : "Téléphone : non renseigné",
     diagnostic ? `Score COAI : ${diagnostic.indiceCoai.score}/100 — ${diagnostic.indiceCoai.niveau}` : null,
     `Objectif : ${objectifLead}`,
+    `Échéance : ${echeanceLead}`,
     `Niveau : ${niveauLead}`,
+    `Évaluation : ${evaluationLead}`,
     `Source : ${source}`,
     `Besoins : ${diagnostic?.pointsATravailler.join(" · ") || "À préciser"}`,
     `Solutions : ${diagnostic?.pointsResolus.join(" · ") || "Diagnostic COAI"}`,
@@ -132,6 +141,8 @@ export async function POST(request: Request) {
             score: diagnostic.indiceCoai.score,
             niveauScore: diagnostic.indiceCoai.niveau,
             objectif: objectifLead,
+            echeance: echeanceLead,
+            evaluation: evaluationLead,
             niveau: niveauLead,
             source,
             besoins: diagnostic.pointsATravailler,

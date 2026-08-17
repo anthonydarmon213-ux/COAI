@@ -62,7 +62,7 @@ Réponds uniquement avec ce JSON (rien d'autre) :
   "frequenceParSemaine": "la fréquence en toutes lettres, ex: 4 séances par semaine",
   "vueEnsemble": "récapitulatif jour par jour de la répartition sur la semaine",
   "contreIndications": ["mouvement ou type d'exercice à éviter à cause d'une contrainte de santé ou d'un antécédent déclaré, un par élément — ex: squat profond (douleur de genou signalée)"],
-  "dureeProgramme": "3 semaines, à réévaluer et ajuster ensuite selon la progression",
+  "dureeProgramme": "4 semaines, puis réévaluation et ajustement selon la progression, les sensations et les éventuelles douleurs",
   "jours": [
     { "jour": "Lundi", "focus": "Haut du corps — Push/Pull", "sportExistant": false }
   ]
