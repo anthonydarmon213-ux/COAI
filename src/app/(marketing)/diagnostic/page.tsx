@@ -48,7 +48,7 @@ export default async function DiagnosticPage({ searchParams }: { searchParams?: 
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Invitation COAI</p>
           <p className="mt-2 text-sm font-medium text-white">Un membre COAI t&apos;a invité à découvrir ton profil sportif.</p>
           <p className="mt-1 text-xs leading-5 text-graphite-400">
-            Le diagnostic prend environ 3 minutes. Il est gratuit et tu découvriras ton résultat avant de choisir quoi que ce soit.
+            Le diagnostic prend moins de 5 minutes. Il est gratuit et tu découvriras ton résultat avant de choisir quoi que ce soit.
           </p>
         </Card>
       )}
