@@ -158,6 +158,14 @@ const MOBILITE_REPERES = ["Fluide, sans gêne", "Quelques raideurs", "Mouvement 
 const CARDIO_REPERES = ["Je monte 3 étages facilement", "Je suis légèrement essoufflé", "Je dois faire une pause", "Je ne peux pas l’évaluer"];
 const FORCE_REPERES = ["10 levers de chaise faciles", "10 levers avec effort", "Moins de 10 répétitions", "Je ne peux pas l’évaluer"];
 const MOUVEMENT_REPERES = ["Stable et contrôlé", "Manque d’équilibre", "Compensation ou raideur", "Douleur — je ne teste pas"];
+const NIVEAUX_CONNAISSANCE = ["Je découvre", "Quelques bases", "Bonnes connaissances", "Très à l’aise"];
+const PRATIQUES_BIEN_ETRE = ["Méditation", "Respiration / breathwork", "Yoga", "Aucune actuellement"];
+const QUOTIDIENS = [
+  "Assis presque toute la journée",
+  "Journée mixte : assis et debout",
+  "Souvent debout ou en déplacement",
+  "Métier physique / très actif",
+];
 
 // Remplace le libellé générique "Autre, à préciser" par le texte
 // effectivement saisi (si renseigné) — garde le libellé tel quel sinon,
@@ -177,8 +185,13 @@ function resolveAutre(list: string[], texteLibre: string): string[] {
 type Step =
   | "intro"
   | "persona"
+  | "quotidien"
   | "niveau"
   | "objectif"
+  | "intentions"
+  | "accompagnement"
+  | "histoire"
+  | "expertise"
   | "echeance"
   | "evaluationPhysique"
   | "equipement"
@@ -212,23 +225,20 @@ type Step =
 // "analyse" (Phase 5) : moment de transition avant la révélation, pas une
 // vraie question — exclu de la barre de progression comme "result".
 const QUESTION_STEPS: Step[] = [
-  "persona",
+  "quotidien",
   "niveau",
   "objectif",
+  "accompagnement",
   "echeance",
-  "evaluationPhysique",
   "equipement",
   "lieu",
   "duree",
   "frequence",
-  "sport",
   "sexe",
-  "santeFeminine",
   "profilPhysique",
   "alimentation",
   "sommeil",
   "sante",
-  "coach",
   "email",
 ];
 
@@ -336,8 +346,24 @@ export function DiagnosticQuiz({
 }: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
   const [step, setStep] = useState<Step>("intro");
   const [persona, setPersona] = useState<string[]>([]);
+  const [activiteQuotidienne, setActiviteQuotidienne] = useState<string | null>(null);
   const [niveau, setNiveau] = useState<string | null>(null);
   const [objectif, setObjectif] = useState<string | null>(null);
+  const [objectifPrincipalLibre, setObjectifPrincipalLibre] = useState("");
+  const [objectifSecondaire, setObjectifSecondaire] = useState("");
+  const [importanceObjectif, setImportanceObjectif] = useState("");
+  const [freinPrincipalLibre, setFreinPrincipalLibre] = useState("");
+  const [attentesCoai, setAttentesCoai] = useState("");
+  const [passeSportif, setPasseSportif] = useState("");
+  const [sourceDecouverteLibre, setSourceDecouverteLibre] = useState("");
+  const [connaissanceMusculation, setConnaissanceMusculation] = useState<string | null>(null);
+  const [connaissanceNutrition, setConnaissanceNutrition] = useState<string | null>(null);
+  const [connaissanceRecuperation, setConnaissanceRecuperation] = useState<string | null>(null);
+  const [pratiquesBienEtre, setPratiquesBienEtre] = useState<string[]>([]);
+  const [anneesMusculation, setAnneesMusculation] = useState("");
+  const [maxDeveloppeCouche, setMaxDeveloppeCouche] = useState("");
+  const [maxDeadlift, setMaxDeadlift] = useState("");
+  const [prioriteTravail, setPrioriteTravail] = useState("");
   const [echeance, setEcheance] = useState<string | null>(null);
   const [mobiliteRepere, setMobiliteRepere] = useState<string | null>(null);
   const [cardioRepere, setCardioRepere] = useState<string | null>(null);
@@ -418,6 +444,18 @@ export function DiagnosticQuiz({
     });
   }
 
+  function togglePratiqueBienEtre(value: string) {
+    const aucune = "Aucune actuellement";
+    if (value === aucune) {
+      setPratiquesBienEtre((prev) => (prev.includes(aucune) ? [] : [aucune]));
+      return;
+    }
+    setPratiquesBienEtre((prev) => {
+      const sansAucune = prev.filter((item) => item !== aucune);
+      return sansAucune.includes(value) ? sansAucune.filter((item) => item !== value) : [...sansAucune, value];
+    });
+  }
+
   const STEP_ORDER: Step[] = ["intro", ...questionSteps, "analyse", "result"];
 
   function goNext() {
@@ -465,9 +503,25 @@ export function DiagnosticQuiz({
       step,
       persona,
       personaAutreTexte,
+      activiteQuotidienne,
       niveau,
       objectif,
       objectifAutreTexte,
+      objectifPrincipalLibre,
+      objectifSecondaire,
+      importanceObjectif,
+      freinPrincipalLibre,
+      attentesCoai,
+      passeSportif,
+      sourceDecouverteLibre,
+      connaissanceMusculation,
+      connaissanceNutrition,
+      connaissanceRecuperation,
+      pratiquesBienEtre,
+      anneesMusculation,
+      maxDeveloppeCouche,
+      maxDeadlift,
+      prioriteTravail,
       echeance,
       mobiliteRepere,
       cardioRepere,
@@ -503,9 +557,25 @@ export function DiagnosticQuiz({
     step,
     persona,
     personaAutreTexte,
+    activiteQuotidienne,
     niveau,
     objectif,
     objectifAutreTexte,
+    objectifPrincipalLibre,
+    objectifSecondaire,
+    importanceObjectif,
+    freinPrincipalLibre,
+    attentesCoai,
+    passeSportif,
+    sourceDecouverteLibre,
+    connaissanceMusculation,
+    connaissanceNutrition,
+    connaissanceRecuperation,
+    pratiquesBienEtre,
+    anneesMusculation,
+    maxDeveloppeCouche,
+    maxDeadlift,
+    prioriteTravail,
     echeance,
     mobiliteRepere,
     cardioRepere,
@@ -540,9 +610,25 @@ export function DiagnosticQuiz({
   function applySavedProgress(saved: Record<string, unknown>) {
     if (Array.isArray(saved.persona)) setPersona(saved.persona as string[]);
     if (typeof saved.personaAutreTexte === "string") setPersonaAutreTexte(saved.personaAutreTexte);
+    if (typeof saved.activiteQuotidienne === "string") setActiviteQuotidienne(saved.activiteQuotidienne);
     if (typeof saved.niveau === "string") setNiveau(saved.niveau);
     if (typeof saved.objectif === "string") setObjectif(saved.objectif);
     if (typeof saved.objectifAutreTexte === "string") setObjectifAutreTexte(saved.objectifAutreTexte);
+    if (typeof saved.objectifPrincipalLibre === "string") setObjectifPrincipalLibre(saved.objectifPrincipalLibre);
+    if (typeof saved.objectifSecondaire === "string") setObjectifSecondaire(saved.objectifSecondaire);
+    if (typeof saved.importanceObjectif === "string") setImportanceObjectif(saved.importanceObjectif);
+    if (typeof saved.freinPrincipalLibre === "string") setFreinPrincipalLibre(saved.freinPrincipalLibre);
+    if (typeof saved.attentesCoai === "string") setAttentesCoai(saved.attentesCoai);
+    if (typeof saved.passeSportif === "string") setPasseSportif(saved.passeSportif);
+    if (typeof saved.sourceDecouverteLibre === "string") setSourceDecouverteLibre(saved.sourceDecouverteLibre);
+    if (typeof saved.connaissanceMusculation === "string") setConnaissanceMusculation(saved.connaissanceMusculation);
+    if (typeof saved.connaissanceNutrition === "string") setConnaissanceNutrition(saved.connaissanceNutrition);
+    if (typeof saved.connaissanceRecuperation === "string") setConnaissanceRecuperation(saved.connaissanceRecuperation);
+    if (Array.isArray(saved.pratiquesBienEtre)) setPratiquesBienEtre(saved.pratiquesBienEtre as string[]);
+    if (typeof saved.anneesMusculation === "string") setAnneesMusculation(saved.anneesMusculation);
+    if (typeof saved.maxDeveloppeCouche === "string") setMaxDeveloppeCouche(saved.maxDeveloppeCouche);
+    if (typeof saved.maxDeadlift === "string") setMaxDeadlift(saved.maxDeadlift);
+    if (typeof saved.prioriteTravail === "string") setPrioriteTravail(saved.prioriteTravail);
     if (typeof saved.echeance === "string") setEcheance(saved.echeance);
     if (typeof saved.mobiliteRepere === "string") setMobiliteRepere(saved.mobiliteRepere);
     if (typeof saved.cardioRepere === "string") setCardioRepere(saved.cardioRepere);
@@ -639,8 +725,10 @@ export function DiagnosticQuiz({
 
   const canContinue = useMemo(() => {
     if (step === "persona") return persona.length > 0;
+    if (step === "quotidien") return Boolean(activiteQuotidienne);
     if (step === "niveau") return Boolean(niveau);
-    if (step === "objectif") return Boolean(objectif);
+    if (step === "objectif") return Boolean(objectif) && objectifPrincipalLibre.trim().length >= 5 && importanceObjectif.trim().length >= 10;
+    if (step === "accompagnement") return attentesCoai.trim().length >= 10;
     if (step === "echeance") return Boolean(echeance);
     if (step === "evaluationPhysique") return Boolean(mobiliteRepere && cardioRepere && forceRepere && mouvementRepere);
     if (step === "equipement") return equipement.length > 0;
@@ -660,8 +748,12 @@ export function DiagnosticQuiz({
   }, [
     step,
     persona,
+    activiteQuotidienne,
     niveau,
     objectif,
+    objectifPrincipalLibre,
+    importanceObjectif,
+    attentesCoai,
     echeance,
     mobiliteRepere,
     cardioRepere,
@@ -687,6 +779,7 @@ export function DiagnosticQuiz({
     () =>
       buildMiniDiagnostic({
         persona: resolveAutre(persona, personaAutreTexte),
+        activiteQuotidienne,
         niveau,
         objectif: resolveObjectif(objectif, objectifAutreTexte),
         equipement,
@@ -700,6 +793,7 @@ export function DiagnosticQuiz({
     [
       persona,
       personaAutreTexte,
+      activiteQuotidienne,
       niveau,
       objectif,
       objectifAutreTexte,
@@ -733,7 +827,20 @@ export function DiagnosticQuiz({
     return {
       niveau: niveau ?? undefined,
       persona: personaResolue.length ? personaResolue.join(", ") : undefined,
-      objectifs: [objectifResolu, echeance ? `échéance : ${echeance}` : null, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
+      objectifs: [
+        objectifResolu,
+        activiteQuotidienne ? `activité quotidienne : ${activiteQuotidienne}` : null,
+        objectifPrincipalLibre.trim() ? `objectif précisé : ${objectifPrincipalLibre.trim()}` : null,
+        objectifSecondaire.trim() ? `objectif secondaire : ${objectifSecondaire.trim()}` : null,
+        importanceObjectif.trim() ? `motivation : ${importanceObjectif.trim()}` : null,
+        freinPrincipalLibre.trim() ? `frein principal : ${freinPrincipalLibre.trim()}` : null,
+        attentesCoai.trim() ? `attentes envers COAI : ${attentesCoai.trim()}` : null,
+        passeSportif.trim() ? `passé sportif : ${passeSportif.trim()}` : null,
+        sourceDecouverteLibre.trim() ? `a connu COAI via : ${sourceDecouverteLibre.trim()}` : null,
+        prioriteTravail.trim() ? `priorité actuelle : ${prioriteTravail.trim()}` : null,
+        echeance ? `échéance : ${echeance}` : null,
+        personaAutreResolue,
+      ].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
       lieuEntrainement: lieu ?? undefined,
       dureeSeanceMinutes: duree ? DUREE_EN_MINUTES[duree] : undefined,
@@ -745,6 +852,12 @@ export function DiagnosticQuiz({
         cardioRepere ? `Cardio : ${cardioRepere}` : null,
         forceRepere ? `Force fonctionnelle : ${forceRepere}` : null,
         mouvementRepere ? `Mouvements de base : ${mouvementRepere}` : null,
+        connaissanceMusculation ? `Connaissances musculation : ${connaissanceMusculation}` : null,
+        connaissanceNutrition ? `Connaissances nutrition : ${connaissanceNutrition}` : null,
+        connaissanceRecuperation ? `Connaissances récupération : ${connaissanceRecuperation}` : null,
+        anneesMusculation.trim() ? `Ancienneté musculation : ${anneesMusculation.trim()}` : null,
+        maxDeveloppeCouche.trim() ? `Développé couché : ${maxDeveloppeCouche.trim()} kg` : null,
+        maxDeadlift.trim() ? `Deadlift : ${maxDeadlift.trim()} kg` : null,
       ].filter(Boolean).join(" — ") || undefined,
       sexe: sexe ?? undefined,
       sportsPratiques: sportResolu.length ? sportResolu.join(", ") : undefined,
@@ -821,8 +934,14 @@ export function DiagnosticQuiz({
           ...utm,
           reponses: {
             persona: resolveAutre(persona, personaAutreTexte),
+            activiteQuotidienne,
             niveau,
             objectif: resolveObjectif(objectif, objectifAutreTexte),
+            objectifPrincipalLibre: objectifPrincipalLibre.trim(),
+            objectifSecondaire: objectifSecondaire.trim() || undefined,
+            importanceObjectif: importanceObjectif.trim(),
+            freinPrincipalLibre: freinPrincipalLibre.trim(),
+            attentesCoai: attentesCoai.trim(),
             echeance,
             mobiliteRepere,
             cardioRepere,
@@ -879,23 +998,25 @@ export function DiagnosticQuiz({
   }
 
   return (
-    <div className={`mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-5xl" : "max-w-2xl"}`}>
+    <div className={`coai-diagnostic-shell mx-auto w-full transition-[max-width] ${step === "result" ? "max-w-5xl" : "max-w-2xl"}`}>
+      <div className="coai-diagnostic-orbit coai-diagnostic-orbit-a" aria-hidden="true" />
+      <div className="coai-diagnostic-orbit coai-diagnostic-orbit-b" aria-hidden="true" />
       <div className={`coai-diagnostic-card overflow-hidden ${step === "result" ? "coai-diagnostic-result" : ""}`}>
         {step !== "intro" && step !== "result" && step !== "analyse" && (
           <div className="coai-diagnostic-progress flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
               Profil {stepIndex + 1} sur {questionSteps.length}
             </span>
-            <div className="h-1.5 w-32 overflow-hidden rounded-full bg-graphite-800 sm:w-40">
+            <div className="coai-progress-track h-1.5 w-32 overflow-hidden rounded-full bg-graphite-800 sm:w-40">
               <div
-                className="h-full rounded-full bg-laiton-400 transition-all duration-300"
+                className="coai-progress-value h-full rounded-full bg-laiton-400 transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
           </div>
         )}
 
-        <div className="px-6 py-7 sm:px-8">
+        <div key={step} className="coai-diagnostic-stage px-6 py-7 sm:px-8">
           {step === "intro" && (
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
               <div className="coai-diagnostic-kicker" aria-label="Ton bilan initial et ton Score COAI">
@@ -910,7 +1031,7 @@ export function DiagnosticQuiz({
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    En 3 minutes, fais le point comme avec un Personal Trainer : besoins, niveau,
+                    En moins de 5 minutes, fais le point comme avec un Personal Trainer : besoins, niveau,
                     contraintes, objectif et Score COAI mesurable.
                   </>
                 )}
@@ -937,8 +1058,8 @@ export function DiagnosticQuiz({
                   </button>
                 </div>
               ) : (
-                <Button onClick={startDiagnostic} className="mt-2 px-8 py-3.5">
-                  Commencer mon bilan initial — 3 min
+                <Button onClick={startDiagnostic} className="mt-2 whitespace-nowrap px-5 py-3.5 text-[0.78rem] min-[390px]:px-8 min-[390px]:text-sm">
+                  Commencer mon bilan — 5 min max
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
@@ -967,6 +1088,19 @@ export function DiagnosticQuiz({
                   className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
                 />
               )}
+            </div>
+          )}
+
+          {step === "quotidien" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <p className="coai-consultation-phase">Ton quotidien</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">En dehors du sport, comment se passent tes journées ?</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Une personne assise huit heures n&apos;a pas les mêmes besoins qu&apos;une personne qui travaille debout ou exerce un métier physique.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {QUOTIDIENS.map((item) => <OptionCard key={item} label={item} active={activiteQuotidienne === item} onClick={() => setActiviteQuotidienne(item)} />)}
+              </div>
             </div>
           )}
 
@@ -1011,6 +1145,169 @@ export function DiagnosticQuiz({
                   className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
                 />
               )}
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Précise ton objectif avec tes mots</span>
+                <textarea value={objectifPrincipalLibre} onChange={(event) => setObjectifPrincipalLibre(event.target.value.slice(0, 500))} rows={2} placeholder="Ex. Perdre 8 kg et retrouver mon souffle…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Objectif secondaire <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <input value={objectifSecondaire} onChange={(event) => setObjectifSecondaire(event.target.value.slice(0, 300))} placeholder="Ex. Mieux dormir, gagner en mobilité…" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Pourquoi est-ce important pour toi maintenant ?</span>
+                <textarea value={importanceObjectif} onChange={(event) => setImportanceObjectif(event.target.value.slice(0, 500))} rows={2} placeholder="La vraie raison qui te donne envie de changer…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
+            </div>
+          )}
+
+          {step === "intentions" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Entretien · Tes motivations</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Parle-nous vraiment de ce que tu veux accomplir.</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Écris avec tes mots. C&apos;est ce qui permettra à COAI — et à ton coach — de comprendre ce qui compte vraiment pour toi.</p>
+              </div>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Quel est précisément ton objectif principal ?</span>
+                <textarea
+                  value={objectifPrincipalLibre}
+                  onChange={(event) => setObjectifPrincipalLibre(event.target.value.slice(0, 500))}
+                  rows={3}
+                  placeholder="Ex. Perdre 8 kg, retrouver mon souffle et me sentir à nouveau à l’aise dans mes vêtements…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">As-tu un objectif secondaire ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <textarea
+                  value={objectifSecondaire}
+                  onChange={(event) => setObjectifSecondaire(event.target.value.slice(0, 500))}
+                  rows={2}
+                  placeholder="Ex. Être plus mobile, mieux dormir, préparer une course…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Pourquoi est-ce si important pour toi aujourd&apos;hui ?</span>
+                <textarea
+                  value={importanceObjectif}
+                  onChange={(event) => setImportanceObjectif(event.target.value.slice(0, 700))}
+                  rows={3}
+                  placeholder="La vraie raison qui te donne envie de changer maintenant…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+              <p className="text-xs leading-5 text-graphite-500">L&apos;objectif secondaire reste facultatif. Les deux autres réponses sont nécessaires pour continuer.</p>
+            </div>
+          )}
+
+          {step === "accompagnement" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Entretien · Ton accompagnement</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Qu&apos;est-ce qui ferait vraiment la différence cette fois ?</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Tes réponses nous évitent de te proposer une solution générique.</p>
+              </div>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <textarea
+                  value={freinPrincipalLibre}
+                  onChange={(event) => setFreinPrincipalLibre(event.target.value.slice(0, 700))}
+                  rows={3}
+                  placeholder="Ex. Le manque de temps, un programme mal adapté, des douleurs, la difficulté à rester régulier…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI pour réussir ?</span>
+                <textarea
+                  value={attentesCoai}
+                  onChange={(event) => setAttentesCoai(event.target.value.slice(0, 700))}
+                  rows={4}
+                  placeholder="Ex. Me dire exactement quoi faire, m’aider à rester régulier, adapter mes séances, avoir le regard d’un coach…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+            </div>
+          )}
+
+          {step === "histoire" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Entretien · Ton histoire</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Aide-nous à comprendre ton point de départ.</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Il n&apos;y a pas de bonne ou de mauvaise réponse.</p>
+              </div>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Quel est ton passé sportif ?</span>
+                <textarea
+                  value={passeSportif}
+                  onChange={(event) => setPasseSportif(event.target.value.slice(0, 900))}
+                  rows={4}
+                  placeholder="Les sports pratiqués, les périodes d’arrêt, ce que tu aimais ou ce qui t’a découragé…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Comment as-tu connu COAI ?</span>
+                <textarea
+                  value={sourceDecouverteLibre}
+                  onChange={(event) => setSourceDecouverteLibre(event.target.value.slice(0, 300))}
+                  rows={2}
+                  placeholder="Instagram, TikTok, Google, recommandation d’un ami, Anthony…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+            </div>
+          )}
+
+          {step === "expertise" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Entretien · Ton expérience</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Quel accompagnement correspond vraiment à ton niveau ?</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Nous adapterons les explications : ni trop basiques, ni inutilement techniques.</p>
+              </div>
+              {[
+                ["Musculation", connaissanceMusculation, setConnaissanceMusculation],
+                ["Nutrition", connaissanceNutrition, setConnaissanceNutrition],
+                ["Récupération", connaissanceRecuperation, setConnaissanceRecuperation],
+              ].map(([label, value, setter]) => (
+                <div key={label as string} className="flex flex-col gap-2 text-left">
+                  <span className="text-sm font-semibold text-graphite-200">Ton niveau de connaissance en {String(label).toLowerCase()}</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {NIVEAUX_CONNAISSANCE.map((item) => (
+                      <button key={item} type="button" aria-pressed={value === item} onClick={() => (setter as (next: string) => void)(item)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold transition ${value === item ? "border-laiton-400 bg-laiton-400/15 text-laiton-200" : "border-graphite-700 bg-graphite-900/50 text-graphite-300"}`}>{item}</button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Pratiques-tu aussi l&apos;une de ces disciplines ?</span>
+                <div className="flex flex-wrap gap-2">
+                  {PRATIQUES_BIEN_ETRE.map((item) => <Chip key={item} label={item} active={pratiquesBienEtre.includes(item)} onClick={() => togglePratiqueBienEtre(item)} />)}
+                </div>
+              </div>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Depuis combien de temps pratiques-tu la musculation ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <input value={anneesMusculation} onChange={(event) => setAnneesMusculation(event.target.value.slice(0, 100))} placeholder="Ex. 2 ans, par intermittence depuis 5 ans, jamais…" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Ton passé sportif en quelques mots <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <textarea value={passeSportif} onChange={(event) => setPasseSportif(event.target.value.slice(0, 600))} rows={2} placeholder="Sports pratiqués, arrêts, reprises…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-2 text-left"><span className="text-xs font-semibold text-graphite-300">Max développé couché</span><input type="number" min="0" max="500" inputMode="decimal" value={maxDeveloppeCouche} onChange={(event) => setMaxDeveloppeCouche(event.target.value)} placeholder="kg (facultatif)" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-3 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" /></label>
+                <label className="flex flex-col gap-2 text-left"><span className="text-xs font-semibold text-graphite-300">Max deadlift</span><input type="number" min="0" max="700" inputMode="decimal" value={maxDeadlift} onChange={(event) => setMaxDeadlift(event.target.value)} placeholder="kg (facultatif)" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-3 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" /></label>
+              </div>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce que tu veux travailler en priorité ?</span>
+                <textarea value={prioriteTravail} onChange={(event) => setPrioriteTravail(event.target.value.slice(0, 500))} rows={3} placeholder="Une zone du corps, une capacité, une habitude ou un mouvement précis…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Comment as-tu connu COAI ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <input value={sourceDecouverteLibre} onChange={(event) => setSourceDecouverteLibre(event.target.value.slice(0, 200))} placeholder="Instagram, TikTok, Google, un ami…" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </label>
             </div>
           )}
 
@@ -1694,21 +1991,24 @@ export function DiagnosticQuiz({
                 // sont mémorisées (pont pré-inscription existant) et
                 // appliquées automatiquement à son profil dès la création du
                 // compte, exactement comme avant.
-                <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-6 text-center">
+                <div className="relative mt-4 flex w-full flex-col items-center gap-4 overflow-hidden rounded-[1.6rem] border-2 border-laiton-400/55 bg-[linear-gradient(145deg,rgba(239,217,173,.22),rgba(255,255,255,.88))] px-5 py-8 text-center shadow-[0_24px_70px_-24px_rgba(143,103,43,.65)] sm:px-8 sm:py-10">
+                  <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-laiton-300 via-laiton-500 to-acier-400" aria-hidden="true" />
                   <div className="coai-diagnostic-kicker">
                     <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                    <span>Ton espace est prêt</span>
+                    <span>Étape suivante · ton espace est prêt</span>
                   </div>
-                  <h3 className="font-display text-2xl font-semibold text-white sm:text-3xl">Découvre ton coaching avant de choisir.</h3>
+                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Passe maintenant dans ton espace COAI.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
-                    Ton tableau de bord personnalisé t&apos;attend. Explore ton profil et ton futur
-                    accompagnement gratuitement. Le paiement ne sera proposé que lorsque tu voudras
-                    générer ton programme complet ou activer un suivi humain.
+                    Retrouve ton diagnostic dans ton tableau de bord et découvre ton futur
+                    accompagnement gratuitement. Aucun paiement n&apos;est demandé pour entrer.
                   </p>
-                  <Link href={signUpHref()} onClick={handleCreerCompte}>
-                    <Button className="px-8 py-3.5">Entrer dans mon espace COAI →</Button>
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-700">Clique ci-dessous pour continuer</span>
+                  <Link href={signUpHref()} onClick={handleCreerCompte} className="w-full max-w-md">
+                    <Button className="coai-rainbow-cta w-full border-0 px-6 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-16px_rgba(201,162,98,.9)] sm:text-lg">
+                      Créer mon espace personnalisé →
+                    </Button>
                   </Link>
-                  <span className="text-xs text-graphite-500">Aucune carte bancaire maintenant</span>
+                  <span className="text-xs font-medium text-graphite-500">Gratuit · aucune carte bancaire · ton diagnostic est conservé</span>
                 </div>
               )}
 
