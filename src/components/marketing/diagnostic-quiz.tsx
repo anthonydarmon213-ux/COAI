@@ -153,6 +153,12 @@ const QUALITES_SOMMEIL = [
   "Excellente (8h ou plus, réparateur)",
 ];
 
+const ECHEANCES = ["Dans 3 mois", "Dans 6 mois", "Dans 12 mois", "Pas de date précise"];
+const MOBILITE_REPERES = ["Fluide, sans gêne", "Quelques raideurs", "Mouvement limité", "Douleur — je ne teste pas"];
+const CARDIO_REPERES = ["Je monte 3 étages facilement", "Je suis légèrement essoufflé", "Je dois faire une pause", "Je ne peux pas l’évaluer"];
+const FORCE_REPERES = ["10 levers de chaise faciles", "10 levers avec effort", "Moins de 10 répétitions", "Je ne peux pas l’évaluer"];
+const MOUVEMENT_REPERES = ["Stable et contrôlé", "Manque d’équilibre", "Compensation ou raideur", "Douleur — je ne teste pas"];
+
 // Remplace le libellé générique "Autre, à préciser" par le texte
 // effectivement saisi (si renseigné) — garde le libellé tel quel sinon,
 // plutôt que de perdre la sélection.
@@ -173,6 +179,8 @@ type Step =
   | "persona"
   | "niveau"
   | "objectif"
+  | "echeance"
+  | "evaluationPhysique"
   | "equipement"
   | "lieu"
   | "duree"
@@ -207,6 +215,8 @@ const QUESTION_STEPS: Step[] = [
   "persona",
   "niveau",
   "objectif",
+  "echeance",
+  "evaluationPhysique",
   "equipement",
   "lieu",
   "duree",
@@ -289,6 +299,28 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
+function AssessmentRow({ number, title, instruction, options, value, onChange }: {
+  number: string; title: string; instruction: string; options: string[];
+  value: string | null; onChange: (value: string) => void;
+}) {
+  return (
+    <fieldset className="coai-assessment-row">
+      <legend className="sr-only">{title}</legend>
+      <div className="flex items-start gap-3">
+        <span className="coai-assessment-number">{number}</span>
+        <div><p className="font-semibold text-[#20211e]">{title}</p><p className="mt-1 text-xs leading-5 text-[#666159]">{instruction}</p></div>
+      </div>
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {options.map((option) => (
+          <button key={option} type="button" aria-pressed={value === option} onClick={() => onChange(option)} className="coai-assessment-choice">
+            <span>{option}</span><i aria-hidden="true">{value === option ? "✓" : ""}</i>
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 function VoletCard({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex w-full flex-col rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4 text-left">
@@ -306,6 +338,11 @@ export function DiagnosticQuiz({
   const [persona, setPersona] = useState<string[]>([]);
   const [niveau, setNiveau] = useState<string | null>(null);
   const [objectif, setObjectif] = useState<string | null>(null);
+  const [echeance, setEcheance] = useState<string | null>(null);
+  const [mobiliteRepere, setMobiliteRepere] = useState<string | null>(null);
+  const [cardioRepere, setCardioRepere] = useState<string | null>(null);
+  const [forceRepere, setForceRepere] = useState<string | null>(null);
+  const [mouvementRepere, setMouvementRepere] = useState<string | null>(null);
   const [equipement, setEquipement] = useState<string[]>([]);
   const [lieu, setLieu] = useState<string | null>(null);
   const [duree, setDuree] = useState<string | null>(null);
@@ -347,6 +384,7 @@ export function DiagnosticQuiz({
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
+  const [antecedentsMedicaux, setAntecedentsMedicaux] = useState("");
   const [sportAutreTexte, setSportAutreTexte] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
@@ -430,6 +468,11 @@ export function DiagnosticQuiz({
       niveau,
       objectif,
       objectifAutreTexte,
+      echeance,
+      mobiliteRepere,
+      cardioRepere,
+      forceRepere,
+      mouvementRepere,
       equipement,
       lieu,
       duree,
@@ -450,6 +493,7 @@ export function DiagnosticQuiz({
       qualiteSommeil,
       sante,
       santeAutreTexte,
+      antecedentsMedicaux,
       coachPreference,
       email,
       telephone,
@@ -462,6 +506,11 @@ export function DiagnosticQuiz({
     niveau,
     objectif,
     objectifAutreTexte,
+    echeance,
+    mobiliteRepere,
+    cardioRepere,
+    forceRepere,
+    mouvementRepere,
     equipement,
     lieu,
     duree,
@@ -482,6 +531,7 @@ export function DiagnosticQuiz({
     qualiteSommeil,
     sante,
     santeAutreTexte,
+    antecedentsMedicaux,
     coachPreference,
     email,
     telephone,
@@ -493,6 +543,11 @@ export function DiagnosticQuiz({
     if (typeof saved.niveau === "string") setNiveau(saved.niveau);
     if (typeof saved.objectif === "string") setObjectif(saved.objectif);
     if (typeof saved.objectifAutreTexte === "string") setObjectifAutreTexte(saved.objectifAutreTexte);
+    if (typeof saved.echeance === "string") setEcheance(saved.echeance);
+    if (typeof saved.mobiliteRepere === "string") setMobiliteRepere(saved.mobiliteRepere);
+    if (typeof saved.cardioRepere === "string") setCardioRepere(saved.cardioRepere);
+    if (typeof saved.forceRepere === "string") setForceRepere(saved.forceRepere);
+    if (typeof saved.mouvementRepere === "string") setMouvementRepere(saved.mouvementRepere);
     if (Array.isArray(saved.equipement)) setEquipement(saved.equipement as string[]);
     if (typeof saved.lieu === "string") setLieu(saved.lieu);
     if (typeof saved.duree === "string") setDuree(saved.duree);
@@ -515,6 +570,7 @@ export function DiagnosticQuiz({
     if (typeof saved.qualiteSommeil === "string") setQualiteSommeil(saved.qualiteSommeil);
     if (Array.isArray(saved.sante)) setSante(saved.sante as string[]);
     if (typeof saved.santeAutreTexte === "string") setSanteAutreTexte(saved.santeAutreTexte);
+    if (typeof saved.antecedentsMedicaux === "string") setAntecedentsMedicaux(saved.antecedentsMedicaux);
     if (
       saved.coachPreference === "FULL_IA" ||
       saved.coachPreference === "HYBRIDE" ||
@@ -585,6 +641,8 @@ export function DiagnosticQuiz({
     if (step === "persona") return persona.length > 0;
     if (step === "niveau") return Boolean(niveau);
     if (step === "objectif") return Boolean(objectif);
+    if (step === "echeance") return Boolean(echeance);
+    if (step === "evaluationPhysique") return Boolean(mobiliteRepere && cardioRepere && forceRepere && mouvementRepere);
     if (step === "equipement") return equipement.length > 0;
     if (step === "lieu") return Boolean(lieu);
     if (step === "duree") return Boolean(duree);
@@ -604,6 +662,11 @@ export function DiagnosticQuiz({
     persona,
     niveau,
     objectif,
+    echeance,
+    mobiliteRepere,
+    cardioRepere,
+    forceRepere,
+    mouvementRepere,
     equipement,
     lieu,
     duree,
@@ -670,12 +733,19 @@ export function DiagnosticQuiz({
     return {
       niveau: niveau ?? undefined,
       persona: personaResolue.length ? personaResolue.join(", ") : undefined,
-      objectifs: [objectifResolu, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
+      objectifs: [objectifResolu, echeance ? `échéance : ${echeance}` : null, personaAutreResolue].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
       lieuEntrainement: lieu ?? undefined,
       dureeSeanceMinutes: duree ? DUREE_EN_MINUTES[duree] : undefined,
       frequenceEntrainement: frequence ?? undefined,
       contraintesSante: santeReelle.length ? santeReelle.join(", ") : undefined,
+      antecedentsMedicaux: [
+        antecedentsMedicaux.trim() || null,
+        mobiliteRepere ? `Mobilité : ${mobiliteRepere}` : null,
+        cardioRepere ? `Cardio : ${cardioRepere}` : null,
+        forceRepere ? `Force fonctionnelle : ${forceRepere}` : null,
+        mouvementRepere ? `Mouvements de base : ${mouvementRepere}` : null,
+      ].filter(Boolean).join(" — ") || undefined,
       sexe: sexe ?? undefined,
       sportsPratiques: sportResolu.length ? sportResolu.join(", ") : undefined,
       // Cycle/maternité opt-in : rien envoyé si jamais coché/renseigné, pour
@@ -935,6 +1005,36 @@ export function DiagnosticQuiz({
                   className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
                 />
               )}
+            </div>
+          )}
+
+          {step === "echeance" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <p className="coai-consultation-phase">Entretien · Objectif</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Quand veux-tu constater un résultat concret ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Nous fixons un horizon réaliste — pas une promesse magique.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {ECHEANCES.map((item) => <OptionCard key={item} label={item} active={echeance === item} onClick={() => setEcheance(item)} />)}
+              </div>
+            </div>
+          )}
+
+          {step === "evaluationPhysique" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Évaluation physique guidée</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Observons comment ton corps répond aujourd’hui.</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Reste près d’un appui et ne force jamais. Arrête immédiatement en cas de douleur, vertige ou gêne inhabituelle.</p>
+              </div>
+              <div className="coai-assessment-suite">
+                <AssessmentRow number="01" title="Mobilité" instruction="Lève les bras au-dessus de la tête puis réalise un squat confortable." options={MOBILITE_REPERES} value={mobiliteRepere} onChange={setMobiliteRepere} />
+                <AssessmentRow number="02" title="Cardio" instruction="Prends comme repère ton ressenti habituel après trois étages à allure normale." options={CARDIO_REPERES} value={cardioRepere} onChange={setCardioRepere} />
+                <AssessmentRow number="03" title="Force fonctionnelle" instruction="Depuis une chaise stable, réalise jusqu’à dix levers contrôlés." options={FORCE_REPERES} value={forceRepere} onChange={setForceRepere} />
+                <AssessmentRow number="04" title="Mouvements de base" instruction="Tiens-toi quelques secondes sur une jambe près d’un appui, puis change de côté." options={MOUVEMENT_REPERES} value={mouvementRepere} onChange={setMouvementRepere} />
+              </div>
+              <p className="rounded-xl border border-[#b78943]/20 bg-[#b78943]/[0.07] px-4 py-3 text-xs leading-5 text-[#665336]">Cette auto-évaluation donne des repères de départ. Elle ne remplace ni un examen médical ni l’observation en direct d’un professionnel.</p>
             </div>
           )}
 
@@ -1221,6 +1321,10 @@ export function DiagnosticQuiz({
                   placeholder="Précise en quelques mots..."
                 />
               )}
+              <Field label="Antécédents médicaux, anciennes blessures ou opérations (facultatif)">
+                <textarea value={antecedentsMedicaux} onChange={(event) => setAntecedentsMedicaux(event.target.value)} placeholder="Ex. entorse ancienne, opération, traitement en cours, recommandation médicale…" rows={3} className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
+              </Field>
+              <p className="text-xs leading-5 text-graphite-500">Ces informations servent uniquement à adapter les précautions. COAI ne pose aucun diagnostic médical.</p>
             </div>
           )}
 

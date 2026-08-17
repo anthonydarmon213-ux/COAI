@@ -126,6 +126,16 @@ body {
   transform: scale(1.04);
 }
 
+.coai-consultation-phase { color: #8b6329; font-size: .65rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.coai-assessment-suite { display: grid; gap: .8rem; }
+.coai-assessment-row { border: 1px solid rgba(96,75,44,.14); border-radius: 1.15rem; background: linear-gradient(145deg,rgba(255,255,255,.82),rgba(245,240,231,.66)); padding: 1rem; box-shadow: inset 0 1px rgba(255,255,255,.9); }
+.coai-assessment-number { display: grid; width: 1.8rem; height: 1.8rem; flex: 0 0 auto; place-items: center; border-radius: 999px; background: #20211e; color: #efd9ad; font-size: .62rem; font-weight: 800; }
+.coai-assessment-choice { display: flex; min-height: 2.75rem; align-items: center; justify-content: space-between; gap: .6rem; border: 1px solid rgba(84,68,44,.14); border-radius: .8rem; background: rgba(255,255,255,.68); padding: .65rem .75rem; color: #494b46; text-align: left; font-size: .72rem; line-height: 1.35; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+.coai-assessment-choice:hover { transform: translateY(-1px); border-color: rgba(167,122,55,.42); }
+.coai-assessment-choice[aria-pressed="true"] { border-color: #a77a37; background: #f2e8d7; color: #2b2419; font-weight: 700; }
+.coai-assessment-choice i { display: grid; width: 1.2rem; height: 1.2rem; flex: 0 0 auto; place-items: center; border: 1px solid rgba(84,68,44,.18); border-radius: 999px; color: #fff; font-size: .65rem; font-style: normal; }
+.coai-assessment-choice[aria-pressed="true"] i { border-color: #8f672b; background: #8f672b; }
+
 .coai-diagnostic-chip[aria-pressed="true"] {
   box-shadow: 0 8px 20px -16px rgba(89, 61, 22, .85), inset 0 1px 0 rgba(255,255,255,.7);
 }
