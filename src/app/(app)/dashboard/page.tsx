@@ -106,7 +106,7 @@ export default async function DashboardPage() {
           <span className="coai-dashboard-status">Suivi centralisé</span>
         </div>
         {programme && sourceSession && !daily?.sleep && (
-          <a href="#check-in-du-jour" className="inline-flex min-h-14 w-full items-center justify-center rounded-full bg-[#20211e] px-7 py-3.5 text-base font-bold text-white shadow-[0_20px_55px_-28px_rgba(32,33,30,.8)] transition hover:-translate-y-0.5 hover:bg-[#343630] sm:w-fit">
+          <a href="#check-in-du-jour" className="coai-dashboard-primary inline-flex min-h-14 w-full items-center justify-center rounded-full px-7 py-3.5 text-base font-bold shadow-[0_20px_55px_-28px_rgba(32,33,30,.8)] transition hover:-translate-y-0.5 sm:w-fit">
             Faire mon check-in · 45 sec →
           </a>
         )}

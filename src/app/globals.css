@@ -816,6 +816,17 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
   color: #5c574e;
 }
 
+.coai-app-shell .coai-dashboard-primary {
+  border: 1px solid rgba(201,162,98,.42);
+  background: linear-gradient(115deg, #191b19, #2c2b25 70%, #59411f);
+  color: #fffdf8 !important;
+  box-shadow: 0 20px 50px -28px rgba(84,56,20,.78), inset 0 1px rgba(255,255,255,.09);
+}
+.coai-app-shell .coai-dashboard-primary:hover {
+  background: linear-gradient(115deg, #252824, #39372e 70%, #6d5027);
+  color: #fffdf8 !important;
+}
+
 .coai-eyebrow {
   color: #7c5720;
   font-size: .66rem;
