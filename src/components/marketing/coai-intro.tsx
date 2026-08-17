@@ -37,14 +37,13 @@ export function CoaiIntro() {
           </div>
 
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
-            Ton Personal Trainer,
-            <span className="mt-2 block text-laiton-200">toujours avec toi.</span>
+            Le premier studio de
+            <span className="mt-2 block text-laiton-200">Personal Training augmenté.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-            Avant chaque séance, COAI fait le point comme un vrai coach : disponibilité, sommeil,
-            énergie, alimentation et douleurs. Ta séance évolue immédiatement, puis un coach humain
-            prend le relais dès que son regard apporte plus de valeur.
+            Un protocole complet — bilan, évaluation, programme, séance et suivi — rendu accessible
+            par l’IA et renforcé par l’expertise humaine lorsque ton objectif l’exige.
           </p>
 
           <ul className="mt-7 space-y-3" aria-label="Ce que comprend le diagnostic">

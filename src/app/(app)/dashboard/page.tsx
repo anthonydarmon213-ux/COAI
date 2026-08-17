@@ -14,6 +14,38 @@ import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoi
 import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 
+const MANTRAS = [
+  "La régularité transforme ce que la motivation commence.",
+  "Aujourd’hui, cherche le mouvement juste — pas le mouvement parfait.",
+  "Une séance adaptée vaut mieux qu’une séance abandonnée.",
+  "La récupération n’interrompt pas la progression. Elle la construit.",
+  "Ton prochain niveau se construit dans les détails d’aujourd’hui.",
+  "Avance avec intention. Le résultat suivra la répétition.",
+  "Écoute ton corps, respecte le plan, célèbre le progrès.",
+];
+
+const JOURS_COURTS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+function startOfWeek(date: Date) {
+  const result = new Date(date);
+  const day = result.getDay() || 7;
+  result.setDate(result.getDate() - day + 1);
+  return result;
+}
+
+function getWeek(date: Date, contenu: unknown) {
+  const monday = startOfWeek(date);
+  return Array.from({ length: 7 }, (_, index) => {
+    const current = new Date(monday);
+    current.setDate(monday.getDate() + index);
+    return {
+      date: current,
+      workout: getWorkoutForDate(contenu, current),
+      today: current.toDateString() === date.toDateString(),
+    };
+  });
+}
+
 function today() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -40,6 +72,8 @@ export default async function DashboardPage() {
 
   const programme = validated ?? latest;
   const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
+  const week = getWeek(date, programme?.contenu);
+  const weeklyWorkoutCount = week.filter((day) => day.workout).length;
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const objective = sourceSession?.nom ? `Aujourd’hui, on travaille ${String(sourceSession.nom).toLowerCase()}.` : "Une journée utile, adaptée à ton rythme.";
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
@@ -71,6 +105,63 @@ export default async function DashboardPage() {
           </a>
         )}
       </header>
+
+      <section className="coai-week-overview" aria-labelledby="week-title">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="coai-eyebrow">Ma semaine</p>
+            <h2 id="week-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+              {programme ? `${weeklyWorkoutCount} entraînement${weeklyWorkoutCount > 1 ? "s" : ""} planifié${weeklyWorkoutCount > 1 ? "s" : ""}` : "Ta semaine va prendre forme ici"}
+            </h2>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-[#60645e]">
+            {programme
+              ? "Un rythme lisible, avec la récupération intégrée au plan. COAI l’ajuste si ton quotidien change."
+              : "Après ton bilan, COAI construit un rythme réaliste selon ton niveau, tes disponibilités et ta récupération."}
+          </p>
+        </div>
+
+        <div className="mt-6 grid grid-cols-7 gap-2" aria-label="Planning de la semaine">
+          {week.map(({ date: day, workout, today: isToday }) => (
+            <div key={day.toISOString()} className={`coai-week-day ${isToday ? "is-today" : ""} ${workout ? "has-workout" : ""}`}>
+              <span>{JOURS_COURTS[day.getDay()]}</span>
+              <strong>{day.getDate()}</strong>
+              <i aria-hidden="true" />
+              <small>{workout ? "Séance" : "Récup."}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="coai-today-briefing" aria-labelledby="today-title">
+        <div className="coai-today-heading">
+          <div>
+            <p className="coai-eyebrow">Aujourd’hui</p>
+            <h2 id="today-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Ton briefing en trois décisions.</h2>
+          </div>
+          <blockquote>“{MANTRAS[date.getDay()]}”</blockquote>
+        </div>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          <Link href={sourceSession ? "#check-in-du-jour" : "/programme/entrainement"} className="coai-brief-card coai-brief-training">
+            <span>01 · Bouger</span>
+            <strong>{sourceSession?.nom ? String(sourceSession.nom) : "Récupération active"}</strong>
+            <p>{sourceSession ? `${getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)} min · adaptée après ton check-in.` : "Marche légère, mobilité et respiration sans douleur."}</p>
+            <em>{sourceSession ? "Préparer ma séance →" : "Voir ma récupération →"}</em>
+          </Link>
+          <Link href="/programme/alimentation" className="coai-brief-card">
+            <span>02 · Nourrir</span>
+            <strong>Énergie stable</strong>
+            <p>Hydrate-toi régulièrement et répartis tes protéines sur la journée.</p>
+            <em>Voir ma nutrition →</em>
+          </Link>
+          <Link href="/programme/recuperation" className="coai-brief-card">
+            <span>03 · Récupérer</span>
+            <strong>Préparer demain</strong>
+            <p>5 minutes de respiration calme ce soir, puis une heure de coucher régulière.</p>
+            <em>Optimiser ma récupération →</em>
+          </Link>
+        </div>
+      </section>
 
       <BesoinsIdentifiesCard besoins={besoins} />
 

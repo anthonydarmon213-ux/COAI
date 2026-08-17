@@ -100,9 +100,9 @@ const PARCOURS_PERSONAL_TRAINING = [
     description: "Le point de départ recommandé pour avancer simplement, séance après séance.",
     etapes: [
       "04 · Programme personnalisé et progressif",
-      "05 · Échauffement adapté à ta séance",
-      "06 · Séance principale guidée et expliquée",
-      "07 · Retour au calme et récupération",
+      "05 · Échauffement : 5 à 10 min de mobilité et d’activation",
+      "06 · Séance : technique, renforcement, cardio ou travail spécifique",
+      "07 · Retour au calme : respiration, mobilité légère et récupération",
     ],
     href: "/pricing#impulsion",
     cta: "Commencer avec Impulsion",
@@ -113,7 +113,7 @@ const PARCOURS_PERSONAL_TRAINING = [
     offre: "Transformation · 89€/mois",
     titre: "Le regard humain en plus",
     description: "Tu évolues vers l'hybride uniquement si tu veux davantage de retours et d'ajustements.",
-    etapes: ["08 · Suivi des performances, sensations et douleurs avec validation humaine"],
+    etapes: ["08 · Suivi : performances, sensations et douleurs consignées après chaque séance"],
     href: "/pricing#transformation",
     cta: "Découvrir Transformation",
     miseEnAvant: false,
@@ -124,7 +124,7 @@ const PARCOURS_PERSONAL_TRAINING = [
     titre: "L'attention maximale",
     description: "Pour les objectifs les plus exigeants, avec des disponibilités volontairement limitées.",
     etapes: [
-      "09 · Ajustements approfondis et réévaluations régulières",
+      "09 · Ajustements et réévaluation structurée toutes les 4 à 6 semaines",
       "10 · Atteinte de ton objectif et définition de la suite",
     ],
     href: "/pricing#vip",
@@ -246,6 +246,21 @@ export default function LandingPage() {
           <Link href="/diagnostic" className="shrink-0 text-sm font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4">
             Découvrir mon Score COAI →
           </Link>
+        </div>
+
+        <div className="mx-auto mt-5 grid max-w-3xl gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
+          <div className="bg-[#111210] px-5 py-4 text-center">
+            <strong className="block text-lg text-white">45–60 min</strong>
+            <span className="mt-1 block text-xs text-graphite-400">durée habituelle d’une séance</span>
+          </div>
+          <div className="bg-[#111210] px-5 py-4 text-center">
+            <strong className="block text-lg text-white">2–3 séances</strong>
+            <span className="mt-1 block text-xs text-graphite-400">par semaine pour débuter</span>
+          </div>
+          <div className="bg-[#111210] px-5 py-4 text-center">
+            <strong className="block text-lg text-white">4–6 semaines</strong>
+            <span className="mt-1 block text-xs text-graphite-400">avant chaque réévaluation</span>
+          </div>
         </div>
       </section>
 

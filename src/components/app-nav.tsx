@@ -65,7 +65,7 @@ export function AppNav() {
       </div>
 
       <p className="mt-10 hidden text-[0.6rem] font-bold uppercase tracking-[0.18em] text-graphite-500 md:block">Ton parcours</p>
-      <nav aria-label="Navigation principale" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-3 md:flex-1 md:flex-col md:overflow-visible">
+      <nav aria-label="Navigation principale" className="coai-app-nav-scroll mt-4 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-3 md:min-h-0 md:flex-1 md:flex-col md:overflow-x-hidden md:overflow-y-auto md:pr-1">
         {NAVIGATION.map((item) => {
           if ("href" in item && item.href) {
             const active = isActive(pathname, item.href);

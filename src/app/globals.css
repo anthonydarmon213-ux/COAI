@@ -390,6 +390,15 @@ body {
 .coai-app-nav nav > a,
 .coai-app-nav nav > button { font-weight: 650; letter-spacing: -.01em; }
 
+.coai-app-nav-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124,87,32,.35) transparent;
+  overscroll-behavior: contain;
+}
+
+.coai-app-nav-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+.coai-app-nav-scroll::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(124,87,32,.35); }
+
 .coai-nav-group summary::-webkit-details-marker { display: none; }
 .coai-nav-group[open] .coai-nav-chevron { transform: rotate(180deg); }
 .coai-nav-chevron { transition: transform .2s ease; }
@@ -742,6 +751,76 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
   background: rgba(255,255,255,.52);
   padding: .45rem .7rem;
   color: #5c574e;
+}
+
+.coai-eyebrow {
+  color: #7c5720;
+  font-size: .66rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.coai-week-overview,
+.coai-today-briefing {
+  border: 1px solid rgba(84,68,44,.14);
+  border-radius: 1.8rem;
+  background: rgba(255,255,255,.62);
+  box-shadow: 0 26px 70px -52px rgba(45,34,20,.55), inset 0 1px rgba(255,255,255,.85);
+  padding: 1.5rem;
+}
+
+.coai-week-day {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
+  border: 1px solid rgba(84,68,44,.1);
+  border-radius: 1rem;
+  background: rgba(248,246,240,.72);
+  padding: .75rem .2rem;
+  color: #6c6e67;
+}
+.coai-week-day > span { font-size: .62rem; font-weight: 750; text-transform: uppercase; }
+.coai-week-day > strong { color: #282925; font-size: 1rem; }
+.coai-week-day > i { width: .38rem; height: .38rem; border-radius: 999px; background: #c7c5bc; }
+.coai-week-day > small { overflow: hidden; max-width: 100%; text-overflow: ellipsis; font-size: .58rem; white-space: nowrap; }
+.coai-week-day.has-workout > i { background: #a8763e; box-shadow: 0 0 0 4px rgba(168,118,62,.12); }
+.coai-week-day.is-today { border-color: rgba(168,118,62,.6); background: #20221f; color: #dad6cc; box-shadow: 0 15px 32px -22px rgba(32,34,31,.8); }
+.coai-week-day.is-today > strong { color: #fffdf8; }
+.coai-week-day.is-today > i { background: #e2bd7c; }
+
+.coai-today-heading { display: flex; flex-direction: column; gap: 1rem; }
+.coai-today-heading blockquote { max-width: 29rem; color: #5c5e58; font-family: var(--font-display), serif; font-size: .95rem; font-style: italic; line-height: 1.6; }
+.coai-brief-card {
+  display: flex;
+  min-height: 12.5rem;
+  flex-direction: column;
+  border: 1px solid rgba(84,68,44,.12);
+  border-radius: 1.25rem;
+  background: rgba(255,255,255,.7);
+  padding: 1.15rem;
+  color: #20221f;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.coai-brief-card:hover { transform: translateY(-2px); border-color: rgba(168,118,62,.42); box-shadow: 0 18px 35px -28px rgba(58,42,21,.6); }
+.coai-brief-card > span { color: #7c5720; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.coai-brief-card > strong { margin-top: .85rem; font-size: 1.12rem; }
+.coai-brief-card > p { margin-top: .5rem; color: #5c5f58; font-size: .8rem; line-height: 1.55; }
+.coai-brief-card > em { margin-top: auto; padding-top: 1.2rem; color: #4f3717; font-size: .75rem; font-style: normal; font-weight: 750; }
+.coai-brief-training { border-color: rgba(168,118,62,.32); background: linear-gradient(145deg,#fffdf8,#f3eadb); }
+
+@media (min-width: 640px) {
+  .coai-week-overview,
+  .coai-today-briefing { padding: 1.9rem; }
+  .coai-today-heading { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .coai-today-heading blockquote { text-align: right; }
+}
+
+@media (max-width: 520px) {
+  .coai-week-day { border-radius: .75rem; padding: .65rem .1rem; }
+  .coai-week-day > small { display: none; }
 }
 
 .coai-dashboard > section,
