@@ -43,7 +43,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
 
       <div className="grid w-full max-w-7xl grid-cols-1 gap-5 lg:grid-cols-3">
         {TIERS.map((tier) => (
-          <Card key={tier.nom} id={tier.nom.toLowerCase()} className={`flex flex-col gap-5 px-6 py-8 ${tier.mostPopular ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)] lg:-translate-y-3" : ""}`}>
+          <Card key={tier.nom} id={tier.nom.toLowerCase()} className={`flex flex-col gap-5 px-6 py-8 ${tier.mostPopular ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
               {tier.mostPopular && <Badge tone="warning">Offre phare</Badge>}
