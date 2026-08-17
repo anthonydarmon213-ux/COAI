@@ -244,8 +244,8 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
   let rappels = 0;
   for (const subscription of candidats) {
     if (!subscription.trialEnd) continue;
-    const prixMensuel = subscription.plan === "GRATUIT" ? 19 : subscription.plan === "STANDARD" ? 49 : 199;
-    const prixAnnuel = subscription.plan === "GRATUIT" ? 190 : subscription.plan === "STANDARD" ? 490 : 2388;
+    const prixMensuel = subscription.plan === "GRATUIT" ? 49 : subscription.plan === "STANDARD" ? 89 : 199;
+    const prixAnnuel = prixMensuel * 12;
     const prix = subscription.billingInterval === "ANNUAL" ? `${prixAnnuel} €/an` : `${prixMensuel} €/mois`;
     const date = subscription.trialEnd.toLocaleDateString("fr-FR", {
       day: "numeric",

@@ -14,10 +14,9 @@ import { storeIntendedPlanCookie, type IntendedPlan } from "@/lib/checkout/inten
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
-// Nouveau modèle d'accès libre (13/08/2026) : l'inscription est gratuite et
-// ne déclenche plus aucun paiement — Impulsion (19€, one-shot) et
-// Transformation (49€/mois) se débloquent séparément, une fois dans
-// l'interface (cf. OffreConsentGate).
+// L'inscription reste gratuite et ne déclenche aucun paiement. Le choix
+// Impulsion, Transformation ou VIP est conservé jusqu'au checkout Stripe,
+// déclenché seulement après le consentement explicite aux conditions.
 //
 // Vérification d'adresse email (14/08/2026, retour d'une testeuse — Elsa,
 // via Anthony : "on peut entrer des fausses adresses pour créer des

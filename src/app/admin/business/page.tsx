@@ -111,7 +111,7 @@ export default async function AdminBusinessPage() {
   // Impulsion, qui était auparavant oubliée du calcul.
   const mrr = abonnesPayants.reduce((total, subscription) => {
     const monthlyPrice = subscription.plan === "GRATUIT" ? PRIX_IMPULSION : subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM;
-    const annualPrice = subscription.plan === "GRATUIT" ? 190 : subscription.plan === "STANDARD" ? 490 : PRIX_PREMIUM * 12;
+    const annualPrice = monthlyPrice * 12;
     return total + (subscription.billingInterval === "ANNUAL" ? annualPrice / 12 : monthlyPrice);
   }, 0);
   const arr = mrr * 12;
