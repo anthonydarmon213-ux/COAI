@@ -37,9 +37,9 @@ const ETAPES: Etape[] = [
       `Ton diagnostic COAI n'est pas un simple prompt envoyé à une IA généraliste. L'algorithme qui a construit ` +
       `ton profil est codé à partir de plus de 17 ans d'expérience terrain d'Anthony Darmon, coach diplômé d'État ` +
       `— chaque règle de personnalisation vient d'un vrai coaching, pas d'un texte générique trouvé en ligne.\n\n` +
-      `Impulsion te donne un Personal Trainer IA disponible 24h/24. Si tu veux aussi un regard humain, ` +
+      `Ton espace personnalisé te permet de découvrir un Personal Trainer IA disponible 24h/24. Si tu veux ensuite un regard humain, ` +
       `Transformation ajoute la validation et les ajustements d'un coach diplômé : l'IA personnalise, l'humain affine.\n\n` +
-      `Revoir ton diagnostic : ${appUrl}/diagnostic\n\n` +
+      `Créer mon espace personnalisé : ${appUrl}/sign-up\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),
   },
@@ -49,11 +49,11 @@ const ETAPES: Etape[] = [
     sujet: "Ton programme doit évoluer avec toi",
     corps: (appUrl, unsubscribe) =>
       `Bonjour,\n\n` +
-      `Un programme figé devient vite inutile. Transformation adapte ton entraînement, ta nutrition ` +
-      `et ta récupération à tes progrès — avec la validation d'un coach diplômé.\n\n` +
+      `Un programme figé devient vite inutile. Dans ton espace personnalisé, le Défi COAI te propose ` +
+      `une action utile par jour pendant 7 jours pour découvrir comment COAI apprend de toi.\n\n` +
       `Tu peux commencer avec Impulsion pendant 7 jours, puis continuer pour 49€/mois, sans engagement. ` +
       `Si tu veux aussi le regard d'un coach humain, Transformation est à 89€/mois.\n\n` +
-      `Commencer mon essai : ${appUrl}/pricing\n\n` +
+      `Créer mon espace personnalisé : ${appUrl}/sign-up\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),
   },
@@ -67,8 +67,8 @@ const ETAPES: Etape[] = [
       );
       return (
         `Bonjour,\n\n` +
-        `Ton diagnostic a identifié le point de départ. Impulsion construit maintenant ton plan ` +
-        `et l'adapte semaine après semaine, dès 49 €/mois après 7 jours d'essai.\n\n` +
+        `Ton diagnostic a identifié le point de départ. Ton espace personnalisé te permet maintenant ` +
+        `de passer à l'action ; si tu veux ton programme adaptatif complet, Impulsion démarre par 7 jours d'essai puis 49 €/mois.\n\n` +
         `Commencer mes 7 jours d'essai : ${appUrl}/pricing\n\n` +
         (whatsapp ? `Tu préfères un accompagnement VIP ? Écris directement à Anthony : ${whatsapp}\n\n` : "") +
         `À bientôt,\nL'équipe COAI` +
