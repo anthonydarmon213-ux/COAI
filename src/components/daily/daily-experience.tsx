@@ -53,7 +53,7 @@ const AREAS = ["Dos", "Épaule", "Genou", "Cheville", "Poignet", "Hanche", "Cou"
 
 function Chip({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition ${active ? "border-[#b98b43] bg-[#27241f] text-white shadow-sm" : "border-[#d9d2c4] bg-white/80 text-[#4a4842] hover:border-[#9c7945] hover:bg-white"}`}>
+    <button type="button" aria-pressed={active} onClick={onClick} className={`coai-daily-chip min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition ${active ? "border-[#b98b43] bg-[#27241f] shadow-sm" : "border-[#d9d2c4] bg-white/80 text-[#4a4842] hover:border-[#9c7945] hover:bg-white"}`}>
       {children}
     </button>
   );
