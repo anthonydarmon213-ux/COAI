@@ -40,8 +40,8 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
           <CoaiMark size={22} />
           <span className="font-display text-xl font-semibold tracking-[0.16em] text-white">COAI</span>
         </span>
-        <span className="text-[0.55rem] font-medium uppercase tracking-[0.1em] text-graphite-400">
-          Performance · santé · longévité
+        <span className="text-[0.55rem] font-medium uppercase tracking-[0.14em] text-laiton-200/80">
+          Personal Training, Reimagined.
         </span>
       </Link>
 
@@ -70,9 +70,13 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
           aria-expanded={menuOuvert}
           aria-controls="navigation-mobile"
           onClick={() => setMenuOuvert((ouvert) => !ouvert)}
-          className="flex items-center gap-2 rounded-full border border-white/[0.12] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white"
+          className="group flex items-center gap-3 rounded-full border border-laiton-300/25 bg-white/[0.035] px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] backdrop-blur-md transition hover:border-laiton-300/45 hover:bg-white/[0.06]"
         >
-          Menu <span className={`text-laiton-300 transition ${menuOuvert ? "rotate-45" : ""}`}>＋</span>
+          Explorer
+          <span className="relative block h-3.5 w-5" aria-hidden="true">
+            <span className={`absolute left-0 top-[3px] h-px bg-laiton-200 transition-all duration-300 ${menuOuvert ? "w-5 translate-y-[3.5px] rotate-45" : "w-5"}`} />
+            <span className={`absolute bottom-[3px] right-0 h-px bg-laiton-200 transition-all duration-300 ${menuOuvert ? "w-5 -translate-y-[3.5px] -rotate-45" : "w-3.5 group-hover:w-5"}`} />
+          </span>
         </button>
         {menuOuvert && <nav id="navigation-mobile" className="coai-public-menu absolute right-0 top-12 flex w-64 flex-col overflow-hidden rounded-2xl border p-2 shadow-2xl" aria-label="Navigation mobile">
           {LIENS.map((lien) => (
