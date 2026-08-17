@@ -65,7 +65,7 @@ export function CoaiIntro() {
               Découvrir les accompagnements →
             </Link>
           </div>
-          <p className="mt-3 text-xs text-graphite-500">Bilan en 3 minutes · Score COAI personnalisé · aucune carte bancaire</p>
+          <p className="mt-3 text-xs text-graphite-500">Bilan initial en moins de 5 minutes · Score COAI personnalisé · aucune carte bancaire</p>
         </div>
       </div>
 
