@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 export function DashboardAvatar({ initialUrl, prenom }: { initialUrl: string | null; prenom: string | null }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -13,9 +14,10 @@ export function DashboardAvatar({ initialUrl, prenom }: { initialUrl: string | n
     if (!file) return;
     setLoading(true);
     setError(null);
-    const formData = new FormData();
-    formData.append("file", file);
     try {
+      const optimized = await compressProgressPhoto(file);
+      const formData = new FormData();
+      formData.append("file", optimized.file);
       const response = await fetch("/api/profil/avatar", { method: "POST", body: formData });
       const data = await response.json();
       if (!response.ok || !data.url) throw new Error(data.error ?? "Impossible d’ajouter la photo.");
@@ -33,8 +35,9 @@ export function DashboardAvatar({ initialUrl, prenom }: { initialUrl: string | n
         {url ? <Image src={url} alt={`Photo de ${prenom ?? "profil"}`} fill sizes="96px" className="object-cover" /> : <span className="font-display text-3xl font-semibold text-[#7c5b25]">{prenom?.slice(0, 1).toUpperCase() ?? "C"}</span>}
         <span className="absolute inset-x-0 bottom-0 bg-black/65 py-1.5 text-[9px] font-bold uppercase tracking-wider text-white opacity-0 transition group-hover:opacity-100">{loading ? "Envoi…" : "Ma photo"}</span>
       </button>
-      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => upload(event.target.files?.[0])} />
+      <input ref={inputRef} type="file" accept="image/*,.heic,.heif" className="hidden" onChange={(event) => upload(event.target.files?.[0])} />
       {!url && <button type="button" onClick={() => inputRef.current?.click()} className="text-[10px] font-bold text-[#76531f] underline underline-offset-4">Ajouter ma photo</button>}
+      <p className="max-w-36 text-center text-[10px] leading-4 text-[#6f746f]">Jusqu’à 40 Mo · optimisée automatiquement</p>
       {error && <p className="max-w-32 text-center text-[10px] text-red-600">{error}</p>}
     </div>
   );

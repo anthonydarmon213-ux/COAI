@@ -185,6 +185,8 @@ const ATTENTES_COAI = [
   AUTRE_LABEL,
 ];
 
+const PRIORITES_OPTIMISATION = ["L’entraînement", "La nutrition", "La récupération", "Les trois", AUTRE_LABEL];
+
 const FREINS = [
   "Le manque de temps",
   "Le manque de régularité",
@@ -382,6 +384,7 @@ export function DiagnosticQuiz({
   const [importanceObjectif, setImportanceObjectif] = useState("");
   const [freinPrincipalLibre, setFreinPrincipalLibre] = useState("");
   const [attentesCoai, setAttentesCoai] = useState("");
+  const [prioriteOptimisation, setPrioriteOptimisation] = useState("");
   const [passeSportif, setPasseSportif] = useState("");
   const [sourceDecouverteLibre, setSourceDecouverteLibre] = useState("");
   const [connaissanceMusculation, setConnaissanceMusculation] = useState<string | null>(null);
@@ -540,6 +543,7 @@ export function DiagnosticQuiz({
       importanceObjectif,
       freinPrincipalLibre,
       attentesCoai,
+      prioriteOptimisation,
       passeSportif,
       sourceDecouverteLibre,
       connaissanceMusculation,
@@ -647,6 +651,7 @@ export function DiagnosticQuiz({
     if (typeof saved.importanceObjectif === "string") setImportanceObjectif(saved.importanceObjectif);
     if (typeof saved.freinPrincipalLibre === "string") setFreinPrincipalLibre(saved.freinPrincipalLibre);
     if (typeof saved.attentesCoai === "string") setAttentesCoai(saved.attentesCoai);
+    if (typeof saved.prioriteOptimisation === "string") setPrioriteOptimisation(saved.prioriteOptimisation);
     if (typeof saved.passeSportif === "string") setPasseSportif(saved.passeSportif);
     if (typeof saved.sourceDecouverteLibre === "string") setSourceDecouverteLibre(saved.sourceDecouverteLibre);
     if (typeof saved.connaissanceMusculation === "string") setConnaissanceMusculation(saved.connaissanceMusculation);
@@ -863,6 +868,7 @@ export function DiagnosticQuiz({
         importanceObjectif.trim() ? `motivation : ${importanceObjectif.trim()}` : null,
         freinPrincipalLibre.trim() ? `frein principal : ${freinPrincipalLibre.trim()}` : null,
         attentesCoai.trim() ? `attentes envers COAI : ${attentesCoai.trim()}` : null,
+        prioriteOptimisation.trim() ? `souhaite optimiser : ${prioriteOptimisation.trim()}` : null,
         passeSportif.trim() ? `passé sportif : ${passeSportif.trim()}` : null,
         sourceDecouverteLibre.trim() ? `a connu COAI via : ${sourceDecouverteLibre.trim()}` : null,
         prioriteTravail.trim() ? `priorité actuelle : ${prioriteTravail.trim()}` : null,
@@ -970,6 +976,7 @@ export function DiagnosticQuiz({
             importanceObjectif: importanceObjectif.trim(),
             freinPrincipalLibre: freinPrincipalLibre.trim(),
             attentesCoai: attentesCoai.trim(),
+            prioriteOptimisation: prioriteOptimisation.trim(),
             echeance,
             mobiliteRepere,
             cardioRepere,
@@ -1241,6 +1248,15 @@ export function DiagnosticQuiz({
                 <h2 className="mt-2 font-display text-xl font-semibold text-white">Qu&apos;est-ce qui ferait vraiment la différence cette fois ?</h2>
                 <p className="mt-1.5 text-sm leading-6 text-graphite-400">Tes réponses nous évitent de te proposer une solution générique.</p>
               </div>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Qu’aimerais-tu optimiser en priorité ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <div className="flex flex-col gap-2">
+                  {PRIORITES_OPTIMISATION.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? prioriteOptimisation.startsWith(`${AUTRE_LABEL} :`) : prioriteOptimisation === item} onClick={() => setPrioriteOptimisation(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : prioriteOptimisation === item ? "" : item)} />)}
+                </div>
+                {prioriteOptimisation.startsWith(`${AUTRE_LABEL} :`) && (
+                  <textarea value={prioriteOptimisation.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setPrioriteOptimisation(`${AUTRE_LABEL} : ${event.target.value.slice(0, 300)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                )}
+              </label>
               <label className="flex flex-col gap-2 text-left">
                 <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
                 <div className="flex flex-col gap-2">
