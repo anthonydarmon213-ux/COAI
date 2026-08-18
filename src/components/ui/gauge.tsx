@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 // Jauge/anneau de progression réutilisable, avec une couleur sémantique
 // fournie par la vue qui connaît la nature de l'indicateur.
 export function Gauge({
@@ -84,6 +88,3 @@ export function Gauge({
     </div>
   );
 }
-"use client";
-
-import { useEffect, useState } from "react";
