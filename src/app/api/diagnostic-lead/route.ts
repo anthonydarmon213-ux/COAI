@@ -6,6 +6,7 @@ import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import { buildNouveauLeadEmailHtml, buildWhatsAppLinkVersLead } from "@/lib/email/lead-notification";
 import { buildMiniDiagnostic, miniDiagnosticEnTexte, type ReponsesDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
 import { trackServerEvent } from "@/lib/analytics/product-events";
+import { synchroniserLeadHubSpot } from "@/lib/hubspot/contact";
 
 const FENETRE_ANTI_DOUBLON_MS = 5 * 60 * 1000;
 
@@ -136,6 +137,14 @@ export async function POST(request: Request) {
     .join("\n");
 
   await Promise.all([
+    // Copie le prospect dans le CRM sans rendre le diagnostic dépendant de
+    // HubSpot. La base COAI reste la source de vérité et conserve le lead si
+    // le CRM est momentanément indisponible ou pas encore configuré.
+    synchroniserLeadHubSpot({
+      email: parsed.data.email,
+      telephone: parsed.data.telephone,
+    }).catch((err) => console.error("[diagnostic-lead] synchronisation HubSpot :", err)),
+
     // Notifie Anthony à chaque lead capturé sur le diagnostic public — ce
     // trou existait depuis la création du quiz (09/08/2026), jusqu'ici
     // invisible sans requête SQL manuelle (repéré le 10/08 via un test d'un
