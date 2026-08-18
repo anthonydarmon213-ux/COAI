@@ -16,6 +16,7 @@ import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
 import { getSignedProgressPhotoUrl } from "@/lib/storage/progress-photos";
+import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -84,6 +85,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="coai-dashboard flex flex-col gap-7">
+      <DashboardIntroVideo />
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />

@@ -951,6 +951,7 @@ export function DiagnosticQuiz({
   function handleCreerCompte() {
     trackFunnelEvent("plan_selected", { plan: "GRATUIT" });
     storeDiagnosticAnswers(reponsesEnProfil());
+    window.localStorage.setItem("coai_dashboard_intro_pending", "1");
   }
 
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
@@ -2083,7 +2084,10 @@ export function DiagnosticQuiz({
                         Profil mis à jour ✓ COAI en sait un peu plus sur toi — ton prochain
                         programme en tiendra compte.
                       </p>
-                      <Link href="/dashboard">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => window.localStorage.setItem("coai_dashboard_intro_pending", "1")}
+                      >
                         <Button className="px-8 py-3">Retour au tableau de bord</Button>
                       </Link>
                     </>
