@@ -167,6 +167,34 @@ const QUOTIDIENS = [
   "Métier physique / très actif",
 ];
 
+const MOTIVATIONS = [
+  "Me sentir mieux dans mon corps",
+  "Retrouver de l'énergie au quotidien",
+  "Améliorer ma santé et mon bien-être",
+  "Atteindre un défi personnel",
+  "Reprendre confiance en moi",
+  AUTRE_LABEL,
+];
+
+const ATTENTES_COAI = [
+  "Savoir exactement quoi faire",
+  "Rester régulier et motivé",
+  "Adapter mes séances à mon quotidien",
+  "Progresser sans me blesser",
+  "Pouvoir compter sur un coach",
+  AUTRE_LABEL,
+];
+
+const FREINS = [
+  "Le manque de temps",
+  "Le manque de régularité",
+  "Un programme mal adapté",
+  "Des douleurs ou une blessure",
+  "Le manque de motivation",
+  "Je ne savais pas par où commencer",
+  AUTRE_LABEL,
+];
+
 // Remplace le libellé générique "Autre, à préciser" par le texte
 // effectivement saisi (si renseigné) — garde le libellé tel quel sinon,
 // plutôt que de perdre la sélection.
@@ -727,8 +755,8 @@ export function DiagnosticQuiz({
     if (step === "persona") return persona.length > 0;
     if (step === "quotidien") return Boolean(activiteQuotidienne);
     if (step === "niveau") return Boolean(niveau);
-    if (step === "objectif") return Boolean(objectif) && objectifPrincipalLibre.trim().length >= 5 && importanceObjectif.trim().length >= 10;
-    if (step === "accompagnement") return attentesCoai.trim().length >= 10;
+    if (step === "objectif") return Boolean(objectif) && objectifPrincipalLibre.trim().length >= 5;
+    if (step === "accompagnement") return true;
     if (step === "echeance") return Boolean(echeance);
     if (step === "evaluationPhysique") return Boolean(mobiliteRepere && cardioRepere && forceRepere && mouvementRepere);
     if (step === "equipement") return equipement.length > 0;
@@ -1154,8 +1182,13 @@ export function DiagnosticQuiz({
                 <input value={objectifSecondaire} onChange={(event) => setObjectifSecondaire(event.target.value.slice(0, 300))} placeholder="Ex. Mieux dormir, gagner en mobilité…" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
               </label>
               <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Pourquoi est-ce important pour toi maintenant ?</span>
-                <textarea value={importanceObjectif} onChange={(event) => setImportanceObjectif(event.target.value.slice(0, 500))} rows={2} placeholder="La vraie raison qui te donne envie de changer…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                <span className="text-sm font-semibold text-graphite-200">Pourquoi est-ce important pour toi maintenant ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <div className="flex flex-col gap-2">
+                  {MOTIVATIONS.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? importanceObjectif.startsWith(`${AUTRE_LABEL} :`) : importanceObjectif === item} onClick={() => setImportanceObjectif(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : importanceObjectif === item ? "" : item)} />)}
+                </div>
+                {importanceObjectif.startsWith(`${AUTRE_LABEL} :`) && (
+                  <textarea value={importanceObjectif.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setImportanceObjectif(`${AUTRE_LABEL} : ${event.target.value.slice(0, 480)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                )}
               </label>
             </div>
           )}
@@ -1209,24 +1242,22 @@ export function DiagnosticQuiz({
                 <p className="mt-1.5 text-sm leading-6 text-graphite-400">Tes réponses nous évitent de te proposer une solution générique.</p>
               </div>
               <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI pour réussir ?</span>
-                <textarea
-                  value={attentesCoai}
-                  onChange={(event) => setAttentesCoai(event.target.value.slice(0, 700))}
-                  rows={4}
-                  placeholder="Ex. Me dire exactement quoi faire, m’aider à rester régulier, adapter mes séances, avoir le regard d’un coach…"
-                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
-                />
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <div className="flex flex-col gap-2">
+                  {ATTENTES_COAI.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? attentesCoai.startsWith(`${AUTRE_LABEL} :`) : attentesCoai === item} onClick={() => setAttentesCoai(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : attentesCoai === item ? "" : item)} />)}
+                </div>
+                {attentesCoai.startsWith(`${AUTRE_LABEL} :`) && (
+                  <textarea value={attentesCoai.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setAttentesCoai(`${AUTRE_LABEL} : ${event.target.value.slice(0, 680)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                )}
               </label>
               <label className="flex flex-col gap-2 text-left">
                 <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
-                <textarea
-                  value={freinPrincipalLibre}
-                  onChange={(event) => setFreinPrincipalLibre(event.target.value.slice(0, 700))}
-                  rows={3}
-                  placeholder="Ex. Le manque de temps, un programme mal adapté, des douleurs, la difficulté à rester régulier…"
-                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
-                />
+                <div className="flex flex-col gap-2">
+                  {FREINS.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? freinPrincipalLibre.startsWith(`${AUTRE_LABEL} :`) : freinPrincipalLibre === item} onClick={() => setFreinPrincipalLibre(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : freinPrincipalLibre === item ? "" : item)} />)}
+                </div>
+                {freinPrincipalLibre.startsWith(`${AUTRE_LABEL} :`) && (
+                  <textarea value={freinPrincipalLibre.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setFreinPrincipalLibre(`${AUTRE_LABEL} : ${event.target.value.slice(0, 680)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                )}
               </label>
             </div>
           )}
