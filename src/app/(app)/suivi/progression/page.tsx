@@ -13,6 +13,8 @@ import { computeProfilCompletion } from "@/lib/profil/completion";
 type Metrique = {
   label: string;
   unite: string;
+  couleur: string;
+  visuel: "ring" | "pie" | "bars";
   valeurs: (m: {
     poidsKg: number | null;
     tourTailleCm: number | null;
@@ -23,11 +25,11 @@ type Metrique = {
 };
 
 const METRIQUES: Metrique[] = [
-  { label: "Poids", unite: "kg", valeurs: (m) => m.poidsKg },
-  { label: "Masse grasse", unite: "%", valeurs: (m) => m.masseGrassePourcent },
-  { label: "Masse musculaire", unite: "kg", valeurs: (m) => m.masseMusculaireKg },
-  { label: "Tour de taille", unite: "cm", valeurs: (m) => m.tourTailleCm },
-  { label: "Fréquence cardiaque de repos", unite: "bpm", valeurs: (m) => m.frequenceCardiaqueReposBpm },
+  { label: "Poids", unite: "kg", couleur: "#4cc9f0", visuel: "ring", valeurs: (m) => m.poidsKg },
+  { label: "Masse grasse", unite: "%", couleur: "#ff8a3d", visuel: "pie", valeurs: (m) => m.masseGrassePourcent },
+  { label: "Masse musculaire", unite: "kg", couleur: "#c56cff", visuel: "bars", valeurs: (m) => m.masseMusculaireKg },
+  { label: "Tour de taille", unite: "cm", couleur: "#ffd84d", visuel: "ring", valeurs: (m) => m.tourTailleCm },
+  { label: "Fréquence cardiaque de repos", unite: "bpm", couleur: "#39e67b", visuel: "bars", valeurs: (m) => m.frequenceCardiaqueReposBpm },
 ];
 
 export default async function ProgressionPage() {
@@ -196,6 +198,8 @@ export default async function ProgressionPage() {
                         min={Math.min(...points)}
                         max={Math.max(...points)}
                         precedente={precedente}
+                        color={g.couleur}
+                        variant={g.visuel}
                       />
                     );
                   })}
