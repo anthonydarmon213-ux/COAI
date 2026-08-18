@@ -138,7 +138,7 @@ const SPORTS = [
   AUTRE_LABEL,
 ];
 
-const SEXES = ["Homme", "Femme", "Préfère ne pas dire"];
+const SEXES = ["Homme", "Femme"];
 
 const HABITUDES_ALIMENTAIRES = [
   "Repas structurés et équilibrés",
@@ -155,7 +155,7 @@ const QUALITES_SOMMEIL = [
   "Excellente (8h ou plus, réparateur)",
 ];
 
-const ECHEANCES = ["Dans 3 mois", "Dans 6 mois", "Dans 12 mois", "Pas de date précise"];
+const ECHEANCES = ["Dans 1 mois — accompagnement VIP", "Dans 3 mois", "Dans 6 mois", "Dans 12 mois", "Pas de date précise"];
 const MOBILITE_REPERES = ["Fluide, sans gêne", "Quelques raideurs", "Mouvement limité", "Douleur — je ne teste pas"];
 const CARDIO_REPERES = ["Je monte 3 étages facilement", "Je suis légèrement essoufflé", "Je dois faire une pause", "Je ne peux pas l’évaluer"];
 const FORCE_REPERES = ["10 levers de chaise faciles", "10 levers avec effort", "Moins de 10 répétitions", "Je ne peux pas l’évaluer"];
@@ -781,7 +781,7 @@ export function DiagnosticQuiz({
     if (step === "sport") return true; // peut n'en pratiquer aucun
     if (step === "sexe") return Boolean(sexe);
     if (step === "santeFeminine") return true; // entièrement facultatif, opt-in
-    if (step === "profilPhysique") return true; // âge/taille/poids facultatifs
+    if (step === "profilPhysique") return Boolean(age && tailleCm && poidsKg);
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
@@ -805,6 +805,9 @@ export function DiagnosticQuiz({
     duree,
     frequence,
     sexe,
+    age,
+    tailleCm,
+    poidsKg,
     habitudesAlimentaires,
     qualiteSommeil,
     coachPreference,
@@ -1279,7 +1282,7 @@ export function DiagnosticQuiz({
                 <p className="mt-1.5 text-sm leading-6 text-graphite-400">Tes réponses nous évitent de te proposer une solution générique.</p>
               </div>
               <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Qu’aimerais-tu optimiser en priorité ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <span className="text-sm font-semibold text-graphite-200">Qu’aimerais-tu optimiser en priorité ?</span>
                 <div className="flex flex-col gap-2">
                   {PRIORITES_OPTIMISATION.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? prioriteOptimisation.startsWith(`${AUTRE_LABEL} :`) : prioriteOptimisation === item} onClick={() => setPrioriteOptimisation(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : prioriteOptimisation === item ? "" : item)} />)}
                 </div>
@@ -1288,7 +1291,7 @@ export function DiagnosticQuiz({
                 )}
               </label>
               <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI ?</span>
                 <div className="flex flex-col gap-2">
                   {ATTENTES_COAI.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? attentesCoai.startsWith(`${AUTRE_LABEL} :`) : attentesCoai === item} onClick={() => setAttentesCoai(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : attentesCoai === item ? "" : item)} />)}
                 </div>
@@ -1297,7 +1300,7 @@ export function DiagnosticQuiz({
                 )}
               </label>
               <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ?</span>
                 <div className="flex flex-col gap-2">
                   {FREINS.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? freinPrincipalLibre.startsWith(`${AUTRE_LABEL} :`) : freinPrincipalLibre === item} onClick={() => setFreinPrincipalLibre(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : freinPrincipalLibre === item ? "" : item)} />)}
                 </div>
@@ -1632,9 +1635,9 @@ export function DiagnosticQuiz({
           {step === "profilPhysique" && (
             <div className="flex flex-col gap-4">
               <div>
-                <h2 className="font-display text-xl font-semibold text-white">Quelques repères physiques ?</h2>
+                <h2 className="font-display text-xl font-semibold text-white">Tes repères physiques</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">
-                  Facultatif — sert à affiner tes repères caloriques et de charge. Tu peux passer.
+                  Ton âge, ta taille et ton poids permettent d&apos;affiner les repères caloriques et la charge d&apos;entraînement.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3">

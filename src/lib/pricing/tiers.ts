@@ -48,10 +48,10 @@ export const TIERS: Tier[] = [
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
     features: [
-      "Bilan initial et programme ultra personnalisé",
+      "Programme ultra-personnalisé selon ton diagnostic",
+      "Entraînement, alimentation et récupération sur mesure",
       "Check-in quotidien : sommeil, forme, douleurs et temps disponible",
       "Séance adaptée chaque jour à tes réponses",
-      "Entraînement, nutrition et récupération réunis",
       "Coach IA disponible 24h/24 et 7j/7",
       "Suivi des séances, mesures et progrès",
     ],

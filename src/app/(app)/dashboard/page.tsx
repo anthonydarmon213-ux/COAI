@@ -15,7 +15,6 @@ import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
-import { getSignedProgressPhotoUrl } from "@/lib/storage/progress-photos";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
 
 const MANTRAS = [
@@ -61,7 +60,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, avatarUrl] = await Promise.all([
+  const [validated, latest, daily, insight] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -72,7 +71,6 @@ export default async function DashboardPage() {
     }),
     prisma.dailySession.findUnique({ where: { userId_date: { userId: user.id, date } } }),
     getCoaiInsight(user.id),
-    user.avatarPath ? getSignedProgressPhotoUrl(user.avatarPath) : Promise.resolve(null),
   ]);
 
   const programme = validated ?? latest;
@@ -94,7 +92,7 @@ export default async function DashboardPage() {
           <span>Aujourd&apos;hui</span>
         </div>
         <div className="flex items-center gap-5 sm:gap-7">
-          <DashboardAvatar initialUrl={avatarUrl} prenom={user.prenom} />
+          <DashboardAvatar score={completion.pourcentage} />
           <div>
             <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
               {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
@@ -115,7 +113,7 @@ export default async function DashboardPage() {
         )}
       </header>
 
-      <section className="relative overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/20 bg-[radial-gradient(circle_at_92%_0%,rgba(197,108,255,.16),transparent_18rem),radial-gradient(circle_at_0%_100%,rgba(76,201,240,.14),transparent_20rem),#111518] px-6 py-6 text-white shadow-[0_28px_80px_-44px_rgba(76,201,240,.65)] sm:px-8" aria-labelledby="coai-intelligence-title">
+      <section className="coai-intelligence-panel relative overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/35 px-6 py-6 text-white shadow-[0_28px_80px_-44px_rgba(76,201,240,.65)] sm:px-8" aria-labelledby="coai-intelligence-title">
         <div className="relative grid gap-6 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">Intelligence COAI · Pas une IA généraliste</p>

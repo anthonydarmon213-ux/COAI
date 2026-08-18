@@ -1088,6 +1088,19 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
 }
 
+.coai-intelligence-panel {
+  background: radial-gradient(circle at 92% 0%, rgba(197,108,255,.18), transparent 18rem), radial-gradient(circle at 0% 100%, rgba(76,201,240,.16), transparent 20rem), #111518 !important;
+  color: #fff !important;
+}
+.coai-intelligence-panel p.text-\[\#b8c0c4\] { color: #eef2f3 !important; }
+.coai-impulsion-challenge {
+  background: linear-gradient(145deg, #242623, #151716) !important;
+  color: #fff !important;
+}
+.coai-impulsion-challenge .text-graphite-300 { color: #edf0ed !important; }
+.coai-impulsion-challenge .text-graphite-500 { color: #c9ceca !important; }
+.coai-impulsion-challenge .text-white { color: #fff !important; }
+
 /* Programme — lisible en mouvement, premium sans surcharge. */
 .coai-programme-hero {
   position: relative;

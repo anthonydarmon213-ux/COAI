@@ -506,7 +506,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <BadgeNouveau />
         </div>
         <div className="flex flex-col gap-3 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.04] p-4">
-          <p className="text-sm font-medium leading-6 text-graphite-200">
+          <p className="text-sm font-medium leading-6 text-[#202421]">
             Envoie un screenshot de ton bracelet ou app santé (Apple Watch, Garmin, Fitbit, Samsung
             Health...) — on en extrait automatiquement pas, fréquence cardiaque, sommeil, VO2 max
             et calories pour affiner ton programme.
@@ -523,11 +523,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
                 e.target.value = "";
               }}
             />
-            <span className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:bg-laiton-400/[0.14]">
+            <span className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#8b6428] bg-[#fff8e9] px-4 py-2 text-sm font-bold text-[#664514] transition hover:bg-[#f4e2bd]">
               {montreLoading ? "Analyse en cours…" : "Analyser un screenshot"}
             </span>
           </label>
-          <p className="text-xs text-graphite-500">Jusqu’à 40 Mo · image 4K optimisée automatiquement avant analyse.</p>
+          <p className="text-xs font-medium text-[#525953]">Jusqu’à 40 Mo · image 4K optimisée automatiquement avant analyse.</p>
           {montreError && <p className="text-sm text-red-400">{montreError}</p>}
           {(montreData.resumeMontre ||
             montreData.pasMoyenParJour ||
@@ -563,7 +563,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <BadgeNouveau />
         </div>
         <div className="flex flex-col gap-3 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.04] p-4">
-          <p className="text-sm font-medium leading-6 text-graphite-200">
+          <p className="text-sm font-medium leading-6 text-[#202421]">
             Envoie une photo de toi en tenue de sport (legging, short, brassière, débardeur...),
             de face, en pied — on en extrait des observations de posture et de morphologie pour
             affiner ton programme d&apos;entraînement. Photo jamais conservée, uniquement les
@@ -581,11 +581,11 @@ export function ProfilForm({ profil }: { profil: Profil }) {
                 e.target.value = "";
               }}
             />
-            <span className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-laiton-400/40 bg-laiton-400/[0.08] px-4 py-2 text-sm font-medium text-laiton-300 transition hover:bg-laiton-400/[0.14]">
+            <span className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#8b6428] bg-[#fff8e9] px-4 py-2 text-sm font-bold text-[#664514] transition hover:bg-[#f4e2bd]">
               {photoLoading ? "Analyse en cours…" : "Analyser une photo"}
             </span>
           </label>
-          <p className="text-xs text-graphite-500">Jusqu’à 40 Mo · photo 4K optimisée automatiquement avant analyse.</p>
+          <p className="text-xs font-medium text-[#525953]">Jusqu’à 40 Mo · photo 4K optimisée automatiquement avant analyse.</p>
           {photoError && <p className="text-sm text-red-400">{photoError}</p>}
           {photoRejected && <p className="text-sm text-graphite-400">{photoRejected}</p>}
           {(photoData.morphologieDetectee || photoData.observationsPosture) && (

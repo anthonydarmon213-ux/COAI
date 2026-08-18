@@ -7,7 +7,7 @@ import { trackEvent } from "@/lib/analytics";
 const STORAGE_KEY_PREFIX = "coai_defi_7_jours_v1_";
 
 const JOURS = [
-  { titre: "Clarifie ton point de départ", texte: "Vérifie les repères essentiels que COAI utilisera pour personnaliser la suite.", action: "Vérifier mon profil", href: "/compte/profil?onboarding=1" },
+  { titre: "Découvre ton programme ultra-personnalisé", texte: "Explore tes recommandations d’entraînement, d’alimentation et de récupération construites à partir de ton diagnostic.", action: "Voir mon programme", href: "/programme/entrainement" },
   { titre: "Observe ta vraie journée", texte: "Renseigne ton activité du jour pour que COAI parte de ta réalité, pas d’une moyenne générique.", action: "Noter mon activité", href: "/dashboard#activite-quotidienne" },
   { titre: "Améliore un repas", texte: "Choisis un seul ajustement nutritionnel simple et applicable aujourd’hui.", action: "Voir mes repères nutrition", href: "/programme/alimentation" },
   { titre: "Prépare ta récupération", texte: "Identifie l’action qui aura le plus d’impact sur ton sommeil ou ton énergie demain.", action: "Voir ma récupération", href: "/programme/recuperation" },
@@ -56,7 +56,7 @@ export function ImpulsionChallenge({ createdAt, userId }: { createdAt: string; u
   const progress = Math.round((completed.length / 7) * 100);
 
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-laiton-400/30 bg-[linear-gradient(145deg,rgba(239,217,173,.16),rgba(255,255,255,.035))] p-6 shadow-[0_26px_80px_-45px_rgba(201,162,98,.75)] sm:p-8">
+    <section className="coai-impulsion-challenge relative overflow-hidden rounded-[1.75rem] border border-laiton-400/30 p-6 shadow-[0_26px_80px_-45px_rgba(201,162,98,.75)] sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-laiton-300">Défi COAI · 7 jours</p>
