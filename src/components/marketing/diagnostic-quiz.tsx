@@ -1209,22 +1209,22 @@ export function DiagnosticQuiz({
                 <p className="mt-1.5 text-sm leading-6 text-graphite-400">Tes réponses nous évitent de te proposer une solution générique.</p>
               </div>
               <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
-                <textarea
-                  value={freinPrincipalLibre}
-                  onChange={(event) => setFreinPrincipalLibre(event.target.value.slice(0, 700))}
-                  rows={3}
-                  placeholder="Ex. Le manque de temps, un programme mal adapté, des douleurs, la difficulté à rester régulier…"
-                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-left">
                 <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI pour réussir ?</span>
                 <textarea
                   value={attentesCoai}
                   onChange={(event) => setAttentesCoai(event.target.value.slice(0, 700))}
                   rows={4}
                   placeholder="Ex. Me dire exactement quoi faire, m’aider à rester régulier, adapter mes séances, avoir le regard d’un coach…"
+                  className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-left">
+                <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
+                <textarea
+                  value={freinPrincipalLibre}
+                  onChange={(event) => setFreinPrincipalLibre(event.target.value.slice(0, 700))}
+                  rows={3}
+                  placeholder="Ex. Le manque de temps, un programme mal adapté, des douleurs, la difficulté à rester régulier…"
                   className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
                 />
               </label>
