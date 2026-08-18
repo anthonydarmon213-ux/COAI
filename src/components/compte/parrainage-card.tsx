@@ -48,7 +48,7 @@ export function ParrainageCard() {
 
   async function partagerLien() {
     if (!lien) return;
-    const text = "Je progresse avec COAI. Fais ton diagnostic personnalisé et découvre ton programme.";
+    const text = "Je progresse avec COAI. Fais ton diagnostic gratuit, découvre ton Score COAI et essaie de battre le mien.";
     if (navigator.share) {
       try {
         await navigator.share({ title: "Découvre COAI", text, url: lien });
@@ -67,8 +67,7 @@ export function ParrainageCard() {
       <SectionLabel>Parrainage</SectionLabel>
       <Card className="flex flex-col gap-4">
         <p className="text-sm text-graphite-300">
-          Ton invité commence par son diagnostic gratuit. Dès qu&apos;il devient abonné payant (à la fin de son essai
-          gratuit de 7 jours), tu reçois 1 mois offert sur ton propre abonnement.
+          Défie un proche avec ton Score COAI. Il commence par son diagnostic gratuit ; s&apos;il devient abonné payant à la fin de son essai de 7 jours, tu reçois automatiquement 1 mois offert.
         </p>
 
         {erreur && <p className="text-sm text-red-400">{erreur}</p>}
