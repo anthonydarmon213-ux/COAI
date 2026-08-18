@@ -109,8 +109,10 @@ export default function ConfidentialitePage() {
       <section>
         <h2>8. Cookies</h2>
         <p>
-          COAI utilise uniquement des cookies techniques nécessaires à l&apos;authentification
-          (session utilisateur). Aucun cookie publicitaire ou de tracking tiers n&apos;est déposé.
+          COAI utilise des cookies techniques nécessaires à l&apos;authentification et des outils
+          de mesure d&apos;audience, dont Microsoft Clarity, afin de comprendre l&apos;utilisation du
+          site et d&apos;améliorer l&apos;expérience. Clarity masque par défaut le contenu sensible des
+          pages. Tu peux limiter ou supprimer ces cookies depuis les réglages de ton navigateur.
         </p>
       </section>
     </LegalPage>
