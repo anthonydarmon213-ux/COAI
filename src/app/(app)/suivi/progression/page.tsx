@@ -7,6 +7,8 @@ import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { Card } from "@/components/ui/card";
 import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
+import { Gauge } from "@/components/ui/gauge";
+import { computeProfilCompletion } from "@/lib/profil/completion";
 
 type Metrique = {
   label: string;
@@ -66,6 +68,25 @@ export default async function ProgressionPage() {
     .map(([nom, points]) => ({ nom, points }));
   const debutBilan = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const seancesDuMois = seances.filter((seance) => seance.date >= debutBilan).length;
+  const frequenceHebdo = Number(user.profile?.frequenceEntrainement?.match(/\d+/)?.[0] ?? 2);
+  const objectifMensuel = Math.max(4, frequenceHebdo * 4);
+  const regularite = Math.min(100, Math.round((seancesDuMois / objectifMensuel) * 100));
+  const profil = computeProfilCompletion(user.profile);
+  const derniereMesure = mesures.at(-1);
+  const champsMesures = derniereMesure
+    ? [derniereMesure.poidsKg, derniereMesure.tourTailleCm, derniereMesure.masseGrassePourcent, derniereMesure.masseMusculaireKg, derniereMesure.frequenceCardiaqueReposBpm]
+    : [];
+  const suiviCorporel = champsMesures.length
+    ? Math.round((champsMesures.filter((valeur) => valeur !== null).length / champsMesures.length) * 100)
+    : 0;
+  const recuperation = (() => {
+    const sommeil = user.profile?.qualiteSommeil?.toLowerCase() ?? "";
+    if (sommeil.includes("excellente")) return 95;
+    if (sommeil.includes("bonne")) return 80;
+    if (sommeil.includes("moyenne")) return 58;
+    if (sommeil.includes("mauvaise")) return 32;
+    return 0;
+  })();
 
   return (
     <div className="flex flex-col gap-8">
@@ -89,11 +110,31 @@ export default async function ProgressionPage() {
         </Card>
       )}
 
+      <Card className="relative overflow-hidden border-laiton-400/20 bg-[radial-gradient(circle_at_50%_-20%,rgba(201,162,98,.16),transparent_48%),rgba(255,255,255,.025)]">
+        <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(circle,rgba(201,162,98,.55)_1px,transparent_1px)] [background-size:24px_24px]" aria-hidden="true" />
+        <div className="relative">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <SectionLabel>COAI Intelligence</SectionLabel>
+              <h2 className="mt-2 font-display text-2xl text-white">Ta vue d’ensemble.</h2>
+              <p className="mt-1 max-w-xl text-sm leading-6 text-graphite-400">Tes indicateurs évoluent avec tes séances, tes mesures et les informations que tu partages.</p>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Analyse personnalisée · 30 jours</span>
+          </div>
+          <div className="mt-7 grid grid-cols-2 gap-7 sm:grid-cols-4">
+            <Gauge label="Régularité" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} size={132} />
+            <Gauge label="Profil COAI" percent={profil.pourcentage} sublabel="précision du profil" size={132} />
+            <Gauge label="Suivi corporel" percent={suiviCorporel} sublabel={derniereMesure ? "dernière mesure" : "à activer"} size={132} />
+            <Gauge label="Récupération" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} size={132} />
+          </div>
+        </div>
+      </Card>
+
       {graphiques.length === 0 && graphiquesForce.length === 0 ? (
-        <p className="text-graphite-400">
-          Pas encore assez de données pour afficher une progression. Ajoute des mesures dans
-          l&apos;onglet « Mesures » et des séances dans « Séances » (avec la charge utilisée).
-        </p>
+        <Card className="text-center">
+          <p className="font-semibold text-white">Tes courbes vont prendre vie ici.</p>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-graphite-400">Ajoute une première mesure ou termine une séance : COAI commencera à révéler tes tendances, au-delà des quatre indicateurs déjà visibles.</p>
+        </Card>
       ) : (
         <>
           {graphiquesForce.length > 0 && (
