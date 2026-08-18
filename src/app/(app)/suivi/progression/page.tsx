@@ -135,19 +135,19 @@ export default async function ProgressionPage() {
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">COAI Intelligence · Aujourd’hui</p>
               <h2 className="mt-2 font-display text-2xl text-white">Tes signaux essentiels.</h2>
-              <p className="mt-1 max-w-xl text-sm leading-6 text-[#9ba3a8]">Comprendre ton état en un regard, puis savoir exactement quoi améliorer.</p>
+              <p className="mt-1 max-w-xl text-sm font-medium leading-6 text-[#555f62]">Comprendre ton état en un regard, puis savoir exactement quoi améliorer.</p>
             </div>
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#aeb5ba]">Analyse personnalisée · 30 jours</span>
           </div>
           <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
-            <Gauge label="Entraînement" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} size={126} color="#ff8a3d" />
-            <Gauge label="Alimentation" percent={alimentation} sublabel="profil nutrition" size={126} color="#ffd84d" />
-            <Gauge label="Récupération" percent={precisionRecuperation} sublabel="précision du signal" size={126} color="#39e67b" />
-            <Gauge label="Sommeil" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} size={126} color="#4cc9f0" />
-            <Gauge label="Score COAI" percent={scoreCoai} sublabel="synthèse actuelle" size={126} color="#c56cff" />
-            <Gauge label="Âge COAI" percent={historiqueSuffisantPourAge ? suiviCorporel : 0} displayValue={historiqueSuffisantPourAge ? "Calcul" : "—"} sublabel={historiqueSuffisantPourAge ? "analyse en cours" : "21 jours de données"} size={126} color="#f56fae" />
+            <Gauge label="Entraînement" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} sublabelColor="#596265" size={126} color="#ff8a3d" />
+            <Gauge label="Alimentation" percent={alimentation} sublabel="profil nutrition" sublabelColor="#596265" size={126} color="#ffd84d" />
+            <Gauge label="Récupération" percent={precisionRecuperation} sublabel="précision du signal" sublabelColor="#596265" size={126} color="#39e67b" />
+            <Gauge label="Sommeil" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} sublabelColor="#596265" size={126} color="#4cc9f0" />
+            <Gauge label="Score COAI" percent={scoreCoai} sublabel="synthèse actuelle" sublabelColor="#596265" size={126} color="#c56cff" />
+            <Gauge label="Âge COAI" percent={historiqueSuffisantPourAge ? suiviCorporel : 0} displayValue={historiqueSuffisantPourAge ? "Calcul" : "—"} sublabel={historiqueSuffisantPourAge ? "analyse en cours" : "21 jours de données"} sublabelColor="#596265" size={126} color="#f56fae" />
           </div>
-          <div className="mt-7 grid gap-2 border-t border-white/[0.07] pt-5 text-[11px] leading-5 text-[#9ba3a8] sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-7 grid gap-2 border-t border-[#343a3d]/15 pt-5 text-[11px] font-medium leading-5 text-[#596265] sm:grid-cols-2 lg:grid-cols-3">
             <p><strong className="text-white">Entraînement</strong> · séances réalisées par rapport à ton rythme mensuel.</p>
             <p><strong className="text-white">Alimentation</strong> · informations nutritionnelles disponibles pour personnaliser le plan.</p>
             <p><strong className="text-white">Récupération</strong> · quantité de signaux disponibles : sommeil, HRV et fréquence cardiaque.</p>
@@ -155,7 +155,7 @@ export default async function ProgressionPage() {
             <p><strong className="text-white">Score COAI</strong> · synthèse de tes quatre piliers actuels.</p>
             <p><strong className="text-white">Âge COAI</strong> · débloqué uniquement après un historique suffisamment fiable.</p>
           </div>
-          <p className="mt-5 text-center text-[10px] leading-5 text-[#687177]">Les scores indiquent ton niveau actuel et la précision des données disponibles. Ils ne constituent pas un diagnostic médical.</p>
+          <p className="mt-5 text-center text-[10px] font-medium leading-5 text-[#4f595d]">Les scores indiquent ton niveau actuel et la précision des données disponibles. Ils ne constituent pas un diagnostic médical.</p>
         </div>
       </Card>
 

@@ -113,6 +113,27 @@ export default async function DashboardPage() {
         )}
       </header>
 
+      <section className="relative overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/20 bg-[radial-gradient(circle_at_92%_0%,rgba(197,108,255,.16),transparent_18rem),radial-gradient(circle_at_0%_100%,rgba(76,201,240,.14),transparent_20rem),#111518] px-6 py-6 text-white shadow-[0_28px_80px_-44px_rgba(76,201,240,.65)] sm:px-8" aria-labelledby="coai-intelligence-title">
+        <div className="relative grid gap-6 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
+          <div>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">Intelligence COAI · Pas une IA généraliste</p>
+            <h2 id="coai-intelligence-title" className="mt-2 font-display text-2xl sm:text-3xl">L&apos;expérience terrain devient ton avantage.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#b8c0c4]">
+              Le moteur COAI structure plus de 17 ans de coaching réel : progression, dosage de l&apos;effort, récupération et prudence face aux douleurs. Il croise ces règles avec ton profil, tes séances et tes retours pour décider quoi ajuster — pas simplement pour produire une réponse plausible.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
+              <span className="rounded-full border border-[#ff8a3d]/25 bg-[#ff8a3d]/10 px-3 py-1.5 text-[#ffb17d]">17 ans de terrain</span>
+              <span className="rounded-full border border-[#39e67b]/25 bg-[#39e67b]/10 px-3 py-1.5 text-[#76eea3]">Tes données réelles</span>
+              <span className="rounded-full border border-[#c56cff]/25 bg-[#c56cff]/10 px-3 py-1.5 text-[#dca2ff]">Décisions explicables</span>
+            </div>
+          </div>
+          <blockquote className="rounded-2xl border border-white/10 bg-white/[0.045] px-5 py-5 text-center font-editorial text-xl leading-8 text-[#fffdf8] sm:text-2xl">
+            “{MANTRAS[date.getDay()]}”
+            <footer className="mt-3 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-[#8f9aa0]">Ton impulsion du jour</footer>
+          </blockquote>
+        </div>
+      </section>
+
       {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
 
       <section className="coai-week-overview" aria-labelledby="week-title">
@@ -148,7 +169,7 @@ export default async function DashboardPage() {
             <p className="coai-eyebrow">Aujourd’hui</p>
             <h2 id="today-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Ton briefing en trois décisions.</h2>
           </div>
-          <blockquote>“{MANTRAS[date.getDay()]}”</blockquote>
+          <span className="rounded-full border border-[#c56cff]/20 bg-[#c56cff]/[0.07] px-4 py-2 text-xs font-bold text-[#8d4cba]">3 décisions utiles aujourd&apos;hui</span>
         </div>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <Link href={sourceSession ? "#check-in-du-jour" : "/programme/entrainement"} className="coai-brief-card coai-brief-training">

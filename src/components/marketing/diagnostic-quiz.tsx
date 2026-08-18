@@ -17,6 +17,7 @@ import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { DiagnosticShareButton } from "@/components/marketing/diagnostic-share-button";
+import { Gauge } from "@/components/ui/gauge";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -45,7 +46,7 @@ const NIVEAUX = [
 // un produit "personnalisé" ne peut pas se limiter à 4 objectifs fixes.
 // "Autre objectif" ouvre un champ texte libre plutôt que de forcer un choix
 // approximatif.
-const OBJECTIF_AUTRE_LABEL = "Autre objectif";
+const OBJECTIF_AUTRE_LABEL = "Autre, à préciser";
 const OBJECTIFS = [
   "Perdre du gras",
   "Prendre du muscle",
@@ -69,6 +70,7 @@ const EQUIPEMENTS = [
   "Kettlebell",
   "TRX / sangles de suspension",
   "Aucun matériel",
+  AUTRE_LABEL,
 ];
 
 // Alignés sur l'enum frequenceEntrainement de /api/profil. Phase 5.1
@@ -379,6 +381,7 @@ export function DiagnosticQuiz({
   const [activiteQuotidienne, setActiviteQuotidienne] = useState<string | null>(null);
   const [niveau, setNiveau] = useState<string | null>(null);
   const [objectif, setObjectif] = useState<string | null>(null);
+  const [objectifsPrincipaux, setObjectifsPrincipaux] = useState<string[]>([]);
   const [objectifPrincipalLibre, setObjectifPrincipalLibre] = useState("");
   const [objectifSecondaire, setObjectifSecondaire] = useState("");
   const [importanceObjectif, setImportanceObjectif] = useState("");
@@ -401,6 +404,7 @@ export function DiagnosticQuiz({
   const [forceRepere, setForceRepere] = useState<string | null>(null);
   const [mouvementRepere, setMouvementRepere] = useState<string | null>(null);
   const [equipement, setEquipement] = useState<string[]>([]);
+  const [equipementAutreTexte, setEquipementAutreTexte] = useState("");
   const [lieu, setLieu] = useState<string | null>(null);
   const [duree, setDuree] = useState<string | null>(null);
   const [frequence, setFrequence] = useState<string | null>(null);
@@ -537,6 +541,7 @@ export function DiagnosticQuiz({
       activiteQuotidienne,
       niveau,
       objectif,
+      objectifsPrincipaux,
       objectifAutreTexte,
       objectifPrincipalLibre,
       objectifSecondaire,
@@ -560,6 +565,7 @@ export function DiagnosticQuiz({
       forceRepere,
       mouvementRepere,
       equipement,
+      equipementAutreTexte,
       lieu,
       duree,
       frequence,
@@ -592,6 +598,7 @@ export function DiagnosticQuiz({
     activiteQuotidienne,
     niveau,
     objectif,
+    objectifsPrincipaux,
     objectifAutreTexte,
     objectifPrincipalLibre,
     objectifSecondaire,
@@ -614,6 +621,7 @@ export function DiagnosticQuiz({
     forceRepere,
     mouvementRepere,
     equipement,
+    equipementAutreTexte,
     lieu,
     duree,
     frequence,
@@ -645,6 +653,7 @@ export function DiagnosticQuiz({
     if (typeof saved.activiteQuotidienne === "string") setActiviteQuotidienne(saved.activiteQuotidienne);
     if (typeof saved.niveau === "string") setNiveau(saved.niveau);
     if (typeof saved.objectif === "string") setObjectif(saved.objectif);
+    if (Array.isArray(saved.objectifsPrincipaux)) setObjectifsPrincipaux(saved.objectifsPrincipaux as string[]);
     if (typeof saved.objectifAutreTexte === "string") setObjectifAutreTexte(saved.objectifAutreTexte);
     if (typeof saved.objectifPrincipalLibre === "string") setObjectifPrincipalLibre(saved.objectifPrincipalLibre);
     if (typeof saved.objectifSecondaire === "string") setObjectifSecondaire(saved.objectifSecondaire);
@@ -668,6 +677,7 @@ export function DiagnosticQuiz({
     if (typeof saved.forceRepere === "string") setForceRepere(saved.forceRepere);
     if (typeof saved.mouvementRepere === "string") setMouvementRepere(saved.mouvementRepere);
     if (Array.isArray(saved.equipement)) setEquipement(saved.equipement as string[]);
+    if (typeof saved.equipementAutreTexte === "string") setEquipementAutreTexte(saved.equipementAutreTexte);
     if (typeof saved.lieu === "string") setLieu(saved.lieu);
     if (typeof saved.duree === "string") setDuree(saved.duree);
     if (typeof saved.frequence === "string") setFrequence(saved.frequence);
@@ -760,7 +770,7 @@ export function DiagnosticQuiz({
     if (step === "persona") return persona.length > 0;
     if (step === "quotidien") return Boolean(activiteQuotidienne);
     if (step === "niveau") return Boolean(niveau);
-    if (step === "objectif") return Boolean(objectif) && objectifPrincipalLibre.trim().length >= 5;
+    if (step === "objectif") return objectifsPrincipaux.length > 0 || Boolean(objectif);
     if (step === "accompagnement") return true;
     if (step === "echeance") return Boolean(echeance);
     if (step === "evaluationPhysique") return Boolean(mobiliteRepere && cardioRepere && forceRepere && mouvementRepere);
@@ -784,9 +794,7 @@ export function DiagnosticQuiz({
     activiteQuotidienne,
     niveau,
     objectif,
-    objectifPrincipalLibre,
-    importanceObjectif,
-    attentesCoai,
+    objectifsPrincipaux,
     echeance,
     mobiliteRepere,
     cardioRepere,
@@ -815,7 +823,7 @@ export function DiagnosticQuiz({
         activiteQuotidienne,
         niveau,
         objectif: resolveObjectif(objectif, objectifAutreTexte),
-        equipement,
+        equipement: resolveAutre(equipement, equipementAutreTexte),
         lieu,
         duree,
         frequence,
@@ -831,6 +839,7 @@ export function DiagnosticQuiz({
       objectif,
       objectifAutreTexte,
       equipement,
+      equipementAutreTexte,
       lieu,
       duree,
       frequence,
@@ -840,6 +849,28 @@ export function DiagnosticQuiz({
       santeAutreTexte,
     ]
   );
+
+  const signauxDiagnostic = useMemo(() => {
+    const entrainement = niveau === "Avancé" ? 82 : niveau === "Intermédiaire" ? 68 : 52;
+    const alimentationScores: Record<string, number> = {
+      "Repas structurés et équilibrés": 82,
+      "Grignotage fréquent / repas irréguliers": 44,
+      "Jeûne intermittent": 65,
+      "Beaucoup de plats préparés ou fast-food": 36,
+      "Déjà suivi par un nutritionniste": 86,
+    };
+    const sommeilScores: Record<string, number> = {
+      "Mauvaise (moins de 5h, sommeil agité)": 28,
+      "Moyenne (5-6h, réveils fréquents)": 52,
+      "Bonne (7-8h, plutôt réparateur)": 78,
+      "Excellente (8h ou plus, réparateur)": 92,
+    };
+    const alimentation = habitudesAlimentaires ? alimentationScores[habitudesAlimentaires] ?? 50 : 0;
+    const sommeil = qualiteSommeil ? sommeilScores[qualiteSommeil] ?? 50 : 0;
+    const contraintesSignalees = resolveAutre(sante, santeAutreTexte).filter((item) => item !== AUCUNE_DOULEUR_LABEL).length;
+    const recuperation = Math.max(25, Math.round(sommeil * 0.8 - Math.min(20, contraintesSignalees * 5) + 12));
+    return { entrainement, alimentation, recuperation, sommeil };
+  }, [niveau, habitudesAlimentaires, qualiteSommeil, sante, santeAutreTexte]);
 
   function signUpHref(): string {
     const params = new URLSearchParams();
@@ -855,13 +886,16 @@ export function DiagnosticQuiz({
     const personaAutreResolue = personaAutreTexte.trim();
     const personaResolue = resolveAutre(persona, personaAutreTexte);
     const objectifResolu = resolveObjectif(objectif, objectifAutreTexte);
+    const objectifsResolus = objectifsPrincipaux.map((item) =>
+      item === OBJECTIF_AUTRE_LABEL ? (objectifAutreTexte.trim() || item) : item
+    );
     const santeReelle = resolveAutre(sante, santeAutreTexte).filter((s) => s !== AUCUNE_DOULEUR_LABEL);
     const sportResolu = resolveAutre(sport, sportAutreTexte);
     return {
       niveau: niveau ?? undefined,
       persona: personaResolue.length ? personaResolue.join(", ") : undefined,
       objectifs: [
-        objectifResolu,
+        ...(objectifsResolus.length ? objectifsResolus : [objectifResolu]),
         activiteQuotidienne ? `activité quotidienne : ${activiteQuotidienne}` : null,
         objectifPrincipalLibre.trim() ? `objectif précisé : ${objectifPrincipalLibre.trim()}` : null,
         objectifSecondaire.trim() ? `objectif secondaire : ${objectifSecondaire.trim()}` : null,
@@ -875,7 +909,7 @@ export function DiagnosticQuiz({
         echeance ? `échéance : ${echeance}` : null,
         personaAutreResolue,
       ].filter(Boolean).join(" — ") || undefined,
-      equipementDisponible: equipement.length ? equipement.join(", ") : undefined,
+      equipementDisponible: equipement.length ? resolveAutre(equipement, equipementAutreTexte).join(", ") : undefined,
       lieuEntrainement: lieu ?? undefined,
       dureeSeanceMinutes: duree ? DUREE_EN_MINUTES[duree] : undefined,
       frequenceEntrainement: frequence ?? undefined,
@@ -971,6 +1005,9 @@ export function DiagnosticQuiz({
             activiteQuotidienne,
             niveau,
             objectif: resolveObjectif(objectif, objectifAutreTexte),
+            objectifsPrincipaux: objectifsPrincipaux.map((item) =>
+              item === OBJECTIF_AUTRE_LABEL ? (objectifAutreTexte.trim() || item) : item
+            ),
             objectifPrincipalLibre: objectifPrincipalLibre.trim(),
             objectifSecondaire: objectifSecondaire.trim() || undefined,
             importanceObjectif: importanceObjectif.trim(),
@@ -983,7 +1020,7 @@ export function DiagnosticQuiz({
             forceRepere,
             mouvementRepere,
             antecedentsMedicaux: antecedentsMedicaux.trim() || undefined,
-            equipement,
+            equipement: resolveAutre(equipement, equipementAutreTexte),
             lieu,
             duree,
             frequence,
@@ -1072,6 +1109,11 @@ export function DiagnosticQuiz({
                 )}
               </p>
               {!resumable && (
+                <p className="max-w-lg rounded-xl border border-laiton-400/20 bg-laiton-400/[0.07] px-4 py-3 text-sm leading-6 text-laiton-100">
+                  Plus tes réponses sont précises, plus ton programme pourra l&apos;être. Réponds simplement : quelques clics suffisent.
+                </p>
+              )}
+              {!resumable && (
                 <div className="grid w-full max-w-xl grid-cols-3 gap-2 text-left sm:gap-3">
                   {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "100 %", label: "personnalisé" }, { value: "0 €", label: "pour commencer" }].map((proof) => (
                     <div key={proof.label} className="coai-diagnostic-proof">
@@ -1156,47 +1198,34 @@ export function DiagnosticQuiz({
           {step === "objectif" && (
             <div className="flex flex-col gap-4">
               <div>
-                <h2 className="font-display text-xl font-semibold text-white">Ton objectif principal ?</h2>
-                <p className="mt-1.5 text-sm text-graphite-400">Un seul, celui qui compte le plus maintenant.</p>
+                <h2 className="font-display text-xl font-semibold text-white">Tes objectifs principaux ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Coche ce que tu veux améliorer. Aucune phrase à écrire.</p>
               </div>
               <div className="flex flex-col gap-2">
                 {OBJECTIFS.map((o) => (
                   <OptionCard
                     key={o}
                     label={o}
-                    active={objectif === o}
-                    onClick={() =>
-                      o === OBJECTIF_AUTRE_LABEL ? setObjectif(o) : chooseSingle(setObjectif, o)
-                    }
+                    active={objectifsPrincipaux.includes(o)}
+                    onClick={() => {
+                      const next = objectifsPrincipaux.includes(o)
+                        ? objectifsPrincipaux.filter((item) => item !== o)
+                        : [...objectifsPrincipaux, o];
+                      setObjectifsPrincipaux(next);
+                      setObjectif(next.find((item) => item !== OBJECTIF_AUTRE_LABEL) ?? next[0] ?? null);
+                    }}
                   />
                 ))}
               </div>
-              {objectif === OBJECTIF_AUTRE_LABEL && (
+              {objectifsPrincipaux.includes(OBJECTIF_AUTRE_LABEL) && (
                 <input
                   type="text"
                   value={objectifAutreTexte}
                   onChange={(e) => setObjectifAutreTexte(e.target.value)}
-                  placeholder="Quel est ton objectif ?"
+                  placeholder="Précise seulement si tu le souhaites…"
                   className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
                 />
               )}
-              <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Précise ton objectif avec tes mots</span>
-                <textarea value={objectifPrincipalLibre} onChange={(event) => setObjectifPrincipalLibre(event.target.value.slice(0, 500))} rows={2} placeholder="Ex. Perdre 8 kg et retrouver mon souffle…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
-              </label>
-              <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Objectif secondaire <span className="font-normal text-graphite-500">(facultatif)</span></span>
-                <input value={objectifSecondaire} onChange={(event) => setObjectifSecondaire(event.target.value.slice(0, 300))} placeholder="Ex. Mieux dormir, gagner en mobilité…" className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
-              </label>
-              <label className="flex flex-col gap-2 text-left">
-                <span className="text-sm font-semibold text-graphite-200">Pourquoi est-ce important pour toi maintenant ? <span className="font-normal text-graphite-500">(facultatif)</span></span>
-                <div className="flex flex-col gap-2">
-                  {MOTIVATIONS.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? importanceObjectif.startsWith(`${AUTRE_LABEL} :`) : importanceObjectif === item} onClick={() => setImportanceObjectif(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : importanceObjectif === item ? "" : item)} />)}
-                </div>
-                {importanceObjectif.startsWith(`${AUTRE_LABEL} :`) && (
-                  <textarea value={importanceObjectif.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setImportanceObjectif(`${AUTRE_LABEL} : ${event.target.value.slice(0, 480)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/60" />
-                )}
-              </label>
             </div>
           )}
 
@@ -1399,6 +1428,15 @@ export function DiagnosticQuiz({
                   <Chip key={e} label={e} active={equipement.includes(e)} onClick={() => toggle(equipement, e, setEquipement)} />
                 ))}
               </div>
+              {equipement.includes(AUTRE_LABEL) && (
+                <input
+                  type="text"
+                  value={equipementAutreTexte}
+                  onChange={(event) => setEquipementAutreTexte(event.target.value.slice(0, 200))}
+                  placeholder="Ex. vélo, tapis de course, elliptique… (facultatif)"
+                  className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
+                />
+              )}
             </div>
           )}
 
@@ -1844,15 +1882,15 @@ export function DiagnosticQuiz({
               {diagnostic.pointsATravailler.length > 0 && (
                 <div className="coai-result-strategy w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-5 py-5 text-left sm:px-6 sm:py-6">
                   <div>
-                    <SectionLabel>Points à améliorer → Solutions COAI</SectionLabel>
+                    <SectionLabel>Tes points à améliorer → La solution COAI</SectionLabel>
                     <h3 className="mt-2 font-display text-2xl font-semibold text-white">
-                      {diagnostic.pointsATravailler.length} priorité{diagnostic.pointsATravailler.length > 1 ? "s" : ""} identifiée{diagnostic.pointsATravailler.length > 1 ? "s" : ""}, une réponse concrète pour chacune
+                      Chaque point faible devient une action concrète pour atteindre tes objectifs.
                     </h3>
                   </div>
                   <div className="mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-2 rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
-                        Les points à améliorer
+                        Tes points à améliorer
                       </span>
                       <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
                         {diagnostic.pointsATravailler.map((p) => (
@@ -1865,7 +1903,7 @@ export function DiagnosticQuiz({
                     </div>
                     <div className="flex flex-col gap-2 rounded-xl border border-laiton-400/30 bg-laiton-400/[0.07] px-4 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-300">
-                        Ce que COAI met en place
+                        La solution COAI pour progresser
                       </span>
                       <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-100">
                         {diagnostic.pointsResolus.map((p) => (
@@ -1900,6 +1938,23 @@ export function DiagnosticQuiz({
                   </p>
                 </div>
               )}
+
+              <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/20 bg-[radial-gradient(circle_at_100%_0%,rgba(197,108,255,.16),transparent_20rem),radial-gradient(circle_at_0%_100%,rgba(76,201,240,.12),transparent_22rem),#111518] px-6 py-7 text-left sm:px-8">
+                <div className="relative grid gap-6 sm:grid-cols-[1.15fr_.85fr] sm:items-center">
+                  <div>
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">Pourquoi COAI n&apos;est pas une IA classique</p>
+                    <h3 className="mt-2 font-display text-2xl text-white">Une méthode de terrain, renforcée par tes propres données.</h3>
+                    <p className="mt-3 text-sm leading-6 text-[#b3bcc0]">
+                      Une IA généraliste formule une réponse à partir d&apos;un prompt. COAI applique des règles de coaching issues de plus de 17 ans d&apos;expérience réelle, puis les croise avec ton niveau, tes contraintes, ta récupération et tes progrès.
+                    </p>
+                  </div>
+                  <ul className="grid gap-2 text-xs leading-5 text-[#d7dcde]">
+                    <li className="rounded-xl border border-[#ff8a3d]/20 bg-[#ff8a3d]/[0.07] px-4 py-3"><strong className="text-[#ffb17d]">Terrain</strong> · dosage, progression et sécurité structurés.</li>
+                    <li className="rounded-xl border border-[#39e67b]/20 bg-[#39e67b]/[0.07] px-4 py-3"><strong className="text-[#76eea3]">Tes données</strong> · chaque retour affine les décisions suivantes.</li>
+                    <li className="rounded-xl border border-[#c56cff]/20 bg-[#c56cff]/[0.07] px-4 py-3"><strong className="text-[#dca2ff]">Explicable</strong> · chaque adaptation répond à un signal réel.</li>
+                  </ul>
+                </div>
+              </div>
 
               <div className="flex w-full flex-col gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
                 <div>
@@ -1957,6 +2012,31 @@ export function DiagnosticQuiz({
                 <p className="mt-6 border-t border-white/10 pt-5 text-center text-sm font-semibold text-laiton-200">
                   Ton programme n&apos;est jamais terminé : il apprend de toi.
                 </p>
+              </div>
+
+              <div className="relative w-full overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[radial-gradient(circle_at_50%_-30%,rgba(76,201,240,.12),transparent_46%),#111518] p-6 text-left shadow-[0_35px_95px_-45px_rgba(0,0,0,.95)] sm:p-8">
+                <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:24px_24px]" aria-hidden="true" />
+                <div className="relative">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">COAI Intelligence · Ton point zéro</p>
+                      <h3 className="mt-2 font-display text-2xl text-white">Tes signaux essentiels.</h3>
+                      <p className="mt-1 max-w-xl text-sm leading-6 text-[#9ba3a8]">Ton premier tableau de bord, calculé à partir des réponses de ce bilan.</p>
+                    </div>
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#aeb5ba]">Analyse initiale · Aujourd&apos;hui</span>
+                  </div>
+                  <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
+                    <Gauge label="Entraînement" percent={signauxDiagnostic.entrainement} sublabel="niveau déclaré" size={112} color="#ff8a3d" />
+                    <Gauge label="Alimentation" percent={signauxDiagnostic.alimentation} sublabel="habitudes déclarées" size={112} color="#ffd84d" />
+                    <Gauge label="Récupération" percent={signauxDiagnostic.recuperation} sublabel="signal initial" size={112} color="#39e67b" />
+                    <Gauge label="Sommeil" percent={signauxDiagnostic.sommeil} sublabel="qualité déclarée" size={112} color="#4cc9f0" />
+                    <Gauge label="Score COAI" percent={diagnostic.indiceCoai.score} sublabel="synthèse actuelle" size={112} color="#c56cff" />
+                    <Gauge label="Âge COAI" percent={0} displayValue="—" sublabel="21 jours de données" size={112} color="#f56fae" />
+                  </div>
+                  <p className="mt-7 border-t border-white/[0.07] pt-5 text-center text-[10px] leading-5 text-[#7f898f]">
+                    Ces scores sont des repères de coaching fondés sur tes réponses déclaratives. Ils évolueront avec tes séances et tes données réelles ; ils ne constituent pas un diagnostic médical.
+                  </p>
+                </div>
               </div>
 
               {connecte ? (

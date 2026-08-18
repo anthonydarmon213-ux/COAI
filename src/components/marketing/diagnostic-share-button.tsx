@@ -118,8 +118,8 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
   }
 
   return (
-    <div className="flex flex-col items-center gap-2 text-center">
-      <p className="text-sm text-graphite-400">Envie de partager ton score&nbsp;?</p>
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-[#25D366]/20 bg-[#25D366]/[0.055] px-5 py-4 text-center">
+      <p className="text-sm font-medium text-white">Fier de ton Score COAI&nbsp;? Lance le défi à un proche.</p>
       {connecte && (
         <p className="text-xs text-graphite-500">
           Si un proche rejoint COAI avec ton lien, un mois t’est offert.
@@ -130,9 +130,9 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
           type="button"
           onClick={partagerWhatsApp}
           disabled={loading}
-          className="rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/[0.1]"
+          className="rounded-full border border-[#25D366]/45 bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-[#102016] shadow-[0_8px_24px_rgba(37,211,102,0.16)] transition hover:-translate-y-0.5 hover:bg-[#35df76] disabled:opacity-50"
         >
-          WhatsApp
+          Partager sur WhatsApp
         </button>
         <button
           type="button"

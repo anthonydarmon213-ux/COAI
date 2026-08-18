@@ -11,6 +11,7 @@ export function Gauge({
   size = 120,
   color = "#c9a262",
   displayValue,
+  sublabelColor,
 }: {
   label: string;
   percent: number;
@@ -18,6 +19,7 @@ export function Gauge({
   size?: number;
   color?: string;
   displayValue?: string;
+  sublabelColor?: string;
 }) {
   const clamped = Math.min(100, Math.max(0, percent));
   const [displayed, setDisplayed] = useState(0);
@@ -83,7 +85,7 @@ export function Gauge({
         <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-white">
           {label}
         </span>
-        {sublabel && <span className="mt-0.5 text-[11px] text-[#8e969c]">{sublabel}</span>}
+        {sublabel && <span className="mt-0.5 text-[11px] font-medium text-[#8e969c]" style={sublabelColor ? { color: sublabelColor } : undefined}>{sublabel}</span>}
       </div>
     </div>
   );
