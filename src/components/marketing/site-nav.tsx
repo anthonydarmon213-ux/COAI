@@ -28,7 +28,7 @@ const LIENS = [
 // uniquement le bouton qui a du sens dans chaque état. Un visiteur non
 // connecté qui clique "Commencer" et a déjà un compte retrouve "Se
 // connecter" directement sur /sign-up (lien déjà présent là-bas).
-export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompte: string }) {
+export function SiteNav({ connecte }: { connecte: boolean }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const menuMobileRef = useRef<HTMLDivElement>(null);
   const actionHref = connecte ? "/dashboard" : "/sign-up";
@@ -57,7 +57,7 @@ export function SiteNav({ connecte, hrefCompte }: { connecte: boolean; hrefCompt
 
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-10">
-      <Link href={hrefCompte} className="flex flex-col gap-0.5">
+      <Link href="/" aria-label="COAI — retour à l’accueil" className="flex flex-col gap-0.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-300">
         <span className="flex items-center gap-2.5">
           <CoaiMark size={22} />
           <span className="font-display text-xl font-semibold tracking-[0.16em] text-white">COAI</span>

@@ -155,9 +155,59 @@ const PILIERS = [
   },
 ];
 
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://coai.fr/#organization",
+      name: "COAI",
+      url: "https://coai.fr/",
+      logo: "https://coai.fr/icon",
+      founder: { "@id": "https://coai.fr/#anthony-darmon" },
+      sameAs: [
+        "https://instagram.com/anthonydarmoncoach",
+        "https://www.linkedin.com/in/darmon-anthony-7a1303101",
+      ],
+    },
+    {
+      "@type": "Person",
+      "@id": "https://coai.fr/#anthony-darmon",
+      name: "Anthony Darmon",
+      jobTitle: "Coach sportif diplômé d’État",
+      worksFor: { "@id": "https://coai.fr/#organization" },
+    },
+    {
+      "@type": "Service",
+      "@id": "https://coai.fr/#personal-training",
+      name: "COAI — Personal Training augmenté",
+      provider: { "@id": "https://coai.fr/#organization" },
+      areaServed: "FR",
+      description: DESCRIPTION,
+      offers: [
+        { "@type": "Offer", name: "Impulsion", price: "49", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Transformation", price: "89", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "VIP", price: "199", priceCurrency: "EUR" },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.reponse },
+      })),
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <main className="bg-lab-grid flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c") }}
+      />
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
       <MarqueeBanner />
@@ -411,17 +461,46 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* Le programme s'adapte à la vraie vie : visuel fourni par Anthony. */}
+      {/* Démonstration produit : rendre l'expérience tangible avant de
+          poursuivre le discours de marque. */}
       <Reveal>
-        <section className="mx-auto flex w-full max-w-6xl justify-center px-6 pb-8">
-          <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
+        <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 py-20 lg:grid-cols-[1.05fr_.95fr]">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
             <Image
-              src="/coai-programme-adaptatif.jpg"
-              alt="Le programme COAI adapte entraînement, nutrition et récupération à la vie de chacun"
+              src="/coai-diagnostic-clean.png"
+              alt="Aperçu réel du diagnostic personnalisé COAI"
               fill
-              sizes="(min-width: 1280px) 72rem, 94vw"
-              className="object-cover object-center"
+              sizes="(min-width: 1024px) 52vw, 94vw"
+              className="object-cover object-top"
             />
+          </div>
+          <div>
+            <SectionLabel>Dans le produit</SectionLabel>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+              Tu vois quoi faire, et pourquoi.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-graphite-300">
+              COAI transforme tes réponses en décisions concrètes : une priorité claire, une séance adaptée et un suivi qui garde la mémoire de ta progression.
+            </p>
+            <ol className="mt-8 space-y-5">
+              {[
+                ["01", "Diagnostic", "Ton niveau, tes objectifs, tes contraintes et tes douleurs sont pris en compte."],
+                ["02", "Séance du jour", "Le contenu s’ajuste à ton temps disponible et à ta forme réelle."],
+                ["03", "Progression", "Tes retours alimentent la prochaine séance et rendent l’évolution mesurable."],
+              ].map(([numero, titre, description]) => (
+                <li key={numero} className="grid grid-cols-[2.5rem_1fr] gap-3">
+                  <span className="font-mono text-xs tracking-widest text-laiton-300">{numero}</span>
+                  <div>
+                    <h3 className="font-semibold text-white">{titre}</h3>
+                    <p className="mt-1 text-sm leading-6 text-graphite-400">{description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <Link href="/diagnostic" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-laiton-400 px-6 text-sm font-semibold text-graphite-950 transition hover:bg-laiton-300">
+              Voir mon aperçu personnalisé
+            </Link>
+            <p className="mt-3 text-xs text-graphite-500">Gratuit · moins de 5 minutes · sans carte bancaire</p>
           </div>
         </section>
       </Reveal>
