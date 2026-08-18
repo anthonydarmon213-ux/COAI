@@ -18,17 +18,30 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
   const [message, setMessage] = useState<string | null>(null);
 
   async function getShareLink() {
-    let lien = "https://coai.fr/diagnostic?utm_source=score_coai&utm_medium=share&utm_campaign=compare_score";
+    let lien = "https://coai.fr/diagnostic";
     if (connecte) {
       const res = await fetch("/api/parrainage").catch(() => null);
       const data = res?.ok ? await res.json() : null;
       if (typeof data?.lien === "string") lien = data.lien;
     }
-    return lien;
+    const url = new URL(lien, window.location.origin);
+    if (connecte) {
+      // /invitation/[code] conserve le score pendant sa redirection vers le
+      // diagnostic : le filleul arrive directement avec un objectif clair à
+      // battre, sans exposer le nom ni les réponses du parrain.
+      url.searchParams.set("score", String(score));
+    } else {
+      url.searchParams.set("challenge_score", String(score));
+    }
+    url.searchParams.set("utm_source", "score_coai");
+    url.searchParams.set("utm_medium", "share");
+    url.searchParams.set("utm_campaign", "score_challenge");
+    url.searchParams.set("utm_content", `score_${score}`);
+    return url.toString();
   }
 
   function shareText(lien: string) {
-    return `J’ai obtenu ${score}/100 à mon Score COAI pour ${objectif.toLowerCase()}. À ton tour : fais le bilan gratuitement et on compare nos scores 👇\n${lien}`;
+    return `J’ai obtenu ${score}/100 à mon Score COAI pour ${objectif.toLowerCase()}. Essaie de battre mon score : le bilan est gratuit 👇\n${lien}`;
   }
 
   async function partagerWhatsApp() {
@@ -98,7 +111,12 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
     <div className="coai-score-challenge flex flex-col items-center gap-2.5 text-center">
       <span className="coai-score-challenge-badge">Défi COAI · {score}/100</span>
       <p className="max-w-sm text-lg font-semibold text-white">Qui de tes proches fera mieux que toi ?</p>
-      <p className="max-w-md text-sm leading-6 text-graphite-300">Partage ton Score COAI. Ils font le même bilan gratuitement, puis vous comparez vos points de départ et votre progression.</p>
+      <p className="max-w-md text-sm leading-6 text-graphite-300">Partage ton Score COAI. Ton proche arrive avec {score}/100 à battre, fait le même bilan gratuitement, puis vous comparez vos points de départ.</p>
+      {connecte && (
+        <p className="rounded-full border border-laiton-300/25 bg-laiton-300/[0.08] px-4 py-2 text-xs font-semibold text-laiton-200">
+          Ton proche devient abonné après son essai → tu gagnes 1 mois offert.
+        </p>
+      )}
       <div className="flex flex-col gap-2 sm:flex-row">
         <button
           type="button"
