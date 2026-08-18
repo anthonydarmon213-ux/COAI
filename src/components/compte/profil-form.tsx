@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Select } from "@/components/ui/select";
+import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 // Badge "Nouveau" (14/08/2026, demande Anthony) : le bracelet connecté et
 // la photo morphologique sont des fonctionnalités récentes, faciles à
@@ -379,8 +380,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     setMontreLoading(true);
     setMontreError(null);
     try {
+      const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized.file);
       const res = await fetch("/api/profil/montre", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse du screenshot.");
@@ -413,8 +415,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     setPhotoError(null);
     setPhotoRejected(null);
     try {
+      const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized.file);
       const res = await fetch("/api/profil/photo-morphologie", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse de la photo.");
@@ -511,7 +514,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <label className="w-fit">
             <input
               type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
+              accept="image/*,.heic,.heif"
               className="hidden"
               disabled={montreLoading}
               onChange={(e) => {
@@ -524,6 +527,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
               {montreLoading ? "Analyse en cours…" : "Analyser un screenshot"}
             </span>
           </label>
+          <p className="text-xs text-graphite-500">Jusqu’à 40 Mo · image 4K optimisée automatiquement avant analyse.</p>
           {montreError && <p className="text-sm text-red-400">{montreError}</p>}
           {(montreData.resumeMontre ||
             montreData.pasMoyenParJour ||
@@ -568,7 +572,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <label className="w-fit">
             <input
               type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
+              accept="image/*,.heic,.heif"
               className="hidden"
               disabled={photoLoading}
               onChange={(e) => {
@@ -581,6 +585,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
               {photoLoading ? "Analyse en cours…" : "Analyser une photo"}
             </span>
           </label>
+          <p className="text-xs text-graphite-500">Jusqu’à 40 Mo · photo 4K optimisée automatiquement avant analyse.</p>
           {photoError && <p className="text-sm text-red-400">{photoError}</p>}
           {photoRejected && <p className="text-sm text-graphite-400">{photoRejected}</p>}
           {(photoData.morphologieDetectee || photoData.observationsPosture) && (

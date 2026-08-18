@@ -87,6 +87,24 @@ export default async function ProgressionPage() {
     if (sommeil.includes("mauvaise")) return 32;
     return 0;
   })();
+  const alimentationFields = [
+    user.profile?.habitudesAlimentaires,
+    user.profile?.allergiesAlimentaires,
+    user.profile?.repasParJour,
+    user.profile?.hydratation,
+    user.profile?.consommationCafe,
+    user.profile?.consommationAlcool,
+  ];
+  const alimentation = Math.round((alimentationFields.filter((value) => value !== null && value !== "").length / alimentationFields.length) * 100);
+  const recuperationFields = [
+    user.profile?.qualiteSommeil,
+    user.profile?.hrv,
+    user.profile?.frequenceCardiaqueRepos,
+    user.profile?.sommeilMoyenHeures,
+  ];
+  const precisionRecuperation = Math.round((recuperationFields.filter((value) => value !== null && value !== "").length / recuperationFields.length) * 100);
+  const scoreCoai = Math.round((regularite + alimentation + recuperation + profil.pourcentage) / 4);
+  const historiqueSuffisantPourAge = seancesDuMois >= 8 && mesures.length >= 3 && Boolean(user.profile?.hrv && user.profile?.frequenceCardiaqueRepos);
 
   return (
     <div className="flex flex-col gap-8">
@@ -110,23 +128,34 @@ export default async function ProgressionPage() {
         </Card>
       )}
 
-      <Card className="relative overflow-hidden border-laiton-400/20 bg-[radial-gradient(circle_at_50%_-20%,rgba(201,162,98,.16),transparent_48%),rgba(255,255,255,.025)]">
-        <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(circle,rgba(201,162,98,.55)_1px,transparent_1px)] [background-size:24px_24px]" aria-hidden="true" />
+      <Card className="relative overflow-hidden rounded-[2rem] border-white/[0.08] bg-[radial-gradient(circle_at_50%_-30%,rgba(76,201,240,.12),transparent_46%),#111518] p-6 shadow-[0_35px_95px_-45px_rgba(0,0,0,.95)] sm:p-8">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:24px_24px]" aria-hidden="true" />
         <div className="relative">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <SectionLabel>COAI Intelligence</SectionLabel>
-              <h2 className="mt-2 font-display text-2xl text-white">Ta vue d’ensemble.</h2>
-              <p className="mt-1 max-w-xl text-sm leading-6 text-graphite-400">Tes indicateurs évoluent avec tes séances, tes mesures et les informations que tu partages.</p>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">COAI Intelligence · Aujourd’hui</p>
+              <h2 className="mt-2 font-display text-2xl text-white">Tes signaux essentiels.</h2>
+              <p className="mt-1 max-w-xl text-sm leading-6 text-[#9ba3a8]">Comprendre ton état en un regard, puis savoir exactement quoi améliorer.</p>
             </div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Analyse personnalisée · 30 jours</span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#aeb5ba]">Analyse personnalisée · 30 jours</span>
           </div>
-          <div className="mt-7 grid grid-cols-2 gap-7 sm:grid-cols-4">
-            <Gauge label="Régularité" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} size={132} />
-            <Gauge label="Profil COAI" percent={profil.pourcentage} sublabel="précision du profil" size={132} />
-            <Gauge label="Suivi corporel" percent={suiviCorporel} sublabel={derniereMesure ? "dernière mesure" : "à activer"} size={132} />
-            <Gauge label="Récupération" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} size={132} />
+          <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
+            <Gauge label="Entraînement" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} size={126} color="#ff8a3d" />
+            <Gauge label="Alimentation" percent={alimentation} sublabel="profil nutrition" size={126} color="#ffd84d" />
+            <Gauge label="Récupération" percent={precisionRecuperation} sublabel="précision du signal" size={126} color="#39e67b" />
+            <Gauge label="Sommeil" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} size={126} color="#4cc9f0" />
+            <Gauge label="Score COAI" percent={scoreCoai} sublabel="synthèse actuelle" size={126} color="#c56cff" />
+            <Gauge label="Âge COAI" percent={historiqueSuffisantPourAge ? suiviCorporel : 0} displayValue={historiqueSuffisantPourAge ? "Calcul" : "—"} sublabel={historiqueSuffisantPourAge ? "analyse en cours" : "21 jours de données"} size={126} color="#f56fae" />
           </div>
+          <div className="mt-7 grid gap-2 border-t border-white/[0.07] pt-5 text-[11px] leading-5 text-[#9ba3a8] sm:grid-cols-2 lg:grid-cols-3">
+            <p><strong className="text-white">Entraînement</strong> · séances réalisées par rapport à ton rythme mensuel.</p>
+            <p><strong className="text-white">Alimentation</strong> · informations nutritionnelles disponibles pour personnaliser le plan.</p>
+            <p><strong className="text-white">Récupération</strong> · quantité de signaux disponibles : sommeil, HRV et fréquence cardiaque.</p>
+            <p><strong className="text-white">Sommeil</strong> · qualité déclarée, puis données de l’app Santé ou du bracelet.</p>
+            <p><strong className="text-white">Score COAI</strong> · synthèse de tes quatre piliers actuels.</p>
+            <p><strong className="text-white">Âge COAI</strong> · débloqué uniquement après un historique suffisamment fiable.</p>
+          </div>
+          <p className="mt-5 text-center text-[10px] leading-5 text-[#687177]">Les scores indiquent ton niveau actuel et la précision des données disponibles. Ils ne constituent pas un diagnostic médical.</p>
         </div>
       </Card>
 
