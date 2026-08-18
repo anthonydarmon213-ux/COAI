@@ -9,6 +9,12 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
 
+const COMPARAISON_RAPIDE = [
+  ["Impulsion", "Je veux avancer en autonomie", "IA 24h/24 · programme adaptatif"],
+  ["Transformation", "Je veux aussi un regard humain", "Supervision et ajustements du coach"],
+  ["VIP", "Je veux une attention maximale", "1 séance privée par mois incluse"],
+] as const;
+
 export const metadata: Metadata = {
   title: "Tarifs — Personal Training réimaginé | COAI",
   description: "Choisis le niveau d'attention dont tu as besoin : Impulsion, Transformation ou VIP.",
@@ -40,6 +46,21 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
           <p className="mt-1 text-sm text-graphite-300">Tu peux reprendre quand tu veux.</p>
         </Card>
       )}
+
+      <section className="w-full max-w-5xl" aria-labelledby="comparatif-rapide">
+        <h2 id="comparatif-rapide" className="text-center text-sm font-semibold uppercase tracking-[0.16em] text-laiton-300">
+          Choisir en 10 secondes
+        </h2>
+        <div className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-graphite-700 bg-graphite-700 md:grid-cols-3">
+          {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
+            <a key={nom} href={`#${nom.toLowerCase()}`} className="bg-graphite-950 px-6 py-5 text-center transition hover:bg-graphite-900 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-laiton-300">
+              <strong className="block text-lg text-white">{nom}</strong>
+              <span className="mt-2 block text-sm font-medium text-laiton-300">{besoin}</span>
+              <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
+            </a>
+          ))}
+        </div>
+      </section>
 
       <div className="grid w-full max-w-7xl grid-cols-1 gap-5 lg:grid-cols-3">
         {TIERS.map((tier) => (

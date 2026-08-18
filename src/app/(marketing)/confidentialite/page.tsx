@@ -25,7 +25,7 @@ export default function ConfidentialitePage() {
       <section>
         <h2>2. Données collectées</h2>
         <ul>
-          <li>Données d&apos;identification : prénom, email, mot de passe (chiffré), téléphone.</li>
+          <li>Données d&apos;identification : prénom, email, mot de passe haché de manière sécurisée, téléphone.</li>
           <li>
             Données de profil sportif : objectifs, niveau, équipement disponible, morphologie,
             fréquence d&apos;entraînement, sports pratiqués.
@@ -100,7 +100,7 @@ export default function ConfidentialitePage() {
       <section>
         <h2>7. Sécurité</h2>
         <p>
-          Les mots de passe sont chiffrés, les communications sont chiffrées (HTTPS), et
+          Les mots de passe sont hachés de manière sécurisée, les communications sont chiffrées (HTTPS), et
           l&apos;accès à tes données est restreint à ce qui est strictement nécessaire au
           fonctionnement du service.
         </p>
