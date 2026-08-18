@@ -31,7 +31,7 @@ const NAVIGATION = [
     ],
   },
   {
-    label: "Mon coach",
+    label: "Mes coachs",
     icon: "✦",
     match: "/coach",
     children: [
