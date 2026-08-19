@@ -618,7 +618,7 @@ export default function LandingPage() {
       </Reveal>
 
       <Reveal>
-        <section className="relative mx-auto my-10 aspect-[16/9] w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/[0.1] shadow-[0_38px_100px_-45px_rgba(0,0,0,.8)]">
+        <section className="relative mx-auto my-10 aspect-[4/5] w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/[0.1] shadow-[0_38px_100px_-45px_rgba(0,0,0,.8)] sm:aspect-[16/9]">
           <Image
             src="/coai-recovery-palace.png"
             alt="Une séance de récupération adaptée à la forme et au temps disponible"
@@ -626,10 +626,10 @@ export default function LandingPage() {
             sizes="(min-width: 1280px) 72rem, 96vw"
             className="coai-palace-image object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent" />
-          <div className="absolute inset-y-0 left-0 flex max-w-xl flex-col justify-end p-7 sm:p-12">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent sm:bg-gradient-to-r sm:from-black/80 sm:via-black/25 sm:to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col p-6 sm:inset-y-0 sm:left-0 sm:right-auto sm:max-w-xl sm:justify-end sm:p-12">
             <SectionLabel>Une méthode qui vit avec toi</SectionLabel>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight text-white sm:text-5xl">
+            <h2 className="mt-4 font-display text-2xl font-semibold leading-tight text-white sm:text-5xl">
               Aujourd&apos;hui n&apos;est jamais une journée standard.
             </h2>
             <p className="mt-4 max-w-lg text-sm leading-6 text-white/80 sm:text-lg sm:leading-8">

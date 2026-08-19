@@ -4,6 +4,31 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Bug visuel homepage — titre chevauchant la photo sur mobile (19/08/2026, suite)
+
+Anthony a envoyé une capture réelle de coai.fr mobile avec « Arrange ça ! » —
+la section photo "Aujourd'hui n'est jamais une journée standard." (juste
+après les 3 piliers, `(marketing)/page.tsx`) était en `aspect-[16/9]` sur
+tous les écrans : sur mobile (390px de large), ça ne laisse qu'environ 220px
+de haut pour la photo, largement insuffisant pour le label + le titre sur 2
+lignes + le paragraphe overlay posés en bas du cadre (`justify-end`) — le
+texte débordait et se chevauchait visuellement avec la photo.
+
+Corrigé par un cadre plus haut sur mobile (`aspect-[4/5] sm:aspect-[16/9]`,
+cinématique 16/9 conservé à partir de `sm:`), texte replacé en bas sur toute
+la largeur sur mobile (`inset-x-0 bottom-0`, au lieu d'un bandeau à gauche
+pensé pour un cadre large) avec un dégradé vertical plutôt qu'horizontal en
+dessous de `sm:`, et titre ramené à `text-2xl` sur mobile (`text-3xl` était
+lui-même une partie du problème, trop grand pour le nouvel espace même
+élargi).
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+Playwright réel (navigateur local Chromium, serveur de dev local — pas
+d'accès réseau à coai.fr depuis ce sandbox) en 390px et 1440px : sur mobile,
+le titre et le paragraphe tiennent maintenant proprement dans le cadre sans
+chevaucher la photo ; aucune régression desktop (toujours 16/9, texte à
+gauche comme avant). Reste à confirmer par Anthony sur le site déployé.
+
 ## Bibliothèque de programmes prêts à l'emploi + page challenge 30 jours (19/08/2026, suite)
 
 Reprise du chantier laissé en attente depuis le début de la session
