@@ -59,12 +59,17 @@ function FilterGroup<T extends string>({
 }
 
 // Catalogue d'exercices (19/08/2026, chantier demandé par Anthony) —
-// entièrement côté client : la liste est statique (src/lib/exercices/catalogue.ts),
+// filtres 100% côté client : la liste est statique (src/lib/exercices/catalogue.ts),
 // pas d'appel réseau nécessaire pour filtrer. Filtres cumulables (ET entre
 // catégories, OU à l'intérieur d'une catégorie) sur groupe musculaire,
 // matériel et type — jamais sur le niveau, affiché seulement en info sur
 // chaque carte pour rester simple.
-export function ExerciceCatalogue() {
+//
+// Photos Pexels ajoutées le même jour (même traitement que les recettes) :
+// résolues une seule fois côté serveur pour les 48 exercices (page.tsx),
+// passées ici en prop — changer un filtre ne déclenche jamais de nouvel
+// appel réseau.
+export function ExerciceCatalogue({ photos }: { photos: Record<string, string | null> }) {
   const [groupes, setGroupes] = useState<GroupePrincipal[]>([]);
   const [materiels, setMateriels] = useState<Materiel[]>([]);
   const [types, setTypes] = useState<TypeExercice[]>([]);
@@ -103,22 +108,37 @@ export function ExerciceCatalogue() {
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {filtres.map((ex) => (
-          <Card key={ex.id} className="flex flex-col gap-2">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="text-sm font-semibold text-white">{ex.nom}</h3>
-              <Badge tone="neutral">{NIVEAU_EXERCICE_LABEL[ex.niveau]}</Badge>
-            </div>
-            <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-graphite-500">
-              <span>{GROUPE_PRINCIPAL_LABEL[ex.groupePrincipal]}</span>
-              <span aria-hidden="true">·</span>
-              <span>{TYPE_LABEL[ex.type]}</span>
-              <span aria-hidden="true">·</span>
-              <span>{ex.materiel.map((m) => MATERIEL_LABEL[m]).join(", ")}</span>
-            </div>
-            <p className="text-sm leading-6 text-graphite-400">{ex.consigne}</p>
-          </Card>
-        ))}
+        {filtres.map((ex) => {
+          const photoUrl = photos[ex.photoQuery] ?? null;
+          return (
+            <article
+              key={ex.id}
+              className="flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_-48px_rgba(0,0,0,0.9)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-laiton-400/25"
+            >
+              <div className="relative h-36 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.2),transparent_60%),#171b1d]">
+                {photoUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, cf. RecetteCard pour la même justification
+                  <img src={photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-transparent to-transparent" aria-hidden="true" />
+                <div className="absolute right-2.5 top-2.5">
+                  <Badge tone="neutral">{NIVEAU_EXERCICE_LABEL[ex.niveau]}</Badge>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 p-4">
+                <h3 className="text-sm font-semibold text-white">{ex.nom}</h3>
+                <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-graphite-500">
+                  <span>{GROUPE_PRINCIPAL_LABEL[ex.groupePrincipal]}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{TYPE_LABEL[ex.type]}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{ex.materiel.map((m) => MATERIEL_LABEL[m]).join(", ")}</span>
+                </div>
+                <p className="text-sm leading-6 text-graphite-400">{ex.consigne}</p>
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       {filtres.length === 0 && (

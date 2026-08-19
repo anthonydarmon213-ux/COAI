@@ -1,6 +1,14 @@
 import { ExerciceCatalogue } from "@/components/exercices/exercice-catalogue";
+import { EXERCICES } from "@/lib/exercices/catalogue";
+import { getStockPhotos } from "@/lib/media/pexels";
 
-export default function ExercicesPage() {
+// Photos résolues côté serveur pour les 48 exercices en une fois (19/08/2026,
+// même traitement que /programme/recettes) — la clé PEXELS_API_KEY ne quitte
+// jamais le serveur, et changer un filtre côté client ne redéclenche aucun
+// appel réseau.
+export default async function ExercicesPage() {
+  const photos = await getStockPhotos(EXERCICES.map((ex) => ex.photoQuery));
+
   return (
     <div className="flex flex-col gap-6">
       <div className="animate-reveal flex flex-col gap-3">
@@ -14,7 +22,7 @@ export default function ExercicesPage() {
           matériel disponible ou type de mouvement pour trouver de quoi varier ou compléter une séance.
         </p>
       </div>
-      <ExerciceCatalogue />
+      <ExerciceCatalogue photos={photos} />
     </div>
   );
 }
