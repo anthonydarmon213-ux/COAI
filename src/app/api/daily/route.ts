@@ -39,10 +39,14 @@ const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("checkin"),
     sleep: z.enum(["TRES_MAUVAIS", "MAUVAIS", "CORRECT", "BON", "EXCELLENT"]),
     energy: z.enum(["TRES_BASSE", "BASSE", "NORMALE", "HAUTE", "TRES_HAUTE"]),
-    food: z.enum(["PAS_ENCORE", "LEGER", "EQUILIBRE", "LOURD"]),
+    food: z.enum(["PAS_ENCORE", "LEGER", "EQUILIBRE", "LOURD"]).optional(),
     pain: z.boolean(),
     painArea: z.string().trim().max(100).optional(),
-    availableMinutes: z.union([z.literal(15), z.literal(25), z.literal(40), z.literal(60), z.literal(75)]),
+    // Facultatif (19/08/2026) : requis en pratique pour un jour d'entraînement
+    // (le formulaire complet l'envoie toujours, cf. DailyExperience), mais un
+    // check-in léger les jours de repos (RestDayCheckin) n'a aucune séance à
+    // dimensionner, donc rien à demander ici.
+    availableMinutes: z.union([z.literal(15), z.literal(25), z.literal(40), z.literal(60), z.literal(75)]).optional(),
   }),
   z.object({ action: z.literal("complete") }),
   z.object({
@@ -76,38 +80,54 @@ export async function POST(request: Request) {
     const programme = await activeTrainingProgramme(user.id);
     if (!programme) return NextResponse.json({ error: "Aucun programme disponible" }, { status: 409 });
     const source = getWorkoutForDate(programme.contenu, date);
-    if (!source) return NextResponse.json({ error: "Aujourd'hui est un jour de repos" }, { status: 409 });
+
+    // Jour de repos (19/08/2026, retour Anthony : le Score COAI restait
+    // bloqué les jours sans séance faute de pouvoir check-in) : check-in
+    // léger sommeil/énergie/douleur, sans séance à adapter — les champs
+    // sourceSession/adaptedSession/adaptation restent vides plutôt que
+    // d'inventer une séance qui n'existe pas ce jour-là.
+    const checkinCommun = {
+      sleep: parsed.data.sleep,
+      energy: parsed.data.energy,
+      pain: parsed.data.pain,
+      painArea: parsed.data.pain ? parsed.data.painArea : null,
+      availableMinutes: parsed.data.availableMinutes,
+    };
+
+    if (!source) {
+      const daily = await prisma.dailySession.upsert({
+        where: { userId_date: { userId: user.id, date } },
+        create: { userId: user.id, date, programmeSourceId: programme.id, programmeVersion: programme.version, ...checkinCommun },
+        update: checkinCommun,
+      });
+      return NextResponse.json(daily);
+    }
 
     const expectedMinutes = getSessionDuration(source, user.profile?.dureeSeanceMinutes ?? 45);
-    const { session, summary } = adaptWorkout(source, parsed.data, expectedMinutes);
+    // Un jour d'entraînement (source truthy) n'est atteint que via le
+    // formulaire de check-in complet (DailyExperience), qui envoie toujours
+    // food et availableMinutes — les deux ne sont facultatifs que pour le
+    // check-in léger des jours de repos (branche !source ci-dessus).
+    if (parsed.data.availableMinutes === undefined || parsed.data.food === undefined) {
+      return NextResponse.json({ error: "Repère repas et temps disponible requis pour un jour d'entraînement" }, { status: 400 });
+    }
+    const { session, summary } = adaptWorkout(
+      source,
+      { ...parsed.data, availableMinutes: parsed.data.availableMinutes, food: parsed.data.food },
+      expectedMinutes
+    );
+    const seanceCommune = {
+      programmeSourceId: programme.id,
+      programmeVersion: programme.version,
+      sourceSession: asJson(source),
+      adaptedSession: asJson(session),
+      adaptation: asJson(summary),
+      ...checkinCommun,
+    };
     const daily = await prisma.dailySession.upsert({
       where: { userId_date: { userId: user.id, date } },
-      create: {
-        userId: user.id,
-        date,
-        programmeSourceId: programme.id,
-        programmeVersion: programme.version,
-        sourceSession: asJson(source),
-        adaptedSession: asJson(session),
-        adaptation: asJson(summary),
-        sleep: parsed.data.sleep,
-        energy: parsed.data.energy,
-        pain: parsed.data.pain,
-        painArea: parsed.data.pain ? parsed.data.painArea : null,
-        availableMinutes: parsed.data.availableMinutes,
-      },
-      update: {
-        programmeSourceId: programme.id,
-        programmeVersion: programme.version,
-        sourceSession: asJson(source),
-        adaptedSession: asJson(session),
-        adaptation: asJson(summary),
-        sleep: parsed.data.sleep,
-        energy: parsed.data.energy,
-        pain: parsed.data.pain,
-        painArea: parsed.data.pain ? parsed.data.painArea : null,
-        availableMinutes: parsed.data.availableMinutes,
-      },
+      create: { userId: user.id, date, ...seanceCommune },
+      update: seanceCommune,
     });
     return NextResponse.json(daily);
   }

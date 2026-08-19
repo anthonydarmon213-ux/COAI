@@ -19,6 +19,7 @@ import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
+import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -297,6 +298,7 @@ export default async function DashboardPage() {
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
           {pendingCoach && <p className="mt-4 text-sm font-semibold text-laiton-300">Programme V{programme.version} — à valider par ton coach.</p>}
           <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
+          <RestDayCheckin initialDaily={daily} />
         </section>
       )}
 
