@@ -4,6 +4,42 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Bibliothèque de programmes prêts à l'emploi + page challenge 30 jours (19/08/2026, suite)
+
+Reprise du chantier laissé en attente depuis le début de la session
+("mettre en place des programmes spécifiques type mobilité, cardio
+semi-marathon/Hyrox, perte de poids, poids du corps, spécial fessiers,
+challenge 30 jours"). Le point bloquant identifié plus tôt (comment ces
+templates s'articulent avec la génération IA) est tranché en reprenant
+exactement le principe déjà validé pour le catalogue d'exercices et les
+recettes : une bibliothèque **additive**, jamais bloquante ni en
+remplacement du programme personnalisé généré par IA.
+
+**7 programmes rédigés** (`src/lib/programmes-prets/catalogue.ts`) :
+mobilité (4 sem.), prépa semi-marathon (8 sem.), prépa Hyrox (6 sem.),
+perte de poids (6 sem.), 100% poids du corps (4 sem.), spécial fessiers
+(4 sem., élargi vers un public féminin comme demandé), et un challenge
+30 jours (un défi concis par jour, mêlant mouvement/nutrition/
+récupération/mental — pas un programme d'entraînement classique, un
+outil de régularité). Nouvelle page `/programme/programmes-prets`
+(même gabarit que `/programme/exercices`/`/programme/recettes` :
+filtrable par catégorie, photo Pexels, détail replié dans un
+`<details>`), lien ajouté au menu "Mon programme".
+
+**Page publique dédiée au challenge** (`/challenge-30-jours`, demande
+directe d'Anthony — "pour faire une pub pour les réseaux") : les 30
+jours affichés publiquement, sans compte requis, réutilise le contenu
+déjà rédigé (jamais dupliqué). Récompense de fin de challenge honnête,
+construite avec ce qui existe déjà — bilan gratuit + offre membre
+fondateur (`MembreFondateurBadge` réutilisé tel quel) — plutôt qu'un
+nouveau mécanisme de récompense inventé pour l'occasion. Ajoutée au
+sitemap, au footer et au maillage interne SEO.
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels,
+propres. **Non vérifié** (comme toujours) : rendu visuel réel — premier
+jet de contenu à relire par Anthony avant mise en avant massive, même
+mise en garde que pour le catalogue d'exercices.
+
 ## Offre "membre fondateur" — Impulsion 49€/mois bloqué à vie (19/08/2026, suite)
 
 Suite de l'audit conversion : Anthony a tranché "impulsion 49 euros a
