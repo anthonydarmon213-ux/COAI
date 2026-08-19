@@ -11,8 +11,8 @@ const LIENS = [
   // reste le parcours principal recommandé, mais ne doit jamais être un mur
   // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
   { href: "/pricing", label: "Nos formules" },
-  { href: "/vip", label: "COAI Privé" },
-  { href: "/entreprise", label: "Entreprise" },
+  { href: "/vip", label: "Coaching 90 jours" },
+  { href: "/entreprise", label: "COAI Entreprise" },
   { href: "/a-propos", label: "À propos" },
 ];
 

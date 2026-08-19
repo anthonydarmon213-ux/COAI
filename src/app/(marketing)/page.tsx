@@ -495,17 +495,61 @@ export default function LandingPage() {
       </section>
 
       {/* Démonstration produit : rendre l'expérience tangible avant de
-          poursuivre le discours de marque. */}
+          poursuivre le discours de marque. Mockup d'interface plutôt qu'une
+          photo (19/08/2026, Anthony a repéré que la photo précédente était
+          strictement la même que le hero juste au-dessus) — reprend les
+          mêmes classes CSS que la section "Ton évolution devient visible"
+          (.coai-mini-signal/-ring) pour une cohérence totale avec ce que
+          Anthony a validé plus haut, plutôt qu'un nouveau style ou une
+          nouvelle photo à trouver. */}
       <Reveal>
         <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 py-20 lg:grid-cols-[1.05fr_.95fr]">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] border border-white/[0.08] shadow-2xl">
-            <Image
-              src="/coai-diagnostic-clean.png"
-              alt="Aperçu réel du diagnostic personnalisé COAI"
-              fill
-              sizes="(min-width: 1024px) 52vw, 94vw"
-              className="object-cover object-top"
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[#0b0d0f] shadow-2xl">
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(circle at 82% 8%, rgba(196,154,82,.2), transparent 55%), radial-gradient(circle at 8% 92%, rgba(76,201,240,.16), transparent 55%)",
+              }}
+              aria-hidden="true"
             />
+            <div className="relative flex h-full flex-col justify-center gap-4 p-6 sm:p-9">
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div>
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-laiton-300">Aujourd&apos;hui</p>
+                  <p className="mt-1 text-base font-semibold text-white">Bonjour Anthony.</p>
+                  <p className="mt-0.5 text-xs text-graphite-400">Séance jambes · 45 min</p>
+                </div>
+                <div className="coai-mini-signal-ring" style={{ "--signal-color": "#c56cff" } as React.CSSProperties}>
+                  <strong>74</strong>
+                  <span>Score</span>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-graphite-500">Séance du jour</p>
+                <p className="mt-1.5 text-sm font-semibold text-white">Squat · 4 × 8</p>
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full w-2/3 rounded-full bg-laiton-400" />
+                </div>
+              </div>
+
+              <div className="flex justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                {[
+                  ["Entraînement", "#ff8a3d", "72"],
+                  ["Nutrition", "#ffd84d", "81"],
+                  ["Récupération", "#39e67b", "64"],
+                ].map(([label, color, score]) => (
+                  <div key={label} className="coai-mini-signal">
+                    <div className="coai-mini-signal-ring" style={{ "--signal-color": color } as React.CSSProperties}>
+                      <strong>{score}</strong>
+                      <span>%</span>
+                    </div>
+                    <span>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           <div>
             <SectionLabel>Dans le produit</SectionLabel>

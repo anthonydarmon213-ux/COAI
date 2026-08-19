@@ -27,24 +27,35 @@ export const AGE_COAI_DISCLAIMER =
 
 type DailyPourAgeCoai = Pick<DailySession, "sleep" | "energy" | "workoutRating" | "pain" | "completedAt">;
 
+// Score et Âge COAI n'ont plus le même seuil de disponibilité (19/08/2026,
+// retour direct d'Anthony testant son propre compte : "je veux voir mon
+// chiffre je ne vois rien" — avec MIN_JOURS_DONNEES unique à 7 pour les
+// deux, le Score restait masqué aussi longtemps que l'Âge, alors que le
+// Score seul est bien moins sensible au bruit d'un petit échantillon. Le
+// Score s'affiche désormais dès MIN_JOURS_SCORE ; l'Âge (qui traduit ce
+// score en années, donc perçu comme plus "précis"/clinique) garde la barre
+// plus haute à MIN_JOURS_AGE + âge déclaré.
+export type AgeInfo =
+  | { disponible: true; ageChronologique: number; ageCoai: number; ecartAnnees: number }
+  | { disponible: false; raison: "DONNEES_INSUFFISANTES" | "AGE_MANQUANT"; joursRestants: number };
+
 export type AgeCoaiResultat =
   | {
       disponible: true;
       score: number;
       niveau: "À renforcer" | "En construction" | "Solide" | "Excellent";
-      ageChronologique: number;
-      ageCoai: number;
-      ecartAnnees: number; // positif = COAI plus jeune que l'âge réel
       composantes: { regularite: number; recuperation: number; dosage: number };
       jours: number;
+      age: AgeInfo;
     }
   | {
       disponible: false;
-      raison: "DONNEES_INSUFFISANTES" | "AGE_MANQUANT";
+      raison: "DONNEES_INSUFFISANTES";
       joursDeSuiviRestants: number;
     };
 
-const MIN_JOURS_DONNEES = 7;
+const MIN_JOURS_SCORE = 3;
+const MIN_JOURS_AGE = 7;
 const ECART_MAX_ANNEES = 6;
 const AGE_COAI_PLANCHER = 16;
 
@@ -58,15 +69,12 @@ export function calculerAgeCoai(params: {
   const { ageChronologique, dailies } = params;
   const avecDonnees = dailies.filter((d) => d.sleep != null || d.energy != null || d.workoutRating != null);
 
-  if (avecDonnees.length < MIN_JOURS_DONNEES) {
+  if (avecDonnees.length < MIN_JOURS_SCORE) {
     return {
       disponible: false,
       raison: "DONNEES_INSUFFISANTES",
-      joursDeSuiviRestants: MIN_JOURS_DONNEES - avecDonnees.length,
+      joursDeSuiviRestants: MIN_JOURS_SCORE - avecDonnees.length,
     };
-  }
-  if (ageChronologique == null) {
-    return { disponible: false, raison: "AGE_MANQUANT", joursDeSuiviRestants: 0 };
   }
 
   // Régularité : part des jours de check-in effectivement menés à terme.
@@ -99,21 +107,28 @@ export function calculerAgeCoai(params: {
     : 55;
 
   const score = Math.round(regularite * 0.4 + recuperation * 0.4 + dosage * 0.2);
-  const ecartBrut = Math.round(((score - 50) / 50) * ECART_MAX_ANNEES);
-  const ecartAnnees = Math.max(-ECART_MAX_ANNEES, Math.min(ECART_MAX_ANNEES, ecartBrut));
-  const ageCoai = Math.max(AGE_COAI_PLANCHER, ageChronologique - ecartAnnees);
 
   const niveau: "À renforcer" | "En construction" | "Solide" | "Excellent" =
     score >= 78 ? "Excellent" : score >= 60 ? "Solide" : score >= 42 ? "En construction" : "À renforcer";
+
+  let age: AgeInfo;
+  if (avecDonnees.length < MIN_JOURS_AGE) {
+    age = { disponible: false, raison: "DONNEES_INSUFFISANTES", joursRestants: MIN_JOURS_AGE - avecDonnees.length };
+  } else if (ageChronologique == null) {
+    age = { disponible: false, raison: "AGE_MANQUANT", joursRestants: 0 };
+  } else {
+    const ecartBrut = Math.round(((score - 50) / 50) * ECART_MAX_ANNEES);
+    const ecartAnnees = Math.max(-ECART_MAX_ANNEES, Math.min(ECART_MAX_ANNEES, ecartBrut));
+    const ageCoai = Math.max(AGE_COAI_PLANCHER, ageChronologique - ecartAnnees);
+    age = { disponible: true, ageChronologique, ageCoai, ecartAnnees: ageChronologique - ageCoai };
+  }
 
   return {
     disponible: true,
     score,
     niveau,
-    ageChronologique,
-    ageCoai,
-    ecartAnnees: ageChronologique - ageCoai,
     composantes: { regularite, recuperation, dosage },
     jours: avecDonnees.length,
+    age,
   };
 }

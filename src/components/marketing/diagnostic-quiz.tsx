@@ -2081,7 +2081,7 @@ export function DiagnosticQuiz({
                 )}
               </div>
 
-              <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-5">
+              <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   { label: "Objectif", valeur: diagnostic.profil.objectif },
                   { label: "Rythme", valeur: diagnostic.profil.rythme },

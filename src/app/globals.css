@@ -789,6 +789,28 @@ body {
 .coai-app-shell .coai-service-modal .text-graphite-400,
 .coai-app-shell .coai-service-modal .text-graphite-500 { color: #aaa9a4 !important; }
 
+/* Même principe pour .coai-vitality-panel (19/08/2026, Score & Âge COAI et
+   Récupération musculaire) — sans ce reset, .bg-white/[0.03]/[0.04] et
+   .border-white/10 devenaient un blanc translucide à 55-65% (pensé pour
+   .coai-app-shell, un univers clair) et .text-graphite-300/400/500
+   devenaient des gris sombres (pensés pour du texte sur fond clair) — sur
+   un panneau volontairement sombre, ça donnait des cartes délavées, peu
+   lisibles (retours directs d'Anthony testant son propre compte). */
+.coai-app-shell .coai-vitality-panel .text-white,
+.coai-app-shell .coai-vitality-panel .text-graphite-50,
+.coai-app-shell .coai-vitality-panel .text-graphite-100,
+.coai-app-shell .coai-vitality-panel .text-graphite-200 { color: #fffdf8 !important; }
+.coai-app-shell .coai-vitality-panel .text-graphite-300 { color: #d4d2cb !important; }
+.coai-app-shell .coai-vitality-panel .text-graphite-400 { color: #aaa9a4 !important; }
+.coai-app-shell .coai-vitality-panel .text-graphite-500 { color: #8f9aa0 !important; }
+.coai-app-shell .coai-vitality-panel .border-white\/10,
+.coai-app-shell .coai-vitality-panel .border-white\/15,
+.coai-app-shell .coai-vitality-panel .border-white\/20 { border-color: rgba(255,255,255,.12) !important; }
+.coai-app-shell .coai-vitality-panel .bg-white\/\[0\.03\] { background-color: rgba(255,255,255,.03) !important; }
+.coai-app-shell .coai-vitality-panel .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,.04) !important; }
+.coai-app-shell .coai-vitality-panel .bg-white\/\[0\.06\] { background-color: rgba(255,255,255,.06) !important; }
+.coai-app-shell .coai-vitality-panel .bg-white\/\[0\.07\] { background-color: rgba(255,255,255,.07) !important; }
+
 .coai-vip-button {
   border: 1px solid rgba(77,61,38,.3);
   background: #252724;
