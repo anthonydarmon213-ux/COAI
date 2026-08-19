@@ -950,7 +950,7 @@ export function DiagnosticQuiz({
   // vide (même garde que celle déjà utilisée plus bas dans "result"). Doit
   // rester déclaré après `diagnostic`/`signauxDiagnostic` (sinon "used
   // before declaration").
-  const revealScreenCount = diagnostic.pointsATravailler.length > 0 ? 4 : 3;
+  const revealScreenCount = (diagnostic?.pointsATravailler.length ?? 0) > 0 ? 4 : 3;
   const [revealIndex, setRevealIndex] = useState(0);
   useEffect(() => {
     if (step !== "reveal") return;
