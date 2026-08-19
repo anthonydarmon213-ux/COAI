@@ -62,8 +62,12 @@ Pour CHAQUE exercice, inclus obligatoirement :
 - "repos" (temps de récupération entre les séries, ex: "90 sec", adapté à l'objectif) — à placer juste après "repetitions"
 - "charge" : repère de difficulté/RPE pour choisir la bonne charge (l'IA ne connaît pas le poids max réel de la personne), ex: "charge permettant de sentir les 2 dernières répétitions difficiles mais réalisables avec une technique propre — arrête-toi 1 à 2 répétitions avant l'échec technique" — ou "poids du corps" pour les exercices au poids du corps.
 - "methode" ("Série classique" par défaut ; techniques d'intensification comme superset/bi-set/drop-set réservées aux niveaux intermédiaire/avancé, avec parcimonie, jamais pour un débutant)
+- "photoQuery" : un terme de recherche court EN ANGLAIS pour trouver une photo de stock illustrant
+  ce mouvement précis (ex: "barbell bench press", "bodyweight squat", "seated cable row") — jamais
+  le nom français traduit littéralement, une vraie requête de recherche naturelle en anglais.
 
 IMPORTANT : respecte cet ordre exact des champs dans le JSON de chaque exercice (nom, series,
-repetitions, repos, charge, methode) — c'est l'ordre d'affichage à l'utilisateur. Au niveau de la
+repetitions, repos, charge, methode, photoQuery) — c'est l'ordre d'affichage à l'utilisateur (sauf
+photoQuery, jamais affiché tel quel, utilisé uniquement pour résoudre une photo). Au niveau de la
 séance, respecte aussi cet ordre : jour, nom, echauffement, exercices, retourAuCalme.`;
 }

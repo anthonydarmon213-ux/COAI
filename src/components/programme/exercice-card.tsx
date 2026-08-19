@@ -24,15 +24,36 @@ const CHAMPS: { cle: string; label: string }[] = [
   { cle: "methode", label: "Méthode" },
 ];
 
-export function ExerciceCard({ exercice }: { exercice: unknown }) {
+export function ExerciceCard({
+  exercice,
+  photosParExercice,
+}: {
+  exercice: unknown;
+  // Photos Pexels (19/08/2026, demande Anthony) : résolues côté serveur
+  // (pilier-page.tsx) à partir du "photoQuery" que l'IA génère pour CHAQUE
+  // exercice — jamais d'appel réseau depuis ce composant client, jamais de
+  // photo inventée (absente du map ou clé null → aucune image affichée).
+  photosParExercice?: Record<string, string | null>;
+}) {
   const [videoOuverte, setVideoOuverte] = useState(false);
 
   if (!isPlainObject(exercice)) return null;
   const nom = typeof exercice.nom === "string" ? exercice.nom : undefined;
+  const photoQuery = typeof exercice.photoQuery === "string" ? exercice.photoQuery : undefined;
+  const photoUrl = photoQuery ? photosParExercice?.[photoQuery] : null;
 
   return (
     <div className="coai-exercise-card group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 pl-5 transition duration-300 hover:border-laiton-400/25 hover:bg-white/[0.035]">
       <div className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-laiton-400 via-laiton-500/70 to-transparent" />
+      {photoUrl && (
+        // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
+        <img
+          src={photoUrl}
+          alt=""
+          className="h-32 w-full rounded-lg object-cover"
+          loading="lazy"
+        />
+      )}
       <div className="flex items-start justify-between gap-3">
         <h4 className="text-sm font-semibold text-graphite-50">{nom ?? "Exercice"}</h4>
         {nom && (

@@ -17,7 +17,31 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
+import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
+
+// Traverse le JSON du programme ENTRAÎNEMENT (structure non garantie —
+// contenu IA) pour en extraire tous les "photoQuery" déjà générés par
+// l'IA, un par exercice (cf. src/lib/ai/prompts/programme-entrainement-
+// session.ts) — jamais de requête inventée ici, uniquement celles déjà
+// présentes dans le contenu généré.
+function extractPhotoQueries(contenu: unknown): string[] {
+  if (typeof contenu !== "object" || contenu === null) return [];
+  const seances = (contenu as { seances?: unknown }).seances;
+  if (!Array.isArray(seances)) return [];
+  const queries = new Set<string>();
+  for (const seance of seances) {
+    if (typeof seance !== "object" || seance === null) continue;
+    const exercices = (seance as { exercices?: unknown }).exercices;
+    if (!Array.isArray(exercices)) continue;
+    for (const exercice of exercices) {
+      if (typeof exercice !== "object" || exercice === null) continue;
+      const query = (exercice as { photoQuery?: unknown }).photoQuery;
+      if (typeof query === "string" && query.trim()) queries.add(query);
+    }
+  }
+  return Array.from(queries);
+}
 
 const LABELS: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
@@ -85,6 +109,18 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
         user.profile?.qualiteSommeil
       )
     : null;
+
+  // Photos Pexels par exercice (19/08/2026, demande Anthony) : résolues une
+  // seule fois ici (Server Component, clé jamais exposée au client) à
+  // partir du "photoQuery" que l'IA génère pour chaque exercice — jamais
+  // pour Nutrition/Récupération, qui n'ont pas d'exercices.
+  const entrainementAffiche =
+    pilierActif === "ENTRAINEMENT"
+      ? valides[0] ?? (derniers[0]?.statut === "EN_ATTENTE" || derniers[0]?.statut === "GENERE_IA" ? derniers[0] : null)
+      : null;
+  const photosParExercice = entrainementAffiche
+    ? await getStockPhotos(extractPhotoQueries(entrainementAffiche.contenu))
+    : undefined;
 
   return (
     <div className="coai-programme-page flex flex-col gap-8">
@@ -218,7 +254,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} />;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParExercice} />;
                 if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
                 if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;

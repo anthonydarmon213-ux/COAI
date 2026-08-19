@@ -14,9 +14,11 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 export function EntrainementView({
   data,
   showContreIndications = false,
+  photosParExercice,
 }: {
   data: unknown;
   showContreIndications?: boolean;
+  photosParExercice?: Record<string, string | null>;
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="exercice" />;
 
@@ -70,7 +72,7 @@ export function EntrainementView({
               {Array.isArray(exercices) && exercices.length > 0 && (
                 <div className="flex flex-col gap-2">
                   {exercices.map((exercice, j) => (
-                    <ExerciceCard key={j} exercice={exercice} />
+                    <ExerciceCard key={j} exercice={exercice} photosParExercice={photosParExercice} />
                   ))}
                 </div>
               )}
