@@ -115,6 +115,24 @@ const ANALYSE_MESSAGES = [
   "Personnalisation de ton profil...",
 ];
 
+// Contenu des écrans respirants "respire1"/"respire2" (19/08/2026) — texte
+// jamais inventé, seulement ce que COAI fait réellement (cf. commentaire
+// sur le type Step). Deux écrans, positionnés après "echeance" (~1/3 du
+// quiz) et après "profilPhysique" (~2/3 du quiz) pour rester dans la
+// fourchette "tous les 5-7 questions" de l'audit MyFitCoach.
+const BREATHERS: Record<"respire1" | "respire2", { kicker: string; titre: string; texte: string }> = {
+  respire1: {
+    kicker: "Pourquoi ce diagnostic",
+    titre: "Un programme générique se règle en 30 secondes. Le tien, non.",
+    texte: "Chaque réponse ici nourrit un vrai champ de ton profil, pas une case cochée pour la forme. C'est ce qui permet à COAI de proposer un programme cohérent dès le départ.",
+  },
+  respire2: {
+    kicker: "Ce qui fait tenir un programme",
+    titre: "La régularité compte plus que l'intensité du premier jour.",
+    texte: "Un programme qui s'adapte à ta récupération et à ton rythme réel est un programme que tu continues. C'est le principe du moteur d'adaptation COAI : garder, progresser ou ajuster, séance après séance.",
+  },
+};
+
 const CONTRAINTES = [AUCUNE_DOULEUR_LABEL, "Dos", "Genoux", "Épaules", "Grossesse / post-partum", AUTRE_LABEL];
 
 // Alignés sur les listes équivalentes de profil-form.tsx (mêmes libellés
@@ -239,6 +257,8 @@ type Step =
   | "sante"
   | "coach"
   | "email"
+  | "respire1"
+  | "respire2"
   | "analyse"
   | "reveal"
   | "result";
@@ -255,6 +275,15 @@ type Step =
 // "santeFeminine" (14/08/2026, retour utilisatrice) : cycle menstruel /
 // grossesse / post-partum — n'apparaît que si sexe === "Femme" (filtré dans
 // questionSteps ci-dessous), jamais présumé, toujours opt-in.
+// "respire1"/"respire2" (19/08/2026, principe transférable #2 de l'audit
+// MyFitCoach demandé par Anthony : "écrans pédagogiques non comptés dans
+// la progression, insérés tous les 5-7 questions — casse le rythme sans
+// allonger le quiz perçu"). Contrairement à MyFitCoach, aucun chiffre
+// inventé dedans ("31% plus fort...") : uniquement ce que COAI fait
+// réellement (profil réellement utilisé, moteur d'adaptation), déjà
+// documenté dans PITCH_EVOLUTION. Insérées via STEP_ORDER (pas dans
+// questionSteps), donc exclues de la barre de progression et du
+// dénominateur "X sur Y", comme "analyse"/"result".
 // "analyse" (Phase 5) : moment de transition avant la révélation, pas une
 // vraie question — exclu de la barre de progression comme "result".
 // "reveal" (19/08/2026, inspiré de l'audit UX MyFitCoach demandé par
@@ -499,7 +528,19 @@ export function DiagnosticQuiz({
     });
   }
 
-  const STEP_ORDER: Step[] = ["intro", ...questionSteps, "analyse", "reveal", "result"];
+  // "respire1"/"respire2" insérés juste après leur étape ancre (jamais
+  // avant "intro"/en tête de liste, jamais collés l'un à l'autre) — si
+  // l'étape ancre disparaît un jour de questionSteps, l'écran respirant
+  // correspondant disparaît aussi avec elle plutôt que de se retrouver
+  // orphelin en tête ou en fin de parcours.
+  const BREATHER_APRES: Partial<Record<Step, Step>> = { echeance: "respire1", profilPhysique: "respire2" };
+  const STEP_ORDER: Step[] = ["intro"];
+  for (const s of questionSteps) {
+    STEP_ORDER.push(s);
+    const breather = BREATHER_APRES[s];
+    if (breather) STEP_ORDER.push(breather);
+  }
+  STEP_ORDER.push("analyse", "reveal", "result");
 
   function goNext() {
     // Événement funnel (section 15) : une vraie question vient d'être
@@ -538,11 +579,27 @@ export function DiagnosticQuiz({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sauvegarde la progression à chaque étape de question (jamais pendant
-  // "intro"/"analyse"/"reveal"/"result" — rien à reprendre une fois le
-  // résultat atteint, ce n'est plus un abandon).
+  // Écrans respirants "respire1"/"respire2" (19/08/2026) : avancent seuls
+  // après un court délai, ou plus tôt si l'utilisateur touche l'écran
+  // (handleBreatherTap) — même mécanique que "analyse"/"reveal", pas de
+  // vraie question donc pas de bouton "Continuer" classique.
   useEffect(() => {
-    if (step === "intro" || step === "analyse" || step === "reveal" || step === "result") return;
+    if (step !== "respire1" && step !== "respire2") return;
+    const advance = setTimeout(goNext, 4200);
+    return () => clearTimeout(advance);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  function handleBreatherTap() {
+    if (step !== "respire1" && step !== "respire2") return;
+    goNext();
+  }
+
+  // Sauvegarde la progression à chaque étape de question (jamais pendant
+  // "intro"/"analyse"/"reveal"/"result"/"respire1"/"respire2" — rien à
+  // reprendre une fois le résultat atteint, ce n'est plus un abandon).
+  useEffect(() => {
+    if (step === "intro" || step === "analyse" || step === "reveal" || step === "result" || step === "respire1" || step === "respire2") return;
     saveDiagnosticProgress({
       step,
       persona,
@@ -1126,7 +1183,7 @@ export function DiagnosticQuiz({
       <div className="coai-diagnostic-orbit coai-diagnostic-orbit-a" aria-hidden="true" />
       <div className="coai-diagnostic-orbit coai-diagnostic-orbit-b" aria-hidden="true" />
       <div className={`coai-diagnostic-card overflow-hidden ${step === "result" ? "coai-diagnostic-result" : ""}`}>
-        {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && (
+        {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && step !== "respire1" && step !== "respire2" && (
           <div className="coai-diagnostic-progress flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
               Profil {stepIndex + 1} sur {questionSteps.length}
@@ -1842,6 +1899,25 @@ export function DiagnosticQuiz({
             </div>
           )}
 
+          {(step === "respire1" || step === "respire2") && (
+            <div
+              onClick={handleBreatherTap}
+              className="flex min-h-[20rem] cursor-pointer flex-col items-center justify-center gap-5 py-10 text-center"
+            >
+              <div className="animate-reveal flex flex-col items-center gap-5">
+                <p className="coai-diagnostic-kicker">
+                  <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+                  <span>{BREATHERS[step].kicker}</span>
+                </p>
+                <h2 className="max-w-md font-display text-2xl font-semibold leading-snug text-white sm:text-3xl">
+                  {BREATHERS[step].titre}
+                </h2>
+                <p className="max-w-md text-sm leading-6 text-graphite-400">{BREATHERS[step].texte}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-600">Touche l&apos;écran pour continuer</p>
+              </div>
+            </div>
+          )}
+
           {step === "analyse" && (
             <div className="flex flex-col items-center gap-6 py-10 text-center">
               <div className="relative flex h-24 w-24 items-center justify-center">
@@ -2296,7 +2372,7 @@ export function DiagnosticQuiz({
           )}
         </div>
 
-        {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && (
+        {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && step !== "respire1" && step !== "respire2" && (
           <div className="flex items-center justify-between border-t border-white/[0.06] px-6 py-4">
             <button
               type="button"
