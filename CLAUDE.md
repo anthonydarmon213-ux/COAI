@@ -4,6 +4,64 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Dashboard "Aujourd'hui" guidé à chaque connexion + paywall (19/08/2026, suite)
+
+Après la bascule en thème sombre, retour à une demande faite avant ce
+chantier (mise en pause exprès pour ne pas construire sur l'ancien thème
+clair) : rendre le dashboard plus pédagogue, avec un effet « wow » et un
+paywall pour les comptes non payants. Deux questions posées avant de
+coder — déclencheur du « wow » et cible du paywall — Anthony a choisi :
+**à chaque connexion** (pas seulement une fois) et **tous les comptes
+gratuits/non payants** (pas seulement Impulsion sans Transformation).
+
+**Nouvelle carte `AujourdhuiGuideCard`**, affichée systématiquement en
+tête de dashboard, juste après le header et avant `ScoreAgeCoaiCard` :
+- Une « mission du jour » unique et claire, calculée côté serveur selon
+  l'état réel de l'utilisateur (profil incomplet → programme à générer →
+  check-in à faire → séance prête → jour de récupération) — reflète
+  exactement le même état que la section détaillée plus bas dans la page,
+  jamais une deuxième source de vérité.
+- Le `CoaiInsight` déjà calculé (`getCoaiInsight`, aucune donnée
+  inventée) mis en avant visuellement à côté de la mission — c'est le
+  moment « wow » : jamais de statistique fabriquée pour faire
+  impressionnant, seulement la même donnée réelle que la carte
+  `CoaiInsightCard` affichait déjà plus bas (déplacée ici, retirée de son
+  ancien emplacement pour ne jamais la dupliquer).
+- Pour tout compte sans `hasProgrammeAccess` (ni Impulsion ni
+  Transformation débloqués) : un bandeau avec CTA « Débloquer mon
+  accompagnement » qui ouvre `ServiceDetailModal` (paywall façon app
+  mobile déjà existant), pré-sélectionné sur le service recommandé par le
+  moteur de besoins déjà en place (`detecterBesoins`/`besoins[0]?.service`,
+  retombe sur `IMPULSION` si aucun besoin détecté).
+
+L'ancien panneau générique « Choisis maintenant ton niveau
+d'accompagnement » (qui ne s'affichait que dans le cas précis « aucun
+programme ») a été retiré — désormais entièrement couvert par la nouvelle
+carte, à chaque connexion et pour tous les états, pas seulement celui-là.
+
+**Corrigé au passage** : plusieurs couleurs de texte oubliées lors du
+passage au thème sombre de la veille — ces couleurs vivaient en dur dans
+`dashboard/page.tsx` (valeurs Tailwind arbitraires `text-[#...]`), donc
+invisibles au grep fait sur `globals.css` seul. Texte gris-brun quasi
+invisible sur la section "Ma semaine", la section "Diagnostic enrichi"
+(fond clair oublié) et le jour de récupération.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme pour le thème sombre la veille) : rendu visuel
+réel, ce sandbox n'a toujours aucun navigateur. À tester par Anthony :
+les 5 états de la mission du jour (profil incomplet, programme à générer,
+check-in à faire, séance prête, repos), et le clic sur "Débloquer mon
+accompagnement" pour un compte sans abonnement.
+
+**Suite immédiate demandée par Anthony (pas encore commencée)** : utiliser
+le bilan initial (diagnostic public, avant inscription) pour proposer au
+prospect un plan concret projeté (entraînement/alimentation/récupération/
+hydratation) qui l'amène jusqu'à son objectif, en recommandant la bonne
+formule (Impulsion / Transformation "hybride" / VIP présentiel-visio)
+selon son besoin — sur l'écran de résultat du diagnostic public, pas le
+dashboard. Anthony a confirmé cet ordre de priorité (dashboard d'abord,
+puis ce chantier) via question posée avant de coder.
+
 ## Bascule complète du site en thème sombre (19/08/2026, suite)
 
 Après la carte `ScoreAgeCoaiCard` et la section homepage "Ton évolution
