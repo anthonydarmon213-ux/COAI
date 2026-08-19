@@ -112,6 +112,7 @@ model User {
   adaptations    ProgrammeAdaptation[]
   activitesJournalieres ActiviteJournaliere[]
   dailySessions  DailySession[]
+  recuperationsMusculaires RecuperationMusculaire[]
   aiUsageEvents  AiUsageEvent[]
   churnFeedback  ChurnFeedback?
   coachNotesReceived CoachNote[] @relation("CoachNoteClient")
@@ -726,6 +727,48 @@ enum NiveauSommeil {
 // motivation sur la semaine). Une entrée par semaine et par utilisateur
 // (semaineDebut = lundi de la semaine concernée), tout est facultatif pour
 // ne jamais bloquer l'envoi sur un champ non renseigné.
+// Suivi de récupération par groupe musculaire (19/08/2026, chantier "suivi
+// de récupération musculaire" demandé par Anthony, inspiré du principe #11
+// de l'audit MyFitCoach : "un même motif visuel traverse onboarding → plan
+// → suivi"). Volontairement déclaratif (l'utilisateur indique lui-même son
+// ressenti par groupe), jamais déduit automatiquement des séances : ni
+// SeanceLog.exercices (Json libre, sans tag de groupe musculaire fiable) ni
+// DailySession.painArea (texte libre) ne permettent de déduire un groupe
+// musculaire avec une confiance suffisante pour l'afficher sans le
+// demander. Une entrée par groupe et par jour (@@unique) — la dernière
+// connue par groupe fait foi tant qu'aucune nouvelle n'est déclarée.
+enum GroupeMusculaire {
+  DOS
+  PECTORAUX
+  EPAULES
+  BRAS
+  JAMBES
+  FESSIERS
+  ABDOMINAUX
+  MOLLETS
+}
+
+enum NiveauRecuperationMuscle {
+  COURBATURES_FORTES
+  COURBATURES_LEGERES
+  LEGERE_FATIGUE
+  FRAIS
+}
+
+model RecuperationMusculaire {
+  id        String                   @id @default(uuid())
+  userId    String
+  user      User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupe    GroupeMusculaire
+  niveau    NiveauRecuperationMuscle
+  date      DateTime                 @db.Date
+  createdAt DateTime                 @default(now())
+
+  @@unique([userId, groupe, date])
+  @@index([userId, groupe])
+  @@map("recuperations_musculaires")
+}
+
 model WeeklyCheckin {
   id               String         @id @default(uuid())
   userId           String

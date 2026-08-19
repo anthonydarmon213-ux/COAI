@@ -23,7 +23,8 @@ export type ProductEventName =
   | "neat_recommendation_shown"
   | "neat_goal_accepted"
   | "first_workout_started"
-  | "diagnostic_email_sent";
+  | "diagnostic_email_sent"
+  | "muscle_recovery_logged";
 
 // userId nullable (Phase 5.1, 11/08/2026) : diagnostic_email_sent se produit
 // avant toute création de compte (lead anonyme, identifié par email seul).

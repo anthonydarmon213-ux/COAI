@@ -18,6 +18,7 @@ import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
 import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
+import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -279,6 +280,7 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <CoaiInsightCard insight={insight} />
         <div id="activite-quotidienne" className="scroll-mt-6"><ActiviteQuotidienneCard /></div>
+        <RecuperationMusculaireCard />
       </div>
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
