@@ -4,6 +4,53 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Projection émotionnelle sur le résultat du diagnostic (19/08/2026, suite)
+
+Retour d'Anthony sur une capture MyFitCoach montrant un graphique de
+projection de poids dans le temps, lié à un événement précis ("est-ce
+qu'il y a un event precis? une compte, un mariahe, pouvoir jouer avec mes
+enfants, ettre plus performant aux travaille, ou avec mon partenaires").
+Deux questions posées avant de coder — Anthony a choisi : **nouvelle
+question dédiée dans le quiz** (pas de réutilisation d'un champ texte
+libre existant) et **un vrai graphique projeté** (poids ou Score, pas
+seulement une phrase descriptive).
+
+**Nouvelle étape "declencheur"** dans `diagnostic-quiz.tsx`, juste après
+l'échéance : 7 choix (mariage, vacances, compétition, performance au
+travail, jouer avec ses enfants, se sentir bien avec son/sa partenaire,
+"pas d'événement précis, juste pour moi") — filetée de bout en bout
+(état, `canContinue`, sauvegarde/reprise de progression localStorage,
+payload du lead email, `reponsesEnProfil()`). Jamais persistée sur
+`Profile` (uniquement utile au moment du diagnostic, pas un champ de
+profil durable).
+
+**Nouveau moteur `construireProjection()`** (`src/lib/diagnostic/
+projection-emotionnelle.ts`, aucun appel IA, même philosophie que le
+reste de l'app) : deux branches selon l'objectif déclaré — poids (perte
+de gras/prise de muscle, rythme prudent -0,45kg/semaine ou +0,22kg/
+semaine, **plafonné à 10%/8% du poids de départ sur toute la période,
+quelle que soit la durée choisie** — jamais un régime extrême même sur un
+objectif à 12 mois) ou Score COAI déjà calculé par `indiceCoai` (tout
+autre objectif — force, mobilité, reprise du sport... — jamais un poids
+hors sujet par rapport à l'objectif réel). Toujours présentée comme une
+estimation bornée avec disclaimer explicite affiché en permanence,
+jamais une promesse de résultat.
+
+**Nouvelle carte `ProjectionEmotionnelleCard`** — graphique SVG dessiné à
+la main (même famille que `Sparkline`, aucune dépendance de charting
+ajoutée), courbe avec dégradé, marqueur du point d'arrivée, titre adapté
+à l'événement choisi ("Voici où tu peux être d'ici ton mariage" / "...
+dans les 12 prochaines semaines" si aucun événement précis). Insérée sur
+l'écran de résultat, juste avant l'aperçu Objectif/Rythme/Format/
+Environnement.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme pour tout ce qui touche l'écran de résultat cette
+semaine) : rendu visuel réel du graphique, ce sandbox n'a accès qu'à un
+navigateur local sans base de données réelle. À tester par Anthony : les
+7 choix d'événement, la bascule poids/Score selon l'objectif choisi, et
+la lisibilité du graphique sur mobile.
+
 ## Test réel du site (browser local) + correction de restes clairs (19/08/2026, suite)
 
 Anthony a demandé de tester le site en prod et de dire ce qui cloche.
