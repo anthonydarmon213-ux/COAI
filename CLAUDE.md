@@ -4,6 +4,86 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Les 4 autres chantiers : respire, Score & Âge COAI, catalogue d'exercices, récupération musculaire, Entreprise (19/08/2026, suite)
+
+Après le chantier 1 (révélation en plusieurs écrans, section ci-dessous),
+Anthony a répondu : *« continue sur les 3 autres chantiers et il faut
+mettre en avant le score coai et l'age coai façon whoop et faire la
+section coai entreprise pour dirigeant et une partie pour collaborateurs
+sur devis avec mon lien whatsapp »*, avec 6 captures Whoop (« ÂGE WHOOP
+45,8 » / « 4,7 ans de moins », « rythme de vieillissement 0,8x »). Sur les
+3 questions de clarification posées (ordre, méthodologie Âge COAI, modèle
+Entreprise), sa réponse a été : *« comme tu veux pour l'ordre fait les 5
+choses et je vérifie à la fin »* — décisions de conception ci-dessous
+prises par défaut, à vérifier par Anthony.
+
+**1. Score & Âge COAI façon Whoop (nouveau module `src/lib/insight/age-coai.ts`)**
+Distinct de `indiceCoai` (`mini-diagnostic.ts`, calculé une fois à partir
+des réponses du quiz — potentiel déclaré). Le nouveau Score COAI est
+**comportemental** : recalculé à chaque visite du dashboard à partir de
+90 jours de `DailySession` réelles (régularité des check-ins terminés,
+récupération sommeil/énergie déclarée moins une pénalité jours
+douloureux, dosage ressenti des séances). Âge COAI = âge déclaré
+(`Profile.age`) ± un écart plafonné à 6 ans dérivé du même score — jamais
+une mesure physiologique réelle (pas de bracelet connecté), disclaimer
+explicite affiché en permanence (`AGE_COAI_DISCLAIMER`). Gate de données
+minimum (7 jours de check-in) avant d'afficher quoi que ce soit ; si l'âge
+n'est pas renseigné, seul le Score s'affiche. Nouvelle carte
+`ScoreAgeCoaiCard`, placée juste sous le header du dashboard (anneau
+`.coai-vitality-ring`, nouvelles classes CSS sombres cohérentes avec
+`.coai-intelligence-panel` existant).
+
+**2. Écrans respirants dans le quiz** — deux pseudo-steps `"respire1"`/
+`"respire2"` insérés dans `STEP_ORDER` juste après `"echeance"` et
+`"profilPhysique"` (répartis sur les 15 questions réelles), jamais dans
+`questionSteps` donc invisibles dans la barre de progression — même
+principe que `"analyse"`/`"reveal"`. Contenu texte fixe (`BREATHERS`),
+jamais de statistique inventée façon MyFitCoach. Avance seule après 4,2s
+ou au toucher.
+
+**3. Catalogue d'exercices** (`src/lib/exercices/catalogue.ts`) — liste
+statique de 48 exercices (6 par groupe musculaire), rédigée à partir de
+repères de technique standards, **pas générée par l'IA** : les programmes
+utilisateur restent générés dynamiquement comme avant
+(`programme-entrainement-*.ts`, inchangé) — ce catalogue est une
+bibliothèque de référence séparée, parcourable librement. Page
+`/programme/exercices`, filtres cumulables groupe musculaire / matériel /
+type. **Premier jet à relire par Anthony** avant mise en avant massive :
+les 48 fiches sont volontairement courtes (1 phrase de repère), pas des
+tutoriels complets.
+
+**4. Suivi de récupération musculaire** — nouveau modèle Prisma
+`RecuperationMusculaire` (+ enums `GroupeMusculaire`,
+`NiveauRecuperationMuscle`), **purement déclaratif** : ni
+`SeanceLog.exercices` (Json libre) ni `DailySession.painArea` (texte
+libre) ne permettent de déduire un groupe musculaire travaillé avec une
+confiance suffisante — demande explicitement à l'utilisateur plutôt que
+d'inventer une corrélation. Migration SQL écrite à la main (`prisma
+migrate dev` impossible ici, pas d'accès DB dans le sandbox) — **à
+appliquer par Anthony** (`npx prisma migrate deploy` ou équivalent) avant
+que ce chantier fonctionne en prod. Carte `RecuperationMusculaireCard`
+dans le dashboard, route `/api/recuperation-musculaire`.
+
+**5. COAI Entreprise, dirigeant vs collaborateurs** — la page `/entreprise`
+existait déjà (pilote/déploiement/pilotage + WhatsApp + formulaire lead,
+entièrement sur devis). Ajouté un nouveau bloc "Pour vous, dirigeant(e)"
+en self-serve juste après l'intro (CTA vers `/diagnostic`, le même point
+d'entrée que le reste du site), et retitré le bloc existant "Pour vos
+collaborateurs — sur devis" pour rendre la séparation explicite. Le lien
+WhatsApp (`buildWhatsAppLink`) reste celui déjà en place. Aucun lien ajouté
+à la navigation principale : ni `/vip` ni `/coach-sportif-paris` (même
+type de page) n'y sont rattachées non plus, cohérence conservée avec ce
+choix existant.
+
+**Pas vérifié pour les 5 chantiers** : pas de `next build`/`tsc` réel
+(sandbox sans accès npm, 403 sur registry.npmjs.org comme d'habitude). À
+la place : `tsc` isolé fichier par fichier (aucune erreur `TS2304`/
+`TS2448`/erreur de syntaxe introduite — le bruit `TS7053`/`TS7031` observé
+vient de l'absence des types React dans ce check isolé, reproduit sur un
+cas minimal sans rapport avec le code livré) + script d'équilibre des
+accolades sur chaque fichier modifié. La migration SQL du chantier 4
+n'a pas été exécutée contre une vraie base.
+
 ## Révélation en plusieurs écrans après le diagnostic (19/08/2026)
 
 Anthony a fait analyser ~60 captures + 2 vidéos de l'app concurrente
