@@ -15,6 +15,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
+import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
+import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
 const LABELS: Record<Pilier, string> = {
@@ -71,6 +73,18 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   const plan = getEffectivePlan(user.subscription);
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
   const aUnContenu = valides.some(Boolean) || derniers.some(Boolean);
+
+  // Score sommeil (19/08/2026, demande Anthony) — requête limitée au pilier
+  // Récupération, jamais chargée pour Entraînement/Nutrition.
+  const scoreSommeil = pilierActif === "RECUPERATION"
+    ? calculerScoreSommeil(
+        await prisma.dailySession.findMany({
+          where: { userId: user.id, date: { gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) } },
+          select: { sleep: true, date: true },
+        }),
+        user.profile?.qualiteSommeil
+      )
+    : null;
 
   return (
     <div className="coai-programme-page flex flex-col gap-8">
@@ -198,6 +212,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                   pour ajouter le regard et les ajustements d&apos;un coach humain.
                 </p>
               )}
+
+              {pilier === "RECUPERATION" && scoreSommeil && <ScoreSommeilCard resultat={scoreSommeil} />}
 
               {(() => {
                 const contenu = affiche?.contenu ?? null;

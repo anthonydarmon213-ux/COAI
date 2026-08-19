@@ -39,10 +39,20 @@ export function RecuperationView({
           return type ? `${jour} — ${type}` : jour;
         }}
         renderContenu={(jourData) => {
-          const { jour, type, ...detailJour } = jourData;
+          const { jour, type, sommeil, ...detailJour } = jourData;
           void jour;
           void type;
-          return <JsonView data={detailJour} />;
+          return (
+            <div className="flex flex-col gap-3">
+              {typeof sommeil === "string" && sommeil.trim() && (
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300">🌙 Sommeil</p>
+                  <p className="mt-1.5 text-sm leading-6 text-graphite-200">{sommeil}</p>
+                </div>
+              )}
+              <JsonView data={detailJour} />
+            </div>
+          );
         }}
       />
 
