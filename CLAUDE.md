@@ -4,6 +4,67 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Bascule complète du site en thème sombre (19/08/2026, suite)
+
+Après la carte `ScoreAgeCoaiCard` et la section homepage "Ton évolution
+devient visible", Anthony a demandé d'uniformiser toute l'app sur ces
+mêmes couleurs sombres (« j'aime bien la partie l'expérience terrain avec
+ces couleurs... peux-tu uniformiser tout le site avec ces couleurs? »).
+Question posée sur l'ampleur (harmoniser les accents seulement / étendre
+les panneaux sombres à quelques endroits / rebasculer tout le site) —
+Anthony a choisi le chantier complet, puis, une fois prévenu qu'aucune
+vérification visuelle n'est possible depuis ce sandbox (aucun navigateur),
+a tranché : **« Je fais tout d'un coup, gros paquet unique »**.
+
+**Ce qui existait avant ce chantier** : le site avait un thème sombre
+d'origine, remplacé par un thème clair "champagne/taupe" lors d'une session
+ChatGPT séparée (13/08-15/08). Le remplacement fonctionnait par 4 classes
+de scope (`.coai-diagnostic-card`, `.coai-access-page`, `.coai-app-shell`,
+`.coai-landing-lux`) qui remappaient en CSS les classes Tailwind
+natives (déjà pensées sombres : `text-white`, `bg-graphite-900`,
+`border-white/10`...) vers des équivalents clairs, plus des dizaines de
+composants réécrits à la main en couleurs claires (options du quiz, cartes
+dashboard, hero programme, mockup téléphone de la landing, footer, nav
+app...). Les panneaux les plus récents (`.coai-intelligence-panel`,
+`.coai-vitality-panel`, `.coai-impulsion-challenge`) étaient restés sombres
+— exemptés du scope clair au cas par cas via des resets `!important`
+(précédent déjà en place pour `.coai-service-modal`).
+
+**Approche** : suppression des 4 blocs de remap Tailwind (redonne leurs
+couleurs sombres natives à `text-white`/`bg-graphite-900`/etc.), puis
+conversion manuelle un par un de chaque composant hand-stylé en dur
+(fonds crème/blanc translucide → fonds `#0d0e10`/`#111518`/blanc
+translucide à 3-9% ; texte foncé `#171817`/`#494b46` → texte clair
+`#fffdf8`/`#d7dcde`/`#aeb5ba` ; ombres/bordures brun chaud → équivalents
+neutres `rgba(255,255,255,X)`/`rgba(0,0,0,X)`). Composants concernés :
+options/kicker/barre de progression du quiz diagnostic, écran d'accès
+post-diagnostic, hero + semaine + cartes de brief du dashboard, hero +
+cartes programme/exercice/séance/nutrition, nav app + dropdown, mockup
+téléphone et footer de la landing, `.coai-pricing-algorithm`. Les éléments
+déjà sombres (`.coai-intelligence-panel`, `.coai-vitality-panel`,
+`.coai-value-loop`, `.coai-color-*`/`.coai-mini-signal*` de la landing,
+`.coai-orb`, `.coai-rainbow-cta`...) n'ont pas été touchés — ils étaient
+déjà corrects. Les resets `!important` scopés (`.coai-service-modal`,
+`.coai-vitality-panel`) deviennent redondants avec ce changement mais
+restent en place, sans effet néfaste.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres —
+toutes les routes compilent et génèrent (dont `/programme/exercices` et
+`/programme/recettes`, chantiers du même jour). **Non vérifié** : aucun
+rendu visuel réel, ce sandbox n'a pas de navigateur ni d'accès réseau au
+site déployé — contrairement à d'habitude où Playwright permettait au
+moins une vérification locale, ici seule la compilation a pu être
+contrôlée. Risque explicitement accepté par Anthony avant de lancer le
+chantier en un seul gros commit plutôt que par petits lots vérifiables un
+par un.
+
+**Reste à faire par Anthony** : tester le site déployé de bout en bout
+(diagnostic, accès post-diagnostic, dashboard, pages programme,
+landing/footer) et signaler tout endroit encore clair ou tout contraste
+resté insuffisant — avec 1666 lignes de CSS et des dizaines de composants
+convertis à la main sans aperçu visuel, une repasse de correction ciblée
+après un premier retour réel est probable, pas un échec du chantier.
+
 ## Direction "wow" façon Apple Watch/Whoop + recettes + blocage images IA (19/08/2026, suite)
 
 Après le lot de 5 chantiers de patches (section suivante), Anthony a demandé
