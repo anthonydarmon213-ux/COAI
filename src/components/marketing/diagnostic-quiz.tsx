@@ -2201,6 +2201,12 @@ export function DiagnosticQuiz({
                 </div>
               )}
 
+              {/* Recommandation de formule remontée juste après le bloc problème/solution
+                  (19/08/2026, audit conversion demandé par Anthony) : elle vivait jusqu'ici
+                  tout en bas de l'écran, après ~6 sections éducatives supplémentaires — le
+                  point de conversion le plus important de la page était le plus enterré. */}
+              <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
+
               <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/20 bg-[radial-gradient(circle_at_100%_0%,rgba(197,108,255,.16),transparent_20rem),radial-gradient(circle_at_0%_100%,rgba(76,201,240,.12),transparent_22rem),#111518] px-6 py-7 text-left sm:px-8">
                 <div className="relative grid gap-6 sm:grid-cols-[1.15fr_.85fr] sm:items-center">
                   <div>
@@ -2302,8 +2308,6 @@ export function DiagnosticQuiz({
                   </p>
                 </div>
               </div>
-
-              <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
 
               {connecte ? (
                 // Parcours D (Phase 5B, 11/08/2026) : déjà abonné, aucune
