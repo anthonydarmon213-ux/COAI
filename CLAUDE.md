@@ -4,6 +4,52 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Score sommeil dédié dans le pilier Récupération (19/08/2026, suite)
+
+Demande d'Anthony (message vocal retranscrit) : dans le pilier
+Récupération, mettre en avant l'amélioration du sommeil avec de vraies
+recommandations/conseils, et un "score sommeil" — "c'est vachement
+important avec un score sommeil aussi".
+
+**Constat avant de coder** : le pilier Récupération n'avait aucune UI
+dédiée au sommeil — le conseil sommeil généré par l'IA pour chaque jour
+(`jourData.sommeil`) était noyé dans un dump JSON générique au même titre
+que n'importe quel autre champ. Aucun score sommeil n'existait nulle part
+côté post-inscription ; le plus proche était le sous-score "récupération"
+de `age-coai.ts` (Score & Âge COAI, dashboard), mais celui-ci **mélange
+sommeil et énergie 50/50** pour nourrir le Score COAI global — jamais un
+score sommeil isolé. Le prompt IA de récupération utilisait déjà
+`Profile.qualiteSommeil` (réponse déclarative unique du diagnostic),
+jamais l'historique réel `DailySession.sleep` (check-in quotidien).
+
+**Nouveau moteur `calculerScoreSommeil()`** (`src/lib/insight/
+score-sommeil.ts`, aucun appel IA, même philosophie que le reste de
+l'app) : moyenne sur les 60 derniers jours de `DailySession.sleep` (même
+barème de points que `age-coai.ts`, mais isolé — jamais mélangé à
+l'énergie), niveau (À travailler/Correct/Bon/Excellent), tendance sur 7
+jours vs les 7 précédents, et recommandations concrètes propres à chaque
+niveau (horaire de coucher fixe, écrans coupés avant de dormir, caféine
+après 14h, température de la chambre...). Gate de données minimum (3
+nuits renseignées) — en dessous, retombe sur le conseil déclaratif du
+diagnostic (`SOMMEIL_TIPS`, réutilisé tel quel depuis `mini-diagnostic.ts`
+plutôt que dupliqué) pour ne jamais laisser la section vide pour un
+nouvel abonné.
+
+**Nouvelle carte `ScoreSommeilCard`**, même langage visuel que
+`ScoreAgeCoaiCard` (`.coai-vitality-panel`/`-ring`) pour rester cohérent
+avec le reste de l'app plutôt que d'inventer un nouveau style — affichée
+en tête du pilier Récupération (`pilier-page.tsx`, requête `DailySession`
+limitée au seul pilier Récupération, jamais chargée sur Entraînement/
+Nutrition). Le conseil sommeil quotidien déjà généré par l'IA
+(`RecuperationView`) reçoit aussi son propre encart visuel avec icône 🌙,
+au lieu d'être indistinct des autres champs dans le dump JSON générique.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme toujours) : rendu visuel réel, ce sandbox n'a
+toujours aucun navigateur. À tester par Anthony : le score une fois 3+
+jours de sommeil renseignés en check-in quotidien, et l'état d'attente
+avant ce seuil.
+
 ## Recommandation de formule sur le résultat du diagnostic public (19/08/2026, suite)
 
 Suite directe de la note laissée dans le chantier dashboard précédent.
