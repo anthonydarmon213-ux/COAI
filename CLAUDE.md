@@ -4,6 +4,95 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Recommandation de formule sur le résultat du diagnostic public (19/08/2026, suite)
+
+Suite directe de la note laissée dans le chantier dashboard précédent.
+Demande d'Anthony (message vocal retranscrit, reformulé) : utiliser le
+bilan initial pour proposer au prospect une solution concrète qui l'amène
+à son objectif le plus vite/efficacement possible, en passant par la
+bonne formule si besoin — rappel des 3 formules par Anthony : Impulsion
+(IA seule), Transformation ("hybride", IA + regard humain), VIP (présentiel
+Paris centre ou visio, budget/vitesse/retours personnalisés). Deux
+questions posées avant de coder : emplacement (résultat du diagnostic
+public, pas le dashboard — confirmé) et priorité (terminer d'abord le
+chantier dashboard déjà en cours — confirmé).
+
+**Constat de départ** : le résultat du diagnostic public montrait déjà un
+aperçu du programme (entraînement/nutrition/récupération, blocs Objectif/
+Rythme/Format/Environnement/Frein) mais **aucune recommandation de
+formule** — le seul champ qui existait (`MiniDiagnostic.recommandation`,
+binaire GRATUIT/STANDARD) n'était utilisé que dans l'email au lead, jamais
+affiché à l'écran (confirmé par une exploration dédiée du code avant de
+coder). Le champ `coachPreference` (choix fait à l'étape "coach" du quiz —
+FULL_IA / HYBRIDE / VIP_PRESENTIEL, déjà collecté depuis le 16/08) n'était
+lui non plus jamais utilisé pour le résultat.
+
+**Nouveau moteur `recommanderFormule()`** (`src/lib/diagnostic/
+mini-diagnostic.ts`) — miroir de `detecterBesoins()` (le moteur
+post-inscription déjà existant, `src/lib/dashboard/besoins-identifies.ts`)
+mais appliqué aux réponses brutes du quiz, avant tout compte créé. Retourne
+une seule formule (pas une liste), par ordre de priorité : (1) choix
+explicite VIP présentiel/visio → VIP ; (2) contrainte de santé signalée →
+Transformation, **garde-fou sécurité qui prime sur n'importe quel choix
+initial** (jamais un accompagnement 100% IA seul face à une contrainte
+physique réelle, même si la personne avait coché "Impulsion") ; (3) choix
+explicite hybride → Transformation ; (4) niveau avancé + objectif de
+force/performance → VIP ; (5) plateau de progression qui dure (persona) →
+Transformation ; (6) par défaut → Impulsion.
+
+**Nouvelle carte `FormuleRecommandeeCard`** (`src/components/marketing/`),
+insérée juste avant le CTA de fin de diagnostic (avant le bloc connecté/
+non connecté) : nom de la formule, raison de la recommandation, 4
+premières fonctionnalités, bouton "Voir en détail" qui ouvre
+`ServiceDetailModal` (déjà utilisé côté dashboard — mêmes prix/
+fonctionnalités que `/pricing`, jamais dupliqués), plus un lien "Comparer
+les 3 formules". Fonctionne à l'identique pour un visiteur connecté ou
+non — `SubscribeButton` (à l'intérieur du modal) gère déjà nativement le
+cas non connecté (redirige vers `/sign-up?plan=...` avec le bon plan
+préchargé), découvert en lisant le code existant avant d'écrire quoi que
+ce soit de nouveau pour ce cas.
+
+**Hydratation ajoutée** comme 4e "aperçu du programme" à côté
+d'Entraînement/Nutrition/Récupération (`HYDRATATION_TIPS`, repère générique
+de nutrition sportive par fréquence d'entraînement déclarée — jamais une
+donnée personnalisée inventée, même principe que `SERIES_PAR_NIVEAU` déjà
+existant).
+
+**Cohérence email admin** : `/api/diagnostic-lead` calculait sa propre
+recommandation ad-hoc pour la notification interne (à partir du seul
+`coachPreference`, sans tenir compte de la contrainte santé ni du niveau)
+— remplacée par `diagnostic.recommandation` du même moteur que celui
+affiché au prospect, pour ne plus jamais avoir deux règles divergentes.
+
+**Corrigé au passage** : la carte de fin de diagnostic pour un visiteur
+non connecté ("Passe maintenant dans ton espace COAI") était restée sur un
+fond clair avec du texte blanc depuis la veille — bascule dark theme
+oubliée car hardcodée en JSX (invisible au grep fait sur `globals.css`
+seul, même famille de bug que celui trouvé et corrigé sur le dashboard).
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme toujours) : rendu visuel réel, ce sandbox n'a
+toujours aucun navigateur. À tester par Anthony : les 6 cas de
+recommandation (au minimum vérifier VIP via le choix explicite à l'étape
+coach, et Transformation via une contrainte santé cochée), le clic "Voir
+en détail" en visiteur non connecté (doit ouvrir le modal puis rediriger
+vers `/sign-up?plan=...` au clic sur le bouton d'achat), et la lisibilité
+de la carte de fin de diagnostic sur fond sombre.
+
+**Reste en attente, pas encore démarré** (demandes d'Anthony pendant ce
+chantier, mises en queue) :
+- Photos **et vidéos** directement sur les programmes d'entraînement
+  générés (pas seulement le catalogue d'exercices, qui a déjà ses photos
+  Pexels) — les vidéos nécessitent une source/licence à confirmer avec
+  Anthony, pas faisable depuis ce sandbox sans décision de sa part.
+- Bibliothèque de programmes prêts à l'emploi, distincte de la génération
+  IA actuelle : mobilité, cardio orienté objectif (semi-marathon, Hyrox),
+  perte de poids, poids du corps, spécial fessiers (élargi par Anthony
+  vers un public féminin), et un "challenge 30 jours" pensé comme outil de
+  motivation. Périmètre à caler avec Anthony avant de coder (comment ces
+  templates s'articulent avec le programme généré dynamiquement — bloquent
+  la génération ? viennent en plus ? remplacent un pilier ?).
+
 ## Dashboard "Aujourd'hui" guidé à chaque connexion + paywall (19/08/2026, suite)
 
 Après la bascule en thème sombre, retour à une demande faite avant ce
