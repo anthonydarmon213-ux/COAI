@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { DailyExperience } from "@/components/daily/daily-experience";
 import { ActiviteQuotidienneCard } from "@/components/dashboard/activite-quotidienne-card";
-import { CoaiInsightCard } from "@/components/dashboard/coai-insight-card";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
@@ -19,6 +18,7 @@ import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-vide
 import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
+import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -91,6 +91,58 @@ export default async function DashboardPage() {
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const objective = sourceSession?.nom ? `Aujourd’hui, on travaille ${String(sourceSession.nom).toLowerCase()}.` : "Une journée utile, adaptée à ton rythme.";
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
+  const hasAccess = hasProgrammeAccess(user, user.subscription);
+  const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
+
+  // Une seule direction claire à chaque connexion (19/08/2026, demande
+  // Anthony : "être pédagogue... indiquer ce que doit faire la personne").
+  // Reflète exactement le même état que la section détaillée plus bas —
+  // jamais une deuxième source de vérité, juste une entrée plus visible.
+  const mission: MissionDuJour = !completion.essentielComplet
+    ? {
+        kicker: "Ta mission du jour",
+        title: "Complète ton profil essentiel.",
+        description: `Il manque : ${completion.champsEssentielsManquants.join(", ")}. C'est ce qui permet à COAI de préparer une séance cohérente et prudente.`,
+        href: "/compte/profil?onboarding=1",
+        cta: "Compléter mon profil →",
+      }
+    : !programme
+      ? hasAccess
+        ? {
+            kicker: "Ta mission du jour",
+            title: "Ta première semaine peut être générée maintenant.",
+            description: "Ton profil est prêt. Il ne reste qu'un geste explicite de ta part pour lancer la génération.",
+            href: "#programme-a-generer",
+            cta: "Générer mon programme →",
+          }
+        : {
+            kicker: "Ta mission du jour",
+            title: "Choisis ton accompagnement pour démarrer.",
+            description: "Découvre d'abord ce que COAI a compris de ton profil, puis choisis l'expérience qui te correspond.",
+          }
+      : sourceSession
+        ? !daily?.sleep
+          ? {
+              kicker: "Ta mission du jour",
+              title: "Fais ton check-in — 45 secondes.",
+              description: "Sommeil, énergie, douleur éventuelle : ces réponses ajustent ta séance du jour avant que tu la commences.",
+              href: "#check-in-du-jour",
+              cta: "Faire mon check-in →",
+            }
+          : {
+              kicker: "Ta mission du jour",
+              title: sourceSession?.nom ? String(sourceSession.nom) : "Ta séance du jour t'attend.",
+              description: "Ton check-in est fait, ta séance est prête et adaptée à ta forme du jour.",
+              href: "#check-in-du-jour",
+              cta: "Voir ma séance →",
+            }
+        : {
+            kicker: "Ta mission du jour",
+            title: "Aujourd'hui, jour de récupération.",
+            description: "La récupération fait partie du programme. Marche légère ou mobilité seulement si tu te sens bien.",
+            href: "/programme/recuperation",
+            cta: "Voir ma récupération →",
+          };
 
   return (
     <div className="coai-dashboard flex flex-col gap-7">
@@ -123,6 +175,8 @@ export default async function DashboardPage() {
           </a>
         )}
       </header>
+
+      <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
 
       <ScoreAgeCoaiCard resultat={ageCoai} />
 
@@ -157,7 +211,7 @@ export default async function DashboardPage() {
               {programme ? `${weeklyWorkoutCount} entraînement${weeklyWorkoutCount > 1 ? "s" : ""} planifié${weeklyWorkoutCount > 1 ? "s" : ""}` : "Ta semaine va prendre forme ici"}
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-6 text-[#60645e]">
+          <p className="max-w-md text-sm leading-6 text-graphite-300">
             {programme
               ? "Un rythme lisible, avec la récupération intégrée au plan. COAI l’ajuste si ton quotidien change."
               : "Après ton bilan, COAI construit un rythme réaliste selon ton niveau, tes disponibilités et ta récupération."}
@@ -216,21 +270,8 @@ export default async function DashboardPage() {
           <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
         </section>
       ) : !programme ? (
-        !hasProgrammeAccess(user, user.subscription) ? (
-          <section className="flex flex-col items-start gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Ton Personal Trainer est prêt</p>
-              <h2 className="mt-2 text-2xl text-white">Choisis maintenant ton niveau d&apos;accompagnement.</h2>
-              <p className="mt-2 max-w-lg text-sm leading-6 text-graphite-300">
-                Découvre d&apos;abord ce que COAI a compris de ton profil. Lorsque tu seras prêt, tu
-                pourras choisir une expérience autonome, hybride ou VIP, toutes conçues pour
-                évoluer avec ton emploi du temps, ta forme et tes objectifs.
-              </p>
-            </div>
-            <Link href="/pricing" className="coai-rainbow-cta inline-flex rounded-xl px-6 py-3 text-sm font-extrabold text-white">Choisir mon accompagnement →</Link>
-          </section>
-        ) : (
-          <section className="flex flex-col gap-4">
+        !hasAccess ? null : (
+          <section id="programme-a-generer" className="scroll-mt-6 flex flex-col gap-4">
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-6 text-center">
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme à préparer</p>
               <h2 className="mt-2 text-2xl text-white">Ta première semaine peut être générée maintenant.</h2>
@@ -251,26 +292,26 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#28715c]">Journée de récupération</p>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
           <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
-          {pendingCoach && <p className="mt-4 text-sm font-semibold text-[#76531f]">Programme V{programme.version} — à valider par ton coach.</p>}
+          {pendingCoach && <p className="mt-4 text-sm font-semibold text-laiton-300">Programme V{programme.version} — à valider par ton coach.</p>}
           <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
         </section>
       )}
 
       {programme && <WeeklyCheckinCard />}
 
-      <section className="rounded-3xl border border-[#c9d7d4] bg-[linear-gradient(135deg,#f8f4eb,#edf5f4)] p-6 text-[#1c211f] shadow-[0_24px_70px_-50px_rgba(25,52,46,.5)] sm:p-7">
+      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 text-graphite-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:p-7">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#28715c]">Diagnostic enrichi · Optionnel</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Diagnostic enrichi · Optionnel</p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight">COAI peut encore mieux te connaître.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#58635f]">Envoie une capture de ton bracelet connecté ou une photo en tenue de sport. L’IA enrichit ton profil pour affiner les prochaines adaptations.</p>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-[#355f52]">
-              <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Sommeil, pas, fréquence cardiaque</span>
-              <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Morphologie et posture</span>
-              <span className="rounded-full border border-[#b8d8cb] bg-white/70 px-3 py-1.5">✓ Photo non conservée</span>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-graphite-300">Envoie une capture de ton bracelet connecté ou une photo en tenue de sport. L’IA enrichit ton profil pour affiner les prochaines adaptations.</p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-emerald-200">
+              <span className="rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-3 py-1.5">✓ Sommeil, pas, fréquence cardiaque</span>
+              <span className="rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-3 py-1.5">✓ Morphologie et posture</span>
+              <span className="rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-3 py-1.5">✓ Photo non conservée</span>
             </div>
           </div>
           <Link href="/compte/profil#diagnostic-high-tech" className="coai-diagnostic-enrich-cta inline-flex min-h-12 shrink-0 items-center justify-center rounded-full px-6 text-sm font-bold transition">Affiner mon diagnostic →</Link>
@@ -278,7 +319,6 @@ export default async function DashboardPage() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <CoaiInsightCard insight={insight} />
         <div id="activite-quotidienne" className="scroll-mt-6"><ActiviteQuotidienneCard /></div>
         <RecuperationMusculaireCard />
       </div>
@@ -286,7 +326,7 @@ export default async function DashboardPage() {
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link
           href="/programme"
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#a87831]/35 bg-white/75 px-6 py-3 text-sm font-bold text-[#4d3516] shadow-[0_14px_34px_-24px_rgba(72,48,18,.7)] transition hover:-translate-y-0.5 hover:bg-white"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-laiton-400/35 bg-white/[0.04] px-6 py-3 text-sm font-bold text-graphite-50 shadow-[0_14px_34px_-24px_rgba(0,0,0,.7)] transition hover:-translate-y-0.5 hover:bg-white/[0.08]"
         >
           Voir mon programme complet →
         </Link>
