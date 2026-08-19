@@ -12,6 +12,7 @@ export type FunnelEventName =
   | "diagnostic_started"
   | "diagnostic_step_completed"
   | "diagnostic_completed"
+  | "diagnostic_reveal_started"
   | "diagnostic_result_viewed"
   | "programme_preview_viewed"
   | "signup_started"

@@ -4,6 +4,73 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Révélation en plusieurs écrans après le diagnostic (19/08/2026)
+
+Anthony a fait analyser ~60 captures + 2 vidéos de l'app concurrente
+MyFitCoach (aucune trace du second concurrent annoncé, "Planificateur
+d'Entraînements", dans ce lot — à fournir séparément si besoin). Direction
+demandée : onboarding plus visuel/animé/immersif, sans copier l'identité
+visuelle, les textes ni les visuels de MyFitCoach — seulement leurs
+principes UX. Décision prise en 4 chantiers distincts, validés un par un
+avec Anthony ; celui-ci est le premier (« la révélation en plusieurs
+écrans (Recommandé) »), les 3 autres restent à faire :
+
+1. **Révélation en plusieurs écrans (fait ce soir)**
+2. Écrans pédagogiques respirants dans les 25 questions du quiz existant
+3. Catalogue d'exercices filtrable par muscle/matériel/type (fonctionnalité
+   produit séparée de l'onboarding)
+4. Suivi de récupération par groupe musculaire (idem, recoupe
+   probablement `profil-appris.ts`/`coai-insight.ts`, cf. Phase 7)
+
+**Ce qui a été livré** : le repère UX central de MyFitCoach n'est pas ses
+33 questions (le quiz `/diagnostic` en a déjà 25, très proches) mais sa
+séquence de révélation en **5 écrans successifs** avant le plan final
+(faux chargement, projection, stat globale, avant/après, récap nommé),
+alors que COAI atterrissait d'un coup sur la longue page `result`.
+Reproduire leurs écrans tels quels aurait demandé d'inventer des données
+(ex. leur "31% plus fort en 3 mois, sur 1845 personnes comme vous" —
+COAI n'a pas ce volume d'utilisateurs, l'inventer aurait été malhonnête).
+Décision : garder le principe (plusieurs écrans, rythmés, avant le plan
+complet) mais avec uniquement des données déjà réelles et déjà calculées
+par `diagnostic`/`signauxDiagnostic` (aucune nouvelle valeur inventée).
+
+Nouveau step `"reveal"` dans `diagnostic-quiz.tsx`, inséré dans
+`STEP_ORDER` entre `"analyse"` et `"result"` — 3 ou 4 écrans (le 3e,
+"Ce qu'on va travailler", sauté si `pointsATravailler` est vide) :
+score COAI (anneau `coai-index-ring` déjà existant), les jauges
+`signauxDiagnostic` (`Gauge`, réutilisé tel quel), points à
+travailler/résolus, puis les 3 premières actions (`indiceCoai.actions`).
+Auto-avance toutes les 2,4s (même mécanique que le step `"analyse"`
+existant), plus un tap/clic sur l'écran pour avancer tout de suite (retour
+déjà reçu sur "analyse" par le passé : personne n'aime attendre une
+animation). La page `result` complète n'est ni coupée ni dupliquée, elle
+arrive telle quelle juste après — additif, aucun contenu retiré.
+Nouvel événement funnel `diagnostic_reveal_started` (ajouté au type
+`FunnelEventName`).
+
+**Piège évité en cours de route** : `revealScreenCount`/`revealIndex`
+avaient d'abord été déclarés juste après le step `"analyse"` (par
+cohérence de lecture avec ce bloc voisin), mais ça référençait `diagnostic`
+avant sa déclaration plus bas dans le composant (`useMemo`) — TypeScript
+l'aurait rejeté à la compilation ("used before declaration"), attrapé par
+un typecheck isolé du fichier (pas de `next build` complet possible ici,
+cf. plus bas) avant l'envoi du patch. Déplacé juste après
+`signauxDiagnostic`, qui est le dernier des deux dont ce bloc dépend.
+
+**Pas vérifié** : `next build`/`tsc` réels (même blocage réseau sandbox
+que d'habitude — `npm ci` refusé, 403 sur registry.npmjs.org). Un
+typecheck isolé du seul fichier modifié (`tsc` en mode autonome, sans
+résolution des alias `@/...` ni des types Next/React installés) a été fait
+à la place — il ne remplace pas un vrai build, mais a permis d'attraper le
+bug de déclaration ci-dessus avant l'envoi. Vérification manuelle de
+l'équilibre des balises JSX/parenthèses sur tout le fichier également
+faite (script Node ad hoc). À confirmer par un vrai build côté Anthony.
+
+**Reste à faire par Anthony si le résultat plaît** : lancer les 3 autres
+chantiers un par un (voir liste plus haut), et transmettre l'image du
+second concurrent ("Planificateur d'Entraînements") si l'analyse doit
+être complétée.
+
 ## Homepage façon Future (dark) + coach IA femme + lead enrichi (16/08/2026, suite)
 
 Anthony a envoyé 5 captures réelles de future.co (jamais eu accès à leur

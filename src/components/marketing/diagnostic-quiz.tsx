@@ -240,6 +240,7 @@ type Step =
   | "coach"
   | "email"
   | "analyse"
+  | "reveal"
   | "result";
 // Ordonné pour couvrir explicitement les 3 piliers COAI (entraînement,
 // nutrition, récupération) plutôt que de s'arrêter à l'entraînement —
@@ -256,6 +257,13 @@ type Step =
 // questionSteps ci-dessous), jamais présumé, toujours opt-in.
 // "analyse" (Phase 5) : moment de transition avant la révélation, pas une
 // vraie question — exclu de la barre de progression comme "result".
+// "reveal" (19/08/2026, inspiré de l'audit UX MyFitCoach demandé par
+// Anthony) : entre "analyse" et "result", quelques écrans courts qui
+// dévoilent un par un des éléments déjà calculés par `diagnostic`/
+// `signauxDiagnostic` (score, jauges, points à travailler, 3 premiers pas)
+// — jamais de nouvelle donnée inventée, juste le même résultat déjà
+// construit, montré en rythme plutôt que d'un bloc. La page "result"
+// complète n'est ni coupée ni dupliquée, elle arrive telle quelle ensuite.
 const QUESTION_STEPS: Step[] = [
   "quotidien",
   "niveau",
@@ -491,7 +499,7 @@ export function DiagnosticQuiz({
     });
   }
 
-  const STEP_ORDER: Step[] = ["intro", ...questionSteps, "analyse", "result"];
+  const STEP_ORDER: Step[] = ["intro", ...questionSteps, "analyse", "reveal", "result"];
 
   function goNext() {
     // Événement funnel (section 15) : une vraie question vient d'être
@@ -509,9 +517,10 @@ export function DiagnosticQuiz({
   }
   function goBack() {
     const i = STEP_ORDER.indexOf(step);
-    // "analyse" n'est pas une vraie étape (rien à corriger) : "Retour" depuis
-    // "result" n'existe pas (pas de bouton nav sur ce step), et "analyse"
-    // enchaîne automatiquement vers "result" sans jamais s'arrêter dessus.
+    // "analyse"/"reveal" ne sont pas de vraies étapes (rien à corriger) :
+    // "Retour" depuis "result" n'existe pas (pas de bouton nav sur ce step),
+    // et "analyse"/"reveal" enchaînent automatiquement l'un vers l'autre
+    // puis vers "result" sans jamais s'arrêter dessus.
     const target = STEP_ORDER[i - 1];
     if (target) setStep(target);
   }
@@ -530,10 +539,10 @@ export function DiagnosticQuiz({
   }, []);
 
   // Sauvegarde la progression à chaque étape de question (jamais pendant
-  // "intro"/"analyse"/"result" — rien à reprendre une fois le résultat
-  // atteint, ce n'est plus un abandon).
+  // "intro"/"analyse"/"reveal"/"result" — rien à reprendre une fois le
+  // résultat atteint, ce n'est plus un abandon).
   useEffect(() => {
-    if (step === "intro" || step === "analyse" || step === "result") return;
+    if (step === "intro" || step === "analyse" || step === "reveal" || step === "result") return;
     saveDiagnosticProgress({
       step,
       persona,
@@ -875,6 +884,45 @@ export function DiagnosticQuiz({
     return { entrainement, alimentation, recuperation, sommeil };
   }, [niveau, habitudesAlimentaires, qualiteSommeil, sante, santeAutreTexte]);
 
+  // "reveal" (19/08/2026, direction MyFitCoach demandée par Anthony) :
+  // au lieu d'atterrir d'un coup sur la longue page "result", on dévoile
+  // 3 ou 4 écrans courts en séquence — score, jauges, points à travailler
+  // (si présents), 3 premiers pas — chacun tiré de `diagnostic`/
+  // `signauxDiagnostic` déjà calculés juste au-dessus, jamais une donnée
+  // nouvelle. Écran "Ce qu'on va travailler" sauté si pointsATravailler est
+  // vide (même garde que celle déjà utilisée plus bas dans "result"). Doit
+  // rester déclaré après `diagnostic`/`signauxDiagnostic` (sinon "used
+  // before declaration").
+  const revealScreenCount = diagnostic.pointsATravailler.length > 0 ? 4 : 3;
+  const [revealIndex, setRevealIndex] = useState(0);
+  useEffect(() => {
+    if (step !== "reveal") return;
+    setRevealIndex(0);
+    trackFunnelEvent("diagnostic_reveal_started");
+    const screenDuration = 2400;
+    const advanceScreen = setInterval(() => {
+      setRevealIndex((i) => (i + 1 < revealScreenCount ? i + 1 : i));
+    }, screenDuration);
+    const advanceStep = setTimeout(goNext, screenDuration * revealScreenCount + 300);
+    return () => {
+      clearInterval(advanceScreen);
+      clearTimeout(advanceStep);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, revealScreenCount]);
+
+  // Un tap/clic sur l'écran de reveal avance tout de suite — personne ne
+  // doit se sentir bloqué à attendre une animation (mêmes retours reçus sur
+  // "analyse" par le passé, cf. Phase 5.1).
+  function handleRevealTap() {
+    if (step !== "reveal") return;
+    if (revealIndex + 1 < revealScreenCount) {
+      setRevealIndex((i) => i + 1);
+    } else {
+      goNext();
+    }
+  }
+
   function signUpHref(): string {
     const params = new URLSearchParams();
     if (email) params.set("email", email);
@@ -1078,7 +1126,7 @@ export function DiagnosticQuiz({
       <div className="coai-diagnostic-orbit coai-diagnostic-orbit-a" aria-hidden="true" />
       <div className="coai-diagnostic-orbit coai-diagnostic-orbit-b" aria-hidden="true" />
       <div className={`coai-diagnostic-card overflow-hidden ${step === "result" ? "coai-diagnostic-result" : ""}`}>
-        {step !== "intro" && step !== "result" && step !== "analyse" && (
+        {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && (
           <div className="coai-diagnostic-progress flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
               Profil {stepIndex + 1} sur {questionSteps.length}
@@ -1820,6 +1868,100 @@ export function DiagnosticQuiz({
             </div>
           )}
 
+          {step === "reveal" && diagnostic && (
+            <div
+              onClick={handleRevealTap}
+              className="flex min-h-[22rem] cursor-pointer flex-col items-center justify-center gap-6 py-10 text-center"
+            >
+              <div key={revealIndex} className="animate-reveal flex w-full flex-col items-center gap-6">
+                {revealIndex === 0 && (
+                  <>
+                    <p className="coai-diagnostic-kicker">
+                      <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+                      <span>Analyse COAI terminée</span>
+                    </p>
+                    <div
+                      className="coai-index-ring"
+                      style={{ "--coai-score": `${diagnostic.indiceCoai.score * 3.6}deg` } as React.CSSProperties}
+                    >
+                      <div>
+                        <strong>{diagnostic.indiceCoai.score}</strong>
+                        <span>/100</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="coai-index-label">Indice COAI · Potentiel d&apos;évolution</p>
+                      <h2 className="mt-1 font-display text-2xl font-semibold text-white sm:text-3xl">
+                        Potentiel {diagnostic.indiceCoai.niveau.toLowerCase()}
+                      </h2>
+                    </div>
+                  </>
+                )}
+
+                {revealIndex === 1 && (
+                  <>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
+                      Tes signaux, déjà mesurés
+                    </p>
+                    <div className="grid grid-cols-3 gap-x-4 gap-y-6">
+                      <Gauge label="Entraînement" percent={signauxDiagnostic.entrainement} size={92} color="#ff8a3d" />
+                      <Gauge label="Alimentation" percent={signauxDiagnostic.alimentation} size={92} color="#ffd84d" />
+                      <Gauge label="Récupération" percent={signauxDiagnostic.recuperation} size={92} color="#39e67b" />
+                      <Gauge label="Sommeil" percent={signauxDiagnostic.sommeil} size={92} color="#4cc9f0" />
+                      <Gauge label="Score COAI" percent={diagnostic.indiceCoai.score} size={92} color="#c56cff" />
+                    </div>
+                  </>
+                )}
+
+                {diagnostic.pointsATravailler.length > 0 && revealIndex === 2 && (
+                  <>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
+                      Ce qu&apos;on va travailler
+                    </p>
+                    <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-2">
+                      <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-300">
+                        {diagnostic.pointsATravailler.slice(0, 4).map((p) => (
+                          <li key={p} className="flex items-start gap-2">
+                            <span className="mt-0.5 text-acier">✕</span>
+                            <span>{p}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <ul className="flex flex-col gap-1.5 text-sm leading-6 text-graphite-100">
+                        {diagnostic.pointsResolus.slice(0, 4).map((p) => (
+                          <li key={p} className="flex items-start gap-2">
+                            <span className="mt-0.5 text-laiton-300">✓</span>
+                            <span>{p}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {revealIndex === revealScreenCount - 1 && (
+                  <>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
+                      Tes 3 premiers pas
+                    </p>
+                    <div className="grid w-full gap-3 sm:grid-cols-3">
+                      {diagnostic.indiceCoai.actions.map((action, index) => (
+                        <div key={action.titre} className="coai-index-action-card">
+                          <span>{index + 1}</span>
+                          <p>{action.titre}</p>
+                          <strong>{action.impact}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-600">
+                Touche l&apos;écran pour continuer
+              </p>
+            </div>
+          )}
+
           {step === "result" && diagnostic && (
             <div className="flex flex-col items-center gap-7 py-2 text-center">
               <div className="coai-result-hero flex w-full flex-col items-center gap-3 px-5 py-7 sm:px-8 sm:py-9">
@@ -2154,7 +2296,7 @@ export function DiagnosticQuiz({
           )}
         </div>
 
-        {step !== "intro" && step !== "result" && step !== "analyse" && (
+        {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && (
           <div className="flex items-center justify-between border-t border-white/[0.06] px-6 py-4">
             <button
               type="button"
