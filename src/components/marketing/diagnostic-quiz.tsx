@@ -253,7 +253,6 @@ type Step =
   | "duree"
   | "frequence"
   | "sport"
-  | "sexe"
   | "santeFeminine"
   | "profilPhysique"
   | "alimentation"
@@ -274,11 +273,16 @@ type Step =
 // laisser (cf. effet IKEA / coût irrécupérable).
 // "lieu"/"duree" (Phase 5, 11/08/2026) : lieu distinct de l'équipement,
 // durée de séance visée — deux infos jusque-là jamais demandées.
-// "profilPhysique" regroupe âge/taille/poids en une seule étape, tous
-// facultatifs (peu de friction, mais utile pour un aperçu plus précis).
+// "profilPhysique" (19/08/2026, retour Anthony : trop de slides séparés
+// pour des infos aussi basiques) regroupe sexe/âge/taille/poids en une
+// seule étape, en tête du quiz — tous requis pour continuer. Note : avant
+// cette date, "sexe" était une étape séparée plus loin dans le quiz.
 // "santeFeminine" (14/08/2026, retour utilisatrice) : cycle menstruel /
 // grossesse / post-partum — n'apparaît que si sexe === "Femme" (filtré dans
-// questionSteps ci-dessous), jamais présumé, toujours opt-in.
+// questionSteps ci-dessous), jamais présumé, toujours opt-in. Placée juste
+// après "profilPhysique" (bug corrigé le 19/08/2026 : cette étape n'était
+// jamais atteignable, absente par erreur de QUESTION_STEPS malgré son
+// rendu/état déjà entièrement câblés).
 // "respire1"/"respire2" (19/08/2026, principe transférable #2 de l'audit
 // MyFitCoach demandé par Anthony : "écrans pédagogiques non comptés dans
 // la progression, insérés tous les 5-7 questions — casse le rythme sans
@@ -298,6 +302,8 @@ type Step =
 // construit, montré en rythme plutôt que d'un bloc. La page "result"
 // complète n'est ni coupée ni dupliquée, elle arrive telle quelle ensuite.
 const QUESTION_STEPS: Step[] = [
+  "profilPhysique",
+  "santeFeminine",
   "quotidien",
   "niveau",
   "objectif",
@@ -308,8 +314,6 @@ const QUESTION_STEPS: Step[] = [
   "lieu",
   "duree",
   "frequence",
-  "sexe",
-  "profilPhysique",
   "alimentation",
   "sommeil",
   "sante",
@@ -542,7 +546,10 @@ export function DiagnosticQuiz({
   // l'étape ancre disparaît un jour de questionSteps, l'écran respirant
   // correspondant disparaît aussi avec elle plutôt que de se retrouver
   // orphelin en tête ou en fin de parcours.
-  const BREATHER_APRES: Partial<Record<Step, Step>> = { echeance: "respire1", profilPhysique: "respire2" };
+  // "profilPhysique" est passé en tête de quiz (19/08/2026) : l'ancre de
+  // respire2 est déplacée sur "frequence" pour rester à ~2/3 du parcours,
+  // comme avant ce changement.
+  const BREATHER_APRES: Partial<Record<Step, Step>> = { echeance: "respire1", frequence: "respire2" };
   const STEP_ORDER: Step[] = ["intro"];
   for (const s of questionSteps) {
     STEP_ORDER.push(s);
@@ -588,17 +595,12 @@ export function DiagnosticQuiz({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Écrans respirants "respire1"/"respire2" (19/08/2026) : avancent seuls
-  // après un court délai, ou plus tôt si l'utilisateur touche l'écran
-  // (handleBreatherTap) — même mécanique que "analyse"/"reveal", pas de
-  // vraie question donc pas de bouton "Continuer" classique.
-  useEffect(() => {
-    if (step !== "respire1" && step !== "respire2") return;
-    const advance = setTimeout(goNext, 4200);
-    return () => clearTimeout(advance);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
-
+  // Écrans respirants "respire1"/"respire2" (19/08/2026, corrigé le
+  // 19/08/2026 suite au retour d'Anthony : l'auto-avance à 4,2s ne
+  // laissait pas le temps de lire le texte, alors que l'écran affiche
+  // "Touche l'écran pour continuer" — contradiction gênante entre le
+  // texte et le comportement réel). N'avance plus que sur un vrai tap/clic
+  // (handleBreatherTap), jamais automatiquement.
   function handleBreatherTap() {
     if (step !== "respire1" && step !== "respire2") return;
     goNext();
@@ -858,9 +860,8 @@ export function DiagnosticQuiz({
     if (step === "duree") return Boolean(duree);
     if (step === "frequence") return Boolean(frequence);
     if (step === "sport") return true; // peut n'en pratiquer aucun
-    if (step === "sexe") return Boolean(sexe);
     if (step === "santeFeminine") return true; // entièrement facultatif, opt-in
-    if (step === "profilPhysique") return Boolean(age && tailleCm && poidsKg);
+    if (step === "profilPhysique") return Boolean(sexe && age && tailleCm && poidsKg);
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
@@ -1664,22 +1665,6 @@ export function DiagnosticQuiz({
             </div>
           )}
 
-          {step === "sexe" && (
-            <div className="flex flex-col gap-4">
-              <div>
-                <h2 className="font-display text-xl font-semibold text-white">Ton sexe ?</h2>
-                <p className="mt-1.5 text-sm text-graphite-400">
-                  Sert à ajuster les repères caloriques et protéiques — jamais un jugement sur ton apparence.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                {SEXES.map((s) => (
-                  <OptionCard key={s} label={s} active={sexe === s} onClick={() => setSexe(s)} />
-                ))}
-              </div>
-            </div>
-          )}
-
           {step === "santeFeminine" && (
             <div className="flex flex-col gap-6">
               <div>
@@ -1785,12 +1770,18 @@ export function DiagnosticQuiz({
           )}
 
           {step === "profilPhysique" && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
               <div>
                 <h2 className="font-display text-xl font-semibold text-white">Tes repères physiques</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">
-                  Ton âge, ta taille et ton poids permettent d&apos;affiner les repères caloriques et la charge d&apos;entraînement.
+                  Sert à ajuster les repères caloriques, protéiques et la charge d&apos;entraînement — jamais un
+                  jugement sur ton apparence.
                 </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {SEXES.map((s) => (
+                  <OptionCard key={s} label={s} active={sexe === s} onClick={() => setSexe(s)} />
+                ))}
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <Field label="Âge">

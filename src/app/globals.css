@@ -94,18 +94,6 @@ body {
   backdrop-filter: blur(24px);
 }
 
-.coai-diagnostic-card::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  width: 34%;
-  pointer-events: none;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,.34), transparent);
-  transform: translateX(-220%) skewX(-12deg);
-  animation: coai-card-scan 8s ease-in-out infinite;
-}
-
 .coai-diagnostic-card > * {
   position: relative;
   z-index: 1;
@@ -220,12 +208,6 @@ body {
 @keyframes coai-stage-enter {
   from { opacity: 0; transform: translateY(10px) scale(.992); filter: blur(3px); }
   to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-@keyframes coai-card-scan {
-  0%, 70% { transform: translateX(-220%) skewX(-12deg); opacity: 0; }
-  76% { opacity: .8; }
-  91%, 100% { transform: translateX(420%) skewX(-12deg); opacity: 0; }
 }
 
 @keyframes coai-orbit-float {
