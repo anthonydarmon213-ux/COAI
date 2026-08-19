@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ServiceDetailModal } from "@/components/marketing/service-detail-modal";
+import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIER_BY_SERVICE, type ServiceKey } from "@/lib/pricing/tiers";
 
 // Recommandation de formule sur l'écran de résultat du diagnostic public
@@ -28,6 +29,11 @@ export function FormuleRecommandeeCard({
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-laiton-300">Notre recommandation pour toi</p>
       <h3 className="mt-2 font-display text-2xl text-white sm:text-3xl">{tier.nom}</h3>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-graphite-300">{recommandation.raison}</p>
+      {tier.founderOffer && (
+        <div className="mt-4">
+          <MembreFondateurBadge />
+        </div>
+      )}
       <ul className="mt-4 flex flex-col gap-1.5 text-sm leading-6 text-graphite-200">
         {tier.features.slice(0, 4).map((f) => (
           <li key={f} className="flex items-start gap-2">

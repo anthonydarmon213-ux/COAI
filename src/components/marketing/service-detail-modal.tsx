@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
+import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIER_BY_SERVICE, vipReservationHref, type ServiceKey } from "@/lib/pricing/tiers";
 
 // Modal plein écran (14/08/2026, simplifié le 16/08/2026 — demande Anthony :
@@ -69,6 +70,12 @@ export function ServiceDetailModal({
       <div className="mx-auto flex max-w-lg flex-col items-center gap-6 px-6 pb-16 pt-10 text-center">
         <h1 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">{tier.nom}</h1>
         <p className="max-w-sm text-base leading-7 text-graphite-300">{tier.description}</p>
+
+        {tier.founderOffer && (
+          <div className="w-full max-w-sm">
+            <MembreFondateurBadge />
+          </div>
+        )}
 
         {/* Liste des bénéfices, présentée pédagogiquement */}
         <div className="w-full rounded-3xl border border-white/[0.08] bg-white/[0.035] p-6 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">

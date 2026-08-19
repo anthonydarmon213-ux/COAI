@@ -13,6 +13,10 @@ export type Tier = {
   mostPopular?: boolean;
   limitedSpots?: boolean;
   trial?: boolean;
+  // Offre "membre fondateur" (19/08/2026) : prix bloqué à vie pour les 100
+  // premiers abonnés — cf. src/lib/pricing/membre-fondateur.ts pour le
+  // comptage réel (jamais un chiffre inventé).
+  founderOffer?: boolean;
   sessions?: { count: 1 | 2 | 3 | 4; label: string; prix: string }[];
 };
 
@@ -58,6 +62,7 @@ export const TIERS: Tier[] = [
     plan: "GRATUIT",
     mostPopular: true,
     trial: true,
+    founderOffer: true,
   },
   {
     nom: "Transformation",

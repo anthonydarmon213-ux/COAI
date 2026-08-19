@@ -7,6 +7,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
+import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
 
 const COMPARAISON_RAPIDE = [
@@ -77,6 +78,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
               </div>
               {tier.trial && <p className="mt-2 text-sm font-medium text-laiton-300">7 jours d&apos;essai</p>}
             </div>
+            {tier.founderOffer && <MembreFondateurBadge />}
             <p className="min-h-20 text-sm leading-6 text-graphite-300">{tier.description}</p>
             <ul className="space-y-3 text-sm leading-6 text-graphite-200">
               {tier.features.map((feature) => <li key={feature} className="flex gap-3"><span className="text-laiton-400">✓</span><span>{feature}</span></li>)}
