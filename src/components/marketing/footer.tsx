@@ -35,6 +35,21 @@ export function Footer() {
           <Link href="/calculateur-calories" className="hover:text-laiton-400">
             Calculateur de calories
           </Link>
+          <Link href="/bilan-forme-gratuit" className="hover:text-laiton-400">
+            Bilan de forme gratuit
+          </Link>
+          <Link href="/coach-sportif-ia" className="hover:text-laiton-400">
+            Coach sportif IA
+          </Link>
+          <Link href="/coach-sante-dirigeant" className="hover:text-laiton-400">
+            Coach santé dirigeant
+          </Link>
+          <Link href="/programme-sport-entrepreneur" className="hover:text-laiton-400">
+            Sport entrepreneur
+          </Link>
+          <Link href="/ameliorer-energie-au-travail" className="hover:text-laiton-400">
+            Énergie au travail
+          </Link>
         </div>
         <div className="flex w-full flex-col items-center justify-between gap-4 text-xs text-graphite-500 sm:flex-row">
           <span>© {new Date().getFullYear()} COAI by Anthony Darmon</span>

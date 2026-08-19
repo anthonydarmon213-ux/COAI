@@ -11,6 +11,11 @@ const PAGES = [
   { href: "/programme-prise-de-masse", label: "Prise de masse" },
   { href: "/programme-musculation-debutant", label: "Musculation débutant" },
   { href: "/calculateur-calories", label: "Calculateur de calories" },
+  { href: "/bilan-forme-gratuit", label: "Bilan de forme gratuit" },
+  { href: "/coach-sportif-ia", label: "Coach sportif IA" },
+  { href: "/coach-sante-dirigeant", label: "Coach santé pour dirigeants" },
+  { href: "/programme-sport-entrepreneur", label: "Programme sport entrepreneur" },
+  { href: "/ameliorer-energie-au-travail", label: "Améliorer son énergie au travail" },
 ] as const;
 
 // Maillage interne entre les pages SEO (11/08/2026, étendu 14/08/2026) —
