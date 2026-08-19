@@ -16,6 +16,7 @@ const PAGES = [
   { href: "/coach-sante-dirigeant", label: "Coach santé pour dirigeants" },
   { href: "/programme-sport-entrepreneur", label: "Programme sport entrepreneur" },
   { href: "/ameliorer-energie-au-travail", label: "Améliorer son énergie au travail" },
+  { href: "/challenge-30-jours", label: "Challenge 30 jours gratuit" },
 ] as const;
 
 // Maillage interne entre les pages SEO (11/08/2026, étendu 14/08/2026) —

@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/coach-sante-dirigeant", priority: 0.8, changeFrequency: "monthly" },
     { path: "/programme-sport-entrepreneur", priority: 0.8, changeFrequency: "monthly" },
     { path: "/ameliorer-energie-au-travail", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/challenge-30-jours", priority: 0.8, changeFrequency: "monthly" },
     { path: "/calculateur-calories", priority: 0.7, changeFrequency: "monthly" },
     { path: "/vip", priority: 0.7, changeFrequency: "monthly" },
     { path: "/entreprise", priority: 0.7, changeFrequency: "monthly" },

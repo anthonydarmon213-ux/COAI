@@ -50,6 +50,9 @@ export function Footer() {
           <Link href="/ameliorer-energie-au-travail" className="hover:text-laiton-400">
             Énergie au travail
           </Link>
+          <Link href="/challenge-30-jours" className="hover:text-laiton-400">
+            Challenge 30 jours gratuit
+          </Link>
         </div>
         <div className="flex w-full flex-col items-center justify-between gap-4 text-xs text-graphite-500 sm:flex-row">
           <span>© {new Date().getFullYear()} COAI by Anthony Darmon</span>
