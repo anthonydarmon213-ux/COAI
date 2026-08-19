@@ -4,6 +4,48 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Audit conversion + 5 pages SEO, suite à un brief acquisition (19/08/2026, suite)
+
+Anthony a demandé "je veux des visiteurs qui fassent notre bilan et des
+abonnements" puis, sur question posée (je ne peux générer aucun trafic
+depuis ce sandbox — pas de pub, pas de réseaux sociaux, pas d'accès
+internet réel), a choisi : **optimiser la conversion du funnel
+existant**. Il a ensuite collé un brief détaillé (inspiration MyFitCoach/
+Whoop/Apple Watch/Strava, offre "membre fondateur", alerte SEO sur la
+concurrence du nom COAI avec un token crypto ChainOpera AI, plan 30
+jours). Triage fait avant de coder : beaucoup de ce brief existe déjà
+(bilan gratuit, essai 7 jours, abonnement sans engagement, suivi funnel
+GA4+UTM, aperçu programme + explication + 3 actions sur le résultat) —
+pas dupliqué. Deux choses vraiment actionnables sans décision business
+supplémentaire :
+
+**CTA remonté sur le résultat du diagnostic** — audit du code (pas de
+données live, ce sandbox n'a pas accès à GA4/Supabase) : l'écran de
+résultat avait accumulé ~9 sections au fil des sessions précédentes
+avant que `FormuleRecommandeeCard` (le seul vrai point de conversion)
+n'apparaisse enfin, tout en bas. Déplacée juste après le bloc problème/
+solution ("voici tes points faibles → voici la solution"), le pic
+émotionnel naturel de la page, plutôt qu'après tout le contenu éducatif
+qui suit. Rien retiré, juste réordonné.
+
+**5 nouvelles pages SEO** — `/bilan-forme-gratuit`, `/coach-sportif-ia`,
+`/coach-sante-dirigeant`, `/programme-sport-entrepreneur`,
+`/ameliorer-energie-au-travail` — même gabarit que les pages SEO
+existantes, prix repris tels quels de `src/lib/pricing/tiers.ts` (jamais
+dupliqués à la main). Répond au signal SEO d'Anthony (le nom "COAI" seul
+est concurrencé sur Google par un token crypto) en ciblant des
+expressions descriptives plutôt que la marque seule.
+
+**Laissé en attente, décision business requise avant de coder** :
+l'offre "membre fondateur" (tarif bloqué à vie pour les 100 premiers —
+un engagement durable, j'ai demandé le prix exact et la formule
+concernée avant d'y toucher) et la refonte des scores façon Whoop
+(énergie/récupération/régularité) — recoupe en partie l'existant
+(jauges Sommeil/Motivation/Douleur), pas encore retranché avec Anthony.
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels sur
+tous les fichiers touchés, propres.
+
 ## Photo hero par jour + refonte visuelle nutrition, sur les 3 piliers (19/08/2026, suite)
 
 Suite directe de l'ajout des photos Pexels par exercice. Question
