@@ -4,6 +4,59 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Test réel du site (browser local) + correction de restes clairs (19/08/2026, suite)
+
+Anthony a demandé de tester le site en prod et de dire ce qui cloche.
+**coai.fr reste injoignable depuis ce sandbox** (`curl` confirme un 403
+sur le proxy sortant, comme documenté partout ailleurs dans ce fichier) —
+mais découverte importante cette fois : **ce sandbox a bien un navigateur
+local** (Chromium pré-installé, `/opt/pw-browsers`, `playwright` présent
+dans `node_modules`), contrairement à ce que les sessions précédentes
+supposaient à tort ("ce sandbox n'a pas de navigateur"). Utilisé pour
+lancer un serveur de dev local (`npm run dev`) et naviguer avec
+Playwright — teste le code tel qu'il est écrit, pas la vraie prod, mais
+bien plus fiable qu'aucune vérification visuelle.
+
+**Ce qui a pu être testé** : les pages 100% publiques/statiques (accueil,
+`/pricing`, `/diagnostic` intro, `/sign-up`, `/vip`) — aucune erreur
+console, aucun débordement horizontal, thème sombre confirmé propre sur
+toutes. **Ce qui n'a pas pu être testé** : tout ce qui a besoin d'une
+vraie session authentifiée ou d'une vraie base (dashboard, pilier
+Récupération avec le nouveau Score sommeil, etc. — ce sandbox n'a
+toujours aucun accès Supabase). Le parcours complet du quiz diagnostic
+(15 questions) n'a pas pu être automatisé jusqu'au bout dans le temps
+imparti (script de clic générique buté sur une étape à choix/case
+spécifique) — pas une preuve de bug, juste une limite du script de test.
+
+**Bugs réels trouvés et corrigés** (cf. commit dédié) : le grep fait sur
+`globals.css` pour la bascule en thème sombre de la veille ne pouvait pas
+voir les couleurs Tailwind écrites en dur directement en JSX
+(`text-[#...]`/`bg-white`, valeurs arbitraires) — invisibles à un grep
+sur le seul fichier CSS. Trouvés en testant réellement plusieurs pages :
+- **`ServiceDetailModal`** (paywall plein écran, utilisé par tout le
+  site — dashboard, `BesoinsIdentifiesCard`, et la nouvelle
+  `FormuleRecommandeeCard` du diagnostic ajoutée aujourd'hui) : fond
+  crème entier, jamais converti.
+- **Sidebar de navigation** (`app-nav.tsx`) : le lien actif était en
+  texte blanc sur fond blanc quasi opaque — totalement invisible, sur
+  toutes les pages de l'app authentifiée. Bug le plus critique trouvé.
+- **`DailyExperience`** (check-in quotidien, l'écran le plus vu de
+  l'app) : toute la carte de check-in (5 questions) restée en clair.
+- **`WeeklyCheckinCard`**, **`pricing/page.tsx`** (les 3 cartes "Choisir
+  en 10 secondes"), **`profil-form.tsx`** (boutons upload bracelet/
+  photo), **`dashboard-avatar.tsx`** (libellés du header dashboard),
+  **`suivi/progression/page.tsx`**, **`AssessmentRow`** (diagnostic-quiz),
+  **`MetricRing`** — même famille de bug à chaque fois.
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres. Screenshot
+Playwright de la section corrigée (`/pricing`, "Choisir en 10 secondes")
+confirmant visuellement le fond sombre et le texte lisible.
+
+**Reste probable** : d'autres restes clairs isolés du même genre
+peuvent encore exister ailleurs (pages/composants non couverts par le
+grep élargi fait cette session, ou jamais visités par les tests locaux)
+— à signaler par Anthony au fil de l'eau s'il en repère.
+
 ## Score sommeil dédié dans le pilier Récupération (19/08/2026, suite)
 
 Demande d'Anthony (message vocal retranscrit) : dans le pilier
