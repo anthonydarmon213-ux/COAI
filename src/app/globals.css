@@ -25,9 +25,9 @@ body {
   isolation: isolate;
   overflow: hidden;
   background:
-    radial-gradient(circle at 12% 5%, rgba(216, 181, 119, 0.28), transparent 25rem),
-    radial-gradient(circle at 88% 18%, rgba(109, 154, 176, 0.18), transparent 28rem),
-    linear-gradient(145deg, #fffdf8 0%, #f5f0e7 48%, #eaf0f2 100%);
+    radial-gradient(circle at 12% 5%, rgba(216, 181, 119, 0.16), transparent 25rem),
+    radial-gradient(circle at 88% 18%, rgba(109, 154, 176, 0.14), transparent 28rem),
+    linear-gradient(145deg, #0d0e10 0%, #111316 48%, #0d1315 100%);
 }
 
 .coai-diagnostic-page::before,
@@ -65,7 +65,7 @@ body {
   top: -3.5rem;
   right: -3rem;
   border: 1px solid rgba(183, 137, 67, .28);
-  box-shadow: 0 0 55px rgba(183, 137, 67, .15), inset 0 0 34px rgba(255,255,255,.5);
+  box-shadow: 0 0 55px rgba(183, 137, 67, .15), inset 0 0 34px rgba(255,255,255,.08);
   animation: coai-orbit-float 8s ease-in-out infinite;
 }
 
@@ -78,13 +78,19 @@ body {
   animation: coai-orbit-float 6s ease-in-out -2s infinite reverse;
 }
 
+/* Retour au thème sombre d'origine (19/08/2026, demande directe d'Anthony :
+   "basculer tout le site en thème sombre"). Les composants sous ce scope
+   utilisent déjà nativement des classes Tailwind sombres (text-white,
+   bg-graphite-900, border-white/10...) — le thème clair "champagne" posé
+   plus tôt les remappait via les règles ci-dessous ; on neutralise ces
+   remappages plutôt que de toucher chaque composant un par un. */
 .coai-diagnostic-card {
   position: relative;
-  color: #171817;
-  border: 1px solid rgba(94, 74, 43, 0.14);
+  color: #fffdf8;
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 2rem;
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: 0 30px 90px -46px rgba(56, 44, 29, 0.36), inset 0 1px 0 rgba(255,255,255,.9);
+  background: radial-gradient(circle at 85% 0%, rgba(196,154,82,.1), transparent 24rem), #111518;
+  box-shadow: 0 30px 90px -46px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255,255,255,.05);
   backdrop-filter: blur(24px);
 }
 
@@ -121,12 +127,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: .65rem;
-  border: 1px solid rgba(122, 91, 42, .2);
+  border: 1px solid rgba(221, 193, 145, .18);
   border-radius: 999px;
-  background: linear-gradient(110deg, rgba(255,255,255,.88), rgba(236,229,216,.68));
-  box-shadow: 0 10px 30px -20px rgba(56, 44, 29, .7), inset 0 1px 0 rgba(255,255,255,.95);
+  background: linear-gradient(110deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  box-shadow: 0 10px 30px -20px rgba(0, 0, 0, .8), inset 0 1px 0 rgba(255,255,255,.06);
   padding: .55rem .85rem;
-  color: #4d453a;
+  color: #ddc191;
   font-family: var(--font-sans), sans-serif;
   font-size: .78rem;
   font-weight: 650;
@@ -137,23 +143,23 @@ body {
   width: .45rem;
   height: .45rem;
   border-radius: 999px;
-  background: #b78943;
-  box-shadow: 0 0 0 4px rgba(183, 137, 67, .12);
+  background: #c9a262;
+  box-shadow: 0 0 0 4px rgba(201, 162, 98, .18);
 }
 
 .coai-diagnostic-kicker-separator {
   width: 1px;
   height: .9rem;
-  background: rgba(77, 69, 58, .2);
+  background: rgba(221, 193, 145, .2);
 }
 
 .coai-diagnostic-progress {
-  background: linear-gradient(90deg, rgba(255,255,255,.3), rgba(232,242,245,.5), rgba(255,255,255,.3));
+  background: linear-gradient(90deg, rgba(255,255,255,.05), rgba(91,145,169,.12), rgba(255,255,255,.05));
   backdrop-filter: blur(12px);
 }
 
 .coai-progress-track {
-  box-shadow: inset 0 1px 3px rgba(48,39,28,.16), 0 0 0 1px rgba(255,255,255,.65);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06);
 }
 
 .coai-progress-value {
@@ -177,12 +183,12 @@ body {
 
 .coai-diagnostic-option {
   min-height: 3.65rem;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-diagnostic-option:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 26px -22px rgba(58, 45, 27, .75), inset 0 1px 0 rgba(255,255,255,.85);
+  box-shadow: 0 12px 26px -22px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255,255,255,.1);
 }
 
 .coai-diagnostic-option-mark {
@@ -191,7 +197,7 @@ body {
   height: 1.35rem;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgba(95, 79, 54, .2);
+  border: 1px solid rgba(255, 255, 255, .2);
   border-radius: 999px;
   color: #fff;
   font-size: .72rem;
@@ -207,7 +213,7 @@ body {
 
 .coai-diagnostic-option[aria-pressed="true"] {
   transform: translateY(-1px) scale(1.008);
-  box-shadow: 0 14px 30px -22px rgba(111,73,23,.72), inset 3px 0 0 #b78943, inset 0 1px 0 rgba(255,255,255,.9);
+  box-shadow: 0 14px 30px -22px rgba(0,0,0,.6), inset 3px 0 0 #b78943, inset 0 1px 0 rgba(255,255,255,.1);
   animation: coai-choice-confirm .28s ease-out;
 }
 
@@ -242,53 +248,24 @@ body {
   }
 }
 
-.coai-consultation-phase { color: #8b6329; font-size: .65rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.coai-consultation-phase { color: #ddc191; font-size: .65rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .coai-assessment-suite { display: grid; gap: .8rem; }
-.coai-assessment-row { border: 1px solid rgba(96,75,44,.14); border-radius: 1.15rem; background: linear-gradient(145deg,rgba(255,255,255,.82),rgba(245,240,231,.66)); padding: 1rem; box-shadow: inset 0 1px rgba(255,255,255,.9); }
+.coai-assessment-row { border: 1px solid rgba(255,255,255,.1); border-radius: 1.15rem; background: linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding: 1rem; box-shadow: inset 0 1px rgba(255,255,255,.06); }
 .coai-assessment-number { display: grid; width: 1.8rem; height: 1.8rem; flex: 0 0 auto; place-items: center; border-radius: 999px; background: #20211e; color: #efd9ad; font-size: .62rem; font-weight: 800; }
-.coai-assessment-choice { display: flex; min-height: 2.75rem; align-items: center; justify-content: space-between; gap: .6rem; border: 1px solid rgba(84,68,44,.14); border-radius: .8rem; background: rgba(255,255,255,.68); padding: .65rem .75rem; color: #494b46; text-align: left; font-size: .72rem; line-height: 1.35; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
-.coai-assessment-choice:hover { transform: translateY(-1px); border-color: rgba(167,122,55,.42); }
-.coai-assessment-choice[aria-pressed="true"] { border-color: #a77a37; background: #f2e8d7; color: #2b2419; font-weight: 700; }
-.coai-assessment-choice i { display: grid; width: 1.2rem; height: 1.2rem; flex: 0 0 auto; place-items: center; border: 1px solid rgba(84,68,44,.18); border-radius: 999px; color: #fff; font-size: .65rem; font-style: normal; }
-.coai-assessment-choice[aria-pressed="true"] i { border-color: #8f672b; background: #8f672b; }
+.coai-assessment-choice { display: flex; min-height: 2.75rem; align-items: center; justify-content: space-between; gap: .6rem; border: 1px solid rgba(255,255,255,.1); border-radius: .8rem; background: rgba(255,255,255,.04); padding: .65rem .75rem; color: #d7dcde; text-align: left; font-size: .72rem; line-height: 1.35; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+.coai-assessment-choice:hover { transform: translateY(-1px); border-color: rgba(201,162,98,.5); }
+.coai-assessment-choice[aria-pressed="true"] { border-color: #c9a262; background: rgba(201,162,98,.14); color: #fffdf8; font-weight: 700; }
+.coai-assessment-choice i { display: grid; width: 1.2rem; height: 1.2rem; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; color: #fff; font-size: .65rem; font-style: normal; }
+.coai-assessment-choice[aria-pressed="true"] i { border-color: #c9a262; background: #c9a262; }
 
 .coai-diagnostic-chip[aria-pressed="true"] {
-  box-shadow: 0 8px 20px -16px rgba(89, 61, 22, .85), inset 0 1px 0 rgba(255,255,255,.7);
+  box-shadow: 0 8px 20px -16px rgba(0, 0, 0, .85), inset 0 1px 0 rgba(255,255,255,.1);
 }
 
-.coai-diagnostic-card .text-white,
-.coai-diagnostic-card .text-graphite-50,
-.coai-diagnostic-card .text-graphite-100,
-.coai-diagnostic-card .text-graphite-200 { color: #171817; }
-.coai-diagnostic-card .text-graphite-300 { color: #444641; }
-.coai-diagnostic-card .text-graphite-400 { color: #64665f; }
-.coai-diagnostic-card .text-graphite-500,
-.coai-diagnostic-card .text-graphite-600 { color: #7b7d75; }
-.coai-diagnostic-card .text-laiton-200 { color: #815b23; }
-/* Variantes hover: (ex: hover:text-white) : nom de classe généré différent
-   de la classe de base, donc les règles ci-dessus ne les couvrent jamais —
-   sans ça, le texte d'une option devient invisible au survol de la souris
-   (blanc sur fond clair). Repéré le 15/08/2026 sur le questionnaire. */
-.coai-diagnostic-card .hover\:text-white:hover,
-.coai-diagnostic-card .hover\:text-graphite-50:hover,
-.coai-diagnostic-card .hover\:text-graphite-100:hover,
-.coai-diagnostic-card .hover\:text-graphite-200:hover { color: #171817; }
-.coai-diagnostic-card .hover\:text-laiton-200:hover,
-.coai-diagnostic-card .hover\:text-laiton-300:hover { color: #815b23; }
-.coai-diagnostic-card .bg-graphite-900,
-.coai-diagnostic-card .bg-graphite-900\/40,
-.coai-diagnostic-card .bg-graphite-900\/50,
-.coai-diagnostic-card .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
-.coai-diagnostic-card .border-graphite-800,
-.coai-diagnostic-card .border-graphite-700 { border-color: rgba(77, 64, 45, .14); }
-/* Champs de formulaire partagés (Input/Textarea/Select) : conçus pour le
-   thème sombre (bordure/fond blancs à faible opacité, visibles sur fond
-   sombre) — invisibles tels quels sur ce fond clair. Repéré le 15/08/2026,
-   champs "Âge/Taille/Poids" du questionnaire rendus comme des cases vides. */
-.coai-diagnostic-card .border-white\/10,
-.coai-diagnostic-card .border-white\/20 { border-color: rgba(77, 64, 45, .18); }
-.coai-diagnostic-card .bg-white\/\[0\.045\],
-.coai-diagnostic-card .bg-white\/\[0\.065\] { background-color: rgba(255,255,255,.72); }
+/* Remappages clairs retirés (19/08/2026, retour au thème sombre) — les
+   classes Tailwind d'origine (text-white, bg-graphite-900, border-white/10)
+   s'appliquent de nouveau nativement, plus besoin de les réécrire ici. */
+.coai-diagnostic-card .text-laiton-200 { color: #e9dcc0; }
 
 .coai-diagnostic-proof {
   display: flex;
@@ -297,31 +274,31 @@ body {
   align-items: center;
   justify-content: center;
   gap: .2rem;
-  border: 1px solid rgba(110, 83, 40, .13);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 1rem;
-  background: rgba(255,255,255,.48);
+  background: rgba(255,255,255,.04);
   padding: .85rem;
   text-align: center;
 }
-.coai-diagnostic-proof strong { color: #171817; font-family: var(--font-sans), sans-serif; font-size: 1.12rem; font-weight: 700; }
+.coai-diagnostic-proof strong { color: #fffdf8; font-family: var(--font-sans), sans-serif; font-size: 1.12rem; font-weight: 700; }
 .coai-diagnostic-proof span {
   display: flex;
   align-items: flex-start;
   min-height: 1.95rem;
-  color: #6d6f68;
+  color: #aeb5ba;
   font-size: .74rem;
   line-height: 1.3;
 }
 
 .coai-diagnostic-result {
-  background: rgba(255,255,255,.82);
+  background: transparent;
 }
 
 .coai-index-reveal,
 .coai-index-actions {
-  border: 1px solid rgba(96,75,44,.15);
-  background: linear-gradient(135deg, rgba(255,255,255,.86), rgba(232,241,243,.7));
-  box-shadow: 0 30px 70px -46px rgba(44,35,22,.62), inset 0 1px 0 rgba(255,255,255,.96);
+  border: 1px solid rgba(255,255,255,.1);
+  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(76,201,240,.04));
+  box-shadow: 0 30px 70px -46px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
 }
 .coai-index-ring {
   --coai-score: 250deg;
@@ -335,11 +312,11 @@ body {
   box-shadow: 0 22px 45px -28px rgba(122,78,19,.8);
   animation: coai-index-arrival .9s cubic-bezier(.2,.85,.25,1) both;
 }
-.coai-index-ring::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(145deg,#fffdf8,#eef2f2); }
-.coai-index-ring > div { z-index: 1; grid-area: 1/1; display: flex; align-items: baseline; color: #171817; }
+.coai-index-ring::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(145deg,#171b1d,#111518); }
+.coai-index-ring > div { z-index: 1; grid-area: 1/1; display: flex; align-items: baseline; color: #fffdf8; }
 .coai-index-ring strong { font-family: var(--font-display), serif; font-size: 3.35rem; line-height: 1; }
-.coai-index-ring span { color: #6e706a; font-size: .72rem; font-weight: 700; }
-.coai-index-label { color: #7b5b29; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.coai-index-ring span { color: #9aa3a1; font-size: .72rem; font-weight: 700; }
+.coai-index-label { color: #ddc191; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .coai-score-challenge { width: 100%; border: 1px solid rgba(105,153,174,.28); border-radius: 1.35rem; background: radial-gradient(circle at 85% 0%,rgba(67,111,130,.25),transparent 20rem),linear-gradient(145deg,#171a1b,#101314); padding: 1.4rem; box-shadow: 0 26px 60px -40px rgba(37,78,96,.75), inset 0 1px rgba(255,255,255,.09); }
 .coai-score-challenge-badge { border: 1px solid rgba(229,201,147,.28); border-radius: 999px; background: rgba(229,201,147,.08); padding: .42rem .75rem; color: #efd9ad; font-size: .62rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
 .coai-diagnostic-card .coai-score-challenge > p:first-of-type { color: #fffdf8 !important; }
@@ -352,10 +329,10 @@ body {
 .coai-instagram-button:hover { filter: brightness(1.08); }
 .coai-tiktok-button { border: 1px solid rgba(76,233,231,.38); background: linear-gradient(115deg,#111,#202426); color: #fff !important; box-shadow: -3px 0 #25f4ee,3px 0 #fe2c55; }
 .coai-tiktok-button:hover { background: #252a2c; }
-.coai-index-action-card { display: grid; grid-template-columns: 1.6rem 1fr; gap: .35rem .65rem; border: 1px solid rgba(96,75,44,.12); border-radius: .9rem; background: rgba(255,255,255,.68); padding: .9rem; }
+.coai-index-action-card { display: grid; grid-template-columns: 1.6rem 1fr; gap: .35rem .65rem; border: 1px solid rgba(255,255,255,.1); border-radius: .9rem; background: rgba(255,255,255,.04); padding: .9rem; }
 .coai-index-action-card > span { grid-row: 1 / 3; display: grid; width: 1.55rem; height: 1.55rem; place-items: center; border-radius: 999px; background: #171817; color: #f5ddb0; font-size: .7rem; font-weight: 800; }
-.coai-index-action-card p { color: #272824; font-size: .78rem; font-weight: 700; line-height: 1.35; }
-.coai-index-action-card strong { grid-column: 2; color: #7b5b29; font-size: .68rem; }
+.coai-index-action-card p { color: #e4e6e8; font-size: .78rem; font-weight: 700; line-height: 1.35; }
+.coai-index-action-card strong { grid-column: 2; color: #ddc191; font-size: .68rem; }
 
 @keyframes coai-index-arrival {
   from { opacity: 0; transform: scale(.72) rotate(-10deg); filter: blur(5px); }
@@ -407,12 +384,12 @@ body {
 .coai-result-hero {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(104, 82, 47, .12);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 1.5rem;
   background:
-    radial-gradient(circle at 15% 0%, rgba(207, 169, 101, .2), transparent 16rem),
-    radial-gradient(circle at 92% 90%, rgba(92, 142, 165, .16), transparent 18rem),
-    rgba(255,255,255,.48);
+    radial-gradient(circle at 15% 0%, rgba(207, 169, 101, .16), transparent 16rem),
+    radial-gradient(circle at 92% 90%, rgba(92, 142, 165, .14), transparent 18rem),
+    #111518;
 }
 
 .coai-result-hero::after {
@@ -422,30 +399,30 @@ body {
   bottom: -8rem;
   width: 18rem;
   height: 18rem;
-  border: 1px solid rgba(135, 102, 51, .12);
+  border: 1px solid rgba(255, 255, 255, .1);
   border-radius: 50%;
   pointer-events: none;
 }
 
 .coai-result-signal {
-  background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(239,235,227,.5));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  background: linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-result-strategy {
-  background: linear-gradient(135deg, rgba(255,255,255,.72), rgba(245,240,231,.5));
-  box-shadow: 0 24px 55px -42px rgba(62, 46, 24, .55), inset 0 1px 0 rgba(255,255,255,.9);
+  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow: 0 24px 55px -42px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-result-entry {
   background:
-    radial-gradient(circle at 50% 0%, rgba(211, 174, 106, .2), transparent 17rem),
-    linear-gradient(145deg, rgba(255,255,255,.82), rgba(235,231,222,.58));
-  box-shadow: 0 28px 65px -46px rgba(62, 46, 24, .65), inset 0 1px 0 rgba(255,255,255,.9);
+    radial-gradient(circle at 50% 0%, rgba(211, 174, 106, .16), transparent 17rem),
+    linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  box-shadow: 0 28px 65px -46px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-analysis-proof { display: flex; width: 100%; max-width: 42rem; flex-wrap: wrap; justify-content: center; gap: .55rem; margin-top: .55rem; }
-.coai-analysis-proof span { display: inline-flex; align-items: center; gap: .42rem; border: 1px solid rgba(73,123,145,.18); border-radius: 999px; background: rgba(235,244,247,.72); padding: .42rem .68rem; color: #496a78; font-size: .62rem; font-weight: 750; letter-spacing: .035em; }
+.coai-analysis-proof span { display: inline-flex; align-items: center; gap: .42rem; border: 1px solid rgba(76,201,240,.22); border-radius: 999px; background: rgba(76,201,240,.08); padding: .42rem .68rem; color: #8fe9ff; font-size: .62rem; font-weight: 750; letter-spacing: .035em; }
 .coai-analysis-proof i { width: .35rem; height: .35rem; border-radius: 999px; background: #5890a8; box-shadow: 0 0 0 3px rgba(88,144,168,.1); }
 
 .coai-value-loop {
@@ -472,80 +449,60 @@ body {
 
 /* Transition diagnostic → espace personnel. */
 .coai-access-page {
-  color: #171817;
+  color: #fffdf8;
   background:
-    radial-gradient(circle at 12% 12%, rgba(216, 181, 119, .28), transparent 25rem),
-    radial-gradient(circle at 90% 84%, rgba(96, 151, 176, .2), transparent 28rem),
-    linear-gradient(145deg, #fffdf8, #f3eee5 52%, #e9f0f2);
+    radial-gradient(circle at 12% 12%, rgba(216, 181, 119, .14), transparent 25rem),
+    radial-gradient(circle at 90% 84%, rgba(96, 151, 176, .12), transparent 28rem),
+    #0d0e10;
 }
 
 .coai-access-shell {
-  border: 1px solid rgba(94, 74, 43, .15);
-  background: rgba(255,255,255,.75);
-  box-shadow: 0 38px 100px -54px rgba(55, 42, 25, .48), inset 0 1px 0 rgba(255,255,255,.95);
+  border: 1px solid rgba(255, 255, 255, .09);
+  background: rgba(255,255,255,.04);
+  box-shadow: 0 38px 100px -54px rgba(0, 0, 0, .8), inset 0 1px 0 rgba(255,255,255,.05);
   backdrop-filter: blur(24px);
 }
 
 .coai-access-intro {
   background:
-    radial-gradient(circle at 5% 0%, rgba(210, 171, 99, .2), transparent 18rem),
-    linear-gradient(145deg, rgba(255,255,255,.68), rgba(236,231,222,.45));
+    radial-gradient(circle at 5% 0%, rgba(210, 171, 99, .14), transparent 18rem),
+    linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
 }
 
 .coai-access-card {
-  background: rgba(255,255,255,.84);
+  background: rgba(255,255,255,.03);
   box-shadow: none;
 }
 
 .coai-access-card .coai-access-input {
   min-height: 3.5rem;
-  border: 1.5px solid #c9c4ba !important;
-  background: #fff !important;
-  color: #171817 !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 1px rgba(255,255,255,.55);
+  border: 1.5px solid rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.05) !important;
+  color: #fffdf8 !important;
+  box-shadow: none;
 }
 
 .coai-access-card .coai-access-input:focus {
-  border-color: #9b7338 !important;
-  box-shadow: 0 0 0 4px rgba(183,137,67,.14);
+  border-color: #c9a262 !important;
+  box-shadow: 0 0 0 4px rgba(201,162,98,.18);
 }
 
-.coai-access-page .text-graphite-50,
-.coai-access-page .text-graphite-100,
-.coai-access-page .text-graphite-200,
-.coai-access-page .text-white { color: #171817; }
-.coai-access-page .text-graphite-300 { color: #484a45; }
-.coai-access-page .text-graphite-400 { color: #64665f; }
-.coai-access-page .text-graphite-500 { color: #7b7d75; }
-.coai-access-page .text-laiton-200 { color: #815b23; }
-.coai-access-page .hover\:text-white:hover,
-.coai-access-page .hover\:text-graphite-50:hover,
-.coai-access-page .hover\:text-graphite-100:hover,
-.coai-access-page .hover\:text-graphite-200:hover { color: #171817; }
-.coai-access-page .hover\:text-laiton-200:hover,
-.coai-access-page .hover\:text-laiton-300:hover { color: #815b23; }
-.coai-access-page .border-graphite-700,
-.coai-access-page .border-graphite-800 { border-color: rgba(77,64,45,.16); }
-.coai-access-page .bg-graphite-900,
-.coai-access-page .bg-graphite-900\/60,
-.coai-access-page .bg-graphite-900\/80 { background-color: rgba(255,255,255,.7); }
-.coai-access-page .border-white\/10,
-.coai-access-page .border-white\/20 { border-color: rgba(77,64,45,.2); }
-.coai-access-page .bg-white\/\[0\.045\],
-.coai-access-page .bg-white\/\[0\.065\] { background-color: rgba(255,255,255,.72); }
+/* Remappages clairs retirés (19/08/2026, retour au thème sombre) — les
+   classes Tailwind d'origine s'appliquent de nouveau nativement. */
+.coai-access-page .text-laiton-200 { color: #e9dcc0; }
 .coai-access-page .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .08em; }
 
-.coai-access-back { color: #625b50; }
+.coai-access-back { color: #aeb5ba; }
 
 .coai-access-proof {
   display: flex;
   align-items: center;
   gap: .65rem;
-  border: 1px solid rgba(104,82,47,.13);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: .9rem;
-  background: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.04);
   padding: .75rem .85rem;
-  color: #4e4c46;
+  color: #d7dcde;
   font-size: .82rem;
   font-weight: 600;
 }
@@ -566,28 +523,22 @@ body {
    "ca fait mal aux yeux maintenant" — le premier essai était trop saturé/
    sombre) — un cran plus doux que le fond d'origine, pas deux. */
 .coai-app-shell {
-  color: #171817;
+  color: #fffdf8;
   font-family: var(--font-display), system-ui, sans-serif;
   background:
-    radial-gradient(circle at 24% 0%, rgba(214,177,110,.22), transparent 28rem),
-    radial-gradient(circle at 94% 72%, rgba(87,145,172,.16), transparent 34rem),
-    linear-gradient(145deg, #f6f3eb, #ebe6db 52%, #e3eaec);
+    radial-gradient(circle at 24% 0%, rgba(214,177,110,.14), transparent 28rem),
+    radial-gradient(circle at 94% 72%, rgba(87,145,172,.12), transparent 34rem),
+    #0d0e10;
 }
 
 .coai-app-nav {
-  border-color: rgba(84,68,44,.13);
-  background: rgba(244,240,231,.74);
-  box-shadow: 16px 0 45px -38px rgba(47,38,25,.42);
+  border-color: rgba(255,255,255,.08);
+  background: rgba(13,14,16,.86);
+  box-shadow: 16px 0 45px -38px rgba(0,0,0,.6);
 }
 
-.coai-app-nav .text-white,
-.coai-app-nav .text-graphite-50 { color: #171817; }
-.coai-app-nav .text-graphite-300 { color: #55574f; }
-.coai-app-nav .text-graphite-400 { color: #6c6e67; }
-.coai-app-nav .text-graphite-500 { color: #777970; }
-.coai-app-nav .text-laiton-300 { color: #7c5720; }
 .coai-app-nav a:hover,
-.coai-app-nav button:hover { color: #171817; }
+.coai-app-nav button:hover { color: #fffdf8; }
 
 .coai-app-nav nav > a,
 .coai-app-nav nav > button { font-weight: 650; letter-spacing: -.01em; }
@@ -606,27 +557,27 @@ body {
 .coai-nav-chevron { transition: transform .2s ease; }
 
 .coai-boarding-card {
-  border-color: rgba(126,96,49,.18) !important;
+  border-color: rgba(255,255,255,.1) !important;
   background:
-    radial-gradient(circle at 12% 0%, rgba(215,181,119,.16), transparent 19rem),
-    linear-gradient(135deg, #fffdf8, #f3eee4);
-  box-shadow: 0 30px 75px -48px rgba(66,48,23,.48), inset 0 1px #fff !important;
+    radial-gradient(circle at 12% 0%, rgba(215,181,119,.1), transparent 19rem),
+    #111518;
+  box-shadow: 0 30px 75px -48px rgba(0,0,0,.7), inset 0 1px rgba(255,255,255,.06) !important;
 }
-.coai-app-shell .coai-boarding-card .text-white { color: #191b19; }
-.coai-app-shell .coai-boarding-card .text-graphite-300 { color: #50544f; }
-.coai-app-shell .coai-boarding-card .text-graphite-500 { color: #747872; }
-.coai-app-shell .coai-boarding-card .text-laiton-300 { color: #875f25; }
+.coai-app-shell .coai-boarding-card .text-white { color: #fffdf8; }
+.coai-app-shell .coai-boarding-card .text-graphite-300 { color: #d7dcde; }
+.coai-app-shell .coai-boarding-card .text-graphite-500 { color: #9aa3a1; }
+.coai-app-shell .coai-boarding-card .text-laiton-300 { color: #ddc191; }
 
 .coai-app-shell .coai-boarding-card .coai-boarding-next {
-  border-color: rgba(76,126,148,.2) !important;
-  background: linear-gradient(145deg, #edf4f5, #e4edef) !important;
-  color: #1d2424;
+  border-color: rgba(76,201,240,.22) !important;
+  background: linear-gradient(145deg, rgba(76,201,240,.1), rgba(76,201,240,.04)) !important;
+  color: #fffdf8;
 }
 
 .coai-app-shell .coai-boarding-card .coai-boarding-next .text-graphite-500 {
-  color: #607176;
+  color: #8fe9ff;
 }
-.coai-app-shell .coai-boarding-card .bg-lab-notch { background: #f3eee4; border-color: rgba(126,96,49,.14); }
+.coai-app-shell .coai-boarding-card .bg-lab-notch { background: #171b1d; border-color: rgba(255,255,255,.1); }
 
 .coai-diagnostic-enrich-cta {
   border: 1px solid #151816;
@@ -739,44 +690,17 @@ body {
 }
 
 .coai-app-nav-dropdown {
-  border-color: rgba(84,68,44,.14);
-  background: rgba(247,244,235,.97);
-  box-shadow: 0 20px 50px -30px rgba(47,38,25,.55);
+  border-color: rgba(255,255,255,.09);
+  background: rgba(17,21,24,.97);
+  box-shadow: 0 20px 50px -30px rgba(0,0,0,.8);
 }
 
-.coai-app-nav-dropdown a { color: #55574f; }
-.coai-app-nav-dropdown a:hover { background: rgba(183,137,67,.09); color: #171817; }
+.coai-app-nav-dropdown a { color: #aeb5ba; }
+.coai-app-nav-dropdown a:hover { background: rgba(201,162,98,.1); color: #fffdf8; }
 
-.coai-app-shell .text-white,
-.coai-app-shell .text-graphite-50,
-.coai-app-shell .text-graphite-100,
-.coai-app-shell .text-graphite-200 { color: #171817; }
-.coai-app-shell .text-graphite-300 { color: #4e504a; }
-.coai-app-shell .text-graphite-400 { color: #686a63; }
-.coai-app-shell .text-graphite-500 { color: #7d7f77; }
-.coai-app-shell .text-laiton-200 { color: #815b23; }
-.coai-app-shell .hover\:text-white:hover,
-.coai-app-shell .hover\:text-graphite-50:hover,
-.coai-app-shell .hover\:text-graphite-100:hover,
-.coai-app-shell .hover\:text-graphite-200:hover { color: #171817; }
-.coai-app-shell .hover\:text-laiton-200:hover,
-.coai-app-shell .hover\:text-laiton-300:hover { color: #815b23; }
-.coai-app-shell .border-white\/\[0\.07\],
-.coai-app-shell .border-white\/\[0\.08\],
-.coai-app-shell .border-graphite-800 { border-color: rgba(84,68,44,.14); }
-.coai-app-shell .bg-white\/\[0\.02\],
-.coai-app-shell .bg-white\/\[0\.025\],
-.coai-app-shell .bg-white\/\[0\.03\],
-.coai-app-shell .bg-white\/\[0\.035\],
-.coai-app-shell .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,.55); }
-.coai-app-shell .bg-graphite-900,
-.coai-app-shell .bg-graphite-900\/40,
-.coai-app-shell .bg-graphite-900\/50,
-.coai-app-shell .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
-.coai-app-shell .border-white\/10,
-.coai-app-shell .border-white\/20 { border-color: rgba(84,68,44,.18); }
-.coai-app-shell .bg-white\/\[0\.045\],
-.coai-app-shell .bg-white\/\[0\.065\] { background-color: rgba(255,255,255,.65); }
+/* Remappages clairs retirés (19/08/2026, retour au thème sombre) — les
+   classes Tailwind d'origine s'appliquent de nouveau nativement. */
+.coai-app-shell .text-laiton-200 { color: #e9dcc0; }
 .coai-app-shell .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .08em; }
 
 /* Contraste autonome pour les éléments sombres placés dans l'univers clair. */
@@ -836,13 +760,13 @@ body {
 
 .coai-app-main > .pointer-events-none { opacity: .38; }
 
-/* Landing — luxe lumineux, émotion cinématographique et précision tech. */
+/* Landing — retour au thème sombre d'origine (19/08/2026). */
 .coai-landing-lux {
-  color: #171817;
+  color: #fffdf8;
   background:
-    radial-gradient(circle at 8% 26%, rgba(220,184,116,.2), transparent 32rem),
-    radial-gradient(circle at 96% 62%, rgba(89,145,169,.15), transparent 36rem),
-    linear-gradient(150deg, #fbfaf7 0%, #f2eee6 52%, #e8eff1 100%);
+    radial-gradient(circle at 8% 26%, rgba(220,184,116,.13), transparent 32rem),
+    radial-gradient(circle at 96% 62%, rgba(89,145,169,.1), transparent 36rem),
+    #0d0e10;
 }
 
 .coai-landing-lux .coai-landing-hero-image {
@@ -869,47 +793,10 @@ body {
   box-shadow: 0 34px 90px -48px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
-.coai-landing-lux .text-white,
-.coai-landing-lux .text-graphite-50,
-.coai-landing-lux .text-graphite-100,
-.coai-landing-lux .text-graphite-200 { color: #171817; }
-.coai-landing-lux .text-graphite-300 { color: #4e504a; }
-.coai-landing-lux .text-graphite-400 { color: #696b64; }
-.coai-landing-lux .text-graphite-500 { color: #7b7d75; }
+/* Remappages clairs retirés (19/08/2026, retour au thème sombre) — les
+   classes Tailwind d'origine s'appliquent de nouveau nativement. */
 .coai-landing-lux .text-laiton-200,
-.coai-landing-lux .text-laiton-300 { color: #815b23; }
-.coai-landing-lux .hover\:text-white:hover,
-.coai-landing-lux .hover\:text-graphite-50:hover,
-.coai-landing-lux .hover\:text-graphite-100:hover,
-.coai-landing-lux .hover\:text-graphite-200:hover { color: #171817; }
-.coai-landing-lux .hover\:text-laiton-200:hover,
-.coai-landing-lux .hover\:text-laiton-300:hover { color: #815b23; }
-/* Couleurs posées via une variante arbitraire Tailwind (ex: [&_h2]:text-graphite-50)
-   : le nom de classe généré contient le token complet, donc les sélecteurs
-   ".text-graphite-50" ci-dessus ne matchent jamais — attrapé ici par sélecteur
-   d'attribut sur toute classe qui CONTIENT ce token. */
-.coai-landing-lux [class*="text-graphite-50"] h2,
-.coai-landing-lux [class*="text-graphite-50"] h3 { color: #171817; }
-.coai-landing-lux .border-white\/\[0\.06\],
-.coai-landing-lux .border-white\/\[0\.07\],
-.coai-landing-lux .border-white\/\[0\.08\],
-.coai-landing-lux .border-white\/5,
-.coai-landing-lux .border-white\/\[0\.05\] { border-color: rgba(84,68,44,.1); }
-.coai-landing-lux .border-white\/10,
-.coai-landing-lux .border-white\/20,
-.coai-landing-lux .border-graphite-700,
-.coai-landing-lux .border-graphite-800 { border-color: rgba(84,68,44,.16); }
-.coai-landing-lux .bg-white\/\[0\.02\],
-.coai-landing-lux .bg-white\/\[0\.03\],
-.coai-landing-lux .bg-white\/\[0\.035\],
-.coai-landing-lux .bg-white\/\[0\.045\],
-.coai-landing-lux .bg-white\/\[0\.06\],
-.coai-landing-lux .bg-white\/\[0\.065\] { background-color: rgba(255,255,255,.6); }
-.coai-landing-lux .bg-graphite-900,
-.coai-landing-lux .bg-graphite-400,
-.coai-landing-lux .bg-graphite-900\/40,
-.coai-landing-lux .bg-graphite-900\/50,
-.coai-landing-lux .bg-graphite-900\/60 { background-color: rgba(255,255,255,.62); }
+.coai-landing-lux .text-laiton-300 { color: #ddc191; }
 .coai-landing-lux .font-mono { font-family: var(--font-sans), sans-serif; letter-spacing: .09em; }
 
 /* Système typographique volontairement réduit : display pour les titres,
@@ -921,63 +808,63 @@ body {
 .coai-landing-eyebrow { line-height: 1.35; }
 
 .coai-landing-lux section:not(.coai-landing-hero) .rounded-2xl {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 24px 60px -52px rgba(54,41,24,.58);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px -52px rgba(0,0,0,.75);
 }
 
 .coai-landing-lux .coai-founder-stage,
 .coai-landing-lux .coai-future-cta {
-  border-color: rgba(99,76,42,.14);
+  border-color: rgba(255,255,255,.09);
   background:
-    radial-gradient(circle at 88% 12%, rgba(89,145,169,.15), transparent 21rem),
-    linear-gradient(135deg, rgba(255,255,255,.82), rgba(239,232,220,.67));
-  box-shadow: 0 34px 90px -58px rgba(54,39,20,.6), inset 0 1px 0 rgba(255,255,255,.95);
+    radial-gradient(circle at 88% 12%, rgba(89,145,169,.16), transparent 21rem),
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow: 0 34px 90px -58px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 /* Aperçu du vrai cockpit COAI dans le téléphone de la landing. */
 .coai-phone-screen {
-  border: 1px solid rgba(255,255,255,.75);
+  border: 1px solid rgba(255,255,255,.1);
   background:
-    radial-gradient(circle at 92% 4%, rgba(91,145,169,.18), transparent 10rem),
-    linear-gradient(155deg, #fffdf9 0%, #f1eee7 58%, #e7eff1 100%);
-  box-shadow: inset 0 1px 0 #fff;
+    radial-gradient(circle at 92% 4%, rgba(91,145,169,.2), transparent 10rem),
+    linear-gradient(155deg, #15171a 0%, #111316 58%, #0f1518 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
 .coai-phone-card,
 .coai-phone-insight {
-  border: 1px solid rgba(96,75,44,.13);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: .9rem;
-  background: rgba(255,255,255,.72);
-  box-shadow: 0 12px 30px -24px rgba(48,36,20,.55), inset 0 1px 0 rgba(255,255,255,.95);
+  background: rgba(255,255,255,.04);
+  box-shadow: 0 12px 30px -24px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.05);
 }
 .coai-phone-insight {
-  border-color: rgba(75,126,148,.22);
-  background: linear-gradient(135deg, rgba(235,244,247,.9), rgba(255,252,246,.82));
+  border-color: rgba(75,126,148,.28);
+  background: linear-gradient(135deg, rgba(75,126,148,.14), rgba(255,255,255,.03));
 }
 .coai-phone-kicker,
-.coai-phone-label { color: #7f673f; font-size: 9px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
-.coai-phone-heading { color: #171817; font-size: 13px; font-weight: 700; }
-.coai-phone-title { color: #171817; font-size: 12px; font-weight: 700; }
-.coai-phone-copy { color: #5b5d58; font-size: 10.5px; }
-.coai-phone-accent { color: #8d682d; font-size: 10.5px; font-weight: 700; }
-.coai-phone-action { border-radius: 999px; background: linear-gradient(135deg, #d7b36f, #bd9148); padding: .45rem .65rem; color: #171817; text-align: center; font-size: 10.5px; font-weight: 800; box-shadow: 0 10px 24px -14px rgba(137,91,23,.75); }
-.coai-phone-status { border: 1px solid rgba(56,124,151,.23); border-radius: 999px; background: rgba(224,240,245,.85); padding: .2rem .45rem; color: #366c83; font-size: 8px; font-weight: 800; text-transform: uppercase; }
-.coai-phone-score { display: grid; width: 2rem; height: 2rem; place-items: center; border: 2px solid #c9a25f; border-radius: 999px; color: #7c5b25; font-size: 10px; font-weight: 800; }
-.coai-phone-progress { height: .35rem; overflow: hidden; border-radius: 999px; background: rgba(58,59,55,.1); }
-.coai-phone-metric { color: #171817; font-size: 20px; font-weight: 750; line-height: 1; }
-.coai-phone-metric span { color: #686a63; font-size: 9px; font-weight: 600; }
-.coai-phone-orb { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border-radius: 999px; background: conic-gradient(#c9a25f 0 87%, rgba(83,124,143,.16) 87% 100%); padding: 3px; }
-.coai-phone-orb::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: #f7f6f1; }
-.coai-phone-orb span { z-index: 1; grid-area: 1/1; color: #171817; font-size: 9px; font-weight: 800; }
+.coai-phone-label { color: #ddc191; font-size: 9px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.coai-phone-heading { color: #fffdf8; font-size: 13px; font-weight: 700; }
+.coai-phone-title { color: #fffdf8; font-size: 12px; font-weight: 700; }
+.coai-phone-copy { color: #aeb5ba; font-size: 10.5px; }
+.coai-phone-accent { color: #e0bd77; font-size: 10.5px; font-weight: 700; }
+.coai-phone-action { border-radius: 999px; background: linear-gradient(135deg, #d7b36f, #bd9148); padding: .45rem .65rem; color: #171817; text-align: center; font-size: 10.5px; font-weight: 800; box-shadow: 0 10px 24px -14px rgba(0,0,0,.85); }
+.coai-phone-status { border: 1px solid rgba(91,145,169,.35); border-radius: 999px; background: rgba(91,145,169,.14); padding: .2rem .45rem; color: #8fc2da; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.coai-phone-score { display: grid; width: 2rem; height: 2rem; place-items: center; border: 2px solid #c9a25f; border-radius: 999px; color: #e0bd77; font-size: 10px; font-weight: 800; }
+.coai-phone-progress { height: .35rem; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.08); }
+.coai-phone-metric { color: #fffdf8; font-size: 20px; font-weight: 750; line-height: 1; }
+.coai-phone-metric span { color: #aeb5ba; font-size: 9px; font-weight: 600; }
+.coai-phone-orb { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border-radius: 999px; background: conic-gradient(#c9a25f 0 87%, rgba(255,255,255,.1) 87% 100%); padding: 3px; }
+.coai-phone-orb::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: #111316; }
+.coai-phone-orb span { z-index: 1; grid-area: 1/1; color: #fffdf8; font-size: 9px; font-weight: 800; }
 
-/* Le footer prolonge la lumière de la landing au lieu de retomber dans le noir. */
+/* Le footer prolonge l'obscurité de la landing (19/08/2026, bascule dark totale). */
 .coai-marketing-footer {
-  border-top: 1px solid rgba(92,72,44,.13);
-  color: #64665f;
+  border-top: 1px solid rgba(221,193,145,.12);
+  color: #8a8d92;
   background:
-    radial-gradient(circle at 82% 0%, rgba(92,151,175,.14), transparent 24rem),
-    linear-gradient(135deg, #f7f3eb 0%, #eef1ef 100%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.92);
+    radial-gradient(circle at 82% 0%, rgba(91,130,150,.14), transparent 24rem),
+    linear-gradient(135deg, #0d0e10 0%, #16181b 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
 }
-.coai-marketing-footer .text-graphite-500 { color: #64665f; }
+.coai-marketing-footer .text-graphite-500 { color: #8a8d92; }
 .coai-marketing-footer a { transition: color .2s ease; }
 
 /* Le footer est un sibling de <main> (posé une fois dans le layout marketing
@@ -1008,15 +895,15 @@ body:has(main.coai-vip-page) .coai-marketing-footer {
 body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: #a3a5a8; }
 
 .coai-pricing-algorithm {
-  border: 1px solid rgba(99,76,42,.15);
+  border: 1px solid rgba(255,255,255,.09);
   background:
-    radial-gradient(circle at 90% 8%, rgba(82,142,167,.14), transparent 18rem),
-    linear-gradient(135deg, rgba(255,255,255,.8), rgba(240,233,221,.62));
-  box-shadow: 0 30px 70px -52px rgba(52,39,22,.62), inset 0 1px 0 rgba(255,255,255,.94);
+    radial-gradient(circle at 90% 8%, rgba(82,142,167,.16), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow: 0 30px 70px -52px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
 }
-.coai-pricing-algorithm .text-white { color: #171817; }
-.coai-pricing-algorithm .text-graphite-300 { color: #4f514c; }
-.coai-pricing-algorithm .text-laiton-300 { color: #7f5d27; }
+.coai-pricing-algorithm .text-white { color: #fffdf8; }
+.coai-pricing-algorithm .text-graphite-300 { color: #c7ccd0; }
+.coai-pricing-algorithm .text-laiton-300 { color: #e0bd77; }
 
 @media (max-width: 640px) {
   .coai-landing-hero { min-height: auto; padding-top: 7rem; }
@@ -1028,12 +915,12 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 .coai-dashboard-hero {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(101,78,43,.14);
+  border: 1px solid rgba(255,255,255,.09);
   border-radius: 1.75rem;
   background:
-    radial-gradient(circle at 88% 10%, rgba(91,143,166,.14), transparent 18rem),
-    linear-gradient(135deg, rgba(255,255,255,.8), rgba(244,238,228,.58));
-  box-shadow: 0 30px 70px -52px rgba(57,43,24,.58), inset 0 1px 0 rgba(255,255,255,.95);
+    radial-gradient(circle at 88% 10%, rgba(91,143,166,.16), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow: 0 30px 70px -52px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-dashboard-hero::after {
@@ -1043,17 +930,17 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
   top: -8rem;
   width: 20rem;
   height: 20rem;
-  border: 1px solid rgba(151,112,48,.12);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: 50%;
   pointer-events: none;
 }
 
 .coai-dashboard-status {
-  border: 1px solid rgba(99,79,48,.14);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 999px;
-  background: rgba(255,255,255,.52);
+  background: rgba(255,255,255,.05);
   padding: .45rem .7rem;
-  color: #5c574e;
+  color: #c7ccd0;
 }
 
 .coai-app-shell .coai-dashboard-primary {
@@ -1074,7 +961,7 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 }
 
 .coai-eyebrow {
-  color: #7c5720;
+  color: #e0bd77;
   font-size: .66rem;
   font-weight: 800;
   letter-spacing: .18em;
@@ -1083,10 +970,10 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 
 .coai-week-overview,
 .coai-today-briefing {
-  border: 1px solid rgba(84,68,44,.14);
+  border: 1px solid rgba(255,255,255,.09);
   border-radius: 1.8rem;
-  background: rgba(255,255,255,.62);
-  box-shadow: 0 26px 70px -52px rgba(45,34,20,.55), inset 0 1px rgba(255,255,255,.85);
+  background: rgba(255,255,255,.035);
+  box-shadow: 0 26px 70px -52px rgba(0,0,0,.85), inset 0 1px rgba(255,255,255,.05);
   padding: 1.5rem;
 }
 
@@ -1096,40 +983,40 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
   flex-direction: column;
   align-items: center;
   gap: .3rem;
-  border: 1px solid rgba(84,68,44,.1);
+  border: 1px solid rgba(255,255,255,.07);
   border-radius: 1rem;
-  background: rgba(248,246,240,.72);
+  background: rgba(255,255,255,.03);
   padding: .75rem .2rem;
-  color: #6c6e67;
+  color: #aeb5ba;
 }
 .coai-week-day > span { font-size: .62rem; font-weight: 750; text-transform: uppercase; }
-.coai-week-day > strong { color: #282925; font-size: 1rem; }
-.coai-week-day > i { width: .38rem; height: .38rem; border-radius: 999px; background: #c7c5bc; }
+.coai-week-day > strong { color: #fffdf8; font-size: 1rem; }
+.coai-week-day > i { width: .38rem; height: .38rem; border-radius: 999px; background: rgba(255,255,255,.18); }
 .coai-week-day > small { overflow: hidden; max-width: 100%; text-overflow: ellipsis; font-size: .58rem; white-space: nowrap; }
-.coai-week-day.has-workout > i { background: #a8763e; box-shadow: 0 0 0 4px rgba(168,118,62,.12); }
-.coai-week-day.is-today { border-color: rgba(168,118,62,.6); background: #20221f; color: #dad6cc; box-shadow: 0 15px 32px -22px rgba(32,34,31,.8); }
+.coai-week-day.has-workout > i { background: #c9a262; box-shadow: 0 0 0 4px rgba(201,162,98,.18); }
+.coai-week-day.is-today { border-color: rgba(201,162,98,.5); background: #20221f; color: #dad6cc; box-shadow: 0 15px 32px -22px rgba(0,0,0,.85); }
 .coai-week-day.is-today > strong { color: #fffdf8; }
 .coai-week-day.is-today > i { background: #e2bd7c; }
 
 .coai-today-heading { display: flex; flex-direction: column; gap: 1rem; }
-.coai-today-heading blockquote { max-width: 29rem; color: #5c5e58; font-family: var(--font-display), serif; font-size: .95rem; font-style: italic; line-height: 1.6; }
+.coai-today-heading blockquote { max-width: 29rem; color: #c7ccd0; font-family: var(--font-display), serif; font-size: .95rem; font-style: italic; line-height: 1.6; }
 .coai-brief-card {
   display: flex;
   min-height: 12.5rem;
   flex-direction: column;
-  border: 1px solid rgba(84,68,44,.12);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: 1.25rem;
-  background: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.035);
   padding: 1.15rem;
-  color: #20221f;
+  color: #fffdf8;
   transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
-.coai-brief-card:hover { transform: translateY(-2px); border-color: rgba(168,118,62,.42); box-shadow: 0 18px 35px -28px rgba(58,42,21,.6); }
-.coai-brief-card > span { color: #7c5720; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.coai-brief-card:hover { transform: translateY(-2px); border-color: rgba(201,162,98,.45); box-shadow: 0 18px 35px -28px rgba(0,0,0,.85); }
+.coai-brief-card > span { color: #e0bd77; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .coai-brief-card > strong { margin-top: .85rem; font-size: 1.12rem; }
-.coai-brief-card > p { margin-top: .5rem; color: #5c5f58; font-size: .8rem; line-height: 1.55; }
-.coai-brief-card > em { margin-top: auto; padding-top: 1.2rem; color: #4f3717; font-size: .75rem; font-style: normal; font-weight: 750; }
-.coai-brief-training { border-color: rgba(168,118,62,.32); background: linear-gradient(145deg,#fffdf8,#f3eadb); }
+.coai-brief-card > p { margin-top: .5rem; color: #c7ccd0; font-size: .8rem; line-height: 1.55; }
+.coai-brief-card > em { margin-top: auto; padding-top: 1.2rem; color: #ddc191; font-size: .75rem; font-style: normal; font-weight: 750; }
+.coai-brief-training { border-color: rgba(201,162,98,.35); background: linear-gradient(145deg,#1c1e1a,#2a2418); }
 
 @media (min-width: 640px) {
   .coai-week-overview,
@@ -1145,7 +1032,7 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 
 .coai-dashboard > section,
 .coai-dashboard > .grid > * {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .coai-intelligence-panel {
@@ -1165,12 +1052,12 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 .coai-programme-hero {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(101,78,43,.14);
+  border: 1px solid rgba(255,255,255,.09);
   border-radius: 1.75rem;
   background:
-    radial-gradient(circle at 92% 10%, rgba(82,139,165,.15), transparent 18rem),
-    linear-gradient(135deg, rgba(255,255,255,.82), rgba(242,236,226,.56));
-  box-shadow: 0 30px 70px -52px rgba(57,43,24,.58), inset 0 1px 0 rgba(255,255,255,.95);
+    radial-gradient(circle at 92% 10%, rgba(82,139,165,.16), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow: 0 30px 70px -52px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-programme-hero::after {
@@ -1180,84 +1067,84 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
   bottom: -10rem;
   width: 22rem;
   height: 22rem;
-  border: 1px solid rgba(151,112,48,.12);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: 50%;
   pointer-events: none;
 }
 
 .coai-programme-card {
-  border-color: rgba(92,71,40,.14);
-  background: rgba(255,255,255,.72);
-  box-shadow: 0 28px 70px -52px rgba(52,40,24,.55), inset 0 1px 0 rgba(255,255,255,.95);
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.035);
+  box-shadow: 0 28px 70px -52px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .coai-exercise-card {
-  border-color: rgba(90,70,40,.13);
-  background: linear-gradient(145deg, rgba(255,255,255,.8), rgba(242,238,230,.58));
-  box-shadow: 0 14px 32px -28px rgba(55,42,24,.62), inset 0 1px 0 rgba(255,255,255,.9);
+  border-color: rgba(255,255,255,.08);
+  background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+  box-shadow: 0 14px 32px -28px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .coai-exercise-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 36px -28px rgba(55,42,24,.72), inset 0 1px 0 rgba(255,255,255,.95);
+  box-shadow: 0 18px 36px -28px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
 .coai-exercise-metric {
-  border-color: rgba(90,70,40,.11);
-  background: rgba(255,255,255,.54);
+  border-color: rgba(255,255,255,.07);
+  background: rgba(255,255,255,.03);
 }
 
 .coai-technique-button {
-  background: linear-gradient(145deg, rgba(219,184,120,.22), rgba(255,255,255,.58));
+  background: linear-gradient(145deg, rgba(219,184,120,.16), rgba(255,255,255,.04));
 }
 
 .coai-session-note {
-  border-color: rgba(90,70,40,.12);
-  background: rgba(255,255,255,.5);
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
 }
 
 .coai-week-badge {
-  border-color: rgba(133,96,39,.18);
-  background: rgba(217,181,111,.16);
-  color: #785521;
+  border-color: rgba(201,162,98,.3);
+  background: rgba(201,162,98,.14);
+  color: #e0bd77;
 }
 
 .coai-week-overview {
-  border-color: rgba(105,80,42,.14);
+  border-color: rgba(255,255,255,.09);
   background:
-    radial-gradient(circle at 92% 8%, rgba(83,143,168,.12), transparent 13rem),
-    linear-gradient(140deg, rgba(235,215,177,.34), rgba(255,255,255,.66));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+    radial-gradient(circle at 92% 8%, rgba(83,143,168,.13), transparent 13rem),
+    linear-gradient(140deg, rgba(201,162,98,.09), rgba(255,255,255,.02));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .coai-week-day {
-  border-color: rgba(88,69,42,.13);
-  background: rgba(255,255,255,.58);
-  box-shadow: 0 14px 32px -30px rgba(54,41,24,.62), inset 0 1px 0 rgba(255,255,255,.88);
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  box-shadow: 0 14px 32px -30px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .coai-week-day:hover {
-  border-color: rgba(159,114,48,.28);
-  background: rgba(255,255,255,.75);
+  border-color: rgba(201,162,98,.35);
+  background: rgba(255,255,255,.05);
 }
 
 .coai-meal-card,
 .coai-habit-card {
-  border-color: rgba(88,69,42,.12);
-  background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(243,238,229,.56));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  border-color: rgba(255,255,255,.08);
+  background: linear-gradient(145deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 .coai-recovery-view .coai-week-overview {
   background:
-    radial-gradient(circle at 92% 8%, rgba(86,145,171,.17), transparent 13rem),
-    linear-gradient(140deg, rgba(228,235,236,.68), rgba(255,255,255,.72));
+    radial-gradient(circle at 92% 8%, rgba(86,145,171,.18), transparent 13rem),
+    linear-gradient(140deg, rgba(86,145,171,.1), rgba(255,255,255,.02));
 }
 
 .coai-nutrition-view .coai-week-overview {
   background:
-    radial-gradient(circle at 92% 8%, rgba(130,154,112,.14), transparent 13rem),
-    linear-gradient(140deg, rgba(238,225,194,.58), rgba(255,255,255,.72));
+    radial-gradient(circle at 92% 8%, rgba(130,154,112,.16), transparent 13rem),
+    linear-gradient(140deg, rgba(130,154,112,.1), rgba(255,255,255,.02));
 }
 
 @media (max-width: 640px) {
@@ -1271,10 +1158,11 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 
 .coai-diagnostic-result .coai-gradient-text,
 .coai-app-shell .coai-gradient-text {
-  color: #171817;
-  background: linear-gradient(105deg, #171817 5%, #8f672b 55%, #547d91 100%);
+  color: #ddc191;
+  background: linear-gradient(105deg, #f0dcc0 5%, #c9a262 48%, #9274c8 100%);
   background-clip: text;
   -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @media (max-width: 640px) {
