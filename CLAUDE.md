@@ -4,6 +4,37 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Photos Pexels sur les exercices du programme généré (19/08/2026, suite)
+
+Suite directe du retour "je ne vois pas les photos et vidéos dans les
+programmes d'entraînements" : la vidéo existait déjà (bouton "▶
+Technique" sur chaque exercice, aperçu YouTube intégré en recherche —
+ajouté le 14/08/2026) mais repliée par défaut, donc facile à manquer ;
+la photo, elle, n'existait vraiment nulle part sur le programme généré
+(seuls le catalogue d'exercices statique et les recettes en avaient).
+
+Le prompt de génération d'une séance (`programme-entrainement-
+session.ts`) demande désormais à l'IA un champ `photoQuery` par
+exercice (terme de recherche court en anglais, ex: "barbell bench
+press") — jamais une traduction littérale du nom français, une vraie
+requête de stock. Résolu en URL via `getStockPhotos()` (déjà existant,
+`src/lib/media/pexels.ts`) une seule fois côté serveur dans
+`pilier-page.tsx`, jamais depuis le client (clé API jamais exposée) —
+même garde-fou que recettes/catalogue : `PEXELS_API_KEY` absente ou
+requête en échec → aucune image affichée, jamais de photo cassée ni
+inventée. `ExerciceCard` affiche la photo en tête de carte quand elle
+est résolue.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme toujours) : rendu visuel réel des photos — ce
+sandbox n'a pas accès à Supabase/Anthropic en conditions réelles pour
+générer un vrai programme et vérifier le rendu. À tester par Anthony :
+générer/régénérer un programme et vérifier que les photos apparaissent
+sur les exercices (uniquement les nouveaux programmes générés après ce
+déploiement — les programmes déjà générés avant n'ont pas de
+`photoQuery` dans leur JSON figé, donc pas de photo tant qu'ils ne sont
+pas régénérés).
+
 ## Check-in léger les jours de repos (19/08/2026, suite)
 
 Retour d'Anthony sur le dashboard ("bilan hebdomadaire"/Score COAI) :
