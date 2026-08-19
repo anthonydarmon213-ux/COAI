@@ -39,12 +39,12 @@ export function MetricRing({
         {variant === "pie" ? (
           <div
             className="absolute inset-0 rounded-full shadow-[0_14px_35px_-18px_currentColor]"
-            style={{ color, background: `conic-gradient(${color} 0 ${visualPercent}%, #d9e0e2 ${visualPercent}% 100%)` }}
+            style={{ color, background: `conic-gradient(${color} 0 ${visualPercent}%, rgba(255,255,255,.1) ${visualPercent}% 100%)` }}
           >
-            <div className="absolute inset-[18%] rounded-full border border-white/70 bg-[#f9f7f2]/90 shadow-inner" />
+            <div className="absolute inset-[18%] rounded-full border border-white/10 bg-[#111518]/90 shadow-inner" />
           </div>
         ) : variant === "bars" ? (
-          <div className="absolute inset-2 flex items-end justify-center gap-1.5 rounded-[1.7rem] border border-black/[0.05] bg-white/45 px-5 pb-5 pt-4">
+          <div className="absolute inset-2 flex items-end justify-center gap-1.5 rounded-[1.7rem] border border-white/[0.08] bg-white/[0.04] px-5 pb-5 pt-4">
             {[38, 58, 48, 76, 64].map((height, index) => (
               <i key={height} className="w-3 rounded-full opacity-80" style={{ height: `${Math.max(18, height * (0.55 + visualPercent / 220))}%`, backgroundColor: index === 3 ? color : `${color}65` }} />
             ))}

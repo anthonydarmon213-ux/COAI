@@ -71,13 +71,13 @@ export function AppNav() {
         {NAVIGATION.map((item) => {
           if ("href" in item && item.href) {
             const active = isActive(pathname, item.href);
-            return <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/30 bg-white/[0.75] text-graphite-50 shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.55] hover:text-graphite-50"}`}><span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>{item.label}</Link>;
+            return <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/30 bg-white/[0.08] text-white shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.06] hover:text-white"}`}><span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>{item.label}</Link>;
           }
 
           const groupActive = Boolean(pathname?.startsWith(item.match ?? "")) || item.children?.some((child) => isActive(pathname, child.href));
           return (
             <details key={item.label} className="coai-nav-group" open={groupActive}>
-              <summary className={`flex cursor-pointer list-none items-center gap-3 rounded-xl border px-3.5 py-3 font-semibold transition ${groupActive ? "border-laiton-400/30 bg-white/[0.75] text-graphite-50 shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.55] hover:text-graphite-50"}`}>
+              <summary className={`flex cursor-pointer list-none items-center gap-3 rounded-xl border px-3.5 py-3 font-semibold transition ${groupActive ? "border-laiton-400/30 bg-white/[0.08] text-white shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.06] hover:text-white"}`}>
                 <span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>
                 <span className="flex-1">{item.label}</span>
                 <span className="coai-nav-chevron text-[10px]" aria-hidden="true">⌄</span>
@@ -85,7 +85,7 @@ export function AppNav() {
               <div className="ml-5 mt-1 flex flex-col border-l border-laiton-500/25 pl-3">
                 {item.children?.map((child) => {
                   const active = isActive(pathname, child.href);
-                  return <Link key={child.href} href={child.href} className={`rounded-lg px-3 py-2 text-[0.78rem] font-bold transition ${active ? "bg-white/80 text-graphite-950" : "text-graphite-300 hover:bg-white/55 hover:text-graphite-950"}`}>{child.label}</Link>;
+                  return <Link key={child.href} href={child.href} className={`rounded-lg px-3 py-2 text-[0.78rem] font-bold transition ${active ? "bg-white/[0.08] text-white" : "text-graphite-300 hover:bg-white/[0.06] hover:text-white"}`}>{child.label}</Link>;
                 })}
               </div>
             </details>

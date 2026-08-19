@@ -39,11 +39,11 @@ export function WeeklyCheckinCard() {
 
   return (
     <>
-      <Card className="flex flex-col gap-3 border-[#d9c9ac] bg-[#fffdf8] text-[#171713] sm:flex-row sm:items-center sm:justify-between">
+      <Card className="flex flex-col gap-3 border-white/[0.08] bg-white/[0.03] text-white sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9a6d2f]">Bilan hebdomadaire</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Bilan hebdomadaire</p>
           <h2 className="mt-1 text-lg font-bold">Ta semaine en 60 secondes.</h2>
-          <p className="mt-1 text-sm text-[#666159]">
+          <p className="mt-1 text-sm text-graphite-300">
             Moins d&apos;une minute — ça aide COAI à ajuster ton programme.
           </p>
         </div>
@@ -103,7 +103,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-6">
-      <div className="flex max-h-[90vh] w-full flex-col gap-5 overflow-y-auto rounded-t-3xl border border-[#d9c9ac] bg-[#fffdf8] p-6 text-[#171713] shadow-2xl sm:max-w-md sm:rounded-3xl sm:p-8">
+      <div className="flex max-h-[90vh] w-full flex-col gap-5 overflow-y-auto rounded-t-3xl border border-white/[0.08] bg-[#111518] p-6 text-white shadow-2xl sm:max-w-md sm:rounded-3xl sm:p-8">
         <div className="flex items-start justify-between">
           <div>
             <SectionLabel>Bilan de la semaine</SectionLabel>
@@ -112,7 +112,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
           <button
             type="button"
             onClick={onClose}
-            className="text-2xl leading-none text-[#756f66] transition hover:text-black"
+            className="text-2xl leading-none text-graphite-400 transition hover:text-white"
             aria-label="Fermer"
           >
             ×

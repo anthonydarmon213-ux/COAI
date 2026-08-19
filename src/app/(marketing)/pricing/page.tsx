@@ -53,10 +53,10 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
         </h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
-            <a key={nom} href={`#${nom.toLowerCase()}`} className="rounded-2xl border border-[#d9d2c6] bg-white px-5 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#b99452] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b99452]">
-              <strong className="block text-base text-[#171a18]">{nom}</strong>
-              <span className="mt-1.5 block text-sm font-semibold text-[#72501f]">{besoin}</span>
-              <span className="mt-1 block text-xs leading-5 text-[#59615d]">{niveau}</span>
+            <a key={nom} href={`#${nom.toLowerCase()}`} className="rounded-2xl border border-white/[0.08] bg-white/[0.035] px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-400/60">
+              <strong className="block text-base text-white">{nom}</strong>
+              <span className="mt-1.5 block text-sm font-semibold text-laiton-300">{besoin}</span>
+              <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
             </a>
           ))}
         </div>

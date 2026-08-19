@@ -53,7 +53,7 @@ const AREAS = ["Dos", "Épaule", "Genou", "Cheville", "Poignet", "Hanche", "Cou"
 
 function Chip({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`coai-daily-chip min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition ${active ? "border-[#b98b43] bg-[#27241f] shadow-sm" : "border-[#d9d2c4] bg-white/80 text-[#4a4842] hover:border-[#9c7945] hover:bg-white"}`}>
+    <button type="button" aria-pressed={active} onClick={onClick} className={`coai-daily-chip min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition ${active ? "border-[#b98b43] bg-[#27241f] shadow-sm" : "border-white/10 bg-white/[0.04] text-graphite-200 hover:border-laiton-400/40 hover:bg-white/[0.08]"}`}>
       {children}
     </button>
   );
@@ -208,33 +208,33 @@ export function DailyExperience({
       )}
 
       {!checkinDone && (
-        <section className="relative overflow-hidden rounded-[2rem] border border-[#d9c9ac] bg-[linear-gradient(145deg,#fffdf8_0%,#f4eee3_70%,#eef4f3_100%)] p-5 text-[#171713] shadow-[0_30px_90px_-55px_rgba(44,35,22,.55)] sm:p-8">
-          <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-[#c9a96b]/25" />
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[radial-gradient(circle_at_88%_0%,rgba(201,162,98,.1),transparent_20rem),#111518] p-5 text-white shadow-[0_30px_90px_-55px_rgba(0,0,0,.85)] sm:p-8">
+          <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-laiton-400/20" />
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#9a6d2f]">Ton coach est prêt · Check-in du jour</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-300">Ton coach est prêt · Check-in du jour</p>
               <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Comment te sens-tu aujourd’hui ?</h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-[#666159]">45 secondes suffisent. Comme en personal training, ta réponse détermine la durée, l’intensité et les précautions de ta séance.</p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">45 secondes suffisent. Comme en personal training, ta réponse détermine la durée, l’intensité et les précautions de ta séance.</p>
             </div>
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c9a96b]/45 bg-white/75 text-xl text-[#9a6d2f]">◎</span>
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-laiton-400/30 bg-white/[0.06] text-xl text-laiton-300">◎</span>
           </div>
           <div className="mt-7 grid gap-3">
-            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">01</span> Combien de temps as-tu ?</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">02</span> Comment est ta forme ?</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">03</span> Comment as-tu dormi ?</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">04</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-[#ded7cb] bg-white/65 p-4"><p className="mb-3 text-sm font-bold"><span className="mr-2 text-[#a77a38]">05</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">01</span> Combien de temps as-tu ?</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">02</span> Comment est ta forme ?</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">03</span> Comment as-tu dormi ?</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">04</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">05</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
           </div>
-          {error && <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>}
-          <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-[#20211e] py-6 text-base font-bold text-white hover:bg-[#343630] sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>
+          {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
+          <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-white py-6 text-base font-bold text-graphite-950 hover:bg-white/90 sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>
         </section>
       )}
 
       {checkinDone && adaptation && (
-        <section className="rounded-2xl border border-[#b8d8cb] bg-[#edf7f2] p-5 text-[#18372d]">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#28715c]">✓ Check-in analysé</p>
+        <section className="rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.07] p-5 text-white">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">✓ Check-in analysé</p>
           <h3 className="mt-2 text-xl font-bold">{adaptation.title}</h3>
-          <p className="mt-1 text-sm leading-6 text-[#355f52]">{adaptation.reason}</p>
+          <p className="mt-1 text-sm leading-6 text-emerald-100">{adaptation.reason}</p>
           {adaptation.changes.length > 0 && <ul className="mt-3 space-y-1 text-sm font-medium">{adaptation.changes.map((change) => <li key={change}>✓ {change}</li>)}</ul>}
         </section>
       )}

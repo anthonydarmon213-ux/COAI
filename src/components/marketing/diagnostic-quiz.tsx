@@ -388,7 +388,7 @@ function AssessmentRow({ number, title, instruction, options, value, onChange }:
       <legend className="sr-only">{title}</legend>
       <div className="flex items-start gap-3">
         <span className="coai-assessment-number">{number}</span>
-        <div><p className="font-semibold text-[#20211e]">{title}</p><p className="mt-1 text-xs leading-5 text-[#666159]">{instruction}</p></div>
+        <div><p className="font-semibold text-white">{title}</p><p className="mt-1 text-xs leading-5 text-graphite-400">{instruction}</p></div>
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {options.map((option) => (
