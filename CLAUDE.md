@@ -4,6 +4,36 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## 3 corrections du diagnostic public (19/08/2026, suite)
+
+Retours d'Anthony après test réel : (1) une lumière balayait en continu la
+carte du diagnostic pendant tout le bilan, gênante dès la première
+question — supprimée (`.coai-diagnostic-card::after`/`coai-card-scan`
+dans `globals.css`). (2) Les écrans respirants "respire1"/"respire2"
+avançaient seuls après 4,2s, alors que le texte affiché disait "Touche
+l'écran pour continuer" — contradiction, pas le temps de lire. N'avancent
+désormais que sur un vrai tap/clic, jamais automatiquement. (3) Les
+étapes "sexe" et "profilPhysique" (âge/taille/poids) fusionnées en un
+seul slide, déplacé en tête du quiz (avant "quotidien") plutôt qu'aux
+2/3 — l'ancre du 2e écran respirant déplacée de "profilPhysique" vers
+"frequence" pour rester à ~2/3 du parcours.
+
+**Bug structurel trouvé et corrigé au passage** (en touchant ce code
+pour la fusion) : l'étape "santeFeminine" (cycle menstruel/grossesse/
+post-partum, ajoutée le 14/08/2026) avait son état/rendu/validation
+entièrement câblés mais n'avait jamais été ajoutée à `QUESTION_STEPS` —
+donc structurellement inatteignable pour qui que ce soit depuis sa
+création, même en sélectionnant "Femme". Corrigé en l'ajoutant juste
+après le nouveau slide fusionné.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme toujours, aucun navigateur/Supabase réel
+accessible pour ce test précis) : rendu visuel réel des 3 corrections. À
+tester par Anthony : absence de la lumière balayante, le nouveau
+comportement tap-only des écrans respirants, le nouveau slide fusionné
+en tête de quiz, et que "santeFeminine" apparaît bien après en
+sélectionnant "Femme".
+
 ## Projection émotionnelle sur le résultat du diagnostic (19/08/2026, suite)
 
 Retour d'Anthony sur une capture MyFitCoach montrant un graphique de
