@@ -4,6 +4,31 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Check-in léger les jours de repos (19/08/2026, suite)
+
+Retour d'Anthony sur le dashboard ("bilan hebdomadaire"/Score COAI) :
+les jours sans séance, `/api/daily` refusait tout check-in (409 "jour de
+repos"), donc aucune ligne `DailySession` n'était jamais créée ces
+jours-là — le Score COAI comportemental (`age-coai.ts`, basé sur la
+régularité des check-ins réels sur 90 jours) était mécaniquement pénalisé
+par ce trou, sans rapport avec l'assiduité réelle de l'abonné.
+
+`food`/`availableMinutes` passent en facultatifs dans le schéma zod
+(rien à dimensionner sans séance) ; le garde-fou explicite qui existait
+déjà pour `availableMinutes` sur la branche "jour d'entraînement" est
+étendu à `food`, pour ne jamais perdre la vérification de complétude
+côté formulaire complet (`DailyExperience`). Nouveau composant
+`RestDayCheckin` (sommeil/énergie/douleur seulement, mêmes libellés que
+`DailyExperience`), affiché sous le bloc "Journée de récupération" du
+dashboard (`/dashboard`, déjà l'écran "Aujourd'hui").
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+**Non vérifié** (comme toujours) : rendu visuel réel, ce sandbox n'a
+qu'un navigateur local sans base de données réelle. À tester par
+Anthony : remplir le check-in un jour de repos, vérifier qu'il ne
+réapparaît pas après rechargement (même jour), et que la régularité du
+Score COAI progresse avec.
+
 ## 3 corrections du diagnostic public (19/08/2026, suite)
 
 Retours d'Anthony après test réel : (1) une lumière balayait en continu la
