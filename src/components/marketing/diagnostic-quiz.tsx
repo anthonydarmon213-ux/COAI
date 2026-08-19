@@ -18,6 +18,8 @@ import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { DiagnosticShareButton } from "@/components/marketing/diagnostic-share-button";
 import { FormuleRecommandeeCard } from "@/components/marketing/formule-recommandee-card";
+import { ProjectionEmotionnelleCard } from "@/components/marketing/projection-emotionnelle-card";
+import { construireProjection, EVENEMENTS_DECLENCHEURS } from "@/lib/diagnostic/projection-emotionnelle";
 import { Gauge } from "@/components/ui/gauge";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
@@ -244,6 +246,7 @@ type Step =
   | "histoire"
   | "expertise"
   | "echeance"
+  | "declencheur"
   | "evaluationPhysique"
   | "equipement"
   | "lieu"
@@ -300,6 +303,7 @@ const QUESTION_STEPS: Step[] = [
   "objectif",
   "accompagnement",
   "echeance",
+  "declencheur",
   "equipement",
   "lieu",
   "duree",
@@ -480,6 +484,10 @@ export function DiagnosticQuiz({
   // Anthony) — n'assigne aucun coach réel, sert juste à orienter la formule
   // mise en avant sur l'écran résultat.
   const [coachPreference, setCoachPreference] = useState<"FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL" | null>(null);
+  // Événement émotionnel déclencheur (19/08/2026, demande Anthony — façon
+  // MyFitCoach) : utilisé uniquement pour la projection affichée sur
+  // l'écran de résultat, jamais persisté sur Profile.
+  const [declencheur, setDeclencheur] = useState<string | null>(null);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
@@ -627,6 +635,7 @@ export function DiagnosticQuiz({
       maxDeadlift,
       prioriteTravail,
       echeance,
+      declencheur,
       mobiliteRepere,
       cardioRepere,
       forceRepere,
@@ -683,6 +692,7 @@ export function DiagnosticQuiz({
     maxDeadlift,
     prioriteTravail,
     echeance,
+    declencheur,
     mobiliteRepere,
     cardioRepere,
     forceRepere,
@@ -739,6 +749,7 @@ export function DiagnosticQuiz({
     if (typeof saved.maxDeadlift === "string") setMaxDeadlift(saved.maxDeadlift);
     if (typeof saved.prioriteTravail === "string") setPrioriteTravail(saved.prioriteTravail);
     if (typeof saved.echeance === "string") setEcheance(saved.echeance);
+    if (typeof saved.declencheur === "string") setDeclencheur(saved.declencheur);
     if (typeof saved.mobiliteRepere === "string") setMobiliteRepere(saved.mobiliteRepere);
     if (typeof saved.cardioRepere === "string") setCardioRepere(saved.cardioRepere);
     if (typeof saved.forceRepere === "string") setForceRepere(saved.forceRepere);
@@ -840,6 +851,7 @@ export function DiagnosticQuiz({
     if (step === "objectif") return objectifsPrincipaux.length > 0 || Boolean(objectif);
     if (step === "accompagnement") return true;
     if (step === "echeance") return Boolean(echeance);
+    if (step === "declencheur") return Boolean(declencheur);
     if (step === "evaluationPhysique") return Boolean(mobiliteRepere && cardioRepere && forceRepere && mouvementRepere);
     if (step === "equipement") return equipement.length > 0;
     if (step === "lieu") return Boolean(lieu);
@@ -863,6 +875,7 @@ export function DiagnosticQuiz({
     objectif,
     objectifsPrincipaux,
     echeance,
+    declencheur,
     mobiliteRepere,
     cardioRepere,
     forceRepere,
@@ -920,6 +933,22 @@ export function DiagnosticQuiz({
       santeAutreTexte,
       coachPreference,
     ]
+  );
+
+  // Projection émotionnelle (19/08/2026) : dépend de `diagnostic` (Score
+  // COAI déjà calculé) donc déclarée après lui.
+  const projection = useMemo(
+    () =>
+      diagnostic
+        ? construireProjection({
+            objectif: resolveObjectif(objectif, objectifAutreTexte),
+            poidsKg,
+            echeance,
+            evenement: declencheur,
+            indiceCoaiScore: diagnostic.indiceCoai.score,
+          })
+        : null,
+    [diagnostic, objectif, objectifAutreTexte, poidsKg, echeance, declencheur]
   );
 
   const signauxDiagnostic = useMemo(() => {
@@ -1018,6 +1047,7 @@ export function DiagnosticQuiz({
         sourceDecouverteLibre.trim() ? `a connu COAI via : ${sourceDecouverteLibre.trim()}` : null,
         prioriteTravail.trim() ? `priorité actuelle : ${prioriteTravail.trim()}` : null,
         echeance ? `échéance : ${echeance}` : null,
+        declencheur ? `déclencheur : ${declencheur}` : null,
         personaAutreResolue,
       ].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? resolveAutre(equipement, equipementAutreTexte).join(", ") : undefined,
@@ -1127,6 +1157,7 @@ export function DiagnosticQuiz({
             attentesCoai: attentesCoai.trim(),
             prioriteOptimisation: prioriteOptimisation.trim(),
             echeance,
+            declencheur,
             mobiliteRepere,
             cardioRepere,
             forceRepere,
@@ -1508,6 +1539,19 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {ECHEANCES.map((item) => <OptionCard key={item} label={item} active={echeance === item} onClick={() => setEcheance(item)} />)}
+              </div>
+            </div>
+          )}
+
+          {step === "declencheur" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <p className="coai-consultation-phase">Entretien · Motivation</p>
+                <h2 className="mt-2 font-display text-xl font-semibold text-white">Qu&apos;est-ce qui rend ce moment important pour toi ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">On s&apos;en sert pour te montrer une vraie trajectoire, pas juste des chiffres abstraits.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {EVENEMENTS_DECLENCHEURS.map((item) => <OptionCard key={item} label={item} active={declencheur === item} onClick={() => setDeclencheur(item)} />)}
               </div>
             </div>
           )}
@@ -2083,6 +2127,8 @@ export function DiagnosticQuiz({
                   </p>
                 )}
               </div>
+
+              {projection && <ProjectionEmotionnelleCard projection={projection} />}
 
               <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
