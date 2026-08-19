@@ -1,6 +1,7 @@
 import { JsonView } from "@/components/programme/json-view";
 import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
+import { RepasCard } from "@/components/programme/repas-card";
 
 // Vue dédiée au pilier NUTRITION : mêmes codes visuels que l'entraînement
 // (vue d'ensemble + un jour par carte repliable) pour une lecture cohérente
@@ -18,9 +19,16 @@ type ConseilHabitude = {
 export function NutritionView({
   data,
   showContreIndications = false,
+  photosParExercice,
 }: {
   data: unknown;
   showContreIndications?: boolean;
+  // Photos Pexels (19/08/2026) — clé = photoQuery/photoQueryJour tel que
+  // généré par l'IA, résolues côté serveur (pilier-page.tsx). Nom du prop
+  // partagé avec EntrainementView : même forme de map, réutilisée telle
+  // quelle par RepasCard (photoQuery) et pour la photo d'ambiance du jour
+  // (photoQueryJour) ci-dessous.
+  photosParExercice?: Record<string, string | null>;
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="repas" />;
 
@@ -54,16 +62,26 @@ export function NutritionView({
         jours={Array.isArray(jours) ? jours : []}
         labelJour={(jourData) => String(jourData.jour ?? "")}
         renderContenu={(jourData) => {
-          const { repas } = jourData as { repas?: unknown[] };
+          const { repas, photoQueryJour } = jourData as { repas?: unknown[]; photoQueryJour?: unknown };
+          const photoJourUrl =
+            typeof photoQueryJour === "string" ? photosParExercice?.[photoQueryJour] : null;
+          const hero = photoJourUrl && (
+            // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
+            <img src={photoJourUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
+          );
           if (!Array.isArray(repas) || repas.length === 0) {
-            return <JsonView data={jourData} typeMedia="repas" />;
+            return (
+              <>
+                {hero}
+                <JsonView data={jourData} typeMedia="repas" />
+              </>
+            );
           }
           return (
             <div className="flex flex-col gap-2.5">
+              {hero}
               {repas.map((r, j) => (
-                <div key={j} className="coai-meal-card rounded-xl border border-graphite-800 bg-graphite-950/60 p-4">
-                  <JsonView data={r} typeMedia="repas" />
-                </div>
+                <RepasCard key={j} repas={r} photosParExercice={photosParExercice} />
               ))}
             </div>
           );

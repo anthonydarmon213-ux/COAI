@@ -11,9 +11,11 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 export function RecuperationView({
   data,
   showContreIndications = false,
+  photosParExercice,
 }: {
   data: unknown;
   showContreIndications?: boolean;
+  photosParExercice?: Record<string, string | null>;
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} />;
 
@@ -39,11 +41,17 @@ export function RecuperationView({
           return type ? `${jour} — ${type}` : jour;
         }}
         renderContenu={(jourData) => {
-          const { jour, type, sommeil, ...detailJour } = jourData;
+          const { jour, type, sommeil, photoQueryJour, ...detailJour } = jourData;
           void jour;
           void type;
+          const photoJourUrl =
+            typeof photoQueryJour === "string" ? photosParExercice?.[photoQueryJour] : null;
           return (
             <div className="flex flex-col gap-3">
+              {photoJourUrl && (
+                // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
+                <img src={photoJourUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
+              )}
               {typeof sommeil === "string" && sommeil.trim() && (
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300">🌙 Sommeil</p>

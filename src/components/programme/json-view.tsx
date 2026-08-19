@@ -24,6 +24,12 @@ const KNOWN_LABELS: Record<string, string> = {
   lipides: "Lipides",
 };
 
+// Champs internes générés par l'IA pour résoudre une photo Pexels
+// (pilier-page.tsx) — jamais destinés à un affichage brut clé/valeur, que
+// ce soit ici ou dans un fallback JsonView (JSON mal formé, champs
+// résiduels non destructurés par les vues dédiées).
+const CHAMPS_INTERNES = new Set(["photoQuery", "photoQuerySeance", "photoQueryJour"]);
+
 function humanizeKey(key: string): string {
   if (KNOWN_LABELS[key]) return KNOWN_LABELS[key];
   const spaced = key.replace(/_/g, " ").replace(/([a-z0-9])([A-Z])/g, "$1 $2");
@@ -87,7 +93,9 @@ export function JsonView({
   if (isPlainObject(data)) {
     return (
       <div className="flex flex-col">
-        {Object.entries(data).map(([key, value], i, arr) => {
+        {Object.entries(data)
+          .filter(([key]) => !CHAMPS_INTERNES.has(key))
+          .map(([key, value], i, arr) => {
           const label = humanizeKey(key);
           const isComplex = isPlainObject(value) || Array.isArray(value);
           const isLast = i === arr.length - 1;

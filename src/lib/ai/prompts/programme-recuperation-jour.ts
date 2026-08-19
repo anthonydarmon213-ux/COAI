@@ -26,9 +26,14 @@ ${
 léger optionnel, sommeil, gestion de la fatigue).`
 }
 
-Réponds au format JSON avec : "jour" ("${jour.jour}"), "type" ("${jour.type}"), et pour ce jour
-précis :
+Réponds au format JSON avec : "jour" ("${jour.jour}"), "type" ("${jour.type}"), "photoQueryJour"
+(terme de recherche court EN ANGLAIS pour une photo de stock illustrant l'ambiance récupération de
+CETTE journée — étirements/yoga si jour d'entraînement, repos/sommeil calme si jour de repos, ex:
+"person stretching yoga mat morning", "peaceful bedroom sleep"), et pour ce jour précis :
 - "mobiliteEtirements" : recommandation concrète et courte (ex: durée, zones ciblées)
 - "sommeil" : un conseil concret pour ce jour, adapté à la qualité de sommeil déclarée
-- "gestionFatigue" : un conseil concret pour ce jour (ex: respiration, marche, repos actif)`;
+- "gestionFatigue" : un conseil concret pour ce jour (ex: respiration, marche, repos actif)
+
+IMPORTANT : respecte cet ordre exact des champs : jour, type, photoQueryJour, mobiliteEtirements,
+sommeil, gestionFatigue.`;
 }

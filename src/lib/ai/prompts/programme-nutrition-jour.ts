@@ -27,9 +27,11 @@ Propose des repas variés et réalistes pour ce jour précis (varie les idées d
 l'autre sur la semaine plutôt que de répéter les mêmes plats). Exclus strictement tout aliment lié
 à une allergie/intolérance déclarée ci-dessus — jamais une suggestion "à tester quand même".
 
-Réponds au format JSON avec : "jour" ("${jour.jour}"), et "repas" (tableau, un objet par repas de
-la journée : petit-déjeuner, déjeuner, dîner, et collation(s) si pertinent selon les habitudes
-déclarées).
+Réponds au format JSON avec : "jour" ("${jour.jour}"), "photoQueryJour" (terme de recherche court
+EN ANGLAIS pour une photo de stock illustrant l'ambiance nutrition/healthy food de CETTE journée
+dans son ensemble, ex: "healthy meal prep flatlay", "colorful salad bowl overhead"), et "repas"
+(tableau, un objet par repas de la journée : petit-déjeuner, déjeuner, dîner, et collation(s) si
+pertinent selon les habitudes déclarées).
 Pour CHAQUE repas, inclus obligatoirement :
 - "type" : le moment du repas (ex: "Petit-déjeuner", "Déjeuner", "Dîner", "Collation")
 - "nom" : un nom de plat concret et court (ex: "Bowl poulet-quinoa-avocat"), pas juste une
@@ -37,5 +39,10 @@ Pour CHAQUE repas, inclus obligatoirement :
 - "quantite" : la quantité exacte recommandée pour chaque aliment du plat, chiffrée en grammes
   ou en unité concrète (ex: "150g de blanc de poulet, 100g de riz basmati cuit, 1/2 avocat, 1
   càs d'huile d'olive"). Ne laisse jamais ce champ vague ou absent — toujours des quantités
-  précises, jamais "une portion" ou "au choix".`;
+  précises, jamais "une portion" ou "au choix".
+- "photoQuery" : un terme de recherche court EN ANGLAIS pour une photo de stock de CE plat précis
+  (ex: "chicken quinoa avocado bowl"), jamais une traduction littérale du nom français.
+
+IMPORTANT : respecte cet ordre exact des champs par repas (type, nom, quantite, photoQuery) et au
+niveau du jour (jour, photoQueryJour, repas).`;
 }

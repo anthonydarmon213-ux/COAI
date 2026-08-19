@@ -49,16 +49,23 @@ export function EntrainementView({
           typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`
         }
         renderContenu={(seance) => {
-          const { echauffement, exercices, retourAuCalme, jour, nom, ...detailSeance } = seance as {
+          const { echauffement, exercices, retourAuCalme, jour, nom, photoQuerySeance, ...detailSeance } = seance as {
             echauffement?: string;
             exercices?: unknown[];
             retourAuCalme?: string;
             jour?: string;
             nom?: string;
+            photoQuerySeance?: string;
             [key: string]: unknown;
           };
+          const photoSeanceUrl =
+            typeof photoQuerySeance === "string" ? photosParExercice?.[photoQuerySeance] : null;
           return (
             <>
+              {photoSeanceUrl && (
+                // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
+                <img src={photoSeanceUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
+              )}
               {echauffement && (
                 <div className="coai-session-note rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">

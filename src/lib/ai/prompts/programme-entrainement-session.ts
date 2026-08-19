@@ -46,7 +46,11 @@ Parmi ces exercices, termine la séance par 1 à 2 exercices d'abdominaux/gainag
 en dernière position dans le tableau "exercices" — sauf si la séance cible déjà principalement les
 abdominaux, ou si c'est un jour de sport existant/cardio pur où ça n'a pas de sens.
 
-Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "echauffement"
+Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "photoQuerySeance"
+(terme de recherche court EN ANGLAIS pour une photo de stock illustrant l'ambiance de CETTE séance
+dans son ensemble — une personne athlétique en train de s'entraîner, cohérente avec le focus du
+jour, ex: "woman upper body gym workout", "man leg day squat rack" — distincte des photoQuery par
+exercice ci-dessous, jamais le même texte), "echauffement"
 (obligatoire, en 3 temps avant la charge de travail : (1) quelques minutes de cardio léger pour
 augmenter la température corporelle et le rythme cardiaque, (2) mobilité articulaire ciblée sur
 les zones sollicitées, (3) pour le premier exercice de force, une gamme montante — séries
@@ -69,5 +73,6 @@ Pour CHAQUE exercice, inclus obligatoirement :
 IMPORTANT : respecte cet ordre exact des champs dans le JSON de chaque exercice (nom, series,
 repetitions, repos, charge, methode, photoQuery) — c'est l'ordre d'affichage à l'utilisateur (sauf
 photoQuery, jamais affiché tel quel, utilisé uniquement pour résoudre une photo). Au niveau de la
-séance, respecte aussi cet ordre : jour, nom, echauffement, exercices, retourAuCalme.`;
+séance, respecte aussi cet ordre : jour, nom, photoQuerySeance, echauffement, exercices,
+retourAuCalme.`;
 }

@@ -20,26 +20,32 @@ import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
-// Traverse le JSON du programme ENTRAÎNEMENT (structure non garantie —
-// contenu IA) pour en extraire tous les "photoQuery" déjà générés par
-// l'IA, un par exercice (cf. src/lib/ai/prompts/programme-entrainement-
-// session.ts) — jamais de requête inventée ici, uniquement celles déjà
-// présentes dans le contenu généré.
+// Traverse le JSON d'un programme généré (structure non garantie — contenu
+// IA, différente par pilier) pour en extraire tous les "photoQuery" que
+// l'IA a déjà générés à sa charge (un par exercice/repas, un par séance/
+// jour via "photoQuerySeance"/"photoQueryJour" — cf. les prompts
+// programme-*-session.ts / *-jour.ts) — jamais de requête inventée ici,
+// uniquement celles déjà présentes dans le contenu généré, où qu'elles
+// soient dans l'arborescence.
+const CLES_PHOTO_QUERY = new Set(["photoQuery", "photoQuerySeance", "photoQueryJour"]);
+
 function extractPhotoQueries(contenu: unknown): string[] {
-  if (typeof contenu !== "object" || contenu === null) return [];
-  const seances = (contenu as { seances?: unknown }).seances;
-  if (!Array.isArray(seances)) return [];
   const queries = new Set<string>();
-  for (const seance of seances) {
-    if (typeof seance !== "object" || seance === null) continue;
-    const exercices = (seance as { exercices?: unknown }).exercices;
-    if (!Array.isArray(exercices)) continue;
-    for (const exercice of exercices) {
-      if (typeof exercice !== "object" || exercice === null) continue;
-      const query = (exercice as { photoQuery?: unknown }).photoQuery;
-      if (typeof query === "string" && query.trim()) queries.add(query);
+  function walk(node: unknown) {
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item);
+      return;
+    }
+    if (typeof node !== "object" || node === null) return;
+    for (const [key, value] of Object.entries(node)) {
+      if (CLES_PHOTO_QUERY.has(key) && typeof value === "string" && value.trim()) {
+        queries.add(value);
+      } else {
+        walk(value);
+      }
     }
   }
+  walk(contenu);
   return Array.from(queries);
 }
 
@@ -110,16 +116,15 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
       )
     : null;
 
-  // Photos Pexels par exercice (19/08/2026, demande Anthony) : résolues une
-  // seule fois ici (Server Component, clé jamais exposée au client) à
-  // partir du "photoQuery" que l'IA génère pour chaque exercice — jamais
-  // pour Nutrition/Récupération, qui n'ont pas d'exercices.
-  const entrainementAffiche =
-    pilierActif === "ENTRAINEMENT"
-      ? valides[0] ?? (derniers[0]?.statut === "EN_ATTENTE" || derniers[0]?.statut === "GENERE_IA" ? derniers[0] : null)
-      : null;
-  const photosParExercice = entrainementAffiche
-    ? await getStockPhotos(extractPhotoQueries(entrainementAffiche.contenu))
+  // Photos Pexels (19/08/2026, demande Anthony, étendu aux 3 piliers) :
+  // résolues une seule fois ici (Server Component, clé jamais exposée au
+  // client) à partir des "photoQuery"/"photoQuerySeance"/"photoQueryJour"
+  // que l'IA génère elle-même dans le contenu (cf. extractPhotoQueries).
+  const contenuAffiche =
+    valides[0]?.contenu ??
+    (derniers[0]?.statut === "EN_ATTENTE" || derniers[0]?.statut === "GENERE_IA" ? derniers[0]?.contenu : null);
+  const photosParExercice = contenuAffiche
+    ? await getStockPhotos(extractPhotoQueries(contenuAffiche))
     : undefined;
 
   return (
@@ -255,8 +260,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
                 if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParExercice} />;
-                if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
-                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} />;
+                if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParExercice} />;
+                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParExercice} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
               })()}
 
