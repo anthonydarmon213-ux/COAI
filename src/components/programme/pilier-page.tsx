@@ -209,6 +209,11 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               })()}
 
               {pilier === "NUTRITION" && <FicheMacros />}
+              {pilier === "NUTRITION" && (
+                <Link href="/programme/recettes" className="self-start text-sm font-semibold text-laiton-400 underline">
+                  Voir des idées de recettes →
+                </Link>
+              )}
             </Card>
 
             {affiche?.temporaire && (

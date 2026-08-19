@@ -14,6 +14,7 @@ const NAVIGATION = [
     children: [
       { href: "/programme/entrainement", label: "Entraînement" },
       { href: "/programme/alimentation", label: "Nutrition" },
+      { href: "/programme/recettes", label: "Recettes" },
       { href: "/programme/recuperation", label: "Récupération" },
       { href: "/programme/evolution", label: "Évolution du programme" },
       { href: "/programme/exercices", label: "Catalogue d’exercices" },

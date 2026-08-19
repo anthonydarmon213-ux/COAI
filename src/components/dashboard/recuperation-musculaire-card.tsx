@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
 import { GROUPE_LABEL, GROUPES_MUSCULAIRES, NIVEAU_LABEL } from "@/lib/insight/recuperation-musculaire";
 
 type GroupeMusculaire = (typeof GROUPES_MUSCULAIRES)[number];
@@ -13,13 +12,31 @@ type EtatGroupe = {
   joursDepuis: number | null;
 };
 
+// Ordre du "moins récupéré" au "plus frais" — sert à la fois au menu de
+// sélection et au nombre de crans allumés sur la barre de graduation
+// (coai-muscle-scale), même logique que la jauge conique de
+// ScoreAgeCoaiCard : plus le niveau est bon, plus la barre est remplie.
 const NIVEAU_ORDER: NiveauRecuperationMuscle[] = ["COURBATURES_FORTES", "COURBATURES_LEGERES", "LEGERE_FATIGUE", "FRAIS"];
+
+const NIVEAU_CRANS: Record<NiveauRecuperationMuscle, number> = {
+  COURBATURES_FORTES: 1,
+  COURBATURES_LEGERES: 2,
+  LEGERE_FATIGUE: 3,
+  FRAIS: 4,
+};
 
 const NIVEAU_COULEUR: Record<NiveauRecuperationMuscle, string> = {
   COURBATURES_FORTES: "border-red-500/40 bg-red-500/10 text-red-300",
   COURBATURES_LEGERES: "border-amber-500/40 bg-amber-500/10 text-amber-300",
   LEGERE_FATIGUE: "border-laiton-400/40 bg-laiton-400/10 text-laiton-200",
   FRAIS: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
+};
+
+const NIVEAU_CRAN_COULEUR: Record<NiveauRecuperationMuscle, string> = {
+  COURBATURES_FORTES: "bg-red-400",
+  COURBATURES_LEGERES: "bg-amber-400",
+  LEGERE_FATIGUE: "bg-laiton-300",
+  FRAIS: "bg-emerald-400",
 };
 
 // Carte "Récupération musculaire" (19/08/2026, chantier demandé par
@@ -62,35 +79,59 @@ export function RecuperationMusculaireCard() {
   if (!etat) return null;
 
   return (
-    <Card className="flex flex-col gap-4">
-      <div>
-        <h2 className="text-base font-semibold text-white">Récupération musculaire</h2>
-        <p className="mt-1 text-xs text-graphite-400">Indique comment tu te sens, groupe par groupe. Toi seul(e) connais ton ressenti.</p>
+    <section className="coai-vitality-panel animate-reveal px-5 py-6 sm:px-7">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#c49a52]">Récupération musculaire</p>
       </div>
+      <p className="mt-2 max-w-md text-xs leading-5 text-graphite-400">
+        Indique comment tu te sens, groupe par groupe. Toi seul(e) connais ton ressenti.
+      </p>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {etat.map(({ groupe, dernier, joursDepuis }) => (
-          <button
-            key={groupe}
-            type="button"
-            onClick={() => setGroupeOuvert(groupeOuvert === groupe ? null : groupe)}
-            className={`flex flex-col items-start gap-1 rounded-xl border px-3 py-2.5 text-left transition ${
-              dernier ? NIVEAU_COULEUR[dernier.niveau] : "border-graphite-800 text-graphite-400 hover:text-white"
-            } ${groupeOuvert === groupe ? "ring-1 ring-laiton-400/60" : ""}`}
-          >
-            <span className="text-xs font-semibold">{GROUPE_LABEL[groupe]}</span>
-            <span className="text-[10px] opacity-80">
-              {dernier
-                ? `${NIVEAU_LABEL[dernier.niveau]}${joursDepuis === 0 ? " · aujourd'hui" : joursDepuis === 1 ? " · hier" : ` · il y a ${joursDepuis} j`}`
-                : "Non renseigné"}
-            </span>
-          </button>
-        ))}
+      <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        {etat.map(({ groupe, dernier, joursDepuis }) => {
+          const crans = dernier ? NIVEAU_CRANS[dernier.niveau] : 0;
+          const misAJourAujourdhui = joursDepuis === 0;
+          return (
+            <button
+              key={groupe}
+              type="button"
+              onClick={() => setGroupeOuvert(groupeOuvert === groupe ? null : groupe)}
+              className={`relative flex flex-col items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-left transition hover:border-white/20 hover:bg-white/[0.07] ${
+                groupeOuvert === groupe ? "ring-1 ring-laiton-300/60" : ""
+              }`}
+            >
+              {misAJourAujourdhui && (
+                <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 animate-status-pulse rounded-full bg-emerald-400" aria-hidden="true" />
+              )}
+              <span className="text-xs font-semibold text-[#fffdf8]">{GROUPE_LABEL[groupe]}</span>
+              {/* Barre de graduation façon "signal" (19/08/2026, direction Whoop) :
+                  4 crans, remplis de gauche à droite selon le niveau déclaré,
+                  tous dans la même couleur que le niveau (pas un dégradé
+                  arbitraire multi-teinte — un seul état à la fois, jamais deux
+                  informations mélangées sur la même barre). */}
+              <span className="flex gap-1" aria-hidden="true">
+                {[0, 1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 w-3.5 rounded-full transition-colors ${
+                      dernier && i < crans ? NIVEAU_CRAN_COULEUR[dernier.niveau] : "bg-white/10"
+                    }`}
+                  />
+                ))}
+              </span>
+              <span className="text-[10px] text-graphite-400">
+                {dernier
+                  ? `${NIVEAU_LABEL[dernier.niveau]}${misAJourAujourdhui ? " · aujourd'hui" : joursDepuis === 1 ? " · hier" : ` · il y a ${joursDepuis} j`}`
+                  : "Non renseigné"}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {groupeOuvert && (
-        <div className="flex flex-col gap-2 rounded-xl border border-graphite-800 bg-white/[0.02] p-3">
-          <span className="text-xs text-graphite-400">Ton ressenti pour {GROUPE_LABEL[groupeOuvert].toLowerCase()} aujourd&apos;hui :</span>
+        <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3.5">
+          <span className="text-xs text-graphite-300">Ton ressenti pour {GROUPE_LABEL[groupeOuvert].toLowerCase()} aujourd&apos;hui :</span>
           <div className="flex flex-wrap gap-2">
             {NIVEAU_ORDER.map((niveau) => (
               <button
@@ -107,6 +148,6 @@ export function RecuperationMusculaireCard() {
           <p className="text-[11px] text-graphite-500">Ce n&apos;est pas une consigne médicale, juste un repère pour doser ta prochaine séance.</p>
         </div>
       )}
-    </Card>
+    </section>
   );
 }

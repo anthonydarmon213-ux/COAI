@@ -11,7 +11,7 @@ import { AGE_COAI_DISCLAIMER } from "@/lib/insight/age-coai";
 export function ScoreAgeCoaiCard({ resultat }: { resultat: AgeCoaiResultat }) {
   if (!resultat.disponible) {
     return (
-      <section className="coai-vitality-panel px-6 py-7 sm:px-8" aria-labelledby="vitality-title">
+      <section className="coai-vitality-panel animate-reveal px-6 py-7 sm:px-8" aria-labelledby="vitality-title">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#c49a52]">Score & Âge COAI</p>
         <h2 id="vitality-title" className="mt-2 font-editorial text-2xl sm:text-3xl">
           {resultat.raison === "AGE_MANQUANT"
@@ -40,7 +40,7 @@ export function ScoreAgeCoaiCard({ resultat }: { resultat: AgeCoaiResultat }) {
         : "aligné sur ton âge réel";
 
   return (
-    <section className="coai-vitality-panel px-6 py-7 sm:px-8" aria-labelledby="vitality-title">
+    <section className="coai-vitality-panel animate-reveal px-6 py-7 sm:px-8" aria-labelledby="vitality-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#c49a52]">Score & Âge COAI</p>
         <span className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-graphite-300">

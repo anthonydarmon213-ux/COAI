@@ -4,6 +4,76 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Direction "wow" façon Apple Watch/Whoop + recettes + blocage images IA (19/08/2026, suite)
+
+Après le lot de 5 chantiers de patches (section suivante), Anthony a demandé
+d'aller plus loin dans le style Whoop repéré sur les captures qu'il a
+envoyées, puis a élargi : « il faut beaucoup plus d'images, d'animation, de
+vidéos... innovant, tech... des belles images de nutrition, de corps
+athlétiques... yoga pour la récupération » et enfin une direction produit à
+trois piliers : **MyFitnessCoach** pour la structure programme/exercices,
+**Whoop** pour le tracking métriques/scores, **partage viral** (défier ses
+amis sur le Score & Âge COAI) — avec un niveau de finition visé « à la Apple
+Watch ».
+
+**Blocage réel identifié et communiqué à Anthony** : ce sandbox n'a aucun
+outil de génération d'images IA (pas de DALL-E/Midjourney/Stable Diffusion
+connecté) et aucun accès réseau sortant vers des banques d'images
+(Pexels/Unsplash bloqués par la politique du proxy — vérifié, pas
+contournable). Anthony a tranché : banque de photos sous licence (Pexels,
+licence commerciale libre, aucune attribution requise) plutôt qu'une clé de
+génération IA. Il doit créer une clé gratuite sur pexels.com/api et la
+donner — **en attente**, rien n'est encore branché en conditions réelles.
+
+**Ce qui est fait dès maintenant, sans dépendre de la clé** :
+- **`RecuperationMusculaireCard` repensée** dans le même langage visuel que
+  `ScoreAgeCoaiCard` (patch 2) : panneau sombre `coai-vitality-panel`
+  (déjà existant, réutilisé pour cohérence plutôt que dupliqué), barre de
+  graduation à 4 crans par groupe musculaire (façon jauge Whoop, une seule
+  couleur par état plutôt qu'un dégradé multi-teinte trompeur), pastille
+  `animate-status-pulse` sur un groupe mis à jour le jour même.
+- **`ScoreAgeCoaiCard`** : `animate-reveal` ajouté (oubli du patch d'origine)
+  pour une entrée cohérente avec le reste du dashboard.
+- **Infrastructure Pexels prête, code écrit d'avance** (`src/lib/media/
+  pexels.ts`, `getStockPhoto`/`getStockPhotos`) : appel côté serveur
+  uniquement (clé jamais exposée au client), cache mémoire par requête,
+  retombe toujours sur `null` si la clé est absente ou l'appel échoue —
+  jamais d'image cassée. Le vrai appel réseau se fera depuis Vercel en
+  production (accès réseau réel), jamais testable depuis ce sandbox — même
+  limite que Stripe/Supabase.
+- **Bibliothèque de recettes** (`/programme/recettes`, nouveau lien de nav
+  sous "Mon programme") : 10 recettes rédigées ici (petit-déj/déjeuner/
+  dîner/collation, tags objectif perte de poids/prise de masse/équilibre et
+  régime végétarien/sans gluten/anti-inflammatoire — cohérent avec le
+  travail cycle/allergies du 14/08), macros indicatives par portion,
+  ingrédients/étapes dans un `<details>` natif. Distincte du plan nutrition
+  généré par l'IA (`NutritionView`) — une bibliothèque commune, pas une
+  personnalisation par profil. Chaque carte (`RecetteCard`) affiche la
+  photo Pexels (ou aucune si absente) avec dégradé sombre, filtrable par
+  repas/objectif/régime (`RecettesGrid`, 100% client, zéro appel réseau
+  supplémentaire au changement de filtre — toutes les photos déjà résolues
+  côté serveur en une fois).
+
+**Vérifié** : `tsc --noEmit` et `next build` réels, propres — la route
+`/programme/recettes` compile et apparaît dans le build. Protection d'accès
+confirmée par lecture de `middleware.ts` (`/programme/:path*` déjà dans le
+matcher, pas de nouvelle règle nécessaire).
+
+**Reste à faire** :
+- Anthony : créer la clé Pexels, l'ajouter sur Vercel (`PEXELS_API_KEY`,
+  déjà documentée dans `.env.example`) — les photos de recettes
+  n'apparaîtront qu'après ça.
+- Claude, une fois validé par Anthony : étendre le même traitement visuel
+  (panneaux sombres façon Whoop, animations d'entrée) au reste des pages
+  programme/nutrition/récupération plutôt que seulement les 2 cartes déjà
+  faites ; construire le "défi Score & Âge COAI" entre amis en réutilisant
+  l'infra de partage déjà existante (Phase 9, cartes `next/og`, liens de
+  parrainage) — pas encore démarré, périmètre à confirmer avec Anthony
+  avant de coder (quel visuel de carte, quel mécanisme de défi).
+- Non testable depuis ce sandbox (comme toujours) : rendu réel des photos
+  Pexels une fois la clé posée, et le vrai rendu visuel en production —
+  Anthony à vérifier après déploiement.
+
 ## Les 4 autres chantiers : respire, Score & Âge COAI, catalogue d'exercices, récupération musculaire, Entreprise (19/08/2026, suite)
 
 Après le chantier 1 (révélation en plusieurs écrans, section ci-dessous),
