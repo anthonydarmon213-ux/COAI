@@ -104,12 +104,14 @@ export async function POST(request: Request) {
     typeof reponsesLead.forceRepere === "string" ? `Force : ${reponsesLead.forceRepere}` : null,
     typeof reponsesLead.mouvementRepere === "string" ? `Mouvement : ${reponsesLead.mouvementRepere}` : null,
   ].filter(Boolean).join(" · ") || "Non renseignée";
-  const coachPreference = reponsesLead.coachPreference;
-  const offreRecommandee = coachPreference === "VIP_PRESENTIEL"
-    ? "VIP — coaching privé en présentiel"
-    : coachPreference === "HYBRIDE"
-      ? "Transformation — IA 24/7 + regard humain"
-      : "Impulsion — Personal Trainer IA 24/7";
+  // Recommandation calculée par le même moteur que celui affiché au prospect
+  // (diagnostic.recommandation, cf. buildMiniDiagnostic ci-dessus) — jamais
+  // une seconde règle divergente ici (avant le 19/08/2026, cette route
+  // recalculait sa propre heuristique simplifiée à partir du seul
+  // coachPreference, sans tenir compte de la contrainte santé ni du niveau).
+  const offreRecommandee = diagnostic
+    ? `${diagnostic.recommandation.label} — ${diagnostic.recommandation.raison}`
+    : "Impulsion — Personal Trainer IA 24/7";
 
   const notifText = [
     `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`,

@@ -17,6 +17,7 @@ import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { DiagnosticShareButton } from "@/components/marketing/diagnostic-share-button";
+import { FormuleRecommandeeCard } from "@/components/marketing/formule-recommandee-card";
 import { Gauge } from "@/components/ui/gauge";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
@@ -899,6 +900,7 @@ export function DiagnosticQuiz({
         habitudesAlimentaires,
         qualiteSommeil,
         sante: resolveAutre(sante, santeAutreTexte),
+        coachPreference,
       }),
     [
       persona,
@@ -916,6 +918,7 @@ export function DiagnosticQuiz({
       qualiteSommeil,
       sante,
       santeAutreTexte,
+      coachPreference,
     ]
   );
 
@@ -2183,7 +2186,7 @@ export function DiagnosticQuiz({
                   <SectionLabel>Aperçu de ton programme</SectionLabel>
                   <p className="mt-2 text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
                 </div>
-                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   <VoletCard label="Entraînement">
                     {diagnostic.split && <p>{diagnostic.split}</p>}
                     <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
@@ -2196,6 +2199,8 @@ export function DiagnosticQuiz({
                   {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
 
                   {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
+
+                  {diagnostic.hydratation && <VoletCard label="Hydratation">{diagnostic.hydratation}</VoletCard>}
                 </div>
                 <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
@@ -2260,6 +2265,8 @@ export function DiagnosticQuiz({
                   </p>
                 </div>
               </div>
+
+              <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
 
               {connecte ? (
                 // Parcours D (Phase 5B, 11/08/2026) : déjà abonné, aucune
@@ -2343,7 +2350,7 @@ export function DiagnosticQuiz({
                 // sont mémorisées (pont pré-inscription existant) et
                 // appliquées automatiquement à son profil dès la création du
                 // compte, exactement comme avant.
-                <div className="relative mt-4 flex w-full flex-col items-center gap-4 overflow-hidden rounded-[1.6rem] border-2 border-laiton-400/55 bg-[linear-gradient(145deg,rgba(239,217,173,.22),rgba(255,255,255,.88))] px-5 py-8 text-center shadow-[0_24px_70px_-24px_rgba(143,103,43,.65)] sm:px-8 sm:py-10">
+                <div className="relative mt-4 flex w-full flex-col items-center gap-4 overflow-hidden rounded-[1.6rem] border-2 border-laiton-400/45 bg-[radial-gradient(circle_at_50%_0%,rgba(201,162,98,.16),transparent_20rem),#111518] px-5 py-8 text-center shadow-[0_24px_70px_-24px_rgba(0,0,0,.9)] sm:px-8 sm:py-10">
                   <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-laiton-300 via-laiton-500 to-acier-400" aria-hidden="true" />
                   <div className="coai-diagnostic-kicker">
                     <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
@@ -2354,7 +2361,7 @@ export function DiagnosticQuiz({
                     Retrouve ton diagnostic dans ton tableau de bord et découvre ton futur
                     accompagnement gratuitement. Aucun paiement n&apos;est demandé pour entrer.
                   </p>
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-700">Clique ci-dessous pour continuer</span>
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-300">Clique ci-dessous pour continuer</span>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="w-full max-w-md">
                     <Button className="coai-rainbow-cta w-full border-0 px-6 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-16px_rgba(201,162,98,.9)] sm:text-lg">
                       Créer mon espace personnalisé →

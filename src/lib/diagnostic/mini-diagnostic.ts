@@ -26,6 +26,10 @@ export type ReponsesDiagnostic = {
   habitudesAlimentaires?: string | null;
   qualiteSommeil?: string | null;
   sante?: string[];
+  // Choix de coach fait à l'étape "coach" du quiz (16/08/2026, modèle Future)
+  // — utilisé uniquement pour la recommandation de formule ci-dessous,
+  // jamais pour affecter un coach humain réel.
+  coachPreference?: "FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL" | null;
 };
 
 const EXEMPLES_DEFAUT = ["pompes", "squats au poids du corps", "gainage"];
@@ -88,6 +92,19 @@ export const NUTRITION_TIPS: Record<string, string> = {
     "Un vrai programme s'appuierait sur ce suivi plutôt que de le dupliquer.",
 };
 
+// Repère générique d'hydratation par fréquence d'entraînement (pas une
+// mesure personnalisée — même principe que SERIES_PAR_NIVEAU : une règle
+// standard de nutrition sportive, jamais un chiffre inventé pour cette
+// personne précise).
+export const HYDRATATION_TIPS: Record<string, string> = {
+  "1 fois par semaine": "1,5 à 2L d'eau par jour suffisent en général — un peu plus autour de ta séance.",
+  "2 fois par semaine": "Vise 2L d'eau par jour, et un peu plus les jours d'entraînement.",
+  "3 fois par semaine": "À ce rythme, 2 à 2,5L par jour t'aident à mieux récupérer entre les séances.",
+  "4 fois par semaine": "2 à 2,5L par jour, avec une attention particulière avant et après chaque séance.",
+  "5 fois par semaine": "2,5L par jour minimum à ce volume d'entraînement, réparti sur la journée plutôt qu'en une fois.",
+  "6 fois ou plus par semaine": "2,5 à 3L par jour à ce rythme — même une légère déshydratation dégrade vite la performance et la récupération.",
+};
+
 export const SOMMEIL_TIPS: Record<string, string> = {
   "Mauvaise (moins de 5h, sommeil agité)":
     "En dessous de 5h, la récupération musculaire — et la capacité à bien manger — en pâtissent : c'est souvent plus limitant que l'entraînement lui-même.",
@@ -118,7 +135,8 @@ export type MiniDiagnostic = {
   exercices: string[];
   nutrition: string | null;
   recuperation: string | null;
-  recommandation: { plan: "GRATUIT" | "STANDARD"; label: string; raison: string };
+  hydratation: string | null;
+  recommandation: { service: "IMPULSION" | "TRANSFORMATION" | "VIP"; label: string; raison: string };
   profil: ProfilStructure;
   profilParagraphe: string;
   pitchEvolution: string;
@@ -311,6 +329,70 @@ function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   return { score, niveau, actions: actions.slice(0, 3) };
 }
 
+// Recommandation de formule (19/08/2026, demande Anthony : "proposer une
+// solution au prospect... en passant par les plusieurs formules si
+// besoin") — miroir du moteur post-inscription (detecterBesoins,
+// src/lib/dashboard/besoins-identifies.ts) mais appliqué aux réponses
+// brutes du quiz public, avant tout compte créé. Une seule formule choisie
+// (pas une liste), par ordre de priorité :
+// 1. Choix explicite "VIP présentiel/visio" à l'étape coach — priorité
+//    absolue, c'est le signal le plus direct qu'on puisse avoir.
+// 2. Contrainte de santé signalée — garde-fou sécurité qui prime sur
+//    n'importe quel choix initial, jamais un accompagnement 100% IA seul
+//    face à une contrainte physique réelle.
+// 3. Choix explicite "hybride" à l'étape coach.
+// 4. Niveau avancé + objectif de force/performance — optimisation fine,
+//    VIP même si "full IA" avait été coché par défaut.
+// 5. Plateau de progression qui dure (persona) — un suivi humain casse
+//    souvent un plateau mieux qu'un simple nouveau programme.
+// 6. Par défaut : Impulsion, le point de départ recommandé.
+function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnostic["recommandation"] {
+  const persona = r.persona ?? [];
+  const avanceExigeant = r.niveau === "Avancé" && /force|performance/i.test(r.objectif ?? "");
+  const plateau = persona.includes("Même programme depuis des années, sans résultat");
+
+  if (r.coachPreference === "VIP_PRESENTIEL") {
+    return {
+      service: "VIP",
+      label: "VIP",
+      raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, en présentiel à Paris centre ou en visio.",
+    };
+  }
+  if (sante.length > 0) {
+    return {
+      service: "TRANSFORMATION",
+      label: "Transformation",
+      raison: "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant.",
+    };
+  }
+  if (r.coachPreference === "HYBRIDE") {
+    return {
+      service: "TRANSFORMATION",
+      label: "Transformation",
+      raison: "Tu as choisi de combiner la disponibilité de l'IA et le regard d'un coach humain.",
+    };
+  }
+  if (avanceExigeant) {
+    return {
+      service: "VIP",
+      label: "VIP",
+      raison: "Ton niveau et ton objectif de performance justifient un accompagnement 1-to-1, pas juste un programme à suivre seul.",
+    };
+  }
+  if (plateau) {
+    return {
+      service: "TRANSFORMATION",
+      label: "Transformation",
+      raison: "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
+    };
+  }
+  return {
+    service: "IMPULSION",
+    label: "Impulsion",
+    raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
+  };
+}
+
 export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | null {
   const { niveau, objectif, equipement = [], frequence, persona = [], sante: santeBrute = [] } = r;
   if (!niveau || !objectif || equipement.length === 0 || !frequence) return null;
@@ -319,22 +401,6 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
   const premierEquipement = equipement[0] ?? "Aucun matériel";
   const exemples = exemplesPour(premierEquipement);
   const series = SERIES_PAR_NIVEAU[niveau] ?? SERIES_PAR_NIVEAU.Débutant;
-
-  const aBesoinDeSuivi = sante.length > 0 || persona.includes("Même programme depuis des années, sans résultat");
-  const recommandation = aBesoinDeSuivi
-    ? {
-        plan: "STANDARD" as const,
-        label: "Transformation",
-        raison:
-          sante.length > 0
-            ? "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant."
-            : "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
-      }
-    : {
-        plan: "GRATUIT" as const,
-        label: "Impulsion",
-        raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
-      };
 
   const profil = calculerProfilStructure(r, sante);
 
@@ -348,7 +414,8 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
     exercices: exemples.map((nom) => `${nom} — ${series}`),
     nutrition: r.habitudesAlimentaires ? NUTRITION_TIPS[r.habitudesAlimentaires] ?? null : null,
     recuperation: r.qualiteSommeil ? SOMMEIL_TIPS[r.qualiteSommeil] ?? null : null,
-    recommandation,
+    hydratation: HYDRATATION_TIPS[frequence] ?? null,
+    recommandation: recommanderFormule(r, sante),
     profil,
     profilParagraphe: construireProfilParagraphe(r, profil),
     pitchEvolution: PITCH_EVOLUTION,
@@ -389,6 +456,7 @@ export function miniDiagnosticEnTexte(
   );
   if (d.nutrition) lignes.push("", "NUTRITION", d.nutrition);
   if (d.recuperation) lignes.push("", "RÉCUPÉRATION", d.recuperation);
+  if (d.hydratation) lignes.push("", "HYDRATATION", d.hydratation);
   lignes.push("", RESULTATS_TIMELINE);
   lignes.push(
     "",
@@ -399,9 +467,15 @@ export function miniDiagnosticEnTexte(
     "",
     cta
       ? `${cta.label} : ${appUrl}${cta.href}`
-      : `Pour aller plus loin : ${appUrl}/sign-up${d.recommandation.plan === "STANDARD" ? "?plan=STANDARD" : ""}`,
+      : `Pour aller plus loin : ${appUrl}/sign-up${PLAN_PARAM_PAR_SERVICE[d.recommandation.service]}`,
     "",
     "Cette expérience t'a plu ? Parles-en à quelqu'un qui a besoin de s'y mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage."
   );
   return lignes.join("\n");
 }
+
+const PLAN_PARAM_PAR_SERVICE: Record<MiniDiagnostic["recommandation"]["service"], string> = {
+  IMPULSION: "",
+  TRANSFORMATION: "?plan=STANDARD",
+  VIP: "?plan=PREMIUM",
+};
