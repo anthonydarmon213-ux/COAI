@@ -27,7 +27,25 @@ export default function EntreprisePage() {
             <SectionLabel>COAI Entreprise</SectionLabel>
             <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-6xl">Des équipes en meilleure forme. Une entreprise plus performante.</h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-graphite-300">COAI personnalise l&apos;entraînement, la nutrition et la récupération de chaque collaborateur, tout en donnant à l&apos;entreprise une vision claire de l&apos;engagement — jamais des données de santé individuelles.</p>
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+
+            <div className="mt-10 rounded-2xl border border-white/[0.09] bg-white/[0.035] p-6 sm:p-7">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Pour vous, dirigeant(e)</p>
+              <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">Commencez dès aujourd&apos;hui, sans attendre le déploiement de l&apos;offre équipe.</h2>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">
+                Avant de penser à vos équipes, prenez soin de vous : l&apos;abonnement individuel COAI est accessible
+                immédiatement, en libre-service, avec le même diagnostic et le même moteur d&apos;adaptation que le
+                dispositif entreprise.
+              </p>
+              <Link
+                href="/diagnostic"
+                className="mt-5 inline-flex min-h-12 items-center rounded-full bg-laiton-400 px-6 text-sm font-semibold text-graphite-950 transition hover:bg-laiton-300"
+              >
+                Faire mon diagnostic offert →
+              </Link>
+            </div>
+
+            <p className="mt-12 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Pour vos collaborateurs — sur devis</p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {[
                 ["Pilote", "Un groupe restreint pour valider l'adoption."],
                 ["Déploiement", "Un parcours personnalisé par collaborateur."],
