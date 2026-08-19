@@ -4,6 +4,46 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Offre "membre fondateur" — Impulsion 49€/mois bloqué à vie (19/08/2026, suite)
+
+Suite de l'audit conversion : Anthony a tranché "impulsion 49 euros a
+vie" puis confirmé l'intention ("faisons une belle promotion pour avoir
+des premiers abonnements et des premiers testeurs, il nous faut
+vraiment de la data et des retours clients").
+
+**Constat avant de coder** : Impulsion est déjà à 49€/mois — aucun
+changement de prix Stripe nécessaire. Un Price Stripe est immuable :
+tout abonné actuel garde déjà nativement son prix, même si Anthony
+augmente le tarif plus tard (en créant un nouveau Price pour les
+nouveaux abonnés plutôt qu'en modifiant celui-ci, techniquement
+impossible de toute façon). Le "blocage à vie" n'a donc rien demandé de
+neuf côté paiement — uniquement une mise en avant marketing avec un
+vrai compteur, jamais un chiffre inventé pour créer une fausse urgence.
+
+**Nouveau moteur** (`src/lib/pricing/membre-fondateur.ts`) : compte réel
+des abonnements Impulsion déjà souscrits (`Subscription.count`, plan
+GRATUIT), plafonné à 100 places. Route publique `GET /api/membres-
+fondateurs` (aucune auth requise, info marketing), consommée par le
+nouveau `MembreFondateurBadge` (client, n'affiche rien tant que le
+compte n'est pas connu, et rien du tout une fois les 100 places prises
+— jamais un compteur figé à zéro qui resterait affiché indéfiniment).
+
+**Nouveau champ `Tier.founderOffer`** (`tiers.ts`), posé uniquement sur
+Impulsion, affiché aux 3 points d'achat existants sans dupliquer la
+logique : `/pricing`, `ServiceDetailModal` (paywall plein écran) et
+`FormuleRecommandeeCard` (résultat du diagnostic public).
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels,
+propres. **Non vérifié cette fois** (au-delà des limites habituelles de
+ce sandbox) : le rendu visuel réel du badge — plusieurs tentatives de
+vérification par navigateur local ont échoué à cause d'un serveur de
+dev instable (désynchronisation de cache Next.js après plusieurs
+redémarrages rapprochés), pas un signal de bug dans le code lui-même
+(logique relue à la main, `tsc`/`build`/`eslint` propres). À vérifier
+par Anthony en conditions réelles : le badge apparaît bien sur les 3
+emplacements et affiche un compte cohérent avec le nombre réel
+d'abonnés Impulsion.
+
 ## Audit conversion + 5 pages SEO, suite à un brief acquisition (19/08/2026, suite)
 
 Anthony a demandé "je veux des visiteurs qui fassent notre bilan et des
