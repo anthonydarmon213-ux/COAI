@@ -16,6 +16,8 @@ import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
+import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
+import { calculerAgeCoai } from "@/lib/insight/age-coai";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -60,7 +62,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight] = await Promise.all([
+  const [validated, latest, daily, insight, diesRecents] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -71,7 +73,15 @@ export default async function DashboardPage() {
     }),
     prisma.dailySession.findUnique({ where: { userId_date: { userId: user.id, date } } }),
     getCoaiInsight(user.id),
+    // Fenêtre de 90 jours pour le Score & Âge COAI (19/08/2026) — assez
+    // large pour ne pas dépendre d'une série sans trou, sans remonter à
+    // des habitudes trop anciennes pour rester représentatif.
+    prisma.dailySession.findMany({
+      where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
+      select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
+    }),
   ]);
+  const ageCoai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies: diesRecents });
 
   const programme = validated ?? latest;
   const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
@@ -112,6 +122,8 @@ export default async function DashboardPage() {
           </a>
         )}
       </header>
+
+      <ScoreAgeCoaiCard resultat={ageCoai} />
 
       <section className="coai-intelligence-panel relative overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/35 px-6 py-6 text-white shadow-[0_28px_80px_-44px_rgba(76,201,240,.65)] sm:px-8" aria-labelledby="coai-intelligence-title">
         <div className="relative grid gap-6 lg:grid-cols-[1.25fr_.75fr] lg:items-center">

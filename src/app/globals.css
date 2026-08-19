@@ -366,6 +366,44 @@ body {
   .coai-index-ring { animation: none; }
 }
 
+/* Score & Âge COAI façon Whoop (19/08/2026) — panneau sombre cohérent avec
+   .coai-intelligence-panel, deux anneaux clairs sur fond quasi noir. */
+.coai-vitality-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(76,201,240,.2);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(196,154,82,.16), transparent 18rem),
+    radial-gradient(circle at 4% 100%, rgba(76,201,240,.14), transparent 20rem),
+    #111518;
+  box-shadow: 0 28px 80px -44px rgba(0,0,0,.65);
+  color: #fff;
+}
+.coai-vitality-ring {
+  --coai-vitality-value: 180deg;
+  display: grid;
+  width: 8.5rem;
+  height: 8.5rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  background: conic-gradient(#c49a52 0 var(--coai-vitality-value), rgba(255,255,255,.1) var(--coai-vitality-value) 360deg);
+  padding: .42rem;
+  animation: coai-index-arrival .9s cubic-bezier(.2,.85,.25,1) both;
+}
+.coai-vitality-ring::before { content: ""; grid-area: 1/1; width: 100%; height: 100%; border-radius: inherit; background: #171b1d; }
+.coai-vitality-ring > div { z-index: 1; grid-area: 1/1; display: flex; flex-direction: column; align-items: center; }
+.coai-vitality-ring strong { font-family: var(--font-display), serif; font-size: 2.3rem; line-height: 1; color: #fffdf8; }
+.coai-vitality-ring span { margin-top: .2rem; color: #9aa3a1; font-size: .62rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) {
+  .coai-vitality-ring { animation: none; }
+}
+@media (max-width: 640px) {
+  .coai-vitality-ring { width: 7rem; height: 7rem; }
+  .coai-vitality-ring strong { font-size: 1.9rem; }
+}
+
 .coai-result-hero {
   position: relative;
   overflow: hidden;
