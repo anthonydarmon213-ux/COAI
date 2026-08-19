@@ -4,6 +4,50 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Photo hero par jour + refonte visuelle nutrition, sur les 3 piliers (19/08/2026, suite)
+
+Suite directe de l'ajout des photos Pexels par exercice. Question
+exploratoire posée à Anthony ("est-ce qu'on peut améliorer encore notre
+programme, les rendre plus attractifs?") — proposé une photo "hero" en
+tête de chaque séance/jour plutôt qu'un nouveau chantier au hasard.
+Anthony a validé puis étendu deux fois pendant que je codais : "idem sur
+la récup et l'alimentation", puis "améliore la mise en page aussi".
+
+**Photo hero par jour, sur les 3 piliers** : chaque séance/jour généré
+a désormais sa propre photo d'ambiance en tête de contenu —
+`photoQuerySeance` (entraînement) / `photoQueryJour` (nutrition,
+récupération), un champ de plus généré par l'IA elle-même dans le même
+appel JSON que le reste (aucun appel IA supplémentaire), distinct des
+photos par exercice/repas déjà en place. `pilier-page.tsx` : la
+résolution Pexels (jusque-là câblée uniquement pour l'entraînement) est
+généralisée aux 3 piliers via un extracteur générique qui parcourt tout
+le JSON du programme à la recherche des clés `photoQuery`/
+`photoQuerySeance`/`photoQueryJour`, plutôt qu'un extracteur par pilier
+— même garde-fou partout (clé absente/échec Pexels → aucune image,
+jamais de photo cassée ni inventée).
+
+**Refonte visuelle nutrition** ("améliore la mise en page") : chaque
+repas généré avait son propre `photoQuery` déjà prévu pour ce chantier,
+mais restait affiché via `JsonView` — un dump clé/valeur générique,
+nettement moins soigné que les exercices (`ExerciceCard`, avec photo/
+readout, depuis un chantier précédent). Nouvelle `RepasCard` (même
+langage visuel qu'`ExerciceCard` : photo, type de repas, nom, quantité)
+qui remplace ce dump pour chaque repas.
+
+**Garde-fou d'affichage** : les 3 clés internes (`photoQuery`/
+`photoQuerySeance`/`photoQueryJour`) sont désormais explicitement
+exclues de tout affichage brut clé/valeur dans `JsonView` — déjà
+destructurées hors des vues dédiées (Entraînement/Nutrition/
+Récupération), ce filtre est un filet de sécurité pour les cas de repli
+(JSON mal formé, champs résiduels non couverts).
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels sur
+les fichiers touchés, propres. **Non vérifié** (comme toujours) : rendu
+visuel réel — mêmes limites que l'ajout des photos par exercice, et même
+mise en garde : uniquement les **nouveaux** programmes générés après ce
+déploiement auront ces photos (les programmes déjà en base sont figés
+sans ces champs).
+
 ## Photos Pexels sur les exercices du programme généré (19/08/2026, suite)
 
 Suite directe du retour "je ne vois pas les photos et vidéos dans les
