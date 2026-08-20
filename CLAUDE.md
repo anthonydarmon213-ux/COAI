@@ -4,6 +4,41 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Hero de la homepage recentré sur "Ton programme évolue avec toi" (20/08/2026)
+
+Anthony a formalisé une liste de points forts COAI (coach quotidien
+"Aujourd'hui", séance adaptée au jour J, IA explicable, coach IA pendant la
+séance, validation humaine selon la formule...) et une formule de
+positionnement : « COAI est le coaching qui évolue avec toi : l'IA
+personnalise ton accompagnement au quotidien, avec l'humain disponible
+quand tu en as besoin. » Question posée sur ce qu'il voulait en faire —
+sans réponse ("dismissed") — puis question directe d'Anthony sur le
+contenu actuel du hero, qui a révélé un vrai décalage : le hero
+(`CoaiIntro`) menait encore avec "Le premier studio de Personal Training
+augmenté" (positionnement protocole/produit), alors que la promesse
+"Ton programme évolue avec toi" n'apparaissait que plus bas sur la page.
+Anthony a validé la réécriture du hero pour refléter ce nouveau
+positionnement.
+
+`src/components/marketing/coai-intro.tsx` : titre devient "Ton programme
+évolue avec toi.", sous-titre reprend directement la formule d'Anthony
+(IA qui personnalise au quotidien entraînement/nutrition/récupération,
+ajustée au sommeil/énergie/temps disponible ; humain disponible en
+soutien). Les 4 bullets remplacés pour porter les points forts les plus
+distinctifs de sa liste plutôt que des bénéfices génériques déjà redondants
+avec le sous-titre : coach quotidien "Aujourd'hui", IA explicable, Coach IA
+disponible pendant la séance, validation humaine selon la formule. Kicker
+crédibilité (17 ans d'expérience), CTA et micro-copy inchangés — seuls le
+titre/sous-titre/bullets ont changé, scope volontairement limité à ce que
+Anthony a validé (pas touché aux autres taglines du site — "Personal
+Training, Reimagined" dans la nav/pricing/meta description — qui sont des
+éléments de marque distincts, pas le hero lui-même).
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+Playwright réel (navigateur local, serveur de dev local) en 390px et
+1440px : aucun débordement, texte lisible, mise en page intacte des deux
+côtés. Reste à confirmer par Anthony sur le site déployé.
+
 ## Bug visuel homepage — titre chevauchant la photo sur mobile (19/08/2026, suite)
 
 Anthony a envoyé une capture réelle de coai.fr mobile avec « Arrange ça ! » —

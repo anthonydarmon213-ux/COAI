@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const BENEFICES = [
-  "Ton Score COAI : un repère concret pour mesurer ta progression",
-  "Un check-in rapide avant chaque séance",
-  "Une séance ajustée à ton temps, ta forme et tes douleurs",
-  "L'IA disponible 24h/24, l'humain pour les décisions qui comptent",
+  "Le coach quotidien « Aujourd'hui » : tu sais quoi faire, sans chercher",
+  "Une IA explicable — tu sais toujours pourquoi ta séance a changé",
+  "Le Coach IA disponible pendant ta séance, dans le contexte exact de ton exercice",
+  "Validation humaine selon ta formule : l'humain garde le dernier mot quand ça compte",
 ];
 
 export function CoaiIntro() {
@@ -37,13 +37,14 @@ export function CoaiIntro() {
           </div>
 
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
-            Le premier studio de
-            <span className="mt-2 block text-laiton-200">Personal Training augmenté.</span>
+            Ton programme
+            <span className="mt-2 block text-laiton-200">évolue avec toi.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-            Un protocole complet — bilan, évaluation, programme, séance et suivi — rendu accessible
-            par l’IA et renforcé par l’expertise humaine lorsque ton objectif l’exige.
+            L’IA personnalise ton accompagnement au quotidien — entraînement, nutrition,
+            récupération — et l’ajuste à ton sommeil, ton énergie et ton temps disponible.
+            L’humain reste là quand tu en as besoin.
           </p>
 
           <ul className="mt-7 space-y-3" aria-label="Ce que comprend le diagnostic">
