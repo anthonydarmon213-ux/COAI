@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
@@ -32,6 +33,13 @@ export function ServiceDetailModal({
   const tier = TIER_BY_SERVICE[initialService];
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  // Rendue via un portail (voir plus bas) : un ancêtre quelconque peut avoir
+  // un backdrop-filter/transform (ex. .coai-diagnostic-card) qui casse
+  // silencieusement position:fixed en le confinant dans son propre cadre —
+  // d'où un "écran noir" au lieu d'une vraie modale plein écran. document
+  // n'existe pas côté serveur, donc on ne monte le portail qu'après le
+  // premier rendu client.
+  const [mounted, setMounted] = useState(false);
 
   const close = useCallback(() => {
     if (window.history.state?.coaiServiceModal) window.history.back();
@@ -39,6 +47,7 @@ export function ServiceDetailModal({
   }, []);
 
   useEffect(() => {
+    setMounted(true);
     window.history.pushState({ ...window.history.state, coaiServiceModal: true }, "");
     const onPopState = () => onCloseRef.current();
     const onKeyDown = (e: KeyboardEvent) => {
@@ -54,7 +63,9 @@ export function ServiceDetailModal({
     };
   }, [close]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className="coai-service-modal fixed inset-0 z-[100] overflow-y-auto bg-[#0d0e10]" role="dialog" aria-modal="true">
       <div className="sticky top-0 z-10 border-b border-white/[0.08] bg-[#0d0e10]/95 px-4 py-3 backdrop-blur">
         <button
@@ -151,6 +162,7 @@ export function ServiceDetailModal({
           .
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

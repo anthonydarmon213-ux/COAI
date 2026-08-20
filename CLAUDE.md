@@ -4,6 +4,40 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Bug corrigé : écran noir au clic "Voir en détail" depuis le résultat du diagnostic (20/08/2026, suite)
+
+Signalé par Anthony : une amie a fait le diagnostic, cliqué sur "Voir
+Impulsion en détail" et vu un écran noir à la place de la modale d'offre.
+
+**Cause réelle trouvée et reproduite** (Playwright, avant/après correctif,
+avec et sans le fix) : `ServiceDetailModal` est une modale plein écran
+`position: fixed inset-0`, ouverte depuis `FormuleRecommandeeCard` sur
+l'écran de résultat du diagnostic — qui est rendu à l'intérieur du
+conteneur `.coai-diagnostic-card` (`diagnostic-quiz.tsx`). Ce conteneur a
+`backdrop-filter: blur(24px)` **et** `overflow-hidden`. Par la spécification
+CSS, un `backdrop-filter` sur un ancêtre crée un nouveau "containing block"
+pour les descendants en `position: fixed` — la modale se retrouvait donc
+piégée et rognée dans le petit cadre arrondi de la carte diagnostic au lieu
+de couvrir tout l'écran, avec son fond quasi noir (`#0d0e10`) qui donnait
+l'impression d'un écran noir cassé, le prix et le bouton d'achat coupés
+hors du cadre visible.
+
+**Corrigé** en rendant `ServiceDetailModal` via un portail React
+(`createPortal` vers `document.body`, monté seulement après le premier
+rendu client — `document` n'existe pas côté serveur) plutôt qu'en JSX
+imbriqué directement dans l'arbre appelant. Corrige le problème à la
+racine pour tous les points d'entrée de cette modale (résultat du
+diagnostic, `BesoinsIdentifiesCard`/dashboard, `/pricing`...), pas
+seulement l'écran du diagnostic — n'importe quel futur ancêtre avec
+`backdrop-filter`/`transform`/`filter` aurait causé le même bug ailleurs.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres. Bug
+reproduit puis corrigé en conditions contrôlées (Playwright, composant
+monté dans un conteneur reproduisant exactement `.coai-diagnostic-card`) :
+capture avant correctif confirmant le rectangle noir tronqué décrit par
+l'amie d'Anthony, capture après confirmant la modale pleine page correcte
+avec prix et bouton d'achat visibles.
+
 ## Titre du hero ajusté : "Ton Personal Trainer, toujours avec toi." (20/08/2026, suite)
 
 Retour immédiat d'Anthony après la réécriture du hero ci-dessous : il
