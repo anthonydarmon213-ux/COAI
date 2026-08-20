@@ -2412,6 +2412,14 @@ export function DiagnosticQuiz({
                 </div>
               )}
 
+              {/* Anthony : une amie arrivée jusqu'en bas du résultat n'avait
+                  aucun accès direct aux tarifs à cet endroit — le seul lien
+                  "Comparer les 3 formules" vit dans FormuleRecommandeeCard,
+                  plus haut sur l'écran. Ajouté ici aussi, à la vraie sortie. */}
+              <Link href="/pricing" className="text-sm font-semibold text-laiton-300 underline decoration-laiton-300/40 underline-offset-4 hover:text-laiton-200">
+                Voir les formules →
+              </Link>
+
               <p className="max-w-lg text-sm leading-6 text-graphite-300">
                 Cette expérience t&apos;a plu ? Parles-en à quelqu&apos;un qui a besoin de s&apos;y
                 mettre — une fois abonné(e), tu auras aussi ton propre lien de parrainage.

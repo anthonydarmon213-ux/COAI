@@ -10,6 +10,7 @@ import { NutritionView } from "@/components/programme/nutrition-view";
 import { RecuperationView } from "@/components/programme/recuperation-view";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { FicheMacros } from "@/components/programme/fiche-macros";
+import { AnalysePhotoRepas } from "@/components/programme/analyse-photo-repas";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -265,10 +266,16 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
               })()}
 
+              {pilier === "NUTRITION" && <AnalysePhotoRepas />}
               {pilier === "NUTRITION" && <FicheMacros />}
               {pilier === "NUTRITION" && (
                 <Link href="/programme/recettes" className="self-start text-sm font-semibold text-laiton-400 underline">
                   Voir des idées de recettes →
+                </Link>
+              )}
+              {pilier === "RECUPERATION" && (
+                <Link href="/programme/programmes-prets" className="self-start text-sm font-semibold text-laiton-400 underline">
+                  Sommeil, respiration, méditation, sauna & massage →
                 </Link>
               )}
             </Card>

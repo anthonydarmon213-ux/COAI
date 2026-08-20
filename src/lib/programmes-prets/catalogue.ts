@@ -17,7 +17,8 @@ export type CategorieProgrammePret =
   | "PERTE_DE_POIDS"
   | "POIDS_DU_CORPS"
   | "FESSIERS"
-  | "CHALLENGE_30_JOURS";
+  | "CHALLENGE_30_JOURS"
+  | "RECUPERATION";
 
 export const CATEGORIE_PROGRAMME_LABEL: Record<CategorieProgrammePret, string> = {
   MOBILITE: "Mobilité",
@@ -27,6 +28,7 @@ export const CATEGORIE_PROGRAMME_LABEL: Record<CategorieProgrammePret, string> =
   POIDS_DU_CORPS: "Poids du corps",
   FESSIERS: "Fessiers",
   CHALLENGE_30_JOURS: "Challenge 30 jours",
+  RECUPERATION: "Récupération",
 };
 
 export type JourProgrammePret = {
@@ -346,6 +348,152 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
         jour: "Jour 30",
         focus: "Mouvement & mental",
         contenu: "Séance complète de ton choix, puis relis ton objectif du jour 1 : où en es-tu ?",
+      },
+    ],
+  },
+  {
+    slug: "sommeil-reparateur",
+    nom: "Sommeil réparateur — 14 jours",
+    categorie: "RECUPERATION",
+    niveau: "Tous niveaux",
+    duree: "14 jours",
+    frequence: "Une habitude par jour, à garder ensuite",
+    accroche: "Un vrai sommeil de récupération ne s'improvise pas, il se construit jour après jour.",
+    description:
+      "14 jours pour installer, une habitude à la fois, les repères qui font le plus de différence sur la qualité du sommeil — horaires, lumière, écrans, caféine, température de la chambre. Chaque jour ajoute une habitude à la précédente, sans jamais tout changer d'un coup.",
+    objectifs: [
+      "Stabiliser un horaire de coucher et de lever régulier",
+      "Réduire les perturbateurs du sommeil (écrans, caféine tardive, lumière)",
+      "Créer un vrai rituel de fin de journée",
+      "Améliorer la qualité perçue du sommeil, pas seulement sa durée",
+    ],
+    photoQuery: "peaceful bedroom night sleep",
+    jours: [
+      { jour: "Jour 1", focus: "Horaire fixe", contenu: "Choisis une heure de coucher et de lever réaliste, et tiens-la ce soir — même le week-end." },
+      { jour: "Jour 2", focus: "Caféine", contenu: "Plus aucune caféine après 14h aujourd'hui (café, thé noir, certains sodas)." },
+      { jour: "Jour 3", focus: "Écrans", contenu: "Coupe les écrans 30 minutes avant de te coucher — lis, étire-toi ou respire à la place." },
+      { jour: "Jour 4", focus: "Lumière", contenu: "Baisse les lumières de la maison 1h avant le coucher, dès ce soir." },
+      { jour: "Jour 5", focus: "Température", contenu: "Vise une chambre fraîche (autour de 18°C) — aère 10 minutes avant de dormir." },
+      { jour: "Jour 6", focus: "Rituel", contenu: "Fixe un rituel court de 10 minutes avant de dormir (étirements légers, lecture, respiration) et répète-le chaque soir dès aujourd'hui." },
+      { jour: "Jour 7", focus: "Bilan", contenu: "Relis les 6 habitudes posées cette semaine — laquelle est la plus dure à tenir ? Concentre-toi dessus la semaine prochaine." },
+      { jour: "Jour 8", focus: "Activité physique", contenu: "Termine tout effort intense au moins 3h avant le coucher aujourd'hui." },
+      { jour: "Jour 9", focus: "Repas du soir", contenu: "Dîne au moins 2-3h avant de te coucher, repas léger plutôt que copieux." },
+      { jour: "Jour 10", focus: "Alcool", contenu: "L'alcool aide à s'endormir mais dégrade le sommeil profond — réduis ou évite-le ce soir." },
+      { jour: "Jour 11", focus: "Réveil", contenu: "Dès le réveil, expose-toi à la lumière du jour quelques minutes — ça aide à régler l'horloge interne pour la nuit suivante." },
+      { jour: "Jour 12", focus: "Sieste", contenu: "Si tu fais une sieste, limite-la à 20 minutes et avant 15h — au-delà, elle perturbe la nuit." },
+      { jour: "Jour 13", focus: "Anxiété du soir", contenu: "Note sur un papier ce qui te trotte dans la tête avant de dormir — sortir les pensées de la tête aide à lâcher prise." },
+      { jour: "Jour 14", focus: "Bilan final", contenu: "Regarde le chemin parcouru : quelles habitudes gardes-tu au-delà de ces 14 jours ? Choisis-en 3 à conserver durablement." },
+    ],
+  },
+  {
+    slug: "respiration-anti-stress",
+    nom: "Respiration & anti-stress",
+    categorie: "RECUPERATION",
+    niveau: "Tous niveaux",
+    duree: "4 techniques",
+    frequence: "5 minutes, quand tu en as besoin",
+    accroche: "4 techniques de respiration simples pour calmer le système nerveux en quelques minutes.",
+    description:
+      "Des techniques de respiration courtes et concrètes, à utiliser avant de dormir, pendant une journée stressante, ou en récupération après une séance intense. Pas besoin de matériel ni d'expérience — juste 5 minutes et un endroit calme.",
+    objectifs: [
+      "Calmer le système nerveux en quelques minutes",
+      "Améliorer l'endormissement",
+      "Récupérer plus vite après un effort intense",
+      "Avoir un outil simple à utiliser n'importe où",
+    ],
+    photoQuery: "calm breathing exercise relaxation",
+    jours: [
+      {
+        jour: "Technique 1",
+        focus: "Respiration diaphragmatique",
+        contenu:
+          "Allongé·e ou assis·e, une main sur le ventre : inspire lentement par le nez en gonflant le ventre (pas la poitrine), expire lentement par la bouche. 10 respirations, à ton rythme.",
+      },
+      {
+        jour: "Technique 2",
+        focus: "Cohérence cardiaque (5-5)",
+        contenu: "Inspire 5 secondes, expire 5 secondes, sans pause entre les deux. Répète pendant 5 minutes — idéal avant une réunion stressante ou en fin de journée.",
+      },
+      {
+        jour: "Technique 3",
+        focus: "4-7-8, pour l'endormissement",
+        contenu: "Inspire 4 secondes, retiens 7 secondes, expire lentement sur 8 secondes. Répète 4 cycles, allongé·e, juste avant de dormir.",
+      },
+      {
+        jour: "Technique 4",
+        focus: "Box breathing, pour se recentrer",
+        contenu: "Inspire 4 secondes, retiens 4 secondes, expire 4 secondes, retiens poumons vides 4 secondes. Répète 4 à 6 cycles — utile pour se recentrer avant ou après une séance intense.",
+      },
+    ],
+  },
+  {
+    slug: "meditation-guidee",
+    nom: "Méditation guidée — 7 jours",
+    categorie: "RECUPERATION",
+    niveau: "Tous niveaux",
+    duree: "7 jours",
+    frequence: "5 à 10 minutes par jour",
+    accroche: "Une courte pratique par jour pour découvrir la méditation sans pression de performance.",
+    description:
+      "7 courtes séances pour découvrir la méditation en douceur, sans application ni matériel — juste toi, un endroit calme et quelques minutes. Chaque jour propose un focus différent : ce n'est pas grave si l'esprit vagabonde, c'est normal, le but est de recommencer, pas d'y arriver parfaitement.",
+    objectifs: [
+      "Découvrir la méditation sans pression de performance",
+      "Réduire le stress accumulé dans la journée",
+      "Améliorer la capacité à se recentrer",
+      "Installer une pause mentale régulière dans la semaine",
+    ],
+    photoQuery: "person meditating calm peaceful",
+    jours: [
+      { jour: "Jour 1", focus: "La respiration", contenu: "5 minutes assis·e, les yeux fermés, à simplement observer ta respiration sans essayer de la changer." },
+      { jour: "Jour 2", focus: "Le corps", contenu: "5 minutes de scan corporel : parcours mentalement ton corps des pieds à la tête, en relâchant chaque zone tendue." },
+      { jour: "Jour 3", focus: "Les sons", contenu: "5 minutes à simplement écouter les sons autour de toi, sans les juger ni les analyser — juste les remarquer." },
+      { jour: "Jour 4", focus: "La gratitude", contenu: "5 minutes assis·e, pense à 3 choses pour lesquelles tu es reconnaissant·e aujourd'hui, en t'attardant sur chacune." },
+      { jour: "Jour 5", focus: "Lâcher-prise", contenu: "7 minutes : à chaque pensée qui arrive, imagine-la comme un nuage qui passe, sans t'y accrocher, puis reviens à ta respiration." },
+      { jour: "Jour 6", focus: "La marche méditative", contenu: "10 minutes de marche lente et silencieuse, en portant toute ton attention sur chaque pas et chaque sensation." },
+      { jour: "Jour 7", focus: "Bilan", contenu: "10 minutes assis·e en silence, puis note en une phrase ce que cette semaine t'a appris sur ton rapport au calme." },
+    ],
+  },
+  {
+    slug: "recuperation-passive-sauna-hammam-massage",
+    nom: "Récupération passive — Sauna, hammam & massage",
+    categorie: "RECUPERATION",
+    niveau: "Tous niveaux",
+    duree: "4 protocoles",
+    frequence: "1 à 2 fois par semaine",
+    accroche: "Le bon protocole, avec les bonnes précautions — pas juste \"aller transpirer\".",
+    description:
+      "Sauna, hammam et massage sont d'excellents outils de récupération quand ils sont utilisés avec un vrai protocole — durée, cycles, hydratation. Utilisés n'importe comment, ils fatiguent plus qu'ils ne récupèrent. Toujours en dehors de toute contre-indication médicale (grossesse, problème cardiovasculaire, hypertension non contrôlée) — demande un avis médical en cas de doute.",
+    objectifs: [
+      "Utiliser le sauna et le hammam avec un vrai protocole, pas au hasard",
+      "Accélérer la récupération musculaire après un effort intense",
+      "Réduire les tensions accumulées dans la semaine",
+      "Éviter les erreurs qui transforment la récupération en fatigue supplémentaire",
+    ],
+    photoQuery: "sauna wellness relaxation spa",
+    jours: [
+      {
+        jour: "Protocole 1",
+        focus: "Sauna (chaleur sèche)",
+        contenu:
+          "3 cycles de 8 à 12 minutes dans le sauna (70-90°C), séparés de 5 à 10 minutes de repos à température ambiante en buvant de l'eau. Jamais juste après un effort très intense — attends que le rythme cardiaque soit redescendu. Hydrate-toi avant, pendant et après (eau, éventuellement une pincée de sel).",
+      },
+      {
+        jour: "Protocole 2",
+        focus: "Hammam (chaleur humide)",
+        contenu:
+          "2 à 3 passages de 10 à 15 minutes (40-50°C, forte humidité), avec une pause fraîche entre chaque. Plus doux que le sauna sur le système cardiovasculaire mais tout aussi déshydratant — bois régulièrement. Termine par une douche fraîche pour resserrer la circulation.",
+      },
+      {
+        jour: "Protocole 3",
+        focus: "Auto-massage",
+        contenu:
+          "10 à 15 minutes avec un rouleau de massage (foam roller) ou une balle de tennis sur les zones les plus sollicitées (mollets, quadriceps, dos) — pression progressive, jamais sur une articulation directement, jamais sur une douleur aiguë ou une zone inflammée.",
+      },
+      {
+        jour: "Protocole 4",
+        focus: "Massage professionnel",
+        contenu:
+          "Un massage sportif (30 à 60 min) une à deux fois par mois en période d'entraînement intense soulage les tensions profondes qu'un auto-massage n'atteint pas — à réserver plutôt en fin de cycle ou avant une semaine de récupération plutôt que juste avant une séance clé.",
       },
     ],
   },

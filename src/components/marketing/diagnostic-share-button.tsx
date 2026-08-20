@@ -54,10 +54,49 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
 
   async function partagerEmail() {
     setLoading(true);
-    const lien = await getShareLink();
-    window.location.href = `mailto:?subject=${encodeURIComponent(`Mon Score COAI · ${score}/100`)}&body=${encodeURIComponent(shareText(lien))}`;
-    trackFunnelEvent("diagnostic_result_shared", { support: "email", referral: connecte, challenge: "compare_score" });
-    setLoading(false);
+    setMessage(null);
+    try {
+      const lien = await getShareLink();
+      const text = shareText(lien);
+      const subject = `Mon Score COAI · ${score}/100`;
+
+      // Un lien mailto: ne peut techniquement joindre aucun fichier — la
+      // carte-image du score n'était donc jamais insérée, seulement le texte
+      // (bug signalé : "ça ne l'a pas inséré en pièce jointe"). Web Share API
+      // avec fichier permet de choisir l'app Mail depuis la vraie feuille de
+      // partage du système, qui l'insère alors comme une pièce jointe réelle
+      // — même mécanisme déjà utilisé pour Instagram/TikTok ci-dessus.
+      const cardUrl = `/api/diagnostic/carte-story?score=${score}&objectif=${encodeURIComponent(objectif)}`;
+      const response = await fetch(cardUrl).catch(() => null);
+      const file = response?.ok
+        ? new File([await response.blob()], `score-coai-${score}.png`, { type: "image/png" })
+        : null;
+
+      if (file && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({ files: [file], title: subject, text });
+        trackFunnelEvent("diagnostic_result_shared", { support: "email_native", referral: connecte, challenge: "compare_score" });
+        return;
+      }
+
+      // Repli : mailto: (texte + lien uniquement) — mais la carte est aussi
+      // téléchargée pour que la personne puisse la joindre elle-même si elle
+      // le souhaite, plutôt que de la perdre silencieusement.
+      if (file) {
+        const href = URL.createObjectURL(file);
+        const anchor = document.createElement("a");
+        anchor.href = href;
+        anchor.download = file.name;
+        anchor.click();
+        URL.revokeObjectURL(href);
+        setMessage("Carte enregistrée ✓ Ta messagerie s'ouvre — joins l'image téléchargée si tu veux l'inclure.");
+      }
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+      trackFunnelEvent("diagnostic_result_shared", { support: "email_mailto", referral: connecte, challenge: "compare_score" });
+    } catch {
+      setMessage("Impossible de partager pour le moment.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function partagerStory(platform: "instagram" | "tiktok") {

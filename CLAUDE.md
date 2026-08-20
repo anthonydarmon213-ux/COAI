@@ -4,6 +4,93 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Retours d'une amie testeuse : 6 points traités (20/08/2026)
+
+Retour vocal d'Anthony transmettant les retours d'une amie ayant testé le
+site en conditions réelles. 6 points, traités un par un :
+
+1. **"Voir les formules" absent à la sortie du résultat de diagnostic** —
+   confirmé en lisant le code : le seul lien vers les tarifs
+   ("Comparer les 3 formules") vivait dans `FormuleRecommandeeCard`, en plein
+   milieu de l'écran de résultat — rien à la toute fin, où l'amie d'Anthony
+   cherchait visiblement à comparer les offres. Ajouté un lien "Voir les
+   formules →" juste avant le tout dernier bloc (`diagnostic-quiz.tsx`),
+   pour les deux variantes (visiteur connecté et non connecté).
+
+2. **Bibliothèque de récupération** ("des programmes, des conseils pour
+   mieux dormir, mieux respirer, une méditation, sauna/hammam/massage avec
+   le process exact") — 4 nouvelles entrées ajoutées à la bibliothèque de
+   programmes prêts à l'emploi existante (`src/lib/programmes-prets/
+   catalogue.ts`, nouvelle catégorie `RECUPERATION`) : "Sommeil réparateur"
+   (14 jours, une habitude par jour), "Respiration & anti-stress" (4
+   techniques : diaphragmatique, cohérence cardiaque, 4-7-8, box breathing),
+   "Méditation guidée" (7 jours, sans application ni matériel), et
+   "Récupération passive — Sauna, hammam & massage" (4 vrais protocoles :
+   durée, cycles, hydratation, contre-indications explicites — jamais juste
+   "va transpirer"). Lien "Sommeil, respiration, méditation, sauna & massage
+   →" ajouté sur le pilier Récupération (`pilier-page.tsx`), même
+   emplacement que le lien recettes déjà existant sur Nutrition.
+
+3. **Photo de plat → macros/calories par IA** (nouvelle fonctionnalité,
+   jamais demandée avant) — même famille que l'analyse de photo
+   morphologique et l'extraction de montre connectée déjà existantes
+   (`generateWithVision`, aucune nouvelle dépendance) : nouveau prompt
+   (`src/lib/ai/prompts/meal-photo-extraction.ts`, garde-fous stricts —
+   estimation prudente, jamais une valeur affirmée comme exacte, refuse
+   explicitement toute photo qui n'est pas un plat), nouvelle route
+   `POST /api/nutrition/photo-repas`, nouveau composant
+   `AnalysePhotoRepas` affiché sur le pilier Nutrition. **Décision
+   volontaire pour rester simple en V1** : rien n'est enregistré en base
+   (ni `RepasLog`, ni nouveau champ) — c'est une estimation ponctuelle à la
+   demande, distincte du suivi repas existant. Capture directe via l'appareil
+   photo sur mobile (`capture="environment"`).
+
+4. **Bug corrigé : partage du score par email sans pièce jointe** — un lien
+   `mailto:` ne peut techniquement joindre aucun fichier (limite du
+   protocole, pas un bug de COAI) — la carte-image du score n'était donc
+   jamais insérée, seulement le texte, d'où la confusion de l'amie
+   d'Anthony ("ça ne l'a pas inséré en pièce jointe, c'était compliqué").
+   Corrigé (`diagnostic-share-button.tsx`) : le bouton email tente
+   maintenant `navigator.share` avec le fichier image (même mécanisme déjà
+   utilisé pour Instagram/TikTok juste au-dessus) — ça ouvre la vraie
+   feuille de partage du système, qui permet de choisir Mail et insère
+   l'image comme une vraie pièce jointe. Si l'appareil ne supporte pas le
+   partage de fichier, repli sur le comportement précédent (mailto: texte
+   seul) mais avec la carte téléchargée en plus, pour qu'elle puisse être
+   jointe manuellement plutôt que perdue silencieusement.
+
+5. **Vidéos dans la bibliothèque (exercices, recettes)** — demande notée
+   mais **non réalisée**, même blocage déjà documenté ailleurs dans ce
+   fichier (patch "Direction wow façon Apple Watch/Whoop") : ce sandbox n'a
+   aucun outil de génération vidéo IA et aucun accès réseau vers une
+   banque de vidéos sous licence. Nécessite une décision d'Anthony sur une
+   source vidéo (licence à vérifier), comme cela avait déjà été le cas pour
+   les photos avant que la clé Pexels ne soit fournie.
+
+6. **Offre membre fondateur réduite de 100 à 50 places** — demande directe
+   d'Anthony ("100 personnes ça fait beaucoup, réduisons à 50") :
+   `MEMBRES_FONDATEURS_MAX` passé de 100 à 50
+   (`membre-fondateur-constants.ts`). Le compteur affiché reste calculé en
+   temps réel à partir du nombre réel d'abonnés Impulsion — jamais un
+   chiffre fixe codé en dur (Anthony avait suggéré "39 places" comme
+   exemple, pas une valeur à figer).
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels sur
+tous les fichiers touchés, propres. Playwright réel (mobile 390px) sur un
+montage isolé de `ProgrammesPretsGrid` (les 4 nouvelles entrées Récupération
+s'affichent et se filtrent correctement, aucun débordement) et
+`AnalysePhotoRepas` (rendu sans erreur console). **Non vérifié** : le
+comportement réel de l'upload photo→macros et du partage email par
+`navigator.share` — ce sandbox n'a ni compte authentifié réel ni accès à
+l'API Anthropic/Supabase en conditions réelles, et le serveur de dev local a
+rencontré un problème d'environnement inhabituel (classe Tailwind `hidden`
+absente du CSS servi, y compris sur des pages déjà en prod — signal d'un
+souci de ce serveur de dev précis, pas du code livré, `tsc`/`build`/`eslint`
+tous propres par ailleurs) qui a empêché une vérification pixel du bouton
+photo caché. À tester par Anthony : upload d'une vraie photo de plat, et un
+vrai partage email sur mobile (iOS/Android) une fois déployé.
+
+
 ## Bug corrigé : écran noir au clic "Voir en détail" depuis le résultat du diagnostic (20/08/2026, suite)
 
 Signalé par Anthony : une amie a fait le diagnostic, cliqué sur "Voir
