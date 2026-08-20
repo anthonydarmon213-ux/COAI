@@ -9,6 +9,7 @@ import {
   MATERIEL_LABEL,
   TYPE_LABEL,
   NIVEAU_EXERCICE_LABEL,
+  buildFreeExerciseDbPhotoUrl,
   type GroupePrincipal,
   type Materiel,
   type TypeExercice,
@@ -146,7 +147,14 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtres.map((ex) => {
-          const photoUrl = photos[ex.photoQuery] ?? null;
+          // Free Exercise DB en priorité (20/08/2026, retour Anthony :
+          // photos Pexels parfois fausses) — photo choisie une fois pour
+          // l'exercice exact plutôt que trouvée par mots-clés à chaque
+          // résolution. Repli Pexels seulement pour les exercices sans
+          // correspondance fiable (cf. commentaires dans catalogue.ts).
+          const photoUrl = ex.freeExerciseDbId
+            ? buildFreeExerciseDbPhotoUrl(ex.freeExerciseDbId)
+            : photos[ex.photoQuery] ?? null;
           return (
             <article
               key={ex.id}
