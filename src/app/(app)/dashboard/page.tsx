@@ -170,13 +170,15 @@ export default async function DashboardPage() {
           <span className="coai-dashboard-status">Programme adaptatif</span>
           <span className="coai-dashboard-status">Suivi centralisé</span>
         </div>
-        {programme && sourceSession && !daily?.sleep && (
-          <a href="#check-in-du-jour" className="coai-dashboard-primary inline-flex min-h-14 w-full items-center justify-center rounded-full px-7 py-3.5 text-base font-bold shadow-[0_20px_55px_-28px_rgba(32,33,30,.8)] transition hover:-translate-y-0.5 sm:w-fit">
-            Faire mon check-in · 45 sec →
-          </a>
-        )}
       </header>
 
+      {/* Doublon retiré (20/08/2026, retour Anthony : "un petit doublon...
+          sur deux carrés à la suite") — le bouton de check-in ci-dessus
+          répétait exactement le même message ("Fais ton check-in — 45
+          secondes") que AujourdhuiGuideCard juste en dessous, qui a déjà
+          son propre CTA. Une seule source pour cette mission, comme prévu
+          par le commentaire sur `mission` plus haut ("jamais une deuxième
+          source de vérité"). */}
       <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
 
       <ScoreAgeCoaiCard resultat={ageCoai} />

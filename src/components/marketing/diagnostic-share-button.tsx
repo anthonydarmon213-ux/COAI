@@ -165,13 +165,33 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
         </p>
       )}
       <div className="flex flex-wrap justify-center gap-2">
+        {/* Story Instagram/TikTok en premier (20/08/2026, retour Anthony :
+            "ce sera plus sympa que sur WhatsApp") — partagerStory() existait
+            déjà (carte-image + Web Share API) mais n'était jusqu'ici jamais
+            rendue : aucun bouton ne l'appelait. */}
+        <button
+          type="button"
+          onClick={() => partagerStory("instagram")}
+          disabled={loading}
+          className="rounded-full border border-transparent bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(214,41,118,0.25)] transition hover:-translate-y-0.5 disabled:opacity-50"
+        >
+          Story Instagram
+        </button>
+        <button
+          type="button"
+          onClick={() => partagerStory("tiktok")}
+          disabled={loading}
+          className="rounded-full border border-white/15 bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-graphite-900 disabled:opacity-50"
+        >
+          Story TikTok
+        </button>
         <button
           type="button"
           onClick={partagerWhatsApp}
           disabled={loading}
           className="rounded-full border border-[#25D366]/45 bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-[#102016] shadow-[0_8px_24px_rgba(37,211,102,0.16)] transition hover:-translate-y-0.5 hover:bg-[#35df76] disabled:opacity-50"
         >
-          Partager sur WhatsApp
+          WhatsApp
         </button>
         <button
           type="button"

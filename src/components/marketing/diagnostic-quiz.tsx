@@ -431,8 +431,13 @@ export function DiagnosticQuiz({
   const [objectifPrincipalLibre, setObjectifPrincipalLibre] = useState("");
   const [objectifSecondaire, setObjectifSecondaire] = useState("");
   const [importanceObjectif, setImportanceObjectif] = useState("");
-  const [freinPrincipalLibre, setFreinPrincipalLibre] = useState("");
-  const [attentesCoai, setAttentesCoai] = useState("");
+  // Multi-choix (20/08/2026, retour Anthony : "il n'y a pas forcément une
+  // seule réponse") — même convention que equipement/sport/sante : un
+  // tableau + un champ "AutreTexte" séparé, mergés via resolveAutre().
+  const [freinsPrincipaux, setFreinsPrincipaux] = useState<string[]>([]);
+  const [freinsAutreTexte, setFreinsAutreTexte] = useState("");
+  const [attentesCoai, setAttentesCoai] = useState<string[]>([]);
+  const [attentesCoaiAutreTexte, setAttentesCoaiAutreTexte] = useState("");
   const [prioriteOptimisation, setPrioriteOptimisation] = useState("");
   const [passeSportif, setPasseSportif] = useState("");
   const [sourceDecouverteLibre, setSourceDecouverteLibre] = useState("");
@@ -623,8 +628,10 @@ export function DiagnosticQuiz({
       objectifPrincipalLibre,
       objectifSecondaire,
       importanceObjectif,
-      freinPrincipalLibre,
+      freinsPrincipaux,
+      freinsAutreTexte,
       attentesCoai,
+      attentesCoaiAutreTexte,
       prioriteOptimisation,
       passeSportif,
       sourceDecouverteLibre,
@@ -681,8 +688,10 @@ export function DiagnosticQuiz({
     objectifPrincipalLibre,
     objectifSecondaire,
     importanceObjectif,
-    freinPrincipalLibre,
+    freinsPrincipaux,
+    freinsAutreTexte,
     attentesCoai,
+    attentesCoaiAutreTexte,
     passeSportif,
     sourceDecouverteLibre,
     connaissanceMusculation,
@@ -737,8 +746,10 @@ export function DiagnosticQuiz({
     if (typeof saved.objectifPrincipalLibre === "string") setObjectifPrincipalLibre(saved.objectifPrincipalLibre);
     if (typeof saved.objectifSecondaire === "string") setObjectifSecondaire(saved.objectifSecondaire);
     if (typeof saved.importanceObjectif === "string") setImportanceObjectif(saved.importanceObjectif);
-    if (typeof saved.freinPrincipalLibre === "string") setFreinPrincipalLibre(saved.freinPrincipalLibre);
-    if (typeof saved.attentesCoai === "string") setAttentesCoai(saved.attentesCoai);
+    if (Array.isArray(saved.freinsPrincipaux)) setFreinsPrincipaux(saved.freinsPrincipaux as string[]);
+    if (typeof saved.freinsAutreTexte === "string") setFreinsAutreTexte(saved.freinsAutreTexte);
+    if (Array.isArray(saved.attentesCoai)) setAttentesCoai(saved.attentesCoai as string[]);
+    if (typeof saved.attentesCoaiAutreTexte === "string") setAttentesCoaiAutreTexte(saved.attentesCoaiAutreTexte);
     if (typeof saved.prioriteOptimisation === "string") setPrioriteOptimisation(saved.prioriteOptimisation);
     if (typeof saved.passeSportif === "string") setPasseSportif(saved.passeSportif);
     if (typeof saved.sourceDecouverteLibre === "string") setSourceDecouverteLibre(saved.sourceDecouverteLibre);
@@ -983,27 +994,19 @@ export function DiagnosticQuiz({
   // vide (même garde que celle déjà utilisée plus bas dans "result"). Doit
   // rester déclaré après `diagnostic`/`signauxDiagnostic` (sinon "used
   // before declaration").
+  // Correction (20/08/2026, retour Anthony : "ça va beaucoup trop vite, on
+  // n'a pas le temps de lire") : plus d'auto-avance par timer — exactement
+  // le même correctif déjà appliqué à respire1/respire2 le 19/08/2026 pour
+  // le même symptôme. N'avance plus que sur un vrai tap/clic.
   const revealScreenCount = (diagnostic?.pointsATravailler.length ?? 0) > 0 ? 4 : 3;
   const [revealIndex, setRevealIndex] = useState(0);
   useEffect(() => {
     if (step !== "reveal") return;
     setRevealIndex(0);
     trackFunnelEvent("diagnostic_reveal_started");
-    const screenDuration = 2400;
-    const advanceScreen = setInterval(() => {
-      setRevealIndex((i) => (i + 1 < revealScreenCount ? i + 1 : i));
-    }, screenDuration);
-    const advanceStep = setTimeout(goNext, screenDuration * revealScreenCount + 300);
-    return () => {
-      clearInterval(advanceScreen);
-      clearTimeout(advanceStep);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, revealScreenCount]);
+  }, [step]);
 
-  // Un tap/clic sur l'écran de reveal avance tout de suite — personne ne
-  // doit se sentir bloqué à attendre une animation (mêmes retours reçus sur
-  // "analyse" par le passé, cf. Phase 5.1).
   function handleRevealTap() {
     if (step !== "reveal") return;
     if (revealIndex + 1 < revealScreenCount) {
@@ -1041,8 +1044,12 @@ export function DiagnosticQuiz({
         objectifPrincipalLibre.trim() ? `objectif précisé : ${objectifPrincipalLibre.trim()}` : null,
         objectifSecondaire.trim() ? `objectif secondaire : ${objectifSecondaire.trim()}` : null,
         importanceObjectif.trim() ? `motivation : ${importanceObjectif.trim()}` : null,
-        freinPrincipalLibre.trim() ? `frein principal : ${freinPrincipalLibre.trim()}` : null,
-        attentesCoai.trim() ? `attentes envers COAI : ${attentesCoai.trim()}` : null,
+        resolveAutre(freinsPrincipaux, freinsAutreTexte).length
+          ? `freins : ${resolveAutre(freinsPrincipaux, freinsAutreTexte).join(", ")}`
+          : null,
+        resolveAutre(attentesCoai, attentesCoaiAutreTexte).length
+          ? `attentes envers COAI : ${resolveAutre(attentesCoai, attentesCoaiAutreTexte).join(", ")}`
+          : null,
         prioriteOptimisation.trim() ? `souhaite optimiser : ${prioriteOptimisation.trim()}` : null,
         passeSportif.trim() ? `passé sportif : ${passeSportif.trim()}` : null,
         sourceDecouverteLibre.trim() ? `a connu COAI via : ${sourceDecouverteLibre.trim()}` : null,
@@ -1154,8 +1161,8 @@ export function DiagnosticQuiz({
             objectifPrincipalLibre: objectifPrincipalLibre.trim(),
             objectifSecondaire: objectifSecondaire.trim() || undefined,
             importanceObjectif: importanceObjectif.trim(),
-            freinPrincipalLibre: freinPrincipalLibre.trim(),
-            attentesCoai: attentesCoai.trim(),
+            freinsPrincipaux: resolveAutre(freinsPrincipaux, freinsAutreTexte),
+            attentesCoai: resolveAutre(attentesCoai, attentesCoaiAutreTexte),
             prioriteOptimisation: prioriteOptimisation.trim(),
             echeance,
             declencheur,
@@ -1432,20 +1439,22 @@ export function DiagnosticQuiz({
               </label>
               <label className="flex flex-col gap-2 text-left">
                 <span className="text-sm font-semibold text-graphite-200">Qu&apos;attends-tu concrètement de COAI ?</span>
+                <span className="text-xs text-graphite-500">Plusieurs réponses possibles.</span>
                 <div className="flex flex-col gap-2">
-                  {ATTENTES_COAI.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? attentesCoai.startsWith(`${AUTRE_LABEL} :`) : attentesCoai === item} onClick={() => setAttentesCoai(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : attentesCoai === item ? "" : item)} />)}
+                  {ATTENTES_COAI.map((item) => <OptionCard key={item} label={item} active={attentesCoai.includes(item)} onClick={() => toggle(attentesCoai, item, setAttentesCoai)} />)}
                 </div>
-                {attentesCoai.startsWith(`${AUTRE_LABEL} :`) && (
-                  <textarea value={attentesCoai.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setAttentesCoai(`${AUTRE_LABEL} : ${event.target.value.slice(0, 680)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                {attentesCoai.includes(AUTRE_LABEL) && (
+                  <textarea value={attentesCoaiAutreTexte} onChange={(event) => setAttentesCoaiAutreTexte(event.target.value.slice(0, 680))} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
                 )}
               </label>
               <label className="flex flex-col gap-2 text-left">
                 <span className="text-sm font-semibold text-graphite-200">Qu&apos;est-ce qui t&apos;a empêché d&apos;atteindre cet objectif jusqu&apos;ici ?</span>
+                <span className="text-xs text-graphite-500">Plusieurs réponses possibles.</span>
                 <div className="flex flex-col gap-2">
-                  {FREINS.map((item) => <OptionCard key={item} label={item} active={item === AUTRE_LABEL ? freinPrincipalLibre.startsWith(`${AUTRE_LABEL} :`) : freinPrincipalLibre === item} onClick={() => setFreinPrincipalLibre(item === AUTRE_LABEL ? `${AUTRE_LABEL} : ` : freinPrincipalLibre === item ? "" : item)} />)}
+                  {FREINS.map((item) => <OptionCard key={item} label={item} active={freinsPrincipaux.includes(item)} onClick={() => toggle(freinsPrincipaux, item, setFreinsPrincipaux)} />)}
                 </div>
-                {freinPrincipalLibre.startsWith(`${AUTRE_LABEL} :`) && (
-                  <textarea value={freinPrincipalLibre.slice(`${AUTRE_LABEL} : `.length)} onChange={(event) => setFreinPrincipalLibre(`${AUTRE_LABEL} : ${event.target.value.slice(0, 680)}`)} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
+                {freinsPrincipaux.includes(AUTRE_LABEL) && (
+                  <textarea value={freinsAutreTexte} onChange={(event) => setFreinsAutreTexte(event.target.value.slice(0, 680))} rows={2} placeholder="Précise en quelques mots…" className="w-full resize-none rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60" />
                 )}
               </label>
             </div>
