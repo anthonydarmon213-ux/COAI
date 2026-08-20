@@ -37,14 +37,14 @@ export function CoaiIntro() {
           </div>
 
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
-            Ton programme
-            <span className="mt-2 block text-laiton-200">évolue avec toi.</span>
+            Ton Personal Trainer,
+            <span className="mt-2 block text-laiton-200">toujours avec toi.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-            L’IA personnalise ton accompagnement au quotidien — entraînement, nutrition,
-            récupération — et l’ajuste à ton sommeil, ton énergie et ton temps disponible.
-            L’humain reste là quand tu en as besoin.
+            Ton programme évolue avec toi : l’IA personnalise ton accompagnement au quotidien —
+            entraînement, nutrition, récupération — et l’ajuste à ton sommeil, ton énergie et ton
+            temps disponible. L’humain reste là quand tu en as besoin.
           </p>
 
           <ul className="mt-7 space-y-3" aria-label="Ce que comprend le diagnostic">

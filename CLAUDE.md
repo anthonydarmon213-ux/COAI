@@ -4,6 +4,19 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Titre du hero ajusté : "Ton Personal Trainer, toujours avec toi." (20/08/2026, suite)
+
+Retour immédiat d'Anthony après la réécriture du hero ci-dessous : il
+préférait le titre "Ton Personal Trainer, toujours avec toi" (déjà la
+formule utilisée dans le `<title>`/meta de la page depuis un moment,
+jamais reprise dans le H1 visible du hero jusqu'ici). Titre remplacé en
+conséquence ; la promesse "Ton programme évolue avec toi" n'est pas
+perdue — déplacée en ouverture du sous-titre plutôt qu'en H1, donc
+toujours portée dès la première ligne de texte lue après le titre.
+
+**Vérifié** : `npx tsc --noEmit` et `npx next build` réels, propres.
+Playwright réel en 390px : aucun débordement, texte lisible.
+
 ## Hero de la homepage recentré sur "Ton programme évolue avec toi" (20/08/2026)
 
 Anthony a formalisé une liste de points forts COAI (coach quotidien
