@@ -13,6 +13,7 @@ import {
   saveDiagnosticProgress,
 } from "@/lib/diagnostic/progress-storage";
 import { readUtmCookie } from "@/lib/attribution/utm-cookie";
+import { storeIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
@@ -1150,6 +1151,16 @@ export function DiagnosticQuiz({
     trackFunnelEvent("plan_selected", { plan: "GRATUIT" });
     storeDiagnosticAnswers(reponsesEnProfil());
     window.localStorage.setItem("coai_dashboard_intro_pending", "1");
+    // Essai Impulsion avec carte requise dès la sortie du diagnostic
+    // (20/08/2026, demande Anthony) — revient sur le "accès libre" du
+    // 13/08 pour CE parcours précis, sans y toucher ailleurs : le cookie
+    // d'intention (déjà utilisé par /pricing) est lu par
+    // CompleterInscriptionForm, qui déclenche maintenant le checkout Stripe
+    // au lieu de rediriger vers /pricing. Le reveal gratuit et partageable
+    // (score, jauges) n'est pas concerné — seule l'entrée dans le vrai
+    // programme, après ce reveal, est concernée. VIP garde trialDays: 0
+    // côté /api/stripe/checkout, jamais proposé ici.
+    storeIntendedPlanCookie("GRATUIT", 1);
   }
 
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
@@ -2453,32 +2464,34 @@ export function DiagnosticQuiz({
                   )}
                 </div>
               ) : (
-                // Nouveau modèle d'accès libre (13/08/2026, demande Anthony) :
-                // ne plus proposer les formules ici — un visiteur non connecté
-                // crée un compte gratuit et atterrit sur son dashboard, où
-                // toute l'interface est visible et chaque offre se débloque
-                // séparément quand il est prêt. Les réponses du diagnostic
-                // sont mémorisées (pont pré-inscription existant) et
-                // appliquées automatiquement à son profil dès la création du
-                // compte, exactement comme avant.
+                // Essai Impulsion carte requise (20/08/2026, demande Anthony) :
+                // remplace le "accès libre" du 13/08 à cet endroit précis —
+                // voir handleCreerCompte(). Le reveal gratuit et partageable
+                // (score, jauges, DiagnosticShareButton plus haut) reste
+                // intact ; c'est seulement l'entrée dans le programme réel
+                // qui passe maintenant par le tunnel Stripe (7 jours offerts,
+                // carte enregistrée dès l'essai — cf. OFFER_BY_PLAN.GRATUIT
+                // dans /api/stripe/checkout). Les réponses du diagnostic
+                // restent mémorisées (pont pré-inscription existant) et
+                // appliquées à son profil dès la création du compte.
                 <div className="relative mt-4 flex w-full flex-col items-center gap-4 overflow-hidden rounded-[1.6rem] border-2 border-laiton-400/45 bg-[radial-gradient(circle_at_50%_0%,rgba(201,162,98,.16),transparent_20rem),#111518] px-5 py-8 text-center shadow-[0_24px_70px_-24px_rgba(0,0,0,.9)] sm:px-8 sm:py-10">
                   <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-laiton-300 via-laiton-500 to-acier-400" aria-hidden="true" />
                   <div className="coai-diagnostic-kicker">
                     <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                    <span>Étape suivante · ton espace est prêt</span>
+                    <span>Étape suivante · ton essai t&apos;attend</span>
                   </div>
-                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Passe maintenant dans ton espace COAI.</h3>
+                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Commence ton essai Impulsion, 7 jours offerts.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
-                    Retrouve ton diagnostic dans ton tableau de bord et découvre ton futur
-                    accompagnement gratuitement. Aucun paiement n&apos;est demandé pour entrer.
+                    Programme, check-ins et Coach IA 24/7, sans limite. Tu ne payes rien pendant 7
+                    jours ; annulable en un clic avant la fin de l&apos;essai.
                   </p>
                   <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-300">Clique ci-dessous pour continuer</span>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="w-full max-w-md">
                     <Button className="coai-rainbow-cta w-full border-0 px-6 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-16px_rgba(201,162,98,.9)] sm:text-lg">
-                      Créer mon espace personnalisé →
+                      Démarrer mon essai gratuit →
                     </Button>
                   </Link>
-                  <span className="text-xs font-medium text-graphite-500">Gratuit · aucune carte bancaire · ton diagnostic est conservé</span>
+                  <span className="text-xs font-medium text-graphite-500">0€ pendant 7 jours · carte requise · résiliable à tout moment</span>
                 </div>
               )}
 

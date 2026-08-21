@@ -5,15 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
-import { clearIntendedPlanCookie, readIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
+import {
+  clearIntendedPlanCookie,
+  readIntendedPlanCookie,
+  readIntendedVipSessionsCookie,
+} from "@/lib/checkout/intended-plan-cookie";
 import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
-// Nouveau modèle d'accès libre (13/08/2026) : même simplification que
-// sign-up/page.tsx — plus de plan visé ni de paiement déclenché ici, cf. ce
-// fichier pour le détail de la décision.
+// Le "accès libre" du 13/08/2026 (aucun paiement déclenché ici, même quand
+// un plan était visé) reste le comportement par défaut d'un compte sans
+// intention déclarée. Corrigé le 20/08/2026 (demande Anthony, sortie du
+// diagnostic public) : quand coai_plan existe, on ne redirige plus vers
+// /pricing pour un second clic — on déclenche directement /api/stripe/checkout
+// (7 jours offerts, carte requise dès l'essai pour Impulsion/Transformation).
+// Sans cookie d'intention (signup "nu", parcours toujours gratuit), rien ne
+// change : direction /bienvenue comme avant.
 export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {
   const [prenom, setPrenom] = useState(prenomSuggere);
   const [consentRgpd, setConsentRgpd] = useState(false);
@@ -50,6 +59,7 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       const intendedPlan = readIntendedPlanCookie();
+      const intendedVipSessions = readIntendedVipSessionsCookie();
       clearParrainageCookie();
       clearIntendedPlanCookie();
       clearUtmCookie();
@@ -58,9 +68,25 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       trackMetaEvent("CompleteRegistration");
       trackFunnelEvent("signup_completed", {});
 
-      window.location.href = intendedPlan
-        ? `/pricing#${intendedPlan === "GRATUIT" ? "autonome" : intendedPlan === "STANDARD" ? "hybride" : "vip"}`
-        : "/bienvenue";
+      if (intendedPlan) {
+        const checkoutRes = await fetch("/api/stripe/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: intendedPlan, vipSessions: intendedVipSessions }),
+        });
+        const checkoutData = await checkoutRes.json().catch(() => null);
+        if (checkoutRes.ok && checkoutData?.url) {
+          window.location.href = checkoutData.url;
+          return;
+        }
+        // Checkout indisponible (Stripe en échec, etc.) : direction /pricing
+        // plutôt que de bloquer l'utilisateur sur une erreur sans issue —
+        // il retrouve son compte créé et peut réessayer depuis là.
+        window.location.href = `/pricing#${intendedPlan === "GRATUIT" ? "autonome" : intendedPlan === "STANDARD" ? "hybride" : "vip"}`;
+        return;
+      }
+
+      window.location.href = "/bienvenue";
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
