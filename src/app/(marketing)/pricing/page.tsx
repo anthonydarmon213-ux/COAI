@@ -8,6 +8,7 @@ import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
+import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
 
 const COMPARAISON_RAPIDE = [
@@ -26,6 +27,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
   return (
     <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-8 px-6 pb-20 pt-16 sm:pt-20">
       <TrackConversion name="pricing_viewed" />
+      <FondateurTicker />
       <div className="w-full max-w-6xl"><BackLink /></div>
       <div className="max-w-4xl text-center">
         <SectionLabel>Personal Training, Reimagined</SectionLabel>
@@ -77,6 +79,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
                 <span className="text-sm text-graphite-400">{tier.suffixe}</span>
               </div>
               {tier.trial && <p className="mt-2 text-sm font-medium text-laiton-300">7 jours d&apos;essai</p>}
+              {tier.noteFacturation && <p className="mt-1 text-xs leading-5 text-graphite-500">{tier.noteFacturation}</p>}
             </div>
             {tier.founderOffer && <MembreFondateurBadge />}
             <p className="min-h-20 text-sm leading-6 text-graphite-300">{tier.description}</p>
@@ -102,7 +105,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
 
             <div className="flex-1" />
             {!tier.sessions && (
-              <OffreConsentGate resumeConditions={<>Abonnement COAI {tier.nom} à {tier.prix}/mois, résiliable à tout moment. {tier.trial ? "Les 7 premiers jours constituent une période d'essai ; la facturation mensuelle commence ensuite sauf résiliation." : "La facturation commence immédiatement."}</>}>
+              <OffreConsentGate resumeConditions={<>Abonnement COAI {tier.nom}{tier.factureAnnuellement ? ", 49€ facturés une fois par an" : ` à ${tier.prix}/mois`}, résiliable à tout moment. {tier.trial ? `Les 7 premiers jours constituent une période d'essai ; ${tier.factureAnnuellement ? "le prélèvement annuel" : "la facturation mensuelle"} commence ensuite sauf résiliation.` : "La facturation commence immédiatement."}</>}>
                 <SubscribeButton plan={tier.plan} label={tier.trial ? (tier.mostPopular ? "Essayer Impulsion pendant 7 jours" : "Commencer mes 7 jours d'essai") : `Choisir ${tier.nom}`} className="coai-rainbow-cta w-full border-0 text-[#111216]" />
               </OffreConsentGate>
             )}

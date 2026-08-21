@@ -2,6 +2,7 @@ import { JsonView } from "@/components/programme/json-view";
 import { ExerciceCard } from "@/components/programme/exercice-card";
 import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
+import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
 // semaine, puis replie chaque séance (fermée par défaut) pour éviter
@@ -65,6 +66,15 @@ export function EntrainementView({
               {photoSeanceUrl && (
                 // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
                 <img src={photoSeanceUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
+              )}
+              {Array.isArray(exercices) && exercices.length > 0 && (
+                <DemarrerSeanceButton
+                  nomSeance={typeof nom === "string" ? nom : "Ta séance"}
+                  echauffement={typeof echauffement === "string" ? echauffement : undefined}
+                  exercices={exercices}
+                  retourAuCalme={typeof retourAuCalme === "string" ? retourAuCalme : undefined}
+                  photosParExercice={photosParExercice}
+                />
               )}
               {echauffement && (
                 <div className="coai-session-note rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
