@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIER_BY_SERVICE, vipReservationHref, type ServiceKey } from "@/lib/pricing/tiers";
@@ -130,28 +129,17 @@ export function ServiceDetailModal({
                 <span className="text-sm text-graphite-400">/mois</span>
               </div>
               <p className="text-sm text-graphite-300">1 séance privée mensuelle incluse</p>
-              <OffreConsentGate resumeConditions={<>Abonnement VIP de 199€/mois, résiliable à tout moment, incluant 1 séance privée par mois.</>}>
-                <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP" className="coai-rainbow-cta w-full border-0" />
-              </OffreConsentGate>
+              <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP" className="coai-rainbow-cta w-full border-0" />
               <a href={vipReservationHref("un rythme VIP de 2 à 4 séances par mois", "sur mesure") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">
                 Besoin de davantage de séances ? Parlons-en
               </a>
             </>
           ) : (
-            <OffreConsentGate
-              resumeConditions={
-                <>
-                  Je reconnais avoir pris connaissance des conditions de l&apos;offre
-                  {tier.nom}{tier.factureAnnuellement ? ", 49€ facturés une fois par an" : ` : ${tier.prix}/mois`}, résiliable à tout moment. {tier.trial ? `${tier.factureAnnuellement ? "Le prélèvement annuel" : "La facturation mensuelle"} commence après 7 jours d'essai, sauf résiliation.` : "La facturation commence immédiatement."}
-                </>
-              }
-            >
-              <SubscribeButton
-                plan={tier.plan}
-                label={tier.trial ? "Commencer mes 7 jours d'essai" : `Choisir ${tier.nom}`}
-                className="coai-rainbow-cta w-full border-0 text-[#111216]"
-              />
-            </OffreConsentGate>
+            <SubscribeButton
+              plan={tier.plan}
+              label={tier.trial ? "Commencer mes 7 jours d'essai" : `Choisir ${tier.nom}`}
+              className="coai-rainbow-cta w-full border-0 text-[#111216]"
+            />
           )}
           {tier.trial && <span className="text-sm font-medium text-laiton-300">7 jours d&apos;essai</span>}
           {tier.plan === "PREMIUM" && <a href={vipReservationHref("une transformation privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">Parler d&apos;une transformation plus longue</a>}

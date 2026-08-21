@@ -66,6 +66,16 @@ export async function POST(request: Request) {
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
+    // Acceptation des CGV déplacée ici (21/08/2026, audit tunnel demandé par
+    // Anthony, point #7 : la case à cocher sur /pricing bloquait chaque
+    // bouton avant même la décision, "alourdit la comparaison des offres").
+    // Stripe Checkout affiche nativement une case "J'accepte les conditions"
+    // avec lien vers l'URL de CGV configurée sur le compte Stripe — ne
+    // fonctionne que si Réglages Stripe → Informations publiques →
+    // "Conditions d'utilisation" pointe vers coai.fr/cgv (à vérifier/régler
+    // une fois dans le dashboard Stripe, hors de portée d'un déploiement de
+    // code). Les boutons /pricing restent immédiatement cliquables.
+    consent_collection: { terms_of_service: "required" },
     subscription_data: {
       metadata,
       ...(offer.trialDays ? { trial_period_days: offer.trialDays } : {}),

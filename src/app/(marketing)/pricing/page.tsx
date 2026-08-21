@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
@@ -94,9 +93,10 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
                   <p className="mt-2 text-sm font-semibold text-white">1 séance privée chaque mois</p>
                   <p className="mt-1 text-xs leading-5 text-graphite-400">En visio partout ou en présentiel à Paris centre.</p>
                 </div>
-                <OffreConsentGate resumeConditions={<>Abonnement VIP COAI de 199€/mois, résiliable à tout moment. Il inclut 1 séance privée par mois. Les créneaux sont confirmés avec Anthony.</>}>
-                  <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP — 199€/mois" className="coai-rainbow-cta w-full border-0" />
-                </OffreConsentGate>
+                <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP — 199€/mois" className="coai-rainbow-cta w-full border-0" />
+                <p className="text-center text-[11px] text-graphite-500">
+                  En continuant, tu acceptes les <Link href="/cgv" target="_blank" className="underline">CGV</Link>.
+                </p>
                 <a className="block text-center text-xs font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("un rythme VIP de 2 à 4 séances par mois", "sur mesure") ?? "/vip"} target="_blank" rel="noreferrer">
                   Besoin de 2 à 4 séances par mois ? Parlons-en
                 </a>
@@ -105,9 +105,13 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
 
             <div className="flex-1" />
             {!tier.sessions && (
-              <OffreConsentGate resumeConditions={<>Abonnement COAI {tier.nom}{tier.factureAnnuellement ? ", 49€ facturés une fois par an" : ` à ${tier.prix}/mois`}, résiliable à tout moment. {tier.trial ? `Les 7 premiers jours constituent une période d'essai ; ${tier.factureAnnuellement ? "le prélèvement annuel" : "la facturation mensuelle"} commence ensuite sauf résiliation.` : "La facturation commence immédiatement."}</>}>
+              <>
                 <SubscribeButton plan={tier.plan} label={tier.trial ? (tier.mostPopular ? "Essayer Impulsion pendant 7 jours" : "Commencer mes 7 jours d'essai") : `Choisir ${tier.nom}`} className="coai-rainbow-cta w-full border-0 text-[#111216]" />
-              </OffreConsentGate>
+                <p className="text-center text-[11px] text-graphite-500">
+                  En continuant, tu acceptes les <Link href="/cgv" target="_blank" className="underline">CGV</Link>
+                  {tier.trial ? " — 7 jours d'essai, puis prélèvement sauf résiliation." : "."}
+                </p>
+              </>
             )}
 
             {tier.plan === "PREMIUM" && (
