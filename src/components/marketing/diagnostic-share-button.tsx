@@ -108,21 +108,31 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       if (!response.ok) throw new Error("Carte indisponible");
       const blob = await response.blob();
       const file = new File([blob], `score-coai-${score}.png`, { type: "image/png" });
-      // Instagram reçoit plus fiablement l'image quand elle est partagée seule :
-      // l'ajout simultané d'un texte/URL peut faire disparaître l'option Story
-      // de la feuille de partage iOS. Le lien reste déjà imprimé sur la carte.
-      if (platform === "instagram" && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      // Bug corrigé (21/08/2026, signalé par Anthony : le bouton TikTok l'a
+      // éjecté de la page diagnostic sans retour possible) — le partage
+      // natif (navigator.share) était réservé à Instagram ; TikTok tombait
+      // toujours dans le chemin de secours ci-dessous. Sur Safari iOS, un
+      // clic synthétique sur un <a download> pointant vers un blob: peut
+      // naviguer l'onglet en cours au lieu de juste télécharger — c'est ce
+      // qui a fait disparaître la page. Les deux plateformes utilisent
+      // maintenant le même partage natif quand il est disponible : l'image
+      // partagée seule (sans texte/URL) reste plus fiable pour que
+      // l'option Story apparaisse dans la feuille de partage iOS.
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
         await navigator.share({ files: [file] });
-        setMessage("Carte prête ✓ Dans Instagram : appuie sur +, choisis Story, puis sélectionne la carte.");
+        setMessage(platform === "instagram"
+          ? "Carte prête ✓ Dans Instagram : appuie sur +, choisis Story, puis sélectionne la carte."
+          : "Carte prête ✓ Dans TikTok : crée une Story, puis sélectionne la carte.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_native`, referral: connecte, challenge: "compare_score" });
       } else {
+        // Repli desktop/navigateurs sans Web Share API : ouvre la carte
+        // dans un nouvel onglet plutôt que de forcer un téléchargement par
+        // clic synthétique — ne remplace jamais la page en cours, quoi que
+        // fasse le navigateur avec ce blob.
         const href = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = href; anchor.download = file.name; anchor.click(); URL.revokeObjectURL(href);
+        window.open(href, "_blank", "noopener,noreferrer");
         if (navigator.clipboard) await navigator.clipboard.writeText(lien);
-        setMessage(platform === "instagram"
-          ? "Carte enregistrée ✓ Ouvre Instagram → + → Story → sélectionne la carte. Le lien du défi est copié."
-          : "Carte enregistrée ✓ Ouvre TikTok, crée une Story et sélectionne la carte.");
+        setMessage("Carte ouverte dans un nouvel onglet ✓ Enregistre-la, puis partage-la en Story. Le lien du défi est copié.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_download`, referral: connecte, challenge: "compare_score" });
       }
     } catch (caught) {
