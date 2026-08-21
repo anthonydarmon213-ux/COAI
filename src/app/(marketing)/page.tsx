@@ -561,7 +561,7 @@ export default function LandingPage() {
             </p>
             <ol className="mt-8 space-y-5">
               {[
-                ["01", "Diagnostic", "Ton niveau, tes objectifs, tes contraintes et tes douleurs sont pris en compte."],
+                ["01", "Bilan", "Ton niveau, tes objectifs, tes contraintes et tes douleurs sont pris en compte."],
                 ["02", "Séance du jour", "Le contenu s’ajuste à ton temps disponible et à ta forme réelle."],
                 ["03", "Progression", "Tes retours alimentent la prochaine séance et rendent l’évolution mesurable."],
               ].map(([numero, titre, description]) => (
@@ -575,7 +575,7 @@ export default function LandingPage() {
               ))}
             </ol>
             <Link href="/diagnostic" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-laiton-400 px-6 text-sm font-semibold text-graphite-950 transition hover:bg-laiton-300">
-              Voir mon aperçu personnalisé
+              Faire mon bilan COAI gratuit
             </Link>
             <p className="mt-3 text-xs text-graphite-500">Gratuit · moins de 5 minutes · sans carte bancaire</p>
           </div>
