@@ -39,6 +39,9 @@ const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("checkin"),
     sleep: z.enum(["TRES_MAUVAIS", "MAUVAIS", "CORRECT", "BON", "EXCELLENT"]),
     energy: z.enum(["TRES_BASSE", "BASSE", "NORMALE", "HAUTE", "TRES_HAUTE"]),
+    // Charge mentale/agenda du jour (20/08/2026), facultative comme food —
+    // aucun comportement ne change si absente.
+    chargeMentale: z.enum(["LEGERE", "NORMALE", "CHARGEE", "SATUREE"]).optional(),
     food: z.enum(["PAS_ENCORE", "LEGER", "EQUILIBRE", "LOURD"]).optional(),
     pain: z.boolean(),
     painArea: z.string().trim().max(100).optional(),
@@ -89,6 +92,7 @@ export async function POST(request: Request) {
     const checkinCommun = {
       sleep: parsed.data.sleep,
       energy: parsed.data.energy,
+      chargeMentale: parsed.data.chargeMentale,
       pain: parsed.data.pain,
       painArea: parsed.data.pain ? parsed.data.painArea : null,
       availableMinutes: parsed.data.availableMinutes,

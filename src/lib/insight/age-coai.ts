@@ -44,6 +44,11 @@ export type AgeCoaiResultat =
       disponible: true;
       score: number;
       niveau: "À renforcer" | "En construction" | "Solide" | "Excellent";
+      // Phrase de synthèse (20/08/2026, piste "Gamification émotionnelle" —
+      // vocabulaire vitalité/résilience plutôt que chiffre froid seul),
+      // dérivée strictement du niveau déjà calculé — jamais une donnée
+      // inventée, juste une autre façon de dire le même résultat réel.
+      synthese: string;
       composantes: { regularite: number; recuperation: number; dosage: number };
       jours: number;
       age: AgeInfo;
@@ -58,6 +63,13 @@ const MIN_JOURS_SCORE = 3;
 const MIN_JOURS_AGE = 7;
 const ECART_MAX_ANNEES = 6;
 const AGE_COAI_PLANCHER = 16;
+
+const SYNTHESE_PAR_NIVEAU: Record<"À renforcer" | "En construction" | "Solide" | "Excellent", string> = {
+  "À renforcer": "Ton énergie a besoin d'un peu plus de régularité pour vraiment décoller.",
+  "En construction": "Ta résilience se construit — chaque check-in ajoute de la clarté à ton rythme.",
+  "Solide": "Une base d'énergie solide, qui te porte au quotidien.",
+  "Excellent": "Ton énergie et ta capacité de récupération sont au sommet de ce que COAI a observé chez toi.",
+};
 
 const SLEEP_SCORE: Record<string, number> = { TRES_MAUVAIS: 15, MAUVAIS: 35, CORRECT: 55, BON: 78, EXCELLENT: 95 };
 const ENERGY_SCORE: Record<string, number> = { TRES_BASSE: 15, BASSE: 35, NORMALE: 55, HAUTE: 78, TRES_HAUTE: 95 };
@@ -127,6 +139,7 @@ export function calculerAgeCoai(params: {
     disponible: true,
     score,
     niveau,
+    synthese: SYNTHESE_PAR_NIVEAU[niveau],
     composantes: { regularite, recuperation, dosage },
     jours: avecDonnees.length,
     age,

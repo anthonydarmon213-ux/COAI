@@ -203,6 +203,17 @@ enum DailyWorkoutRating {
   TROP_DURE
 }
 
+// Charge mentale/agenda du jour (20/08/2026, piste "Real-Time Contextual
+// Engine" allégée) — signal déclaratif distinct de sleep/energy : une
+// journée peut être bien reposée mais chargée en imprévus/stress
+// professionnel, ce que sommeil/énergie seuls ne captent pas.
+enum DailyChargeMentale {
+  LEGERE
+  NORMALE
+  CHARGEE
+  SATUREE
+}
+
 // Phase 6.1 — photographie immuable de la séance proposée pour une journée.
 // La séance source et sa version adaptée sont copiées ici : le contenu de
 // ProgrammeGenerated n'est jamais modifié par un check-in quotidien.
@@ -218,6 +229,7 @@ model DailySession {
   adaptation          Json?
   sleep               DailySleep?
   energy              DailyEnergy?
+  chargeMentale       DailyChargeMentale?
   pain                 Boolean?
   painArea             String?
   availableMinutes    Int?

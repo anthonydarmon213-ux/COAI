@@ -28,6 +28,7 @@ type Daily = {
   adaptation: unknown;
   sleep: string | null;
   energy: string | null;
+  chargeMentale: string | null;
   pain: boolean | null;
   painArea: string | null;
   availableMinutes: number | null;
@@ -42,6 +43,11 @@ const SLEEP = [
 const ENERGY = [
   ["TRES_BASSE", "Très basse"], ["BASSE", "Basse"], ["NORMALE", "Normale"],
   ["HAUTE", "Haute"], ["TRES_HAUTE", "Très haute"],
+] as const;
+// Charge mentale/agenda du jour (20/08/2026, piste "Real-Time Contextual
+// Engine" allégée) — facultative, distincte du sommeil/énergie.
+const CHARGE_MENTALE = [
+  ["LEGERE", "Légère"], ["NORMALE", "Normale"], ["CHARGEE", "Chargée"], ["SATUREE", "Saturée"],
 ] as const;
 const FOOD = [
   ["PAS_ENCORE", "Pas encore mangé"], ["LEGER", "Plutôt léger"],
@@ -124,6 +130,7 @@ export function DailyExperience({
   const [daily, setDaily] = useState<Daily>(initialDaily);
   const [sleep, setSleep] = useState(initialDaily?.sleep ?? "");
   const [energy, setEnergy] = useState(initialDaily?.energy ?? "");
+  const [chargeMentale, setChargeMentale] = useState(initialDaily?.chargeMentale ?? "");
   const [food, setFood] = useState("");
   const [pain, setPain] = useState(initialDaily?.pain ?? false);
   const [painArea, setPainArea] = useState(initialDaily?.painArea ?? "");
@@ -184,7 +191,7 @@ export function DailyExperience({
   async function submitCheckin() {
     if (!sleep || !energy || !food) return setError("Réponds aux cinq repères pour adapter ta séance.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
-    await post({ action: "checkin", sleep, energy, food, pain, painArea: pain ? painArea : undefined, availableMinutes });
+    await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food, pain, painArea: pain ? painArea : undefined, availableMinutes });
   }
 
   async function completeWorkout() {
@@ -222,8 +229,9 @@ export function DailyExperience({
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">01</span> Combien de temps as-tu ?</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">02</span> Comment est ta forme ?</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">03</span> Comment as-tu dormi ?</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">04</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">05</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">04</span> Comment se présente ta journée ? <span className="font-normal text-graphite-500">(facultatif)</span></p><div className="flex flex-wrap gap-2">{CHARGE_MENTALE.map(([value, label]) => <Chip key={value} active={chargeMentale === value} onClick={() => setChargeMentale(chargeMentale === value ? "" : value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">05</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">06</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
           </div>
           {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
           <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-white py-6 text-base font-bold text-graphite-950 hover:bg-white/90 sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>

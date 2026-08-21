@@ -4,6 +4,55 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Pistes #1 et #4 — charge mentale du jour + synthèse vitalité (20/08/2026, suite)
+
+Suite du brainstorm produit : Anthony a validé les versions allégées
+proposées pour les pistes #1 (Real-Time Contextual Engine) et #4
+(Gamification émotionnelle), déjà décrites dans la note précédente.
+
+**Piste #1** : nouveau champ facultatif `chargeMentale` (LEGERE/NORMALE/
+CHARGEE/SATUREE) sur le check-in quotidien (`DailySession.chargeMentale`,
+migration additive `20260821120000_add_daily_charge_mentale`) — distinct
+du sommeil/énergie déjà collectés : une journée peut être reposée mais
+chargée de stress/imprévus, ce que ces deux champs seuls ne captent pas.
+Nouvelle question "Comment se présente ta journée ? (facultatif)" ajoutée
+dans `DailyExperience`, entre forme et sommeil.
+
+Le moteur d'adaptation (`src/lib/daily/session.ts`, `adaptWorkout`) en
+tient compte à deux niveaux : une charge "CHARGEE" réduit légèrement le
+volume (même mécanisme que sommeil/énergie faibles) ; une charge
+"SATUREE" transforme entièrement la séance en mobilité douce + respiration
+dirigée plutôt que de simplement réduire l'effort prévu — reprend
+directement l'exemple donné par Anthony ("on transforme cette séance en
+mouvement doux... pour purger le cortisol, sans baisser ton sentiment
+d'accomplissement"). Priorité juste après la douleur (toujours prioritaire
+sur tout le reste). Au passage, les textes d'explication existants
+(`reason`) ont été réécrits dans un ton plus humain/moins clinique
+("Ton programme d'origine, lui, reste intact" plutôt qu'une liste sèche de
+conditions).
+
+**Piste #4** : nouveau champ `synthese` sur `AgeCoaiResultat`
+(`src/lib/insight/age-coai.ts`) — une phrase par niveau
+(SYNTHESE_PAR_NIVEAU, même pattern que `RECOMMANDATIONS_PAR_NIVEAU` de
+`score-sommeil.ts`), dérivée strictement du niveau déjà calculé, jamais
+une donnée inventée. Affichée en tête de `ScoreAgeCoaiCard`, juste sous le
+titre. Le libellé "Dosage" (composante du score, un peu clinique) renommé
+à l'affichage en "Équilibre de l'effort" — même valeur réelle, vocabulaire
+plus proche de vitalité/résilience que d'un jargon d'entraînement.
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels sur
+tous les fichiers touchés, propres. Montage isolé (Playwright, mobile
+390px et desktop 1440px) de `ScoreAgeCoaiCard` avec données simulées :
+aucune erreur console, aucun débordement, contenu/texte confirmés corrects
+(synthèse affichée, libellé renommé) — le CSS ne s'est pas chargé sur ce
+test précis (même souci d'environnement de serveur de dev déjà rencontré
+dans cette session, pas un problème du code livré). **Non vérifié**
+(comme toujours) : le comportement réel avec un vrai check-in et un vrai
+programme — ce sandbox n'a pas d'accès Supabase en conditions réelles. À
+tester par Anthony : renseigner "Saturée" un jour d'entraînement et
+vérifier que la séance devient bien mobilité/respiration ; vérifier le
+rendu visuel de la nouvelle phrase de synthèse sur le dashboard.
+
 ## Piste #3 "Hybrid Human-AI Mirror" — escalade humaine sur baisse de motivation (20/08/2026, suite)
 
 Suite d'un brainstorm produit d'Anthony (4 pistes d'innovation façon

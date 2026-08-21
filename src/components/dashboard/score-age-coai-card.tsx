@@ -35,6 +35,7 @@ export function ScoreAgeCoaiCard({ resultat }: { resultat: AgeCoaiResultat }) {
         </span>
       </div>
       <h2 id="vitality-title" className="sr-only">Score et âge COAI</h2>
+      <p className="mt-3 max-w-xl font-editorial text-lg text-[#fffdf8] sm:text-xl">{resultat.synthese}</p>
 
       <div className="mt-5 flex flex-wrap items-center gap-6 sm:gap-9">
         <div className="coai-vitality-ring" style={{ "--coai-vitality-value": `${resultat.score * 3.6}deg` } as React.CSSProperties}>
@@ -74,7 +75,7 @@ export function ScoreAgeCoaiCard({ resultat }: { resultat: AgeCoaiResultat }) {
         </div>
         <div>
           <strong className="block font-display text-lg text-[#fffdf8]">{resultat.composantes.dosage}</strong>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-graphite-400">Dosage</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-graphite-400">Équilibre de l&apos;effort</span>
         </div>
       </div>
 

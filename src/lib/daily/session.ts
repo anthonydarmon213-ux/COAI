@@ -9,6 +9,11 @@ export type WorkoutSession = Record<string, unknown> & {
 export type DailyCheckinInput = {
   sleep: "TRES_MAUVAIS" | "MAUVAIS" | "CORRECT" | "BON" | "EXCELLENT";
   energy: "TRES_BASSE" | "BASSE" | "NORMALE" | "HAUTE" | "TRES_HAUTE";
+  // Charge mentale/agenda du jour, distincte du sommeil/énergie — une
+  // journée peut être reposée mais chargée de stress/imprévus. Facultatif :
+  // l'adaptation reste inchangée si non renseigné (comportement identique à
+  // avant l'ajout de ce champ).
+  chargeMentale?: "LEGERE" | "NORMALE" | "CHARGEE" | "SATUREE";
   food: "PAS_ENCORE" | "LEGER" | "EQUILIBRE" | "LOURD";
   pain: boolean;
   painArea?: string;
@@ -113,8 +118,35 @@ export function adaptWorkout(
       summary: {
         adapted: true,
         title: "COAI a adapté ta séance",
-        reason: `Tu as signalé une douleur ou une gêne${zone}. La séance prévue est mise en pause par prudence.`,
+        reason: `Tu as signalé une douleur ou une gêne${zone} — on met la séance en pause aujourd'hui, par prudence. Rien à prouver, mieux vaut laisser la gêne se calmer.`,
         changes: ["Séance d'entraînement suspendue aujourd'hui", "Aucune progression ni charge proposée"],
+        originalExerciseCount: exercices.length,
+        adaptedExerciseCount: 0,
+      },
+    };
+  }
+
+  // Charge mentale saturée (20/08/2026, piste "Real-Time Contextual Engine"
+  // allégée) — priorité juste après la douleur : forcer un HIIT/renfo un
+  // jour saturé ferait plus de mal que de bien. La séance devient une vraie
+  // pause active plutôt qu'un entraînement au rabais, avec une explication
+  // qui parle à la personne, pas à un tableau de métriques.
+  if (checkin.chargeMentale === "SATUREE") {
+    return {
+      session: {
+        ...completeSource,
+        nom: "Mobilité douce & respiration",
+        exercices: [],
+        echauffement: undefined,
+        retourAuCalme:
+          "10 à 15 minutes de mobilité douce (hanches, épaules, colonne) suivies de respiration dirigée (inspire 4s, expire 6s, plusieurs minutes). L'objectif n'est pas de transpirer, c'est de faire redescendre la pression.",
+      },
+      summary: {
+        adapted: true,
+        title: "COAI a adapté ta séance",
+        reason:
+          "Ta journée s'annonce chargée et ton niveau de tension est élevé. On transforme la séance prévue en mouvement doux et respiration dirigée, pour souffler vraiment — sans te faire perdre ton sentiment d'accomplissement.",
+        changes: ["Séance d'effort remplacée par de la mobilité et de la respiration", "Aucune charge ni intensité proposée aujourd'hui"],
         originalExerciseCount: exercices.length,
         adaptedExerciseCount: 0,
       },
@@ -123,6 +155,7 @@ export function adaptWorkout(
 
   const lowRecovery = ["TRES_MAUVAIS", "MAUVAIS"].includes(checkin.sleep) ||
     ["TRES_BASSE", "BASSE"].includes(checkin.energy);
+  const journeeChargee = checkin.chargeMentale === "CHARGEE";
   const needsFuelCaution = checkin.food === "PAS_ENCORE" || checkin.food === "LOURD";
   let adaptedExercises = [...exercices];
 
@@ -135,9 +168,13 @@ export function adaptWorkout(
     changes.push(`Durée ramenée à ${checkin.availableMinutes === 75 ? "60+" : checkin.availableMinutes} min en gardant les exercices prioritaires`);
   }
 
-  if (lowRecovery) {
+  if (lowRecovery || journeeChargee) {
     adaptedExercises = adaptedExercises.map(reduceSeries);
-    changes.push("Volume réduit d'une série par exercice et méthodes d'intensification retirées");
+    changes.push(
+      lowRecovery
+        ? "Volume réduit d'une série par exercice et méthodes d'intensification retirées"
+        : "Volume légèrement réduit pour laisser de la place à ta journée chargée"
+    );
   }
 
   if (needsFuelCaution) {
@@ -150,6 +187,7 @@ export function adaptWorkout(
   const reasonParts = [];
   if (checkin.availableMinutes < expectedMinutes) reasonParts.push(`tu disposes de ${checkin.availableMinutes === 75 ? "60+" : checkin.availableMinutes} minutes`);
   if (lowRecovery) reasonParts.push("ton sommeil ou ton énergie est faible aujourd'hui");
+  if (journeeChargee) reasonParts.push("ta journée s'annonce chargée");
   if (needsFuelCaution) reasonParts.push(checkin.food === "PAS_ENCORE" ? "tu n'as pas encore mangé" : "tu viens de faire un repas lourd");
 
   return {
@@ -158,8 +196,8 @@ export function adaptWorkout(
       adapted,
       title: adapted ? "COAI a adapté ta séance" : "Ta séance reste inchangée",
       reason: adapted
-        ? `Parce que ${reasonParts.join(" et ")}. Le programme source reste intact.`
-        : "Ton check-in ne nécessite aucun ajustement aujourd'hui.",
+        ? `On a ajusté ta séance parce que ${reasonParts.join(" et ")} — ton programme d'origine, lui, reste intact.`
+        : "Ton check-in ne nécessite aucun ajustement aujourd'hui — profite de ta séance telle quelle.",
       changes,
       originalExerciseCount: exercices.length,
       adaptedExerciseCount: adaptedExercises.length,
