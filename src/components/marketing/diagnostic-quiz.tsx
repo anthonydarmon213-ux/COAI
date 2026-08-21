@@ -409,19 +409,68 @@ function AssessmentRow({ number, title, instruction, options, value, onChange }:
   );
 }
 
-function VoletCard({ label, children }: { label: string; children: ReactNode }) {
+// Photo par pilier (20/08/2026, retour Anthony : l'aperçu "ne donne pas
+// envie") — vignette à gauche plutôt qu'une photo pleine largeur, pour
+// répondre en même temps à l'autre retour de la même session ("réduire le
+// diagnostic, aller à l'essentiel") : format compact, pas de scroll
+// supplémentaire sur l'écran résultat. `accentColor` reprend la couleur déjà
+// utilisée pour le gauge du même pilier plus haut sur l'écran (Entraînement
+// #ff8a3d, Alimentation #ffd84d, Récupération #39e67b), pour que la carte se
+// lise comme le prolongement du gauge plutôt qu'un élément déconnecté.
+function VoletCard({
+  label,
+  photoUrl,
+  accentColor,
+  children,
+}: {
+  label: string;
+  photoUrl?: string | null;
+  accentColor?: string;
+  children: ReactNode;
+}) {
   return (
-    <div className="flex w-full flex-col rounded-xl border border-graphite-800 bg-graphite-900/50 px-4 py-4 text-left">
-      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">{label}</span>
-      <div className="mt-1.5 text-sm leading-6 text-graphite-300">{children}</div>
+    <div className="flex w-full items-stretch gap-3 overflow-hidden rounded-xl border border-graphite-800 bg-graphite-900/50 text-left">
+      <div
+        className="relative h-auto w-[72px] flex-none overflow-hidden bg-graphite-800 sm:w-20"
+        style={accentColor ? { boxShadow: `inset 3px 0 0 ${accentColor}` } : undefined}
+      >
+        {photoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
+          <img src={photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+        )}
+      </div>
+      <div className="flex flex-1 flex-col justify-center px-1 py-4 pr-4">
+        <span
+          className="font-mono text-[10px] uppercase tracking-[0.14em]"
+          style={{ color: accentColor ?? "#767c86" }}
+        >
+          {label}
+        </span>
+        <div className="mt-1.5 text-sm leading-6 text-graphite-300">{children}</div>
+      </div>
     </div>
   );
 }
 
+export type PilierPhotos = {
+  entrainement: string | null;
+  nutrition: string | null;
+  recuperation: string | null;
+  hydratation: string | null;
+};
+
+const PILIER_PHOTOS_VIDE: PilierPhotos = {
+  entrainement: null,
+  nutrition: null,
+  recuperation: null,
+  hydratation: null,
+};
+
 export function DiagnosticQuiz({
   connecte = false,
   aDejaUnProgramme = false,
-}: { connecte?: boolean; aDejaUnProgramme?: boolean } = {}) {
+  pilierPhotos = PILIER_PHOTOS_VIDE,
+}: { connecte?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
   const [persona, setPersona] = useState<string[]>([]);
   const [activiteQuotidienne, setActiviteQuotidienne] = useState<string | null>(null);
@@ -2239,7 +2288,7 @@ export function DiagnosticQuiz({
                   <p className="mt-2 text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
                 </div>
                 <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <VoletCard label="Entraînement">
+                  <VoletCard label="Entraînement" photoUrl={pilierPhotos.entrainement} accentColor="#ff8a3d">
                     {diagnostic.split && <p>{diagnostic.split}</p>}
                     <ul className="mt-2 flex flex-col gap-1 text-graphite-400">
                       {diagnostic.exercices.map((ex) => (
@@ -2248,11 +2297,23 @@ export function DiagnosticQuiz({
                     </ul>
                   </VoletCard>
 
-                  {diagnostic.nutrition && <VoletCard label="Nutrition">{diagnostic.nutrition}</VoletCard>}
+                  {diagnostic.nutrition && (
+                    <VoletCard label="Nutrition" photoUrl={pilierPhotos.nutrition} accentColor="#ffd84d">
+                      {diagnostic.nutrition}
+                    </VoletCard>
+                  )}
 
-                  {diagnostic.recuperation && <VoletCard label="Récupération">{diagnostic.recuperation}</VoletCard>}
+                  {diagnostic.recuperation && (
+                    <VoletCard label="Récupération" photoUrl={pilierPhotos.recuperation} accentColor="#39e67b">
+                      {diagnostic.recuperation}
+                    </VoletCard>
+                  )}
 
-                  {diagnostic.hydratation && <VoletCard label="Hydratation">{diagnostic.hydratation}</VoletCard>}
+                  {diagnostic.hydratation && (
+                    <VoletCard label="Hydratation" photoUrl={pilierPhotos.hydratation} accentColor="#3ea8dc">
+                      {diagnostic.hydratation}
+                    </VoletCard>
+                  )}
                 </div>
                 <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
