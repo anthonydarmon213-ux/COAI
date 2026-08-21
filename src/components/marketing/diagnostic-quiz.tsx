@@ -559,6 +559,11 @@ export function DiagnosticQuiz({
   const [applyStatus, setApplyStatus] = useState<
     "idle" | "loading" | "done" | "generation" | "pret" | "erreur"
   >("idle");
+  // Vraie raison de l'échec de génération, quand l'API en donne une
+  // (21/08/2026, cf. appliquerAuProfil) — null si la cause est inconnue,
+  // auquel cas le message générique reste affiché.
+  const [applyErrorMessage, setApplyErrorMessage] = useState<string | null>(null);
+  const [applyNeedsFormule, setApplyNeedsFormule] = useState(false);
   const [resumable, setResumable] = useState(false);
 
   const stepIndex = questionSteps.indexOf(step);
@@ -1169,6 +1174,7 @@ export function DiagnosticQuiz({
   // régénération silencieuse de son programme déjà en place.
   async function appliquerAuProfil() {
     setApplyStatus("loading");
+    setApplyErrorMessage(null);
     let profilApplique = false;
     try {
       const res = await fetch("/api/profil", {
@@ -1184,7 +1190,18 @@ export function DiagnosticQuiz({
       }
       setApplyStatus("generation");
       const genRes = await fetch("/api/programmes/generate", { method: "POST" });
-      if (!genRes.ok) throw new Error();
+      if (!genRes.ok) {
+        // Bug corrigé (21/08/2026, signalé par Anthony : "un souci" affiché
+        // alors que la vraie raison — pas de formule active — était déjà
+        // renvoyée par l'API et jetée ici). /api/programmes/generate répond
+        // 403 avec un message actionnable quand aucun abonnement n'est
+        // actif (cf. hasProgrammeAccess) ou 422 si le profil est incomplet
+        // — on l'affiche tel quel plutôt qu'un message générique.
+        const data = await genRes.json().catch(() => null);
+        setApplyErrorMessage(typeof data?.error === "string" ? data.error : null);
+        setApplyNeedsFormule(genRes.status === 403);
+        throw new Error();
+      }
       trackFunnelEvent("first_programme_viewed");
       setApplyStatus("pret");
     } catch {
@@ -2192,12 +2209,17 @@ export function DiagnosticQuiz({
                   ) : applyStatus === "erreur" ? (
                     <>
                       <p className="text-sm text-graphite-300">
-                        Ton profil est enregistré, mais la génération de ton programme a rencontré
-                        un souci.
+                        {applyErrorMessage ?? "Ton profil est enregistré, mais la génération de ton programme a rencontré un souci."}
                       </p>
-                      <Link href="/programme/entrainement" className="text-sm text-laiton-300 underline">
-                        Réessayer depuis ton programme →
-                      </Link>
+                      {applyNeedsFormule ? (
+                        <Link href="/pricing" className="text-sm text-laiton-300 underline">
+                          Choisir ma formule →
+                        </Link>
+                      ) : (
+                        <Link href="/programme/entrainement" className="text-sm text-laiton-300 underline">
+                          Réessayer depuis ton programme →
+                        </Link>
+                      )}
                     </>
                   ) : applyStatus === "done" ? (
                     <>
