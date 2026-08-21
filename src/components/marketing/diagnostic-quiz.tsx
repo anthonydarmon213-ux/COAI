@@ -2155,31 +2155,6 @@ export function DiagnosticQuiz({
                 </p>
               </div>
 
-              <div className="relative w-full overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[radial-gradient(circle_at_50%_-30%,rgba(76,201,240,.12),transparent_46%),#111518] p-6 text-left shadow-[0_35px_95px_-45px_rgba(0,0,0,.95)] sm:p-8">
-                <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:24px_24px]" aria-hidden="true" />
-                <div className="relative">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">COAI Intelligence · Ton point zéro</p>
-                      <h3 className="mt-2 font-display text-2xl text-white">Tes signaux essentiels.</h3>
-                      <p className="mt-1 max-w-xl text-sm leading-6 text-[#9ba3a8]">Ton premier tableau de bord, calculé à partir des réponses de ce bilan.</p>
-                    </div>
-                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#aeb5ba]">Analyse initiale · Aujourd&apos;hui</span>
-                  </div>
-                  <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
-                    <Gauge label="Entraînement" percent={signauxDiagnostic.entrainement} sublabel="niveau déclaré" size={112} color="#ff8a3d" />
-                    <Gauge label="Alimentation" percent={signauxDiagnostic.alimentation} sublabel="habitudes déclarées" size={112} color="#ffd84d" />
-                    <Gauge label="Récupération" percent={signauxDiagnostic.recuperation} sublabel="signal initial" size={112} color="#39e67b" />
-                    <Gauge label="Sommeil" percent={signauxDiagnostic.sommeil} sublabel="qualité déclarée" size={112} color="#4cc9f0" />
-                    <Gauge label="Score COAI" percent={diagnostic.indiceCoai.score} sublabel="synthèse actuelle" size={112} color="#c56cff" />
-                    <Gauge label="Âge COAI" percent={0} displayValue="—" sublabel="21 jours de données" size={112} color="#f56fae" />
-                  </div>
-                  <p className="mt-7 border-t border-white/[0.07] pt-5 text-center text-[10px] leading-5 text-[#7f898f]">
-                    Ces scores sont des repères de coaching fondés sur tes réponses déclaratives. Ils évolueront avec tes séances et tes données réelles ; ils ne constituent pas un diagnostic médical.
-                  </p>
-                </div>
-              </div>
-
               {connecte ? (
                 // Parcours D (Phase 5B, 11/08/2026) : déjà abonné, aucune
                 // raison de proposer de créer un compte — on applique
