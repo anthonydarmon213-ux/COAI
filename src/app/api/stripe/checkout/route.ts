@@ -3,10 +3,17 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
 
+// Impulsion passe en facturation annuelle (21/08/2026, demande Anthony —
+// "je veux faire du volume sur cette offre") : 49€ une fois par an
+// (≈4,08€/mois) au lieu de 49€/mois, pour rivaliser avec les apps IA seule
+// du marché (Reboot Plan : 39,99€/an) plutôt que de perdre la comparaison
+// directe sur un tier qui n'a pas de coach humain à opposer. Transformation
+// et VIP restent mensuels — c'est volontairement seulement Impulsion qui
+// change, cf. discussion pricing du jour.
 const OFFER_BY_PLAN = {
-  GRATUIT: { name: "COAI — Impulsion", amount: 4900, trialDays: 7 },
-  STANDARD: { name: "COAI — Transformation", amount: 8900, trialDays: 7 },
-  PREMIUM: { name: "COAI — VIP", amount: 19900, trialDays: 0 },
+  GRATUIT: { name: "COAI — Impulsion", amount: 4900, interval: "year", trialDays: 7 },
+  STANDARD: { name: "COAI — Transformation", amount: 8900, interval: "month", trialDays: 7 },
+  PREMIUM: { name: "COAI — VIP", amount: 19900, interval: "month", trialDays: 0 },
 } as const;
 
 type Plan = keyof typeof OFFER_BY_PLAN;
@@ -33,19 +40,22 @@ export async function POST(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (!appUrl) return NextResponse.json({ error: "Configuration Stripe manquante" }, { status: 500 });
 
-  const metadata = { plan, billing: "MONTHLY", vipSessions: String(vipSessions) };
+  const billing = offer.interval === "year" ? "ANNUAL" : "MONTHLY";
+  const metadata = { plan, billing, vipSessions: String(vipSessions) };
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{
       price_data: {
         currency: "eur",
         unit_amount: offer.amount,
-        recurring: { interval: "month" },
+        recurring: { interval: offer.interval },
         product_data: {
           name: offer.name,
           description: plan === "PREMIUM"
             ? `${vipSessions} séance${vipSessions > 1 ? "s" : ""} privée${vipSessions > 1 ? "s" : ""} par mois — visio ou Paris centre.`
-            : "Personal Training réimaginé — accompagnement mensuel résiliable à tout moment.",
+            : offer.interval === "year"
+              ? "Personal Training réimaginé — 49€ facturés une fois par an, résiliable à tout moment."
+              : "Personal Training réimaginé — accompagnement mensuel résiliable à tout moment.",
         },
       },
       quantity: vipSessions,
@@ -54,7 +64,7 @@ export async function POST(request: Request) {
       ? { customer: user.subscription.stripeCustomerId }
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
-    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=MONTHLY`,
+    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}`,
     cancel_url: `${appUrl}/pricing?checkout=cancel`,
     subscription_data: {
       metadata,
@@ -67,7 +77,7 @@ export async function POST(request: Request) {
     where: { id: user.id },
     data: {
       checkoutStartedAt: new Date(), checkoutPlan: plan,
-      checkoutBillingInterval: "MONTHLY", checkoutReminderSentAt: null,
+      checkoutBillingInterval: billing, checkoutReminderSentAt: null,
     },
   });
 

@@ -18,6 +18,13 @@ export type Tier = {
   // comptage réel (jamais un chiffre inventé).
   founderOffer?: boolean;
   sessions?: { count: 1 | 2 | 3 | 4; label: string; prix: string }[];
+  // Facturation annuelle (21/08/2026, Impulsion seulement — cf.
+  // checkout/route.ts) : "prix"/"suffixe" affichent l'équivalent mensuel en
+  // gros (repère familier), "noteFacturation" précise en petit le vrai
+  // rythme de prélèvement — jamais l'inverse, pour ne jamais donner
+  // l'impression d'un prix mensuel qui ne sera pas le vrai prélèvement.
+  factureAnnuellement?: boolean;
+  noteFacturation?: string;
 };
 
 export const ENTREPRISE = {
@@ -47,8 +54,10 @@ export const TIERS: Tier[] = [
   {
     nom: "Impulsion",
     eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24",
-    prix: "49€",
-    suffixe: "/mois",
+    prix: "4€",
+    suffixe: "/mois*",
+    factureAnnuellement: true,
+    noteFacturation: "*49€ facturés une fois par an — 4,08€/mois, résiliable à tout moment",
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
     features: [

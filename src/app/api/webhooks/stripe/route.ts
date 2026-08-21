@@ -7,7 +7,7 @@ import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  GRATUIT: "Impulsion — 49€/mois",
+  GRATUIT: "Impulsion — 49€/an",
   STANDARD: "Transformation — 89€/mois",
   PREMIUM: "VIP — à partir de 199€/mois",
 };
