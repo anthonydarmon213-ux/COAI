@@ -55,7 +55,8 @@ function buildSteps(echauffement: string | undefined, exercices: unknown[], reto
       steps.push({ type: "set", exercice, nom, setIndex: s, totalSets });
       const dernierSetDuDernierExercice = s === totalSets && i === valides.length - 1;
       if (!dernierSetDuDernierExercice) {
-        const prochainNom = s < totalSets ? nom : (typeof valides[i + 1]?.nom === "string" ? (valides[i + 1].nom as string) : "l'exercice suivant");
+        const exerciceSuivant = valides[i + 1];
+        const prochainNom = s < totalSets ? nom : (typeof exerciceSuivant?.nom === "string" ? exerciceSuivant.nom : "l'exercice suivant");
         steps.push({ type: "repos", secondes: reposSecondes, prochainNom });
       }
     }
@@ -157,7 +158,11 @@ export function SeanceRunner({
     setIndex((i) => i + 1);
   }
 
-  if (steps.length === 0) return null;
+  // Garde double : au-delà de "steps vide", TypeScript ne peut pas déduire
+  // que "index" reste toujours dans les bornes du tableau juste parce que
+  // suivant()/useEffect le maintiennent correct — sans ce garde, chaque
+  // accès à step.type plus bas est "possibly undefined" (noUncheckedIndexedAccess).
+  if (steps.length === 0 || !step) return null;
 
   const prochainSet = steps.slice(index + 1).find((s): s is Extract<Step, { type: "set" }> => s.type === "set");
 
