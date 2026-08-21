@@ -9,6 +9,7 @@ import {
   MATERIEL_LABEL,
   TYPE_LABEL,
   NIVEAU_EXERCICE_LABEL,
+  buildFreeExerciseDbPhotoUrl,
   type GroupePrincipal,
   type Materiel,
   type TypeExercice,
@@ -20,6 +21,43 @@ const TYPES = Object.keys(TYPE_LABEL) as TypeExercice[];
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+}
+
+// Vidéo technique (20/08/2026, retour Anthony : "il faut absolument mettre
+// des vidéos, c'est beaucoup plus sympa que juste des photos" + plusieurs
+// photos Pexels erronées dans ce catalogue). Même mécanisme déjà en place
+// et approuvé sur ExerciceCard (programme généré) : recherche YouTube
+// intégrable par nom d'exercice, aucune clé API, aucune bibliothèque à
+// maintenir — contrairement à une photo de stock cherchée par mots-clés
+// génériques, une vidéo cherchée par le nom exact de l'exercice a beaucoup
+// moins de chances de tomber sur le mauvais mouvement.
+function TechniqueVideo({ nom }: { nom: string }) {
+  const [ouverte, setOuverte] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOuverte((v) => !v)}
+        aria-expanded={ouverte}
+        className="self-start rounded-full border border-laiton-400/25 bg-laiton-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-laiton-300 transition hover:border-laiton-400/50 hover:bg-laiton-400/20"
+      >
+        {ouverte ? "✕ Fermer" : "▶ Voir la technique"}
+      </button>
+      {ouverte && (
+        <div className="w-full overflow-hidden rounded-lg border border-white/[0.08] bg-black">
+          <iframe
+            src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${nom} technique musculation`)}`}
+            title={`Aperçu technique : ${nom}`}
+            className="aspect-video w-full"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )}
+    </>
+  );
 }
 
 function FilterGroup<T extends string>({
@@ -109,7 +147,14 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtres.map((ex) => {
-          const photoUrl = photos[ex.photoQuery] ?? null;
+          // Free Exercise DB en priorité (20/08/2026, retour Anthony :
+          // photos Pexels parfois fausses) — photo choisie une fois pour
+          // l'exercice exact plutôt que trouvée par mots-clés à chaque
+          // résolution. Repli Pexels seulement pour les exercices sans
+          // correspondance fiable (cf. commentaires dans catalogue.ts).
+          const photoUrl = ex.freeExerciseDbId
+            ? buildFreeExerciseDbPhotoUrl(ex.freeExerciseDbId)
+            : photos[ex.photoQuery] ?? null;
           return (
             <article
               key={ex.id}
@@ -135,6 +180,7 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
                   <span>{ex.materiel.map((m) => MATERIEL_LABEL[m]).join(", ")}</span>
                 </div>
                 <p className="text-sm leading-6 text-graphite-400">{ex.consigne}</p>
+                <TechniqueVideo nom={ex.nom} />
               </div>
             </article>
           );
