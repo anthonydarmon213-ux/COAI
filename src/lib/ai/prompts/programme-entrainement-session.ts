@@ -69,10 +69,19 @@ Pour CHAQUE exercice, inclus obligatoirement :
 - "photoQuery" : un terme de recherche court EN ANGLAIS pour trouver une photo de stock illustrant
   ce mouvement précis (ex: "barbell bench press", "bodyweight squat", "seated cable row") — jamais
   le nom français traduit littéralement, une vraie requête de recherche naturelle en anglais.
+- "phases" (20/08/2026, demande Anthony — écran détail d'exercice plus guidé) : tableau
+  d'EXACTEMENT 3 repères de technique très courts (4-8 mots chacun, pas des phrases), dans l'ordre
+  d'exécution réel du mouvement. Adapte les 3 repères au type d'exercice plutôt que de forcer un
+  schéma "position/descente/poussée" qui ne veut rien dire pour un gainage ou un cardio — ex. pour
+  un développé couché : "Pieds à plat, dos cambré, omoplates serrées" / "Barre poitrine, coudes à
+  45°" / "Pousse et contrôle, ne verrouille pas brutalement" ; pour une planche : "Corps aligné
+  épaules-talons" / "Ventre gainé, fessiers serrés" / "Respire, ne bloque pas en apnée". Chaque
+  repère doit être un point de contrôle réel qu'une personne peut se répéter pendant le mouvement,
+  jamais une description généraliste du geste.
 
 IMPORTANT : respecte cet ordre exact des champs dans le JSON de chaque exercice (nom, series,
-repetitions, repos, charge, methode, photoQuery) — c'est l'ordre d'affichage à l'utilisateur (sauf
-photoQuery, jamais affiché tel quel, utilisé uniquement pour résoudre une photo). Au niveau de la
-séance, respecte aussi cet ordre : jour, nom, photoQuerySeance, echauffement, exercices,
-retourAuCalme.`;
+repetitions, repos, charge, methode, photoQuery, phases) — c'est l'ordre d'affichage à
+l'utilisateur (sauf photoQuery, jamais affiché tel quel, utilisé uniquement pour résoudre une
+photo). Au niveau de la séance, respecte aussi cet ordre : jour, nom, photoQuerySeance,
+echauffement, exercices, retourAuCalme.`;
 }
