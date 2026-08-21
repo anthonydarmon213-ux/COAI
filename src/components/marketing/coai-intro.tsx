@@ -36,15 +36,23 @@ export function CoaiIntro() {
             </span>
           </div>
 
+          {/* Recentré sur les dirigeants (21/08/2026, audit tunnel demandé
+              par Anthony, points #1/#2 : "la page parle à presque tout le
+              monde"... "une promesse ciblée convertit généralement mieux").
+              Reprend le ciblage déjà défini dans le dossier de
+              positionnement (35-65 ans, agenda instable, charge mentale) —
+              jusqu'ici jamais porté par le titre principal de la home. Les
+              pages SEO généralistes restent inchangées, seule l'entrée
+              principale change de cible. */}
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
-            Ton Personal Trainer,
-            <span className="mt-2 block text-laiton-200">toujours avec toi.</span>
+            Retrouve ton énergie et ta forme,
+            <span className="mt-2 block text-laiton-200">malgré un agenda chargé.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-            Ton programme évolue avec toi : l’IA personnalise ton accompagnement au quotidien —
-            entraînement, nutrition, récupération — et l’ajuste à ton sommeil, ton énergie et ton
-            temps disponible. L’humain reste là quand tu en as besoin.
+            COAI construit chaque jour la séance la plus utile selon ton temps disponible, ta
+            forme réelle et tes contraintes — pas un programme figé que tu dois faire tenir dans
+            ton emploi du temps.
           </p>
 
           <ul className="mt-7 space-y-3" aria-label="Ce que comprend le diagnostic">
