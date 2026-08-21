@@ -3,6 +3,7 @@ import type { SubscriptionPlan } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { sendEmail, sendAdminNotification } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
+import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
 // Transformation/Premium le 11/08/2026). À l'origine réservé au palier
@@ -223,6 +224,64 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
     }
   }
 
+  return alertes;
+}
+
+// Escalade humaine sur baisse de motivation (20/08/2026, piste produit
+// "Hybrid Human-AI Mirror" validée par Anthony) — réservée à Transformation
+// (seul palier avec une vraie relation coach humain, cf. buildWhatsAppContactLink
+// déjà utilisé sur /admin/suivi et /admin/clients/[id]). Contrairement à
+// alerterDouleurImpulsion ci-dessus, aucun email automatique n'est envoyé à
+// l'abonné : l'idée n'est pas un message généré par un bot, mais de donner
+// à Anthony le signal + un message WhatsApp prêt qu'il envoie lui-même, en
+// vrai, à sa façon — l'IA détecte, l'humain répond.
+async function alerterMotivationEnBaisse(appUrl: string): Promise<number> {
+  const candidats = await prisma.user.findMany({
+    where: { subscription: { plan: "STANDARD", status: { in: ["ACTIVE", "PAST_DUE"] } } },
+    select: {
+      id: true,
+      prenom: true,
+      phoneWhatsapp: true,
+      derniereAlerteMotivationEnvoyeeAt: true,
+      weeklyCheckins: {
+        where: { motivation: { not: null } },
+        select: { motivation: true, semaineDebut: true },
+        orderBy: { semaineDebut: "desc" },
+        take: 3,
+      },
+    },
+  });
+
+  let alertes = 0;
+  for (const user of candidats) {
+    const flag = detecterBaisseMotivation(user.weeklyCheckins);
+    if (!flag) continue;
+
+    const dernierCheckin = user.weeklyCheckins[0];
+    if (
+      user.derniereAlerteMotivationEnvoyeeAt &&
+      dernierCheckin &&
+      dernierCheckin.semaineDebut.getTime() <= user.derniereAlerteMotivationEnvoyeeAt.getTime()
+    ) {
+      continue;
+    }
+
+    const lienWhatsApp = buildWhatsAppContactLink(user.phoneWhatsapp, user.prenom, [flag]);
+    await sendAdminNotification(
+      "Motivation en baisse — Transformation",
+      `${user.prenom ? user.prenom : "Un abonné"} montre un signal de motivation en baisse : ${flag.detail}.\n\n` +
+        (lienWhatsApp
+          ? `Message WhatsApp prêt à envoyer : ${lienWhatsApp}`
+          : "Pas de numéro WhatsApp enregistré — à recontacter par email.") +
+        `\n\nFiche complète : ${appUrl}/admin/clients/${user.id}`
+    );
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { derniereAlerteMotivationEnvoyeeAt: new Date() },
+    });
+    alertes++;
+  }
   return alertes;
 }
 
@@ -471,9 +530,10 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement] = await Promise.all([
+  const [relances, alertesDouleur, alertesMotivation, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
+    alerterMotivationEnBaisse(appUrl),
     rappelerFinEssai(appUrl),
     relancerDiagnosticsNonConvertis(appUrl),
     relancerEssaisNonActives(appUrl),
@@ -481,5 +541,5 @@ export async function GET(request: Request) {
     relancerPaiementsEnRetard(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement });
+  return NextResponse.json({ relances, alertesDouleur, alertesMotivation, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement });
 }

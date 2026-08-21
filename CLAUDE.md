@@ -4,6 +4,66 @@ Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
 
+## Piste #3 "Hybrid Human-AI Mirror" — escalade humaine sur baisse de motivation (20/08/2026, suite)
+
+Suite d'un brainstorm produit d'Anthony (4 pistes d'innovation façon
+"real-time contextual engine", "reverse burnout shield", "hybrid human-AI
+mirror", "gamification émotionnelle"). Triage fait avant de coder : la
+piste #2 (analyse vidéo de la vitesse de mouvement via la caméra) n'est pas
+réaliste depuis ce sandbox — un vrai projet de computer vision/tracking de
+pose, pas un simple appel IA, communiqué clairement à Anthony plutôt que de
+prétendre s'en approcher. Anthony a choisi de démarrer par la #3 : l'IA
+gère le quotidien, mais escalade les vrais blocages psychologiques à un
+humain plutôt que de répondre par un message générique.
+
+**Nouveau flag `"motivation"`** (`src/lib/admin/flags.ts`) — même famille
+que les flags douleur/inactivité/mesure/régression déjà en place (repris
+tels quels, réutilisés partout où `computeFlags`/`FLAG_LABELS` sont déjà
+branchés : `/admin`, `/admin/suivi`, `/admin/clients/[id]`, aucune
+modification UI nécessaire, tout est déjà dynamique). Détection basée sur
+`WeeklyCheckin.motivation` (1-5, déjà collecté chaque semaine, donnée
+réelle auto-déclarée par l'abonné — jamais déduite d'un pattern
+d'inactivité, qui a déjà son propre flag distinct) : baisse sur au moins 2
+check-ins hebdomadaires consécutifs ET valeur repassée à 2/5 ou moins —
+jamais un seul chiffre bas isolé (une semaine difficile arrive à tout le
+monde). Logique extraite dans `detecterBaisseMotivation()`, fonction pure
+exportée et réutilisée à l'identique par `computeFlags` (interactif, côté
+espace coach) et par la nouvelle alerte automatique ci-dessous — une seule
+règle, jamais deux logiques divergentes.
+
+**Escalade automatique** (`alerterMotivationEnBaisse`, nouveau, dans le
+cron quotidien `relance-inactifs` déjà existant) — réservée à Transformation
+(seul palier avec une vraie relation coach humain ; Impulsion est 100% IA
+sans validation humaine, escalader n'y aurait aucun sens produit).
+Contrairement à `alerterDouleurImpulsion` (qui envoie aussi un email
+automatique à l'abonné), **aucun message automatique n'est envoyé à
+l'abonné ici** — décision volontaire, cohérente avec l'esprit de la piste
+#3 ("l'IA détecte, l'humain répond vraiment") : seule une notification à
+Anthony part, avec le lien WhatsApp déjà prêt (réutilise
+`buildWhatsAppContactLink`, message chaleureux et personnel, pas une
+question fermée sur des chiffres) pour qu'il envoie lui-même un vrai
+message, à sa façon. Dédoublonnage sur `User.derniereAlerteMotivationEnvoyeeAt`
+(nouveau champ, migration `20260820120000_add_derniere_alerte_motivation`,
+additive) comparé à la date du check-in déclencheur — ne re-notifie que
+si une nouvelle semaine en baisse apparaît, jamais de spam quotidien tant
+que rien ne change.
+
+**Vérifié** : `npx tsc --noEmit`, `npx next build` et `eslint` réels sur
+tous les fichiers touchés, propres. Logique de détection relue à la main
+(seuils, dédoublonnage, priorité de file coach). **Non vérifié** (comme
+toujours) : le comportement réel avec de vraies données — ce sandbox n'a
+pas d'accès à Supabase/aux crons Vercel en conditions réelles. À tester
+par Anthony une fois déployé : renseigner 2-3 semaines de motivation en
+baisse pour un compte Transformation test, vérifier que le badge apparaît
+sur `/admin` et `/admin/clients/[id]`, et que la notification + le lien
+WhatsApp arrivent au prochain passage du cron quotidien.
+
+**Pistes #1 et #4** restent des versions allégées possibles plus tard (un
+check-in enrichi + un ton d'adaptation moins clinique pour #1 ; une
+reformulation des cartes existantes — Score COAI, Age COAI — vers un
+vocabulaire vitalité/résilience plutôt que calories pour #4) — pas encore
+demandées par Anthony, pas commencées.
+
 ## Retours d'une amie testeuse : 6 points traités (20/08/2026)
 
 Retour vocal d'Anthony transmettant les retours d'une amie ayant testé le

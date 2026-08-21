@@ -82,6 +82,13 @@ model User {
   // pas renvoyer deux fois pour la même mention — cf. /api/cron/relance-inactifs.
   derniereAlerteDouleurEnvoyeeAt DateTime?
 
+  // Escalade humaine sur baisse de motivation, palier Transformation
+  // (20/08/2026) — signal auto-déclaré (WeeklyCheckin.motivation, cf.
+  // src/lib/admin/flags.ts) plutôt qu'une mesure d'inactivité déjà couverte
+  // ailleurs. Comparé à la date du check-in qui déclenche l'alerte (pas un
+  // cooldown fixe) pour ne renvoyer qu'à une nouvelle semaine en baisse.
+  derniereAlerteMotivationEnvoyeeAt DateTime?
+
   // Récupération de Checkout : mémorise uniquement l'intention commerciale,
   // jamais une donnée bancaire (Stripe reste le seul détenteur de la carte).
   checkoutStartedAt       DateTime?
