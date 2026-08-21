@@ -8,6 +8,7 @@ import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
+import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
 
 const COMPARAISON_RAPIDE = [
@@ -26,6 +27,7 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
   return (
     <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-8 px-6 pb-20 pt-16 sm:pt-20">
       <TrackConversion name="pricing_viewed" />
+      <FondateurTicker />
       <div className="w-full max-w-6xl"><BackLink /></div>
       <div className="max-w-4xl text-center">
         <SectionLabel>Personal Training, Reimagined</SectionLabel>
