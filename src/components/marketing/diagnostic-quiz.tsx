@@ -19,6 +19,7 @@ import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { DiagnosticShareButton } from "@/components/marketing/diagnostic-share-button";
 import { FormuleRecommandeeCard } from "@/components/marketing/formule-recommandee-card";
+import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { ProjectionEmotionnelleCard } from "@/components/marketing/projection-emotionnelle-card";
 import { construireProjection, EVENEMENTS_DECLENCHEURS } from "@/lib/diagnostic/projection-emotionnelle";
 import { Gauge } from "@/components/ui/gauge";
@@ -2286,6 +2287,9 @@ export function DiagnosticQuiz({
                     </Button>
                   </Link>
                   <span className="text-xs font-medium text-graphite-500">0€ pendant 7 jours · carte requise · résiliable à tout moment</span>
+                  <div className="-mx-5 w-[calc(100%+2.5rem)] sm:-mx-8 sm:w-[calc(100%+4rem)]">
+                    <FondateurTicker />
+                  </div>
                 </div>
               )}
 

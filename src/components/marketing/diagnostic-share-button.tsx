@@ -40,6 +40,53 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
     return url.toString();
   }
 
+  // Lien "offrir un bilan gratuit" (21/08/2026, demande Anthony) — distinct
+  // du défi ci-dessus : pas de score/challenge_score (le destinataire n'est
+  // pas invité à battre un chiffre, juste à faire SON bilan gratuit), même
+  // lien de parrainage réel pour un visiteur connecté. Séparé volontairement
+  // de getShareLink() plutôt que d'ajouter un paramètre conditionnel de plus
+  // : deux intentions différentes (défi vs cadeau) valent deux fonctions
+  // simples plutôt qu'une seule avec des branches qui s'entremêlent.
+  async function getGiftLink() {
+    let lien = "https://coai.fr/diagnostic";
+    if (connecte) {
+      const res = await fetch("/api/parrainage").catch(() => null);
+      const data = res?.ok ? await res.json() : null;
+      if (typeof data?.lien === "string") lien = data.lien;
+    }
+    const url = new URL(lien, window.location.origin);
+    url.searchParams.set("utm_source", "score_coai");
+    url.searchParams.set("utm_medium", "share");
+    url.searchParams.set("utm_campaign", "gift_bilan");
+    url.searchParams.set("utm_content", "offre_bilan");
+    return url.toString();
+  }
+
+  async function partagerBilanOffert() {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const lien = await getGiftLink();
+      const text = `Je t’offre un bilan gratuit COAI — 5 minutes, sans carte bancaire, pour voir où tu en es et ce qu’un programme sur-mesure changerait :\n${lien}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Un bilan gratuit COAI, offert par moi", text });
+          trackFunnelEvent("diagnostic_result_shared", { support: "native", referral: connecte, challenge: "gift_bilan" });
+          return;
+        } catch (caught) {
+          if (caught instanceof DOMException && caught.name === "AbortError") return;
+        }
+      }
+      await navigator.clipboard.writeText(text);
+      setMessage("Message copié — envoie-le à qui tu veux.");
+      trackFunnelEvent("diagnostic_result_shared", { support: "clipboard", referral: connecte, challenge: "gift_bilan" });
+    } catch {
+      setMessage("Impossible de partager pour le moment.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function shareText(lien: string) {
     return `J’ai obtenu ${score}/100 à mon Score COAI pour ${objectif.toLowerCase()}. Essaie de battre mon score : le bilan est gratuit 👇\n${lien}`;
   }
@@ -168,14 +215,25 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
 
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl border border-[#25D366]/20 bg-[#25D366]/[0.055] px-5 py-4 text-center">
-      <p className="text-sm font-medium text-white">Fier de ton Score COAI&nbsp;? Lance le défi à un proche.</p>
+      <p className="text-sm font-medium text-white">Partage ton Score COAI, ou offres-en un à un proche.</p>
       {connecte && (
         <p className="text-xs text-graphite-500">
           Si un proche rejoint COAI avec ton lien, un mois t’est offert.
         </p>
       )}
       <div className="flex flex-wrap justify-center gap-2">
-        {/* Story Instagram/TikTok en premier (20/08/2026, retour Anthony :
+        {/* "Offrir un bilan gratuit" en premier (21/08/2026, demande Anthony —
+            un lien simple plutôt qu'une image à créer, plus robuste et plus
+            proche des habitudes de la cible COAI que publier une Story). */}
+        <button
+          type="button"
+          onClick={partagerBilanOffert}
+          disabled={loading}
+          className="rounded-full border border-laiton-400/45 bg-laiton-400 px-5 py-2.5 text-sm font-semibold text-[#1a140a] shadow-[0_8px_24px_rgba(201,162,98,0.25)] transition hover:-translate-y-0.5 hover:bg-laiton-300 disabled:opacity-50"
+        >
+          Offrir un bilan gratuit
+        </button>
+        {/* Story Instagram/TikTok (20/08/2026, retour Anthony :
             "ce sera plus sympa que sur WhatsApp") — partagerStory() existait
             déjà (carte-image + Web Share API) mais n'était jusqu'ici jamais
             rendue : aucun bouton ne l'appelait. */}

@@ -112,9 +112,12 @@ export function ServiceDetailModal({
           Cette formule te correspond ? Voici le prix.
         </p>
         {!tier.sessions && (
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-display text-4xl font-semibold text-white">{tier.prix}</span>
-            <span className="text-sm text-graphite-400">{tier.suffixe}</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display text-4xl font-semibold text-white">{tier.prix}</span>
+              <span className="text-sm text-graphite-400">{tier.suffixe}</span>
+            </div>
+            {tier.noteFacturation && <p className="text-xs leading-5 text-graphite-500">{tier.noteFacturation}</p>}
           </div>
         )}
 
@@ -139,7 +142,7 @@ export function ServiceDetailModal({
               resumeConditions={
                 <>
                   Je reconnais avoir pris connaissance des conditions de l&apos;offre
-                  {tier.nom} : {tier.prix}/mois, résiliable à tout moment. {tier.trial ? "La facturation mensuelle commence après 7 jours d'essai, sauf résiliation." : "La facturation commence immédiatement."}
+                  {tier.nom}{tier.factureAnnuellement ? ", 49€ facturés une fois par an" : ` : ${tier.prix}/mois`}, résiliable à tout moment. {tier.trial ? `${tier.factureAnnuellement ? "Le prélèvement annuel" : "La facturation mensuelle"} commence après 7 jours d'essai, sauf résiliation.` : "La facturation commence immédiatement."}
                 </>
               }
             >
