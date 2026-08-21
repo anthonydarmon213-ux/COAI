@@ -318,11 +318,20 @@ function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   if (sante.length > 0) {
     actions.push({ titre: "Adapter les mouvements à ta contrainte", impact: "progression sécurisée" });
   }
-  if (actions.length < 3) {
-    actions.push({ titre: `Tenir ton rythme de ${r.frequence?.toLowerCase() ?? "séances"}`, impact: "+3 à 5 points" });
-  }
-  if (actions.length < 3) {
-    actions.push({ titre: "Compléter ton check-in chaque semaine", impact: "adaptation plus précise" });
+  // Bug corrigé (20/08/2026, signalé par Anthony : "tes 3 premiers pas"
+  // n'en affichait que 2) — ces trois secours étaient chacun un `if`
+  // séparé au lieu d'une boucle : avec 0 action conditionnelle poussée
+  // au-dessus (profil sans point faible détecté), les deux premiers `if`
+  // suffisaient à peine à 2 éléments, jamais 3. Boucle jusqu'à 3, sur une
+  // liste de secours volontairement plus longue que nécessaire.
+  const secours = [
+    { titre: `Tenir ton rythme de ${r.frequence?.toLowerCase() ?? "séances"}`, impact: "+3 à 5 points" },
+    { titre: "Compléter ton check-in chaque semaine", impact: "adaptation plus précise" },
+    { titre: "Suivre ton programme personnalisé", impact: "progression mesurée" },
+  ];
+  for (const item of secours) {
+    if (actions.length >= 3) break;
+    actions.push(item);
   }
 
   const niveau = score >= 78 ? "Très élevé" : score >= 68 ? "Élevé" : score >= 55 ? "Prometteur" : "À révéler";
