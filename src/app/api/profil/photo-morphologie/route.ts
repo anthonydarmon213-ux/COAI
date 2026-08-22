@@ -30,6 +30,10 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
+  // Vue déclarée par l'utilisateur (face/profil) — facultative : une photo
+  // envoyée sans précision reste analysée comme avant.
+  const vueBrute = formData.get("vue");
+  const vue = vueBrute === "face" || vueBrute === "profil" ? vueBrute : undefined;
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
@@ -55,7 +59,7 @@ export async function POST(request: Request) {
   let extraction: Extraction;
   try {
     extraction = await generateWithVision<Extraction>(
-      buildBodyPhotoExtractionPrompt(),
+      buildBodyPhotoExtractionPrompt(vue),
       buffer.toString("base64"),
       mediaType,
       { userId: user.id, feature: "vision_morphologie" }

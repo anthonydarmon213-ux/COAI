@@ -3,7 +3,21 @@
 // des observations factuelles utiles à l'entraînement, jamais un jugement
 // sur l'apparence, et refus explicite si la photo n'est pas adaptée à cet
 // usage (personne mineure, tenue non sportive, image inappropriée).
-export function buildBodyPhotoExtractionPrompt(): string {
+export function buildBodyPhotoExtractionPrompt(vue?: "face" | "profil"): string {
+  // Vue précisée par l'utilisateur au moment de la prise (22/08/2026) — de
+  // face et de profil ne révèlent pas les mêmes choses : l'équilibre
+  // gauche/droite se juge de face, la position du bassin et des épaules se
+  // juge de profil. Le dire au modèle évite qu'il commente un alignement
+  // qu'il ne peut pas voir sous cet angle.
+  const consigneVue = vue === "face"
+    ? `\n\nCette photo est prise DE FACE : juge l'équilibre gauche/droite (épaules, bassin) et l'équilibre de développement entre les côtés. Ne commente PAS la position du bassin dans le plan sagittal (antéversion/rétroversion), invisible sous cet angle.`
+    : vue === "profil"
+      ? `\n\nCette photo est prise DE PROFIL : juge l'alignement vertical (position de la tête, des épaules, du bassin, courbures du dos). Ne commente PAS l'équilibre gauche/droite, invisible sous cet angle.`
+      : "";
+  return buildPrompt(consigneVue);
+}
+
+function buildPrompt(consigneVue: string): string {
   return `Tu es un assistant technique qui aide un coach sportif diplômé à préparer un programme
 d'entraînement. On te montre une photo qu'un utilisateur adulte a envoyée volontairement, en
 tenue de sport (legging, short, brassière, débardeur...), dans le but exclusif d'obtenir des
@@ -38,5 +52,5 @@ Règles impératives si "analysable": true :
 - Ne décris jamais la personne au-delà de ce qui sert le programme (pas de description physique
   générale, pas de commentaire sur la tenue elle-même).
 - "morphologieDetectee" reste une estimation informative pour le coach, pas une classification
-  définitive — si le doute est trop important, mets null plutôt que de deviner.`;
+  définitive — si le doute est trop important, mets null plutôt que de deviner.${consigneVue}`;
 }
