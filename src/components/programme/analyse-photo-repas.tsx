@@ -12,6 +12,7 @@ type Resultat = {
   glucidesG: number | null;
   lipidesG: number | null;
   resume: string | null;
+  conseilCoach?: string | null;
 };
 
 // Outil ponctuel (20/08/2026, demande Anthony) : prendre en photo son plat et
@@ -100,6 +101,12 @@ export function AnalysePhotoRepas() {
               </div>
             ))}
           </div>
+          {resultat.conseilCoach && (
+            <div className="rounded-xl border border-laiton-400/25 bg-laiton-400/[0.07] px-3.5 py-3">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-300">Le conseil du coach COAI</p>
+              <p className="mt-1.5 text-xs leading-5 text-graphite-100">{resultat.conseilCoach}</p>
+            </div>
+          )}
           {resultat.resume && <p className="text-xs italic leading-5 text-graphite-500">{resultat.resume}</p>}
         </div>
       )}

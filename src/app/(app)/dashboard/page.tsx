@@ -18,6 +18,8 @@ import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-vide
 import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
+import { ReadinessCard } from "@/components/dashboard/readiness-card";
+import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 
@@ -83,6 +85,17 @@ export default async function DashboardPage() {
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
   ]);
+  // Readiness du jour (22/08/2026) — calculé sur le check-in déjà chargé
+  // ci-dessus + les données santé du profil quand elles existent. Aucune
+  // requête supplémentaire.
+  const readiness = calculerReadiness({
+    sleep: daily?.sleep ?? null,
+    energy: daily?.energy ?? null,
+    chargeMentale: daily?.chargeMentale ?? null,
+    pain: daily?.pain ?? null,
+    hrv: user.profile?.hrv ?? null,
+    frequenceCardiaqueRepos: user.profile?.frequenceCardiaqueRepos ?? null,
+  });
   const ageCoai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies: diesRecents });
 
   const programme = validated ?? latest;
@@ -221,6 +234,7 @@ export default async function DashboardPage() {
                 expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
                 pendingCoach={pendingCoach}
                 programmeVersion={programme.version}
+                equipementProfil={user.profile?.equipementDisponible}
               />
             </div>
           ) : (
@@ -288,6 +302,7 @@ export default async function DashboardPage() {
             Récupération musculaire remontée ici, à côté de la semaine,
             au lieu d'être tout en bas de page comme avant. */}
         <div className="flex flex-col gap-5">
+          <ReadinessCard readiness={readiness} />
           <ScoreAgeCoaiCard resultat={ageCoai} />
           <RecuperationMusculaireCard />
           {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}

@@ -50,6 +50,10 @@ const requestSchema = z.discriminatedUnion("action", [
     // check-in léger les jours de repos (RestDayCheckin) n'a aucune séance à
     // dimensionner, donc rien à demander ici.
     availableMinutes: z.union([z.literal(15), z.literal(25), z.literal(40), z.literal(60), z.literal(75)]).optional(),
+    // Matériel réellement dispo ce jour-là (22/08/2026, demande Anthony :
+    // "ça peut évoluer") — facultatif : sans réponse, la séance continue
+    // d'utiliser l'équipement du profil, exactement comme avant.
+    equipementDuJour: z.string().trim().max(300).optional(),
   }),
   z.object({ action: z.literal("complete") }),
   z.object({
@@ -96,6 +100,7 @@ export async function POST(request: Request) {
       pain: parsed.data.pain,
       painArea: parsed.data.pain ? parsed.data.painArea : null,
       availableMinutes: parsed.data.availableMinutes,
+      equipementDuJour: parsed.data.equipementDuJour,
     };
 
     if (!source) {
