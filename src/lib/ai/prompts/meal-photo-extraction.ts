@@ -17,7 +17,8 @@ Renvoie un objet JSON avec ces champs :
   "proteinesG": nombre entier (grammes), sinon null,
   "glucidesG": nombre entier (grammes), sinon null,
   "lipidesG": nombre entier (grammes), sinon null,
-  "resume": "une phrase neutre expliquant l'estimation, ou pourquoi l'image n'a pas pu être analysée"
+  "resume": "une phrase neutre expliquant l'estimation, ou pourquoi l'image n'a pas pu être analysée",
+  "conseilCoach": "un conseil terrain court et actionnable lié à CE repas, sinon null"
 }
 
 Mets "analysable": false et tous les champs numériques/listes à null (aliments à []) dans CHACUN
@@ -39,5 +40,14 @@ Règles impératives si "analysable": true :
   quantités et sauces cachées peuvent faire varier ce chiffre.").
 - Ne donne aucun jugement de valeur sur le repas (pas de "trop calorique", "pas assez sain"...) —
   uniquement des chiffres et une description factuelle, à l'utilisateur d'en tirer ses propres
-  conclusions.`;
+  conclusions.
+- "conseilCoach" (22/08/2026, demande Anthony — "Le Conseil du Coach COAI") : UNE phrase de
+  savoir-faire terrain, utile et concrète, à propos de CE repas précis. Exemples de registres
+  pertinents : délai de digestion avant une séance, façon simple de compléter l'apport en
+  protéines, moment de la journée où ce type de repas est le plus utile, association qui améliore
+  l'absorption. Reste factuel et bienveillant : c'est un repère pratique, JAMAIS un jugement
+  déguisé ("évite ce plat", "trop gras" sont interdits, y compris formulés gentiment), JAMAIS un
+  conseil médical ou nutritionnel personnalisé (aucune recommandation de supplémentation, de
+  régime, ni rien qui suppose une pathologie). Si tu n'as pas de conseil réellement utile à
+  donner pour ce plat, mets null plutôt qu'une banalité.`;
 }

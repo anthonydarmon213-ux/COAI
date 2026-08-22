@@ -18,6 +18,8 @@ import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-vide
 import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
+import { ReadinessCard } from "@/components/dashboard/readiness-card";
+import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 
@@ -83,6 +85,17 @@ export default async function DashboardPage() {
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
   ]);
+  // Readiness du jour (22/08/2026) — calculé sur le check-in déjà chargé
+  // ci-dessus + les données santé du profil quand elles existent. Aucune
+  // requête supplémentaire.
+  const readiness = calculerReadiness({
+    sleep: daily?.sleep ?? null,
+    energy: daily?.energy ?? null,
+    chargeMentale: daily?.chargeMentale ?? null,
+    pain: daily?.pain ?? null,
+    hrv: user.profile?.hrv ?? null,
+    frequenceCardiaqueRepos: user.profile?.frequenceCardiaqueRepos ?? null,
+  });
   const ageCoai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies: diesRecents });
 
   const programme = validated ?? latest;
@@ -180,6 +193,8 @@ export default async function DashboardPage() {
           par le commentaire sur `mission` plus haut ("jamais une deuxième
           source de vérité"). */}
       <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
+
+      <ReadinessCard readiness={readiness} />
 
       <ScoreAgeCoaiCard resultat={ageCoai} />
 
