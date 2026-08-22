@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
+import { MuscleMap } from "@/components/programme/muscle-map";
+import { musclesPourExercice } from "@/lib/exercices/muscles";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -569,6 +571,16 @@ export function SeanceRunner({
               const saisi = realise[cle] ?? { reps: "", charge: "" };
               return (
                 <>
+                  {/* Cartographie anatomique en haut d'écran (22/08/2026,
+                      demande Anthony, mobile-first). Ne s'affiche que si
+                      l'exercice est reconnu dans la table des muscles —
+                      une silhouette éteinte laisserait croire à un bug. */}
+                  {(() => {
+                    const cible = musclesPourExercice(step.nom);
+                    if (!cible) return null;
+                    return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
+                  })()}
+
                   {photoUrl && (
                     // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe
                     <img src={photoUrl} alt="" className="h-40 w-full max-w-xs rounded-2xl object-cover" loading="lazy" />
@@ -664,8 +676,8 @@ export function SeanceRunner({
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">Repos</span>
                 <CercleMinuteur secondesRestantes={secondesRestantes} secondesTotal={step.secondes} />
                 <div className="flex gap-3">
-                  <button type="button" onClick={() => setSecondesRestantes((s) => Math.max(0, s - 15))} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white">-15s</button>
-                  <button type="button" onClick={() => setSecondesRestantes((s) => s + 15)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white">+15s</button>
+                  <button type="button" onClick={() => setSecondesRestantes((s) => Math.max(0, s - 15))} className="min-h-12 rounded-2xl border border-white/15 px-6 text-base font-semibold text-white transition active:scale-95">−15s</button>
+                  <button type="button" onClick={() => setSecondesRestantes((s) => s + 15)} className="min-h-12 rounded-2xl border border-white/15 px-6 text-base font-semibold text-white transition active:scale-95">+15s</button>
                 </div>
                 <p className="text-xs text-graphite-500">Suivant : {step.prochainNom}</p>
               </>
@@ -719,7 +731,10 @@ export function SeanceRunner({
               type="button"
               onClick={suivant}
               disabled={envoiEnCours}
-              className="coai-rainbow-cta w-full rounded-full border-0 py-3.5 text-sm font-extrabold text-[#111216] disabled:opacity-60"
+              // Gros poussoir tactile (22/08/2026, demande Anthony) : 64px
+              // de haut, bien au-delà des 44px recommandés par Apple —
+              // cliquable en pleine série, avec des doigts moites.
+              className="coai-rainbow-cta min-h-16 w-full rounded-2xl border-0 text-base font-extrabold text-[#111216] transition active:scale-[0.98] disabled:opacity-60"
             >
               {index + 1 >= steps.length ? (envoiEnCours ? "…" : "Terminer la séance ✓") : step.type === "repos" ? "Passer le repos →" : "C'est fait ✓"}
             </button>
