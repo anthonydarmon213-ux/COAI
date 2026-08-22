@@ -19,8 +19,8 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
 // distinctif sur chaque palier. Ces phrases sont écrites spécifiquement pour
 // comparer d'un coup d'œil — le détail complet reste dans ServiceDetailModal.
 const RESUME_COMPARATIF: Record<ServiceKey, string> = {
-  IMPULSION: "Personal Trainer autonome et adaptatif — 49€/an",
-  TRANSFORMATION: "IA 24/7 + regard et ajustements humains — 89€/mois",
+  IMPULSION: "Personal Trainer autonome et adaptatif — 19,99€/mois",
+  TRANSFORMATION: "IA 24/7 + regard et ajustements humains — 99€/mois",
   VIP: "1 à 4 séances privées par mois, présentiel ou visio — dès 199€/mois",
 };
 

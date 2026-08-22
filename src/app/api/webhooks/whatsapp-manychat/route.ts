@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     if (questionsUtilisees >= QUOTA_LIMITE) {
       const reply =
-        "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre Pass IA. Passe à Coaching Hybride (89€/mois) pour un accès illimité au coach IA et le regard d'un coach humain.";
+        "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre Pass IA. Passe à Coaching Hybride (99€/mois) pour un accès illimité au coach IA et le regard d'un coach humain.";
       await prisma.whatsAppEvent.create({
         data: { userId: user.id, direction: "OUTBOUND", payload: { reply } as Prisma.InputJsonValue },
       });

@@ -54,10 +54,10 @@ export const TIERS: Tier[] = [
   {
     nom: "Pass IA",
     eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24",
-    prix: "4€",
-    suffixe: "/mois*",
-    factureAnnuellement: true,
-    noteFacturation: "*49€ facturés une fois par an — 4,08€/mois, résiliable à tout moment",
+    prix: "19,99€",
+    suffixe: "/mois",
+    factureAnnuellement: false,
+    noteFacturation: "Sans engagement · ou 9,99€/mois en annuel (119€ facturés une fois par an)",
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
     features: [
@@ -76,7 +76,7 @@ export const TIERS: Tier[] = [
   {
     nom: "Coaching Hybride",
     eyebrow: "IA + REGARD HUMAIN",
-    prix: "89€",
+    prix: "99€",
     suffixe: "/mois",
     description:
       "La rapidité de l'IA et la subtilité d'un coach humain : le bon niveau d'attention pour progresser sans rester seul.",

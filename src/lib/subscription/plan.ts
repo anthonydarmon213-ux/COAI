@@ -57,7 +57,7 @@ export function hasSuiviAccess(subscription?: Subscription | null): boolean {
 // Noms marketing (08/08/2026) : GRATUIT = "Pass IA", STANDARD = "Coaching Hybride"
 // — les identifiants techniques historiques sont conservés pour compatibilité.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
-  GRATUIT: "Pass IA — 49€/an (soit 4,08€/mois)",
-  STANDARD: "Coaching Hybride — 89€/mois",
+  GRATUIT: "Pass IA — 19,99€/mois ou 119€/an",
+  STANDARD: "Coaching Hybride — 99€/mois",
   PREMIUM: "VIP — à partir de 199€/mois",
 };
