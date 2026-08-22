@@ -144,6 +144,58 @@ function useBip() {
   }, []);
 }
 
+// Saisie vocale (22/08/2026, demande Anthony) — en salle, les mains sont
+// souvent occupées ou moites. Utilise la Web Speech API du navigateur
+// (aucune dépendance, aucun envoi audio à un serveur). Indisponible sur
+// Firefox et sur certains navigateurs : le bouton ne s'affiche alors pas
+// du tout, plutôt qu'un bouton mort qui ne réagit jamais.
+type ReconnaissanceVocale = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+};
+
+function creerReconnaissance(): ReconnaissanceVocale | null {
+  if (typeof window === "undefined") return null;
+  type AvecSpeech = typeof window & {
+    SpeechRecognition?: new () => ReconnaissanceVocale;
+    webkitSpeechRecognition?: new () => ReconnaissanceVocale;
+  };
+  const w = window as AvecSpeech;
+  const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+  if (!Ctor) return null;
+  const instance = new Ctor();
+  instance.lang = "fr-FR";
+  instance.continuous = false;
+  instance.interimResults = false;
+  return instance;
+}
+
+// Extrait reps et charge d'une phrase dictée. Accepte les formulations
+// naturelles ("douze à quarante kilos", "10 reps 50"). Si un seul nombre
+// est dicté, il est traité comme les répétitions — le cas le plus fréquent,
+// et la charge reste modifiable à la main.
+function analyserDictee(texte: string): { reps?: string; charge?: string } {
+  const t = texte.toLowerCase();
+  const nombres = t.match(/\d+([.,]\d+)?/g)?.map((n) => n.replace(",", ".")) ?? [];
+  if (nombres.length === 0) return {};
+
+  // Une unité de poids explicite lève toute ambiguïté.
+  const avecKilo = t.match(/(\d+([.,]\d+)?)\s*(kg|kilo)/);
+  if (avecKilo?.[1]) {
+    const charge = avecKilo[1].replace(",", ".");
+    const reps = nombres.find((n) => n !== charge);
+    return { charge, ...(reps ? { reps } : {}) };
+  }
+  if (nombres.length === 1) return { reps: nombres[0] };
+  return { reps: nombres[0], charge: nombres[1] };
+}
+
 function CercleMinuteur({ secondesRestantes, secondesTotal }: { secondesRestantes: number; secondesTotal: number }) {
   const rayon = 88;
   const circonference = 2 * Math.PI * rayon;
@@ -191,6 +243,11 @@ export function SeanceRunner({
   const [ajustementOuvert, setAjustementOuvert] = useState(false);
   const [substitutions, setSubstitutions] = useState<Record<string, { variante: string; consigne: string }>>({});
   const [seanceCondensee, setSeanceCondensee] = useState(false);
+  const [dicteeActive, setDicteeActive] = useState(false);
+  // Résolu une seule fois : la disponibilité de la Web Speech API ne change
+  // pas pendant la séance, et instancier à chaque rendu créerait des objets
+  // de reconnaissance orphelins.
+  const [vocalDisponible] = useState(() => creerReconnaissance() !== null);
 
   const tousLesSteps = useMemo(() => buildSteps(echauffement, exercices, retourAuCalme), [echauffement, exercices, retourAuCalme]);
   // "Pressé par le temps" : garde le premier exercice (le plus lourd, placé
@@ -419,6 +476,41 @@ export function SeanceRunner({
 
                   {/* Saisie de ce qui a été réellement fait — facultative :
                       laisser vide reste valable, la série compte quand même. */}
+                  {vocalDisponible && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const reco = creerReconnaissance();
+                        if (!reco) return;
+                        setDicteeActive(true);
+                        reco.onresult = (e) => {
+                          const dit = e.results?.[0]?.[0]?.transcript ?? "";
+                          const { reps, charge } = analyserDictee(dit);
+                          if (reps || charge) {
+                            setRealise((r) => ({
+                              ...r,
+                              [cle]: {
+                                reps: reps ?? saisi.reps,
+                                charge: charge ?? saisi.charge,
+                              },
+                            }));
+                          }
+                        };
+                        reco.onerror = () => setDicteeActive(false);
+                        reco.onend = () => setDicteeActive(false);
+                        reco.start();
+                      }}
+                      disabled={dicteeActive}
+                      className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                        dicteeActive
+                          ? "border-laiton-400 bg-laiton-400/20 text-laiton-100"
+                          : "border-white/15 bg-white/[0.04] text-graphite-300 hover:border-laiton-400/40 hover:text-white"
+                      }`}
+                    >
+                      {dicteeActive ? "🎙️ Je t'écoute…" : "🎙️ Dicter mes reps"}
+                    </button>
+                  )}
+
                   <div className="grid w-full max-w-xs grid-cols-2 gap-2.5 text-left">
                     <label className="flex flex-col gap-1">
                       <span className="font-mono text-[9px] uppercase tracking-widest text-graphite-500">Reps faites</span>

@@ -260,7 +260,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParExercice} />;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParExercice} dureeProfil={user.profile?.dureeSeanceMinutes} />;
                 if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParExercice} />;
                 if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParExercice} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;

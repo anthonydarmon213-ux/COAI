@@ -3,6 +3,7 @@ import { ExerciceCard } from "@/components/programme/exercice-card";
 import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
+import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
 // semaine, puis replie chaque séance (fermée par défaut) pour éviter
@@ -16,10 +17,12 @@ export function EntrainementView({
   data,
   showContreIndications = false,
   photosParExercice,
+  dureeProfil,
 }: {
   data: unknown;
   showContreIndications?: boolean;
   photosParExercice?: Record<string, string | null>;
+  dureeProfil?: number | null;
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="exercice" />;
 
@@ -41,6 +44,9 @@ export function EntrainementView({
   return (
     <div className="flex flex-col gap-5">
       {showContreIndications && <ContreIndications items={contreIndications} />}
+      {/* Séance du jour en tête (22/08/2026) — le lecteur est accessible en
+          un clic, sans avoir à deviner quel jour ouvrir dans l'accordéon. */}
+      <SeanceDuJourHero contenu={data} photosParExercice={photosParExercice} dureeProfil={dureeProfil} />
       <SemainePlan
         titre={titre}
         badges={badges}
