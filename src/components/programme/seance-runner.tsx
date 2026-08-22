@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
 import { MuscleMap } from "@/components/programme/muscle-map";
-import { musclesPourExercice } from "@/lib/exercices/muscles";
+import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
+import { MotionCheck } from "@/components/programme/motion-check";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -599,6 +600,8 @@ export function SeanceRunner({
                       <p className="mt-1 text-sm text-graphite-300">Visé : {String(step.exercice.repetitions)}</p>
                     )}
                   </div>
+
+                  {estPolyarticulaire(step.nom) && <MotionCheck nomExercice={step.nom} />}
 
                   {consigne && (
                     <button
