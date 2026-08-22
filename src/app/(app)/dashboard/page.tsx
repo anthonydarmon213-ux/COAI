@@ -291,6 +291,7 @@ export default async function DashboardPage() {
             expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
             pendingCoach={pendingCoach}
             programmeVersion={programme.version}
+            equipementProfil={user.profile?.equipementDisponible}
           />
         </div>
       ) : (

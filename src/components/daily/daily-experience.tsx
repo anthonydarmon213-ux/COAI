@@ -32,6 +32,7 @@ type Daily = {
   pain: boolean | null;
   painArea: string | null;
   availableMinutes: number | null;
+  equipementDuJour?: string | null;
   completedAt: string | Date | null;
   workoutRating: string | null;
 } | null;
@@ -112,18 +113,32 @@ function Exercise({
   );
 }
 
+// Options de matériel du jour — mêmes libellés que EQUIPEMENTS du profil
+// (diagnostic-quiz / profil-form), pour que la valeur enregistrée reste
+// comparable à celle du profil.
+const MATERIELS_DU_JOUR = [
+  "Salle de sport complète",
+  "Matériel à la maison (haltères, bancs...)",
+  "Élastiques / bandes de résistance",
+  "Kettlebell",
+  "TRX / sangles de suspension",
+  "Aucun matériel",
+];
+
 export function DailyExperience({
   sourceSession,
   initialDaily,
   expectedMinutes,
   pendingCoach,
   programmeVersion,
+  equipementProfil,
 }: {
   sourceSession: Session;
   initialDaily: Daily;
   expectedMinutes: number;
   pendingCoach: boolean;
   programmeVersion: number;
+  equipementProfil?: string | null;
 }) {
   const router = useRouter();
   const defaultTime = expectedMinutes <= 15 ? 15 : expectedMinutes <= 25 ? 25 : expectedMinutes <= 40 ? 40 : expectedMinutes <= 60 ? 60 : 75;
@@ -135,6 +150,13 @@ export function DailyExperience({
   const [pain, setPain] = useState(initialDaily?.pain ?? false);
   const [painArea, setPainArea] = useState(initialDaily?.painArea ?? "");
   const [availableMinutes, setAvailableMinutes] = useState(initialDaily?.availableMinutes ?? defaultTime);
+  // Matériel du jour (22/08/2026, demande Anthony) — pré-coché avec celui
+  // du profil : dans la majorité des cas rien ne change, la personne
+  // confirme d'un coup d'œil et ne corrige que les jours où ça diffère.
+  const [equipementDuJour, setEquipementDuJour] = useState<string[]>(() => {
+    const source = initialDaily?.equipementDuJour ?? equipementProfil ?? "";
+    return MATERIELS_DU_JOUR.filter((m) => source.includes(m));
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [feedbackOpen, setFeedbackOpen] = useState(Boolean(initialDaily?.completedAt && !initialDaily?.workoutRating));
@@ -191,7 +213,7 @@ export function DailyExperience({
   async function submitCheckin() {
     if (!sleep || !energy || !food) return setError("Réponds aux cinq repères pour adapter ta séance.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
-    await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food, pain, painArea: pain ? painArea : undefined, availableMinutes });
+    await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food, pain, painArea: pain ? painArea : undefined, availableMinutes, equipementDuJour: equipementDuJour.length ? equipementDuJour.join(", ") : undefined });
   }
 
   async function completeWorkout() {
@@ -232,6 +254,7 @@ export function DailyExperience({
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">04</span> Comment se présente ta journée ? <span className="font-normal text-graphite-500">(facultatif)</span></p><div className="flex flex-wrap gap-2">{CHARGE_MENTALE.map(([value, label]) => <Chip key={value} active={chargeMentale === value} onClick={() => setChargeMentale(chargeMentale === value ? "" : value)}>{label}</Chip>)}</div></div>
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">05</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">06</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-1 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">07</span> Quel matériel as-tu aujourd&apos;hui ?</p><p className="mb-3 text-xs text-graphite-500">Pré-rempli avec ton équipement habituel — corrige seulement si ça change aujourd&apos;hui.</p><div className="flex flex-wrap gap-2">{MATERIELS_DU_JOUR.map((m) => <Chip key={m} active={equipementDuJour.includes(m)} onClick={() => setEquipementDuJour((prev) => prev.includes(m) ? prev.filter((v) => v !== m) : [...prev, m])}>{m}</Chip>)}</div></div>
           </div>
           {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
           <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-white py-6 text-base font-bold text-graphite-950 hover:bg-white/90 sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>
