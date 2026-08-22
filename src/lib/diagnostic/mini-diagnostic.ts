@@ -354,7 +354,7 @@ function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
 //    VIP même si "full IA" avait été coché par défaut.
 // 5. Plateau de progression qui dure (persona) — un suivi humain casse
 //    souvent un plateau mieux qu'un simple nouveau programme.
-// 6. Par défaut : Impulsion, le point de départ recommandé.
+// 6. Par défaut : Pass IA, le point de départ recommandé.
 function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnostic["recommandation"] {
   const persona = r.persona ?? [];
   const avanceExigeant = r.niveau === "Avancé" && /force|performance/i.test(r.objectif ?? "");
@@ -370,14 +370,14 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   if (sante.length > 0) {
     return {
       service: "TRANSFORMATION",
-      label: "Transformation",
+      label: "Coaching Hybride",
       raison: "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant.",
     };
   }
   if (r.coachPreference === "HYBRIDE") {
     return {
       service: "TRANSFORMATION",
-      label: "Transformation",
+      label: "Coaching Hybride",
       raison: "Tu as choisi de combiner la disponibilité de l'IA et le regard d'un coach humain.",
     };
   }
@@ -391,13 +391,13 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   if (plateau) {
     return {
       service: "TRANSFORMATION",
-      label: "Transformation",
+      label: "Coaching Hybride",
       raison: "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
     };
   }
   return {
     service: "IMPULSION",
-    label: "Impulsion",
+    label: "Pass IA",
     raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
   };
 }

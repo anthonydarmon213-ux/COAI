@@ -47,7 +47,7 @@ const FAQ_ITEMS = [
   {
     question: "Le programme est-il vérifié par un humain ?",
     reponse:
-      "Avec Impulsion (49€/mois), ton programme évolue grâce au Personal Trainer IA disponible 24h/24. Transformation (89€/mois) ajoute le regard et les ajustements d'un coach humain.",
+      "Avec Pass IA (49€/an, soit 4,08€/mois), ton programme évolue grâce au Personal Trainer IA disponible 24h/24. Coaching Hybride (89€/mois) ajoute le regard et les ajustements d'un coach humain.",
   },
   {
     question: "Le programme s'adapte-t-il à mon matériel (salle, maison, sans matériel) ?",

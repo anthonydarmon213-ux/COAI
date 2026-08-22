@@ -15,15 +15,15 @@ export default function CgvPage() {
       <section>
         <h2>2. Abonnements proposés</h2>
         <ul>
-          <li><strong>Impulsion — 49€/mois</strong> : bilan, programme adaptatif, check-ins, entraînement, nutrition, récupération, suivi des progrès et Coach IA disponible 24h/24.</li>
-          <li><strong>Transformation — 89€/mois</strong> : tous les services Impulsion, complétés par le regard, la supervision et les ajustements d&apos;un coach humain.</li>
-          <li><strong>VIP — dès 199€/mois</strong> : tous les services Transformation et des séances privées mensuelles avec Anthony Darmon, en visio ou à Paris centre. Le tarif est de 199€/mois pour 1 séance, 398€/mois pour 2 séances, 597€/mois pour 3 séances et 796€/mois pour 4 séances. Les créneaux et accompagnements sont volontairement très limités.</li>
+          <li><strong>Pass IA — 49€/an (soit 4,08€/mois)</strong> : bilan, programme adaptatif, check-ins, entraînement, nutrition, récupération, suivi des progrès et Coach IA disponible 24h/24.</li>
+          <li><strong>Coaching Hybride — 89€/mois</strong> : tous les services Pass IA, complétés par le regard, la supervision et les ajustements d&apos;un coach humain.</li>
+          <li><strong>VIP — dès 199€/mois</strong> : tous les services Coaching Hybride et des séances privées mensuelles avec Anthony Darmon, en visio ou à Paris centre. Le tarif est de 199€/mois pour 1 séance, 398€/mois pour 2 séances, 597€/mois pour 3 séances et 796€/mois pour 4 séances. Les créneaux et accompagnements sont volontairement très limités.</li>
         </ul>
         <p>Une transformation privée plus longue ou plus intensive fait l&apos;objet d&apos;un échange préalable et d&apos;une proposition personnalisée. Le détail à jour figure sur la page <a href="/pricing">Tarifs</a>.</p>
       </section>
       <section>
         <h2>3. Essai, prix et paiement</h2>
-        <p>Les prix sont indiqués en euros toutes taxes comprises. Impulsion et Transformation comprennent 7 jours d&apos;essai avec moyen de paiement requis. Sauf résiliation avant la fin de l&apos;essai, la facturation mensuelle débute automatiquement. VIP est facturé dès la souscription. Les paiements et renouvellements sont traités par Stripe ; COAI ne stocke pas les données bancaires.</p>
+        <p>Les prix sont indiqués en euros toutes taxes comprises. Pass IA et Coaching Hybride comprennent 7 jours d&apos;essai avec moyen de paiement requis. Sauf résiliation avant la fin de l&apos;essai, la facturation mensuelle débute automatiquement. VIP est facturé dès la souscription. Les paiements et renouvellements sont traités par Stripe ; COAI ne stocke pas les données bancaires.</p>
       </section>
       <section>
         <h2>4. Durée et résiliation</h2>

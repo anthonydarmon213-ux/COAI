@@ -14,12 +14,12 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
 
 // Résumés courts et distincts par formule (16/08/2026, correction Anthony —
 // "on ne comprend pas les différentes formules") : afficher la première
-// feature brute de tiers.ts (ex: "Journal de séances" pour Impulsion, "Tout
-// ce qui est inclus dans Impulsion" pour Transformation) ne dit rien de
+// feature brute de tiers.ts (ex: "Journal de séances" pour Pass IA, "Tout
+// ce qui est inclus dans Pass IA" pour Coaching Hybride) ne dit rien de
 // distinctif sur chaque palier. Ces phrases sont écrites spécifiquement pour
 // comparer d'un coup d'œil — le détail complet reste dans ServiceDetailModal.
 const RESUME_COMPARATIF: Record<ServiceKey, string> = {
-  IMPULSION: "Personal Trainer autonome et adaptatif — 49€/mois",
+  IMPULSION: "Personal Trainer autonome et adaptatif — 49€/an",
   TRANSFORMATION: "IA 24/7 + regard et ajustements humains — 89€/mois",
   VIP: "1 à 4 séances privées par mois, présentiel ou visio — dès 199€/mois",
 };
@@ -55,7 +55,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
           </>
         ) : (
           <p className="mt-2 text-sm leading-6 text-graphite-300">
-            Choisis ton niveau d&apos;attention : Impulsion, Transformation ou VIP.
+            Choisis ton niveau d&apos;attention : Pass IA, Coaching Hybride ou VIP.
           </p>
         )}
       </div>

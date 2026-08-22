@@ -37,7 +37,7 @@ const FAQ = [
   {
     question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
     reponse:
-      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Transformation et en VIP, l'humain apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
+      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Coaching Hybride et en VIP, l'humain apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
   },
   {
     question: "C'est adapté si je suis débutant ?",
@@ -47,7 +47,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Impulsion coûte 49€/mois, Transformation 89€/mois et VIP démarre à 199€/mois. Les deux premières formules incluent 7 jours d'essai.",
+      "Le diagnostic est offert. Ensuite, Pass IA coûte 49€/an (soit 4,08€/mois), Coaching Hybride 89€/mois et VIP démarre à 199€/mois. Les deux premières formules incluent 7 jours d'essai.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -56,7 +56,7 @@ const FAQ = [
   {
     question: "Et si mon programme ne me convient pas ?",
     reponse:
-      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Transformation et en VIP, l'humain peut aussi intervenir pour affiner les décisions importantes.",
+      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Coaching Hybride et en VIP, l'humain peut aussi intervenir pour affiner les décisions importantes.",
   },
   {
     question: "Mes données sont-elles en sécurité ?",
@@ -95,8 +95,8 @@ const PARCOURS_PERSONAL_TRAINING = [
   },
   {
     plage: "04—07",
-    offre: "Impulsion · 49€/mois",
-    titre: "Commencer avec Impulsion",
+    offre: "Pass IA · 49€/an",
+    titre: "Commencer avec Pass IA",
     description: "Si tu veux commencer, COAI crée ton programme et te guide pendant chaque séance.",
     etapes: [
       "04 · Programme personnalisé et progressif",
@@ -105,17 +105,17 @@ const PARCOURS_PERSONAL_TRAINING = [
       "07 · Retour au calme : respiration, mobilité légère et récupération",
     ],
     href: "/pricing#impulsion",
-    cta: "Commencer avec Impulsion",
+    cta: "Commencer avec Pass IA",
     miseEnAvant: true,
   },
   {
     plage: "08",
-    offre: "Transformation · 89€/mois",
+    offre: "Coaching Hybride · 89€/mois",
     titre: "Ajouter le suivi humain",
-    description: "Tu passes à Transformation seulement si tu veux un regard extérieur, des retours et des ajustements.",
+    description: "Tu passes à Coaching Hybride seulement si tu veux un regard extérieur, des retours et des ajustements.",
     etapes: ["08 · Suivi : performances, sensations et douleurs consignées après chaque séance"],
     href: "/pricing#transformation",
-    cta: "Découvrir Transformation",
+    cta: "Découvrir Coaching Hybride",
     miseEnAvant: false,
   },
   {
@@ -185,8 +185,8 @@ const STRUCTURED_DATA = {
       areaServed: "FR",
       description: DESCRIPTION,
       offers: [
-        { "@type": "Offer", name: "Impulsion", price: "49", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Transformation", price: "89", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Pass IA", price: "49", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Coaching Hybride", price: "89", priceCurrency: "EUR" },
         { "@type": "Offer", name: "VIP", price: "199", priceCurrency: "EUR" },
       ],
     },
@@ -289,7 +289,7 @@ export default function LandingPage() {
             Du bilan initial à l&apos;atteinte de ton objectif.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
-            Tu commences gratuitement. Impulsion te donne tout le nécessaire pour avancer. Tu ajoutes ensuite de l&apos;attention humaine seulement si ton objectif le demande.
+            Tu commences gratuitement. Pass IA te donne tout le nécessaire pour avancer. Tu ajoutes ensuite de l&apos;attention humaine seulement si ton objectif le demande.
           </p>
         </div>
 
@@ -475,7 +475,7 @@ export default function LandingPage() {
           <p className="mt-7">
             COAI est né de cette tension : le Personal Training réimaginé. L&apos;IA apporte la
             rapidité et une présence 24h/24 ; l&apos;humain apporte le regard, la subtilité et les
-            ajustements décisifs. Tu choisis une expérience Impulsion, Transformation ou VIP.
+            ajustements décisifs. Tu choisis une expérience Pass IA, Coaching Hybride ou VIP.
           </p>
         </div>
       </section>
@@ -642,7 +642,7 @@ export default function LandingPage() {
       {/* Coach IA 24/7 — différenciateur qu'aucun concurrent 100% manuel
           (type TrueCoach) ne peut proposer : une vraie présence permanente,
           pas juste un programme statique. Depuis le 11/08/2026, seul
-          Impulsion garde un quota (4 questions/mois) — Transformation est
+          Pass IA garde un quota (4 questions/mois) — Coaching Hybride est
           illimité (cf. /api/coach/ask), donc "disponible 24/7" est un vrai
           avantage du palier supérieur, pas qu'une promesse marketing. */}
       <Reveal>
@@ -684,7 +684,7 @@ export default function LandingPage() {
           Commence à ton rythme.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Impulsion à 49€/mois, Transformation à 89€/mois ou VIP dès 199€/mois. Trois niveaux
+          Pass IA à 49€/an (soit 4,08€/mois), Coaching Hybride à 89€/mois ou VIP dès 199€/mois. Trois niveaux
           d&apos;attention, un même objectif : te guider simplement jusqu&apos;au résultat.
         </p>
         <Link href="/pricing">
@@ -718,8 +718,8 @@ export default function LandingPage() {
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Ton prochain chapitre</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Un coaching conçu pour ta vraie vie.</h2>
         <p className="max-w-2xl text-graphite-200">
-          Ton Personal Trainer, toujours avec toi. Commence avec Impulsion, ajoute le regard humain
-          avec Transformation, ou choisis l&apos;attention maximale du VIP.
+          Ton Personal Trainer, toujours avec toi. Commence avec Pass IA, ajoute le regard humain
+          avec Coaching Hybride, ou choisis l&apos;attention maximale du VIP.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/diagnostic"><Button>Faire mon diagnostic offert</Button></Link>

@@ -22,7 +22,7 @@ export default async function AdminVideosPage() {
           <SectionLabel>Espace coach</SectionLabel>
           <h1 className="text-2xl font-semibold text-graphite-50">Bibliothèque de streaming</h1>
           <p className="text-sm text-graphite-400">
-            Vidéos YouTube non répertoriées, visibles par les abonnés Transformation.
+            Vidéos YouTube non répertoriées, visibles par les abonnés Coaching Hybride.
           </p>
         </div>
 

@@ -2,9 +2,9 @@ import { prisma } from "@/lib/db/client";
 import { MEMBRES_FONDATEURS_MAX } from "@/lib/pricing/membre-fondateur-constants";
 
 // Offre "membre fondateur" (19/08/2026, demande Anthony — obtenir les tout
-// premiers abonnés et retours terrain) : 49€/mois bloqué à vie sur
-// Impulsion pour les 100 premiers abonnés. Le prix Impulsion est déjà
-// 49€/mois aujourd'hui (rien à changer côté Stripe) — Stripe garantit déjà
+// premiers abonnés et retours terrain) : le tarif Pass IA est bloqué à
+// vie pour les 100 premiers abonnés. Pass IA est facturé 49€/an depuis le
+// 21/08/2026 (rien à changer côté Stripe) — Stripe garantit déjà
 // nativement qu'un abonné existant garde le prix auquel il a souscrit tant
 // qu'Anthony augmente les tarifs futurs en créant un nouveau Price Stripe
 // plutôt qu'en modifiant celui-ci (impossible de toute façon : un Price

@@ -138,7 +138,7 @@ export function AdaptationNotificationCard({
         >
           <span>Un coach diplômé d&apos;État peut t&apos;accompagner sur ce type d&apos;ajustement.</span>
           <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wide">
-            Découvrir Transformation →
+            Découvrir Coaching Hybride →
           </span>
         </Link>
       )}

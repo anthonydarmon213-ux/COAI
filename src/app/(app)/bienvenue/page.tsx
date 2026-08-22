@@ -14,12 +14,12 @@ import { ParrainageCard } from "@/components/compte/parrainage-card";
 // moments différents. (1) Juste après une inscription gratuite — aucun
 // paiement n'a eu lieu, la carte d'embarquement façon "confirmation d'achat"
 // n'a plus lieu d'être, remplacée par un accueil neutre qui explique que
-// tout est visible librement. (2) Juste après un vrai achat (Impulsion
-// one-shot ou abonnement Transformation, cf. success_url des deux routes
+// tout est visible librement. (2) Juste après un vrai achat (Pass IA
+// one-shot ou abonnement Coaching Hybride, cf. success_url des deux routes
 // Stripe) — la carte d'embarquement reste affichée, avec les événements de
 // conversion. On distingue les deux à partir des paramètres d'URL posés par
 // les routes de paiement elles-mêmes (jamais par une simple intention côté
-// client) : ?plan=... (Transformation) ou ?unlock=programme (Impulsion).
+// client) : ?plan=... (Coaching Hybride) ou ?unlock=programme (Pass IA).
 const CONTENU_PAR_PLAN: Record<
   "GRATUIT" | "STANDARD" | "PREMIUM",
   {
@@ -29,7 +29,7 @@ const CONTENU_PAR_PLAN: Record<
   }
 > = {
   GRATUIT: {
-    formule: "Impulsion",
+    formule: "Pass IA",
     sousTitre: "Ton Personal Trainer IA reste disponible 24h/24 et fait évoluer ton programme.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
@@ -39,7 +39,7 @@ const CONTENU_PAR_PLAN: Record<
     ],
   },
   STANDARD: {
-    formule: "Transformation",
+    formule: "Coaching Hybride",
     sousTitre: "L'IA apporte la disponibilité ; le coach humain apporte le regard et la subtilité.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
@@ -148,7 +148,7 @@ export default async function BienvenuePage({
         <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-2">
           {[
             { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de ton futur programme." },
-            { titre: "Ton programme", texte: "Impulsion, Transformation ou VIP : le niveau d'attention qui te correspond." },
+            { titre: "Ton programme", texte: "Pass IA, Coaching Hybride ou VIP : le niveau d'attention qui te correspond." },
             { titre: "Ton Coach IA", texte: "Pose tes questions, 24h/24, dans l'esprit de la méthode d'Anthony." },
             { titre: "Ton suivi", texte: "Séances, mesures, progression — tout au même endroit." },
           ].map((etape, i) => (
@@ -196,7 +196,7 @@ export default async function BienvenuePage({
   const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
-  // Impulsion en paiement unique (unlock=programme) tombait dans le même
+  // Pass IA en paiement unique (unlock=programme) tombait dans le même
   // calcul que les abonnements (plan="GRATUIT" par défaut → "Subscribe")
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).

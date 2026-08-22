@@ -50,7 +50,7 @@ export default async function AdminDashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card className="flex flex-col gap-1">
             <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
-              Clients Transformation
+              Clients Coaching Hybride
             </span>
             <span className="text-3xl font-semibold text-white">{clientsTransformation.length}</span>
           </Card>

@@ -2,7 +2,7 @@ import type { EffectivePlan } from "@/lib/subscription/plan";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const MESSAGE_VIP = "Bonjour Anthony, je suis abonné VIP COAI et je souhaite organiser mes séances privées du mois.";
-const MESSAGE_HYBRIDE = "Bonjour Anthony, je suis abonné Transformation COAI et j'aimerais faire un point sur mon accompagnement.";
+const MESSAGE_HYBRIDE = "Bonjour Anthony, je suis abonné Coaching Hybride COAI et j'aimerais faire un point sur mon accompagnement.";
 
 export function CoachingVisioCta({ plan }: { plan?: EffectivePlan } = {}) {
   const estVip = plan === "PREMIUM";

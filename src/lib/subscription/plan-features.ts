@@ -9,13 +9,13 @@ export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
     "Suivi des séances, mesures et progrès",
   ],
   STANDARD: [
-    "Tout l'accompagnement Impulsion",
+    "Tout l'accompagnement Pass IA",
     "Programme supervisé par un coach diplômé d'État",
     "Retours humains et ajustements réguliers",
     "Coach IA 24h/24 entre les échanges humains",
   ],
   PREMIUM: [
-    "Tout l'accompagnement Transformation",
+    "Tout l'accompagnement Coaching Hybride",
     "Séance privée mensuelle avec Anthony",
     "Visio partout ou présentiel à Paris centre",
     "Ajustements prioritaires et attention maximale",

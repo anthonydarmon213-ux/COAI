@@ -6,19 +6,19 @@ import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
-// Transformation/Premium le 11/08/2026). À l'origine réservé au palier
-// Impulsion, qui n'a aucun suivi humain (contrairement à Transformation, cf.
+// Coaching Hybride/Premium le 11/08/2026). À l'origine réservé au palier
+// Pass IA, qui n'a aucun suivi humain (contrairement à Coaching Hybride, cf.
 // /admin/suivi + relance WhatsApp par le coach) — sans ce cron, un abonné
 // qui décroche après sa première semaine ne reçoit jamais de relance et
 // churn silencieusement, alors que l'acquisition ne se fait qu'en pub
 // payante/SEO (pas de réseau perso à réactiver en filet de secours).
 //
-// Étendu à Transformation/Premium : le suivi manuel via /admin/suivi ne
+// Étendu à Coaching Hybride/Premium : le suivi manuel via /admin/suivi ne
 // scale pas avec le volume d'abonnés visé par l'acquisition externe — ce
 // cron sert de filet de sécurité qui garantit qu'aucun abonné (quel que
 // soit le palier payé) ne décroche silencieusement, sans remplacer le
 // suivi humain existant sur ces deux paliers. Message personnalisé et
-// signé "Anthony" sur Transformation/Premium (au lieu de "L'équipe COAI")
+// signé "Anthony" sur Coaching Hybride/Premium (au lieu de "L'équipe COAI")
 // pour rester cohérent avec le positionnement coaching humain qui
 // justifie leur prix.
 //
@@ -39,7 +39,7 @@ const RELANCE_CHECKOUT_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_PAIEMENT_APRES_MS = 48 * 60 * 60 * 1000;
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
-// Transformation) — gardés synchronisés à la main, les deux vivent dans des
+// Coaching Hybride) — gardés synchronisés à la main, les deux vivent dans des
 // fichiers séparés (l'un lu par un coach humain, l'autre déclenché par cron)
 // donc pas d'import croisé pratique.
 const FENETRE_DOULEUR_JOURS = 14;
@@ -61,7 +61,7 @@ const MOTS_DOULEUR = [
   "craquement",
 ];
 
-// Impulsion (IA seule) : ton générique, "L'équipe COAI". Transformation/
+// Pass IA (IA seule) : ton générique, "L'équipe COAI". Coaching Hybride/
 // Premium (coach humain qui valide) : signé Anthony directement, pour ne
 // pas casser la promesse "coaching humain" avec un email qui sonne comme un
 // système automatisé anonyme.
@@ -153,9 +153,9 @@ async function relancerInactifs(appUrl: string): Promise<number> {
   return relances;
 }
 
-// Alerte sécurité douleur, palier Impulsion (10/08/2026) — sur Transformation
+// Alerte sécurité douleur, palier Pass IA (10/08/2026) — sur Coaching Hybride
 // une mention de douleur dans une séance est vue par le coach humain via
-// /admin/suivi ; sur Impulsion (IA seule, pas de relecture humaine) rien ne
+// /admin/suivi ; sur Pass IA (IA seule, pas de relecture humaine) rien ne
 // la voyait jusqu'ici. On comble ce trou en deux temps : un email à
 // l'abonné avec un message sécurité (pas un diagnostic — juste "repose-toi,
 // consulte un professionnel de santé si ça persiste"), et une notification
@@ -210,9 +210,9 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
 
     const extrait = (seanceAvecDouleur.ressenti || seanceAvecDouleur.notes || "").slice(0, 200);
     await sendAdminNotification(
-      "Douleur signalée — palier Impulsion",
+      "Douleur signalée — palier Pass IA",
       `${user.prenom ? user.prenom : "Un abonné"} (${user.email}) a mentionné une gêne/douleur dans une séance ` +
-        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier Impulsion, pas de relecture humaine) : « ${extrait} »`
+        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier Pass IA, pas de relecture humaine) : « ${extrait} »`
     );
 
     if (envoyeUtilisateur) {
@@ -228,7 +228,7 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
 }
 
 // Escalade humaine sur baisse de motivation (20/08/2026, piste produit
-// "Hybrid Human-AI Mirror" validée par Anthony) — réservée à Transformation
+// "Hybrid Human-AI Mirror" validée par Anthony) — réservée à Coaching Hybride
 // (seul palier avec une vraie relation coach humain, cf. buildWhatsAppContactLink
 // déjà utilisé sur /admin/suivi et /admin/clients/[id]). Contrairement à
 // alerterDouleurImpulsion ci-dessus, aucun email automatique n'est envoyé à
@@ -268,7 +268,7 @@ async function alerterMotivationEnBaisse(appUrl: string): Promise<number> {
 
     const lienWhatsApp = buildWhatsAppContactLink(user.phoneWhatsapp, user.prenom, [flag]);
     await sendAdminNotification(
-      "Motivation en baisse — Transformation",
+      "Motivation en baisse — Coaching Hybride",
       `${user.prenom ? user.prenom : "Un abonné"} montre un signal de motivation en baisse : ${flag.detail}.\n\n` +
         (lienWhatsApp
           ? `Message WhatsApp prêt à envoyer : ${lienWhatsApp}`
@@ -378,8 +378,8 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
         `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
         `Choisis ta formule : ${appUrl}/pricing\n\n` +
-        `Impulsion : 7 jours d'essai, puis 49 €/mois, avec ton Personal Trainer IA disponible 24h/24.\n` +
-        `Transformation : 7 jours d'essai, puis 89 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
+        `Pass IA : 7 jours d'essai, puis 49 €/an (soit 4,08 €/mois), avec ton Personal Trainer IA disponible 24h/24.\n` +
+        `Coaching Hybride : 7 jours d'essai, puis 89 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
         `VIP : à partir de 199 €/mois, avec une séance privée mensuelle.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
@@ -463,8 +463,11 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
 
   let relancesCheckout = 0;
   for (const user of candidats) {
-    const plan = user.checkoutPlan === "STANDARD" ? "Transformation" : "Impulsion";
-    const prix = user.checkoutPlan === "STANDARD" ? "89 €/mois" : "49 €/mois";
+    const plan = user.checkoutPlan === "STANDARD" ? "Coaching Hybride" : "Pass IA";
+    // Pass IA est facturé à l'année (cf. OFFER_BY_PLAN.GRATUIT, interval
+    // "year") — l'e-mail affichait un prix mensuel qui n'a jamais
+    // correspondu au prélèvement réel.
+    const prix = user.checkoutPlan === "STANDARD" ? "89 €/mois" : "49 €/an";
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const envoye = await sendEmail(
       user.email,

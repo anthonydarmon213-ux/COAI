@@ -11,14 +11,14 @@ import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
 
 const COMPARAISON_RAPIDE = [
-  ["Impulsion", "Je veux avancer en autonomie", "IA 24h/24 · programme adaptatif"],
-  ["Transformation", "Je veux aussi un regard humain", "Supervision et ajustements du coach"],
+  ["Pass IA", "Je veux avancer en autonomie", "IA 24h/24 · programme adaptatif"],
+  ["Coaching Hybride", "Je veux aussi un regard humain", "Supervision et ajustements du coach"],
   ["VIP", "Je veux une attention maximale", "1 séance privée par mois incluse"],
 ] as const;
 
 export const metadata: Metadata = {
   title: "Tarifs — Personal Training réimaginé | COAI",
-  description: "Choisis le niveau d'attention dont tu as besoin : Impulsion, Transformation ou VIP.",
+  description: "Choisis le niveau d'attention dont tu as besoin : Pass IA, Coaching Hybride ou VIP.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -64,8 +64,12 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
         </div>
       </section>
 
-      <div className="grid w-full max-w-7xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-3">
-        {TIERS.map((tier) => (
+      {/* Deux cartes principales (22/08/2026, demande Anthony) — VIP sort
+          de la grille et devient un lien d'upsell sous les cartes : à trois
+          colonnes, l'offre à 199€/mois écrasait visuellement les deux
+          offres réellement souscrites en ligne. */}
+      <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
+        {TIERS.filter((tier) => tier.plan !== "PREMIUM").map((tier) => (
           <Card key={tier.nom} id={tier.nom.toLowerCase()} className={`flex flex-col gap-5 px-6 py-8 ${tier.mostPopular ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
@@ -106,7 +110,16 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
             <div className="flex-1" />
             {!tier.sessions && (
               <>
-                <SubscribeButton plan={tier.plan} label={tier.trial ? (tier.mostPopular ? "Essayer Impulsion pendant 7 jours" : "Commencer mes 7 jours d'essai") : `Choisir ${tier.nom}`} className="coai-rainbow-cta w-full border-0 text-[#111216]" />
+                <SubscribeButton plan={tier.plan} label={tier.trial ? (tier.mostPopular ? "Essayer Pass IA pendant 7 jours" : "Commencer mes 7 jours d'essai") : `Choisir ${tier.nom}`} className="coai-rainbow-cta w-full border-0 text-[#111216]" />
+                {/* Réassurance sous le bouton (22/08/2026, demande
+                    Anthony). Apple Pay / Google Pay apparaissent
+                    automatiquement dans Stripe Checkout quand ils sont
+                    activés côté dashboard Stripe — on ne les annonce donc
+                    pas ici en dur, pour ne rien promettre que la page de
+                    paiement n'afficherait pas réellement. */}
+                <p className="text-center text-[11px] font-medium text-graphite-400">
+                  🔒 Paiement sécurisé · Sans engagement · Annulation en 1 clic
+                </p>
                 <p className="text-center text-[11px] text-graphite-500">
                   En continuant, tu acceptes les <Link href="/cgv" target="_blank" className="underline">CGV</Link>
                   {tier.trial ? " — 7 jours d'essai, puis prélèvement sauf résiliation." : "."}
@@ -121,6 +134,20 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
             )}
           </Card>
         ))}
+      </div>
+
+      <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">
+        <p className="text-sm text-graphite-200">
+          Besoin d&apos;un accompagnement maximal, avec des séances privées ?
+        </p>
+        <a
+          className="mt-1.5 inline-block text-sm font-semibold text-laiton-300 underline underline-offset-4"
+          href={vipReservationHref("l'accompagnement VIP", "dès 199€/mois") ?? "/vip"}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Découvrir VIP, dès 199€/mois →
+        </a>
       </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">

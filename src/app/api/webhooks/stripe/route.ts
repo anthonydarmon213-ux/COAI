@@ -7,8 +7,8 @@ import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  GRATUIT: "Impulsion — 49€/an",
-  STANDARD: "Transformation — 89€/mois",
+  GRATUIT: "Pass IA — 49€/an",
+  STANDARD: "Coaching Hybride — 89€/mois",
   PREMIUM: "VIP — à partir de 199€/mois",
 };
 
@@ -173,7 +173,7 @@ export async function POST(request: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.client_reference_id;
-      // Déblocage Impulsion (13/08/2026) : paiement unique, pas
+      // Déblocage Pass IA (13/08/2026) : paiement unique, pas
       // d'abonnement Stripe créé — géré à part de upsertFromSubscription
       // (qui suppose toujours session.subscription).
       if (userId && session.mode === "payment" && session.metadata?.oneShotProgramme === "IMPULSION") {
@@ -182,7 +182,7 @@ export async function POST(request: Request) {
           data: { programmeUnlockedAt: new Date() },
         });
         await sendAdminNotification(
-          "Programme Impulsion débloqué",
+          "Programme Pass IA débloqué",
           `${user.prenom ? user.prenom : "Un utilisateur"} (${user.email}) vient de débloquer la génération de son programme (19€, paiement unique).`
         );
       }

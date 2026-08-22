@@ -50,7 +50,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Le bilan initial est gratuit. Impulsion coûte ensuite 49€/mois avec 7 jours d'essai, Transformation 89€/mois avec 7 jours d'essai et le regard d'un coach diplômé d'État. Sans engagement.",
+      "Le bilan initial est gratuit. Pass IA coûte ensuite 49€/an (soit 4,08€/mois) avec 7 jours d'essai, Coaching Hybride 89€/mois avec 7 jours d'essai et le regard d'un coach diplômé d'État. Sans engagement.",
   },
 ];
 

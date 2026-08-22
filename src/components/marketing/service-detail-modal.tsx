@@ -13,8 +13,8 @@ import { TIER_BY_SERVICE, vipReservationHref, type ServiceKey } from "@/lib/pric
 // pédagogiquement (ce que ça comprend, expliqué simplement) puis le prix en
 // tout dernier, comme une réponse à "cette formule te correspond ?" plutôt
 // qu'un tableau à comparer. Avant, des onglets permettaient de basculer
-// entre Impulsion/Transformation/VIP dans la même fenêtre — retiré : le menu
-// (Impulsion/Transformation/VIP en entrées séparées) et les vitrines
+// entre Pass IA/Coaching Hybride/VIP dans la même fenêtre — retiré : le menu
+// (Pass IA/Coaching Hybride/VIP en entrées séparées) et les vitrines
 // personnalisées (besoins identifiés, "ta formule") choisissent déjà la
 // bonne offre à l'ouverture, jamais besoin de comparer les 3 au même endroit.
 // Contenu et logique d'achat réutilisés tels quels depuis /pricing

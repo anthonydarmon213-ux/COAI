@@ -20,7 +20,7 @@ import Link from "next/link";
 // intention déclarée. Corrigé le 20/08/2026 (demande Anthony, sortie du
 // diagnostic public) : quand coai_plan existe, on ne redirige plus vers
 // /pricing pour un second clic — on déclenche directement /api/stripe/checkout
-// (7 jours offerts, carte requise dès l'essai pour Impulsion/Transformation).
+// (7 jours offerts, carte requise dès l'essai pour Pass IA/Coaching Hybride).
 // Sans cookie d'intention (signup "nu", parcours toujours gratuit), rien ne
 // change : direction /bienvenue comme avant.
 export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {

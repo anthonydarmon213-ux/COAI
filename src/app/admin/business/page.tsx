@@ -108,7 +108,7 @@ export default async function AdminBusinessPage() {
   };
 
   // MRR conservateur : exclut les essais non encore facturés et inclut bien
-  // Impulsion, qui était auparavant oubliée du calcul.
+  // Pass IA, qui était auparavant oubliée du calcul.
   const mrr = abonnesPayants.reduce((total, subscription) => {
     const monthlyPrice = subscription.plan === "GRATUIT" ? PRIX_IMPULSION : subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM;
     const annualPrice = monthlyPrice * 12;
@@ -194,7 +194,7 @@ export default async function AdminBusinessPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} Impulsion · ${nbStandard} Transformation · ${essaisActifs.length} essai(s)`} highlight />
+          <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} Pass IA · ${nbStandard} Coaching Hybride · ${essaisActifs.length} essai(s)`} highlight />
           <StatCard label="MRR" value={eur.format(mrr)} sublabel="Revenu mensuel récurrent" highlight />
           <StatCard label="ARR projeté" value={eur.format(arr)} sublabel="MRR × 12" />
           <StatCard

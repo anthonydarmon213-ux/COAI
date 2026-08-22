@@ -18,7 +18,7 @@ export type Tier = {
   // comptage réel (jamais un chiffre inventé).
   founderOffer?: boolean;
   sessions?: { count: 1 | 2 | 3 | 4; label: string; prix: string }[];
-  // Facturation annuelle (21/08/2026, Impulsion seulement — cf.
+  // Facturation annuelle (21/08/2026, Pass IA seulement — cf.
   // checkout/route.ts) : "prix"/"suffixe" affichent l'équivalent mensuel en
   // gros (repère familier), "noteFacturation" précise en petit le vrai
   // rythme de prélèvement — jamais l'inverse, pour ne jamais donner
@@ -52,7 +52,7 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
 
 export const TIERS: Tier[] = [
   {
-    nom: "Impulsion",
+    nom: "Pass IA",
     eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24",
     prix: "4€",
     suffixe: "/mois*",
@@ -74,14 +74,14 @@ export const TIERS: Tier[] = [
     founderOffer: true,
   },
   {
-    nom: "Transformation",
+    nom: "Coaching Hybride",
     eyebrow: "IA + REGARD HUMAIN",
     prix: "89€",
     suffixe: "/mois",
     description:
       "La rapidité de l'IA et la subtilité d'un coach humain : le bon niveau d'attention pour progresser sans rester seul.",
     features: [
-      "Tout l'accompagnement Impulsion",
+      "Tout l'accompagnement Pass IA",
       "Programme relu et supervisé par un coach diplômé d'État",
       "Retour humain sur tes progrès et tes difficultés",
       "Ajustements en cas de plateau, gêne ou changement d'objectif",
@@ -99,7 +99,7 @@ export const TIERS: Tier[] = [
     description:
       "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau.",
     features: [
-      "Tout l'accompagnement Transformation",
+      "Tout l'accompagnement Coaching Hybride",
       "1 séance privée de Personal Training par mois incluse",
       "Visio partout ou présentiel à Paris centre",
       "Analyse approfondie des objectifs, douleurs et contraintes",

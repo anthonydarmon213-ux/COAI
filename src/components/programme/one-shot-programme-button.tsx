@@ -6,7 +6,7 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 // Compatibilité avec les anciens écrans : l'ancien achat unique a été retiré.
 // Cette action conduit désormais vers les abonnements récurrents officiels.
 export function OneShotProgrammeButton({
-  label = "Essayer Impulsion pendant 7 jours",
+  label = "Essayer Pass IA pendant 7 jours",
   className,
 }: {
   label?: string;

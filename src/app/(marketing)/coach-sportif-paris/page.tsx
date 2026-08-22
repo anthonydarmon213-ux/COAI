@@ -102,8 +102,8 @@ export default function CoachSportifParisPage() {
         <Card className="flex flex-col gap-3 text-center">
           <h2 className="text-lg font-semibold text-white">Accompagnement COAI à distance</h2>
           <p className="text-sm leading-6 text-graphite-300">
-            Personal Trainer IA avec Impulsion à 49€/mois, ou avec le regard et les ajustements
-            d&apos;un coach humain avec Transformation à 89€/mois — accessible depuis n&apos;importe où.
+            Personal Trainer IA avec Pass IA à 49€/an (soit 4,08€/mois), ou avec le regard et les ajustements
+            d&apos;un coach humain avec Coaching Hybride à 89€/mois — accessible depuis n&apos;importe où.
           </p>
         </Card>
       </div>

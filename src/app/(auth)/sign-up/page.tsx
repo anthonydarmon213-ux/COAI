@@ -15,7 +15,7 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
 // L'inscription reste gratuite et ne déclenche aucun paiement. Le choix
-// Impulsion, Transformation ou VIP est conservé jusqu'au checkout Stripe,
+// Pass IA, Coaching Hybride ou VIP est conservé jusqu'au checkout Stripe,
 // déclenché seulement après le consentement explicite aux conditions.
 //
 // Vérification d'adresse email (14/08/2026, retour d'une testeuse — Elsa,
