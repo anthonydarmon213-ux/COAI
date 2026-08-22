@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -248,6 +249,19 @@ export function SeanceRunner({
   // pas pendant la séance, et instancier à chaque rendu créerait des objets
   // de reconnaissance orphelins.
   const [vocalDisponible] = useState(() => creerReconnaissance() !== null);
+  // Voice Coach (22/08/2026) — opt-in, jamais activé d'office.
+  const [voixActive, setVoixActive] = useState(false);
+  const [voixSupportee] = useState(() => voixDisponible());
+  const [coachParle, setCoachParle] = useState(false);
+  const [questionEnCours, setQuestionEnCours] = useState(false);
+  const [reponseCoach, setReponseCoach] = useState<string | null>(null);
+
+  // La préférence n'est lue qu'au montage côté client : la lire pendant le
+  // rendu provoquerait une différence entre serveur et client.
+  useEffect(() => {
+    setVoixActive(lirePreferenceVoix());
+    return () => stopperVoix();
+  }, []);
 
   const tousLesSteps = useMemo(() => buildSteps(echauffement, exercices, retourAuCalme), [echauffement, exercices, retourAuCalme]);
   // "Pressé par le temps" : garde le premier exercice (le plus lourd, placé
@@ -288,6 +302,30 @@ export function SeanceRunner({
   useEffect(() => {
     if (step?.type === "repos") setSecondesRestantes(step.secondes);
   }, [index, step]);
+
+  // Annonce vocale de l'étape en cours. Interrompt l'annonce précédente :
+  // enchaîner vite ne doit pas empiler les phrases.
+  useEffect(() => {
+    if (!voixActive || !step) return;
+    if (step.type === "set") {
+      const reps = typeof step.exercice.repetitions === "string" ? `, ${step.exercice.repetitions}` : "";
+      parler(`${step.nom}. Série ${step.setIndex} sur ${step.totalSets}${reps}`, { interrompre: true });
+    } else if (step.type === "echauffement") {
+      parler("Échauffement", { interrompre: true });
+    } else if (step.type === "calme") {
+      parler("Retour au calme", { interrompre: true });
+    }
+  }, [index, step, voixActive]);
+
+  // Décompte de fin de repos : 3, 2, 1 puis "c'est parti".
+  useEffect(() => {
+    if (!voixActive || step?.type !== "repos") return;
+    if (secondesRestantes === 3 || secondesRestantes === 2 || secondesRestantes === 1) {
+      parler(String(secondesRestantes));
+    } else if (secondesRestantes === 0) {
+      parler("C'est parti !", { interrompre: true });
+    }
+  }, [secondesRestantes, step, voixActive]);
 
   useEffect(() => {
     if (step?.type !== "repos") return;
@@ -339,6 +377,72 @@ export function SeanceRunner({
     }
   }
 
+  // Question au coach pendant la séance (22/08/2026) — dictée, envoyée à
+  // /api/coach/ask avec le contexte de l'exercice en cours, réponse lue à
+  // voix haute. Le prompt côté serveur reçoit déjà ce contexte (cf.
+  // coach-question.ts) : pas de nouvelle route, pas de duplication.
+  function poserQuestionAuCoach() {
+    const reco = creerReconnaissance();
+    if (!reco || questionEnCours) return;
+    setQuestionEnCours(true);
+    setReponseCoach(null);
+    stopperVoix();
+
+    reco.onresult = async (e) => {
+      const question = e.results?.[0]?.[0]?.transcript?.trim() ?? "";
+      if (!question) {
+        setQuestionEnCours(false);
+        return;
+      }
+      try {
+        const contexte = step?.type === "set"
+          ? {
+              sessionName: nomSeance,
+              exerciseName: step.nom,
+              series: typeof step.exercice.series === "string" ? step.exercice.series : undefined,
+              repetitions: typeof step.exercice.repetitions === "string" ? step.exercice.repetitions : undefined,
+              rest: typeof step.exercice.repos === "string" ? step.exercice.repos : undefined,
+              loadGuidance: typeof step.exercice.charge === "string" ? step.exercice.charge : undefined,
+            }
+          : { sessionName: nomSeance };
+
+        const res = await fetch("/api/coach/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            // Contrainte de brièveté portée par la question elle-même : en
+            // pleine séance, une réponse longue est inutilisable, et lue à
+            // voix haute elle devient interminable.
+            question: `${question}\n\n(Réponds en 2 phrases courtes maximum, je suis en pleine séance.)`,
+            context: contexte,
+          }),
+        });
+        const data = await res.json().catch(() => null);
+        const reponse = typeof data?.answer === "string" ? data.answer : null;
+        if (!res.ok || !reponse) {
+          const message = typeof data?.error === "string" ? data.error : "Je n'ai pas pu répondre, réessaie.";
+          setReponseCoach(message);
+          parler(message, { interrompre: true });
+          return;
+        }
+        setReponseCoach(reponse);
+        setCoachParle(true);
+        parler(reponse, { interrompre: true });
+        // Durée approximative de lecture pour éteindre l'onde sonore —
+        // l'API ne fournit pas d'événement de fin fiable sur tous les
+        // navigateurs.
+        window.setTimeout(() => setCoachParle(false), Math.min(20_000, reponse.length * 70));
+      } catch {
+        setReponseCoach("Connexion impossible pour le moment.");
+      } finally {
+        setQuestionEnCours(false);
+      }
+    };
+    reco.onerror = () => setQuestionEnCours(false);
+    reco.onend = () => setQuestionEnCours(false);
+    reco.start();
+  }
+
   function suivant() {
     setConsigneOuverte(false);
     if (index + 1 >= steps.length) {
@@ -381,6 +485,26 @@ export function SeanceRunner({
                 <p className="truncate text-sm font-semibold text-white">{nomSeance}</p>
                 <span className="flex items-center gap-2">
                   <span className="flex-none font-mono text-[11px] tabular-nums text-laiton-300">{formatChrono(chronoGlobal)}</span>
+                  {voixSupportee && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const suivant = !voixActive;
+                        setVoixActive(suivant);
+                        ecrirePreferenceVoix(suivant);
+                        if (suivant) parler("Voice coach activé");
+                      }}
+                      aria-pressed={voixActive}
+                      title={voixActive ? "Couper la voix du coach" : "Activer la voix du coach"}
+                      className={`flex-none rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
+                        voixActive
+                          ? "border-laiton-400 bg-laiton-400/20 text-laiton-100"
+                          : "border-white/15 bg-white/[0.04] text-graphite-400 hover:text-white"
+                      }`}
+                    >
+                      {voixActive ? "🔊" : "🔇"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setAjustementOuvert(true)}
@@ -548,7 +672,46 @@ export function SeanceRunner({
             )}
           </div>
 
+          {/* Onde sonore dorée pendant que le coach parle (22/08/2026) —
+              repère visuel utile quand le téléphone est posé au sol. */}
+          {coachParle && (
+            <div className="flex items-center justify-center gap-1 pb-2" aria-hidden="true">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <span
+                  key={i}
+                  className="w-1 rounded-full bg-laiton-400"
+                  style={{
+                    height: `${8 + (i % 3) * 6}px`,
+                    animation: "coai-onde 0.9s ease-in-out infinite",
+                    animationDelay: `${i * 0.12}s`,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          {reponseCoach && (
+            <div className="mx-6 mb-2 rounded-xl border border-laiton-400/25 bg-laiton-400/[0.07] px-3.5 py-2.5">
+              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-laiton-300">Ton coach</p>
+              <p className="mt-1 text-xs leading-5 text-graphite-100">{reponseCoach}</p>
+            </div>
+          )}
+
           <div className="flex flex-col gap-2 border-t border-white/10 px-6 py-4">
+            {vocalDisponible && (
+              <button
+                type="button"
+                onClick={poserQuestionAuCoach}
+                disabled={questionEnCours}
+                className={`w-full rounded-full border py-2.5 text-xs font-semibold transition ${
+                  questionEnCours
+                    ? "border-laiton-400 bg-laiton-400/20 text-laiton-100"
+                    : "border-white/15 bg-white/[0.04] text-graphite-300 hover:border-laiton-400/40 hover:text-white"
+                }`}
+              >
+                {questionEnCours ? "🎙️ Je t'écoute…" : "🎙️ Poser une question au coach"}
+              </button>
+            )}
             {prochainSet && (
               <p className="text-center text-[11px] uppercase tracking-wide text-graphite-600">À venir · {prochainSet.nom}</p>
             )}
