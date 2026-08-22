@@ -18,6 +18,8 @@ import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-vide
 import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
+import { StreakBadgesCard } from "@/components/dashboard/streak-badges-card";
+import { getGamification } from "@/lib/insight/gamification";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 
@@ -64,7 +66,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, diesRecents] = await Promise.all([
+  const [validated, latest, daily, insight, diesRecents, gamification] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -82,6 +84,7 @@ export default async function DashboardPage() {
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
+    getGamification(user.id),
   ]);
   const ageCoai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies: diesRecents });
 
@@ -180,6 +183,8 @@ export default async function DashboardPage() {
           par le commentaire sur `mission` plus haut ("jamais une deuxième
           source de vérité"). */}
       <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
+
+      <StreakBadgesCard gamification={gamification} />
 
       <ScoreAgeCoaiCard resultat={ageCoai} />
 
