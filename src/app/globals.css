@@ -1657,3 +1657,56 @@ html {
 @media (prefers-reduced-motion: reduce) {
   [style*="coai-onde"] { animation: none !important; }
 }
+
+
+/* ---------------------------------------------------------------------------
+   Charte Dark Luxury (22/08/2026, demande Anthony) — utilitaires partagés
+   plutôt que les mêmes classes recopiées dans chaque composant : une
+   retouche de la charte se fait ici, pas dans quarante fichiers.
+
+   backdrop-filter n'est pas supporté partout : chaque règle définit
+   d'abord un fond opaque lisible, puis le flou en amélioration. Sans ce
+   repli, une carte deviendrait illisible sur un navigateur sans support.
+--------------------------------------------------------------------------- */
+.coai-glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+@supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+  .coai-glass {
+    background: rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Lueur dorée — réservée aux éléments d'action principaux. Utilisée
+   partout, elle ne signalerait plus rien. */
+.coai-glow-or {
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.25), 0 18px 45px -28px rgba(212, 175, 55, 0.9);
+}
+.coai-glow-cyan {
+  box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.22), 0 18px 45px -28px rgba(0, 240, 255, 0.75);
+}
+
+/* Micro-interaction commune aux cartes cliquables. */
+.coai-interactive {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.coai-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+.coai-interactive:active {
+  transform: translateY(0) scale(0.995);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coai-interactive,
+  .coai-interactive:hover,
+  .coai-interactive:active {
+    transform: none;
+    transition: border-color 0.25s ease;
+  }
+}

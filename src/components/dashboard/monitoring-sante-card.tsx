@@ -76,7 +76,7 @@ export function MonitoringSanteCard({
   const aDesDonnees = metriques.some((m) => m.valeur !== null);
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5" aria-labelledby="monitoring-titre">
+    <section className="coai-glass p-5" aria-labelledby="monitoring-titre">
       <div className="flex items-baseline justify-between gap-3">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">⌚ Monitoring santé</p>
         {derniereAnalyseMontre && (

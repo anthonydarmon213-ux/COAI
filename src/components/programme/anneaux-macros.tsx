@@ -57,7 +57,7 @@ export function AnneauxMacros({ objectifsJournaliers }: { objectifsJournaliers: 
   const { nombre: calories, texte: caloriesTexte } = extraireNombre(objectifs.calories);
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-5" aria-labelledby="macros-titre">
+    <section className="coai-glass px-5 py-5" aria-labelledby="macros-titre">
       <div className="flex items-baseline justify-between gap-3">
         <p id="macros-titre" className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
           Tes objectifs du jour
