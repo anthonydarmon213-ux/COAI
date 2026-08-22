@@ -19,6 +19,7 @@ import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
 import { StreakBadgesCard } from "@/components/dashboard/streak-badges-card";
+import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { getGamification } from "@/lib/insight/gamification";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
 import { calculerReadiness } from "@/lib/insight/readiness";
@@ -195,8 +196,14 @@ export default async function DashboardPage() {
           récupération musculaire, ce qui reste à faire), plutôt que tout
           empiler en une seule colonne. Contenu et logique de chaque bloc
           inchangés — seule la disposition change. */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:items-start">
-        <div className="flex flex-col gap-5 lg:col-span-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
+        <div className="flex min-w-0 flex-col gap-5 lg:col-span-8">
+          {/* Ordre demandé (22/08/2026) : readiness en haut, séance du jour
+              au milieu, streak en bas — les trois cartes que la personne
+              vient réellement consulter, dans la colonne principale plutôt
+              qu'en marge. */}
+          <ReadinessCard readiness={readiness} />
+
           {/* Lueur légère (point 5, demande Anthony) réservée à la carte
               d'action principale — pas ailleurs, pour ne pas diluer l'effet. */}
           <div className="relative">
@@ -298,18 +305,28 @@ export default async function DashboardPage() {
               </Link>
             </div>
           </section>
+
+          {/* Accès direct au lecteur de séance (22/08/2026) — le dashboard
+              renvoyait vers /programme/entrainement, où il fallait encore
+              trouver le bouton. Rendu seulement s'il y a une séance
+              aujourd'hui, sinon le bloc ne s'affiche pas du tout. */}
+          {sourceSession && programme && (
+            <SeanceDuJourHero contenu={programme.contenu} dureeProfil={user.profile?.dureeSeanceMinutes} />
+          )}
+
+          <StreakBadgesCard gamification={gamification} />
         </div>
 
-        {/* Colonne d'indicateurs — condensée exprès (point 2, demande
-            Anthony : "transforme les blocs de texte en badges/jauges").
-            Récupération musculaire remontée ici, à côté de la semaine,
-            au lieu d'être tout en bas de page comme avant. */}
-        <div className="flex flex-col gap-5">
-          <ReadinessCard readiness={readiness} />
-          <StreakBadgesCard gamification={gamification} />
+        {/* Colonne latérale (4/12). ScoreAgeCoai y reste en premier : il rend
+            toujours quelque chose, contrairement à RecuperationMusculaire,
+            ImpulsionChallenge et BesoinsIdentifies qui renvoient null au
+            chargement ou sans données — sans cette carte en tête, la colonne
+            pouvait apparaître vide au premier rendu et laisser un trou à
+            côté de la colonne principale. */}
+        <div className="flex min-w-0 flex-col gap-5 lg:col-span-4">
           <ScoreAgeCoaiCard resultat={ageCoai} />
-          <RecuperationMusculaireCard />
           {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
+          <RecuperationMusculaireCard />
           <BesoinsIdentifiesCard besoins={besoins} />
           <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5" aria-labelledby="coai-intelligence-title">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#4cc9f0]">Intelligence COAI</p>
