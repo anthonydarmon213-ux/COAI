@@ -24,6 +24,7 @@ import { RoutineRecuperation } from "@/components/dashboard/routine-recuperation
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { getGamification } from "@/lib/insight/gamification";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
+import { MonitoringSanteCard } from "@/components/dashboard/monitoring-sante-card";
 import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
@@ -205,6 +206,17 @@ export default async function DashboardPage() {
               vient réellement consulter, dans la colonne principale plutôt
               qu'en marge. */}
           <ReadinessCard readiness={readiness} />
+
+          {/* Monitoring santé placé juste sous le Readiness : ce sont ces
+              mêmes métriques qui alimentent son calcul (cf.
+              calculerReadiness), la proximité rend le lien lisible. */}
+          <MonitoringSanteCard
+            pasMoyenParJour={user.profile?.pasMoyenParJour}
+            sommeilMoyenHeures={user.profile?.sommeilMoyenHeures}
+            hrv={user.profile?.hrv}
+            frequenceCardiaqueRepos={user.profile?.frequenceCardiaqueRepos}
+            derniereAnalyseMontre={user.profile?.derniereAnalyseMontre}
+          />
 
           {/* Lueur légère (point 5, demande Anthony) réservée à la carte
               d'action principale — pas ailleurs, pour ne pas diluer l'effet. */}
