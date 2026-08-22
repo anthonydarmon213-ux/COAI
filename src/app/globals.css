@@ -1646,3 +1646,14 @@ html {
   background-color: #0c0d0f;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+
+/* Onde sonore du Voice Coach (22/08/2026) — respecte prefers-reduced-motion,
+   comme toutes les animations de l'app. */
+@keyframes coai-onde {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.55; }
+  50% { transform: scaleY(1.6); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="coai-onde"] { animation: none !important; }
+}
