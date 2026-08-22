@@ -11,6 +11,7 @@ import { RecuperationView } from "@/components/programme/recuperation-view";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { FicheMacros } from "@/components/programme/fiche-macros";
 import { AnalysePhotoRepas } from "@/components/programme/analyse-photo-repas";
+import { MenuRestaurant } from "@/components/programme/menu-restaurant";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -262,6 +263,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                   vivait sous la liste des repas, donc invisible sans
                   scroller toute la semaine. */}
               {pilier === "NUTRITION" && <AnalysePhotoRepas />}
+              {pilier === "NUTRITION" && <MenuRestaurant />}
 
               {(() => {
                 const contenu = affiche?.contenu ?? null;
