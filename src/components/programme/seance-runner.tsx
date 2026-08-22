@@ -51,6 +51,33 @@ function enEtapes(texte: string): string[] {
     .filter((t) => t.length > 3);
 }
 
+// Substitutions "matériel indisponible" (22/08/2026, demande Anthony) —
+// même schéma moteur, sans la machine ou la charge externe. Table écrite à
+// la main plutôt que déduite par mots-clés : proposer un mouvement
+// approximatif pour un exercice mal reconnu serait pire que ne rien
+// proposer. Un exercice absent de la table n'affiche pas l'option.
+const VARIANTES_SANS_MATERIEL: { motifs: string[]; variante: string; consigne: string }[] = [
+  { motifs: ["développé couché", "developpe couche", "bench press", "presse pectoraux", "chest press"], variante: "Pompes (mains larges)", consigne: "Même poussée horizontale. Pieds surélevés pour durcir, genoux au sol pour alléger." },
+  { motifs: ["développé incliné", "developpe incline", "incline press"], variante: "Pompes pieds surélevés", consigne: "Pieds sur un banc : l'angle reproduit le travail du haut des pectoraux." },
+  { motifs: ["développé militaire", "developpe militaire", "shoulder press", "développé épaules"], variante: "Pompes piquées (pike push-up)", consigne: "Bassin haut, tête vers le sol : la poussée devient verticale." },
+  { motifs: ["tirage vertical", "lat pulldown", "traction"], variante: "Rowing inversé TRX", consigne: "Sangles ou barre basse, corps gainé : plus tu es horizontal, plus c'est dur." },
+  { motifs: ["tirage horizontal", "rowing", "seated row"], variante: "Rowing inversé TRX", consigne: "Tire les coudes le long du corps, omoplates serrées en fin de mouvement." },
+  { motifs: ["squat", "presse à cuisses", "presse a cuisses", "leg press", "hack squat"], variante: "Squat bulgare (une jambe)", consigne: "Pied arrière surélevé : une jambe à la fois compense l'absence de charge." },
+  { motifs: ["soulevé de terre", "souleve de terre", "deadlift", "romanian"], variante: "Hip thrust une jambe", consigne: "Dos calé, une jambe tendue, pousse par le talon. Serre les fessiers en haut." },
+  { motifs: ["fente", "lunge"], variante: "Fentes marchées au poids du corps", consigne: "Sans charge : ralentis la descente à 3 secondes pour garder la difficulté." },
+  { motifs: ["curl", "biceps"], variante: "Curl TRX (renversé)", consigne: "Sangles, paumes vers le haut, corps incliné en arrière. Recule les pieds pour durcir." },
+  { motifs: ["triceps", "extension"], variante: "Dips sur banc / chaise", consigne: "Mains derrière toi sur un appui stable, coudes vers l'arrière, descente contrôlée." },
+  { motifs: ["leg curl", "ischio"], variante: "Curl ischio TRX", consigne: "Allongé, bassin décollé, ramène les talons vers les fessiers sans laisser tomber les hanches." },
+  { motifs: ["mollet", "calf"], variante: "Mollets debout sur une marche", consigne: "Une jambe si c'est trop facile. Descends sous la marche pour l'amplitude." },
+  { motifs: ["élévation latérale", "elevation laterale", "lateral raise"], variante: "Élévations latérales élastique", consigne: "Charge légère, contrôle total : monte à hauteur d'épaule, pas plus haut." },
+];
+
+function trouverVariante(nom: string): { variante: string; consigne: string } | null {
+  const normalise = nom.toLowerCase();
+  const trouve = VARIANTES_SANS_MATERIEL.find((v) => v.motifs.some((m) => normalise.includes(m)));
+  return trouve ? { variante: trouve.variante, consigne: trouve.consigne } : null;
+}
+
 type Step =
   | { type: "echauffement"; texte: string }
   | { type: "set"; exercice: ExerciceBrut; nom: string; setIndex: number; totalSets: number; exerciceIndex: number }
@@ -158,7 +185,26 @@ export function SeanceRunner({
   photosParExercice?: Record<string, string | null>;
   onClose: () => void;
 }) {
-  const steps = useMemo(() => buildSteps(echauffement, exercices, retourAuCalme), [echauffement, exercices, retourAuCalme]);
+  // Ajustements en direct (22/08/2026, demande Anthony) — appliqués
+  // uniquement à la séance en cours, jamais écrits dans le programme
+  // généré : c'est un dépannage du jour, pas une modification du plan.
+  const [ajustementOuvert, setAjustementOuvert] = useState(false);
+  const [substitutions, setSubstitutions] = useState<Record<string, { variante: string; consigne: string }>>({});
+  const [seanceCondensee, setSeanceCondensee] = useState(false);
+
+  const tousLesSteps = useMemo(() => buildSteps(echauffement, exercices, retourAuCalme), [echauffement, exercices, retourAuCalme]);
+  // "Pressé par le temps" : garde le premier exercice (le plus lourd, placé
+  // en tête par le générateur) plus un sur deux ensuite, avec un plancher à
+  // deux exercices — en dessous ce n'est plus une séance.
+  const steps = useMemo(() => {
+    if (!seanceCondensee) return tousLesSteps;
+    const indexExercices = [...new Set(
+      tousLesSteps.filter((s): s is Extract<Step, { type: "set" }> => s.type === "set").map((s) => s.exerciceIndex)
+    )];
+    const cible = Math.max(2, Math.ceil(indexExercices.length / 2));
+    const aGarder = new Set(indexExercices.filter((_, i) => i === 0 || i % 2 === 1).slice(0, cible));
+    return tousLesSteps.filter((s) => s.type !== "set" || aGarder.has(s.exerciceIndex));
+  }, [tousLesSteps, seanceCondensee]);
   const [index, setIndex] = useState(0);
   const [secondesRestantes, setSecondesRestantes] = useState(0);
   const [chronoGlobal, setChronoGlobal] = useState(0);
@@ -276,7 +322,16 @@ export function SeanceRunner({
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline justify-between gap-3">
                 <p className="truncate text-sm font-semibold text-white">{nomSeance}</p>
-                <span className="flex-none font-mono text-[11px] tabular-nums text-laiton-300">{formatChrono(chronoGlobal)}</span>
+                <span className="flex items-center gap-2">
+                  <span className="flex-none font-mono text-[11px] tabular-nums text-laiton-300">{formatChrono(chronoGlobal)}</span>
+                  <button
+                    type="button"
+                    onClick={() => setAjustementOuvert(true)}
+                    className="flex-none rounded-full border border-laiton-400/30 bg-laiton-400/10 px-2.5 py-1 text-[10px] font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+                  >
+                    ⚡️ Ajuster
+                  </button>
+                </span>
               </div>
               <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.08]">
                 <div className="h-full rounded-full bg-laiton-400 transition-all duration-300" style={{ width: `${Math.round(((index + 1) / steps.length) * 100)}%` }} />
@@ -339,7 +394,14 @@ export function SeanceRunner({
                   )}
                   <div>
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">Série {step.setIndex}/{step.totalSets}</span>
-                    <h2 className="mt-1 font-display text-2xl font-semibold text-white">{step.nom}</h2>
+                    <h2 className="mt-1 font-display text-2xl font-semibold text-white">
+                      {substitutions[step.nom]?.variante ?? step.nom}
+                    </h2>
+                    {substitutions[step.nom] && (
+                      <p className="mx-auto mt-1 max-w-xs text-[11px] leading-4 text-laiton-300">
+                        Remplace {step.nom} · {substitutions[step.nom]?.consigne}
+                      </p>
+                    )}
                     {typeof step.exercice.repetitions === "string" && (
                       <p className="mt-1 text-sm text-graphite-300">Visé : {String(step.exercice.repetitions)}</p>
                     )}
@@ -407,6 +469,77 @@ export function SeanceRunner({
               {index + 1 >= steps.length ? (envoiEnCours ? "…" : "Terminer la séance ✓") : step.type === "repos" ? "Passer le repos →" : "C'est fait ✓"}
             </button>
           </div>
+
+          {ajustementOuvert && (
+            <div className="fixed inset-0 z-10 flex items-end justify-center bg-black/70 p-4 sm:items-center" onClick={() => setAjustementOuvert(false)}>
+              <div className="w-full max-w-sm rounded-2xl border border-laiton-400/25 bg-[#16181b] p-5 text-left" onClick={(e) => e.stopPropagation()}>
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">⚡️ Ajuster la séance</p>
+                <p className="mt-2 text-xs leading-5 text-graphite-400">
+                  Valable pour aujourd&apos;hui seulement — ton programme n&apos;est pas modifié.
+                </p>
+
+                <div className="mt-4 flex flex-col gap-2.5">
+                  {step.type === "set" && (() => {
+                    const variante = trouverVariante(step.nom);
+                    const dejaRemplace = Boolean(substitutions[step.nom]);
+                    if (!variante) {
+                      return (
+                        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3">
+                          <p className="text-sm font-semibold text-graphite-300">Matériel occupé</p>
+                          <p className="mt-1 text-xs leading-5 text-graphite-500">
+                            Pas de variante fiable pour « {step.nom} ». Demande-la à ton coach plutôt que d&apos;improviser un mouvement approchant.
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSubstitutions((prev) => {
+                            if (!dejaRemplace) return { ...prev, [step.nom]: variante };
+                            const copie = { ...prev };
+                            delete copie[step.nom];
+                            return copie;
+                          });
+                          setAjustementOuvert(false);
+                        }}
+                        className={`rounded-xl border px-3.5 py-3 text-left transition ${dejaRemplace ? "border-laiton-400/50 bg-laiton-400/[0.1]" : "border-white/10 bg-white/[0.03] hover:border-laiton-400/30"}`}
+                      >
+                        <p className="text-sm font-semibold text-white">
+                          {dejaRemplace ? "↩︎ Revenir à l'exercice prévu" : "Matériel occupé / indisponible"}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-graphite-400">
+                          {dejaRemplace ? `Reprendre ${step.nom}` : `Remplacer par : ${variante.variante}`}
+                        </p>
+                      </button>
+                    );
+                  })()}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSeanceCondensee((v) => !v);
+                      setIndex(0);
+                      setAjustementOuvert(false);
+                    }}
+                    className={`rounded-xl border px-3.5 py-3 text-left transition ${seanceCondensee ? "border-laiton-400/50 bg-laiton-400/[0.1]" : "border-white/10 bg-white/[0.03] hover:border-laiton-400/30"}`}
+                  >
+                    <p className="text-sm font-semibold text-white">
+                      {seanceCondensee ? "↩︎ Reprendre la séance complète" : "Pressé(e) par le temps"}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-graphite-400">
+                      {seanceCondensee ? "Revenir à tous les exercices prévus" : "Garder les exercices clés et réduire le volume"}
+                    </p>
+                  </button>
+                </div>
+
+                <button type="button" onClick={() => setAjustementOuvert(false)} className="mt-4 w-full rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white">
+                  Fermer
+                </button>
+              </div>
+            </div>
+          )}
 
           {consigneOuverte && consigne && (
             <div className="fixed inset-0 z-10 flex items-end justify-center bg-black/70 p-4 sm:items-center" onClick={() => setConsigneOuverte(false)}>
