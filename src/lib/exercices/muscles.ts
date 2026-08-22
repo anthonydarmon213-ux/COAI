@@ -77,3 +77,20 @@ export const MUSCLE_LABEL: Record<MuscleSlug, string> = {
   triceps: "Triceps",
   "upper-back": "Dos",
 };
+
+// Exercices polyarticulaires (22/08/2026) — seuls concernés par le Motion
+// Check : ce sont ceux où une position dégradée sous charge peut réellement
+// blesser. Proposer une vérification de posture sur un curl biceps
+// banaliserait la fonctionnalité sans rien apporter.
+const MOTIFS_POLYARTICULAIRES = [
+  "squat", "soulevé de terre", "souleve de terre", "deadlift", "romanian",
+  "développé couché", "developpe couche", "bench press", "développé militaire",
+  "developpe militaire", "shoulder press", "développé incliné", "developpe incline",
+  "fente", "lunge", "traction", "pull-up", "pull up", "rowing", "dips",
+  "hip thrust", "presse à cuisses", "presse a cuisses", "leg press", "clean", "thruster",
+];
+
+export function estPolyarticulaire(nom: string): boolean {
+  const normalise = nom.toLowerCase();
+  return MOTIFS_POLYARTICULAIRES.some((m) => normalise.includes(m));
+}
