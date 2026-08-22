@@ -18,6 +18,8 @@ import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-vide
 import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
+import { StreakBadgesCard } from "@/components/dashboard/streak-badges-card";
+import { getGamification } from "@/lib/insight/gamification";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
 import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
@@ -66,7 +68,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, diesRecents] = await Promise.all([
+  const [validated, latest, daily, insight, diesRecents, gamification] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -84,6 +86,7 @@ export default async function DashboardPage() {
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
+    getGamification(user.id),
   ]);
   // Readiness du jour (22/08/2026) — calculé sur le check-in déjà chargé
   // ci-dessus + les données santé du profil quand elles existent. Aucune
@@ -303,6 +306,7 @@ export default async function DashboardPage() {
             au lieu d'être tout en bas de page comme avant. */}
         <div className="flex flex-col gap-5">
           <ReadinessCard readiness={readiness} />
+          <StreakBadgesCard gamification={gamification} />
           <ScoreAgeCoaiCard resultat={ageCoai} />
           <RecuperationMusculaireCard />
           {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}

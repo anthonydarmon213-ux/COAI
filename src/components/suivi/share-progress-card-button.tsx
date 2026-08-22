@@ -26,17 +26,20 @@ export function ShareProgressCardButton({ imageUrl, filename, title }: { imageUr
         await navigator.share({ title, text: `Mon évolution avec COAI. Fais ton diagnostic : ${referralLink}`, files: [file] });
         trackFunnelEvent("progress_shared", { support: "native", referral: Boolean(parrainage?.lien) });
       } else {
+        // Repli sans Web Share API : ouvre la carte dans un nouvel onglet
+        // au lieu de cliquer un <a download> sur un blob: (22/08/2026).
+        // Même bug que celui corrigé sur DiagnosticShareButton le 21/08 :
+        // sur Safari iOS, ce clic synthétique peut naviguer l'onglet en
+        // cours au lieu de télécharger, éjectant la personne de la page
+        // sans retour possible. Concerne les 3 pages qui utilisent ce
+        // bouton (évolution, tests-maxi, progression).
         const href = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = href;
-        link.download = filename;
-        link.click();
-        URL.revokeObjectURL(href);
+        window.open(href, "_blank", "noopener,noreferrer");
         if (parrainage?.lien && navigator.clipboard) {
           await navigator.clipboard.writeText(referralLink);
-          setMessage("Carte téléchargée · lien de parrainage copié");
+          setMessage("Carte ouverte dans un nouvel onglet · lien de parrainage copié");
         } else {
-          setMessage("Carte téléchargée");
+          setMessage("Carte ouverte dans un nouvel onglet — enregistre-la pour la publier");
         }
         trackFunnelEvent("progress_shared", { support: "download", referral: Boolean(parrainage?.lien) });
       }
