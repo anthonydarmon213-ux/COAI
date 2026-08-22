@@ -13,6 +13,37 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 // lien de parrainage (chargé à la demande, pas au montage, pour ne jamais
 // appeler /api/parrainage pour un visiteur anonyme qui n'en a pas) ; un
 // visiteur anonyme partage simplement le diagnostic public.
+// Mobile vs desktop (22/08/2026, demande Anthony) — sur mobile, la feuille
+// de partage native ouvre directement Instagram/TikTok ; sur desktop ces
+// apps n'existent pas, donc partager l'image n'a aucun sens : on télécharge
+// le visuel pour que la personne le transfère sur son téléphone.
+// Détection par pointeur grossier + absence de survol plutôt que par user
+// agent : un iPad se déclare "Macintosh" depuis iPadOS 13, et un user agent
+// se falsifie trivialement.
+function estMobile(): boolean {
+  if (typeof window === "undefined") return false;
+  const tactile = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+  const sansSurvol = window.matchMedia?.("(hover: none)").matches ?? false;
+  return tactile && sansSurvol;
+}
+
+// Téléchargement explicite du visuel Story (1080x1920, cf.
+// /api/diagnostic/carte-story). Réservé au desktop : sur Safari iOS, ce
+// même clic synthétique sur un blob: pouvait naviguer l'onglet en cours et
+// éjecter la personne de la page (bug signalé le 21/08).
+function telechargerFichier(blob: Blob, nom: string) {
+  const href = URL.createObjectURL(blob);
+  const lien = document.createElement("a");
+  lien.href = href;
+  lien.download = nom;
+  document.body.appendChild(lien);
+  lien.click();
+  lien.remove();
+  // Révocation différée : révoquer immédiatement annule parfois le
+  // téléchargement sur Chrome avant qu'il ne démarre.
+  setTimeout(() => URL.revokeObjectURL(href), 10_000);
+}
+
 export function DiagnosticShareButton({ connecte, objectif, score }: { connecte: boolean; objectif: string; score: number }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -129,13 +160,8 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       // téléchargée pour que la personne puisse la joindre elle-même si elle
       // le souhaite, plutôt que de la perdre silencieusement.
       if (file) {
-        const href = URL.createObjectURL(file);
-        const anchor = document.createElement("a");
-        anchor.href = href;
-        anchor.download = file.name;
-        anchor.click();
-        URL.revokeObjectURL(href);
-        setMessage("Carte enregistrée ✓ Ta messagerie s'ouvre — joins l'image téléchargée si tu veux l'inclure.");
+        telechargerFichier(file, file.name);
+        setMessage("Carte téléchargée ✓ Ta messagerie s'ouvre — joins l'image si tu veux l'inclure.");
       }
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
       trackFunnelEvent("diagnostic_result_shared", { support: "email_mailto", referral: connecte, challenge: "compare_score" });
@@ -165,21 +191,26 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       // maintenant le même partage natif quand il est disponible : l'image
       // partagée seule (sans texte/URL) reste plus fiable pour que
       // l'option Story apparaisse dans la feuille de partage iOS.
-      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      const partageNatifDisponible =
+        Boolean(navigator.share) && (!navigator.canShare || navigator.canShare({ files: [file] }));
+
+      if (estMobile() && partageNatifDisponible) {
+        // Mobile : la feuille de partage native propose directement
+        // Instagram/TikTok. L'image est partagée SEULE (sans texte ni URL) —
+        // ajouter du texte fait disparaître l'option Story sur iOS. Le lien
+        // du défi est déjà imprimé sur la carte.
         await navigator.share({ files: [file] });
         setMessage(platform === "instagram"
           ? "Carte prête ✓ Dans Instagram : appuie sur +, choisis Story, puis sélectionne la carte."
           : "Carte prête ✓ Dans TikTok : crée une Story, puis sélectionne la carte.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_native`, referral: connecte, challenge: "compare_score" });
       } else {
-        // Repli desktop/navigateurs sans Web Share API : ouvre la carte
-        // dans un nouvel onglet plutôt que de forcer un téléchargement par
-        // clic synthétique — ne remplace jamais la page en cours, quoi que
-        // fasse le navigateur avec ce blob.
-        const href = URL.createObjectURL(blob);
-        window.open(href, "_blank", "noopener,noreferrer");
+        // Desktop : Instagram et TikTok ne publient pas de Story depuis un
+        // ordinateur — on télécharge le visuel 1080x1920 pour que la
+        // personne le transfère sur son téléphone.
+        telechargerFichier(blob, `story-coai-${score}.png`);
         if (navigator.clipboard) await navigator.clipboard.writeText(lien);
-        setMessage("Carte ouverte dans un nouvel onglet ✓ Enregistre-la, puis partage-la en Story. Le lien du défi est copié.");
+        setMessage("Story téléchargée ! Transfère-la sur ton téléphone pour la poster. Le lien du défi est copié.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_download`, referral: connecte, challenge: "compare_score" });
       }
     } catch (caught) {
