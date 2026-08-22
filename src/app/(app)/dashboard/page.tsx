@@ -172,137 +172,140 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {/* Doublon retiré (20/08/2026, retour Anthony : "un petit doublon...
-          sur deux carrés à la suite") — le bouton de check-in ci-dessus
-          répétait exactement le même message ("Fais ton check-in — 45
-          secondes") que AujourdhuiGuideCard juste en dessous, qui a déjà
-          son propre CTA. Une seule source pour cette mission, comme prévu
-          par le commentaire sur `mission` plus haut ("jamais une deuxième
-          source de vérité"). */}
-      <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
-
-      <ScoreAgeCoaiCard resultat={ageCoai} />
-
-      <section className="coai-intelligence-panel relative overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/35 px-6 py-6 text-white shadow-[0_28px_80px_-44px_rgba(76,201,240,.65)] sm:px-8" aria-labelledby="coai-intelligence-title">
-        <div className="relative grid gap-6 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
-          <div>
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">Intelligence COAI · Pas une IA généraliste</p>
-            <h2 id="coai-intelligence-title" className="mt-2 font-display text-2xl sm:text-3xl">L&apos;expérience terrain devient ton avantage.</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#b8c0c4]">
-              Le moteur COAI structure plus de 17 ans de coaching réel : progression, dosage de l&apos;effort, récupération et prudence face aux douleurs. Il croise ces règles avec ton profil, tes séances et tes retours pour décider quoi ajuster — pas simplement pour produire une réponse plausible.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
-              <span className="rounded-full border border-[#ff8a3d]/25 bg-[#ff8a3d]/10 px-3 py-1.5 text-[#ffb17d]">17 ans de terrain</span>
-              <span className="rounded-full border border-[#39e67b]/25 bg-[#39e67b]/10 px-3 py-1.5 text-[#76eea3]">Tes données réelles</span>
-              <span className="rounded-full border border-[#c56cff]/25 bg-[#c56cff]/10 px-3 py-1.5 text-[#dca2ff]">Décisions explicables</span>
+      {/* Cockpit en grille (21/08/2026, demande Anthony : "vrai cockpit
+          ultra-professionnel... éliminer le scroll vertical infini") —
+          colonne principale (action du jour + check-in/séance, 2/3 sur
+          desktop) à côté d'une colonne d'indicateurs (Score/Âge COAI,
+          récupération musculaire, ce qui reste à faire), plutôt que tout
+          empiler en une seule colonne. Contenu et logique de chaque bloc
+          inchangés — seule la disposition change. */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:items-start">
+        <div className="flex flex-col gap-5 lg:col-span-2">
+          {/* Lueur légère (point 5, demande Anthony) réservée à la carte
+              d'action principale — pas ailleurs, pour ne pas diluer l'effet. */}
+          <div className="relative">
+            <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-laiton-400/[0.12] blur-2xl" />
+            <div className="relative">
+              {/* Doublon retiré (20/08/2026, retour Anthony : "un petit
+                  doublon... sur deux carrés à la suite") — le bouton de
+                  check-in du header répétait exactement le même message
+                  que cette carte, qui a déjà son propre CTA. Une seule
+                  source pour cette mission. */}
+              <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
             </div>
           </div>
-          <blockquote className="rounded-2xl border border-white/10 bg-white/[0.045] px-5 py-5 text-center font-editorial text-xl leading-8 text-[#fffdf8] sm:text-2xl">
-            “{MANTRAS[date.getDay()]}”
-            <footer className="mt-3 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-[#8f9aa0]">Ton impulsion du jour</footer>
-          </blockquote>
-        </div>
-      </section>
 
-      {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
-
-      <section className="coai-week-overview" aria-labelledby="week-title">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="coai-eyebrow">Ma semaine</p>
-            <h2 id="week-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-              {programme ? `${weeklyWorkoutCount} entraînement${weeklyWorkoutCount > 1 ? "s" : ""} planifié${weeklyWorkoutCount > 1 ? "s" : ""}` : "Ta semaine va prendre forme ici"}
-            </h2>
-          </div>
-          <p className="max-w-md text-sm leading-6 text-graphite-300">
-            {programme
-              ? "Un rythme lisible, avec la récupération intégrée au plan. COAI l’ajuste si ton quotidien change."
-              : "Après ton bilan, COAI construit un rythme réaliste selon ton niveau, tes disponibilités et ta récupération."}
-          </p>
-        </div>
-
-        <div className="mt-6 grid grid-cols-7 gap-2" aria-label="Planning de la semaine">
-          {week.map(({ date: day, workout, today: isToday }) => (
-            <div key={day.toISOString()} className={`coai-week-day ${isToday ? "is-today" : ""} ${workout ? "has-workout" : ""}`}>
-              <span>{JOURS_COURTS[day.getDay()]}</span>
-              <strong>{day.getDate()}</strong>
-              <i aria-hidden="true" />
-              <small>{workout ? "Séance" : "Récup."}</small>
+          {!completion.essentielComplet ? (
+            <section className="rounded-2xl border border-white/10 bg-laiton-400/[0.06] p-6">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Profil incomplet</p>
+              <h2 className="mt-2 text-2xl text-white">COAI a besoin de quelques repères essentiels.</h2>
+              <p className="mt-2 text-sm leading-6 text-graphite-300">Il manque : {completion.champsEssentielsManquants.join(", ")}. Ces informations permettent de préparer une séance cohérente et prudente.</p>
+              <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
+            </section>
+          ) : !programme ? (
+            !hasAccess ? null : (
+              <section id="programme-a-generer" className="scroll-mt-6 flex flex-col gap-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 text-center">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme à préparer</p>
+                  <h2 className="mt-2 text-2xl text-white">Ta première semaine peut être générée maintenant.</h2>
+                  <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-graphite-300">Pendant la génération, COAI affiche un état explicite puis revient vers ton programme — aucun chargement ne tourne indéfiniment.</p>
+                </div>
+                <GenererProgrammeOnboarding />
+              </section>
+            )
+          ) : sourceSession ? (
+            <div id="check-in-du-jour" className="scroll-mt-6">
+              <DailyExperience
+                sourceSession={sourceSession as WorkoutSession}
+                initialDaily={daily}
+                expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
+                pendingCoach={pendingCoach}
+                programmeVersion={programme.version}
+              />
             </div>
-          ))}
-        </div>
-      </section>
+          ) : (
+            <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
+              <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
+              {pendingCoach && <p className="mt-4 text-sm font-semibold text-laiton-300">Programme V{programme.version} — à valider par ton coach.</p>}
+              <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
+              <RestDayCheckin initialDaily={daily} />
+            </section>
+          )}
 
-      <section className="coai-today-briefing" aria-labelledby="today-title">
-        <div className="coai-today-heading">
-          <div>
-            <p className="coai-eyebrow">Aujourd’hui</p>
-            <h2 id="today-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Ton briefing en trois décisions.</h2>
-          </div>
-          <span className="rounded-full border border-[#c56cff]/20 bg-[#c56cff]/[0.07] px-4 py-2 text-xs font-bold text-[#8d4cba]">3 décisions utiles aujourd&apos;hui</span>
-        </div>
-        <div className="mt-6 grid gap-3 md:grid-cols-3">
-          <Link href={sourceSession ? "#check-in-du-jour" : "/programme/entrainement"} className="coai-brief-card coai-brief-training">
-            <span>01 · Bouger</span>
-            <strong>{sourceSession?.nom ? String(sourceSession.nom) : "Récupération active"}</strong>
-            <p>{sourceSession ? `${getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)} min · adaptée après ton check-in.` : "Marche légère, mobilité et respiration sans douleur."}</p>
-            <em>{sourceSession ? "Préparer ma séance →" : "Voir ma récupération →"}</em>
-          </Link>
-          <Link href="/programme/alimentation" className="coai-brief-card">
-            <span>02 · Nourrir</span>
-            <strong>Énergie stable</strong>
-            <p>Hydrate-toi régulièrement et répartis tes protéines sur la journée.</p>
-            <em>Voir ma nutrition →</em>
-          </Link>
-          <Link href="/programme/recuperation" className="coai-brief-card">
-            <span>03 · Récupérer</span>
-            <strong>Préparer demain</strong>
-            <p>5 minutes de respiration calme ce soir, puis une heure de coucher régulière.</p>
-            <em>Optimiser ma récupération →</em>
-          </Link>
-        </div>
-      </section>
-
-      <BesoinsIdentifiesCard besoins={besoins} />
-
-      {!completion.essentielComplet ? (
-        <section className="rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Profil incomplet</p>
-          <h2 className="mt-2 text-2xl text-white">COAI a besoin de quelques repères essentiels.</h2>
-          <p className="mt-2 text-sm leading-6 text-graphite-300">Il manque : {completion.champsEssentielsManquants.join(", ")}. Ces informations permettent de préparer une séance cohérente et prudente.</p>
-          <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
-        </section>
-      ) : !programme ? (
-        !hasAccess ? null : (
-          <section id="programme-a-generer" className="scroll-mt-6 flex flex-col gap-4">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-6 text-center">
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme à préparer</p>
-              <h2 className="mt-2 text-2xl text-white">Ta première semaine peut être générée maintenant.</h2>
-              <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-graphite-300">Pendant la génération, COAI affiche un état explicite puis revient vers ton programme — aucun chargement ne tourne indéfiniment.</p>
+          <section className="coai-week-overview" aria-labelledby="week-title">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="coai-eyebrow">Ma semaine</p>
+                <h2 id="week-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                  {programme ? `${weeklyWorkoutCount} entraînement${weeklyWorkoutCount > 1 ? "s" : ""} planifié${weeklyWorkoutCount > 1 ? "s" : ""}` : "Ta semaine va prendre forme ici"}
+                </h2>
+              </div>
             </div>
-            <GenererProgrammeOnboarding />
+            <div className="mt-6 grid grid-cols-7 gap-2" aria-label="Planning de la semaine">
+              {week.map(({ date: day, workout, today: isToday }) => (
+                <div key={day.toISOString()} className={`coai-week-day ${isToday ? "is-today" : ""} ${workout ? "has-workout" : ""}`}>
+                  <span>{JOURS_COURTS[day.getDay()]}</span>
+                  <strong>{day.getDate()}</strong>
+                  <i aria-hidden="true" />
+                  <small>{workout ? "Séance" : "Récup."}</small>
+                </div>
+              ))}
+            </div>
           </section>
-        )
-      ) : sourceSession ? (
-        <div id="check-in-du-jour" className="scroll-mt-6">
-          <DailyExperience
-            sourceSession={sourceSession as WorkoutSession}
-            initialDaily={daily}
-            expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
-            pendingCoach={pendingCoach}
-            programmeVersion={programme.version}
-          />
+
+          <section className="coai-today-briefing" aria-labelledby="today-title">
+            <div className="coai-today-heading">
+              <p className="coai-eyebrow">Aujourd’hui</p>
+              <h2 id="today-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Ton briefing en trois décisions.</h2>
+            </div>
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              <Link href={sourceSession ? "#check-in-du-jour" : "/programme/entrainement"} className="coai-brief-card coai-brief-training">
+                <span>01 · Bouger</span>
+                <strong>{sourceSession?.nom ? String(sourceSession.nom) : "Récupération active"}</strong>
+                <p>{sourceSession ? `${getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)} min · adaptée après ton check-in.` : "Marche légère, mobilité et respiration sans douleur."}</p>
+                <em>{sourceSession ? "Préparer ma séance →" : "Voir ma récupération →"}</em>
+              </Link>
+              <Link href="/programme/alimentation" className="coai-brief-card">
+                <span>02 · Nourrir</span>
+                <strong>Énergie stable</strong>
+                <p>Hydrate-toi régulièrement et répartis tes protéines sur la journée.</p>
+                <em>Voir ma nutrition →</em>
+              </Link>
+              <Link href="/programme/recuperation" className="coai-brief-card">
+                <span>03 · Récupérer</span>
+                <strong>Préparer demain</strong>
+                <p>5 minutes de respiration calme ce soir, puis une heure de coucher régulière.</p>
+                <em>Optimiser ma récupération →</em>
+              </Link>
+            </div>
+          </section>
         </div>
-      ) : (
-        <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
-          <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
-          {pendingCoach && <p className="mt-4 text-sm font-semibold text-laiton-300">Programme V{programme.version} — à valider par ton coach.</p>}
-          <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
-          <RestDayCheckin initialDaily={daily} />
-        </section>
-      )}
+
+        {/* Colonne d'indicateurs — condensée exprès (point 2, demande
+            Anthony : "transforme les blocs de texte en badges/jauges").
+            Récupération musculaire remontée ici, à côté de la semaine,
+            au lieu d'être tout en bas de page comme avant. */}
+        <div className="flex flex-col gap-5">
+          <ScoreAgeCoaiCard resultat={ageCoai} />
+          <RecuperationMusculaireCard />
+          {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
+          <BesoinsIdentifiesCard besoins={besoins} />
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5" aria-labelledby="coai-intelligence-title">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#4cc9f0]">Intelligence COAI</p>
+            <h2 id="coai-intelligence-title" className="mt-1.5 text-sm font-semibold text-white">17 ans de coaching réel, pas une IA généraliste.</h2>
+            <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold">
+              <span className="rounded-full border border-[#ff8a3d]/25 bg-[#ff8a3d]/10 px-2.5 py-1 text-[#ffb17d]">17 ans de terrain</span>
+              <span className="rounded-full border border-[#39e67b]/25 bg-[#39e67b]/10 px-2.5 py-1 text-[#76eea3]">Tes données réelles</span>
+              <span className="rounded-full border border-[#c56cff]/25 bg-[#c56cff]/10 px-2.5 py-1 text-[#dca2ff]">Décisions explicables</span>
+            </div>
+            <blockquote className="mt-4 border-t border-white/10 pt-3 text-xs italic leading-5 text-graphite-300">
+              “{MANTRAS[date.getDay()]}”
+            </blockquote>
+          </section>
+        </div>
+      </div>
 
       {programme && <WeeklyCheckinCard />}
 
@@ -322,10 +325,10 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div id="activite-quotidienne" className="scroll-mt-6"><ActiviteQuotidienneCard /></div>
-        <RecuperationMusculaireCard />
-      </div>
+      {/* RecuperationMusculaireCard vit maintenant dans la colonne
+          d'indicateurs plus haut (à côté de "Ma semaine") — retiré d'ici
+          pour ne pas l'afficher deux fois. */}
+      <div id="activite-quotidienne" className="scroll-mt-6"><ActiviteQuotidienneCard /></div>
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link
