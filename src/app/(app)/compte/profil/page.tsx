@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { ProfilForm } from "@/components/compte/profil-form";
+import { ScanMorphoPosture } from "@/components/compte/scan-morpho-posture";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { MaFormuleCard } from "@/components/compte/ma-formule-card";
@@ -123,6 +124,14 @@ export default async function ProfilPage({
             }}
           />
         </Card>
+
+        {/* Scan morpho & posture sorti du formulaire (22/08/2026, demande
+            Anthony) — il y était enfoui parmi les champs de saisie, en
+            photo unique. Module dédié, avec capture face ET profil. */}
+        <ScanMorphoPosture
+          morphologieInitiale={user.profile?.morphologieDetectee}
+          observationsInitiales={user.profile?.observationsPosture}
+        />
       </div>
     </div>
   );
