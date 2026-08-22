@@ -32,8 +32,8 @@ export function SubscribeButton({
         body: JSON.stringify({ plan, billing, vipSessions }),
       });
       if (res.status === 401) {
-        // Préserve l'intention (Transformation) à travers l'inscription —
-        // sinon /sign-up créait toujours un abonnement Impulsion par défaut.
+        // Préserve l'intention (Coaching Hybride) à travers l'inscription —
+        // sinon /sign-up créait toujours un abonnement Pass IA par défaut.
         window.location.href = `/sign-up?plan=${plan}&vipSessions=${vipSessions}`;
         return;
       }

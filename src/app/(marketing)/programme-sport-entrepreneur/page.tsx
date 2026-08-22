@@ -50,7 +50,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Impulsion coûte 49€/mois avec 7 jours d'essai et un coach IA disponible 24h/24. Transformation coûte 89€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain diplômé d'État. Les deux sont sans engagement.",
+      "Pass IA coûte 49€/an (soit 4,08€/mois) avec 7 jours d'essai et un coach IA disponible 24h/24. Coaching Hybride coûte 89€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain diplômé d'État. Les deux sont sans engagement.",
   },
 ];
 

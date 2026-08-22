@@ -44,8 +44,8 @@ async function sleep(ms: number) {
 
 // Nouveau modèle d'accès libre (13/08/2026) : l'inscription est gratuite,
 // donc un profil essentiel complet ne suffit plus à déclencher la
-// génération automatiquement — il faut aussi avoir débloqué Impulsion ou
-// Transformation. La tentative de génération se base sur le vrai statut
+// génération automatiquement — il faut aussi avoir débloqué Pass IA ou
+// Coaching Hybride. La tentative de génération se base sur le vrai statut
 // HTTP de /api/programmes/generate (qui revérifie l'accès en base à chaque
 // appel) plutôt que sur un accès pré-calculé au chargement de la page : ça
 // absorbe naturellement le décalage du webhook Stripe juste après un achat
@@ -217,9 +217,9 @@ export function ActivationFlow({
   }
 
   if (etat === "pret") {
-    // Transformation : la V1 générée reste en attente de relecture par le
+    // Coaching Hybride : la V1 générée reste en attente de relecture par le
     // coach (statut EN_ATTENTE existant, cf. StatutProgramme) — jamais
-    // présentée comme définitive avant sa validation. Impulsion : 100% IA,
+    // présentée comme définitive avant sa validation. Pass IA : 100% IA,
     // disponible immédiatement, rien à valider.
     if (coachValidationRequise) {
       return (

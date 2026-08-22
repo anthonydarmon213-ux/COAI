@@ -81,8 +81,8 @@ export function CoaiIntro() {
       <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
         {[
           ["01", "Bilan initial offert", "Tes besoins, ton niveau et ton Score COAI."],
-          ["02", "Impulsion pour commencer", "Ton programme et tes séances adaptatives."],
-          ["03", "Tu évolues si nécessaire", "Transformation ou VIP selon l'attention souhaitée."],
+          ["02", "Pass IA pour commencer", "Ton programme et tes séances adaptatives."],
+          ["03", "Tu évolues si nécessaire", "Coaching Hybride ou VIP selon l'attention souhaitée."],
         ].map(([numero, titre, texte]) => (
           <div key={numero} className="border-white/[0.08] px-6 py-6 text-left sm:border-r sm:last:border-r-0">
             <span className="font-mono text-[10px] tracking-[0.18em] text-laiton-300">{numero}</span>

@@ -178,7 +178,7 @@ export default async function AbonnementPage() {
           </div>
         ) : !statut ? (
           <a href="/pricing" className="text-laiton-400 underline">
-            Voir les offres — à partir de 49€/mois
+            Voir les offres — à partir de 49€/an
           </a>
         ) : null}
       </Card>

@@ -3,16 +3,16 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
 
-// Impulsion passe en facturation annuelle (21/08/2026, demande Anthony —
+// Pass IA passe en facturation annuelle (21/08/2026, demande Anthony —
 // "je veux faire du volume sur cette offre") : 49€ une fois par an
 // (≈4,08€/mois) au lieu de 49€/mois, pour rivaliser avec les apps IA seule
 // du marché (Reboot Plan : 39,99€/an) plutôt que de perdre la comparaison
-// directe sur un tier qui n'a pas de coach humain à opposer. Transformation
-// et VIP restent mensuels — c'est volontairement seulement Impulsion qui
+// directe sur un tier qui n'a pas de coach humain à opposer. Coaching Hybride
+// et VIP restent mensuels — c'est volontairement seulement Pass IA qui
 // change, cf. discussion pricing du jour.
 const OFFER_BY_PLAN = {
-  GRATUIT: { name: "COAI — Impulsion", amount: 4900, interval: "year", trialDays: 7 },
-  STANDARD: { name: "COAI — Transformation", amount: 8900, interval: "month", trialDays: 7 },
+  GRATUIT: { name: "COAI — Pass IA", amount: 4900, interval: "year", trialDays: 7 },
+  STANDARD: { name: "COAI — Coaching Hybride", amount: 8900, interval: "month", trialDays: 7 },
   PREMIUM: { name: "COAI — VIP", amount: 19900, interval: "month", trialDays: 0 },
 } as const;
 

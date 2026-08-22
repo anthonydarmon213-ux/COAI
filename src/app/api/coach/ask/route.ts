@@ -9,9 +9,9 @@ import { z } from "zod";
 import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
 
 // Le Q&A "coach IA" est limité (fenêtre glissante de 30 jours) uniquement
-// sur Impulsion (GRATUIT, 49€) — Transformation (STANDARD, 89€) et
+// sur Pass IA (GRATUIT, 49€) — Coaching Hybride (STANDARD, 89€) et
 // palier PREMIUM (199€) ont un accès illimité (11/08/2026 : avant ce
-// changement, Transformation partageait le même quota qu'Impulsion, sans
+// changement, Coaching Hybride partageait le même quota qu'Pass IA, sans
 // palier payant pour le lever puisque PREMIUM n'est plus vendu — corrigé
 // pour que la disponibilité H24/7j/7 promue sur la home soit un vrai
 // avantage du palier supérieur, pas juste une promesse marketing).
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     if (reserved.count === 0) {
       return NextResponse.json(
         {
-          error: `Limite de ${COACH_QUOTA_LIMIT} questions/mois atteinte — passe à Transformation pour un accès illimité.`,
+          error: `Limite de ${COACH_QUOTA_LIMIT} questions/mois atteinte — passe à Coaching Hybride pour un accès illimité.`,
           quotaRemaining: 0,
         },
         { status: 429 }

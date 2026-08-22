@@ -34,7 +34,7 @@ export function MembreFondateurBadge() {
         🚀 Offre membre fondateur — {placesRestantes}/{MEMBRES_FONDATEURS_MAX} places restantes
       </p>
       <p className="mt-1 text-xs leading-5 text-graphite-300">
-        Ton tarif Impulsion reste bloqué à vie, même si le prix augmente plus tard pour les nouveaux membres.
+        Ton tarif Pass IA reste bloqué à vie, même si le prix augmente plus tard pour les nouveaux membres.
       </p>
     </div>
   );

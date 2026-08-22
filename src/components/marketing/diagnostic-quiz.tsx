@@ -1266,7 +1266,7 @@ export function DiagnosticQuiz({
     trackFunnelEvent("plan_selected", { plan: "GRATUIT" });
     storeDiagnosticAnswers(reponsesEnProfil());
     window.localStorage.setItem("coai_dashboard_intro_pending", "1");
-    // Essai Impulsion avec carte requise dès la sortie du diagnostic
+    // Essai Pass IA avec carte requise dès la sortie du diagnostic
     // (20/08/2026, demande Anthony) — revient sur le "accès libre" du
     // 13/08 pour CE parcours précis, sans y toucher ailleurs : le cookie
     // d'intention (déjà utilisé par /pricing) est lu par
@@ -2279,7 +2279,7 @@ export function DiagnosticQuiz({
                 </div>
                 <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
-                  Transformation ou VIP, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
+                  Coaching Hybride ou VIP, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
                   valide ton programme et te suit dans la durée, pendant que ton{" "}
                   <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
                   séances.
@@ -2401,7 +2401,7 @@ export function DiagnosticQuiz({
                   )}
                 </div>
               ) : (
-                // Essai Impulsion carte requise (20/08/2026, demande Anthony) :
+                // Essai Pass IA carte requise (20/08/2026, demande Anthony) :
                 // remplace le "accès libre" du 13/08 à cet endroit précis —
                 // voir handleCreerCompte(). Le reveal gratuit et partageable
                 // (score, jauges, DiagnosticShareButton plus haut) reste
@@ -2417,7 +2417,7 @@ export function DiagnosticQuiz({
                     <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
                     <span>Étape suivante · ton essai t&apos;attend</span>
                   </div>
-                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Commence ton essai Impulsion, 7 jours offerts.</h3>
+                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Commence ton essai Pass IA, 7 jours offerts.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
                     Programme, check-ins et Coach IA 24/7, sans limite. Tu ne payes rien pendant 7
                     jours ; annulable en un clic avant la fin de l&apos;essai.

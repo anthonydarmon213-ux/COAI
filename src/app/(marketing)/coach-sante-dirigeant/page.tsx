@@ -32,7 +32,7 @@ const AVANTAGES = [
   {
     titre: "Un regard humain quand ça compte",
     description:
-      "Sur le palier Transformation, un coach diplômé d'État relit et valide ton programme avant qu'il ne devienne définitif.",
+      "Sur le palier Coaching Hybride, un coach diplômé d'État relit et valide ton programme avant qu'il ne devienne définitif.",
   },
 ];
 
@@ -55,7 +55,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Impulsion coûte 49€/mois avec 7 jours d'essai et un coach IA disponible 24h/24. Transformation coûte 89€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain. Les deux sont sans engagement.",
+      "Pass IA coûte 49€/an (soit 4,08€/mois) avec 7 jours d'essai et un coach IA disponible 24h/24. Coaching Hybride coûte 89€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain. Les deux sont sans engagement.",
   },
 ];
 

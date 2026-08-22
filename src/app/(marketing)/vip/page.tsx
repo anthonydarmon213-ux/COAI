@@ -6,7 +6,7 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
-  title: "COAI Privé — Transformation 90 jours",
+  title: "COAI Privé — Coaching Hybride 90 jours",
   description: "Accompagnement privé de 90 jours avec Anthony Darmon : stratégie, entraînement, nutrition, récupération et suivi COAI quotidien.",
   alternates: { canonical: "/vip" },
 };

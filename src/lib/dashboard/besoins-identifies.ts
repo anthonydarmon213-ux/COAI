@@ -15,8 +15,8 @@ export type BesoinIdentifie = {
 };
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
-  IMPULSION: { label: "Impulsion — 49€/mois", href: "/pricing#impulsion" },
-  TRANSFORMATION: { label: "Transformation — 89€/mois", href: "/pricing#transformation" },
+  IMPULSION: { label: "Pass IA — 49€/an (soit 4,08€/mois)", href: "/pricing#impulsion" },
+  TRANSFORMATION: { label: "Coaching Hybride — 89€/mois", href: "/pricing#transformation" },
   VIP: { label: "VIP — dès 199€/mois", href: "/pricing#vip" },
 };
 
@@ -98,7 +98,7 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
   } else if (profile.coachPreference === "HYBRIDE") {
     besoins.push({
       besoin: "Tu veux combiner IA et expertise humaine",
-      explication: "Transformation associe un programme évolutif à la validation et aux ajustements d'un coach diplômé.",
+      explication: "Coaching Hybride associe un programme évolutif à la validation et aux ajustements d'un coach diplômé.",
       service: "TRANSFORMATION",
     });
   } else if (profile.coachPreference === "FULL_IA") {
@@ -113,7 +113,7 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
 }
 
 // Retire les besoins pointant vers un service déjà actif — inutile de
-// pousser Impulsion si le programme est déjà débloqué, ou Transformation si
+// pousser Pass IA si le programme est déjà débloqué, ou Coaching Hybride si
 // le suivi humain est déjà en place. VIP n'a pas d'état persistant (séances
 // à l'unité) : toujours affiché s'il est détecté.
 export function filtrerBesoinsPertinents(

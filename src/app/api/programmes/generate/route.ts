@@ -37,11 +37,11 @@ export async function POST() {
 
   // Génération bloquée tant que rien n'est débloqué (13/08/2026, nouveau
   // modèle d'abonnement) : la génération est disponible avec une formule
-  // Impulsion, Transformation ou VIP active.
+  // Pass IA, Coaching Hybride ou VIP active.
   // L'inscription elle-même est gratuite et ne suffit plus.
   if (!hasProgrammeAccess(user, user.subscription)) {
     return NextResponse.json(
-      { error: "Choisis ton accompagnement Impulsion, Transformation ou VIP pour générer et faire évoluer ton programme." },
+      { error: "Choisis ton accompagnement Pass IA, Coaching Hybride ou VIP pour générer et faire évoluer ton programme." },
       { status: 403 }
     );
   }
@@ -63,12 +63,12 @@ export async function POST() {
     );
   }
 
-  // Palier Impulsion : programme 100% IA, jamais envoyé en relecture au
+  // Palier Pass IA : programme 100% IA, jamais envoyé en relecture au
   // coach (statut GENERE_IA, visible immédiatement). Standard/Premium :
   // comportement inchangé, en attente de validation humaine.
   // Garde-fou grossesse/post-partum (14/08/2026, demande Anthony) : jamais
   // de programme livré sans relecture humaine pour ces statuts, quel que
-  // soit le palier — même Impulsion, normalement instantané.
+  // soit le palier — même Pass IA, normalement instantané.
   const plan = getEffectivePlan(user.subscription);
   const enceinteOuPostPartum =
     user.profile?.statutMaternite === "ENCEINTE" || user.profile?.statutMaternite === "POST_PARTUM";

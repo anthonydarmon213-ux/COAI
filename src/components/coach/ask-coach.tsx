@@ -168,7 +168,9 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
             <p className="text-sm text-red-400">{error}</p>
             {quotaAtteint && (
               <Link href="/pricing?plan=STANDARD">
-                <Button variant="secondary" className="px-6">Découvrir l&apos;accompagnement Transformation</Button>
+                <Button variant="secondary" className="px-6">
+                  Découvrir l&apos;accompagnement Coaching Hybride
+                </Button>
               </Link>
             )}
           </div>

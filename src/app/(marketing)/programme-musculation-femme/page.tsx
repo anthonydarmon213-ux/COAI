@@ -56,7 +56,7 @@ const FAQ_ITEMS = [
   {
     question: "Est-ce payant dès le départ ?",
     reponse:
-      "Non — le diagnostic est offert. Tu choisis ensuite Impulsion (49€/mois, 7 jours d'essai) ou Transformation (89€/mois, 7 jours d'essai, avec le regard d'un coach humain).",
+      "Non — le diagnostic est offert. Tu choisis ensuite Pass IA (49€/an, soit 4,08€/mois, 7 jours d'essai) ou Coaching Hybride (89€/mois, 7 jours d'essai, avec le regard d'un coach humain).",
   },
 ];
 

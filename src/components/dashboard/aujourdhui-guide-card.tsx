@@ -28,8 +28,8 @@ export type MissionDuJour = {
 // programme", cette carte s'affiche à chaque visite, tout en haut du
 // dashboard : une seule direction claire (mission), le COAI Insight déjà
 // calculé (jamais de statistique inventée pour faire "waouh") mis en avant
-// visuellement, puis — pour tout compte n'ayant débloqué ni Impulsion ni
-// Transformation (`!hasAccess`) — un rappel du bon accompagnement.
+// visuellement, puis — pour tout compte n'ayant débloqué ni Pass IA ni
+// Coaching Hybride (`!hasAccess`) — un rappel du bon accompagnement.
 export function AujourdhuiGuideCard({
   mission,
   insight,

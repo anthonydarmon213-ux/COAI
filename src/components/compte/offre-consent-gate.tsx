@@ -7,7 +7,7 @@ import Link from "next/link";
 // aucun engagement de paiement (elle est gratuite, cf. sign-up). Cette
 // reconnaissance des conditions de l'offre — jusque-là recueillie une seule
 // fois à l'inscription — doit donc être recueillie ici, juste avant chaque
-// achat réel (abonnement Impulsion, Transformation ou VIP), quel que
+// achat réel (abonnement Pass IA, Coaching Hybride ou VIP), quel que
 // soit l'endroit d'où l'action est déclenchée (dashboard, page de pilier,
 // /pricing). Affiche le bouton d'achat réel (children) seulement une fois
 // la case cochée. Le CTA reste visible pour que le prospect comprenne tout
