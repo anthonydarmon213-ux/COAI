@@ -257,6 +257,12 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
 
               {pilier === "RECUPERATION" && scoreSommeil && <ScoreSommeilCard resultat={scoreSommeil} />}
 
+              {/* Vision Nutri remonté en tête (22/08/2026, demande Anthony :
+                  "ajoute un composant bien visible en haut de page") — il
+                  vivait sous la liste des repas, donc invisible sans
+                  scroller toute la semaine. */}
+              {pilier === "NUTRITION" && <AnalysePhotoRepas />}
+
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
@@ -266,7 +272,6 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
               })()}
 
-              {pilier === "NUTRITION" && <AnalysePhotoRepas />}
               {pilier === "NUTRITION" && <FicheMacros />}
               {pilier === "NUTRITION" && (
                 <Link href="/programme/recettes" className="self-start text-sm font-semibold text-laiton-400 underline">
