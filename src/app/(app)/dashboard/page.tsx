@@ -19,6 +19,7 @@ import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
 import { StreakBadgesCard } from "@/components/dashboard/streak-badges-card";
+import { DeskResetCard } from "@/components/dashboard/desk-reset-card";
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { getGamification } from "@/lib/insight/gamification";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
@@ -325,6 +326,7 @@ export default async function DashboardPage() {
             côté de la colonne principale. */}
         <div className="flex min-w-0 flex-col gap-5 lg:col-span-4">
           <ScoreAgeCoaiCard resultat={ageCoai} />
+          <DeskResetCard />
           {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
           <RecuperationMusculaireCard />
           <BesoinsIdentifiesCard besoins={besoins} />
