@@ -2,6 +2,7 @@ import { JsonView } from "@/components/programme/json-view";
 import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
 import { RepasCard } from "@/components/programme/repas-card";
+import { AnneauxMacros } from "@/components/programme/anneaux-macros";
 
 // Vue dédiée au pilier NUTRITION : mêmes codes visuels que l'entraînement
 // (vue d'ensemble + un jour par carte repliable) pour une lecture cohérente
@@ -42,21 +43,26 @@ export function NutritionView({
     [key: string]: unknown;
   };
 
-  const badges = isPlainObject(objectifsJournaliers)
+  // Calories et macros sont désormais dans AnneauxMacros — ne restent en
+  // badges que les éventuelles autres clés (hydratation, etc.), pour ne
+  // pas afficher deux fois la même donnée.
+  const DANS_LES_ANNEAUX = ["calories", "proteines", "glucides", "lipides"];
+  const badgesHorsMacros = isPlainObject(objectifsJournaliers)
     ? Object.entries(objectifsJournaliers)
-        .filter(([, v]) => v !== undefined && v !== null && v !== "")
-        .map(([k, v]) => ({
-          icone: k === "calories" ? "🔥" : k === "proteines" ? "🍗" : k === "glucides" ? "🍚" : "🥑",
-          texte: String(v),
-        }))
+        .filter(([k, v]) => !DANS_LES_ANNEAUX.includes(k) && v !== undefined && v !== null && v !== "")
+        .map(([, v]) => ({ icone: "💧", texte: String(v) }))
     : [];
 
   return (
     <div className="coai-nutrition-view flex flex-col gap-5">
       {showContreIndications && <ContreIndications items={contreIndications} />}
+      {/* Anneaux de macros en tête (22/08/2026) — remplacent les badges
+          textuels de SemainePlan, qui affichaient la même information en
+          moins lisible. */}
+      <AnneauxMacros objectifsJournaliers={objectifsJournaliers} />
       <SemainePlan
         titre={titre}
-        badges={badges}
+        badges={badgesHorsMacros}
         vueEnsemble={vueEnsemble}
         vueEnsembleLabel="🥗 Principes de la semaine"
         jours={Array.isArray(jours) ? jours : []}
