@@ -3,6 +3,7 @@ import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
 import { RepasCard } from "@/components/programme/repas-card";
 import { AnneauxMacros } from "@/components/programme/anneaux-macros";
+import { ListeCourses } from "@/components/programme/liste-courses";
 
 // Vue dédiée au pilier NUTRITION : mêmes codes visuels que l'entraînement
 // (vue d'ensemble + un jour par carte repliable) pour une lecture cohérente
@@ -60,6 +61,7 @@ export function NutritionView({
           textuels de SemainePlan, qui affichaient la même information en
           moins lisible. */}
       <AnneauxMacros objectifsJournaliers={objectifsJournaliers} />
+      <ListeCourses contenu={data} />
       <SemainePlan
         titre={titre}
         badges={badgesHorsMacros}

@@ -20,6 +20,7 @@ import { calculerAgeCoai } from "@/lib/insight/age-coai";
 import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
 import { StreakBadgesCard } from "@/components/dashboard/streak-badges-card";
 import { DeskResetCard } from "@/components/dashboard/desk-reset-card";
+import { RoutineRecuperation } from "@/components/dashboard/routine-recuperation";
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { getGamification } from "@/lib/insight/gamification";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
@@ -313,6 +314,21 @@ export default async function DashboardPage() {
               aujourd'hui, sinon le bloc ne s'affiche pas du tout. */}
           {sourceSession && programme && (
             <SeanceDuJourHero contenu={programme.contenu} dureeProfil={user.profile?.dureeSeanceMinutes} />
+          )}
+
+          {/* Récupération ciblée : uniquement les jours de séance, et
+              seulement si les exercices sont reconnus — une routine
+              "générique" ne serait ciblée qu'en apparence. */}
+          {sourceSession && (
+            <RoutineRecuperation
+              exercicesDuJour={
+                Array.isArray((sourceSession as { exercices?: unknown }).exercices)
+                  ? ((sourceSession as { exercices: unknown[] }).exercices
+                      .map((e) => (typeof e === "object" && e !== null && typeof (e as { nom?: unknown }).nom === "string" ? (e as { nom: string }).nom : null))
+                      .filter((n): n is string => n !== null))
+                  : []
+              }
+            />
           )}
 
           <StreakBadgesCard gamification={gamification} />
