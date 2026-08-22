@@ -2,53 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
-const NAVIGATION = [
-  { href: "/dashboard", label: "Aujourd’hui", icon: "◉" },
-  {
-    label: "Mon programme",
-    icon: "◇",
-    match: "/programme",
-    children: [
-      { href: "/programme/entrainement", label: "Entraînement" },
-      { href: "/programme/alimentation", label: "Nutrition" },
-      { href: "/programme/recettes", label: "Recettes" },
-      { href: "/programme/recuperation", label: "Récupération" },
-      { href: "/programme/evolution", label: "Évolution du programme" },
-      { href: "/programme/exercices", label: "Catalogue d’exercices" },
-      { href: "/programme/programmes-prets", label: "Programmes prêts à l’emploi" },
-    ],
-  },
-  {
-    label: "Mon suivi",
-    icon: "↗",
-    match: "/suivi",
-    children: [
-      { href: "/suivi/progression", label: "Vue d’ensemble" },
-      { href: "/suivi/mesures", label: "Mes mesures" },
-      { href: "/suivi/seances", label: "Mes séances" },
-      { href: "/suivi/alimentation", label: "Mon alimentation" },
-      { href: "/suivi/tests-maxi", label: "Mes performances" },
-    ],
-  },
-  {
-    label: "Mes coachs",
-    icon: "✦",
-    match: "/coach",
-    children: [
-      { href: "/coach", label: "Poser une question" },
-      { href: "/pricing", label: "Comparer les formules" },
-      { href: "/compte/abonnement", label: "Mon abonnement" },
-    ],
-  },
+// Refonte complète (21/08/2026, demande Anthony — "épuré, moderne, qualité
+// app native premium") : remplace l'ancienne nav à 3 groupes déroulants
+// (<details>/<summary>, ~15 liens visibles) par 5 onglets fixes, sans
+// accordéon ni sous-menu. Chaque onglet pointe vers la page d'entrée réelle
+// du pilier plutôt qu'un nouveau chemin inventé ("/workout", "/nutrition")
+// qui n'existe pas dans l'app — /suivi/progression, /programme/entrainement
+// et /programme/alimentation sont les routes réelles.
+const ONGLETS: { href: string; label: string; icon: LucideIcon; match: string }[] = [
+  { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard" },
+  { href: "/programme/entrainement", label: "Entraînement", icon: Dumbbell, match: "/programme" },
+  { href: "/suivi/progression", label: "Progression", icon: TrendingUp, match: "/suivi" },
+  { href: "/programme/alimentation", label: "Nutrition", icon: Apple, match: "/programme/alimentation" },
+  { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
 ];
 
-function isActive(pathname: string | null, href: string) {
-  if (href === "/programme/entrainement") return pathname?.startsWith("/programme") ?? false;
-  if (href === "/suivi/progression") return pathname?.startsWith("/suivi") ?? false;
-  return pathname === href || (pathname?.startsWith(`${href}/`) ?? false);
+function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
+  if (!pathname) return false;
+  // "Entraînement" reste actif sur tout /programme SAUF /programme/alimentation,
+  // qui a son propre onglet "Nutrition" — sans cette exclusion les deux
+  // onglets s'allumeraient ensemble sur les pages nutrition.
+  if (onglet.href === "/programme/entrainement") {
+    return pathname.startsWith("/programme") && !pathname.startsWith("/programme/alimentation");
+  }
+  return pathname === onglet.match || pathname.startsWith(`${onglet.match}/`);
 }
 
 export function AppNav() {
@@ -67,36 +48,32 @@ export function AppNav() {
         <SignOutButton variant="icon" />
       </div>
 
-      <p className="mt-10 hidden text-[0.6rem] font-bold uppercase tracking-[0.18em] text-graphite-500 md:block">Ton parcours</p>
-      <nav aria-label="Navigation principale" className="coai-app-nav-scroll mt-4 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-3 md:min-h-0 md:flex-1 md:flex-col md:overflow-x-hidden md:overflow-y-auto md:pr-1">
-        {NAVIGATION.map((item) => {
-          if ("href" in item && item.href) {
-            const active = isActive(pathname, item.href);
-            return <Link key={item.href} href={item.href} className={`flex items-center gap-3 whitespace-nowrap rounded-xl border px-3.5 py-3 font-semibold transition ${active ? "border-laiton-400/30 bg-white/[0.08] text-white shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.06] hover:text-white"}`}><span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>{item.label}</Link>;
-          }
-
-          const groupActive = Boolean(pathname?.startsWith(item.match ?? "")) || item.children?.some((child) => isActive(pathname, child.href));
+      <nav aria-label="Navigation principale" className="coai-app-nav-scroll mt-6 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-8 md:min-h-0 md:flex-1 md:flex-col md:gap-1.5 md:overflow-x-hidden md:overflow-y-auto md:pr-1">
+        {ONGLETS.map((onglet) => {
+          const active = isActive(pathname, onglet);
+          const Icon = onglet.icon;
           return (
-            <details key={item.label} className="coai-nav-group" open={groupActive}>
-              <summary className={`flex cursor-pointer list-none items-center gap-3 rounded-xl border px-3.5 py-3 font-semibold transition ${groupActive ? "border-laiton-400/30 bg-white/[0.08] text-white shadow-sm" : "border-transparent text-graphite-300 hover:bg-white/[0.06] hover:text-white"}`}>
-                <span className="w-4 text-center text-xs" aria-hidden="true">{item.icon}</span>
-                <span className="flex-1">{item.label}</span>
-                <span className="coai-nav-chevron text-[10px]" aria-hidden="true">⌄</span>
-              </summary>
-              <div className="ml-5 mt-1 flex flex-col border-l border-laiton-500/25 pl-3">
-                {item.children?.map((child) => {
-                  const active = isActive(pathname, child.href);
-                  return <Link key={child.href} href={child.href} className={`rounded-lg px-3 py-2 text-[0.78rem] font-bold transition ${active ? "bg-white/[0.08] text-white" : "text-graphite-300 hover:bg-white/[0.06] hover:text-white"}`}>{child.label}</Link>;
-                })}
-              </div>
-            </details>
+            <Link
+              key={onglet.href}
+              href={onglet.href}
+              aria-current={active ? "page" : undefined}
+              className={`relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3.5 py-3 font-semibold transition ${
+                active ? "bg-white/[0.08] text-white shadow-sm" : "text-graphite-300 hover:bg-white/[0.06] hover:text-white"
+              }`}
+            >
+              {active && (
+                <span aria-hidden="true" className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-laiton-400 md:inset-y-2" />
+              )}
+              <Icon size={18} strokeWidth={2} className={active ? "text-laiton-300" : "text-graphite-500"} aria-hidden="true" />
+              {onglet.label}
+            </Link>
           );
         })}
       </nav>
 
       <div className="mt-6 hidden border-t border-laiton-500/15 pt-5 md:block">
         <div className="grid grid-cols-2 gap-2 text-xs text-graphite-400">
-          <Link href="/compte/profil" className="hover:text-white">Mon profil</Link>
+          <Link href="/compte/profil" className="hover:text-white">Profil</Link>
           <Link href="/compte/parametres" className="hover:text-white">Réglages</Link>
         </div>
       </div>

@@ -3,7 +3,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 type Echange = { question: string; reponse: string };
@@ -34,9 +33,6 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
   const [historique, setHistorique] = useState<Echange[]>([]);
   const [quotaRemaining, setQuotaRemaining] = useState(initialQuotaRemaining);
   const [progress, setProgress] = useSimulatedProgress(loading);
-
-  const rOuter = 44;
-  const circumference = 2 * Math.PI * rOuter;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -72,68 +68,103 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
     }
   }
 
-  const dash = (progress / 100) * circumference;
+  // Raccourcis de réponses rapides (21/08/2026, demande Anthony) —
+  // pré-remplissent le champ au lieu d'envoyer directement : la personne
+  // peut préciser sa situation avant d'envoyer, ce qui donne une bien
+  // meilleure réponse qu'une question générique.
+  const RACCOURCIS = [
+    "Je voudrais ajuster mes charges, elles me semblent",
+    "Je me sens fatigué(e) en ce moment, comment adapter ma semaine ?",
+    "Je n'ai pas le matériel prévu aujourd'hui, par quoi remplacer",
+    "J'ai une gêne quelque part, que faire pour ma prochaine séance ?",
+  ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <Card className="flex flex-col items-center gap-5 py-10 text-center">
-        <div className="relative flex h-36 w-36 items-center justify-center">
-          <div className="relative h-36 w-36 overflow-hidden rounded-full border-2 border-laiton-400/40 shadow-[0_0_32px_-6px_rgba(201,162,98,0.55)]">
-            <Image
-              src="/coach-ia-anthony.png"
-              alt="Anthony Darmon, ton coach IA"
-              fill
-              sizes="9rem"
-              className="coai-coach-photo object-cover object-[50%_22%]"
-              priority
-            />
-          </div>
-          {loading && (
-            <svg width="144" height="144" viewBox="0 0 120 120" fill="none" className="absolute inset-0" aria-hidden="true">
-              <circle cx="60" cy="60" r={rOuter} stroke="#26282d" strokeWidth="6" />
-              <circle
-                className="coai-loader-arc"
-                cx="60"
-                cy="60"
-                r={rOuter}
-                stroke="#c9a262"
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeDasharray={`${dash} ${circumference}`}
-                transform="rotate(-90 60 60)"
-                style={{ transition: "stroke-dasharray 0.2s linear" }}
-              />
-            </svg>
-          )}
-          {loading && (
-            <span className="absolute inset-0 flex items-center justify-center font-mono text-sm font-medium text-graphite-50">
-              {progress}%
-            </span>
-          )}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3 rounded-t-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+        <div className="relative h-10 w-10 flex-none overflow-hidden rounded-full border border-laiton-400/40">
+          <Image src="/coach-ia-anthony.png" alt="" fill sizes="2.5rem" className="object-cover object-[50%_22%]" />
         </div>
-        <p className="font-mono text-xs uppercase tracking-widest text-graphite-400">
-          {loading ? "Ton coach réfléchit…" : "Prêt à répondre"}
-        </p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-white">Coach COAI</p>
+          <p className="text-[11px] text-graphite-500">{loading ? "écrit…" : "répond en quelques secondes"}</p>
+        </div>
         {quotaRemaining !== null && (
-          <p className="text-xs text-laiton-300">
-            {quotaRemaining} question{quotaRemaining > 1 ? "s" : ""} restante{quotaRemaining > 1 ? "s" : ""} ce mois-ci
+          <span className="flex-none rounded-full border border-laiton-400/25 bg-laiton-400/10 px-2.5 py-1 text-[10px] font-semibold text-laiton-200">
+            {quotaRemaining} restante{quotaRemaining > 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
+
+      {/* Fil de conversation en bulles — le plus ancien en haut, comme
+          dans une vraie messagerie (l'historique était affiché à l'envers
+          jusqu'ici, ce qui cassait la lecture d'un échange suivi). */}
+      <div className="flex min-h-[8rem] flex-col gap-3 border-x border-white/10 bg-white/[0.015] px-4 py-4">
+        {historique.length === 0 && !loading && (
+          <p className="my-6 text-center text-xs leading-5 text-graphite-500">
+            Pose ta première question — technique, charge, fatigue, remplacement d&apos;exercice.
           </p>
         )}
-        <form onSubmit={handleSubmit} className="flex w-full max-w-lg flex-col gap-3">
+        {historique.map((echange, i) => (
+          <div key={i} className="flex flex-col gap-2">
+            <div className="flex justify-end">
+              <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-laiton-400/90 px-3.5 py-2.5 text-sm leading-6 text-[#111216]">
+                {echange.question}
+              </p>
+            </div>
+            <div className="flex justify-start">
+              <p className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-bl-sm border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm leading-6 text-graphite-100">
+                {echange.reponse}
+              </p>
+            </div>
+          </div>
+        ))}
+        {loading && (
+          <div className="flex justify-start">
+            <span className="rounded-2xl rounded-bl-sm border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-graphite-400">
+              <span className="inline-flex gap-1" aria-label="Le coach écrit">
+                <span className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-laiton-300" />
+                <span className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-laiton-300" style={{ animationDelay: "0.15s" }} />
+                <span className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-laiton-300" style={{ animationDelay: "0.3s" }} />
+              </span>
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-b-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+        <div className="coai-app-nav-scroll -mx-1 mb-2.5 flex gap-2 overflow-x-auto px-1 pb-1">
+          {RACCOURCIS.map((texte) => (
+            <button
+              key={texte}
+              type="button"
+              onClick={() => setQuestion(texte)}
+              className="flex-none rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+            >
+              {texte.length > 34 ? `${texte.slice(0, 34)}…` : texte}
+            </button>
+          ))}
+        </div>
+        <form onSubmit={handleSubmit} className="flex items-end gap-2">
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ex : Je peux remplacer le squat par quoi si je n'ai pas de barre ?"
-            rows={3}
+            placeholder="Écris ton message…"
+            rows={1}
             maxLength={1000}
-            className="w-full resize-none rounded-lg border border-graphite-700 bg-graphite-900/60 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-500 focus:border-laiton-400/50 focus:outline-none"
+            className="max-h-32 min-h-[2.75rem] w-full flex-1 resize-none rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-500 focus:border-laiton-400/50 focus:outline-none"
           />
-          <Button type="submit" disabled={loading || !question.trim()} className="self-center px-7">
-            {loading ? "Envoi…" : "Poser la question"}
+          <Button type="submit" disabled={loading || !question.trim()} className="h-11 flex-none rounded-full px-5">
+            {loading ? "…" : "Envoyer"}
           </Button>
         </form>
+        {loading && (
+          <div className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+            <div className="h-full rounded-full bg-laiton-400 transition-all duration-200" style={{ width: `${progress}%` }} />
+          </div>
+        )}
         {error && (
-          <div className="flex flex-col items-center gap-3">
+          <div className="mt-3 flex flex-col items-center gap-2">
             <p className="text-sm text-red-400">{error}</p>
             {quotaAtteint && (
               <Link href="/pricing?plan=STANDARD">
@@ -144,20 +175,7 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
             )}
           </div>
         )}
-      </Card>
-
-      {historique.length > 0 && (
-        <div className="flex flex-col gap-4">
-          {[...historique].reverse().map((echange, i) => (
-            <Card key={i} className="flex flex-col gap-3">
-              <p className="text-sm font-medium text-graphite-50">{echange.question}</p>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-graphite-300">
-                {echange.reponse}
-              </p>
-            </Card>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
