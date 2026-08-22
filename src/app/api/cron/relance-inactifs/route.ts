@@ -378,8 +378,8 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
         `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
         `Choisis ta formule : ${appUrl}/pricing\n\n` +
-        `Pass IA : 7 jours d'essai, puis 49 €/an (soit 4,08 €/mois), avec ton Personal Trainer IA disponible 24h/24.\n` +
-        `Coaching Hybride : 7 jours d'essai, puis 89 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
+        `Pass IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
+        `Coaching Hybride : 7 jours d'essai, puis 99 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
         `VIP : à partir de 199 €/mois, avec une séance privée mensuelle.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
@@ -467,7 +467,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
     // Pass IA est facturé à l'année (cf. OFFER_BY_PLAN.GRATUIT, interval
     // "year") — l'e-mail affichait un prix mensuel qui n'a jamais
     // correspondu au prélèvement réel.
-    const prix = user.checkoutPlan === "STANDARD" ? "89 €/mois" : "49 €/an";
+    const prix = user.checkoutPlan === "STANDARD" ? "99 €/mois" : "49 €/an";
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const envoye = await sendEmail(
       user.email,

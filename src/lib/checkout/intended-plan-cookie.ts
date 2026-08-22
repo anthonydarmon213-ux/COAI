@@ -2,7 +2,7 @@
 // S'abonner de /pricing pour un visiteur non connecté, redirigé vers
 // /sign-up) le temps de l'inscription — nécessaire pour survivre à
 // l'aller-retour Google OAuth, qui ne repasse pas par /sign-up au retour.
-// Sans ça, un visiteur qui clique "S'abonner — Coaching Hybride 89€/mois"
+// Sans ça, un visiteur qui clique "S'abonner — Coaching Hybride 99€/mois"
 // se retrouvait silencieusement inscrit sur l'offre Pass IA (7 jours
 // offerts) une fois son compte créé. Cookie non httpOnly (lu/écrit côté
 // client uniquement), courte durée de vie, aucune donnée sensible.

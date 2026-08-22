@@ -250,7 +250,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
 
               {genereIA && (
                 <p className="text-sm text-graphite-400">
-                  Ton programme est piloté par ton Personal Trainer IA. Passe à Coaching Hybride (89€/mois)
+                  Ton programme est piloté par ton Personal Trainer IA. Passe à Coaching Hybride (99€/mois)
                   pour ajouter le regard et les ajustements d&apos;un coach humain.
                 </p>
               )}

@@ -7,8 +7,8 @@ import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  GRATUIT: "Pass IA — 49€/an",
-  STANDARD: "Coaching Hybride — 89€/mois",
+  GRATUIT: "Pass IA — 19,99€/mois",
+  STANDARD: "Coaching Hybride — 99€/mois",
   PREMIUM: "VIP — à partir de 199€/mois",
 };
 

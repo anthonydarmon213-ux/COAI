@@ -51,8 +51,8 @@ const ETAPES: Etape[] = [
       `Bonjour,\n\n` +
       `Un programme figé devient vite inutile. Dans ton espace personnalisé, le Défi COAI te propose ` +
       `une action utile par jour pendant 7 jours pour découvrir comment COAI apprend de toi.\n\n` +
-      `Tu peux commencer avec Pass IA pendant 7 jours, puis continuer pour 49€/an (soit 4,08€/mois), sans engagement. ` +
-      `Si tu veux aussi le regard d'un coach humain, Coaching Hybride est à 89€/mois.\n\n` +
+      `Tu peux commencer avec Pass IA pendant 7 jours, puis continuer pour 19,99€/mois (ou 119€/an), sans engagement. ` +
+      `Si tu veux aussi le regard d'un coach humain, Coaching Hybride est à 99€/mois.\n\n` +
       `Créer mon espace personnalisé : ${appUrl}/sign-up\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),
@@ -68,7 +68,7 @@ const ETAPES: Etape[] = [
       return (
         `Bonjour,\n\n` +
         `Ton diagnostic a identifié le point de départ. Ton espace personnalisé te permet maintenant ` +
-        `de passer à l'action ; si tu veux ton programme adaptatif complet, Pass IA démarre par 7 jours d'essai puis 49 €/an (soit 4,08 €/mois).\n\n` +
+        `de passer à l'action ; si tu veux ton programme adaptatif complet, Pass IA démarre par 7 jours d'essai puis 19,99 €/mois (ou 119 €/an).\n\n` +
         `Commencer mes 7 jours d'essai : ${appUrl}/pricing\n\n` +
         (whatsapp ? `Tu préfères un accompagnement VIP ? Écris directement à Anthony : ${whatsapp}\n\n` : "") +
         `À bientôt,\nL'équipe COAI` +

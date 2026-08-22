@@ -111,6 +111,17 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
             {!tier.sessions && (
               <>
                 <SubscribeButton plan={tier.plan} label={tier.trial ? (tier.mostPopular ? "Essayer Pass IA pendant 7 jours" : "Commencer mes 7 jours d'essai") : `Choisir ${tier.nom}`} className="coai-rainbow-cta w-full border-0 text-[#111216]" />
+                {/* Option annuelle (22/08/2026) — proposée uniquement sur
+                    Pass IA : c'est le seul plan dont le checkout accepte
+                    réellement les deux rythmes (cf. OFFER_BY_PLAN). */}
+                {tier.plan === "GRATUIT" && (
+                  <SubscribeButton
+                    plan="GRATUIT"
+                    billing="ANNUAL"
+                    label="Payer à l'année — 9,99€/mois (119€/an)"
+                    className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
+                  />
+                )}
                 {/* Réassurance sous le bouton (22/08/2026, demande
                     Anthony). Apple Pay / Google Pay apparaissent
                     automatiquement dans Stripe Checkout quand ils sont

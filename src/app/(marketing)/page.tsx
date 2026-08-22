@@ -47,7 +47,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Pass IA coûte 49€/an (soit 4,08€/mois), Coaching Hybride 89€/mois et VIP démarre à 199€/mois. Les deux premières formules incluent 7 jours d'essai.",
+      "Le diagnostic est offert. Ensuite, Pass IA coûte 19,99€/mois (ou 119€/an), Coaching Hybride 99€/mois et VIP démarre à 199€/mois. Les deux premières formules incluent 7 jours d'essai.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -95,7 +95,7 @@ const PARCOURS_PERSONAL_TRAINING = [
   },
   {
     plage: "04—07",
-    offre: "Pass IA · 49€/an",
+    offre: "Pass IA · 19,99€/mois",
     titre: "Commencer avec Pass IA",
     description: "Si tu veux commencer, COAI crée ton programme et te guide pendant chaque séance.",
     etapes: [
@@ -110,7 +110,7 @@ const PARCOURS_PERSONAL_TRAINING = [
   },
   {
     plage: "08",
-    offre: "Coaching Hybride · 89€/mois",
+    offre: "Coaching Hybride · 99€/mois",
     titre: "Ajouter le suivi humain",
     description: "Tu passes à Coaching Hybride seulement si tu veux un regard extérieur, des retours et des ajustements.",
     etapes: ["08 · Suivi : performances, sensations et douleurs consignées après chaque séance"],
@@ -684,7 +684,7 @@ export default function LandingPage() {
           Commence à ton rythme.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Pass IA à 49€/an (soit 4,08€/mois), Coaching Hybride à 89€/mois ou VIP dès 199€/mois. Trois niveaux
+          Pass IA à 19,99€/mois (ou 119€/an), Coaching Hybride à 99€/mois ou VIP dès 199€/mois. Trois niveaux
           d&apos;attention, un même objectif : te guider simplement jusqu&apos;au résultat.
         </p>
         <Link href="/pricing">

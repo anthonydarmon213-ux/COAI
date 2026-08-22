@@ -29,7 +29,7 @@ export default async function VideosPage() {
         <Card className="flex flex-col items-start gap-3">
           <Badge tone="warning">Réservé à l&apos;offre Coaching Hybride</Badge>
           <p className="text-sm text-graphite-300">
-            Passe à l&apos;offre Coaching Hybride (89€/mois) pour accéder à la bibliothèque de streaming.
+            Passe à l&apos;offre Coaching Hybride (99€/mois) pour accéder à la bibliothèque de streaming.
           </p>
           <Link href="/pricing">
             <Button>Voir les offres</Button>
