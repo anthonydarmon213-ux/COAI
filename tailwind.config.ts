@@ -46,6 +46,19 @@ const config: Config = {
         // Additifs : graphite/laiton restent la base déjà en place, brass/steel
         // sont les nouveaux accents (bouton primaire/secondaire), ink/paper/
         // surface/muted/line sont disponibles pour les futurs écrans clairs.
+        // Accents "high-tech" (22/08/2026, charte Dark Luxury demandée par
+        // Anthony) — AJOUTÉS à côté de laiton/acier, jamais à leur place :
+        // le brand book COAI définit Laiton #C9A262 et Steel #5B8296 comme
+        // couleurs d'identité. Les remplacer par #D4AF37 / #00F0FF aurait
+        // changé la marque partout (logo, PDF, e-mails) sans décision
+        // explicite. Ces deux teintes servent les surfaces techniques :
+        // jauges biométriques, cartographie musculaire, métriques live.
+        or: "#D4AF37",
+        cyan: "#00F0FF",
+        // Fond profond de la charte, très proche du graphite-950 existant
+        // (#0d0e10) : conservé distinct pour les écrans immersifs
+        // (lecteur de séance) sans toucher au fond global de l'app.
+        abysse: "#0D0E12",
         ink: "#14181A",
         paper: "#EEF1ED",
         surface: "#E3E7E1",

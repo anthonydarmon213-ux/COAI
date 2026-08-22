@@ -52,7 +52,7 @@ export function RoutineRecuperation({ exercicesDuJour }: { exercicesDuJour: stri
   if (routine.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <section className="coai-glass p-5">
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Après ta séance</p>
       <h2 className="mt-1.5 text-lg font-semibold text-white">🧘 Récupération ciblée</h2>
       <p className="mt-1 text-xs leading-5 text-graphite-400">

@@ -36,7 +36,7 @@ export function RepasCard({
   if (/avoine|riz|patate|quinoa|p[âa]tes|pain complet/.test(texteComplet)) badges.push("Énergie durable");
 
   return (
-    <div className="coai-meal-card group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-laiton-400/40 hover:shadow-[0_18px_45px_-30px_rgba(201,162,98,0.9)]">
+    <div className="coai-meal-card coai-glass coai-interactive group relative flex flex-col overflow-hidden">
       {photoUrl && (
         <div className="relative h-40 w-full overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental */}

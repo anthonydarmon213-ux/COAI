@@ -465,7 +465,7 @@ export function SeanceRunner({
   const consigne = step.type === "set" && typeof step.exercice.charge === "string" ? step.exercice.charge : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#0d0e10]">
+    <div className="fixed inset-0 z-50 flex flex-col bg-abysse">
       {termine ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <span className="text-5xl">✅</span>

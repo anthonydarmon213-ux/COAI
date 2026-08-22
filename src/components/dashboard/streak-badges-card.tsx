@@ -8,7 +8,7 @@ export function StreakBadgesCard({ gamification }: { gamification: Gamification 
   const { streakJours, actifAujourdhui, meilleurStreak, badges, badgesObtenus } = gamification;
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5" aria-labelledby="gamification-titre">
+    <section className="coai-glass p-5" aria-labelledby="gamification-titre">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Ta série</p>
