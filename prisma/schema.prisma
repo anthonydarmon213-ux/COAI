@@ -230,6 +230,10 @@ model DailySession {
   sleep               DailySleep?
   energy              DailyEnergy?
   chargeMentale       DailyChargeMentale?
+  // Matériel disponible CE jour-là (22/08/2026) — distinct de
+  // Profile.equipementDisponible (le matériel habituel). NULL = non
+  // renseigné, la génération retombe alors sur celui du profil.
+  equipementDuJour    String?
   pain                 Boolean?
   painArea             String?
   availableMinutes    Int?

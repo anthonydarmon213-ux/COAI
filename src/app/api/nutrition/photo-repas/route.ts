@@ -16,6 +16,7 @@ type Extraction = {
   glucidesG: number | null;
   lipidesG: number | null;
   resume: string | null;
+  conseilCoach: string | null;
 };
 
 // Estimation des macros/calories d'un repas à partir d'une photo (20/08/2026,

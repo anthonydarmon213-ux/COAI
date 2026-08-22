@@ -115,9 +115,10 @@ const DUREE_EN_MINUTES: Record<string, number> = {
 // réellement fait avec les réponses (calcul du split, du format...), pas du
 // texte générique type "chargement...".
 const ANALYSE_MESSAGES = [
-  "Analyse de ton objectif...",
+  "Analyse de tes réponses...",
   "Calcul de ton format d'entraînement...",
-  "Personnalisation de ton profil...",
+  "Calibrage de ta nutrition...",
+  "Construction de ton profil COAI...",
 ];
 
 // Contenu des écrans respirants "respire1"/"respire2" (19/08/2026) — texte
@@ -339,6 +340,107 @@ function normalizeTelephone(value: string): string {
 
 function isValidTelephone(value: string): boolean {
   return /^\+[1-9]\d{6,14}$/.test(normalizeTelephone(value));
+}
+
+// Icônes des cartes de choix (21/08/2026, demande Anthony : "remplace les
+// boutons texte par des cartes interactives avec icônes"). Emoji plutôt
+// qu'une bibliothèque d'icônes : rendu identique sur tous les appareils
+// sans dépendance ni requête réseau, et lisible à petite taille sur mobile.
+// Une entrée absente de la table retombe sur une puce neutre — jamais
+// d'icône approximative qui suggérerait autre chose que le libellé.
+const ICONE_CHOIX: Record<string, string> = {
+  // Objectifs
+  "Perdre du gras": "🔥",
+  "Prendre du muscle": "💪",
+  "Me sentir mieux au quotidien": "🌿",
+  "Progresser en force": "🏋️",
+  "Améliorer mes performances": "⚡",
+  "Gagner en mobilité": "🤸",
+  "Reprendre le sport": "🔄",
+  // Niveaux
+  "Débutant": "🌱",
+  "Intermédiaire": "📈",
+  "Avancé": "🎯",
+  // Équipement
+  "Salle de sport complète": "🏟️",
+  "Matériel à la maison (haltères, bancs...)": "🏠",
+  "Élastiques / bandes de résistance": "🎗️",
+  "Kettlebell": "🔔",
+  "TRX / sangles de suspension": "🪢",
+  "Aucun matériel": "🧍",
+  // Lieux
+  "Salle de sport": "🏟️",
+  "À la maison": "🏠",
+  "En extérieur": "🌳",
+  "Ça dépend des jours": "🔀",
+};
+
+// Zones du corps pour la sélection des douleurs (21/08/2026, demande
+// Anthony : "grille de boutons visuels pour sélectionner les zones").
+// Ordre haut → bas du corps, pour que la grille se lise comme une
+// silhouette. Les libellés doivent rester EXACTEMENT ceux de CONTRAINTES
+// pour "Dos", "Genoux" et "Épaules" : ce sont ces chaînes qui partent en
+// base, une variante casserait le pré-remplissage du profil.
+const ZONES_CORPS: { label: string; icone: string }[] = [
+  { label: "Épaules", icone: "🫱" },
+  { label: "Dos", icone: "🔙" },
+  { label: "Coudes", icone: "💪" },
+  { label: "Poignets", icone: "✋" },
+  { label: "Hanches", icone: "🦴" },
+  { label: "Genoux", icone: "🦵" },
+  { label: "Chevilles", icone: "🦶" },
+  { label: "Nuque / cervicales", icone: "🧣" },
+];
+
+// Grande carte de choix avec icône — remplace OptionCard sur les questions
+// où un repère visuel aide vraiment (objectif, niveau, équipement, lieu).
+// Les questions à réponse purement numérique ou textuelle gardent
+// OptionCard : y coller une icône décorative n'aiderait personne.
+function ChoixVisuel({
+  label,
+  hint,
+  active,
+  onClick,
+}: {
+  label: string;
+  hint?: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const icone = ICONE_CHOIX[label];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`group flex items-center gap-3.5 rounded-2xl border px-4 py-4 text-left transition duration-200 ${
+        active
+          ? "border-laiton-400/60 bg-laiton-400/[0.1] shadow-[0_0_0_1px_rgba(201,162,98,0.25),0_18px_40px_-28px_rgba(201,162,98,0.9)]"
+          : "border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-laiton-400/30 hover:bg-white/[0.06]"
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`flex h-11 w-11 flex-none items-center justify-center rounded-xl text-xl transition ${
+          active ? "bg-laiton-400/20" : "bg-white/[0.05] group-hover:bg-white/[0.08]"
+        }`}
+      >
+        {icone ?? "•"}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className={`block text-sm font-semibold ${active ? "text-laiton-100" : "text-graphite-100"}`}>{label}</span>
+        {hint && <span className="mt-0.5 block text-xs leading-5 text-graphite-500">{hint}</span>}
+      </span>
+      <span
+        aria-hidden="true"
+        className={`flex h-5 w-5 flex-none items-center justify-center rounded-full border text-[11px] transition ${
+          active ? "border-laiton-400 bg-laiton-400 text-[#111216]" : "border-white/20 text-transparent"
+        }`}
+      >
+        ✓
+      </span>
+    </button>
+  );
 }
 
 function OptionCard({
@@ -886,16 +988,27 @@ export function DiagnosticQuiz({
   // questions, ce court passage matérialise le "travail" fait sur ses
   // réponses plutôt qu'un résultat qui apparaît instantanément.
   const [analyseIndex, setAnalyseIndex] = useState(0);
+  const [analyseProgress, setAnalyseProgress] = useState(0);
   useEffect(() => {
     if (step !== "analyse") return;
     setAnalyseIndex(0);
-    const stepDuration = 750;
+    setAnalyseProgress(0);
+    // 3 secondes au total (21/08/2026, demande Anthony) réparties sur les
+    // messages, avec une jauge qui avance en continu — la personne voit un
+    // vrai décompte plutôt qu'un simple arc qui tourne.
+    const dureeTotale = 3000;
+    const stepDuration = Math.round(dureeTotale / ANALYSE_MESSAGES.length);
     const messageInterval = setInterval(() => {
       setAnalyseIndex((i) => (i + 1 < ANALYSE_MESSAGES.length ? i + 1 : i));
     }, stepDuration);
-    const advance = setTimeout(goNext, stepDuration * ANALYSE_MESSAGES.length + 300);
+    const debut = Date.now();
+    const progressInterval = setInterval(() => {
+      setAnalyseProgress(Math.min(100, Math.round(((Date.now() - debut) / dureeTotale) * 100)));
+    }, 60);
+    const advance = setTimeout(goNext, dureeTotale + 250);
     return () => {
       clearInterval(messageInterval);
+      clearInterval(progressInterval);
       clearTimeout(advance);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1301,8 +1414,8 @@ export function DiagnosticQuiz({
       <div className={`coai-diagnostic-card overflow-hidden ${step === "result" ? "coai-diagnostic-result" : ""}`}>
         {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && step !== "respire1" && step !== "respire2" && (
           <div className="coai-diagnostic-progress flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
-              Profil {stepIndex + 1} sur {questionSteps.length}
+            <span key={stepIndex} className="animate-reveal font-mono text-[11px] uppercase tracking-[0.18em] text-laiton-400">
+              Étape {stepIndex + 1} sur {questionSteps.length}
             </span>
             <div className="coai-progress-track h-1.5 w-32 overflow-hidden rounded-full bg-graphite-800 sm:w-40">
               <div
@@ -1391,7 +1504,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {NIVEAUX.map((n) => (
-                  <OptionCard key={n.value} label={n.value} hint={n.hint} active={niveau === n.value} onClick={() => chooseSingle(setNiveau, n.value)} />
+                  <ChoixVisuel key={n.value} label={n.value} hint={n.hint} active={niveau === n.value} onClick={() => chooseSingle(setNiveau, n.value)} />
                 ))}
               </div>
             </div>
@@ -1405,7 +1518,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {OBJECTIFS.map((o) => (
-                  <OptionCard
+                  <ChoixVisuel
                     key={o}
                     label={o}
                     active={objectifsPrincipaux.includes(o)}
@@ -1503,9 +1616,9 @@ export function DiagnosticQuiz({
                 <h2 className="font-display text-xl font-semibold text-white">Ton équipement ?</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">Coche tout ce qui est vraiment disponible.</p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid gap-2 sm:grid-cols-2">
                 {EQUIPEMENTS.map((e) => (
-                  <Chip key={e} label={e} active={equipement.includes(e)} onClick={() => toggle(equipement, e, setEquipement)} />
+                  <ChoixVisuel key={e} label={e} active={equipement.includes(e)} onClick={() => toggle(equipement, e, setEquipement)} />
                 ))}
               </div>
               {equipement.includes(AUTRE_LABEL) && (
@@ -1530,7 +1643,7 @@ export function DiagnosticQuiz({
               </div>
               <div className="flex flex-col gap-2">
                 {LIEUX.map((l) => (
-                  <OptionCard key={l} label={l} active={lieu === l} onClick={() => chooseSingle(setLieu, l)} />
+                  <ChoixVisuel key={l} label={l} active={lieu === l} onClick={() => chooseSingle(setLieu, l)} />
                 ))}
               </div>
             </div>
@@ -1744,8 +1857,53 @@ export function DiagnosticQuiz({
                   Coche ce qui s&apos;applique, ou passe si rien à signaler.
                 </p>
               </div>
+              {/* Grille de zones (21/08/2026, demande Anthony) — remplace la
+                  liste de chips par des boutons visuels ordonnés du haut
+                  vers le bas du corps. "Aucune douleur" et "Autre" restent
+                  hors grille : ce ne sont pas des zones, et "Aucune" est
+                  exclusif (cf. toggleSante). */}
+              <button
+                type="button"
+                onClick={() => toggleSante(AUCUNE_DOULEUR_LABEL)}
+                aria-pressed={sante.includes(AUCUNE_DOULEUR_LABEL)}
+                className={`flex items-center gap-3 rounded-2xl border px-4 py-3.5 text-left transition ${
+                  sante.includes(AUCUNE_DOULEUR_LABEL)
+                    ? "border-emerald-400/50 bg-emerald-400/[0.1]"
+                    : "border-white/10 bg-white/[0.03] hover:border-emerald-400/30 hover:bg-white/[0.06]"
+                }`}
+              >
+                <span aria-hidden="true" className="text-xl">✅</span>
+                <span className={`text-sm font-semibold ${sante.includes(AUCUNE_DOULEUR_LABEL) ? "text-emerald-200" : "text-graphite-100"}`}>
+                  {AUCUNE_DOULEUR_LABEL}
+                </span>
+              </button>
+
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {ZONES_CORPS.map((zone) => {
+                  const actif = sante.includes(zone.label);
+                  return (
+                    <button
+                      key={zone.label}
+                      type="button"
+                      onClick={() => toggleSante(zone.label)}
+                      aria-pressed={actif}
+                      className={`flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3.5 transition ${
+                        actif
+                          ? "border-laiton-400/60 bg-laiton-400/[0.12] shadow-[0_0_0_1px_rgba(201,162,98,0.2)]"
+                          : "border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-laiton-400/30 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      <span aria-hidden="true" className="text-xl">{zone.icone}</span>
+                      <span className={`text-center text-[11px] font-semibold leading-tight ${actif ? "text-laiton-100" : "text-graphite-300"}`}>
+                        {zone.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="flex flex-wrap gap-2">
-                {CONTRAINTES.map((c) => (
+                {CONTRAINTES.filter((c) => c !== AUCUNE_DOULEUR_LABEL && !ZONES_CORPS.some((z) => z.label === c)).map((c) => (
                   <Chip key={c} label={c} active={sante.includes(c)} onClick={() => toggleSante(c)} />
                 ))}
               </div>
@@ -1846,9 +2004,18 @@ export function DiagnosticQuiz({
                 <span className="font-display text-2xl font-semibold text-white">COAI</span>
               </div>
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
-                COAI analyse ton profil
+                L&apos;algorithme COAI analyse ton profil
               </p>
-              <p className="text-sm text-graphite-400">{ANALYSE_MESSAGES[analyseIndex]}</p>
+              <p className="text-sm text-graphite-300">{ANALYSE_MESSAGES[analyseIndex]}</p>
+              <div className="w-full max-w-xs">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-laiton-500 to-laiton-300 transition-[width] duration-100 ease-linear"
+                    style={{ width: `${analyseProgress}%` }}
+                  />
+                </div>
+                <p className="mt-2 font-mono text-[11px] tabular-nums text-graphite-500">{analyseProgress}%</p>
+              </div>
             </div>
           )}
 
