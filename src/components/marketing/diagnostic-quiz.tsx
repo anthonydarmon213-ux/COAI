@@ -1044,19 +1044,19 @@ export function DiagnosticQuiz({
     if (step === "sante") return true; // peut n'avoir rien à signaler
     if (step === "email") return isValidEmail(email) && isValidTelephone(telephone) && consentEmail;
     return true;
+    // persona / mobiliteRepere / cardioRepere / forceRepere /
+    // mouvementRepere / coachPreference retirés (22/08/2026) : les étapes
+    // qui les utilisaient ont été supprimées avec le code mort du
+    // diagnostic, ces dépendances n'étaient plus lues ici et faisaient
+    // remonter un warning react-hooks/exhaustive-deps à chaque build.
   }, [
     step,
-    persona,
     activiteQuotidienne,
     niveau,
     objectif,
     objectifsPrincipaux,
     echeance,
     declencheur,
-    mobiliteRepere,
-    cardioRepere,
-    forceRepere,
-    mouvementRepere,
     equipement,
     lieu,
     duree,
@@ -1067,7 +1067,6 @@ export function DiagnosticQuiz({
     poidsKg,
     habitudesAlimentaires,
     qualiteSommeil,
-    coachPreference,
     email,
     telephone,
     consentEmail,
