@@ -16,10 +16,12 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
       const res = await fetch("/api/programmes/generate", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
-        const detail = Array.isArray(data.details) ? data.details.join(" · ") : null;
-        throw new Error(
-          detail ? `${data.error ?? "Échec de la génération."} (${detail})` : data.error ?? "Échec de la génération."
-        );
+        // Le détail technique renvoyé par l'API était concaténé au message
+        // affiché (23/08/2026) : un abonné a vu l'erreur brute du
+        // fournisseur IA, avec les identifiants de requête. L'API ne
+        // renvoie plus ce détail, et le bouton n'affiche que le message
+        // destiné à l'utilisateur.
+        throw new Error(typeof data?.error === "string" ? data.error : "La génération n'a pas abouti.");
       }
       router.refresh();
     } catch (err) {
