@@ -559,21 +559,34 @@ export function SeanceRunner({
               const cle = `${step.exerciceIndex}-${step.setIndex}`;
               const saisi = realise[cle] ?? { reps: "", charge: "" };
               return (
-                <>
-                  {/* Cartographie anatomique en haut d'écran (22/08/2026,
-                      demande Anthony, mobile-first). Ne s'affiche que si
-                      l'exercice est reconnu dans la table des muscles —
-                      une silhouette éteinte laisserait croire à un bug. */}
-                  {(() => {
-                    const cible = musclesPourExercice(step.nom);
-                    if (!cible) return null;
-                    return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
-                  })()}
+                /* Deux colonnes sur desktop (23/08/2026, signalé par Anthony :
+                   "il faut que je déroule beaucoup pour voir les instructions,
+                   une en haut, une au milieu, une tout en bas"). Tout était
+                   empilé dans une seule colonne centrée : schéma, photo,
+                   titre, consigne, saisie — donc l'écran dépassait la hauteur
+                   du navigateur en pleine séance, au pire moment pour
+                   scroller. Visuels à gauche, actions à droite : la hauteur
+                   est divisée par deux.
+                   Reste en colonne unique sous lg — sur mobile, deux colonnes
+                   rendraient le schéma et les champs de saisie trop étroits. */
+                <div className="grid w-full max-w-4xl items-center gap-6 lg:grid-cols-2 lg:gap-8 lg:text-left">
+                  <div className="flex flex-col items-center gap-4">
+                    {/* Cartographie anatomique (22/08/2026) — ne s'affiche que
+                        si l'exercice est reconnu dans la table des muscles :
+                        une silhouette éteinte laisserait croire à un bug. */}
+                    {(() => {
+                      const cible = musclesPourExercice(step.nom);
+                      if (!cible) return null;
+                      return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
+                    })()}
 
-                  {photoUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe
-                    <img src={photoUrl} alt="" className="h-40 w-full max-w-xs rounded-2xl object-cover" loading="lazy" />
-                  )}
+                    {photoUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe
+                      <img src={photoUrl} alt="" className="h-40 w-full max-w-xs rounded-2xl object-cover" loading="lazy" />
+                    )}
+                  </div>
+
+                  <div className="flex flex-col items-center gap-4 lg:items-start">
                   <div>
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">Série {step.setIndex}/{step.totalSets}</span>
                     <h2 className="mt-1 font-display text-2xl font-semibold text-white">
@@ -591,6 +604,10 @@ export function SeanceRunner({
 
                   {estPolyarticulaire(step.nom) && <MotionCheck nomExercice={step.nom} />}
 
+                  {/* La consigne reste derrière un bouton plutôt qu'affichée
+                      en clair : c'est une phrase longue (repère de charge
+                      généré par l'IA), elle réintroduirait le défilement que
+                      cette mise en page vient de supprimer. */}
                   {consigne && (
                     <button
                       type="button"
@@ -658,7 +675,8 @@ export function SeanceRunner({
                       />
                     </label>
                   </div>
-                </>
+                  </div>
+                </div>
               );
             })()}
 
