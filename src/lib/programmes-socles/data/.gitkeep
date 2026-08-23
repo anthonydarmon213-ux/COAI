@@ -1,0 +1,3 @@
+Les programmes socles générés (un JSON par combinaison) sont déposés ici par
+scripts/generer-socles.ts, puis relus et versionnés comme le reste du code.
+Tant qu'un socle est absent, la génération sur mesure prend le relais.
