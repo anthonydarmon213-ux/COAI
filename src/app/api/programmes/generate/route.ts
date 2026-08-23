@@ -7,6 +7,7 @@ import { sendAdminNotification } from "@/lib/email/client";
 import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { getGenerationQuotaState, GENERATION_QUOTA_WINDOW_MS } from "@/lib/subscription/generation-quota";
+import { soclePourProfil, socleAcceptable } from "@/lib/programmes-socles";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { buildContexteFeminin } from "@/lib/cycle/phase";
 import type { Pilier } from "@prisma/client";
@@ -82,7 +83,12 @@ export async function POST() {
   });
   const quota = getGenerationQuotaState(plan, user.generationsUsed, user.generationsResetAt);
 
-  if (aDejaUnProgramme && quota.epuise) {
+  // Vérifié avant le quota : un abonné Pass IA éligible à un socle n'est
+  // jamais bloqué, puisque le servir ne coûte rien.
+  const socleDisponible =
+    plan === "GRATUIT" && socleAcceptable(user.profile ?? {});
+
+  if (aDejaUnProgramme && quota.epuise && !socleDisponible) {
     const quand = quota.prochainReset
       ? quota.prochainReset.toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
       : null;
@@ -137,10 +143,31 @@ export async function POST() {
 
   const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
 
+  // Programme socle pour Pass IA (24/08/2026, décision Anthony :
+  // "des génériques pour le full IA, plus personnalisé pour l'ultimus").
+  //
+  // Une génération sur mesure coûte ~21 appels IA — plus cher que
+  // l'abonnement Pass IA lui-même. Le socle correspondant au profil est
+  // servi tel quel : zéro appel, affichage immédiat, et contenu déjà relu
+  // par Anthony. Le check-in quotidien continue de l'adapter, c'est ce qui
+  // le distingue d'un PDF.
+  //
+  // Jamais de socle si une contrainte de santé, une grossesse ou un
+  // post-partum est déclaré : le socle est construit sur un cas général et
+  // les ignore. Ces profils gardent la génération sur mesure quel que soit
+  // leur abonnement — règle de sécurité, pas de tarif.
+  const socle =
+    plan === "GRATUIT" && socleAcceptable(user.profile ?? {})
+      ? await soclePourProfil(profil)
+      : null;
+
   const resultats = await Promise.allSettled(
     piliers.map(async (pilier) => {
+      const contenuSocle =
+        socle && (pilier === "ENTRAINEMENT" ? socle.entrainement : pilier === "NUTRITION" ? socle.nutrition : socle.recuperation);
+
       const [contenu, version] = await Promise.all([
-        genererPilier(pilier, profil, user.id),
+        contenuSocle ?? genererPilier(pilier, profil, user.id),
         prochaineVersion(user.id, pilier),
       ]);
       return prisma.programmeGenerated.create({
@@ -198,7 +225,9 @@ export async function POST() {
   // La fenêtre glissante démarre à la première génération de la période et
   // n'est pas repoussée par les suivantes — sinon le quota ne se
   // réinitialiserait jamais pour quelqu'un qui régénère régulièrement.
-  if (programmes.length > 0) {
+  // Un socle servi n'a déclenché aucun appel IA : il ne consomme pas de
+  // quota. Plafonner un accès gratuit n'aurait aucun sens.
+  if (programmes.length > 0 && !socle) {
     await prisma.user.update({
       where: { id: user.id },
       data: {
