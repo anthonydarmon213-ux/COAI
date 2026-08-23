@@ -11,7 +11,6 @@ import { ProgressionSparkline } from "@/components/marketing/progression-sparkli
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { VideoAnatomie } from "@/components/marketing/video-anatomie";
 
 const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
 const DESCRIPTION =
@@ -213,11 +212,25 @@ export default function LandingPage() {
       <CoaiIntro />
       <MarqueeBanner />
 
-      {/* Vidéo anatomique (23/08/2026, fournie par Anthony) — placée juste
-          après l'intro, avant les blocs explicatifs : c'est l'élément le
-          plus démonstratif de la page, il perdrait son effet en bas. */}
-      <section className="mx-auto w-full max-w-6xl px-6 pt-10 sm:px-10" aria-label="COAI en mouvement">
-        <VideoAnatomie className="aspect-video w-full" />
+      {/* Maquette de l'app (23/08/2026, fournie par Anthony) — remplace la
+          vidéo anatomique qui s'affichait en rectangle noir : preload="none"
+          empêchait le navigateur de charger le poster ET bloquait
+          l'autoplay, donc rien ne s'affichait. Une image rend le même
+          service ici, sans dépendre du bon vouloir des politiques
+          d'autoplay, et pèse 132 Ko contre 534 Ko.
+          next/image sert automatiquement WebP/AVIF selon le navigateur ;
+          priority parce que c'est le visuel principal en haut de page. */}
+      <section className="mx-auto w-full max-w-6xl px-6 pt-10 sm:px-10" aria-label="L'application COAI">
+        <div className="overflow-hidden rounded-[1.75rem] border border-white/[0.09] bg-[#0D0E12]">
+          <Image
+            src="/coai-app-mockup.jpg"
+            alt="L'application COAI : anneaux de macros, Vision Nutri, cartographie musculaire et score de readiness"
+            width={1600}
+            height={873}
+            priority
+            className="h-auto w-full"
+          />
+        </div>
       </section>
 
       <section className="coai-live-signals mx-auto w-full max-w-6xl px-6 pt-10 sm:px-10" aria-label="Les signaux suivis par COAI">

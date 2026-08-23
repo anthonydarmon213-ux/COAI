@@ -43,17 +43,19 @@ function TechniqueVideo({ nom }: { nom: string }) {
       >
         {ouverte ? "✕ Fermer" : "▶ Voir la technique"}
       </button>
+      {/* Lien plutôt qu'embed (23/08/2026) : `listType=search` est déprécié
+          par YouTube depuis le 15/11/2020 et affichait "Cette vidéo n'est
+          pas disponible". */}
       {ouverte && (
-        <div className="w-full overflow-hidden rounded-lg border border-white/[0.08] bg-black">
-          <iframe
-            src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${nom} technique musculation`)}`}
-            title={`Aperçu technique : ${nom}`}
-            className="aspect-video w-full"
-            sandbox="allow-scripts allow-same-origin allow-presentation"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+        <div className="w-full rounded-lg border border-white/[0.08] bg-black/30 p-3 text-center">
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${nom} technique musculation`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-laiton-400/35 bg-laiton-400/10 px-4 py-2 text-[11px] font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+          >
+            ▶ Voir la démonstration sur YouTube
+          </a>
         </div>
       )}
     </>

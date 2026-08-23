@@ -12,9 +12,13 @@ import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exer
 // format, plutôt que de sortir vers un nouvel onglet YouTube (14/08/2026,
 // demande explicite d'Anthony — l'ancien lien externe cassait
 // l'expérience intégrée qu'il avait mise en place précédemment). Utilise
-// le mode recherche intégrable de YouTube (`listType=search`), qui ne
-// nécessite aucune clé API et fonctionne pour n'importe quel nom
-// d'exercice généré par l'IA, sans bibliothèque à maintenir.
+// Lien vers la recherche YouTube plutôt qu'un lecteur intégré
+// (23/08/2026) : l'embed s'appuyait sur `listType=search`, que YouTube a
+// déprécié le 15 novembre 2020 — il affichait "Cette vidéo n'est pas
+// disponible" sur chaque exercice. Un lecteur réellement intégré
+// exigerait un ID de vidéo par exercice (clé API YouTube ou table
+// maintenue à la main) ; le lien ouvre une vraie démonstration tout de
+// suite, sans dépendance ni contenu approximatif.
 //
 // Vignette vidéo + décomposition en 3 temps (20/08/2026, demande Anthony,
 // référence : écran "Chaque exercice, guidé, expliqué" de Reboot Plan) :
@@ -231,16 +235,18 @@ export function ExerciceCard({
       )}
 
       {videoOuverte && nom && (
-        <div className="w-full overflow-hidden rounded-lg border border-white/[0.08] bg-black">
-          <iframe
-            src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${nom} technique musculation`)}`}
-            title={`Aperçu technique : ${nom}`}
-            className="aspect-video w-full"
-            sandbox="allow-scripts allow-same-origin allow-presentation"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+        <div className="w-full rounded-lg border border-white/[0.08] bg-black/30 p-4 text-center">
+          <p className="text-xs leading-5 text-graphite-300">
+            Voir une démonstration de <span className="font-semibold text-white">{nom}</span> sur YouTube.
+          </p>
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${nom} technique musculation`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center gap-2 rounded-full border border-laiton-400/35 bg-laiton-400/10 px-4 py-2 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+          >
+            ▶ Ouvrir la démonstration
+          </a>
         </div>
       )}
 
