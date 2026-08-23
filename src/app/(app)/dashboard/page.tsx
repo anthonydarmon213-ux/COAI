@@ -262,7 +262,14 @@ export default async function DashboardPage() {
               />
             </div>
           ) : (
-            <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
+            /* id="check-in-du-jour" présent ici AUSSI (23/08/2026, signalé
+               par Anthony : "le check-in ne marche pas"). L'ancre n'existait
+               que sur la branche jour d'entraînement : un jour de repos, le
+               lien "#check-in-du-jour" (header, carte Readiness, page Coach)
+               ne pointait sur rien, le navigateur ne scrollait pas et la
+               page restait bloquée en haut sur un grand vide, alors que le
+               check-in de repos était bien rendu plus bas. */
+            <section id="check-in-du-jour" className="relative scroll-mt-6 overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
               <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
