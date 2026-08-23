@@ -7,7 +7,7 @@ import { sendAdminNotification } from "@/lib/email/client";
 import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { getGenerationQuotaState, GENERATION_QUOTA_WINDOW_MS } from "@/lib/subscription/generation-quota";
-import { soclePourProfil, socleAcceptable } from "@/lib/programmes-socles";
+import { socleEntrainement, socleNutrition, socleRecuperation, socleAcceptable } from "@/lib/programmes-socles";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { buildContexteFeminin } from "@/lib/cycle/phase";
 import type { Pilier } from "@prisma/client";
@@ -81,14 +81,15 @@ export async function POST() {
     where: { userId: user.id },
     select: { id: true },
   });
+  // Éligibilité au socle calculée avant le contrôle de quota : un abonné
+  // Pass IA qui peut recevoir un socle n'est jamais bloqué, puisque le
+  // servir ne coûte aucun appel IA.
+  const eligibleAuSocle = plan === "GRATUIT" && socleAcceptable(user.profile ?? {});
   const quota = getGenerationQuotaState(plan, user.generationsUsed, user.generationsResetAt);
 
   // Vérifié avant le quota : un abonné Pass IA éligible à un socle n'est
   // jamais bloqué, puisque le servir ne coûte rien.
-  const socleDisponible =
-    plan === "GRATUIT" && socleAcceptable(user.profile ?? {});
-
-  if (aDejaUnProgramme && quota.epuise && !socleDisponible) {
+  if (aDejaUnProgramme && quota.epuise && !eligibleAuSocle) {
     const quand = quota.prochainReset
       ? quota.prochainReset.toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
       : null;
@@ -156,15 +157,24 @@ export async function POST() {
   // post-partum est déclaré : le socle est construit sur un cas général et
   // les ignore. Ces profils gardent la génération sur mesure quel que soit
   // leur abonnement — règle de sécurité, pas de tarif.
-  const socle =
-    plan === "GRATUIT" && socleAcceptable(user.profile ?? {})
-      ? await soclePourProfil(profil)
-      : null;
+  // Un socle par pilier (24/08/2026) : les trois ne dépendent pas des mêmes
+  // axes, et chacun est lu indépendamment. Une nutrition socle peut donc
+  // être servie pendant qu'un entraînement est généré sur mesure, si seul
+  // ce dernier manque encore à la bibliothèque.
+  const socles = eligibleAuSocle
+    ? {
+        ENTRAINEMENT: await socleEntrainement(profil),
+        NUTRITION: await socleNutrition(profil),
+        RECUPERATION: await socleRecuperation(profil),
+      }
+    : null;
+  // Le quota n'est décompté que si au moins un pilier a réellement coûté
+  // des appels IA.
+  const socle = socles && Object.values(socles).every((v) => v !== null);
 
   const resultats = await Promise.allSettled(
     piliers.map(async (pilier) => {
-      const contenuSocle =
-        socle && (pilier === "ENTRAINEMENT" ? socle.entrainement : pilier === "NUTRITION" ? socle.nutrition : socle.recuperation);
+      const contenuSocle = socles?.[pilier] ?? null;
 
       const [contenu, version] = await Promise.all([
         contenuSocle ?? genererPilier(pilier, profil, user.id),
