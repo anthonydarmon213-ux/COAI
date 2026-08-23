@@ -4,6 +4,8 @@ import { ContreIndications } from "@/components/programme/contre-indications";
 
 // Vue dédiée au pilier RÉCUPÉRATION : mêmes codes visuels que l'entraînement
 // et la nutrition (vue d'ensemble + un jour par carte repliable).
+import { photoRecuperationPourTexte } from "@/lib/recuperation/photos-recuperation";
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -43,9 +45,16 @@ export function RecuperationView({
         renderContenu={(jourData) => {
           const { jour, type, sommeil, photoQueryJour, ...detailJour } = jourData;
           void jour;
-          void type;
+          // Photo COAI d'abord (24/08/2026), sur le contenu réel de la
+          // journée plutôt que sur la requête Pexels : "rouleau de mousse
+          // sur les quadriceps" trouve la bonne image, là où la recherche
+          // par mots-clés renvoyait des photos de spa sans rapport.
+          const texteDuJour = [type, sommeil, ...Object.values(detailJour)]
+            .filter((v): v is string => typeof v === "string")
+            .join(" ");
           const photoJourUrl =
-            typeof photoQueryJour === "string" ? photosParExercice?.[photoQueryJour] : null;
+            photoRecuperationPourTexte(texteDuJour) ??
+            (typeof photoQueryJour === "string" ? photosParExercice?.[photoQueryJour] ?? null : null);
           return (
             <div className="flex flex-col gap-3">
               {photoJourUrl && (
