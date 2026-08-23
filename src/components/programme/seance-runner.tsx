@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
 import { MuscleMap } from "@/components/programme/muscle-map";
+import { ExerciceAnimation } from "@/components/programme/exercice-animation";
 import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
+import { animationPourExercice } from "@/lib/exercices/animations";
 import { MotionCheck } from "@/components/programme/motion-check";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 
@@ -580,7 +582,11 @@ export function SeanceRunner({
                       return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
                     })()}
 
-                    {photoUrl && (
+                    {/* Boucle animée en priorité sur la photo de stock : elle
+                        montre le geste réel plutôt qu'une image figée. */}
+                    <ExerciceAnimation nom={step.nom} className="w-full max-w-xs" />
+
+                    {photoUrl && !animationPourExercice(step.nom) && (
                       // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe
                       <img src={photoUrl} alt="" className="h-40 w-full max-w-xs rounded-2xl object-cover" loading="lazy" />
                     )}
