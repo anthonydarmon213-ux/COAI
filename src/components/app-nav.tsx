@@ -39,6 +39,7 @@ const ONGLETS: {
     match: "/programme",
     sous: [
       { href: "/programme/entrainement", label: "Séance du jour" },
+      { href: "/programme/seance-du-jour", label: "Fiche imprimable" },
       { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
       { href: "/programme/programmes-prets", label: "Programmes prêts" },
       { href: "/suivi/seances", label: "Historique des séances" },

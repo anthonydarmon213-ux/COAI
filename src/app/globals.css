@@ -1745,3 +1745,62 @@ html {
     opacity: 1;
   }
 }
+
+
+/* ---------------------------------------------------------------------------
+   Impression de la fiche de séance (23/08/2026) — l'export PDF passe par
+   l'impression du navigateur plutôt qu'une librairie JS : rendu vectoriel,
+   texte sélectionnable, polices exactes, et zéro poids ajouté au bundle.
+
+   Le fond sombre est conservé volontairement : la fiche est faite pour être
+   lue à l'écran et postée en story, pas imprimée sur papier. Sans
+   print-color-adjust, le navigateur supprimerait les aplats et la fiche
+   arriverait blanche et illisible.
+--------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* Ne garde que la fiche : navigation, barre d'actions et pied de page
+     n'ont aucun sens dans un PDF. */
+  body * {
+    visibility: hidden;
+  }
+  .fiche-seance,
+  .fiche-seance * {
+    visibility: visible;
+  }
+  .fiche-seance {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: none;
+    border: none;
+    border-radius: 0;
+  }
+  .fiche-actions,
+  .fiche-actions-barre {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #0d0e12 !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Un exercice ne doit jamais être coupé entre deux pages. */
+  .fiche-seance > div {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
