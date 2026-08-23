@@ -11,13 +11,18 @@ function extraireNombre(valeur: unknown): { nombre: number | null; texte: string
   return { nombre: trouve ? Number(trouve[0].replace(",", ".")) : null, texte };
 }
 
+// Initiales typographiques plutôt qu'emojis alimentaires (23/08/2026,
+// demande Anthony : "change ce poulet, mets un truc premium"). Un pilon de
+// poulet, un bol de riz et un avocat au centre d'anneaux Dark Luxury
+// cassaient le registre — et sur un anneau de 112px, un emoji rend
+// différemment selon la plateforme, ce qu'une lettre ne fait pas.
 const CONFIG = [
-  { cle: "proteines", label: "Protéines", couleur: "#4cc9f0", emoji: "🍗" },
-  { cle: "glucides", label: "Glucides", couleur: "#39e67b", emoji: "🍚" },
-  { cle: "lipides", label: "Lipides", couleur: "#ff8a3d", emoji: "🥑" },
+  { cle: "proteines", label: "Protéines", couleur: "#4cc9f0", initiale: "P" },
+  { cle: "glucides", label: "Glucides", couleur: "#39e67b", initiale: "G" },
+  { cle: "lipides", label: "Lipides", couleur: "#ff8a3d", initiale: "L" },
 ] as const;
 
-function Anneau({ label, valeur, couleur, emoji }: { label: string; valeur: string; couleur: string; emoji: string }) {
+function Anneau({ label, valeur, couleur, initiale }: { label: string; valeur: string; couleur: string; initiale: string }) {
   const rayon = 46;
   const circonference = 2 * Math.PI * rayon;
   return (
@@ -33,7 +38,7 @@ function Anneau({ label, valeur, couleur, emoji }: { label: string; valeur: stri
           />
         </svg>
         <span className="absolute flex flex-col items-center">
-          <span aria-hidden="true" className="text-base leading-none">{emoji}</span>
+          <span aria-hidden="true" className="font-mono text-[11px] font-bold leading-none tracking-[0.1em]" style={{ color: couleur }}>{initiale}</span>
           <span className="mt-1 font-display text-lg font-bold tabular-nums text-white">{valeur}</span>
         </span>
       </div>
@@ -71,7 +76,7 @@ export function AnneauxMacros({ objectifsJournaliers }: { objectifsJournaliers: 
 
       <div className="mt-4 flex flex-wrap items-start justify-center gap-6 sm:justify-between">
         {anneaux.map((a) => (
-          <Anneau key={a.cle} label={a.label} valeur={a.valeur} couleur={a.couleur} emoji={a.emoji} />
+          <Anneau key={a.cle} label={a.label} valeur={a.valeur} couleur={a.couleur} initiale={a.initiale} />
         ))}
       </div>
 
