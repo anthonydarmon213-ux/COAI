@@ -30,6 +30,28 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["relevé de jambes", "releve de jambes", "hanging leg raise"], fichier: "releve-jambes-suspendu" },
   { motifs: ["russian twist"], fichier: "russian-twist" },
   { motifs: ["roue abdominale", "ab wheel", "ab roller"], fichier: "roue-abdominale" },
+
+  // Second lot (23/08/2026) — 14 photos COAI supplémentaires. L'ordre
+  // compte autant que dans le premier lot : les motifs les plus
+  // spécifiques passent avant les génériques qui les captureraient.
+  { motifs: ["superman"], fichier: "superman-au-sol" },
+  { motifs: ["écarté", "ecarte", "chest fly", "pec deck", "butterfly"], fichier: "ecarte-halteres-banc-plat" },
+  // "dips sur banc" avant "dips" : le premier travaille les triceps, le
+  // second les pectoraux — deux exercices et deux photos distinctes.
+  { motifs: ["dips sur banc", "dips banc", "bench dips"], fichier: "dips-banc-triceps" },
+  { motifs: ["dips"], fichier: "dips-pectoraux" },
+  { motifs: ["développé incliné", "developpe incline", "incline press"], fichier: "developpe-incline-machine" },
+  { motifs: ["développé arnold", "developpe arnold", "arnold press"], fichier: "developpe-arnold" },
+  { motifs: ["développé militaire", "developpe militaire", "shoulder press", "overhead press"], fichier: "developpe-militaire-halteres" },
+  { motifs: ["élévations latérales", "elevations laterales", "lateral raise"], fichier: "elevations-laterales" },
+  { motifs: ["élévations frontales", "elevations frontales", "front raise"], fichier: "elevations-frontales" },
+  { motifs: ["rowing menton", "upright row"], fichier: "rowing-menton" },
+  { motifs: ["face pull"], fichier: "face-pull-elastique" },
+  // Extension triceps : la variante au-dessus de la tête d'abord, sinon le
+  // motif "extension triceps" de la poulie capterait les deux.
+  { motifs: ["extension triceps haltère", "extension triceps haltere", "au-dessus de la tête", "overhead triceps"], fichier: "extension-triceps-dessus-tete" },
+  { motifs: ["extension triceps", "triceps poulie", "pushdown"], fichier: "extension-triceps-poulie" },
+  { motifs: ["sauts à la corde", "sauts a la corde", "corde à sauter", "corde a sauter", "jump rope"], fichier: "sauts-corde" },
 ];
 
 /**
