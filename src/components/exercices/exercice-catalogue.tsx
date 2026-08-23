@@ -14,6 +14,7 @@ import {
   type Materiel,
   type TypeExercice,
 } from "@/lib/exercices/catalogue";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 
 const GROUPES = Object.keys(GROUPE_PRINCIPAL_LABEL) as GroupePrincipal[];
 const MATERIELS = Object.keys(MATERIEL_LABEL) as Materiel[];
@@ -157,15 +158,19 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
           const photoUrl = ex.freeExerciseDbId
             ? buildFreeExerciseDbPhotoUrl(ex.freeExerciseDbId)
             : photos[ex.photoQuery] ?? null;
+          // Photo COAI prioritaire (23/08/2026) — seule source tournée dans
+          // la charte, et dont l'exercice est garanti par le nom du fichier
+          // plutôt que déduit par rapprochement de mots.
+          const photoFinale = photoCoaiPourNom(ex.nom) ?? photoUrl;
           return (
             <article
               key={ex.id}
               className="flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_-48px_rgba(0,0,0,0.9)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-laiton-400/25"
             >
               <div className="relative h-36 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.2),transparent_60%),#171b1d]">
-                {photoUrl && (
+                {photoFinale && (
                   // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, cf. RecetteCard pour la même justification
-                  <img src={photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <img src={photoFinale} alt="" className="h-full w-full object-cover" loading="lazy" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-transparent to-transparent" aria-hidden="true" />
                 <div className="absolute right-2.5 top-2.5">

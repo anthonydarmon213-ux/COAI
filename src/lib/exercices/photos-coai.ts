@@ -1,0 +1,48 @@
+// Photos d'exercices produites pour COAI (23/08/2026, fournies par Anthony).
+//
+// Prioritaires sur Free Exercise DB et sur Pexels : ce sont les seules
+// photos tournées dans la charte de la marque (fond noir, tenue unie,
+// éclairage latéral), et la seule source dont l'exercice est garanti par
+// le nom du fichier plutôt que déduit par rapprochement de mots.
+//
+// Chaque photo a été ouverte et vérifiée une par une avant intégration —
+// notamment le crunch, où une flexion de hanche complète aurait fait
+// travailler les psoas au lieu des abdominaux.
+//
+// Servies depuis /public/exercices : redimensionnées à 900px de large et
+// converties en JPEG (18 Mo de PNG → 356 Ko au total), sans quoi la page
+// aurait chargé plusieurs mégaoctets pour des vignettes.
+
+type EntreePhoto = { motifs: string[]; fichier: string };
+
+const TABLE: EntreePhoto[] = [
+  { motifs: ["fentes avant", "fente avant", "fentes haltères", "lunge"], fichier: "fentes-avant-halteres" },
+  { motifs: ["leg curl", "ischio"], fichier: "leg-curl-allonge" },
+  { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split", "split squat"], fichier: "fentes-bulgares" },
+  { motifs: ["kickback"], fichier: "kickback-fessier-elastique" },
+  { motifs: ["abduction"], fichier: "abduction-hanche-elastique" },
+  // "gainage latéral" avant "gainage planche" : sans cet ordre, le motif
+  // "gainage" du second capterait aussi le latéral, qui est un autre
+  // exercice (appui sur un seul avant-bras, obliques).
+  { motifs: ["gainage latéral", "gainage lateral", "side plank"], fichier: "gainage-lateral" },
+  { motifs: ["gainage planche", "planche", "plank"], fichier: "gainage-planche" },
+  { motifs: ["crunch"], fichier: "crunch-au-sol" },
+  { motifs: ["relevé de jambes", "releve de jambes", "hanging leg raise"], fichier: "releve-jambes-suspendu" },
+  { motifs: ["russian twist"], fichier: "russian-twist" },
+  { motifs: ["roue abdominale", "ab wheel", "ab roller"], fichier: "roue-abdominale" },
+];
+
+/**
+ * Photo COAI pour un exercice, ou null si aucune ne lui correspond
+ * exactement. L'appelant retombe alors sur Free Exercise DB puis Pexels.
+ */
+export function photoCoaiPourNom(nom: string): string | null {
+  const normalise = nom
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+  const entree = TABLE.find((e) =>
+    e.motifs.some((m) => normalise.includes(m.normalize("NFD").replace(/[̀-ͯ]/g, "")))
+  );
+  return entree ? `/exercices/${entree.fichier}.jpg` : null;
+}
