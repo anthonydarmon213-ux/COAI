@@ -32,6 +32,11 @@ model User {
   // depuis coachQuestionsResetAt, pas un calendrier fixe.
   coachQuestionsUsed    Int       @default(0)
   coachQuestionsResetAt DateTime?
+  // Quota de génération de programme (24/08/2026) — une génération complète
+  // déclenche ~21 appels IA (structure + un appel par jour, sur 3 piliers).
+  // Fenêtre glissante comme le quota coach, pas un calendrier fixe.
+  generationsUsed       Int       @default(0)
+  generationsResetAt    DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
