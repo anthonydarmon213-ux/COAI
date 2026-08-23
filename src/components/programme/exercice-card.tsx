@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { MuscleMap } from "@/components/programme/muscle-map";
+import { ExerciceAnimation } from "@/components/programme/exercice-animation";
+import { animationPourExercice } from "@/lib/exercices/animations";
 import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 
@@ -234,7 +236,13 @@ export function ExerciceCard({
         </div>
       )}
 
-      {videoOuverte && nom && (
+      {/* Boucle animée si un clip existe pour ce mouvement (23/08/2026) —
+          le lien externe ne sert plus que de repli. */}
+      {videoOuverte && nom && animationPourExercice(nom) && (
+        <ExerciceAnimation nom={nom} className="w-full" />
+      )}
+
+      {videoOuverte && nom && !animationPourExercice(nom) && (
         <div className="w-full rounded-lg border border-white/[0.08] bg-black/30 p-4 text-center">
           <p className="text-xs leading-5 text-graphite-300">
             Voir une démonstration de <span className="font-semibold text-white">{nom}</span> sur YouTube.
