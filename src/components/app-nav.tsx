@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, type LucideIcon } from "lucide-react";
+import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
@@ -42,7 +42,32 @@ const ONGLETS: {
       { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
       { href: "/programme/programmes-prets", label: "Programmes prêts" },
       { href: "/suivi/seances", label: "Historique des séances" },
-      { href: "/programme/recuperation", label: "Récupération" },
+    ],
+  },
+  {
+    href: "/programme/alimentation",
+    label: "Nutrition",
+    icon: Apple,
+    match: "/programme/alimentation",
+    sous: [
+      { href: "/programme/alimentation", label: "Plan du jour" },
+      { href: "/programme/recettes", label: "Catalogue de recettes" },
+      { href: "/suivi/alimentation", label: "Suivi des macros" },
+    ],
+  },
+  // Récupération en onglet principal (23/08/2026, demande Anthony : "c'est
+  // un de nos piliers"). Elle était sous-menu d'Entraînement, ce qui la
+  // reléguait au rang de détail alors que COAI repose sur trois piliers —
+  // entraînement, nutrition, récupération. Placée juste après Nutrition
+  // pour que les trois se suivent dans la navigation.
+  {
+    href: "/programme/recuperation",
+    label: "Récupération",
+    icon: Moon,
+    match: "/programme/recuperation",
+    sous: [
+      { href: "/programme/recuperation", label: "Plan de récupération" },
+      { href: "/suivi/mesures", label: "Sommeil & mesures" },
     ],
   },
   {
@@ -57,17 +82,6 @@ const ONGLETS: {
       { href: "/programme/evolution", label: "Courbes d’évolution" },
     ],
   },
-  {
-    href: "/programme/alimentation",
-    label: "Nutrition",
-    icon: Apple,
-    match: "/programme/alimentation",
-    sous: [
-      { href: "/programme/alimentation", label: "Plan du jour" },
-      { href: "/programme/recettes", label: "Catalogue de recettes" },
-      { href: "/suivi/alimentation", label: "Suivi des macros" },
-    ],
-  },
   { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
 ];
 
@@ -76,8 +90,14 @@ function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
   // "Entraînement" reste actif sur tout /programme SAUF /programme/alimentation,
   // qui a son propre onglet "Nutrition" — sans cette exclusion les deux
   // onglets s'allumeraient ensemble sur les pages nutrition.
+  // Entraînement couvre /programme SAUF les sections qui ont leur propre
+  // onglet — sans ces exclusions, deux onglets s'allumeraient ensemble.
   if (onglet.href === "/programme/entrainement") {
-    return pathname.startsWith("/programme") && !pathname.startsWith("/programme/alimentation");
+    return (
+      pathname.startsWith("/programme") &&
+      !pathname.startsWith("/programme/alimentation") &&
+      !pathname.startsWith("/programme/recuperation")
+    );
   }
   return pathname === onglet.match || pathname.startsWith(`${onglet.match}/`);
 }
