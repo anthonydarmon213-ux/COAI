@@ -1710,3 +1710,38 @@ html {
     transition: border-color 0.25s ease;
   }
 }
+
+
+/* ---------------------------------------------------------------------------
+   Pulsation des muscles sollicités (23/08/2026, demande Anthony) — simule
+   l'effort sans fichier Lottie ni animation approximative du geste.
+
+   Cible les tracés que react-muscle-highlighter a remplis en or, via un
+   sélecteur d'attribut : la librairie n'est pas modifiée, et si elle
+   change un jour sa façon d'appliquer la couleur, le sélecteur cesse
+   simplement de matcher — la lueur reste statique, rien ne casse.
+
+   La pulsation porte sur opacity plutôt que sur filter/drop-shadow :
+   animer un filtre force un recalcul de flou à chaque image et fait
+   chuter le framerate sur mobile, alors qu'opacity est composée par le
+   GPU. La lueur ambiante du conteneur, elle, reste fixe.
+--------------------------------------------------------------------------- */
+.coai-muscle-map svg path[fill="#D4AF37"] {
+  animation: coai-muscle-pulse 2.4s ease-in-out infinite;
+  will-change: opacity;
+}
+
+@keyframes coai-muscle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* Un muscle qui clignote en permanence est fatigant pour qui y est
+   sensible, et l'information (quels muscles travaillent) reste lisible
+   sans mouvement. */
+@media (prefers-reduced-motion: reduce) {
+  .coai-muscle-map svg path[fill="#D4AF37"] {
+    animation: none;
+    opacity: 1;
+  }
+}
