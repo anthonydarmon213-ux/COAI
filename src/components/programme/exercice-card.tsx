@@ -137,13 +137,37 @@ export function ExerciceCard({
         )}
       </div>
 
-      {/* Cartographie musculaire (23/08/2026, demande Anthony) — remplace
-          l'affichage textuel des groupes ciblés. Rien n'est affiché si le
-          mouvement n'est pas reconnu : mieux vaut pas de schéma qu'un
-          schéma qui éclaire les mauvais muscles. */}
-      {cible && (
-        <div className="flex justify-center">
-          <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />
+      {/* Double vue (23/08/2026, demande Anthony) — anatomie à gauche,
+          repères d'exécution à droite. En colonne sur mobile : côte à côte
+          sous 640px, le schéma deviendrait trop petit pour distinguer les
+          faisceaux, ce qui est justement son intérêt.
+          Chaque moitié ne s'affiche que si elle a du contenu réel : un
+          mouvement non reconnu n'a pas de schéma (mieux vaut rien qu'un
+          schéma qui éclaire les mauvais muscles), et tous les exercices
+          générés n'ont pas encore de `phases`. */}
+      {(cible || phases.length === 3) && (
+        <div className={`grid gap-3 ${cible && phases.length === 3 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+          {cible && (
+            <div className="coai-glass flex flex-col items-center justify-center px-3 py-4">
+              <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />
+            </div>
+          )}
+
+          {phases.length === 3 && (
+            <div className="coai-glass flex flex-col gap-2.5 px-4 py-4">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-300">
+                Exécution · étape par étape
+              </p>
+              {phases.map((phase, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full border border-laiton-400/40 bg-laiton-400/10 font-mono text-[10px] font-bold text-laiton-200">
+                    {i + 1}
+                  </span>
+                  <span className="text-[11px] leading-5 text-graphite-300">{phase}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -220,18 +244,9 @@ export function ExerciceCard({
         </div>
       )}
 
-      {phases.length === 3 && (
-        <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
-          {phases.map((phase, i) => (
-            <div key={i} className="flex items-start gap-2 rounded-lg border border-white/[0.05] bg-black/20 px-2.5 py-2">
-              <span className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-laiton-400/20 font-mono text-[9px] font-bold text-laiton-300">
-                {i + 1}
-              </span>
-              <span className="text-[11px] leading-snug text-graphite-300">{phase}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Les phases d'exécution étaient rendues ici ET dans la double vue
+          ci-dessus depuis l'ajout de cette dernière (23/08/2026) : bloc
+          retiré, la double vue est le seul emplacement. */}
 
       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
         {CHAMPS.map(({ cle, label }) => {
