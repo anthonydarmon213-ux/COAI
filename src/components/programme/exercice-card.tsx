@@ -44,6 +44,13 @@ const CHAMPS: { cle: string; label: string }[] = [
   { cle: "methode", label: "Méthode" },
 ];
 
+// Au-delà de cette longueur, une valeur n'est plus une métrique lisible en
+// un coup d'œil mais une consigne : elle bascule dans le bloc dépliable
+// sous la grille. Seuil sur la longueur réelle plutôt qu'une liste de
+// champs figée — l'IA peut être concise sur "charge" pour un exercice au
+// poids du corps ("poids du corps") et verbeuse sur "methode" ailleurs.
+const LONGUEUR_METRIQUE_MAX = 42;
+
 export function ExerciceCard({
   exercice,
   photosParExercice,
@@ -69,6 +76,12 @@ export function ExerciceCard({
   const photoUrl = photoQuery ? photosParExercice?.[photoQuery] : null;
   const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
+  const consignesLongues = CHAMPS.flatMap(({ cle, label }) => {
+    const valeur = exercice[cle];
+    if (valeur === undefined || valeur === null || valeur === "") return [];
+    const texte = String(valeur);
+    return texte.length > LONGUEUR_METRIQUE_MAX ? [{ label, texte }] : [];
+  });
   const phases = Array.isArray(exercice.phases)
     ? exercice.phases.filter((p): p is string => typeof p === "string").slice(0, 3)
     : [];
@@ -224,6 +237,14 @@ export function ExerciceCard({
         {CHAMPS.map(({ cle, label }) => {
           const valeur = exercice[cle];
           if (valeur === undefined || valeur === null || valeur === "") return null;
+          const texte = String(valeur);
+          // Les repères de charge générés par l'IA sont des phrases
+          // entières ("charge permettant de sentir les 2 dernières
+          // répétitions difficiles…"), pas des valeurs courtes comme les
+          // séries ou le repos. Tassées dans une case de métrique, elles
+          // produisaient le pavé illisible signalé par Anthony
+          // (23/08/2026) : rendues en consigne dépliable sous la grille.
+          if (texte.length > LONGUEUR_METRIQUE_MAX) return null;
           return (
             <div
               key={cle}
@@ -233,12 +254,29 @@ export function ExerciceCard({
                 {label}
               </span>
               <span className="mt-1 block text-xs font-semibold leading-snug text-graphite-50">
-                {String(valeur)}
+                {texte}
               </span>
             </div>
           );
         })}
       </div>
+
+      {consignesLongues.length > 0 && (
+        <details className="group/consigne rounded-lg border border-white/[0.07] bg-black/20">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 marker:content-none">
+            <span className="text-[11px] font-semibold text-laiton-200">💡 Consigne du coach</span>
+            <span aria-hidden="true" className="text-graphite-500 transition group-open/consigne:rotate-180">▾</span>
+          </summary>
+          <div className="flex flex-col gap-2 border-t border-white/[0.06] px-3 py-2.5">
+            {consignesLongues.map(({ label, texte }) => (
+              <div key={label}>
+                <span className="block font-mono text-[9px] uppercase tracking-widest text-graphite-500">{label}</span>
+                <span className="mt-0.5 block text-[11px] leading-5 text-graphite-300">{texte}</span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   );
 }
