@@ -5,6 +5,7 @@ import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopp
 import { MuscleMap } from "@/components/programme/muscle-map";
 import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
 import { MotionCheck } from "@/components/programme/motion-check";
+import { variantesPourExercice } from "@/lib/exercices/variantes";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -55,31 +56,18 @@ function enEtapes(texte: string): string[] {
     .filter((t) => t.length > 3);
 }
 
-// Substitutions "matériel indisponible" (22/08/2026, demande Anthony) —
-// même schéma moteur, sans la machine ou la charge externe. Table écrite à
-// la main plutôt que déduite par mots-clés : proposer un mouvement
-// approximatif pour un exercice mal reconnu serait pire que ne rien
-// proposer. Un exercice absent de la table n'affiche pas l'option.
-const VARIANTES_SANS_MATERIEL: { motifs: string[]; variante: string; consigne: string }[] = [
-  { motifs: ["développé couché", "developpe couche", "bench press", "presse pectoraux", "chest press"], variante: "Pompes (mains larges)", consigne: "Même poussée horizontale. Pieds surélevés pour durcir, genoux au sol pour alléger." },
-  { motifs: ["développé incliné", "developpe incline", "incline press"], variante: "Pompes pieds surélevés", consigne: "Pieds sur un banc : l'angle reproduit le travail du haut des pectoraux." },
-  { motifs: ["développé militaire", "developpe militaire", "shoulder press", "développé épaules"], variante: "Pompes piquées (pike push-up)", consigne: "Bassin haut, tête vers le sol : la poussée devient verticale." },
-  { motifs: ["tirage vertical", "lat pulldown", "traction"], variante: "Rowing inversé TRX", consigne: "Sangles ou barre basse, corps gainé : plus tu es horizontal, plus c'est dur." },
-  { motifs: ["tirage horizontal", "rowing", "seated row"], variante: "Rowing inversé TRX", consigne: "Tire les coudes le long du corps, omoplates serrées en fin de mouvement." },
-  { motifs: ["squat", "presse à cuisses", "presse a cuisses", "leg press", "hack squat"], variante: "Squat bulgare (une jambe)", consigne: "Pied arrière surélevé : une jambe à la fois compense l'absence de charge." },
-  { motifs: ["soulevé de terre", "souleve de terre", "deadlift", "romanian"], variante: "Hip thrust une jambe", consigne: "Dos calé, une jambe tendue, pousse par le talon. Serre les fessiers en haut." },
-  { motifs: ["fente", "lunge"], variante: "Fentes marchées au poids du corps", consigne: "Sans charge : ralentis la descente à 3 secondes pour garder la difficulté." },
-  { motifs: ["curl", "biceps"], variante: "Curl TRX (renversé)", consigne: "Sangles, paumes vers le haut, corps incliné en arrière. Recule les pieds pour durcir." },
-  { motifs: ["triceps", "extension"], variante: "Dips sur banc / chaise", consigne: "Mains derrière toi sur un appui stable, coudes vers l'arrière, descente contrôlée." },
-  { motifs: ["leg curl", "ischio"], variante: "Curl ischio TRX", consigne: "Allongé, bassin décollé, ramène les talons vers les fessiers sans laisser tomber les hanches." },
-  { motifs: ["mollet", "calf"], variante: "Mollets debout sur une marche", consigne: "Une jambe si c'est trop facile. Descends sous la marche pour l'amplitude." },
-  { motifs: ["élévation latérale", "elevation laterale", "lateral raise"], variante: "Élévations latérales élastique", consigne: "Charge légère, contrôle total : monte à hauteur d'épaule, pas plus haut." },
-];
-
+// Substitutions "matériel indisponible" — table partagée dans
+// lib/exercices/variantes.ts (23/08/2026) : elle vivait ici en dur avec
+// une seule variante par mouvement, donc inutilisable sur la fiche
+// d'exercice. Deux tables auraient forcément divergé.
 function trouverVariante(nom: string): { variante: string; consigne: string } | null {
-  const normalise = nom.toLowerCase();
-  const trouve = VARIANTES_SANS_MATERIEL.find((v) => v.motifs.some((m) => normalise.includes(m)));
-  return trouve ? { variante: trouve.variante, consigne: trouve.consigne } : null;
+  const alternatives = variantesPourExercice(nom);
+  // Le lecteur en pleine séance n'affiche qu'UNE alternative : au milieu
+  // d'une série, un choix entre trois options est une friction, pas un
+  // service. Le poids du corps est privilégié — c'est l'option toujours
+  // disponible, quel que soit ce qui manque.
+  const preferee = alternatives.find((v) => v.materiel === "poids_du_corps") ?? alternatives[0];
+  return preferee ? { variante: preferee.nom, consigne: preferee.consigne } : null;
 }
 
 type Step =

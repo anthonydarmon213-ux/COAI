@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { MuscleMap } from "@/components/programme/muscle-map";
+import { musclesPourExercice } from "@/lib/exercices/muscles";
+import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
 // clé/valeur) : repères façon "readout" HUD, mise en page dense mais aérée.
@@ -53,11 +56,19 @@ export function ExerciceCard({
   photosParExercice?: Record<string, string | null>;
 }) {
   const [videoOuverte, setVideoOuverte] = useState(false);
+  // Substitution matériel (23/08/2026, demande Anthony) — purement locale :
+  // remplacer l'exercice dans le programme enregistré demanderait de
+  // régénérer la séance côté serveur. Ici la personne voit l'alternative
+  // pour SA séance du jour, son programme reste celui validé.
+  const [variantesOuvertes, setVariantesOuvertes] = useState(false);
+  const [varianteChoisie, setVarianteChoisie] = useState<Variante | null>(null);
 
   if (!isPlainObject(exercice)) return null;
   const nom = typeof exercice.nom === "string" ? exercice.nom : undefined;
   const photoQuery = typeof exercice.photoQuery === "string" ? exercice.photoQuery : undefined;
   const photoUrl = photoQuery ? photosParExercice?.[photoQuery] : null;
+  const cible = nom ? musclesPourExercice(nom) : null;
+  const variantes = nom ? variantesPourExercice(nom) : [];
   const phases = Array.isArray(exercice.phases)
     ? exercice.phases.filter((p): p is string => typeof p === "string").slice(0, 3)
     : [];
@@ -112,6 +123,75 @@ export function ExerciceCard({
           </button>
         )}
       </div>
+
+      {/* Cartographie musculaire (23/08/2026, demande Anthony) — remplace
+          l'affichage textuel des groupes ciblés. Rien n'est affiché si le
+          mouvement n'est pas reconnu : mieux vaut pas de schéma qu'un
+          schéma qui éclaire les mauvais muscles. */}
+      {cible && (
+        <div className="flex justify-center">
+          <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />
+        </div>
+      )}
+
+      {variantes.length > 0 && (
+        <div className="rounded-xl border border-white/[0.07] bg-black/20 p-3">
+          <button
+            type="button"
+            onClick={() => setVariantesOuvertes((v) => !v)}
+            aria-expanded={variantesOuvertes}
+            className="flex w-full items-center justify-between gap-2 text-left"
+          >
+            <span className="text-[11px] font-semibold text-laiton-200">
+              ⚡️ Pas le matériel ? Changer d&apos;exercice
+            </span>
+            <span aria-hidden="true" className="text-graphite-500">{variantesOuvertes ? "✕" : "▾"}</span>
+          </button>
+
+          {variantesOuvertes && (
+            <div className="mt-2.5 flex flex-col gap-1.5">
+              {variantes.map((v) => (
+                <button
+                  key={v.nom}
+                  type="button"
+                  onClick={() => {
+                    setVarianteChoisie(varianteChoisie?.nom === v.nom ? null : v);
+                    setVariantesOuvertes(false);
+                  }}
+                  className={`rounded-lg border px-3 py-2 text-left transition ${
+                    varianteChoisie?.nom === v.nom
+                      ? "border-laiton-400/50 bg-laiton-400/10"
+                      : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                  }`}
+                >
+                  <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-laiton-300">
+                    {MATERIEL_LABEL[v.materiel]}
+                  </span>
+                  <span className="mt-0.5 block text-xs font-semibold text-graphite-50">{v.nom}</span>
+                  <span className="mt-0.5 block text-[11px] leading-4 text-graphite-400">{v.consigne}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {varianteChoisie && !variantesOuvertes && (
+            <div className="mt-2.5 rounded-lg border border-laiton-400/35 bg-laiton-400/[0.08] px-3 py-2">
+              <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-laiton-300">
+                Tu fais à la place · {MATERIEL_LABEL[varianteChoisie.materiel]}
+              </span>
+              <span className="mt-0.5 block text-xs font-semibold text-[#fffdf8]">{varianteChoisie.nom}</span>
+              <span className="mt-0.5 block text-[11px] leading-4 text-graphite-300">{varianteChoisie.consigne}</span>
+              <button
+                type="button"
+                onClick={() => setVarianteChoisie(null)}
+                className="mt-1.5 text-[10px] text-graphite-500 underline"
+              >
+                Revenir à {nom}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {videoOuverte && nom && (
         <div className="w-full overflow-hidden rounded-lg border border-white/[0.08] bg-black">
