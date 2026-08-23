@@ -33,6 +33,10 @@ const TABLE: EntreeRecup[] = [
 
   // Matériel
   { motifs: ["hydratation", "boire", "eau"], fichier: "hydratation-eau" },
+  { motifs: ["dos au mur", "adossé", "adosse", "assise calme"], fichier: "assise-calme-mur" },
+  // Nature morte du matériel — dernier recours pour une journée de
+  // récupération dont le contenu ne mentionne aucun geste précis.
+  { motifs: ["matériel", "materiel", "récupération active", "recuperation active"], fichier: "materiel-recuperation" },
 ];
 
 /**
