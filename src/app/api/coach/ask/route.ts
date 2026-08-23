@@ -9,8 +9,10 @@ import { z } from "zod";
 import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
 
 // Le Q&A "coach IA" est limité (fenêtre glissante de 30 jours) uniquement
-// sur Pass IA (GRATUIT, 49€) — Coaching Hybride (STANDARD, 89€) et
-// palier PREMIUM (199€) ont un accès illimité (11/08/2026 : avant ce
+// sur Pass IA (GRATUIT) — Coaching Hybride (STANDARD) et palier PREMIUM
+// ont un accès illimité. Montants volontairement absents de ce
+// commentaire : ils changent, et un commentaire périmé induit en erreur
+// (cf. les tarifs restés à 49€/89€ ici jusqu'au 23/08/2026) (11/08/2026 : avant ce
 // changement, Coaching Hybride partageait le même quota qu'Pass IA, sans
 // palier payant pour le lever puisque PREMIUM n'est plus vendu — corrigé
 // pour que la disponibilité H24/7j/7 promue sur la home soit un vrai
