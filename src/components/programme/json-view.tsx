@@ -131,20 +131,16 @@ export function JsonView({
               <div className="text-right text-sm font-medium text-graphite-50">
                 {String(value)}
                 {media && typeMedia === "exercice" ? (
-                  <details className="ml-auto mt-2 w-40 overflow-hidden rounded-lg border border-white/[0.08] bg-black text-left">
-                    <summary className="cursor-pointer px-3 py-2 font-mono text-[10px] uppercase tracking-wide text-laiton-400">
-                      ▶ Technique
-                    </summary>
-                    <iframe
-                      src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${String(value)} technique musculation`)}`}
-                      title={`Technique : ${String(value)}`}
-                      className="aspect-square w-full"
-                      sandbox="allow-scripts allow-same-origin allow-presentation"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </details>
+                  /* Lien au lieu d'un embed (23/08/2026) : `listType=search`
+                     est déprécié par YouTube depuis le 15/11/2020. */
+                  <a
+                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${String(value)} technique musculation`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-auto mt-2 inline-flex items-center gap-1.5 rounded-full border border-laiton-400/30 bg-laiton-400/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide text-laiton-300 transition hover:bg-laiton-400/20"
+                  >
+                    ▶ Technique
+                  </a>
                 ) : media ? (
                   <a
                     href={media.searchUrl(value as string)}
