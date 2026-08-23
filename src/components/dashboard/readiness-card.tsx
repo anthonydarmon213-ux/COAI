@@ -16,14 +16,17 @@ const PASTILLE: Record<"positif" | "neutre" | "negatif", string> = {
   negatif: "bg-[#ff8a3d]",
 };
 
-export function ReadinessCard({ readiness }: { readiness: Readiness }) {
+// `compact` (23/08/2026) : version resserrée pour le hero du dashboard —
+// anneau + titre uniquement, sans les pastilles de facteurs ni la mention
+// de bas de carte, qui restent affichées dans la version pleine.
+export function ReadinessCard({ readiness, compact = false }: { readiness: Readiness; compact?: boolean }) {
   const couleur = COULEUR[readiness.niveau];
   const rayon = 52;
   const circonference = 2 * Math.PI * rayon;
 
   if (!readiness.disponible) {
     return (
-      <section className="coai-glass p-5">
+      <section className={compact ? "coai-glass flex-none p-4 sm:w-64" : "coai-glass p-5"}>
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Readiness du jour</p>
         <h2 className="mt-2 text-lg font-semibold text-white">{readiness.titre}</h2>
         <p className="mt-1.5 text-xs leading-5 text-graphite-400">{readiness.recommandation}</p>
@@ -38,10 +41,13 @@ export function ReadinessCard({ readiness }: { readiness: Readiness }) {
   }
 
   return (
-    <section className={`rounded-2xl border ${couleur.bord} bg-white/[0.03] p-5`} aria-labelledby="readiness-titre">
+    <section
+      className={`rounded-2xl border ${couleur.bord} bg-white/[0.03] ${compact ? "flex-none p-4 sm:w-64" : "p-5"}`}
+      aria-labelledby="readiness-titre"
+    >
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Readiness du jour</p>
 
-      <div className="mt-3 flex items-center gap-4">
+      <div className={`mt-3 flex gap-4 ${compact ? "flex-col items-center text-center" : "items-center"}`}>
         <div className="relative flex h-28 w-28 flex-none items-center justify-center">
           <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90" aria-hidden="true">
             <circle cx="60" cy="60" r={rayon} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
@@ -63,7 +69,7 @@ export function ReadinessCard({ readiness }: { readiness: Readiness }) {
         </div>
       </div>
 
-      {readiness.facteurs.length > 0 && (
+      {!compact && readiness.facteurs.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-1.5 border-t border-white/10 pt-3">
           {readiness.facteurs.map((facteur) => (
             <span
@@ -77,9 +83,11 @@ export function ReadinessCard({ readiness }: { readiness: Readiness }) {
         </div>
       )}
 
-      <p className="mt-3 text-[10px] leading-4 text-graphite-500">
-        Repère de coaching calculé sur ton check-in du jour — pas une mesure médicale.
-      </p>
+      {!compact && (
+        <p className="mt-3 text-[10px] leading-4 text-graphite-500">
+          Repère de coaching calculé sur ton check-in du jour — pas une mesure médicale.
+        </p>
+      )}
     </section>
   );
 }
