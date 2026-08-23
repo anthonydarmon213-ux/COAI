@@ -91,6 +91,31 @@ const TABLE: Entree[] = [
       description: "Travail des bras et des épaules, charge contrôlée",
     },
   },
+  // Lot 3 (23/08/2026) — troisième génération. La version "15 mouvements
+  // en 60 s" livrée en même temps était un DIAPORAMA de poses figées
+  // (images identiques au pixel près sur 1,5 s), donc inutilisable :
+  // seule cette génération de 10 s contenait du mouvement réel.
+  {
+    motifs: ["leg extension", "extension jambes", "quadriceps machine", "leg curl", "ischio"],
+    animation: {
+      fichier: "leg-extension",
+      description: "Extension des jambes assis, quadriceps en action",
+    },
+  },
+  {
+    motifs: ["mollet", "calf", "extension chevilles", "corde à sauter", "corde a sauter", "marche sur pointes"],
+    animation: {
+      fichier: "mollets",
+      description: "Extension des chevilles, mollets sollicités",
+    },
+  },
+  {
+    motifs: ["pont fessier", "hip thrust", "glute bridge", "kickback", "abduction", "fessier"],
+    animation: {
+      fichier: "pont-fessier",
+      description: "Pont fessier, extension de hanche et chaîne postérieure",
+    },
+  },
 ];
 
 /**
