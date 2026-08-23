@@ -171,8 +171,8 @@ export function ActivationFlow({
       <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
         <SectionLabel>Ton profil est prêt</SectionLabel>
         <p className="max-w-md text-sm leading-6 text-graphite-300">
-          Choisis le niveau d&apos;attention qui te correspond : Personal Trainer autonome à 49€,
-          accompagnement hybride à 89€, ou coaching privé dès 199€ par mois.
+          Choisis le niveau d&apos;attention qui te correspond : Pass IA à 19,99€/mois,
+          Coaching Hybride à 99€/mois, ou VIP dès 199€/mois.
         </p>
         <Link href="/pricing">
           <Button className="px-8 py-3">Choisir mon accompagnement</Button>

@@ -464,10 +464,17 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
   let relancesCheckout = 0;
   for (const user of candidats) {
     const plan = user.checkoutPlan === "STANDARD" ? "Coaching Hybride" : "Pass IA";
-    // Pass IA est facturé à l'année (cf. OFFER_BY_PLAN.GRATUIT, interval
-    // "year") — l'e-mail affichait un prix mensuel qui n'a jamais
-    // correspondu au prélèvement réel.
-    const prix = user.checkoutPlan === "STANDARD" ? "99 €/mois" : "49 €/an";
+    // Le prix cité doit suivre le rythme de facturation réellement choisi
+    // au checkout (23/08/2026) : Pass IA propose désormais les deux, et
+    // l'e-mail affichait encore "49 €/an", un tarif qui n'existe plus
+    // depuis le repositionnement du 22/08. Un e-mail de relance qui cite
+    // un prix faux est pire que pas d'e-mail du tout.
+    const prix =
+      user.checkoutPlan === "STANDARD"
+        ? "99 €/mois"
+        : user.checkoutBillingInterval === "ANNUAL"
+          ? "119 €/an"
+          : "19,99 €/mois";
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const envoye = await sendEmail(
       user.email,
