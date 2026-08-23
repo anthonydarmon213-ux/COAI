@@ -6,6 +6,8 @@ import { ExerciceAnimation } from "@/components/programme/exercice-animation";
 import { animationPourExercice } from "@/lib/exercices/animations";
 import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { photoFiablePourNom } from "@/lib/exercices/photo-fiable";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
 // clé/valeur) : repères façon "readout" HUD, mise en page dense mais aérée.
@@ -79,7 +81,14 @@ export function ExerciceCard({
   if (!isPlainObject(exercice)) return null;
   const nom = typeof exercice.nom === "string" ? exercice.nom : undefined;
   const photoQuery = typeof exercice.photoQuery === "string" ? exercice.photoQuery : undefined;
-  const photoUrl = photoQuery ? photosParExercice?.[photoQuery] : null;
+  // Ordre de priorité (23/08/2026) : photo COAI tournée dans la charte,
+  // puis Free Exercise DB (photo liée à l'exercice exact par un humain),
+  // puis Pexels en dernier — la source qui donnait des photos fausses,
+  // conservée seulement pour ne pas laisser une carte sans visuel.
+  const photoUrl =
+    (nom ? photoCoaiPourNom(nom) : null) ??
+    (nom ? photoFiablePourNom(nom) : null) ??
+    (photoQuery ? photosParExercice?.[photoQuery] ?? null : null);
   const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
   const consignesLongues = CHAMPS.flatMap(({ cle, label }) => {
