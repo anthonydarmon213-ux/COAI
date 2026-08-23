@@ -23,6 +23,7 @@ import { DeskResetCard } from "@/components/dashboard/desk-reset-card";
 import { RoutineRecuperation } from "@/components/dashboard/routine-recuperation";
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { getGamification } from "@/lib/insight/gamification";
+import { AnneauxMacros } from "@/components/programme/anneaux-macros";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
 import { MonitoringSanteCard } from "@/components/dashboard/monitoring-sante-card";
 import { calculerReadiness } from "@/lib/insight/readiness";
@@ -72,7 +73,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, diesRecents, gamification] = await Promise.all([
+  const [validated, latest, daily, insight, diesRecents, gamification, programmeNutrition] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -91,7 +92,22 @@ export default async function DashboardPage() {
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
     getGamification(user.id),
+    // Programme nutrition (23/08/2026) — uniquement pour les anneaux de
+    // macros du bloc 3. Le dashboard ne chargeait que l'entraînement.
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "NUTRITION" },
+      orderBy: { generatedAt: "desc" },
+      select: { contenu: true },
+    }),
   ]);
+
+  // objectifsJournaliers vit à la racine du contenu nutrition généré.
+  // Absent (programme non encore généré, ancienne version) → AnneauxMacros
+  // ne rend rien, plutôt que d'inventer des cibles.
+  const objectifsMacros =
+    programmeNutrition?.contenu && typeof programmeNutrition.contenu === "object" && !Array.isArray(programmeNutrition.contenu)
+      ? (programmeNutrition.contenu as Record<string, unknown>).objectifsJournaliers
+      : null;
   // Readiness du jour (22/08/2026) — calculé sur le check-in déjà chargé
   // ci-dessus + les données santé du profil quand elles existent. Aucune
   // requête supplémentaire.
@@ -166,86 +182,52 @@ export default async function DashboardPage() {
           };
 
   return (
-    <div className="coai-dashboard flex flex-col gap-7">
+    /* Dashboard épuré en 3 blocs (23/08/2026, demande Anthony : "un
+       dashboard premium doit être épuré", ~14 blocs auparavant).
+       Retirés d'ici : Intelligence COAI, Activité quotidienne, Streak &
+       badges, Monitoring santé, Score/Âge COAI, Récupération musculaire,
+       Besoins identifiés, Ma semaine, Briefing du jour, Routine
+       récupération, Diagnostic enrichi, Impulsion challenge.
+       Aucun composant n'est supprimé du code : ils restent disponibles
+       pour /progression ou /compte, seul le dashboard est allégé. */
+    <div className="coai-dashboard flex flex-col gap-8">
       <DashboardIntroVideo />
-      <header className="coai-dashboard-hero animate-reveal flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
-        <div className="coai-diagnostic-kicker self-start">
-          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-          <span>Personal training, reimagined</span>
-          <span className="coai-diagnostic-kicker-separator" aria-hidden="true" />
-          <span>Aujourd&apos;hui</span>
-        </div>
-        <div className="flex items-center gap-5 sm:gap-7">
-          <DashboardAvatar score={completion.pourcentage} />
-          <div>
-            <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
-              {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
-            </h1>
-            <p className="mt-3 text-xl font-bold text-graphite-50">Ton Personal Trainer, toujours avec toi.</p>
-            <p className="mt-2 max-w-2xl text-base leading-7 text-graphite-300">{objective}</p>
+
+      {/* BLOC 1 — Hero + Readiness du jour */}
+      <header className="coai-dashboard-hero animate-reveal flex flex-col gap-6 px-6 py-7 sm:px-8 sm:py-9">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-5">
+            <DashboardAvatar score={completion.pourcentage} />
+            <div>
+              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
+                {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
+              </h1>
+              <p className="mt-2 max-w-xl text-base leading-7 text-graphite-300">{objective}</p>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="coai-dashboard-status">Profil analysé</span>
-          <span className="coai-dashboard-status">Programme adaptatif</span>
-          <span className="coai-dashboard-status">Suivi centralisé</span>
+          <ReadinessCard readiness={readiness} compact />
         </div>
       </header>
 
-      {/* Cockpit en grille (21/08/2026, demande Anthony : "vrai cockpit
-          ultra-professionnel... éliminer le scroll vertical infini") —
-          colonne principale (action du jour + check-in/séance, 2/3 sur
-          desktop) à côté d'une colonne d'indicateurs (Score/Âge COAI,
-          récupération musculaire, ce qui reste à faire), plutôt que tout
-          empiler en une seule colonne. Contenu et logique de chaque bloc
-          inchangés — seule la disposition change. */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
-        <div className="flex min-w-0 flex-col gap-5 lg:col-span-8">
-          {/* Ordre demandé (22/08/2026) : readiness en haut, séance du jour
-              au milieu, streak en bas — les trois cartes que la personne
-              vient réellement consulter, dans la colonne principale plutôt
-              qu'en marge. */}
-          <ReadinessCard readiness={readiness} />
-
-          {/* Monitoring santé placé juste sous le Readiness : ce sont ces
-              mêmes métriques qui alimentent son calcul (cf.
-              calculerReadiness), la proximité rend le lien lisible. */}
-          <MonitoringSanteCard
-            pasMoyenParJour={user.profile?.pasMoyenParJour}
-            sommeilMoyenHeures={user.profile?.sommeilMoyenHeures}
-            hrv={user.profile?.hrv}
-            frequenceCardiaqueRepos={user.profile?.frequenceCardiaqueRepos}
-            derniereAnalyseMontre={user.profile?.derniereAnalyseMontre}
-          />
-
-          {/* Lueur légère (point 5, demande Anthony) réservée à la carte
-              d'action principale — pas ailleurs, pour ne pas diluer l'effet. */}
-          <div className="relative">
-            <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-laiton-400/[0.12] blur-2xl" />
-            <div className="relative">
-              {/* Doublon retiré (20/08/2026, retour Anthony : "un petit
-                  doublon... sur deux carrés à la suite") — le bouton de
-                  check-in du header répétait exactement le même message
-                  que cette carte, qui a déjà son propre CTA. Une seule
-                  source pour cette mission. */}
-              <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
-            </div>
-          </div>
-
+      {/* BLOC 2 — L'action principale du jour, seule décision à prendre */}
+      <div className="relative">
+        <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-laiton-400/[0.12] blur-2xl" />
+        <div className="relative flex flex-col gap-5">
           {!completion.essentielComplet ? (
-            <section className="rounded-2xl border border-white/10 bg-laiton-400/[0.06] p-6">
+            <section className="coai-glass p-6">
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Profil incomplet</p>
               <h2 className="mt-2 text-2xl text-white">COAI a besoin de quelques repères essentiels.</h2>
-              <p className="mt-2 text-sm leading-6 text-graphite-300">Il manque : {completion.champsEssentielsManquants.join(", ")}. Ces informations permettent de préparer une séance cohérente et prudente.</p>
+              <p className="mt-2 text-sm leading-6 text-graphite-300">Il manque : {completion.champsEssentielsManquants.join(", ")}.</p>
               <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
             </section>
           ) : !programme ? (
-            !hasAccess ? null : (
-              <section id="programme-a-generer" className="scroll-mt-6 flex flex-col gap-4">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 text-center">
+            !hasAccess ? (
+              <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
+            ) : (
+              <section id="programme-a-generer" className="coai-glass scroll-mt-6 flex flex-col gap-4 p-6">
+                <div className="text-center">
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Programme à préparer</p>
                   <h2 className="mt-2 text-2xl text-white">Ta première semaine peut être générée maintenant.</h2>
-                  <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-graphite-300">Pendant la génération, COAI affiche un état explicite puis revient vers ton programme — aucun chargement ne tourne indéfiniment.</p>
                 </div>
                 <GenererProgrammeOnboarding />
               </section>
@@ -262,151 +244,27 @@ export default async function DashboardPage() {
               />
             </div>
           ) : (
-            /* id="check-in-du-jour" présent ici AUSSI (23/08/2026, signalé
-               par Anthony : "le check-in ne marche pas"). L'ancre n'existait
-               que sur la branche jour d'entraînement : un jour de repos, le
-               lien "#check-in-du-jour" (header, carte Readiness, page Coach)
-               ne pointait sur rien, le navigateur ne scrollait pas et la
-               page restait bloquée en haut sur un grand vide, alors que le
-               check-in de repos était bien rendu plus bas. */
             <section id="check-in-du-jour" className="relative scroll-mt-6 overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] to-white/[0.025] p-6 sm:p-8">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Journée de récupération</p>
-              <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd’hui, ton programme prévoit du repos.</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">La récupération fait partie du programme. Reste à l’écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
+              <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd&rsquo;hui, ton programme prévoit du repos.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">Reste à l&rsquo;écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
               {pendingCoach && <p className="mt-4 text-sm font-semibold text-laiton-300">Programme V{programme.version} — à valider par ton coach.</p>}
-              <Link href="/programme/recuperation" className="mt-5 inline-flex rounded-full border border-[#343730] bg-[#252724] px-5 py-2.5 text-sm font-bold text-[#fffdf8] shadow-sm transition hover:bg-[#343730]">Voir ma récupération</Link>
               <RestDayCheckin initialDaily={daily} />
             </section>
           )}
-
-          <section className="coai-week-overview" aria-labelledby="week-title">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="coai-eyebrow">Ma semaine</p>
-                <h2 id="week-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                  {programme ? `${weeklyWorkoutCount} entraînement${weeklyWorkoutCount > 1 ? "s" : ""} planifié${weeklyWorkoutCount > 1 ? "s" : ""}` : "Ta semaine va prendre forme ici"}
-                </h2>
-              </div>
-            </div>
-            <div className="mt-6 grid grid-cols-7 gap-2" aria-label="Planning de la semaine">
-              {week.map(({ date: day, workout, today: isToday }) => (
-                <div key={day.toISOString()} className={`coai-week-day ${isToday ? "is-today" : ""} ${workout ? "has-workout" : ""}`}>
-                  <span>{JOURS_COURTS[day.getDay()]}</span>
-                  <strong>{day.getDate()}</strong>
-                  <i aria-hidden="true" />
-                  <small>{workout ? "Séance" : "Récup."}</small>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="coai-today-briefing" aria-labelledby="today-title">
-            <div className="coai-today-heading">
-              <p className="coai-eyebrow">Aujourd’hui</p>
-              <h2 id="today-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Ton briefing en trois décisions.</h2>
-            </div>
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
-              <Link href={sourceSession ? "#check-in-du-jour" : "/programme/entrainement"} className="coai-brief-card coai-brief-training">
-                <span>01 · Bouger</span>
-                <strong>{sourceSession?.nom ? String(sourceSession.nom) : "Récupération active"}</strong>
-                <p>{sourceSession ? `${getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)} min · adaptée après ton check-in.` : "Marche légère, mobilité et respiration sans douleur."}</p>
-                <em>{sourceSession ? "Préparer ma séance →" : "Voir ma récupération →"}</em>
-              </Link>
-              <Link href="/programme/alimentation" className="coai-brief-card">
-                <span>02 · Nourrir</span>
-                <strong>Énergie stable</strong>
-                <p>Hydrate-toi régulièrement et répartis tes protéines sur la journée.</p>
-                <em>Voir ma nutrition →</em>
-              </Link>
-              <Link href="/programme/recuperation" className="coai-brief-card">
-                <span>03 · Récupérer</span>
-                <strong>Préparer demain</strong>
-                <p>5 minutes de respiration calme ce soir, puis une heure de coucher régulière.</p>
-                <em>Optimiser ma récupération →</em>
-              </Link>
-            </div>
-          </section>
-
-          {/* Accès direct au lecteur de séance (22/08/2026) — le dashboard
-              renvoyait vers /programme/entrainement, où il fallait encore
-              trouver le bouton. Rendu seulement s'il y a une séance
-              aujourd'hui, sinon le bloc ne s'affiche pas du tout. */}
-          {sourceSession && programme && (
-            <SeanceDuJourHero contenu={programme.contenu} dureeProfil={user.profile?.dureeSeanceMinutes} />
-          )}
-
-          {/* Récupération ciblée : uniquement les jours de séance, et
-              seulement si les exercices sont reconnus — une routine
-              "générique" ne serait ciblée qu'en apparence. */}
-          {sourceSession && (
-            <RoutineRecuperation
-              exercicesDuJour={
-                Array.isArray((sourceSession as { exercices?: unknown }).exercices)
-                  ? ((sourceSession as { exercices: unknown[] }).exercices
-                      .map((e) => (typeof e === "object" && e !== null && typeof (e as { nom?: unknown }).nom === "string" ? (e as { nom: string }).nom : null))
-                      .filter((n): n is string => n !== null))
-                  : []
-              }
-            />
-          )}
-
-          <StreakBadgesCard gamification={gamification} />
-        </div>
-
-        {/* Colonne latérale (4/12). ScoreAgeCoai y reste en premier : il rend
-            toujours quelque chose, contrairement à RecuperationMusculaire,
-            ImpulsionChallenge et BesoinsIdentifies qui renvoient null au
-            chargement ou sans données — sans cette carte en tête, la colonne
-            pouvait apparaître vide au premier rendu et laisser un trou à
-            côté de la colonne principale. */}
-        <div className="flex min-w-0 flex-col gap-5 lg:col-span-4">
-          <ScoreAgeCoaiCard resultat={ageCoai} />
-          <DeskResetCard />
-          {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
-          <RecuperationMusculaireCard />
-          <BesoinsIdentifiesCard besoins={besoins} />
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5" aria-labelledby="coai-intelligence-title">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#4cc9f0]">Intelligence COAI</p>
-            <h2 id="coai-intelligence-title" className="mt-1.5 text-sm font-semibold text-white">17 ans de coaching réel, pas une IA généraliste.</h2>
-            <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold">
-              <span className="rounded-full border border-[#ff8a3d]/25 bg-[#ff8a3d]/10 px-2.5 py-1 text-[#ffb17d]">17 ans de terrain</span>
-              <span className="rounded-full border border-[#39e67b]/25 bg-[#39e67b]/10 px-2.5 py-1 text-[#76eea3]">Tes données réelles</span>
-              <span className="rounded-full border border-[#c56cff]/25 bg-[#c56cff]/10 px-2.5 py-1 text-[#dca2ff]">Décisions explicables</span>
-            </div>
-            <blockquote className="mt-4 border-t border-white/10 pt-3 text-xs italic leading-5 text-graphite-300">
-              “{MANTRAS[date.getDay()]}”
-            </blockquote>
-          </section>
         </div>
       </div>
 
-      {programme && <WeeklyCheckinCard />}
-
-      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 text-graphite-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:p-7">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Diagnostic enrichi · Optionnel</p>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight">COAI peut encore mieux te connaître.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-graphite-300">Envoie une capture de ton bracelet connecté ou une photo en tenue de sport. L’IA enrichit ton profil pour affiner les prochaines adaptations.</p>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-emerald-200">
-              <span className="rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-3 py-1.5">✓ Sommeil, pas, fréquence cardiaque</span>
-              <span className="rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-3 py-1.5">✓ Morphologie et posture</span>
-              <span className="rounded-full border border-emerald-400/25 bg-emerald-400/[0.08] px-3 py-1.5">✓ Photo non conservée</span>
-            </div>
-          </div>
-          <Link href="/compte/profil#diagnostic-high-tech" className="coai-diagnostic-enrich-cta inline-flex min-h-12 shrink-0 items-center justify-center rounded-full px-6 text-sm font-bold transition">Affiner mon diagnostic →</Link>
-        </div>
-      </section>
-
-      {/* RecuperationMusculaireCard vit maintenant dans la colonne
-          d'indicateurs plus haut (à côté de "Ma semaine") — retiré d'ici
-          pour ne pas l'afficher deux fois. */}
-      <div id="activite-quotidienne" className="scroll-mt-6"><ActiviteQuotidienneCard /></div>
+      {/* BLOC 3 — Bilan rapide : macros à gauche, pause active à droite */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        <AnneauxMacros objectifsJournaliers={objectifsMacros} />
+        <DeskResetCard />
+      </div>
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link
           href="/programme"
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-laiton-400/35 bg-white/[0.04] px-6 py-3 text-sm font-bold text-graphite-50 shadow-[0_14px_34px_-24px_rgba(0,0,0,.7)] transition hover:-translate-y-0.5 hover:bg-white/[0.08]"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-laiton-400/35 bg-white/[0.04] px-6 py-3 text-sm font-bold text-graphite-50 transition hover:-translate-y-0.5 hover:bg-white/[0.08]"
         >
           Voir mon programme complet →
         </Link>
