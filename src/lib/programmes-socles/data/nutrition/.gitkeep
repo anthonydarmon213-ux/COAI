@@ -1,0 +1,3 @@
+Socles nutrition générés par scripts/generer-socles.ts, puis relus et versionnés
+comme le reste du code. Tant qu'un socle est absent, la génération sur
+mesure prend le relais pour ce pilier.

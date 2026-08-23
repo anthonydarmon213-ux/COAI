@@ -2,27 +2,38 @@
  * Génère la bibliothèque de programmes socles — À EXÉCUTER À LA MAIN,
  * jamais depuis l'application (24/08/2026).
  *
- *   npx tsx scripts/generer-socles.ts            # les 60 combinaisons
- *   npx tsx scripts/generer-socles.ts MUSCLE     # un seul objectif
+ *   npx tsx scripts/generer-socles.ts                  # tout
+ *   npx tsx scripts/generer-socles.ts nutrition        # un seul pilier
+ *   npx tsx scripts/generer-socles.ts --force          # regénère l'existant
  *
- * Chaque programme coûte ~21 appels IA. Les 60 combinaisons représentent
- * donc ~1 260 appels : c'est un coût unique, assumé, à la place d'un coût
- * répété à chaque abonné Pass IA.
+ * 54 fichiers, ~370 appels IA : 45 entraînements (~5 appels chacun),
+ * 4 nutritions et 5 récupérations (~8 appels chacune).
+ *
+ * Les trois piliers sont générés séparément parce qu'ils ne dépendent pas
+ * des mêmes axes (cf. cle.ts). Les générer ensemble pour chaque combinaison
+ * revenait à produire quinze fois la même nutrition sous des étiquettes
+ * différentes — 1 260 appels au lieu de 370.
+ *
+ * C'est un coût unique, en remplacement d'un coût répété à chaque abonné
+ * Pass IA.
  *
  * Le résultat est écrit dans src/lib/programmes-socles/data/. Ces fichiers
  * sont versionnés et servis tels quels — Anthony les relit et les corrige
- * comme n'importe quel autre contenu de l'application. C'est justement
- * l'intérêt : le contenu servi aux abonnés Pass IA devient relisable, ce
- * qu'une génération à la volée ne permet pas.
+ * comme n'importe quel autre contenu. C'est justement l'intérêt : ce qui
+ * est servi aux abonnés Pass IA devient relisable, ce qu'une génération à
+ * la volée ne permet pas.
  *
- * Reprise possible : un socle déjà présent sur le disque est ignoré, sauf
- * avec --force. Une interruption ne fait donc pas repayer les appels déjà
- * effectués.
+ * Reprise possible : un socle déjà présent est ignoré, sauf avec --force.
+ * Une interruption ne fait donc pas repayer les appels déjà effectués.
  */
 import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { genererPilier } from "../src/lib/programmes/generer";
-import { toutesLesCles, type CleSocle } from "../src/lib/programmes-socles/cle";
+import {
+  toutesLesClesEntrainement,
+  toutesLesClesNutrition,
+  toutesLesClesRecuperation,
+} from "../src/lib/programmes-socles/cle";
 
 const DOSSIER = join(process.cwd(), "src/lib/programmes-socles/data");
 
@@ -31,6 +42,10 @@ const OBJECTIF_TEXTE: Record<string, string> = {
   MUSCLE: "Prendre du muscle et gagner en volume",
   FORME: "Me sentir mieux au quotidien, reprendre une activité régulière",
   PERFORMANCE: "Progresser en force et en performance",
+  // Socle commun aux débutants : à ce niveau l'objectif ne change pas la
+  // séance (full body sur les mouvements de base), la différence se joue
+  // dans l'assiette — arbitrage validé par Anthony, coach.
+  BASE: "Construire des bases solides et une technique propre",
 };
 
 const NIVEAU_TEXTE: Record<string, string> = {
@@ -39,67 +54,113 @@ const NIVEAU_TEXTE: Record<string, string> = {
   AVANCE: "Avancé",
 };
 
-function profilPourCle(cle: CleSocle) {
-  // Le split d'un template literal type reste `string[]` pour TypeScript :
-  // il ne sait pas que la clé a exactement trois segments. Valeurs par
-  // défaut plutôt qu'un cast — si la clé était malformée, mieux vaut un
-  // profil cohérent qu'un `undefined` propagé jusqu'au prompt.
-  const [objectif = "FORME", niveau = "DEBUTANT", frequence = "3"] = cle.split("_");
-  return {
-    objectifs: OBJECTIF_TEXTE[objectif],
-    niveau: NIVEAU_TEXTE[niveau],
-    frequenceEntrainement: `${frequence} fois par semaine`,
-    // Salle complète : variantes.ts substitue à l'affichage selon le
-    // matériel réel de la personne. Générer une version par lieu aurait
-    // triplé la bibliothèque pour rien.
-    equipementDisponible: "Salle de sport complète",
-    lieuEntrainement: "Salle de sport",
-    dureeSeanceMinutes: 60,
-    // Aucune contrainte de santé : le socle est le cas général. Une
-    // personne avec des douleurs déclarées passe par la génération sur
-    // mesure, jamais par un socle qui ne les connaît pas.
-    contraintesSante: null,
-  };
+/** Profil commun à tous les socles : salle équipée, 60 min, aucune
+ *  contrainte de santé. variantes.ts substitue les exercices à l'affichage
+ *  selon le matériel réel, et un profil avec contrainte déclarée ne reçoit
+ *  jamais de socle (cf. socleAcceptable). */
+const PROFIL_BASE = {
+  equipementDisponible: "Salle de sport complète",
+  lieuEntrainement: "Salle de sport",
+  dureeSeanceMinutes: 60,
+  contraintesSante: null,
+};
+
+type Pilier = "ENTRAINEMENT" | "NUTRITION" | "RECUPERATION";
+type Tache = {
+  pilier: Pilier;
+  sousDossier: string;
+  cle: string;
+  profil: Record<string, unknown>;
+};
+
+function taches(): Tache[] {
+  const out: Tache[] = [];
+
+  for (const cle of toutesLesClesEntrainement()) {
+    const [objectif = "BASE", niveau = "DEBUTANT", frequence = "3"] = cle.split("_");
+    out.push({
+      pilier: "ENTRAINEMENT",
+      sousDossier: "entrainement",
+      cle,
+      profil: {
+        ...PROFIL_BASE,
+        objectifs: OBJECTIF_TEXTE[objectif],
+        niveau: NIVEAU_TEXTE[niveau],
+        frequenceEntrainement: `${frequence} fois par semaine`,
+      },
+    });
+  }
+
+  for (const cle of toutesLesClesNutrition()) {
+    out.push({
+      pilier: "NUTRITION",
+      sousDossier: "nutrition",
+      cle,
+      profil: {
+        ...PROFIL_BASE,
+        objectifs: OBJECTIF_TEXTE[cle],
+        // Niveau et fréquence n'entrent pas dans la clé nutrition, mais le
+        // prompt les attend : valeurs médianes, les cibles chiffrées étant
+        // de toute façon recalculées sur le profil réel à l'affichage.
+        niveau: "Intermédiaire",
+        frequenceEntrainement: "3 fois par semaine",
+      },
+    });
+  }
+
+  for (const cle of toutesLesClesRecuperation()) {
+    const frequence = cle.replace("FREQ_", "");
+    out.push({
+      pilier: "RECUPERATION",
+      sousDossier: "recuperation",
+      cle,
+      profil: {
+        ...PROFIL_BASE,
+        objectifs: OBJECTIF_TEXTE.FORME,
+        niveau: "Intermédiaire",
+        frequenceEntrainement: `${frequence} fois par semaine`,
+      },
+    });
+  }
+
+  return out;
 }
 
 async function main() {
-  const filtre = process.argv.find((a) => !a.startsWith("--") && /^[A-Z_]+$/.test(a));
+  const filtre = process.argv.slice(2).find((a) => !a.startsWith("--"));
   const force = process.argv.includes("--force");
-  mkdirSync(DOSSIER, { recursive: true });
 
-  const cles = toutesLesCles().filter((c) => !filtre || c.startsWith(filtre));
-  console.log(`${cles.length} socle(s) à traiter\n`);
+  const aFaire = taches().filter((t) => !filtre || t.sousDossier === filtre);
+  console.log(`${aFaire.length} socle(s) à traiter\n`);
 
   let faits = 0;
   let ignores = 0;
   const echecs: string[] = [];
 
-  for (const cle of cles) {
-    const chemin = join(DOSSIER, `${cle}.json`);
+  for (const t of aFaire) {
+    const dossier = join(DOSSIER, t.sousDossier);
+    mkdirSync(dossier, { recursive: true });
+    const chemin = join(dossier, `${t.cle}.json`);
+
     if (existsSync(chemin) && !force) {
       ignores++;
       continue;
     }
 
-    const profil = profilPourCle(cle);
-    process.stdout.write(`${cle} … `);
+    process.stdout.write(`${t.sousDossier}/${t.cle} … `);
     try {
-      // Séquentiel volontairement : 60 générations en parallèle
-      // dépasseraient les limites de débit du fournisseur et feraient
-      // échouer des appels déjà facturés.
-      const [entrainement, nutrition, recuperation] = await Promise.all([
-        genererPilier("ENTRAINEMENT", profil, "socle"),
-        genererPilier("NUTRITION", profil, "socle"),
-        genererPilier("RECUPERATION", profil, "socle"),
-      ]);
+      // Séquentiel volontairement : lancer les 54 en parallèle dépasserait
+      // les limites de débit du fournisseur et ferait échouer des appels
+      // déjà facturés.
+      const contenu = await genererPilier(t.pilier, t.profil, "socle");
       writeFileSync(
         chemin,
-        JSON.stringify({ cle, genereLe: new Date().toISOString(), entrainement, nutrition, recuperation }, null, 2)
+        JSON.stringify({ cle: t.cle, genereLe: new Date().toISOString(), contenu }, null, 2)
       );
       faits++;
       console.log("✓");
     } catch (err) {
-      echecs.push(cle);
+      echecs.push(`${t.sousDossier}/${t.cle}`);
       console.log(`✗ ${err instanceof Error ? err.message : String(err)}`);
     }
   }

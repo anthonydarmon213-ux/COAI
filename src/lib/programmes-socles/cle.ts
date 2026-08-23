@@ -24,8 +24,6 @@ export type NiveauSocle = "DEBUTANT" | "INTERMEDIAIRE" | "AVANCE";
 /** Séances par semaine — 5 couvre aussi "6 fois ou plus". */
 export type FrequenceSocle = 1 | 2 | 3 | 4 | 5;
 
-export type CleSocle = `${ObjectifSocle}_${NiveauSocle}_${FrequenceSocle}`;
-
 /**
  * Objectif du profil ramené à l'un des quatre socles.
  *
@@ -36,7 +34,6 @@ export type CleSocle = `${ObjectifSocle}_${NiveauSocle}_${FrequenceSocle}`;
  */
 export function objectifSocle(objectifs: string | null | undefined): ObjectifSocle {
   const t = (objectifs ?? "").toLowerCase();
-
   if (/perdre du gras|perte de poids|s[ée]cher|maigrir|affiner/.test(t)) return "PERTE";
   if (/prendre du muscle|prise de masse|hypertrophie|me muscler/.test(t)) return "MUSCLE";
   if (/force|performance|comp[ée]tition|course|marathon|hyrox/.test(t)) return "PERFORMANCE";
@@ -62,22 +59,81 @@ export function frequenceSocle(frequence: string | null | undefined): FrequenceS
   return n as FrequenceSocle;
 }
 
-export function cleSocle(profil: {
+// UNE CLÉ PAR PILIER, pas une clé unique (24/08/2026, remarque d'Anthony :
+// "60 c'est beaucoup"). Les trois piliers ne dépendent pas des mêmes axes,
+// et les générer tous les trois pour chaque combinaison revenait à produire
+// quinze fois la même nutrition sous des étiquettes différentes.
+//
+//   Entraînement  objectif × niveau × fréquence   (45 — voir ci-dessous)
+//   Nutrition     objectif seul                   (4)
+//   Récupération  fréquence seule                 (5)
+//
+// Soit 54 fichiers et ~370 appels IA au lieu de 180 fichiers et ~1 260.
+// Surtout : 9 fichiers à relire côté nutrition et récupération au lieu
+// de 120.
+
+/**
+ * Clé entraînement.
+ *
+ * Chez un DÉBUTANT, l'objectif ne change quasiment pas la séance : c'est du
+ * full body sur les mouvements de base dans tous les cas, la différence se
+ * joue dans l'assiette (arbitrage validé par Anthony, coach). Les quatre
+ * objectifs partagent donc un même socle "BASE" à ce niveau — 5 programmes
+ * au lieu de 20, et 45 fichiers au total.
+ */
+export type CleEntrainement =
+  | `BASE_DEBUTANT_${FrequenceSocle}`
+  | `${ObjectifSocle}_INTERMEDIAIRE_${FrequenceSocle}`
+  | `${ObjectifSocle}_AVANCE_${FrequenceSocle}`;
+
+/** La nutrition ne dépend pas de la fréquence d'entraînement : déficit,
+ *  surplus ou maintien découlent de l'objectif. Les cibles chiffrées, elles,
+ *  restent calculées sur le profil réel de la personne. */
+export type CleNutrition = ObjectifSocle;
+
+/** La récupération suit le volume d'entraînement, pas l'objectif : cinq
+ *  séances par semaine demandent autre chose qu'une seule. */
+export type CleRecuperation = `FREQ_${FrequenceSocle}`;
+
+export function cleEntrainement(profil: {
   objectifs?: string | null;
   niveau?: string | null;
   frequenceEntrainement?: string | null;
-}): CleSocle {
-  return `${objectifSocle(profil.objectifs)}_${niveauSocle(profil.niveau)}_${frequenceSocle(
-    profil.frequenceEntrainement
-  )}` as CleSocle;
+}): CleEntrainement {
+  const niveau = niveauSocle(profil.niveau);
+  const frequence = frequenceSocle(profil.frequenceEntrainement);
+  if (niveau === "DEBUTANT") return `BASE_DEBUTANT_${frequence}`;
+  return `${objectifSocle(profil.objectifs)}_${niveau}_${frequence}` as CleEntrainement;
 }
 
-/** Les 60 combinaisons : 4 objectifs × 3 niveaux × 5 fréquences. */
-export function toutesLesCles(): CleSocle[] {
-  const objectifs: ObjectifSocle[] = ["PERTE", "MUSCLE", "FORME", "PERFORMANCE"];
-  const niveaux: NiveauSocle[] = ["DEBUTANT", "INTERMEDIAIRE", "AVANCE"];
-  const frequences: FrequenceSocle[] = [1, 2, 3, 4, 5];
-  return objectifs.flatMap((o) =>
-    niveaux.flatMap((n) => frequences.map((f) => `${o}_${n}_${f}` as CleSocle))
-  );
+export function cleNutrition(profil: { objectifs?: string | null }): CleNutrition {
+  return objectifSocle(profil.objectifs);
+}
+
+export function cleRecuperation(profil: { frequenceEntrainement?: string | null }): CleRecuperation {
+  return `FREQ_${frequenceSocle(profil.frequenceEntrainement)}`;
+}
+
+const OBJECTIFS: ObjectifSocle[] = ["PERTE", "MUSCLE", "FORME", "PERFORMANCE"];
+const FREQUENCES: FrequenceSocle[] = [1, 2, 3, 4, 5];
+
+/** Les 45 clés d'entraînement à générer. */
+export function toutesLesClesEntrainement(): CleEntrainement[] {
+  return [
+    ...FREQUENCES.map((f) => `BASE_DEBUTANT_${f}` as CleEntrainement),
+    ...OBJECTIFS.flatMap((o) =>
+      FREQUENCES.flatMap((f) => [
+        `${o}_INTERMEDIAIRE_${f}` as CleEntrainement,
+        `${o}_AVANCE_${f}` as CleEntrainement,
+      ])
+    ),
+  ];
+}
+
+export function toutesLesClesNutrition(): CleNutrition[] {
+  return [...OBJECTIFS];
+}
+
+export function toutesLesClesRecuperation(): CleRecuperation[] {
+  return FREQUENCES.map((f) => `FREQ_${f}` as CleRecuperation);
 }
