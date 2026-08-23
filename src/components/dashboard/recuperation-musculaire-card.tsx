@@ -87,7 +87,14 @@ export function RecuperationMusculaireCard() {
         Indique comment tu te sens, groupe par groupe. Toi seul(e) connais ton ressenti.
       </p>
 
-      <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+      {/* 2 colonnes fixes (23/08/2026, signalé par Anthony : "Abdominaux"
+          et "Mollets" se touchaient). La grille passait à 4 colonnes dès
+          le palier sm:, qui dépend de la largeur de la FENÊTRE — or cette
+          carte vit dans la colonne latérale étroite du dashboard
+          (lg:col-span-4). Sur un grand écran, sm: était donc actif et
+          tassait 4 cellules dans ~380px, faisant déborder les libellés
+          longs. 2 colonnes × 4 lignes tiennent proprement à cette largeur. */}
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
         {etat.map(({ groupe, dernier, joursDepuis }) => {
           const crans = dernier ? NIVEAU_CRANS[dernier.niveau] : 0;
           const misAJourAujourdhui = joursDepuis === 0;
@@ -96,14 +103,14 @@ export function RecuperationMusculaireCard() {
               key={groupe}
               type="button"
               onClick={() => setGroupeOuvert(groupeOuvert === groupe ? null : groupe)}
-              className={`relative flex flex-col items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-left transition hover:border-white/20 hover:bg-white/[0.07] ${
+              className={`relative flex min-w-0 flex-col items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-left transition hover:border-white/20 hover:bg-white/[0.07] ${
                 groupeOuvert === groupe ? "ring-1 ring-laiton-300/60" : ""
               }`}
             >
               {misAJourAujourdhui && (
-                <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 animate-status-pulse rounded-full bg-emerald-400" aria-hidden="true" />
+                <span className="absolute right-2 top-2 h-1.5 w-1.5 animate-status-pulse rounded-full bg-emerald-400" aria-hidden="true" />
               )}
-              <span className="text-xs font-semibold text-[#fffdf8]">{GROUPE_LABEL[groupe]}</span>
+              <span className="w-full text-xs font-semibold leading-tight text-[#fffdf8]">{GROUPE_LABEL[groupe]}</span>
               {/* Barre de graduation façon "signal" (19/08/2026, direction Whoop) :
                   4 crans, remplis de gauche à droite selon le niveau déclaré,
                   tous dans la même couleur que le niveau (pas un dégradé
@@ -119,7 +126,7 @@ export function RecuperationMusculaireCard() {
                   />
                 ))}
               </span>
-              <span className="text-[10px] text-graphite-400">
+              <span className="w-full text-[10px] leading-tight text-graphite-400">
                 {dernier
                   ? `${NIVEAU_LABEL[dernier.niveau]}${misAJourAujourdhui ? " · aujourd'hui" : joursDepuis === 1 ? " · hier" : ` · il y a ${joursDepuis} j`}`
                   : "Non renseigné"}
