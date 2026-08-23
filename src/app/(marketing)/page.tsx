@@ -11,6 +11,7 @@ import { ProgressionSparkline } from "@/components/marketing/progression-sparkli
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
+import { VideoAnatomie } from "@/components/marketing/video-anatomie";
 
 const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
 const DESCRIPTION =
@@ -211,6 +212,13 @@ export default function LandingPage() {
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
       <MarqueeBanner />
+
+      {/* Vidéo anatomique (23/08/2026, fournie par Anthony) — placée juste
+          après l'intro, avant les blocs explicatifs : c'est l'élément le
+          plus démonstratif de la page, il perdrait son effet en bas. */}
+      <section className="mx-auto w-full max-w-6xl px-6 pt-10 sm:px-10" aria-label="COAI en mouvement">
+        <VideoAnatomie className="aspect-video w-full" />
+      </section>
 
       <section className="coai-live-signals mx-auto w-full max-w-6xl px-6 pt-10 sm:px-10" aria-label="Les signaux suivis par COAI">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.09] bg-[#111518] px-5 py-7 sm:px-8">
