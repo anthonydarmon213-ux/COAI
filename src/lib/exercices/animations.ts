@@ -57,6 +57,40 @@ const TABLE: Entree[] = [
       description: "Poussée horizontale, pectoraux et triceps engagés",
     },
   },
+  // Lot 2 (23/08/2026) — deuxième génération fournie par Anthony, même
+  // style, 3 mouvements en 10 s (l'outil plafonne à cette durée).
+  {
+    motifs: [
+      "tirage vertical", "tirage poulie haute", "poulie haute", "lat pulldown",
+      "traction", "pull up", "pull-up", "tirage nuque",
+    ],
+    animation: {
+      fichier: "tirage-vertical",
+      description: "Tirage vertical assis, dorsaux et biceps sollicités",
+    },
+  },
+  {
+    motifs: [
+      "rowing", "tirage horizontal", "tirage poulie basse", "poulie basse",
+      "seated row", "row machine", "superman",
+    ],
+    animation: {
+      fichier: "rowing-haltere",
+      description: "Rowing haltère, dos et arrière d'épaule engagés",
+    },
+  },
+  {
+    motifs: [
+      "curl", "biceps", "extension triceps", "triceps", "pushdown",
+      "élévation", "elevation", "lateral raise", "développé militaire",
+      "developpe militaire", "shoulder press", "arnold", "face pull",
+      "rowing menton", "développé épaules", "developpe epaules",
+    ],
+    animation: {
+      fichier: "curl-biceps",
+      description: "Travail des bras et des épaules, charge contrôlée",
+    },
+  },
 ];
 
 /**
