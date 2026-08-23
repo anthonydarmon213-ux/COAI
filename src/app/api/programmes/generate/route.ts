@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
 import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
+import { getGenerationQuotaState, GENERATION_QUOTA_WINDOW_MS } from "@/lib/subscription/generation-quota";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { buildContexteFeminin } from "@/lib/cycle/phase";
 import type { Pilier } from "@prisma/client";
@@ -70,6 +71,33 @@ export async function POST() {
   // de programme livré sans relecture humaine pour ces statuts, quel que
   // soit le palier — même Pass IA, normalement instantané.
   const plan = getEffectivePlan(user.subscription);
+
+  // Quota de génération (24/08/2026) — ~21 appels IA par génération, donc
+  // une régénération en boucle coûte plus cher que l'abonnement. La
+  // PREMIÈRE génération n'est jamais bloquée : un nouvel abonné doit
+  // toujours obtenir son programme, quoi qu'il arrive.
+  const aDejaUnProgramme = await prisma.programmeGenerated.findFirst({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+  const quota = getGenerationQuotaState(plan, user.generationsUsed, user.generationsResetAt);
+
+  if (aDejaUnProgramme && quota.epuise) {
+    const quand = quota.prochainReset
+      ? quota.prochainReset.toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
+      : null;
+    return NextResponse.json(
+      {
+        error: quand
+          ? `Tu as utilisé tes ${quota.limite} régénérations de programme ce mois-ci. Tu pourras en relancer une à partir du ${quand}. Ton programme actuel reste disponible et s'adapte chaque jour à tes check-ins.`
+          : `Tu as utilisé tes ${quota.limite} régénérations de programme ce mois-ci.`,
+        quotaEpuise: true,
+        retryable: false,
+      },
+      { status: 429 }
+    );
+  }
+
   const enceinteOuPostPartum =
     user.profile?.statutMaternite === "ENCEINTE" || user.profile?.statutMaternite === "POST_PARTUM";
   const statutInitial = plan === "GRATUIT" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE";
@@ -164,6 +192,21 @@ export async function POST() {
   const programmes = resultats
     .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof prisma.programmeGenerated.create>>> => r.status === "fulfilled")
     .map((r) => r.value);
+
+  // Décompté seulement en cas de succès : une génération qui échoue ne doit
+  // pas consommer le quota de l'utilisateur, il n'a rien obtenu.
+  // La fenêtre glissante démarre à la première génération de la période et
+  // n'est pas repoussée par les suivantes — sinon le quota ne se
+  // réinitialiserait jamais pour quelqu'un qui régénère régulièrement.
+  if (programmes.length > 0) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        generationsUsed: quota.expire ? 1 : { increment: 1 },
+        ...(quota.expire ? { generationsResetAt: new Date() } : {}),
+      },
+    });
+  }
 
   if (programmes.length > 0 && statutInitial === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
