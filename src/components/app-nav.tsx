@@ -13,11 +13,61 @@ import { SignOutButton } from "@/components/compte/sign-out-button";
 // du pilier plutôt qu'un nouveau chemin inventé ("/workout", "/nutrition")
 // qui n'existe pas dans l'app — /suivi/progression, /programme/entrainement
 // et /programme/alimentation sont les routes réelles.
-const ONGLETS: { href: string; label: string; icon: LucideIcon; match: string }[] = [
+// Sous-menus (23/08/2026, demande Anthony) — la simplification en 5 onglets
+// du 22/08 avait rendu inaccessibles des pages qui existaient toujours :
+// catalogue de recettes, bibliothèque d'exercices, historique des séances,
+// mesures, tests maxi, évolution. Aucune page nouvelle ici, uniquement le
+// chemin pour y accéder à nouveau.
+//
+// Les sous-menus ne s'affichent que sous l'onglet actif : les déplier tous
+// en permanence donnerait 17 liens dans une colonne de 224px, soit
+// exactement la surcharge que la simplification voulait supprimer.
+type SousLien = { href: string; label: string };
+
+const ONGLETS: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  match: string;
+  sous?: SousLien[];
+}[] = [
   { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard" },
-  { href: "/programme/entrainement", label: "Entraînement", icon: Dumbbell, match: "/programme" },
-  { href: "/suivi/progression", label: "Progression", icon: TrendingUp, match: "/suivi" },
-  { href: "/programme/alimentation", label: "Nutrition", icon: Apple, match: "/programme/alimentation" },
+  {
+    href: "/programme/entrainement",
+    label: "Entraînement",
+    icon: Dumbbell,
+    match: "/programme",
+    sous: [
+      { href: "/programme/entrainement", label: "Séance du jour" },
+      { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
+      { href: "/programme/programmes-prets", label: "Programmes prêts" },
+      { href: "/suivi/seances", label: "Historique des séances" },
+      { href: "/programme/recuperation", label: "Récupération" },
+    ],
+  },
+  {
+    href: "/suivi/progression",
+    label: "Progression",
+    icon: TrendingUp,
+    match: "/suivi",
+    sous: [
+      { href: "/suivi/progression", label: "Tonnage & volume" },
+      { href: "/suivi/tests-maxi", label: "PRs & records" },
+      { href: "/suivi/mesures", label: "Mesures" },
+      { href: "/programme/evolution", label: "Courbes d’évolution" },
+    ],
+  },
+  {
+    href: "/programme/alimentation",
+    label: "Nutrition",
+    icon: Apple,
+    match: "/programme/alimentation",
+    sous: [
+      { href: "/programme/alimentation", label: "Plan du jour" },
+      { href: "/programme/recettes", label: "Catalogue de recettes" },
+      { href: "/suivi/alimentation", label: "Suivi des macros" },
+    ],
+  },
   { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
 ];
 
@@ -53,8 +103,8 @@ export function AppNav() {
           const active = isActive(pathname, onglet);
           const Icon = onglet.icon;
           return (
+            <div key={onglet.href} className="contents md:block">
             <Link
-              key={onglet.href}
               href={onglet.href}
               aria-current={active ? "page" : undefined}
               className={`relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3.5 py-3 font-semibold transition ${
@@ -67,6 +117,31 @@ export function AppNav() {
               <Icon size={18} strokeWidth={2} className={active ? "text-laiton-300" : "text-graphite-500"} aria-hidden="true" />
               {onglet.label}
             </Link>
+
+            {/* Sous-liens visibles uniquement sous l'onglet actif, et
+                seulement sur desktop : la barre mobile défile
+                horizontalement, y empiler des sous-niveaux la rendrait
+                illisible. */}
+            {active && onglet.sous && (
+              <div className="ml-3 mt-1 hidden flex-col gap-0.5 border-l border-white/10 pl-3 md:flex">
+                {onglet.sous.map((sl) => {
+                  const sousActif = pathname === sl.href;
+                  return (
+                    <Link
+                      key={sl.href}
+                      href={sl.href}
+                      aria-current={sousActif ? "page" : undefined}
+                      className={`rounded-lg px-2.5 py-1.5 text-[12.5px] font-medium transition ${
+                        sousActif ? "bg-laiton-400/10 text-laiton-200" : "text-graphite-400 hover:bg-white/[0.05] hover:text-white"
+                      }`}
+                    >
+                      {sl.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+            </div>
           );
         })}
       </nav>
