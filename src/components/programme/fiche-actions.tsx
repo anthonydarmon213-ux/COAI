@@ -46,7 +46,7 @@ export function FicheActions({ nomSeance }: { nomSeance: string }) {
         onClick={() => window.print()}
         className="rounded-full bg-laiton-400 px-5 py-2.5 text-sm font-bold text-[#0D0E12] transition hover:bg-laiton-300"
       >
-        Télécharger en PDF
+        Enregistrer en PDF
       </button>
       <button
         type="button"

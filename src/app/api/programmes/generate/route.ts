@@ -129,8 +129,34 @@ export async function POST() {
 
   const echecs = resultats.filter((r): r is PromiseRejectedResult => r.status === "rejected");
   if (echecs.length === piliers.length) {
+    // Message générique côté utilisateur (23/08/2026) — l'API renvoyait
+    // jusqu'ici l'erreur brute du fournisseur IA, que le bouton affichait
+    // telle quelle : un abonné a vu le détail d'un problème de facturation
+    // interne et les identifiants de requête. Le détail complet reste dans
+    // les logs serveur (console.error juste au-dessus), seul endroit où il
+    // a sa place.
+    //
+    // Un souci de crédit/quota n'est pas de la même nature qu'une panne :
+    // il se règle côté COAI, pas en réessayant. Le distinguer évite de
+    // faire boucler l'utilisateur sur un bouton qui ne peut pas marcher.
+    const messages = echecs.map((e) => String(e.reason).toLowerCase());
+    const problemeDeQuota = messages.some(
+      (m) =>
+        m.includes("credit balance") ||
+        m.includes("quota") ||
+        m.includes("rate_limit") ||
+        m.includes("insufficient")
+    );
+
     return NextResponse.json(
-      { error: "Échec de la génération IA", details: echecs.map((e) => String(e.reason)) },
+      {
+        error: problemeDeQuota
+          ? "La génération est momentanément indisponible. L'équipe COAI est prévenue — réessaie dans quelques minutes."
+          : "La génération n'a pas abouti. Réessaie dans un instant.",
+        // "retryable" permet au bouton de proposer ou non un nouvel essai
+        // immédiat, plutôt que d'inviter à réessayer dans le vide.
+        retryable: !problemeDeQuota,
+      },
       { status: 502 }
     );
   }
