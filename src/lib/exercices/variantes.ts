@@ -29,7 +29,7 @@ type Entree = { motifs: string[]; variantes: Variante[] };
 
 const TABLE: Entree[] = [
   {
-    motifs: ["développé couché", "developpe couche", "bench press", "presse pectoraux", "chest press", "pec deck", "écarté", "ecarte"],
+    motifs: ["développé couché", "developpe couche", "bench press", "presse pectoraux", "chest press", "pec deck", "écarté", "ecarte", "butterfly", "pectoraux machine"],
     variantes: [
       { materiel: "halteres", nom: "Développé couché haltères", consigne: "Au sol si tu n'as pas de banc : l'amplitude est réduite, garde le même contrôle." },
       { materiel: "elastique", nom: "Développé élastique debout", consigne: "Élastique dans le dos, passé sous les aisselles. Pousse devant toi, coudes à 45°." },
@@ -53,7 +53,7 @@ const TABLE: Entree[] = [
     ],
   },
   {
-    motifs: ["tirage vertical", "lat pulldown", "traction", "pull up", "pull-up"],
+    motifs: ["tirage vertical", "tirage poulie haute", "poulie haute", "tirage nuque", "lat pulldown", "traction", "pull up", "pull-up"],
     variantes: [
       { materiel: "halteres", nom: "Pull-over haltère", consigne: "Allongé, bras tendus derrière la tête, ramène l'haltère au-dessus du buste." },
       { materiel: "elastique", nom: "Tirage vertical élastique", consigne: "Élastique ancré en hauteur, tire vers le haut de la poitrine, omoplates serrées." },
@@ -61,7 +61,7 @@ const TABLE: Entree[] = [
     ],
   },
   {
-    motifs: ["tirage horizontal", "rowing", "seated row", "row machine"],
+    motifs: ["tirage horizontal", "tirage poulie basse", "poulie basse", "rowing", "seated row", "row machine"],
     variantes: [
       { materiel: "halteres", nom: "Rowing haltère unilatéral", consigne: "Un genou et une main en appui, dos plat, tire l'haltère vers la hanche." },
       { materiel: "elastique", nom: "Rowing élastique assis", consigne: "Élastique autour des pieds, tire les coudes le long du corps." },
@@ -69,7 +69,7 @@ const TABLE: Entree[] = [
     ],
   },
   {
-    motifs: ["squat", "presse à cuisses", "presse a cuisses", "leg press", "hack squat", "leg extension"],
+    motifs: ["squat", "presse à cuisses", "presse a cuisses", "leg press", "hack squat", "leg extension", "extension jambes", "quadriceps machine"],
     variantes: [
       { materiel: "halteres", nom: "Squat gobelet", consigne: "Haltère contre la poitrine, buste droit, coudes entre les genoux en bas." },
       { materiel: "elastique", nom: "Squat élastique", consigne: "Élastique sous les pieds et sur les épaules. Garde la tension en montant." },
@@ -117,7 +117,7 @@ const TABLE: Entree[] = [
     ],
   },
   {
-    motifs: ["mollet", "calf"],
+    motifs: ["mollet", "calf", "extension chevilles"],
     variantes: [
       { materiel: "halteres", nom: "Mollets debout haltères", consigne: "Sur une marche pour l'amplitude complète, une pause en haut." },
       { materiel: "elastique", nom: "Mollets élastique", consigne: "Élastique sous la plante, pointe le pied contre la résistance." },
