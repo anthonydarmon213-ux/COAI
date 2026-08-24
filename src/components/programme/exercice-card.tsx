@@ -8,7 +8,6 @@ import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { photoFiablePourNom } from "@/lib/exercices/photo-fiable";
-import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
 // clé/valeur) : repères façon "readout" HUD, mise en page dense mais aérée.
@@ -90,8 +89,7 @@ export function ExerciceCard({
     (nom ? photoCoaiPourNom(nom) : null) ??
     (nom ? photoFiablePourNom(nom) : null) ??
     (photoQuery ? photosParExercice?.[photoQuery] ?? null : null);
-  const videoUrl = nom ? videoCoaiPourNom(nom) : null;
-  const hasTechniqueValidee = Boolean(videoUrl || (nom && animationPourExercice(nom)));
+  const hasTechniqueValidee = Boolean(nom && animationPourExercice(nom));
   const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
   const consignesLongues = CHAMPS.flatMap(({ cle, label }) => {
@@ -259,20 +257,7 @@ export function ExerciceCard({
         </div>
       )}
 
-      {videoOuverte && nom && videoUrl && (
-        <div className="w-full overflow-hidden rounded-lg border border-white/[0.08]">
-          <video
-            src={videoUrl}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="h-auto w-full"
-          />
-        </div>
-      )}
-
-      {videoOuverte && nom && !videoUrl && animationPourExercice(nom) && (
+      {videoOuverte && nom && animationPourExercice(nom) && (
         <ExerciceAnimation nom={nom} className="w-full" />
       )}
 

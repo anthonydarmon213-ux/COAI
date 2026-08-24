@@ -46,7 +46,20 @@ export function SemainePlan({
         </div>
       )}
 
-      {vueEnsemble && (
+      {jours.length > 0 ? (
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {jours.slice(0, 7).map((jourData, i) => {
+            const jourNom = String(jourData[jourKey] ?? `Jour ${i + 1}`);
+            const label = labelJour ? labelJour(jourData, i) : jourNom;
+            return (
+              <div key={i} className="rounded-xl border border-laiton-400/20 bg-gradient-to-br from-laiton-400/[0.09] to-white/[0.02] p-3.5">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-laiton-300">{jourNom}</span>
+                <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-white">{label}</p>
+              </div>
+            );
+          })}
+        </div>
+      ) : vueEnsemble ? (
         <div className="coai-week-overview relative overflow-hidden rounded-2xl border border-laiton-400/20 bg-gradient-to-br from-laiton-400/[0.08] via-white/[0.02] to-transparent p-5">
           <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-laiton-400/10 blur-2xl" />
           <span className="font-mono text-xs uppercase tracking-[0.15em] text-laiton-400">
@@ -54,7 +67,7 @@ export function SemainePlan({
           </span>
           <p className="mt-2 text-sm leading-6 text-graphite-100">{vueEnsemble}</p>
         </div>
-      )}
+      ) : null}
 
       {jours.length > 0 && (
         <div className="coai-week-days flex flex-col gap-2.5">

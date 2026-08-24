@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
 import { MuscleMap } from "@/components/programme/muscle-map";
-import { ExerciceAnimation } from "@/components/programme/exercice-animation";
 import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
-import { animationPourExercice } from "@/lib/exercices/animations";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { MotionCheck } from "@/components/programme/motion-check";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 
@@ -455,7 +454,7 @@ export function SeanceRunner({
   const consigne = step.type === "set" && typeof step.exercice.charge === "string" ? step.exercice.charge : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-abysse">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
       {termine ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <span className="text-5xl">✅</span>
@@ -557,7 +556,7 @@ export function SeanceRunner({
 
             {step.type === "set" && (() => {
               const photoQuery = typeof step.exercice.photoQuery === "string" ? step.exercice.photoQuery : undefined;
-              const photoUrl = photoQuery ? photosParExercice?.[photoQuery] : null;
+              const photoUrl = photoCoaiPourNom(step.nom) ?? (photoQuery ? photosParExercice?.[photoQuery] : null);
               const cle = `${step.exerciceIndex}-${step.setIndex}`;
               const saisi = realise[cle] ?? { reps: "", charge: "" };
               return (
@@ -582,13 +581,9 @@ export function SeanceRunner({
                       return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
                     })()}
 
-                    {/* Boucle animée en priorité sur la photo de stock : elle
-                        montre le geste réel plutôt qu'une image figée. */}
-                    <ExerciceAnimation nom={step.nom} className="w-full max-w-xs" />
-
-                    {photoUrl && !animationPourExercice(step.nom) && (
-                      // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe
-                      <img src={photoUrl} alt="" className="h-40 w-full max-w-xs rounded-2xl object-cover" loading="lazy" />
+                    {photoUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element -- cascade visuel COAI puis stock
+                      <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full max-w-sm rounded-2xl object-cover" loading="eager" />
                     )}
                   </div>
 

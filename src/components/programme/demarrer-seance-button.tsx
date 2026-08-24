@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { SeanceRunner } from "@/components/programme/seance-runner";
 
 // Bouton client isolé (21/08/2026) : entrainement-view.tsx reste un
@@ -20,6 +21,17 @@ export function DemarrerSeanceButton({
   photosParExercice?: Record<string, string | null>;
 }) {
   const [ouvert, setOuvert] = useState(false);
+  const [monte, setMonte] = useState(false);
+
+  useEffect(() => setMonte(true), []);
+  useEffect(() => {
+    if (!ouvert) return;
+    const precedent = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = precedent;
+    };
+  }, [ouvert]);
 
   if (!Array.isArray(exercices) || exercices.length === 0) return null;
 
@@ -32,7 +44,7 @@ export function DemarrerSeanceButton({
       >
         ▶ Démarrer la séance
       </button>
-      {ouvert && (
+      {ouvert && monte && createPortal(
         <SeanceRunner
           nomSeance={nomSeance}
           echauffement={echauffement}
@@ -40,7 +52,8 @@ export function DemarrerSeanceButton({
           retourAuCalme={retourAuCalme}
           photosParExercice={photosParExercice}
           onClose={() => setOuvert(false)}
-        />
+        />,
+        document.body
       )}
     </>
   );

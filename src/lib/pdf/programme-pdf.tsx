@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Link, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Link, StyleSheet, Image as PdfImage } from "@react-pdf/renderer";
 import type { Pilier } from "@prisma/client";
 
 // Export PDF des programmes générés — porte l'identité visuelle du site
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   },
   h1: { fontSize: 21, fontFamily: "Helvetica-Bold", color: C.textPrimary, letterSpacing: -0.3, marginBottom: 4 },
   genereLe: { fontSize: 7.5, color: C.textFaint, marginBottom: 16 },
+  heroImage: { width: "100%", height: 170, objectFit: "cover", borderRadius: 10, marginBottom: 14 },
 
   // --- Badges ---
   badgeRow: { flexDirection: "row", flexWrap: "wrap", marginBottom: 14 },
@@ -377,11 +378,9 @@ function JourHeader({ index, titre, sousTitre }: { index: number; titre: string;
 }
 
 function EntrainementBody({ data }: { data: Record<string, unknown> }) {
-  const { frequenceParSemaine, dureeProgramme, vueEnsemble, contreIndications, seances } = data as {
+  const { frequenceParSemaine, dureeProgramme, seances } = data as {
     frequenceParSemaine?: string;
     dureeProgramme?: string;
-    vueEnsemble?: string;
-    contreIndications?: unknown[];
     seances?: Record<string, unknown>[];
   };
 
@@ -401,17 +400,8 @@ function EntrainementBody({ data }: { data: Record<string, unknown> }) {
           ))}
         </View>
       )}
-      {vueEnsemble && (
-        <View style={styles.vueEnsembleBox}>
-          <Text style={styles.vueEnsembleLabel}>Plan de ta semaine</Text>
-          <Text style={styles.vueEnsembleText}>{vueEnsemble}</Text>
-        </View>
-      )}
-      {Array.isArray(contreIndications) && contreIndications.length > 0 && (
-        <ContreIndicationsBlock items={contreIndications} />
-      )}
       {Array.isArray(seances) &&
-        seances.map((seance, i) => {
+        seances.slice(0, 1).map((seance, i) => {
           const nom = typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`;
           const jour = typeof seance.jour === "string" ? seance.jour : undefined;
           const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
@@ -428,7 +418,7 @@ function EntrainementBody({ data }: { data: Record<string, unknown> }) {
               )}
               {exercices.length > 0 && (
                 <View style={{ marginTop: 4 }}>
-                  {exercices.map((ex, j) => (
+                  {exercices.slice(0, 6).map((ex, j) => (
                     <PdfExercice key={j} exercice={ex} />
                   ))}
                 </View>
@@ -447,11 +437,8 @@ function EntrainementBody({ data }: { data: Record<string, unknown> }) {
 }
 
 function NutritionBody({ data }: { data: Record<string, unknown> }) {
-  const { vueEnsemble, contreIndications, objectifsJournaliers, conseilsHabitudes, jours } = data as {
-    vueEnsemble?: string;
-    contreIndications?: unknown[];
+  const { objectifsJournaliers, jours } = data as {
     objectifsJournaliers?: Record<string, unknown>;
-    conseilsHabitudes?: { sujet?: string; constatActuel?: string; conseil?: string }[];
     jours?: Record<string, unknown>[];
   };
 
@@ -472,17 +459,8 @@ function NutritionBody({ data }: { data: Record<string, unknown> }) {
           ))}
         </View>
       )}
-      {vueEnsemble && (
-        <View style={styles.vueEnsembleBox}>
-          <Text style={styles.vueEnsembleLabel}>Principes de la semaine</Text>
-          <Text style={styles.vueEnsembleText}>{vueEnsemble}</Text>
-        </View>
-      )}
-      {Array.isArray(contreIndications) && contreIndications.length > 0 && (
-        <ContreIndicationsBlock items={contreIndications} />
-      )}
       {Array.isArray(jours) &&
-        jours.map((jourData, i) => {
+        jours.slice(0, 1).map((jourData, i) => {
           const jourNom = typeof jourData.jour === "string" ? jourData.jour : `Jour ${i + 1}`;
           const repas = Array.isArray(jourData.repas) ? jourData.repas : null;
           const { repas: _repas, jour: _jour, ...reste } = jourData;
@@ -492,7 +470,7 @@ function NutritionBody({ data }: { data: Record<string, unknown> }) {
             <View key={i} style={styles.jourBlock}>
               <JourHeader index={i} titre={jourNom} />
               {repas
-                ? repas.map((r, ri) => (
+                ? repas.slice(0, 4).map((r, ri) => (
                     <View key={ri} style={styles.subCard}>
                       <PdfKeyValue data={r} />
                     </View>
@@ -501,42 +479,19 @@ function NutritionBody({ data }: { data: Record<string, unknown> }) {
             </View>
           );
         })}
-      {Array.isArray(conseilsHabitudes) && conseilsHabitudes.length > 0 && (
-        <View style={{ marginTop: 4 }} wrap={false}>
-          <Text style={styles.subLabel}>Conseils sur tes habitudes</Text>
-          {conseilsHabitudes.map((c, i) => (
-            <View key={i} style={styles.conseilBloc}>
-              {c.sujet && <Text style={styles.conseilSujet}>{c.sujet}</Text>}
-              {c.constatActuel && <Text style={styles.paragraph}>{c.constatActuel}</Text>}
-              {c.conseil && <Text style={{ ...styles.paragraph, marginBottom: 0 }}>{c.conseil}</Text>}
-            </View>
-          ))}
-        </View>
-      )}
     </>
   );
 }
 
 function RecuperationBody({ data }: { data: Record<string, unknown> }) {
-  const { vueEnsemble, contreIndications, jours } = data as {
-    vueEnsemble?: string;
-    contreIndications?: unknown[];
+  const { jours } = data as {
     jours?: Record<string, unknown>[];
   };
 
   return (
     <>
-      {vueEnsemble && (
-        <View style={styles.vueEnsembleBox}>
-          <Text style={styles.vueEnsembleLabel}>Principes de la semaine</Text>
-          <Text style={styles.vueEnsembleText}>{vueEnsemble}</Text>
-        </View>
-      )}
-      {Array.isArray(contreIndications) && contreIndications.length > 0 && (
-        <ContreIndicationsBlock items={contreIndications} />
-      )}
       {Array.isArray(jours) &&
-        jours.map((jourData, i) => {
+        jours.slice(0, 2).map((jourData, i) => {
           const jour = typeof jourData.jour === "string" ? jourData.jour : `Jour ${i + 1}`;
           const type = typeof jourData.type === "string" ? jourData.type : undefined;
           const { jour: _jour, type: _type, ...reste } = jourData;
@@ -619,11 +574,13 @@ export function ProgrammePdf({
   data,
   prenom,
   generatedAt,
+  heroUrl,
 }: {
   pilier: Pilier;
   data: unknown;
   prenom?: string | null;
   generatedAt: Date;
+  heroUrl?: string;
 }) {
   const contenu = isPlainObject(data) ? data : {};
   const titre = typeof contenu.titre === "string" ? contenu.titre : PILIER_LABEL[pilier];
@@ -641,6 +598,7 @@ export function ProgrammePdf({
         <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>
         <Text style={styles.h1}>{titre}</Text>
         <Text style={styles.genereLe}>Généré le {dateFormatee} par l&apos;IA COAI</Text>
+        {heroUrl && <PdfImage src={heroUrl} style={styles.heroImage} />}
 
         {pilier === "ENTRAINEMENT" && <EntrainementBody data={contenu} />}
         {pilier === "NUTRITION" && <NutritionBody data={contenu} />}
