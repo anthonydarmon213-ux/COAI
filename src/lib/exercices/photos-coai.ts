@@ -86,6 +86,32 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["gainage trx", "planche trx", "gainage suspension"], fichier: "suspension-gainage-planche" },
   { motifs: ["curl ischio trx", "ischio suspension", "curl ischio glissé"], fichier: "suspension-curl-ischio" },
 
+  // FORCE BARRE & HALTÈRES (24/08/2026) — développés, deadlifts, squats.
+  // Les variantes spécifiques passent avant les motifs génériques.
+
+  // Développés — "décliné" et "incliné barre" avant "incliné" générique,
+  // "couché haltères" avant "couché" seul.
+  { motifs: ["développé décliné", "developpe decline", "decline press"], fichier: "developpe-decline-barre" },
+  { motifs: ["développé incliné barre", "developpe incline barre", "incline barbell"], fichier: "developpe-incline-barre" },
+  { motifs: ["développé incliné haltères", "developpe incline halteres", "incline dumbbell"], fichier: "developpe-incline-halteres" },
+  { motifs: ["développé couché haltères", "developpe couche halteres", "dumbbell bench"], fichier: "developpe-couche-halteres" },
+  { motifs: ["développé couché", "developpe couche", "bench press"], fichier: "developpe-couche-barre" },
+
+  // Deadlifts — "roumain unilatéral" avant "roumain", "sumo" avant générique.
+  { motifs: ["deadlift roumain unilatéral", "deadlift roumain unilateral", "single leg rdl", "rdl unilatéral"], fichier: "deadlift-roumain-unilateral" },
+  { motifs: ["deadlift roumain", "rdl", "soulevé de terre roumain", "romanian deadlift"], fichier: "deadlift-roumain" },
+  { motifs: ["deadlift sumo", "soulevé de terre sumo", "sumo deadlift"], fichier: "deadlift-sumo" },
+  { motifs: ["trap bar", "hex bar", "barre hexagonale"], fichier: "deadlift-trap-bar" },
+  { motifs: ["deadlift", "soulevé de terre"], fichier: "deadlift-conventionnel" },
+
+  // Squats barre — "front squat" avant "squat" générique, variantes rares en fin.
+  { motifs: ["box squat"], fichier: "box-squat-barre" },
+  { motifs: ["overhead squat", "squat au-dessus de la tête"], fichier: "overhead-squat-barre" },
+  { motifs: ["zercher squat", "zercher"], fichier: "zercher-squat-barre" },
+  { motifs: ["hack squat"], fichier: "hack-squat-machine" },
+  { motifs: ["front squat"], fichier: "front-squat-barre" },
+  { motifs: ["back squat", "squat barre", "squat arrière"], fichier: "back-squat-barre" },
+
   // KETTLEBELL — "goblet squat" avant "squat", "swing" avant tout.
   { motifs: ["kettlebell swing", "swing kettlebell", "swing"], fichier: "kettlebell-swing" },
   { motifs: ["goblet squat", "squat gobelet"], fichier: "kettlebell-goblet-squat" },
