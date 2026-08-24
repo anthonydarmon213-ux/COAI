@@ -147,7 +147,7 @@ export function DailyExperience({
   const [energy, setEnergy] = useState(initialDaily?.energy ?? "");
   const [chargeMentale, setChargeMentale] = useState(initialDaily?.chargeMentale ?? "");
   const [food, setFood] = useState("");
-  const [pain, setPain] = useState(initialDaily?.pain ?? false);
+  const [pain, setPain] = useState<boolean | null>(initialDaily?.pain ?? null);
   const [painArea, setPainArea] = useState(initialDaily?.painArea ?? "");
   const [availableMinutes, setAvailableMinutes] = useState(initialDaily?.availableMinutes ?? defaultTime);
   // Matériel du jour (22/08/2026, demande Anthony) — pré-coché avec celui
@@ -193,6 +193,16 @@ export function DailyExperience({
     setActiveExercise(next >= 0 ? next : null);
   }
 
+  function toggleEquipment(materiel: string) {
+    setEquipementDuJour((current) => {
+      if (materiel === "Aucun matériel") return current.includes(materiel) ? [] : [materiel];
+      const sansAucun = current.filter((item) => item !== "Aucun matériel");
+      return sansAucun.includes(materiel)
+        ? sansAucun.filter((item) => item !== materiel)
+        : [...sansAucun, materiel];
+    });
+  }
+
   async function post(body: Record<string, unknown>) {
     setLoading(true);
     setError("");
@@ -211,9 +221,9 @@ export function DailyExperience({
   }
 
   async function submitCheckin() {
-    if (!sleep || !energy || !food) return setError("Réponds aux cinq repères pour adapter ta séance.");
+    if (!sleep || !energy || pain === null || equipementDuJour.length === 0) return setError("Réponds aux cinq repères essentiels pour adapter ta séance.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
-    await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food, pain, painArea: pain ? painArea : undefined, availableMinutes, equipementDuJour: equipementDuJour.length ? equipementDuJour.join(", ") : undefined });
+    await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food: food || undefined, pain, painArea: pain ? painArea : undefined, availableMinutes, equipementDuJour: equipementDuJour.join(", ") });
   }
 
   async function completeWorkout() {
@@ -243,19 +253,24 @@ export function DailyExperience({
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-300">Ton coach est prêt · Check-in du jour</p>
               <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Comment te sens-tu aujourd’hui ?</h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">45 secondes suffisent. Comme en personal training, ta réponse détermine la durée, l’intensité et les précautions de ta séance.</p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">5 repères, 30 secondes. COAI ajuste gratuitement la durée, le volume, le matériel et les précautions de ta séance.</p>
             </div>
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-laiton-400/30 bg-white/[0.06] text-xl text-laiton-300">◎</span>
           </div>
-          <div className="mt-7 grid gap-3">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">01</span> Combien de temps as-tu ?</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">02</span> Comment est ta forme ?</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">03</span> Comment as-tu dormi ?</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">04</span> Comment se présente ta journée ? <span className="font-normal text-graphite-500">(facultatif)</span></p><div className="flex flex-wrap gap-2">{CHARGE_MENTALE.map(([value, label]) => <Chip key={value} active={chargeMentale === value} onClick={() => setChargeMentale(chargeMentale === value ? "" : value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">05</span> Qu’as-tu mangé avant la séance ?</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">06</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip><Chip active={pain} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-1 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">07</span> Quel matériel as-tu aujourd&apos;hui ?</p><p className="mb-3 text-xs text-graphite-500">Pré-rempli avec ton équipement habituel — corrige seulement si ça change aujourd&apos;hui.</p><div className="flex flex-wrap gap-2">{MATERIELS_DU_JOUR.map((m) => <Chip key={m} active={equipementDuJour.includes(m)} onClick={() => setEquipementDuJour((prev) => prev.includes(m) ? prev.filter((v) => v !== m) : [...prev, m])}>{m}</Chip>)}</div></div>
+          <div className="mt-7 grid gap-3 lg:grid-cols-2">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">01</span> Ta forme aujourd&apos;hui ?</p><div className="flex flex-wrap gap-2">{ENERGY.map(([value, label]) => <Chip key={value} active={energy === value} onClick={() => setEnergy(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">02</span> Ton sommeil ?</p><div className="flex flex-wrap gap-2">{SLEEP.map(([value, label]) => <Chip key={value} active={sleep === value} onClick={() => setSleep(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">03</span> Une douleur ou une gêne ?</p><div className="flex gap-2"><Chip active={pain === false} onClick={() => { setPain(false); setPainArea(""); }}>Non</Chip><Chip active={pain === true} onClick={() => setPain(true)}>Oui</Chip></div>{pain && <div className="mt-3 flex flex-wrap gap-2">{AREAS.map((area) => <Chip key={area} active={painArea === area} onClick={() => setPainArea(area)}>{area}</Chip>)}</div>}</div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"><p className="mb-3 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">04</span> Ton temps disponible ?</p><div className="flex flex-wrap gap-2">{TIMES.map(([value, label]) => <Chip key={value} active={availableMinutes === value} onClick={() => setAvailableMinutes(value)}>{label}</Chip>)}</div></div>
+            <div className="rounded-2xl border border-laiton-400/20 bg-laiton-400/[0.045] p-4 lg:col-span-2"><p className="mb-1 text-sm font-bold text-white"><span className="mr-2 text-laiton-300">05</span> Ton matériel disponible ?</p><p className="mb-3 text-xs text-graphite-400">COAI retire automatiquement les exercices impossibles aujourd&apos;hui.</p><div className="flex flex-wrap gap-2">{MATERIELS_DU_JOUR.map((m) => <Chip key={m} active={equipementDuJour.includes(m)} onClick={() => toggleEquipment(m)}>{m}</Chip>)}</div></div>
           </div>
+          <details className="group mt-3 rounded-2xl border border-white/[0.07] bg-black/15 p-4">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-graphite-300 marker:content-none">Ajouter un contexte utile <span className="font-normal text-graphite-500">(facultatif)</span><span className="float-right transition group-open:rotate-180">⌄</span></summary>
+            <div className="mt-4 grid gap-4 border-t border-white/[0.06] pt-4 lg:grid-cols-2">
+              <div><p className="mb-2 text-xs font-semibold text-graphite-300">Charge de la journée</p><div className="flex flex-wrap gap-2">{CHARGE_MENTALE.map(([value, label]) => <Chip key={value} active={chargeMentale === value} onClick={() => setChargeMentale(chargeMentale === value ? "" : value)}>{label}</Chip>)}</div></div>
+              <div><p className="mb-2 text-xs font-semibold text-graphite-300">Repas avant la séance</p><div className="flex flex-wrap gap-2">{FOOD.map(([value, label]) => <Chip key={value} active={food === value} onClick={() => setFood(value)}>{label}</Chip>)}</div></div>
+            </div>
+          </details>
           {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
           <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-white py-6 text-base font-bold text-graphite-950 hover:bg-white/90 sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>
         </section>

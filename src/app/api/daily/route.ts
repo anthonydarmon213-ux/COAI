@@ -113,16 +113,12 @@ export async function POST(request: Request) {
     }
 
     const expectedMinutes = getSessionDuration(source, user.profile?.dureeSeanceMinutes ?? 45);
-    // Un jour d'entraînement (source truthy) n'est atteint que via le
-    // formulaire de check-in complet (DailyExperience), qui envoie toujours
-    // food et availableMinutes — les deux ne sont facultatifs que pour le
-    // check-in léger des jours de repos (branche !source ci-dessus).
-    if (parsed.data.availableMinutes === undefined || parsed.data.food === undefined) {
-      return NextResponse.json({ error: "Repère repas et temps disponible requis pour un jour d'entraînement" }, { status: 400 });
+    if (parsed.data.availableMinutes === undefined) {
+      return NextResponse.json({ error: "Temps disponible requis pour un jour d'entraînement" }, { status: 400 });
     }
     const { session, summary } = adaptWorkout(
       source,
-      { ...parsed.data, availableMinutes: parsed.data.availableMinutes, food: parsed.data.food },
+      { ...parsed.data, availableMinutes: parsed.data.availableMinutes },
       expectedMinutes
     );
     const seanceCommune = {

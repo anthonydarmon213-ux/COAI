@@ -14,10 +14,11 @@ export type DailyCheckinInput = {
   // l'adaptation reste inchangée si non renseigné (comportement identique à
   // avant l'ajout de ce champ).
   chargeMentale?: "LEGERE" | "NORMALE" | "CHARGEE" | "SATUREE";
-  food: "PAS_ENCORE" | "LEGER" | "EQUILIBRE" | "LOURD";
+  food?: "PAS_ENCORE" | "LEGER" | "EQUILIBRE" | "LOURD";
   pain: boolean;
   painArea?: string;
   availableMinutes: 15 | 25 | 40 | 60 | 75;
+  equipementDuJour?: string;
 };
 
 export type AdaptationSummary = {
@@ -95,6 +96,30 @@ function reduceSeries(exercice: Record<string, unknown>) {
   };
 }
 
+const MOTIFS_MATERIEL = [
+  /halt[eè]re/i,
+  /barre/i,
+  /machine|poulie|smith|guid[ée]e?/i,
+  /kettlebell/i,
+  /trx|sangle/i,
+  /[ée]lastique|bande de r[ée]sistance/i,
+  /banc/i,
+  /m[ée]decine.?ball|wall.?ball/i,
+  /corde/i,
+];
+
+function exerciceCompatibleAvecMateriel(exercice: Record<string, unknown>, materiel: string) {
+  if (materiel.includes("Salle de sport complète")) return true;
+  const nom = String(exercice.nom ?? "");
+  const exigeMateriel = MOTIFS_MATERIEL.some((motif) => motif.test(nom));
+  if (!exigeMateriel) return true;
+  if (/halt[eè]re|banc/i.test(nom) && materiel.includes("Matériel à la maison")) return true;
+  if (/[ée]lastique|bande de r[ée]sistance/i.test(nom) && materiel.includes("Élastiques")) return true;
+  if (/kettlebell/i.test(nom) && materiel.includes("Kettlebell")) return true;
+  if (/trx|sangle/i.test(nom) && materiel.includes("TRX")) return true;
+  return false;
+}
+
 export function adaptWorkout(
   source: WorkoutSession,
   checkin: DailyCheckinInput,
@@ -158,12 +183,25 @@ export function adaptWorkout(
   const journeeChargee = checkin.chargeMentale === "CHARGEE";
   const needsFuelCaution = checkin.food === "PAS_ENCORE" || checkin.food === "LOURD";
   let adaptedExercises = [...exercices];
+  let materielAjuste = false;
 
-  if (checkin.availableMinutes < expectedMinutes && exercices.length > 0) {
-    const targetCount = Math.max(2, Math.min(exercices.length, Math.floor(exercices.length * checkin.availableMinutes / expectedMinutes)));
-    const coreExercise = exercices.find(isCoreExercise);
+  if (checkin.equipementDuJour && !checkin.equipementDuJour.includes("Salle de sport complète")) {
+    const compatibles = adaptedExercises.filter((exercice) =>
+      exerciceCompatibleAvecMateriel(exercice, checkin.equipementDuJour ?? "")
+    );
+    if (compatibles.length > 0 && compatibles.length < adaptedExercises.length) {
+      const retires = adaptedExercises.length - compatibles.length;
+      adaptedExercises = compatibles;
+      materielAjuste = true;
+      changes.push(`${retires} exercice${retires > 1 ? "s" : ""} retiré${retires > 1 ? "s" : ""} car le matériel n'est pas disponible aujourd'hui`);
+    }
+  }
+
+  if (checkin.availableMinutes < expectedMinutes && adaptedExercises.length > 0) {
+    const targetCount = Math.max(1, Math.min(adaptedExercises.length, Math.floor(adaptedExercises.length * checkin.availableMinutes / expectedMinutes)));
+    const coreExercise = adaptedExercises.find(isCoreExercise);
     const priorityCount = coreExercise ? targetCount - 1 : targetCount;
-    adaptedExercises = exercices.filter((exercise) => exercise !== coreExercise).slice(0, priorityCount);
+    adaptedExercises = adaptedExercises.filter((exercise) => exercise !== coreExercise).slice(0, priorityCount);
     if (coreExercise) adaptedExercises.push(coreExercise);
     changes.push(`Durée ramenée à ${checkin.availableMinutes === 75 ? "60+" : checkin.availableMinutes} min en gardant les exercices prioritaires`);
   }
@@ -189,6 +227,7 @@ export function adaptWorkout(
   if (lowRecovery) reasonParts.push("ton sommeil ou ton énergie est faible aujourd'hui");
   if (journeeChargee) reasonParts.push("ta journée s'annonce chargée");
   if (needsFuelCaution) reasonParts.push(checkin.food === "PAS_ENCORE" ? "tu n'as pas encore mangé" : "tu viens de faire un repas lourd");
+  if (materielAjuste) reasonParts.push("certains équipements ne sont pas disponibles");
 
   return {
     session: { ...completeSource, exercices: adaptedExercises },
