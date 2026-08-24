@@ -1,5 +1,21 @@
 # Notes stratégiques COAI
 
+## Relais Codex — Yoga, Pilates et sauvegarde de la bibliothèque (24/08/2026)
+
+Les 16 photos validées avec le modèle féminin blond (8 Yoga + 8 Pilates)
+sont intégrées dans `public/exercices/` : JPEG 4:3 de 900 × 675 px, avec les
+préfixes `yoga-` et `pilates-`. Le registre
+`src/lib/exercices/photos-coai.ts` contient leurs correspondances, placées
+avant les motifs génériques pour éviter notamment que « plank Pilates »
+retombe sur la photo de gainage standard. Ne pas régénérer ces images.
+
+La bibliothèque source complète (154 fichiers, environ 260 Mo) est conservée
+hors du dépôt pour ne pas alourdir GitHub, dans :
+`/Users/anthonydarmon/Documents/Codex/2026-08-21/j-x20/coai-bibliotheque-exercices-claude-code/`.
+Elle regroupe notamment boxe/kickboxing, poids du corps, duo, récupération,
+mobilité, Yoga et Pilates, avec les différents modèles validés. Utiliser ces
+fichiers en priorité avant de générer un exercice déjà présent.
+
 Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.
