@@ -2,26 +2,34 @@
 
 import { useState } from "react";
 
-export function ProgrammeShareButton({ pilier }: { pilier: string }) {
-  const [copie, setCopie] = useState(false);
+export function ProgrammeShareButton() {
+  const [etat, setEtat] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   async function partager() {
-    const title = `Mon programme COAI — ${pilier}`;
-    const text = `Je progresse avec mon programme ${pilier.toLowerCase()} COAI : entraînement, nutrition et récupération réunis. Fais ton bilan offert sur coai.fr`;
-    const url = "https://coai.fr";
-
+    setEtat("loading");
     try {
-      if (navigator.share) {
-        await navigator.share({ title, text, url });
+      const response = await fetch("/api/programmes/carte-story");
+      if (!response.ok) throw new Error("Carte indisponible");
+      const blob = await response.blob();
+      const file = new File([blob], "mon-programme-coai-story.png", { type: "image/png" });
+      const text = "Mon programme COAI réunit entraînement, alimentation et récupération. Fais ton bilan offert sur coai.fr/diagnostic";
+
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({ title: "Mon programme COAI", text, files: [file] });
+        setEtat("idle");
         return;
       }
-      await navigator.clipboard.writeText(`${text} — ${url}`);
-      setCopie(true);
-      window.setTimeout(() => setCopie(false), 2000);
+      const href = URL.createObjectURL(blob);
+      window.open(href, "_blank", "noopener,noreferrer");
+      if (navigator.clipboard) await navigator.clipboard.writeText(`${text} — https://coai.fr/diagnostic`);
+      setEtat("done");
+      window.setTimeout(() => setEtat("idle"), 3500);
     } catch (error) {
-      // L'annulation volontaire de la feuille de partage n'est pas une
-      // erreur à afficher à l'utilisateur.
-      if (error instanceof DOMException && error.name === "AbortError") return;
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setEtat("idle");
+        return;
+      }
+      setEtat("error");
     }
   }
 
@@ -29,9 +37,10 @@ export function ProgrammeShareButton({ pilier }: { pilier: string }) {
     <button
       type="button"
       onClick={partager}
+      disabled={etat === "loading"}
       className="rounded-full border border-laiton-400/35 bg-laiton-400/[0.08] px-4 py-2 text-sm font-semibold text-laiton-200 transition hover:bg-laiton-400/[0.16]"
     >
-      {copie ? "Lien copié ✓" : "Partager"}
+      {etat === "loading" ? "Création de la Story…" : etat === "done" ? "Story ouverte ✓" : etat === "error" ? "Réessayer" : "Partager en Story"}
     </button>
   );
 }

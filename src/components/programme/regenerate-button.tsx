@@ -8,8 +8,13 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState(false);
 
   async function handleClick() {
+    if (hasExisting && !confirmation) {
+      setConfirmation(true);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -33,13 +38,23 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <Button onClick={handleClick} disabled={loading}>
-        {loading
-          ? "Génération en cours…"
-          : hasExisting
-            ? "Régénérer mon programme"
-            : "Générer mon programme"}
-      </Button>
+      {confirmation && !loading ? (
+        <div className="flex flex-col items-start gap-2 rounded-xl border border-amber-400/25 bg-amber-400/[0.06] p-3">
+          <p className="max-w-md text-xs leading-5 text-amber-100">Confirmer la création d&apos;une nouvelle version complète : entraînement, alimentation et récupération.</p>
+          <div className="flex gap-2">
+            <Button onClick={handleClick}>Oui, recréer les 3 piliers</Button>
+            <button type="button" onClick={() => setConfirmation(false)} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-graphite-300">Annuler</button>
+          </div>
+        </div>
+      ) : (
+        <Button onClick={handleClick} disabled={loading}>
+          {loading
+            ? "Création en cours…"
+            : hasExisting
+              ? "Recréer mes 3 piliers"
+              : "Créer mon programme complet"}
+        </Button>
+      )}
       {loading && (
         <div className="flex w-56 flex-col gap-1.5">
           <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-graphite-800">

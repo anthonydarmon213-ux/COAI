@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RegenerateButton } from "@/components/programme/regenerate-button";
@@ -88,7 +89,10 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const piliersAffiches: Pilier[] = [pilierActif];
+  // Les trois piliers forment un seul parcours, toujours présenté dans le
+  // même ordre pédagogique quelle que soit l'ancienne route utilisée.
+  void pilierActif;
+  const piliersAffiches: Pilier[] = PILIERS;
   const [valides, derniers] = await Promise.all([
     Promise.all(
       piliersAffiches.map((pilier) =>
@@ -114,49 +118,107 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
 
   // Score sommeil (19/08/2026, demande Anthony) — requête limitée au pilier
   // Récupération, jamais chargée pour Entraînement/Nutrition.
-  const scoreSommeil = pilierActif === "RECUPERATION"
-    ? calculerScoreSommeil(
-        await prisma.dailySession.findMany({
-          where: { userId: user.id, date: { gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) } },
-          select: { sleep: true, date: true },
-        }),
-        user.profile?.qualiteSommeil
-      )
-    : null;
+  const scoreSommeil = calculerScoreSommeil(
+    await prisma.dailySession.findMany({
+      where: { userId: user.id, date: { gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) } },
+      select: { sleep: true, date: true },
+    }),
+    user.profile?.qualiteSommeil
+  );
 
   // Photos Pexels (19/08/2026, demande Anthony, étendu aux 3 piliers) :
   // résolues une seule fois ici (Server Component, clé jamais exposée au
   // client) à partir des "photoQuery"/"photoQuerySeance"/"photoQueryJour"
   // que l'IA génère elle-même dans le contenu (cf. extractPhotoQueries).
-  const contenuAffiche =
-    valides[0]?.contenu ??
-    (derniers[0]?.statut === "EN_ATTENTE" || derniers[0]?.statut === "GENERE_IA" ? derniers[0]?.contenu : null);
-  const photosParExercice = contenuAffiche && !estSocleCoai(contenuAffiche)
-    ? await getStockPhotos(extractPhotoQueries(contenuAffiche))
-    : undefined;
+  const contenusAffiches = piliersAffiches.map((_, index) =>
+    valides[index]?.contenu ??
+    (derniers[index]?.statut === "EN_ATTENTE" || derniers[index]?.statut === "GENERE_IA"
+      ? derniers[index]?.contenu
+      : null)
+  );
+  const photosParPilier = await Promise.all(
+    contenusAffiches.map((contenu) =>
+      contenu && !estSocleCoai(contenu)
+        ? getStockPhotos(extractPhotoQueries(contenu))
+        : Promise.resolve(undefined)
+    )
+  );
+  const recupHero = user.profile?.sexe?.toLowerCase() === "homme"
+    ? "/recuperation/sauna-homme-blond-premium.jpg"
+    : "/recuperation/sauna-femme-blonde-premium.jpg";
+  const etapes = [
+    { pilier: "ENTRAINEMENT" as Pilier, numero: "01", titre: "S'entraîner", sousTitre: "Ta séance guidée", image: "/exercices/back-squat-barre.jpg" },
+    { pilier: "NUTRITION" as Pilier, numero: "02", titre: "Bien manger", sousTitre: "Tes repas et tes portions", image: "/repas/plat-saumon-quinoa-brocolis.jpg" },
+    { pilier: "RECUPERATION" as Pilier, numero: "03", titre: "Récupérer", sousTitre: "Sommeil, mobilité et détente", image: recupHero },
+  ];
 
   return (
     <div className="coai-programme-page flex flex-col gap-8">
       {derniers[0] && derniers[0].version === 1 && <TrackConversion name="first_programme_viewed" />}
 
-      <div className="coai-programme-hero animate-reveal flex flex-col gap-4 px-6 py-7 sm:px-8 sm:py-9">
-        <div className="coai-diagnostic-kicker self-start">
-          <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-          <span>Programme personnalisé</span>
+      <div className="coai-programme-hero animate-reveal overflow-hidden px-5 py-6 sm:px-8 sm:py-9">
+        <div className="flex flex-col gap-7">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="coai-diagnostic-kicker mb-4 w-fit">
+                <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+                <span>Ton parcours personnalisé</span>
+              </div>
+              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Aujourd&apos;hui, fais simple.</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
+                Suis les trois étapes dans l&apos;ordre. Ton entraînement, ta diète et ta récupération sont déjà coordonnés.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <ProgrammeShareButton />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/[0.09] to-laiton-400/[0.07] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">À faire en premier · 45 secondes</p>
+              <h2 className="mt-1.5 text-lg font-semibold text-white">Comment te sens-tu aujourd&apos;hui ?</h2>
+              <p className="mt-1 text-xs leading-5 text-graphite-300">Forme, sommeil, douleur, temps et matériel : COAI prépare la bonne séance sans recréer tout ton programme.</p>
+            </div>
+            <Link href="/dashboard#check-in-du-jour" className="inline-flex shrink-0 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-bold text-graphite-950 transition hover:bg-cyan-50">
+              Faire mon check-in →
+            </Link>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            {etapes.map((etape) => {
+              const disponible = Boolean(contenusAffiches[piliersAffiches.indexOf(etape.pilier)]);
+              return (
+                <a
+                  key={etape.pilier}
+                  href={`#pilier-${etape.pilier.toLowerCase()}`}
+                  className="group relative min-h-44 overflow-hidden rounded-2xl border border-white/10 bg-black/30"
+                >
+                  <Image src={etape.image} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-55 transition duration-500 group-hover:scale-105 group-hover:opacity-70" />
+                  <span className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" aria-hidden="true" />
+                  <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+                    <span>
+                      <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-laiton-300">ÉTAPE {etape.numero}</span>
+                      <strong className="mt-1 block text-base text-white">{etape.titre}</strong>
+                      <span className="mt-0.5 block text-xs text-graphite-300">{etape.sousTitre}</span>
+                    </span>
+                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${disponible ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-graphite-400"}`}>
+                      {disponible ? "Prêt" : "À créer"}
+                    </span>
+                  </span>
+                </a>
+              );
+            })}
+          </div>
         </div>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Ton programme.</h1>
-        <p className="max-w-2xl text-base leading-7 text-graphite-400">
-          Entraînement, nutrition et récupération — un seul programme, coordonné.
-        </p>
       </div>
 
-      <p className="rounded-lg border border-graphite-800 bg-graphite-900/40 p-4 text-xs leading-5 text-graphite-400">
-        ⚠️ Avant de démarrer un programme sur COAI, nous te recommandons fortement de faire un
-        bilan médical complet auprès de ton médecin, en particulier en cas d&apos;antécédent ou de
-        doute sur ta condition physique. Les programmes générés et validés sur COAI sont des
-        recommandations sportives, pas un avis médical : tu restes seul responsable de ta pratique
-        et de son adéquation avec ton état de santé, y compris en cas de blessure.
-      </p>
+      <details className="rounded-lg border border-graphite-800 bg-graphite-900/40 p-4 text-xs leading-5 text-graphite-400">
+        <summary className="cursor-pointer font-semibold text-graphite-300">⚠️ Avant de commencer : sécurité et avis médical</summary>
+        <p className="mt-3">
+          Nous te recommandons de faire un bilan médical complet, en particulier en cas d&apos;antécédent ou de doute sur ta condition physique. Les programmes COAI sont des recommandations sportives, pas un avis médical : tu restes responsable de leur adéquation avec ton état de santé.
+        </p>
+      </details>
 
       {!peutGenerer && !aUnContenu && (
         <Card className="flex flex-col items-start gap-4 p-5 sm:p-8">
@@ -199,22 +261,21 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
         if (!affiche && (!peutGenerer || !aUnContenu)) return null;
 
         return (
-          <div key={pilier} className="flex flex-col gap-3">
+          <section id={`pilier-${pilier.toLowerCase()}`} key={pilier} className="scroll-mt-6 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <SectionLabel>{LABELS[pilier]}</SectionLabel>
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-laiton-400/35 bg-laiton-400/10 font-mono text-xs font-bold text-laiton-300">{i + 1}</span>
+                <SectionLabel>{LABELS[pilier]}</SectionLabel>
+              </div>
               <div className="flex items-center gap-2">
                 {affiche && (
-                  <>
-                    <ProgrammeShareButton pilier={LABELS[pilier]} />
-                    <a
-                      href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
-                      className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-                    >
-                      Télécharger en PDF
-                    </a>
-                  </>
+                  <a
+                    href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
+                    className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+                  >
+                    PDF
+                  </a>
                 )}
-                {peutGenerer && <RegenerateButton hasExisting={Boolean(dernier)} />}
               </div>
             </div>
 
@@ -287,9 +348,9 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParExercice} dureeProfil={user.profile?.dureeSeanceMinutes} />;
-                if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParExercice} />;
-                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParExercice} sexe={user.profile?.sexe} />;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParPilier[i]} dureeProfil={user.profile?.dureeSeanceMinutes} />;
+                if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParPilier[i]} />;
+                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParPilier[i]} sexe={user.profile?.sexe} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
               })()}
 
@@ -313,10 +374,32 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               />
             )}
 
-            {affiche && peutGenerer && <AnalyserAdaptationButton pilierSlug={PDF_SLUG[pilier]} />}
-          </div>
+          </section>
         );
       })}
+
+      {peutGenerer && (
+        <details className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 text-sm">
+          <summary className="cursor-pointer font-semibold text-graphite-300">Ajustements avancés du programme</summary>
+          <div className="mt-3 flex flex-col items-start gap-3 border-t border-white/[0.07] pt-3">
+            <p className="max-w-2xl text-xs leading-5 text-graphite-500">
+              Ces actions peuvent utiliser l&apos;IA. Pour ta forme, ton temps ou ton matériel aujourd&apos;hui, utilise le check-in gratuit. Ne recrée les trois piliers qu&apos;après un vrai changement d&apos;objectif ou de situation.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {piliersAffiches.map((pilier, index) => {
+                const affiche = valides[index] ?? derniers[index];
+                return affiche ? (
+                  <div key={pilier} className="flex flex-col gap-2 rounded-xl border border-white/[0.07] bg-black/20 p-3">
+                    <span className="text-xs font-semibold text-white">Analyser · {LABELS[pilier]}</span>
+                    <AnalyserAdaptationButton pilierSlug={PDF_SLUG[pilier]} />
+                  </div>
+                ) : null;
+              })}
+            </div>
+            <RegenerateButton hasExisting={Boolean(derniers.some(Boolean))} />
+          </div>
+        </details>
+      )}
 
       <Link href="/compte/profil" className="text-sm text-laiton-400 underline">
         Modifier votre profil →
