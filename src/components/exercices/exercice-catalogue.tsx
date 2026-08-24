@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ExerciceVideo } from "@/components/programme/exercice-video";
 import {
   EXERCICES,
   GROUPE_PRINCIPAL_LABEL,
@@ -15,6 +16,7 @@ import {
   type TypeExercice,
 } from "@/lib/exercices/catalogue";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 const GROUPES = Object.keys(GROUPE_PRINCIPAL_LABEL) as GroupePrincipal[];
 const MATERIELS = Object.keys(MATERIEL_LABEL) as Materiel[];
@@ -22,45 +24,6 @@ const TYPES = Object.keys(TYPE_LABEL) as TypeExercice[];
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-}
-
-// Vidéo technique (20/08/2026, retour Anthony : "il faut absolument mettre
-// des vidéos, c'est beaucoup plus sympa que juste des photos" + plusieurs
-// photos Pexels erronées dans ce catalogue). Même mécanisme déjà en place
-// et approuvé sur ExerciceCard (programme généré) : recherche YouTube
-// intégrable par nom d'exercice, aucune clé API, aucune bibliothèque à
-// maintenir — contrairement à une photo de stock cherchée par mots-clés
-// génériques, une vidéo cherchée par le nom exact de l'exercice a beaucoup
-// moins de chances de tomber sur le mauvais mouvement.
-function TechniqueVideo({ nom }: { nom: string }) {
-  const [ouverte, setOuverte] = useState(false);
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOuverte((v) => !v)}
-        aria-expanded={ouverte}
-        className="self-start rounded-full border border-laiton-400/25 bg-laiton-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-laiton-300 transition hover:border-laiton-400/50 hover:bg-laiton-400/20"
-      >
-        {ouverte ? "✕ Fermer" : "▶ Voir la technique"}
-      </button>
-      {/* Lien plutôt qu'embed (23/08/2026) : `listType=search` est déprécié
-          par YouTube depuis le 15/11/2020 et affichait "Cette vidéo n'est
-          pas disponible". */}
-      {ouverte && (
-        <div className="w-full rounded-lg border border-white/[0.08] bg-black/30 p-3 text-center">
-          <a
-            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${nom} technique musculation`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-laiton-400/35 bg-laiton-400/10 px-4 py-2 text-[11px] font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
-          >
-            ▶ Voir la démonstration sur YouTube
-          </a>
-        </div>
-      )}
-    </>
-  );
 }
 
 function FilterGroup<T extends string>({
@@ -162,6 +125,7 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
           // la charte, et dont l'exercice est garanti par le nom du fichier
           // plutôt que déduit par rapprochement de mots.
           const photoFinale = photoCoaiPourNom(ex.nom) ?? photoUrl;
+          const hasVideoReelle = Boolean(videoCoaiPourNom(ex.nom));
           return (
             <article
               key={ex.id}
@@ -187,7 +151,7 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
                   <span>{ex.materiel.map((m) => MATERIEL_LABEL[m]).join(", ")}</span>
                 </div>
                 <p className="text-sm leading-6 text-graphite-400">{ex.consigne}</p>
-                <TechniqueVideo nom={ex.nom} />
+                {hasVideoReelle && <ExerciceVideo nom={ex.nom} className="mt-1 w-full" />}
               </div>
             </article>
           );
