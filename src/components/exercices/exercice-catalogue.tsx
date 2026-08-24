@@ -124,7 +124,8 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
           // Photo COAI prioritaire (23/08/2026) — seule source tournée dans
           // la charte, et dont l'exercice est garanti par le nom du fichier
           // plutôt que déduit par rapprochement de mots.
-          const photoFinale = photoCoaiPourNom(ex.nom) ?? photoUrl;
+          const photoCoai = photoCoaiPourNom(ex.nom);
+          const photoFinale = photoCoai ?? photoUrl;
           const hasVideoReelle = Boolean(videoCoaiPourNom(ex.nom));
           return (
             <article
@@ -134,7 +135,12 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
               <div className="relative h-36 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.2),transparent_60%),#171b1d]">
                 {photoFinale && (
                   // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, cf. RecetteCard pour la même justification
-                  <img src={photoFinale} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={photoFinale}
+                    alt=""
+                    className={`h-full w-full ${photoCoai ? "object-contain" : "object-cover"}`}
+                    loading="lazy"
+                  />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-transparent to-transparent" aria-hidden="true" />
                 <div className="absolute right-2.5 top-2.5">

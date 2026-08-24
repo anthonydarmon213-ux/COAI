@@ -120,6 +120,7 @@ const TABLE: EntreePhoto[] = [
 
   // Deadlifts — "roumain unilatéral" avant "roumain", "sumo" avant générique.
   { motifs: ["deadlift roumain unilatéral", "deadlift roumain unilateral", "single leg rdl", "rdl unilatéral"], fichier: "deadlift-roumain-unilateral" },
+  { motifs: ["deadlift roumain haltères", "deadlift roumain halteres", "soulevé de terre roumain haltères", "souleve de terre roumain halteres", "rdl haltères", "rdl halteres"], fichier: "deadlift-roumain-halteres" },
   { motifs: ["deadlift roumain", "rdl", "soulevé de terre roumain", "romanian deadlift"], fichier: "deadlift-roumain" },
   { motifs: ["deadlift sumo", "soulevé de terre sumo", "sumo deadlift"], fichier: "deadlift-sumo" },
   { motifs: ["trap bar", "hex bar", "barre hexagonale"], fichier: "deadlift-trap-bar" },
