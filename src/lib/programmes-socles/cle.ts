@@ -23,6 +23,7 @@ export type ObjectifSocle = "PERTE" | "MUSCLE" | "FORME" | "PERFORMANCE";
 export type NiveauSocle = "DEBUTANT" | "INTERMEDIAIRE" | "AVANCE";
 /** Séances par semaine — 5 couvre aussi "6 fois ou plus". */
 export type FrequenceSocle = 1 | 2 | 3 | 4 | 5;
+export type RegimeSocle = "CLASSIQUE" | "SANS_GLUTEN" | "VEGETARIEN" | "VEGAN" | "PALEO";
 
 /**
  * Objectif du profil ramené à l'un des quatre socles.
@@ -65,12 +66,12 @@ export function frequenceSocle(frequence: string | null | undefined): FrequenceS
 // quinze fois la même nutrition sous des étiquettes différentes.
 //
 //   Entraînement  objectif × niveau × fréquence   (45 — voir ci-dessous)
-//   Nutrition     objectif seul                   (4)
+//   Nutrition     objectif × régime couvert       (20)
 //   Récupération  fréquence seule                 (5)
 //
-// Soit 54 fichiers et ~370 appels IA au lieu de 180 fichiers et ~1 260.
-// Surtout : 9 fichiers à relire côté nutrition et récupération au lieu
-// de 120.
+// Soit 70 combinaisons éditoriales, sans appel IA à l'exécution. Les
+// variantes de régime sont assemblées depuis un catalogue commun afin de
+// ne pas dupliquer vingt gros fichiers quasi identiques.
 
 /**
  * Clé entraînement.
@@ -89,7 +90,7 @@ export type CleEntrainement =
 /** La nutrition ne dépend pas de la fréquence d'entraînement : déficit,
  *  surplus ou maintien découlent de l'objectif. Les cibles chiffrées, elles,
  *  restent calculées sur le profil réel de la personne. */
-export type CleNutrition = ObjectifSocle;
+export type CleNutrition = `${ObjectifSocle}_${RegimeSocle}`;
 
 /** La récupération suit le volume d'entraînement, pas l'objectif : cinq
  *  séances par semaine demandent autre chose qu'une seule. */
@@ -106,8 +107,27 @@ export function cleEntrainement(profil: {
   return `${objectifSocle(profil.objectifs)}_${niveau}_${frequence}` as CleEntrainement;
 }
 
-export function cleNutrition(profil: { objectifs?: string | null }): CleNutrition {
-  return objectifSocle(profil.objectifs);
+export function regimeSocle(profil: {
+  allergiesAlimentaires?: string | null;
+  habitudesAlimentaires?: string | null;
+}): RegimeSocle {
+  const t = `${profil.allergiesAlimentaires ?? ""} ${profil.habitudesAlimentaires ?? ""}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+  if (/paleo|paléo/.test(t)) return "PALEO";
+  if (/vegan|vegetalien|végétalien/.test(t)) return "VEGAN";
+  if (/vegetarien|végétarien/.test(t)) return "VEGETARIEN";
+  if (/sans gluten|gluten free/.test(t)) return "SANS_GLUTEN";
+  return "CLASSIQUE";
+}
+
+export function cleNutrition(profil: {
+  objectifs?: string | null;
+  allergiesAlimentaires?: string | null;
+  habitudesAlimentaires?: string | null;
+}): CleNutrition {
+  return `${objectifSocle(profil.objectifs)}_${regimeSocle(profil)}`;
 }
 
 export function cleRecuperation(profil: { frequenceEntrainement?: string | null }): CleRecuperation {
@@ -131,7 +151,10 @@ export function toutesLesClesEntrainement(): CleEntrainement[] {
 }
 
 export function toutesLesClesNutrition(): CleNutrition[] {
-  return [...OBJECTIFS];
+  const regimes: RegimeSocle[] = ["CLASSIQUE", "SANS_GLUTEN", "VEGETARIEN", "VEGAN", "PALEO"];
+  return OBJECTIFS.flatMap((objectif) =>
+    regimes.map((regime) => `${objectif}_${regime}` as CleNutrition)
+  );
 }
 
 export function toutesLesClesRecuperation(): CleRecuperation[] {

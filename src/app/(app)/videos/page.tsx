@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { hasStreamingAccess } from "@/lib/subscription/plan";
 import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +11,9 @@ export default async function VideosPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const plan = getEffectivePlan(user.subscription);
+  const aAcces = hasStreamingAccess(user, user.subscription);
   const videos =
-    plan !== "GRATUIT" ? await prisma.video.findMany({ orderBy: { createdAt: "desc" } }) : [];
+    aAcces ? await prisma.video.findMany({ orderBy: { createdAt: "desc" } }) : [];
 
   return (
     <div className="flex flex-col gap-8">
@@ -25,11 +25,11 @@ export default async function VideosPage() {
         </p>
       </div>
 
-      {plan === "GRATUIT" ? (
+      {!aAcces ? (
         <Card className="flex flex-col items-start gap-3">
-          <Badge tone="warning">Réservé à l&apos;offre Coaching Hybride</Badge>
+          <Badge tone="warning">Réservé aux membres COAI</Badge>
           <p className="text-sm text-graphite-300">
-            Passe à l&apos;offre Coaching Hybride (99€/mois) pour accéder à la bibliothèque de streaming.
+            Active un Pass IA, Coaching Hybride ou VIP pour accéder aux cours exclusifs d&apos;Anthony.
           </p>
           <Link href="/pricing">
             <Button>Voir les offres</Button>

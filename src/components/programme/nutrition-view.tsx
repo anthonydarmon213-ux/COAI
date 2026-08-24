@@ -34,7 +34,8 @@ export function NutritionView({
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="repas" />;
 
-  const { titre, vueEnsemble, contreIndications, objectifsJournaliers, conseilsHabitudes, jours, ...reste } = data as {
+  const { _source, titre, vueEnsemble, contreIndications, objectifsJournaliers, conseilsHabitudes, jours, ...reste } = data as {
+    _source?: string;
     titre?: string;
     vueEnsemble?: string;
     contreIndications?: string[];
@@ -43,6 +44,7 @@ export function NutritionView({
     jours?: Record<string, unknown>[];
     [key: string]: unknown;
   };
+  void _source;
 
   // Calories et macros sont désormais dans AnneauxMacros — ne restent en
   // badges que les éventuelles autres clés (hydratation, etc.), pour ne

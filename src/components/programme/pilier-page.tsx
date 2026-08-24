@@ -19,6 +19,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
+import { ProgrammeShareButton } from "@/components/programme/programme-share-button";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
@@ -49,6 +50,11 @@ function extractPhotoQueries(contenu: unknown): string[] {
   }
   walk(contenu);
   return Array.from(queries);
+}
+
+function estSocleCoai(contenu: unknown): boolean {
+  return typeof contenu === "object" && contenu !== null && !Array.isArray(contenu) &&
+    (contenu as Record<string, unknown>)._source === "SOCLE_COAI";
 }
 
 const LABELS: Record<Pilier, string> = {
@@ -125,7 +131,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   const contenuAffiche =
     valides[0]?.contenu ??
     (derniers[0]?.statut === "EN_ATTENTE" || derniers[0]?.statut === "GENERE_IA" ? derniers[0]?.contenu : null);
-  const photosParExercice = contenuAffiche
+  const photosParExercice = contenuAffiche && !estSocleCoai(contenuAffiche)
     ? await getStockPhotos(extractPhotoQueries(contenuAffiche))
     : undefined;
 
@@ -198,12 +204,15 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               <SectionLabel>{LABELS[pilier]}</SectionLabel>
               <div className="flex items-center gap-2">
                 {affiche && (
-                  <a
-                    href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
-                    className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-                  >
-                    Télécharger en PDF
-                  </a>
+                  <>
+                    <ProgrammeShareButton pilier={LABELS[pilier]} />
+                    <a
+                      href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
+                      className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+                    >
+                      Télécharger en PDF
+                    </a>
+                  </>
                 )}
                 {peutGenerer && <RegenerateButton hasExisting={Boolean(dernier)} />}
               </div>
@@ -216,7 +225,10 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                     <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
                   )}
                   {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
-                  {!valide && genereIA && (
+                  {!valide && genereIA && estSocleCoai(affiche?.contenu) && (
+                    <Badge tone="success">Programme COAI · conçu par Anthony Darmon</Badge>
+                  )}
+                  {!valide && genereIA && !estSocleCoai(affiche?.contenu) && (
                     <Badge tone="neutral">Généré par l&apos;IA — non relu par un coach</Badge>
                   )}
                 </div>
@@ -249,10 +261,17 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 </p>
               )}
 
-              {genereIA && (
+              {genereIA && !estSocleCoai(affiche?.contenu) && (
                 <p className="text-sm text-graphite-400">
                   Ton programme est piloté par ton Personal Trainer IA. Passe à Coaching Hybride (99€/mois)
                   pour ajouter le regard et les ajustements d&apos;un coach humain.
+                </p>
+              )}
+
+              {genereIA && estSocleCoai(affiche?.contenu) && (
+                <p className="text-sm text-graphite-400">
+                  Une méthode claire, progressive et illustrée avec la médiathèque exclusive COAI.
+                  Tes check-ins font ensuite évoluer la difficulté au fil de ta progression.
                 </p>
               )}
 
@@ -270,7 +289,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
                 if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParExercice} dureeProfil={user.profile?.dureeSeanceMinutes} />;
                 if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParExercice} />;
-                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParExercice} />;
+                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParExercice} sexe={user.profile?.sexe} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
               })()}
 

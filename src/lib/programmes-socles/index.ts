@@ -1,19 +1,25 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { cleEntrainement, cleNutrition, cleRecuperation } from "@/lib/programmes-socles/cle";
+import {
+  construireSocleEntrainement,
+  construireSocleNutrition,
+  construireSocleRecuperation,
+} from "@/lib/programmes-socles/catalogue";
 
 // Lecture des programmes socles (24/08/2026) — voir cle.ts pour le pourquoi
 // du découpage par pilier.
 //
-// Les socles vivent en JSON dans data/ plutôt qu'en base : ce sont du
-// contenu versionné, relu et corrigé comme le reste du code. Un socle
-// modifié se déploie comme un correctif, et l'historique dit qui a changé
-// quoi — ce qu'une table ne donnerait pas.
+// Un JSON éditorial peut surcharger une combinaison précise dans data/.
+// Toutes les autres combinaisons sont construites par le catalogue local
+// déterministe : zéro appel IA, contenu versionné et résultat reproductible.
 
 type ProfilSocle = {
   objectifs?: string | null;
   niveau?: string | null;
   frequenceEntrainement?: string | null;
+  allergiesAlimentaires?: string | null;
+  habitudesAlimentaires?: string | null;
 };
 
 const DOSSIER = join(process.cwd(), "src/lib/programmes-socles/data");
@@ -32,25 +38,27 @@ async function lire(sousDossier: string, cle: string): Promise<unknown | null> {
 }
 
 /**
- * Socle d'un pilier pour ce profil, ou null si la bibliothèque ne le couvre
- * pas encore. L'appelant retombe alors sur la génération sur mesure —
- * jamais sur un socle approchant : servir un programme "presque bon" est
- * précisément ce qu'on veut éviter.
+ * Socle d'un pilier pour ce profil. Un JSON relu peut remplacer la version
+ * déterministe ; sinon le catalogue produit exactement la combinaison
+ * attendue à partir des axes autorisés.
  *
  * Chaque pilier est lu indépendamment : une nutrition socle peut être servie
  * pendant qu'un entraînement est généré sur mesure, si seul ce dernier
  * manque à la bibliothèque.
  */
 export async function socleEntrainement(profil: ProfilSocle) {
-  return lire("entrainement", cleEntrainement(profil));
+  const cle = cleEntrainement(profil);
+  return (await lire("entrainement", cle)) ?? construireSocleEntrainement(cle);
 }
 
 export async function socleNutrition(profil: ProfilSocle) {
-  return lire("nutrition", cleNutrition(profil));
+  const cle = cleNutrition(profil);
+  return (await lire("nutrition", cle)) ?? construireSocleNutrition(cle);
 }
 
 export async function socleRecuperation(profil: ProfilSocle) {
-  return lire("recuperation", cleRecuperation(profil));
+  const cle = cleRecuperation(profil);
+  return (await lire("recuperation", cle)) ?? construireSocleRecuperation(cle);
 }
 
 /**
@@ -65,7 +73,23 @@ export async function socleRecuperation(profil: ProfilSocle) {
 export function socleAcceptable(profil: {
   contraintesSante?: string | null;
   statutMaternite?: string | null;
+  allergiesAlimentaires?: string | null;
 }): boolean {
   if (profil.statutMaternite) return false;
-  return (profil.contraintesSante ?? "").trim().length === 0;
+  const estVide = (valeur: string | null | undefined) => {
+    const normalisee = (valeur ?? "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "");
+    return !normalisee || /^(aucun|aucune|neant|non|ras|r\.a\.s\.?|rien)$/.test(normalisee);
+  };
+  if (!estVide(profil.contraintesSante)) return false;
+  const alimentation = (profil.allergiesAlimentaires ?? "").trim().toLowerCase();
+  if (estVide(alimentation)) return true;
+  // Les régimes éditoriaux couverts ont leur propre menu. Une allergie ou
+  // intolérance médicale spécifique reste hors socle : la simple exclusion
+  // d'un mot ne suffit pas à garantir l'absence de traces ou de dérivés.
+  if (/allerg|intol[ée]ran/.test(alimentation)) return false;
+  return /sans gluten|gluten free|v[ée]g[ée]tar|vegan|v[ée]g[ée]talien|pal[ée]o/.test(alimentation);
 }
