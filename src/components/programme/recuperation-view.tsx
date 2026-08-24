@@ -1,10 +1,7 @@
 import { JsonView } from "@/components/programme/json-view";
 import Image from "next/image";
-import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
 
-// Vue dédiée au pilier RÉCUPÉRATION : mêmes codes visuels que l'entraînement
-// et la nutrition (vue d'ensemble + un jour par carte repliable).
 import { photoRecuperationPourTexte } from "@/lib/recuperation/photos-recuperation";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -34,50 +31,82 @@ export function RecuperationView({
     [key: string]: unknown;
   };
   void _source;
+  const joursUtiles = Array.isArray(jours)
+    ? jours.filter((jour) => Object.entries(jour).some(([cle, valeur]) =>
+        !["jour", "type", "photoQueryJour"].includes(cle) &&
+        valeur !== null && valeur !== undefined && valeur !== "" &&
+        (!Array.isArray(valeur) || valeur.length > 0)
+      ))
+    : [];
+  const jourActuel = new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long",
+    timeZone: "Europe/Paris",
+  }).format(new Date());
+  const normaliser = (texte: string) =>
+    texte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const recuperationDuJour =
+    joursUtiles.find((jour) => normaliser(String(jour.jour ?? "")) === normaliser(jourActuel)) ??
+    joursUtiles[0];
+
+  const rendreRecuperation = (jourData: Record<string, unknown>) => {
+    const { jour, type, sommeil, photoQueryJour, ...detailJour } = jourData;
+    void jour;
+    void photoQueryJour;
+    void photosParExercice;
+    const texteDuJour = [type, sommeil, ...Object.values(detailJour)]
+      .filter((v): v is string => typeof v === "string")
+      .join(" ");
+    const photoJourUrl = photoRecuperationPourTexte(texteDuJour, sexe);
+
+    return (
+      <div className="overflow-hidden rounded-2xl border border-laiton-400/25 bg-white/[0.025] shadow-[0_24px_70px_-45px_rgba(201,162,98,0.65)]">
+        {photoJourUrl && (
+          <div className="relative h-52 overflow-hidden bg-black sm:h-64">
+            <Image src={photoJourUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 760px" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
+                Récupération du jour
+              </p>
+              <h3 className="mt-1 font-display text-xl font-semibold text-white">
+                {typeof type === "string" ? type : "Prends soin de ton corps"}
+              </h3>
+            </div>
+          </div>
+        )}
+        <div className="flex flex-col gap-3 p-4 sm:p-5">
+          {!photoJourUrl && (
+            <div>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
+                Récupération du jour
+              </p>
+              <h3 className="mt-1 font-display text-xl font-semibold text-white">
+                {typeof type === "string" ? type : "Prends soin de ton corps"}
+              </h3>
+            </div>
+          )}
+          {typeof sommeil === "string" && sommeil.trim() && (
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300">Sommeil</p>
+              <p className="mt-1.5 text-sm leading-6 text-graphite-200">{sommeil}</p>
+            </div>
+          )}
+          <JsonView data={detailJour} />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="coai-recovery-view flex flex-col gap-5">
       {showContreIndications && <ContreIndications items={contreIndications} />}
-      <SemainePlan
-        titre={titre}
-        vueEnsemble={vueEnsemble}
-        vueEnsembleLabel="🌙 Principes de la semaine"
-        jours={Array.isArray(jours) ? jours : []}
-        labelJour={(jourData) => {
-          const jour = String(jourData.jour ?? "");
-          const type = typeof jourData.type === "string" ? jourData.type : undefined;
-          return type ? `${jour} — ${type}` : jour;
-        }}
-        renderContenu={(jourData) => {
-          const { jour, type, sommeil, photoQueryJour, ...detailJour } = jourData;
-          void jour;
-          // Photo COAI d'abord (24/08/2026), sur le contenu réel de la
-          // journée plutôt que sur la requête Pexels : "rouleau de mousse
-          // sur les quadriceps" trouve la bonne image, là où la recherche
-          // par mots-clés renvoyait des photos de spa sans rapport.
-          const texteDuJour = [type, sommeil, ...Object.values(detailJour)]
-            .filter((v): v is string => typeof v === "string")
-            .join(" ");
-          const photoJourUrl =
-            photoRecuperationPourTexte(texteDuJour, sexe) ??
-            (typeof photoQueryJour === "string" ? photosParExercice?.[photoQueryJour] ?? null : null);
-          return (
-            <div className="flex flex-col gap-3">
-              {photoJourUrl && (
-                // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
-                <img src={photoJourUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
-              )}
-              {typeof sommeil === "string" && sommeil.trim() && (
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-laiton-300">🌙 Sommeil</p>
-                  <p className="mt-1.5 text-sm leading-6 text-graphite-200">{sommeil}</p>
-                </div>
-              )}
-              <JsonView data={detailJour} />
-            </div>
-          );
-        }}
-      />
+      {(titre || vueEnsemble) && (
+        <div>
+          {titre && <h3 className="font-editorial text-2xl text-graphite-50">{titre}</h3>}
+          {vueEnsemble && <p className="mt-2 text-sm leading-6 text-graphite-300">{vueEnsemble}</p>}
+        </div>
+      )}
+      {recuperationDuJour && rendreRecuperation(recuperationDuJour)}
 
       {Array.isArray(protocoles) && protocoles.length > 0 && (
         <section className="flex flex-col gap-3">

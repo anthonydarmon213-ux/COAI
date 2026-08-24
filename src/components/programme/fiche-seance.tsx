@@ -1,7 +1,6 @@
 import { MUSCLE_LABEL, musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
-import { photoFiablePourNom } from "@/lib/exercices/photo-fiable";
 
 // Fiche de séance partageable (23/08/2026, format validé par Anthony sur
 // maquette) — pensée pour être imprimée en PDF et postée en story.
@@ -141,7 +140,7 @@ export function FicheSeance({
       {/* Exercices */}
       {valides.map((ex, i) => {
         const nom = texte(ex.nom) ?? `Exercice ${i + 1}`;
-        const photo = photoCoaiPourNom(nom) ?? photoFiablePourNom(nom);
+        const photo = photoCoaiPourNom(nom);
         const cible = musclesPourExercice(nom);
         const variante = variantesPourExercice(nom)[0];
         const methode = texte(ex.methode);
@@ -154,7 +153,7 @@ export function FicheSeance({
                 <img
                   src={photo}
                   alt=""
-                  className="h-full w-full object-cover [filter:grayscale(1)_contrast(1.12)_brightness(0.88)]"
+                  className="h-full w-full object-contain [filter:grayscale(1)_contrast(1.12)_brightness(0.88)]"
                   loading="lazy"
                 />
               )}

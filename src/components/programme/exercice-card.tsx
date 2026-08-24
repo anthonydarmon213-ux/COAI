@@ -7,7 +7,6 @@ import { animationPourExercice } from "@/lib/exercices/animations";
 import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
-import { photoFiablePourNom } from "@/lib/exercices/photo-fiable";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
 // clé/valeur) : repères façon "readout" HUD, mise en page dense mais aérée.
@@ -80,15 +79,10 @@ export function ExerciceCard({
 
   if (!isPlainObject(exercice)) return null;
   const nom = typeof exercice.nom === "string" ? exercice.nom : undefined;
-  const photoQuery = typeof exercice.photoQuery === "string" ? exercice.photoQuery : undefined;
-  // Ordre de priorité (23/08/2026) : photo COAI tournée dans la charte,
-  // puis Free Exercise DB (photo liée à l'exercice exact par un humain),
-  // puis Pexels en dernier — la source qui donnait des photos fausses,
-  // conservée seulement pour ne pas laisser une carte sans visuel.
-  const photoUrl =
-    (nom ? photoCoaiPourNom(nom) : null) ??
-    (nom ? photoFiablePourNom(nom) : null) ??
-    (photoQuery ? photosParExercice?.[photoQuery] ?? null : null);
+  void photosParExercice;
+  // Une photo COAI exacte, ou rien. Les anciennes images génériques ont été
+  // retirées : une absence est préférable à une démonstration trompeuse.
+  const photoUrl = nom ? photoCoaiPourNom(nom) : null;
   const hasTechniqueValidee = Boolean(nom && animationPourExercice(nom));
   const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
@@ -114,7 +108,7 @@ export function ExerciceCard({
           className="group/thumb relative h-44 w-full overflow-hidden rounded-lg"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental */}
-          <img src={photoUrl} alt="" className="h-full w-full object-cover transition duration-500 group-hover/thumb:scale-[1.03]" loading="lazy" />
+          <img src={photoUrl} alt="" className="h-full w-full bg-black object-contain transition duration-500 group-hover/thumb:scale-[1.03]" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" aria-hidden="true" />
           <span className="absolute left-3 top-3 rounded-full border border-white/25 bg-black/45 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
             Vidéo technique
@@ -133,7 +127,7 @@ export function ExerciceCard({
       {photoUrl && nom && !videoOuverte && !hasTechniqueValidee && (
         <div className="relative h-44 w-full overflow-hidden rounded-lg">
           {/* eslint-disable-next-line @next/next/no-img-element -- cascade locale/Free Exercise DB/Pexels */}
-          <img src={photoUrl} alt={`Position de référence : ${nom}`} className="h-full w-full object-cover" loading="lazy" />
+          <img src={photoUrl} alt={`Position de référence : ${nom}`} className="h-full w-full bg-black object-contain" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden="true" />
           <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
             Position de référence

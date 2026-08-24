@@ -73,21 +73,22 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
   // peut préciser sa situation avant d'envoyer, ce qui donne une bien
   // meilleure réponse qu'une question générique.
   const RACCOURCIS = [
-    "Je voudrais ajuster mes charges, elles me semblent",
-    "Je me sens fatigué(e) en ce moment, comment adapter ma semaine ?",
-    "Je n'ai pas le matériel prévu aujourd'hui, par quoi remplacer",
-    "J'ai une gêne quelque part, que faire pour ma prochaine séance ?",
+    { label: "Ajuster mes charges", texte: "Je voudrais ajuster mes charges, elles me semblent" },
+    { label: "Adapter ma semaine", texte: "Je me sens fatigué(e) en ce moment, comment adapter ma semaine ?" },
+    { label: "Changer un exercice", texte: "Je n'ai pas le matériel prévu aujourd'hui, par quoi remplacer" },
+    { label: "Signaler une gêne", texte: "J'ai une gêne quelque part, que faire pour ma prochaine séance ?" },
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3 rounded-t-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+    <div className="relative flex flex-col overflow-hidden rounded-[1.75rem] border border-cyan-300/15 bg-[radial-gradient(circle_at_90%_0%,rgba(76,201,240,.12),transparent_22rem),linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.015))] shadow-[0_35px_90px_-55px_rgba(76,201,240,.65),inset_0_1px_rgba(255,255,255,.08)]">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(76,201,240,.3)_1px,transparent_1px),linear-gradient(90deg,rgba(76,201,240,.3)_1px,transparent_1px)] [background-size:34px_34px]" />
+      <div className="relative flex items-center gap-3 border-b border-white/10 bg-black/20 px-5 py-4">
         <div className="relative h-10 w-10 flex-none overflow-hidden rounded-full border border-laiton-400/40">
           <Image src="/coach-ia-anthony.png" alt="" fill sizes="2.5rem" className="object-cover object-[50%_22%]" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-white">Coach COAI</p>
-          <p className="text-[11px] text-graphite-500">{loading ? "écrit…" : "répond en quelques secondes"}</p>
+          <p className="truncate text-sm font-semibold text-white">Coach COAI · Anthony</p>
+          <p className="text-[11px] text-cyan-200/70">{loading ? "analyse ton contexte…" : "prêt à t’accompagner"}</p>
         </div>
         {quotaRemaining !== null && (
           <span className="flex-none rounded-full border border-laiton-400/25 bg-laiton-400/10 px-2.5 py-1 text-[10px] font-semibold text-laiton-200">
@@ -99,11 +100,13 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
       {/* Fil de conversation en bulles — le plus ancien en haut, comme
           dans une vraie messagerie (l'historique était affiché à l'envers
           jusqu'ici, ce qui cassait la lecture d'un échange suivi). */}
-      <div className="flex min-h-[8rem] flex-col gap-3 border-x border-white/10 bg-white/[0.015] px-4 py-4">
+      <div className="relative flex min-h-[16rem] flex-col gap-3 px-5 py-5 sm:min-h-[19rem]">
         {historique.length === 0 && !loading && (
-          <p className="my-6 text-center text-xs leading-5 text-graphite-500">
-            Pose ta première question — technique, charge, fatigue, remplacement d&apos;exercice.
-          </p>
+          <div className="my-auto text-center">
+            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.08] text-xl text-cyan-200 shadow-[0_0_30px_-8px_rgba(76,201,240,.75)]">✦</span>
+            <p className="mt-4 text-sm font-semibold text-white">Comment puis-je t&apos;aider aujourd&apos;hui ?</p>
+            <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-graphite-400">Technique, progression des charges, fatigue ou adaptation de séance.</p>
+          </div>
         )}
         {historique.map((echange, i) => (
           <div key={i} className="flex flex-col gap-2">
@@ -132,16 +135,16 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
         )}
       </div>
 
-      <div className="rounded-b-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
-        <div className="coai-app-nav-scroll -mx-1 mb-2.5 flex gap-2 overflow-x-auto px-1 pb-1">
-          {RACCOURCIS.map((texte) => (
+      <div className="relative border-t border-white/10 bg-black/20 px-4 py-4 sm:px-5">
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          {RACCOURCIS.map(({ label, texte }) => (
             <button
-              key={texte}
+              key={label}
               type="button"
               onClick={() => setQuestion(texte)}
-              className="flex-none rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+              className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-left text-[11px] font-semibold text-graphite-200 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.07] hover:text-white"
             >
-              {texte.length > 34 ? `${texte.slice(0, 34)}…` : texte}
+              <span className="mr-1 text-cyan-200">↗</span> {label}
             </button>
           ))}
         </div>
@@ -152,7 +155,7 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
             placeholder="Écris ton message…"
             rows={1}
             maxLength={1000}
-            className="max-h-32 min-h-[2.75rem] w-full flex-1 resize-none rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-500 focus:border-laiton-400/50 focus:outline-none"
+            className="max-h-32 min-h-[3rem] w-full flex-1 resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-500 focus:border-cyan-300/45 focus:outline-none focus:shadow-[0_0_24px_-10px_rgba(76,201,240,.7)]"
           />
           <Button type="submit" disabled={loading || !question.trim()} className="h-11 flex-none rounded-full px-5">
             {loading ? "…" : "Envoyer"}

@@ -55,6 +55,9 @@ export function NutritionView({
         .filter(([k, v]) => !DANS_LES_ANNEAUX.includes(k) && v !== undefined && v !== null && v !== "")
         .map(([, v]) => ({ icone: "💧", texte: String(v) }))
     : [];
+  const joursUtiles = Array.isArray(jours)
+    ? jours.filter((jour) => Array.isArray(jour.repas) && jour.repas.length > 0)
+    : [];
 
   return (
     <div className="coai-nutrition-view flex flex-col gap-5">
@@ -69,27 +72,19 @@ export function NutritionView({
         badges={badgesHorsMacros}
         vueEnsemble={vueEnsemble}
         vueEnsembleLabel="🥗 Principes de la semaine"
-        jours={Array.isArray(jours) ? jours : []}
+        jours={joursUtiles}
         labelJour={(jourData) => String(jourData.jour ?? "")}
         renderContenu={(jourData) => {
-          const { repas, photoQueryJour } = jourData as { repas?: unknown[]; photoQueryJour?: unknown };
-          const photoJourUrl =
-            typeof photoQueryJour === "string" ? photosParExercice?.[photoQueryJour] : null;
-          const hero = photoJourUrl && (
-            // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
-            <img src={photoJourUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
-          );
+          const { repas } = jourData as { repas?: unknown[] };
           if (!Array.isArray(repas) || repas.length === 0) {
             return (
               <>
-                {hero}
                 <JsonView data={jourData} typeMedia="repas" />
               </>
             );
           }
           return (
             <div className="flex flex-col gap-2.5">
-              {hero}
               {repas.map((r, j) => (
                 <RepasCard key={j} repas={r} photosParExercice={photosParExercice} />
               ))}

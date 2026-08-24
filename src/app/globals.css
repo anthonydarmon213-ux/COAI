@@ -534,6 +534,50 @@ body {
 .coai-app-nav-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
 .coai-app-nav-scroll::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(124,87,32,.35); }
 
+/* COAI Core — objet signature de l'univers biométrique premium. */
+.coai-coach-hero {
+  background:
+    radial-gradient(circle at 78% 50%, rgba(76,201,240,.10), transparent 23rem),
+    radial-gradient(circle at 12% 100%, rgba(201,162,98,.10), transparent 22rem),
+    linear-gradient(112deg, #070809 0%, #0b0d0f 60%, #101416 100%);
+  box-shadow: 0 45px 120px -60px rgba(0,0,0,.95), inset 0 1px rgba(255,255,255,.07);
+}
+.coai-core::after {
+  content: "";
+  position: absolute;
+  inset: 18% 3% 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(76,201,240,.22), transparent 63%);
+  filter: blur(22px);
+  transform: translateY(28%);
+}
+.coai-core-grid {
+  opacity: .22;
+  transform: perspective(240px) rotateX(68deg) translateY(42%);
+  background-image: linear-gradient(rgba(76,201,240,.25) 1px, transparent 1px), linear-gradient(90deg, rgba(76,201,240,.25) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(circle, #000, transparent 67%);
+}
+.coai-core-ring { z-index: 1; border: 1px solid rgba(255,255,255,.11); }
+.coai-core-ring::before,
+.coai-core-ring::after { content: ""; position: absolute; border-radius: 999px; }
+.coai-core-ring::before { inset: -2px; border-top: 2px solid #d4af37; border-right: 2px solid transparent; filter: drop-shadow(0 0 8px rgba(212,175,55,.75)); }
+.coai-core-ring::after { width: 7px; height: 7px; top: 8%; left: 18%; background: #00f0ff; box-shadow: 0 0 14px #00f0ff; }
+.coai-core-ring-a { animation: coai-core-spin 12s linear infinite; transform: rotateX(62deg) rotateZ(5deg); }
+.coai-core-ring-b { animation: coai-core-spin-reverse 8s linear infinite; transform: rotateY(58deg) rotateZ(28deg); }
+.coai-core-ring-c { animation: coai-core-spin 6s linear infinite; border-color: rgba(0,240,255,.28); }
+.coai-core-center {
+  z-index: 3;
+  background: radial-gradient(circle at 36% 25%, #24292b, #090a0b 68%);
+  border: 1px solid rgba(212,175,55,.42);
+  box-shadow: 0 0 42px rgba(0,240,255,.18), 0 0 24px rgba(212,175,55,.16), inset 0 1px rgba(255,255,255,.12);
+}
+@keyframes coai-core-spin { to { transform: rotate(360deg); } }
+@keyframes coai-core-spin-reverse { to { transform: rotate(-360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .coai-core-ring-a,.coai-core-ring-b,.coai-core-ring-c { animation: none; }
+}
+
 .coai-nav-group summary::-webkit-details-marker { display: none; }
 .coai-nav-group[open] .coai-nav-chevron { transform: rotate(180deg); }
 .coai-nav-chevron { transition: transform .2s ease; }

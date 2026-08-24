@@ -23,13 +23,11 @@ export function RepasCard({
   const type = typeof repas.type === "string" ? repas.type : undefined;
   const nom = typeof repas.nom === "string" ? repas.nom : undefined;
   const quantite = typeof repas.quantite === "string" ? repas.quantite : undefined;
-  const photoQuery = typeof repas.photoQuery === "string" ? repas.photoQuery : undefined;
+  void photosParExercice;
   // Photo COAI d'abord (24/08/2026) — choisie pour ce plat précis, là où la
   // recherche Pexels par mots-clés renvoyait des assiettes sans rapport.
   // Repli sur Pexels tant que la photo du plat n'existe pas.
-  const photoUrl =
-    (nom ? photoRepasPourNom(nom) : null) ??
-    (photoQuery ? photosParExercice?.[photoQuery] ?? null : null);
+  const photoUrl = nom ? photoRepasPourNom(nom) : null;
 
   // Badges dérivés de ce que l'IA a réellement écrit sur le repas — un
   // badge "High Protein" affiché sans que le plat le soit vraiment serait

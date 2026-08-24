@@ -66,7 +66,7 @@ export default async function ProgressionPage() {
     }
   }
   const graphiquesForce = Array.from(chargesParExercice.entries())
-    .filter(([, points]) => points.length > 1)
+    .filter(([, points]) => points.length > 0)
     .map(([nom, points]) => ({ nom, points }));
   const debutBilan = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const seancesDuMois = seances.filter((seance) => seance.date >= debutBilan).length;
@@ -169,7 +169,7 @@ export default async function ProgressionPage() {
       ) : (
         <>
           {graphiquesForce.length > 0 && (
-            <div className="flex flex-col gap-3">
+            <div id="charges" className="scroll-mt-8 flex flex-col gap-3">
               <SectionLabel>Force</SectionLabel>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {graphiquesForce.map((g) => (

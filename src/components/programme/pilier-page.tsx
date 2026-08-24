@@ -197,22 +197,22 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
             </Link>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 lg:grid-cols-3">
             {etapes.map((etape, etapeIndex) => {
               const disponible = Boolean(contenusAffiches[piliersAffiches.indexOf(etape.pilier)]);
               return (
                 <a
                   key={etape.pilier}
                   href={`#pilier-${etape.pilier.toLowerCase()}`}
-                  className="group relative min-h-44 overflow-hidden rounded-2xl border border-white/10 bg-black/30"
+                  className="group relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-black/30 sm:min-h-60 lg:min-h-52"
                 >
                   <Image src={etape.image} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-55 transition duration-500 group-hover:scale-105 group-hover:opacity-70" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" aria-hidden="true" />
                   <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
                     <span>
                       <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-laiton-300">ÉTAPE {etape.numero}</span>
-                      <strong className="mt-1 block text-base text-white">{etape.titre}</strong>
-                      <span className="mt-0.5 block line-clamp-2 text-xs leading-5 text-graphite-200">{titresApercu[etapeIndex]}</span>
+                      <strong className="mt-1 block text-lg text-white lg:text-base">{etape.titre}</strong>
+                      <span className="mt-1 block line-clamp-2 max-w-[26rem] text-sm leading-5 text-graphite-100 lg:text-xs">{titresApercu[etapeIndex]}</span>
                     </span>
                     <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${disponible ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-graphite-400"}`}>
                       {disponible ? "Prêt" : "À créer"}
