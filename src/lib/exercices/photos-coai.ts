@@ -16,6 +16,27 @@
 type EntreePhoto = { motifs: string[]; fichier: string };
 
 const TABLE: EntreePhoto[] = [
+  // Yoga & Pilates (24/08/2026) — modèle féminin blond, même studio COAI.
+  // Ces motifs spécifiques restent avant « planche » et les autres motifs
+  // génériques afin de ne jamais afficher une photo de musculation à la place.
+  { motifs: ["salutation au soleil", "surya namaskar"], fichier: "yoga-01-salutation-au-soleil" },
+  { motifs: ["chien tête en bas", "chien tete en bas", "adho mukha", "downward dog"], fichier: "yoga-02-chien-tete-en-bas" },
+  { motifs: ["guerrier ii", "virabhadrasana ii", "warrior ii"], fichier: "yoga-03-guerrier-ii" },
+  { motifs: ["posture de l'arbre", "arbre yoga", "vrksasana", "tree pose"], fichier: "yoga-04-arbre" },
+  { motifs: ["cobra", "bhujangasana"], fichier: "yoga-05-cobra" },
+  { motifs: ["triangle yoga", "trikonasana", "triangle pose"], fichier: "yoga-06-triangle" },
+  { motifs: ["pigeon yoga", "eka pada rajakapotasana", "pigeon pose"], fichier: "yoga-07-pigeon" },
+  { motifs: ["savasana", "relaxation finale yoga", "corpse pose"], fichier: "yoga-08-savasana" },
+
+  { motifs: ["the hundred", "hundred pilates"], fichier: "pilates-01-the-hundred" },
+  { motifs: ["roll-up", "roll up pilates"], fichier: "pilates-02-roll-up" },
+  { motifs: ["plank pilates", "planche pilates", "pilates plank"], fichier: "pilates-03-plank-pilates" },
+  { motifs: ["teaser pilates", "pilates teaser"], fichier: "pilates-04-teaser" },
+  { motifs: ["side-lying leg lift", "side lying leg lift", "élévation jambe latérale pilates", "elevation jambe laterale pilates"], fichier: "pilates-05-side-lying-leg-lift" },
+  { motifs: ["swimming pilates", "pilates swimming"], fichier: "pilates-06-swimming" },
+  { motifs: ["bridge pilates", "pont pilates", "pilates bridge"], fichier: "pilates-07-bridge-pont-pilates" },
+  { motifs: ["spine stretch forward", "étirement colonne pilates", "etirement colonne pilates"], fichier: "pilates-08-spine-stretch-forward" },
+
   { motifs: ["fentes avant", "fente avant", "fentes haltères", "lunge"], fichier: "fentes-avant-halteres" },
   { motifs: ["leg curl", "ischio"], fichier: "leg-curl-allonge" },
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split", "split squat"], fichier: "fentes-bulgares" },
