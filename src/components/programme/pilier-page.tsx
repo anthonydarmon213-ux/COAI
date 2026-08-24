@@ -177,7 +177,12 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <ProgrammeShareButton />
+              <ProgrammeShareButton cartes={etapes.map((etape, index) => ({
+                numero: etape.numero,
+                label: LABELS[etape.pilier].toUpperCase(),
+                titre: titresApercu[index] ?? etape.sousTitre,
+                image: etape.image,
+              }))} />
             </div>
           </div>
 
