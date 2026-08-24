@@ -84,7 +84,7 @@ export default async function EvolutionPage() {
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">
           Chaque ajustement de ton programme est expliqué ici — jamais de changement silencieux.
-          COAI apprend de tes séances et de tes check-ins pour faire évoluer ce qui doit l&apos;être,
+          COAI apprend de tes séances et de tes bilans pour faire évoluer ce qui doit l&apos;être,
           et garder le reste.
         </p>
       </div>

@@ -92,9 +92,9 @@ export default async function CoachPage() {
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Prochaine étape</p>
             {checkinSemaine ? (
               <>
-                <h2 className="mt-2 text-lg font-semibold text-white">Check-in de la semaine fait ✓</h2>
+                <h2 className="mt-2 text-lg font-semibold text-white">Bilan de la semaine fait ✓</h2>
                 <p className="mt-1.5 text-xs leading-5 text-graphite-400">
-                  Prochain bilan hebdomadaire lundi prochain. D&apos;ici là, tes check-ins quotidiens continuent d&apos;affiner ton programme.
+                  Prochain bilan hebdomadaire lundi prochain. D&apos;ici là, tes bilans quotidiens continuent d&apos;affiner ton programme.
                 </p>
               </>
             ) : (

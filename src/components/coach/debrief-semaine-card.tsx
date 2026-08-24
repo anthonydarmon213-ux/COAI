@@ -63,13 +63,13 @@ export function DebriefSemaineCard({ debrief }: { debrief: DebriefSemaine }) {
           icone="🌙"
           label="Récupération"
           puce={debrief.recuperation}
-          vide="Fais tes check-ins quotidiens pour voir ce score apparaître."
+          vide="Fais tes bilans quotidiens pour voir ce score apparaître."
           accent="text-[#7fafc3]"
         />
       </div>
 
       <p className="mt-3 text-[11px] leading-4 text-graphite-500">
-        Calculé à partir de tes séances et check-ins réellement enregistrés — pas une estimation.
+        Calculé à partir de tes séances et bilans réellement enregistrés — pas une estimation.
       </p>
     </section>
   );

@@ -18,7 +18,7 @@ export function StreakBadgesCard({ gamification }: { gamification: Gamification 
           </h2>
           {streakJours === 0 ? (
             <p className="mt-1 text-xs leading-5 text-graphite-500">
-              Une séance ou un check-in aujourd&apos;hui lance ta série.
+              Une séance ou un bilan aujourd&apos;hui lance ta série.
             </p>
           ) : !actifAujourdhui ? (
             <p className="mt-1 text-xs leading-5 text-[#ffb17d]">

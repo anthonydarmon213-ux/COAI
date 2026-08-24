@@ -3,7 +3,6 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { DailyExperience } from "@/components/daily/daily-experience";
-import { ActiviteQuotidienneCard } from "@/components/dashboard/activite-quotidienne-card";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
@@ -29,6 +28,7 @@ import { MonitoringSanteCard } from "@/components/dashboard/monitoring-sante-car
 import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
+import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -41,6 +41,17 @@ const MANTRAS = [
 ];
 
 const JOURS_COURTS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+function nomSeanceCourt(nom: string) {
+  const normalise = nom.toLowerCase();
+  if (normalise.includes("full body") || normalise.includes("corps entier")) {
+    if (normalise.includes("force")) return "Corps entier — Force";
+    if (normalise.includes("hypertroph")) return "Corps entier — Muscle";
+    if (normalise.includes("métabol")) return "Corps entier — Dynamique";
+    return "Corps entier";
+  }
+  return nom.length > 42 ? `${nom.slice(0, 39).trim()}…` : nom;
+}
 
 function startOfWeek(date: Date) {
   const result = new Date(date);
@@ -126,7 +137,9 @@ export default async function DashboardPage() {
   const week = getWeek(date, programme?.contenu);
   const weeklyWorkoutCount = week.filter((day) => day.workout).length;
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
-  const objective = sourceSession?.nom ? `Aujourd’hui, on travaille ${String(sourceSession.nom).toLowerCase()}.` : "Une journée utile, adaptée à ton rythme.";
+  const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
+  const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
+  const mantra = MANTRAS[Math.floor(date.getTime() / 86_400_000) % MANTRAS.length];
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
   const hasAccess = hasProgrammeAccess(user, user.subscription);
   const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
@@ -161,15 +174,15 @@ export default async function DashboardPage() {
         ? !daily?.sleep
           ? {
               kicker: "Ta mission du jour",
-              title: "Fais ton check-in — 30 secondes.",
+              title: "Fais ton bilan du jour — 30 secondes.",
               description: "Forme, sommeil, douleur, temps et matériel : COAI ajuste ta séance avant que tu la commences.",
               href: "#check-in-du-jour",
-              cta: "Faire mon check-in →",
+              cta: "Faire mon bilan →",
             }
           : {
               kicker: "Ta mission du jour",
               title: sourceSession?.nom ? String(sourceSession.nom) : "Ta séance du jour t'attend.",
-              description: "Ton check-in est fait, ta séance est prête et adaptée à ta forme du jour.",
+              description: "Ton bilan est fait, ta séance est prête et adaptée à ta forme du jour.",
               href: "#check-in-du-jour",
               cta: "Voir ma séance →",
             }
@@ -197,12 +210,15 @@ export default async function DashboardPage() {
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-6 px-6 py-7 sm:px-8 sm:py-9">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-5">
-            <DashboardAvatar score={completion.pourcentage} />
+            <DashboardAvatar resultat={ageCoai} />
             <div>
               <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
                 {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
               </h1>
               <p className="mt-2 max-w-xl text-base leading-7 text-graphite-300">{objective}</p>
+              <p className="mt-3 max-w-xl border-l border-laiton-400/55 pl-4 font-editorial text-base italic leading-6 text-laiton-100/90">
+                « {mantra} »
+              </p>
             </div>
           </div>
           <ReadinessCard readiness={readiness} compact />
@@ -260,6 +276,8 @@ export default async function DashboardPage() {
         <AnneauxMacros objectifsJournaliers={objectifsMacros} />
         <DeskResetCard />
       </div>
+
+      <ReperesDuJour habitudeHydratation={user.profile?.hydratation} />
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link

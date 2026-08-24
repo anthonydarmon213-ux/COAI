@@ -30,10 +30,10 @@ const CONTENU_PAR_PLAN: Record<
 > = {
   GRATUIT: {
     formule: "Pass IA",
-    sousTitre: "Ton Personal Trainer IA reste disponible 24h/24 et fait évoluer ton programme.",
+    sousTitre: "Ton coach personnel augmenté reste disponible 24h/24 et fait évoluer ton programme.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
-      { titre: "Ton check-in", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
+      { titre: "Ton bilan du jour", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
       { titre: "Ta séance s'adapte", texte: "Entraînement, nutrition et récupération évoluent avec ta vraie vie." },
       { titre: "Ton PT IA", texte: "Une réponse immédiate, même le soir et le week-end." },
     ],
@@ -43,7 +43,7 @@ const CONTENU_PAR_PLAN: Record<
     sousTitre: "L'IA apporte la disponibilité ; le coach humain apporte le regard et la subtilité.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
-      { titre: "Ton check-in", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
+      { titre: "Ton bilan du jour", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
       { titre: "Validé par ton coach", texte: "Un regard humain relit, nuance et ajuste les décisions importantes." },
       { titre: "Suivi jusqu'à ton objectif", texte: "Ton coach revient vers toi si besoin — jusqu'à ce que tu y sois." },
     ],

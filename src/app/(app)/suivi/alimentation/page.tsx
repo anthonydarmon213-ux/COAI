@@ -31,7 +31,7 @@ export default async function AlimentationSuiviPage() {
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Journal nutrition.</h1>
         <p className="text-sm text-graphite-400">
-          Un check-in rapide par jour, pas un journal alimentaire complet à remplir à chaque repas.
+          Un bilan rapide par jour, pas un journal alimentaire complet à remplir à chaque repas.
         </p>
       </div>
       <RepasForm />
@@ -46,7 +46,7 @@ export default async function AlimentationSuiviPage() {
             </Card>
           );
         })}
-        {repasLogs.length === 0 && <p className="text-graphite-400">Aucun check-in pour l&apos;instant.</p>}
+        {repasLogs.length === 0 && <p className="text-graphite-400">Aucun bilan pour l&apos;instant.</p>}
       </div>
     </div>
   );
