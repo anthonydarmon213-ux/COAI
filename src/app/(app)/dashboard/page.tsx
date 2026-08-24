@@ -161,8 +161,8 @@ export default async function DashboardPage() {
         ? !daily?.sleep
           ? {
               kicker: "Ta mission du jour",
-              title: "Fais ton check-in — 45 secondes.",
-              description: "Sommeil, énergie, douleur éventuelle : ces réponses ajustent ta séance du jour avant que tu la commences.",
+              title: "Fais ton check-in — 30 secondes.",
+              description: "Forme, sommeil, douleur, temps et matériel : COAI ajuste ta séance avant que tu la commences.",
               href: "#check-in-du-jour",
               cta: "Faire mon check-in →",
             }
