@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { MuscleMap } from "@/components/programme/muscle-map";
-import { ExerciceAnimation } from "@/components/programme/exercice-animation";
-import { animationPourExercice } from "@/lib/exercices/animations";
+import { ExerciceVideo } from "@/components/programme/exercice-video";
 import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
 // clé/valeur) : repères façon "readout" HUD, mise en page dense mais aérée.
@@ -69,7 +69,6 @@ export function ExerciceCard({
   // photo inventée (absente du map ou clé null → aucune image affichée).
   photosParExercice?: Record<string, string | null>;
 }) {
-  const [videoOuverte, setVideoOuverte] = useState(false);
   // Substitution matériel (23/08/2026, demande Anthony) — purement locale :
   // remplacer l'exercice dans le programme enregistré demanderait de
   // régénérer la séance côté serveur. Ici la personne voit l'alternative
@@ -83,7 +82,7 @@ export function ExerciceCard({
   // Une photo COAI exacte, ou rien. Les anciennes images génériques ont été
   // retirées : une absence est préférable à une démonstration trompeuse.
   const photoUrl = nom ? photoCoaiPourNom(nom) : null;
-  const hasTechniqueValidee = Boolean(nom && animationPourExercice(nom));
+  const hasVideoReelle = Boolean(nom && videoCoaiPourNom(nom));
   const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
   const consignesLongues = CHAMPS.flatMap(({ cle, label }) => {
@@ -100,62 +99,24 @@ export function ExerciceCard({
     <div className="coai-exercise-card group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 pl-5 transition duration-300 hover:border-laiton-400/25 hover:bg-white/[0.035]">
       <div className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-laiton-400 via-laiton-500/70 to-transparent" />
 
-      {photoUrl && nom && !videoOuverte && hasTechniqueValidee && (
-        <button
-          type="button"
-          onClick={() => setVideoOuverte(true)}
-          aria-label={`Voir la technique : ${nom}`}
-          className="group/thumb relative h-44 w-full overflow-hidden rounded-lg"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental */}
-          <img src={photoUrl} alt="" className="h-full w-full bg-black object-contain transition duration-500 group-hover/thumb:scale-[1.03]" loading="lazy" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" aria-hidden="true" />
-          <span className="absolute left-3 top-3 rounded-full border border-white/25 bg-black/45 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
-            Vidéo technique
-          </span>
-          <span
-            className="absolute inset-0 flex items-center justify-center"
-            aria-hidden="true"
-          >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/40 bg-black/40 text-white backdrop-blur-sm transition group-hover/thumb:scale-110 group-hover/thumb:bg-laiton-400/85 group-hover/thumb:border-laiton-300">
-              <svg viewBox="0 0 24 24" className="ml-0.5 h-6 w-6 fill-current"><path d="M8 5v14l11-7z" /></svg>
-            </span>
-          </span>
-        </button>
-      )}
-
-      {photoUrl && nom && !videoOuverte && !hasTechniqueValidee && (
-        <div className="relative h-44 w-full overflow-hidden rounded-lg">
+      {(photoUrl || hasVideoReelle) && nom && (
+        <div className={`grid gap-2 ${photoUrl && hasVideoReelle ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+          {photoUrl && (
+            <div className="relative h-44 w-full overflow-hidden rounded-lg">
           {/* eslint-disable-next-line @next/next/no-img-element -- cascade locale/Free Exercise DB/Pexels */}
-          <img src={photoUrl} alt={`Position de référence : ${nom}`} className="h-full w-full bg-black object-contain" loading="lazy" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden="true" />
-          <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
-            Position de référence
-          </span>
+              <img src={photoUrl} alt={`Position de référence : ${nom}`} className="h-full w-full bg-black object-contain" loading="lazy" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden="true" />
+              <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
+                Position de référence
+              </span>
+            </div>
+          )}
+          {hasVideoReelle && <ExerciceVideo nom={nom} className="w-full" />}
         </div>
       )}
 
       <div className="flex items-start justify-between gap-3">
         <h4 className="text-sm font-semibold text-graphite-50">{nom ?? "Exercice"}</h4>
-        {nom && !photoUrl && hasTechniqueValidee && (
-          <button
-            type="button"
-            onClick={() => setVideoOuverte((v) => !v)}
-            aria-expanded={videoOuverte}
-            className="coai-technique-button shrink-0 whitespace-nowrap rounded-full border border-laiton-400/25 bg-laiton-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-laiton-300 transition hover:border-laiton-400/50 hover:bg-laiton-400/20"
-          >
-            {videoOuverte ? "✕ Fermer" : "▶ Technique"}
-          </button>
-        )}
-        {nom && photoUrl && videoOuverte && hasTechniqueValidee && (
-          <button
-            type="button"
-            onClick={() => setVideoOuverte(false)}
-            className="coai-technique-button shrink-0 whitespace-nowrap rounded-full border border-laiton-400/25 bg-laiton-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-laiton-300 transition hover:border-laiton-400/50 hover:bg-laiton-400/20"
-          >
-            ✕ Fermer la vidéo
-          </button>
-        )}
       </div>
 
       {/* Double vue (23/08/2026, demande Anthony) — anatomie à gauche,
@@ -249,10 +210,6 @@ export function ExerciceCard({
             </div>
           )}
         </div>
-      )}
-
-      {videoOuverte && nom && animationPourExercice(nom) && (
-        <ExerciceAnimation nom={nom} className="w-full" />
       )}
 
       {/* Les phases d'exécution étaient rendues ici ET dans la double vue

@@ -153,7 +153,7 @@ export function FicheSeance({
                 <img
                   src={photo}
                   alt=""
-                  className="h-full w-full object-contain [filter:grayscale(1)_contrast(1.12)_brightness(0.88)]"
+                  className="h-full w-full object-contain"
                   loading="lazy"
                 />
               )}
