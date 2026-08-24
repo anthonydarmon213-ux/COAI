@@ -74,7 +74,9 @@ export default async function CoachPage() {
             <div className="coai-core-center absolute inset-[37%] flex items-center justify-center rounded-full">
               <CoaiMark size={58} />
             </div>
-            <span className="absolute bottom-[17%] right-[9%] rounded-full border border-cyan-200/30 bg-black/70 px-2.5 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-cyan-200">Live</span>
+            <span className="absolute bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-cyan-200/30 bg-black/80 px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-cyan-200 shadow-[0_0_24px_rgba(76,201,240,.18)] sm:bottom-2">
+              En direct
+            </span>
           </div>
         </div>
         {plan === "GRATUIT" && <div className="relative mt-5"><Badge tone="warning">{quota.remaining} question(s) restante(s) sur 4</Badge></div>}

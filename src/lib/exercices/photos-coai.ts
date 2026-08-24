@@ -149,7 +149,7 @@ const TABLE: EntreePhoto[] = [
 
 /**
  * Photo COAI pour un exercice, ou null si aucune ne lui correspond
- * exactement. L'appelant retombe alors sur Free Exercise DB puis Pexels.
+ * exactement. Aucun visuel générique ne doit être utilisé en remplacement.
  */
 export function photoCoaiPourNom(nom: string): string | null {
   const normalise = nom

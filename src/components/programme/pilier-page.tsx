@@ -78,25 +78,16 @@ const PDF_SLUG: Record<Pilier, string> = {
   RECUPERATION: "recuperation",
 };
 
-// Programme regroupé en une seule page (16/08/2026, demande Anthony — "je ne
-// veux plus qu'on sépare les 3 piliers") : entraînement, nutrition et
-// récupération s'affichent désormais empilés sur une même page au lieu de 3
-// pages distinctes avec un sélecteur d'onglets. Les 3 anciennes routes
-// (/programme/entrainement, /alimentation, /recuperation) restent en place
-// et rendent toutes ce même composant — les liens existants ailleurs dans
-// l'app (email coach, onboarding, dashboard...) continuent de fonctionner
-// sans devoir être réécrits un par un.
+// Chaque pilier possède sa page dédiée. Le composant reste partagé pour
+// conserver la même qualité visuelle, mais il ne rend que le contenu demandé
+// par la route active : entraînement, alimentation ou récupération.
 export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  // Les trois piliers forment un seul parcours, toujours présenté dans le
-  // même ordre pédagogique quelle que soit l'ancienne route utilisée.
-  void pilierActif;
-  const piliersAffiches: Pilier[] = PILIERS;
   const [valides, derniers] = await Promise.all([
     Promise.all(
-      piliersAffiches.map((pilier) =>
+      PILIERS.map((pilier) =>
         prisma.programmeGenerated.findFirst({
           where: { userId: user.id, pilier, statut: "VALIDE" },
           orderBy: { generatedAt: "desc" },
@@ -104,7 +95,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
       )
     ),
     Promise.all(
-      piliersAffiches.map((pilier) =>
+      PILIERS.map((pilier) =>
         prisma.programmeGenerated.findFirst({
           where: { userId: user.id, pilier },
           orderBy: { generatedAt: "desc" },
@@ -115,31 +106,34 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
 
   const plan = getEffectivePlan(user.subscription);
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
-  const aUnContenu = valides.some(Boolean) || derniers.some(Boolean);
+  const indexPilierActif = PILIERS.indexOf(pilierActif);
+  const aUnContenu = Boolean(valides[indexPilierActif] || derniers[indexPilierActif]);
 
   // Score sommeil (19/08/2026, demande Anthony) — requête limitée au pilier
   // Récupération, jamais chargée pour Entraînement/Nutrition.
-  const scoreSommeil = calculerScoreSommeil(
-    await prisma.dailySession.findMany({
-      where: { userId: user.id, date: { gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) } },
-      select: { sleep: true, date: true },
-    }),
-    user.profile?.qualiteSommeil
-  );
+  const scoreSommeil = pilierActif === "RECUPERATION"
+    ? calculerScoreSommeil(
+        await prisma.dailySession.findMany({
+          where: { userId: user.id, date: { gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) } },
+          select: { sleep: true, date: true },
+        }),
+        user.profile?.qualiteSommeil
+      )
+    : null;
 
   // Photos Pexels (19/08/2026, demande Anthony, étendu aux 3 piliers) :
   // résolues une seule fois ici (Server Component, clé jamais exposée au
   // client) à partir des "photoQuery"/"photoQuerySeance"/"photoQueryJour"
   // que l'IA génère elle-même dans le contenu (cf. extractPhotoQueries).
-  const contenusAffiches = piliersAffiches.map((_, index) =>
+  const contenusAffiches = PILIERS.map((_, index) =>
     valides[index]?.contenu ??
     (derniers[index]?.statut === "EN_ATTENTE" || derniers[index]?.statut === "GENERE_IA"
       ? derniers[index]?.contenu
       : null)
   );
   const photosParPilier = await Promise.all(
-    contenusAffiches.map((contenu) =>
-      contenu && !estSocleCoai(contenu)
+    contenusAffiches.map((contenu, index) =>
+      index === indexPilierActif && contenu && !estSocleCoai(contenu)
         ? getStockPhotos(extractPhotoQueries(contenu))
         : Promise.resolve(undefined)
     )
@@ -152,6 +146,23 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
     { pilier: "NUTRITION" as Pilier, numero: "02", titre: "Bien manger", sousTitre: "Tes repas et tes portions", image: "/repas/plat-saumon-quinoa-brocolis.jpg" },
     { pilier: "RECUPERATION" as Pilier, numero: "03", titre: "Récupérer", sousTitre: "Sommeil, mobilité et détente", image: recupHero },
   ];
+  // pilierActif est typé par Prisma et ne peut être qu'une des trois valeurs
+  // de PILIERS ; l'assertion évite de propager un faux cas undefined.
+  const etapeActive = etapes[indexPilierActif]!;
+  const heroParPilier: Record<Pilier, { titre: string; texte: string }> = {
+    ENTRAINEMENT: {
+      titre: "Ton entraînement.",
+      texte: "Ta séance, tes exercices et ta progression — immédiatement accessibles.",
+    },
+    NUTRITION: {
+      titre: "Ton alimentation.",
+      texte: "Tes repas, tes portions et tes repères nutritionnels — simples à suivre.",
+    },
+    RECUPERATION: {
+      titre: "Ta récupération.",
+      texte: "Sommeil, mobilité et détente — seulement les actions utiles aujourd'hui.",
+    },
+  };
 
   const titresApercu = contenusAffiches.map((contenu, index) => {
     if (typeof contenu !== "object" || contenu === null || Array.isArray(contenu)) return etapes[index]?.sousTitre ?? "Programme prêt";
@@ -169,20 +180,20 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
             <div>
               <div className="coai-diagnostic-kicker mb-4 w-fit">
                 <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                <span>Ton parcours personnalisé</span>
+                <span>{LABELS[pilierActif]}</span>
               </div>
-              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Ton plan en un coup d&apos;œil.</h1>
+              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{heroParPilier[pilierActif].titre}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
-                Trois fiches visuelles. Ouvre seulement le niveau de détail dont tu as besoin.
+                {heroParPilier[pilierActif].texte}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <ProgrammeShareButton cartes={etapes.map((etape, index) => ({
-                numero: etape.numero,
-                label: LABELS[etape.pilier].toUpperCase(),
-                titre: titresApercu[index] ?? etape.sousTitre,
-                image: etape.image,
-              }))} />
+              <ProgrammeShareButton cartes={[{
+                numero: etapeActive.numero,
+                label: LABELS[pilierActif].toUpperCase(),
+                titre: titresApercu[indexPilierActif] ?? etapeActive.sousTitre,
+                image: etapeActive.image,
+              }]} />
             </div>
           </div>
 
@@ -197,31 +208,23 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
             </Link>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-3">
-            {etapes.map((etape, etapeIndex) => {
-              const disponible = Boolean(contenusAffiches[piliersAffiches.indexOf(etape.pilier)]);
-              return (
-                <a
-                  key={etape.pilier}
-                  href={`#pilier-${etape.pilier.toLowerCase()}`}
-                  className="group relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-black/30 sm:min-h-60 lg:min-h-52"
-                >
-                  <Image src={etape.image} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-55 transition duration-500 group-hover:scale-105 group-hover:opacity-70" />
-                  <span className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" aria-hidden="true" />
-                  <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
-                    <span>
-                      <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-laiton-300">ÉTAPE {etape.numero}</span>
-                      <strong className="mt-1 block text-lg text-white lg:text-base">{etape.titre}</strong>
-                      <span className="mt-1 block line-clamp-2 max-w-[26rem] text-sm leading-5 text-graphite-100 lg:text-xs">{titresApercu[etapeIndex]}</span>
-                    </span>
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${disponible ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-graphite-400"}`}>
-                      {disponible ? "Prêt" : "À créer"}
-                    </span>
-                  </span>
-                </a>
-              );
-            })}
-          </div>
+          <a
+            href={`#pilier-${pilierActif.toLowerCase()}`}
+            className="group relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-black/30 sm:min-h-64"
+          >
+            <Image src={etapeActive.image} alt="" fill sizes="(max-width: 768px) 100vw, 900px" className="object-cover opacity-60 transition duration-500 group-hover:scale-[1.02] group-hover:opacity-75" />
+            <span className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" aria-hidden="true" />
+            <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 sm:p-6">
+              <span>
+                <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-laiton-300">{LABELS[pilierActif].toUpperCase()}</span>
+                <strong className="mt-1 block text-xl text-white">{etapeActive.titre}</strong>
+                <span className="mt-1 block max-w-[36rem] text-sm leading-5 text-graphite-100">{titresApercu[indexPilierActif]}</span>
+              </span>
+              <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${aUnContenu ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-graphite-400"}`}>
+                {aUnContenu ? "Prêt" : "À créer"}
+              </span>
+            </span>
+          </a>
         </div>
       </div>
 
@@ -263,7 +266,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
         </Card>
       )}
 
-      {piliersAffiches.map((pilier, i) => {
+      {[pilierActif].map((pilier) => {
+        const i = PILIERS.indexOf(pilier);
         const valide = valides[i];
         const dernier = derniers[i];
         const enAttente = dernier && dernier.statut === "EN_ATTENTE";
@@ -393,7 +397,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               Ces actions peuvent utiliser l&apos;IA. Pour ta forme, ton temps ou ton matériel aujourd&apos;hui, utilise le bilan gratuit. Ne recrée les trois piliers qu&apos;après un vrai changement d&apos;objectif ou de situation.
             </p>
             <div className="grid gap-3 sm:grid-cols-3">
-              {piliersAffiches.map((pilier, index) => {
+              {[pilierActif].map((pilier) => {
+                const index = PILIERS.indexOf(pilier);
                 const affiche = valides[index] ?? derniers[index];
                 return affiche ? (
                   <div key={pilier} className="flex flex-col gap-2 rounded-xl border border-white/[0.07] bg-black/20 p-3">

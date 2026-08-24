@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { MarqueeBanner } from "@/components/marketing/marquee-banner";
 import { Reveal } from "@/components/marketing/reveal";
-import { ProgressionSparkline } from "@/components/marketing/progression-sparkline";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
@@ -133,25 +132,30 @@ const PARCOURS_PERSONAL_TRAINING = [
   },
 ];
 
-const PILIERS = [
+const PILIERS_VISUELS = [
   {
     numero: "01",
-    titre: "Un programme vraiment personnel",
-    description:
-      "Entraînement, nutrition et récupération (sauna, massage, mobilité, méditation, sommeil...) construits à partir de milliers de données analysées et de plus de 17 ans d'expérience terrain d'Anthony Darmon, autour de ton niveau, tes objectifs et tes contraintes.",
+    categorie: "Entraînement",
+    titre: "S’entraîner",
+    description: "La bonne séance, adaptée à ta forme et à ton objectif.",
+    image: "/exercices/back-squat-barre.jpg",
+    position: "object-[52%_center]",
   },
   {
     numero: "02",
-    titre: "Une progression visible",
-    description:
-      "Chaque semaine, ton programme s'ajuste à ta forme, ton énergie et le temps dont tu disposes ce jour-là — tes séances, tes mesures et tes progrès réunis dans un suivi vivant, jamais figé.",
-    visuel: true,
+    categorie: "Nutrition",
+    titre: "Bien manger",
+    description: "Des repas simples et gourmands, alignés avec ton objectif.",
+    image: "/repas/plat-saumon-quinoa-brocolis.jpg",
+    position: "object-center",
   },
   {
     numero: "03",
-    titre: "Un coach dans ta poche, H24",
-    description:
-      "Ton Coach IA répond à toute heure, 7j/7 — ton coach humain supervise la méthode et valide ce qui compte.",
+    categorie: "Récupération",
+    titre: "Récupérer",
+    description: "Mobilité, sommeil et détente pour progresser durablement.",
+    image: "/recuperation/hammam-femme-blonde-premium.jpg",
+    position: "object-[48%_center]",
   },
 ];
 
@@ -603,26 +607,41 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      {/* Les 3 piliers */}
+      {/* Les 3 piliers visuels */}
       <Reveal>
-      <section id="piliers" className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-6 py-24">
+      <section id="piliers" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-24">
         <div className="text-center">
-          <SectionLabel>Ce que tu obtiens</SectionLabel>
-          <h2 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">Tout ce qui compte pour progresser, enfin réuni.</h2>
+          <SectionLabel>Une méthode complète</SectionLabel>
+          <h2 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">Trois piliers. Une seule direction.</h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+            Ton corps ne progresse pas uniquement pendant la séance. COAI coordonne ton entraînement,
+            ton alimentation et ta récupération.
+          </p>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-          {PILIERS.map((pilier) => (
-            <Card
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {PILIERS_VISUELS.map((pilier) => (
+            <article
               key={pilier.titre}
-              className="flex min-h-72 flex-col items-center justify-start gap-6 px-7 py-8 text-center"
+              className="group relative min-h-[30rem] overflow-hidden rounded-[2rem] border border-white/[0.1] bg-graphite-900 shadow-[0_32px_90px_-42px_rgba(0,0,0,.95)]"
             >
-              <span className="text-sm font-semibold text-laiton-400">{pilier.numero}</span>
-              <div className="flex flex-col items-center">
-                <h3 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-white">{pilier.titre}</h3>
-                <p className="mt-4 max-w-xs text-base leading-7 text-graphite-300">{pilier.description}</p>
+              <Image
+                src={pilier.image}
+                alt={`${pilier.titre} avec COAI`}
+                fill
+                sizes="(max-width: 767px) calc(100vw - 3rem), 33vw"
+                className={`object-cover transition duration-700 ease-out group-hover:scale-[1.035] ${pilier.position}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-black/5" />
+              <div className="absolute inset-x-0 bottom-0 p-7 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-laiton-300">
+                  {pilier.numero} · {pilier.categorie}
+                </p>
+                <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-white">
+                  {pilier.titre}
+                </h3>
+                <p className="mt-3 max-w-xs text-sm leading-6 text-white/75">{pilier.description}</p>
               </div>
-              {pilier.visuel && <ProgressionSparkline />}
-            </Card>
+            </article>
           ))}
         </div>
         <div className="mx-auto max-w-3xl border-t border-white/[0.08] pt-10 text-center">
