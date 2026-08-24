@@ -29,7 +29,7 @@ export function ProfilIntelligenceSection({ profil }: { profil: ProfilIntelligen
 
       <SectionLabel>Ce que COAI apprend sur toi</SectionLabel>
       {profil.items.length === 0 ? (
-        <Card className="text-sm leading-6 text-graphite-400">COAI apprend encore à te connaître. Termine quelques séances et check-ins : les premières observations apparaîtront ici avec leur preuve.</Card>
+        <Card className="text-sm leading-6 text-graphite-400">COAI apprend encore à te connaître. Termine quelques séances et bilans : les premières observations apparaîtront ici avec leur preuve.</Card>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {profil.items.map((item) => (
@@ -51,7 +51,7 @@ export function ProfilIntelligenceSection({ profil }: { profil: ProfilIntelligen
           <p className="mt-2 text-xs leading-5 text-graphite-500">Des associations mesurées dans ton historique, jamais présentées comme des causes ou des prédictions.</p>
         </div>
         {profil.tendances.length === 0 ? (
-          <Card className="text-sm leading-6 text-graphite-400">Pas encore assez de recul pour comparer tes journées. Continue les check-ins et ressentis après séance.</Card>
+          <Card className="text-sm leading-6 text-graphite-400">Pas encore assez de recul pour comparer tes journées. Continue les bilans et ressentis après séance.</Card>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {profil.tendances.map((tendance) => (

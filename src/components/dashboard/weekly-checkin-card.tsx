@@ -107,7 +107,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
         <div className="flex items-start justify-between">
           <div>
             <SectionLabel>Bilan de la semaine</SectionLabel>
-            <h2 className="mt-1 text-xl font-bold">Ton check-in de la semaine</h2>
+            <h2 className="mt-1 text-xl font-bold">Ton bilan de la semaine</h2>
           </div>
           <button
             type="button"
@@ -220,7 +220,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
         {error && <p className="text-sm text-red-400">{error}</p>}
         <Button onClick={handleSubmit} disabled={loading}>
-          {loading ? "Envoi…" : "Envoyer mon check-in"}
+          {loading ? "Envoi…" : "Envoyer mon bilan"}
         </Button>
       </div>
     </div>

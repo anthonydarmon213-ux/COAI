@@ -19,7 +19,7 @@ export function ScoreAgeCoaiCard({ resultat }: { resultat: AgeCoaiResultat }) {
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#c49a52]">Score & Âge COAI</p>
         <h2 id="vitality-title" className="mt-2 font-editorial text-2xl sm:text-3xl">Ton Score COAI arrive bientôt.</h2>
         <p className="mt-3 max-w-xl text-sm leading-6 text-graphite-300">
-          Encore {resultat.joursDeSuiviRestants} check-in{resultat.joursDeSuiviRestants > 1 ? "s" : ""} (sommeil, énergie,
+          Encore {resultat.joursDeSuiviRestants} bilan{resultat.joursDeSuiviRestants > 1 ? "s" : ""} (sommeil, énergie,
           ressenti) et COAI pourra calculer ton Score à partir de tes vraies données — pas d&apos;une estimation.
         </p>
       </section>
@@ -53,7 +53,7 @@ export function ScoreAgeCoaiCard({ resultat }: { resultat: AgeCoaiResultat }) {
             <p className="mt-2 text-xs leading-5 text-graphite-400">
               {resultat.age.raison === "AGE_MANQUANT"
                 ? "Renseigne ton âge pour débloquer l'Âge COAI, qui compare ta forme réelle à ton âge déclaré."
-                : `Encore ${resultat.age.joursRestants} check-in${resultat.age.joursRestants > 1 ? "s" : ""} pour débloquer ton Âge COAI.`}
+                : `Encore ${resultat.age.joursRestants} bilan${resultat.age.joursRestants > 1 ? "s" : ""} pour débloquer ton Âge COAI.`}
             </p>
             {resultat.age.raison === "AGE_MANQUANT" && (
               <Link href="/compte/profil" className="mt-3 inline-flex rounded-full bg-laiton-400 px-5 py-2 text-xs font-semibold text-graphite-950">

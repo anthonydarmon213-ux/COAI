@@ -89,7 +89,7 @@ export function MonitoringSanteCard({
       {!aDesDonnees ? (
         <>
           <h2 id="monitoring-titre" className="mt-1.5 text-sm font-semibold text-white">
-            Connecte ta montre pour affiner ton Readiness.
+            Connecte ta montre pour affiner ton état du jour.
           </h2>
           <p className="mt-1 text-xs leading-5 text-graphite-400">
             Sommeil, HRV et fréquence cardiaque au repos rendent ton score d&apos;aptitude nettement plus précis.

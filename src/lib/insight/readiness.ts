@@ -88,8 +88,8 @@ export function calculerReadiness(entree: EntreeReadiness): Readiness {
     return {
       score: 0,
       niveau: "MODERE",
-      titre: "Ton readiness t'attend",
-      recommandation: "Fais ton check-in du jour pour connaître ton niveau d'aptitude et laisser COAI ajuster ta séance.",
+      titre: "Ton état du jour t'attend",
+      recommandation: "Fais ton bilan du jour pour connaître ton niveau de forme et laisser COAI ajuster ta séance.",
       facteurs: [],
       disponible: false,
     };

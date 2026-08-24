@@ -99,7 +99,7 @@ export function DailyCoach({ context }: { context: CoachSessionContext }) {
                 {context.pain && <p className="mt-1 text-xs text-amber-200">Gêne déclarée{context.painArea ? ` : ${context.painArea}` : ""}</p>}
               </div>
 
-              {history.length === 0 && <p className="mt-4 text-sm leading-6 text-graphite-400">Je connais ta séance, ton exercice ouvert et ton check-in. Pose-moi une question précise.</p>}
+              {history.length === 0 && <p className="mt-4 text-sm leading-6 text-graphite-400">Je connais ta séance, ton exercice ouvert et ton bilan du jour. Pose-moi une question précise.</p>}
               <div className="mt-4 flex flex-col gap-4">
                 {history.map((exchange, index) => (
                   <div key={`${exchange.question}-${index}`} className="space-y-2">

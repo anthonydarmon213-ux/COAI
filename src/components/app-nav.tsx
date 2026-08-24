@@ -86,7 +86,7 @@ const ONGLETS: {
       { href: "/programme/evolution", label: "Courbes d’évolution" },
     ],
   },
-  { href: "/videos", label: "Streaming", icon: Play, match: "/videos" },
+  { href: "/videos", label: "Vidéos", icon: Play, match: "/videos" },
   { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
 ];
 
@@ -118,7 +118,7 @@ export function AppNav() {
             <CoaiMark size={26} />
             <span className="font-display text-xl font-extrabold tracking-[0.16em] text-graphite-50">COAI</span>
           </div>
-          <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300">Ton Personal Trainer, toujours avec toi</span>
+          <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300">Ton coach personnel, toujours avec toi</span>
         </Link>
         <SignOutButton variant="icon" />
       </div>

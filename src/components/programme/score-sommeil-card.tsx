@@ -19,7 +19,7 @@ export function ScoreSommeilCard({ resultat }: { resultat: ScoreSommeilResultat 
           COAI apprend encore ton rythme de sommeil.
         </h3>
         <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">
-          Encore {resultat.joursRestants} check-in{resultat.joursRestants > 1 ? "s" : ""} avec le sommeil renseigné
+          Encore {resultat.joursRestants} bilan{resultat.joursRestants > 1 ? "s" : ""} avec le sommeil renseigné
           et ton score réel apparaîtra ici — calculé sur tes vraies nuits, pas une estimation.
         </p>
         {resultat.conseilDeclare && (

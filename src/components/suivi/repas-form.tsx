@@ -86,7 +86,7 @@ export function RepasForm() {
         </Field>
         {error && <p className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={loading}>
-          {loading ? "Ajout…" : "Ajouter le check-in"}
+          {loading ? "Ajout…" : "Ajouter mon bilan"}
         </Button>
       </form>
     </Card>

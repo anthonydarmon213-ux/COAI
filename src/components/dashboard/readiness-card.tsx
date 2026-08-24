@@ -16,6 +16,12 @@ const PASTILLE: Record<"positif" | "neutre" | "negatif", string> = {
   negatif: "bg-[#ff8a3d]",
 };
 
+const NIVEAU_LABEL: Record<Readiness["niveau"], string> = {
+  ELEVE: "Prêt",
+  MODERE: "À doser",
+  BAS: "Alléger",
+};
+
 // `compact` (23/08/2026) : version resserrée pour le hero du dashboard —
 // anneau + titre uniquement, sans les pastilles de facteurs ni la mention
 // de bas de carte, qui restent affichées dans la version pleine.
@@ -27,14 +33,14 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
   if (!readiness.disponible) {
     return (
       <section className={compact ? "coai-glass flex-none p-4 sm:w-64" : "coai-glass p-5"}>
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Readiness du jour</p>
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">État du jour</p>
         <h2 className="mt-2 text-lg font-semibold text-white">{readiness.titre}</h2>
         <p className="mt-1.5 text-xs leading-5 text-graphite-400">{readiness.recommandation}</p>
         <Link
           href="#check-in-du-jour"
           className="mt-3 inline-flex rounded-full border border-laiton-400/35 bg-laiton-400/10 px-4 py-2 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
         >
-          Faire mon check-in →
+          Faire mon bilan →
         </Link>
       </section>
     );
@@ -43,9 +49,9 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
   return (
     <section
       className={`rounded-2xl border ${couleur.bord} bg-white/[0.03] ${compact ? "flex-none p-4 sm:w-64" : "p-5"}`}
-      aria-labelledby="readiness-titre"
+      aria-labelledby="etat-du-jour-titre"
     >
-      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Readiness du jour</p>
+      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">État du jour</p>
 
       <div className={`mt-3 flex gap-4 ${compact ? "flex-col items-center text-center" : "items-center"}`}>
         <div className="relative flex h-28 w-28 flex-none items-center justify-center">
@@ -58,13 +64,13 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
             />
           </svg>
           <span className="absolute flex flex-col items-center">
-            <span className={`font-display text-3xl font-bold tabular-nums ${couleur.texte}`}>{readiness.score}</span>
-            <span className="font-mono text-[9px] text-graphite-500">/ 100</span>
+            <span className={`font-display text-base font-bold ${couleur.texte}`}>{NIVEAU_LABEL[readiness.niveau]}</span>
+            <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.1em] text-graphite-500">aujourd’hui</span>
           </span>
         </div>
 
         <div className="min-w-0">
-          <h2 id="readiness-titre" className="text-base font-semibold text-white">{readiness.titre}</h2>
+          <h2 id="etat-du-jour-titre" className="text-base font-semibold text-white">{readiness.titre}</h2>
           <p className="mt-1 text-xs leading-5 text-graphite-400">{readiness.recommandation}</p>
         </div>
       </div>
@@ -85,7 +91,7 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
 
       {!compact && (
         <p className="mt-3 text-[10px] leading-4 text-graphite-500">
-          Repère de coaching calculé sur ton check-in du jour — pas une mesure médicale.
+          Repère de coaching calculé sur ton bilan du jour — pas une mesure médicale.
         </p>
       )}
     </section>

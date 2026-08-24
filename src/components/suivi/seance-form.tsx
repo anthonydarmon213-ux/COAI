@@ -118,7 +118,7 @@ export function SeanceForm() {
         </Field>
 
         <div className="flex flex-col gap-4 border-t border-graphite-800 pt-4">
-          <SectionLabel>Check-in rapide</SectionLabel>
+          <SectionLabel>Bilan rapide</SectionLabel>
 
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-graphite-400">Difficulté de la séance</span>

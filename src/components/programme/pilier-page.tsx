@@ -193,7 +193,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               <p className="mt-1 text-xs leading-5 text-graphite-300">Forme, sommeil, douleur, temps et matériel : COAI prépare la bonne séance sans recréer tout ton programme.</p>
             </div>
             <Link href="/dashboard#check-in-du-jour" className="inline-flex shrink-0 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-bold text-graphite-950 transition hover:bg-cyan-50">
-              Faire mon check-in →
+              Faire mon bilan →
             </Link>
           </div>
 
@@ -331,7 +331,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
 
               {genereIA && !estSocleCoai(affiche?.contenu) && (
                 <p className="text-sm text-graphite-400">
-                  Ton programme est piloté par ton Personal Trainer IA. Passe à Coaching Hybride (99€/mois)
+                  Ton programme est piloté par ton coach personnel augmenté. Passe à l’accompagnement hybride (99 €/mois)
                   pour ajouter le regard et les ajustements d&apos;un coach humain.
                 </p>
               )}
@@ -339,7 +339,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               {genereIA && estSocleCoai(affiche?.contenu) && (
                 <p className="text-sm text-graphite-400">
                   Une méthode claire, progressive et illustrée avec la médiathèque exclusive COAI.
-                  Tes check-ins font ensuite évoluer la difficulté au fil de ta progression.
+                  Tes bilans font ensuite évoluer la difficulté au fil de ta progression.
                 </p>
               )}
 
@@ -390,7 +390,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
           <summary className="cursor-pointer font-semibold text-graphite-300">Ajustements avancés du programme</summary>
           <div className="mt-3 flex flex-col items-start gap-3 border-t border-white/[0.07] pt-3">
             <p className="max-w-2xl text-xs leading-5 text-graphite-500">
-              Ces actions peuvent utiliser l&apos;IA. Pour ta forme, ton temps ou ton matériel aujourd&apos;hui, utilise le check-in gratuit. Ne recrée les trois piliers qu&apos;après un vrai changement d&apos;objectif ou de situation.
+              Ces actions peuvent utiliser l&apos;IA. Pour ta forme, ton temps ou ton matériel aujourd&apos;hui, utilise le bilan gratuit. Ne recrée les trois piliers qu&apos;après un vrai changement d&apos;objectif ou de situation.
             </p>
             <div className="grid gap-3 sm:grid-cols-3">
               {piliersAffiches.map((pilier, index) => {

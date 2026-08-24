@@ -73,7 +73,7 @@ export function RestDayCheckin({ initialDaily }: { initialDaily: InitialDaily })
   if (done) {
     return (
       <p className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-3 text-sm text-emerald-200">
-        Check-in du jour enregistré — ça compte aussi pour ta régularité, même sans séance.
+        Bilan du jour enregistré — cela compte aussi pour ta régularité, même sans séance.
       </p>
     );
   }
@@ -118,7 +118,7 @@ export function RestDayCheckin({ initialDaily }: { initialDaily: InitialDaily })
         disabled={loading}
         className="mt-1 inline-flex items-center justify-center rounded-full bg-laiton-400 px-6 py-3 text-sm font-bold text-graphite-950 transition hover:bg-laiton-300 disabled:opacity-60"
       >
-        {loading ? "Enregistrement…" : "Valider mon check-in"}
+        {loading ? "Enregistrement…" : "Valider mon bilan"}
       </button>
     </div>
   );

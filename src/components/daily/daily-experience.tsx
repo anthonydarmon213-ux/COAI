@@ -251,7 +251,7 @@ export function DailyExperience({
           <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-laiton-400/20" />
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-300">Ton coach est prêt · Check-in du jour</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-300">Ton coach est prêt · Bilan du jour</p>
               <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Comment te sens-tu aujourd’hui ?</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">5 repères, 30 secondes. COAI ajuste gratuitement la durée, le volume, le matériel et les précautions de ta séance.</p>
             </div>
@@ -278,7 +278,7 @@ export function DailyExperience({
 
       {checkinDone && adaptation && (
         <section className="rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.07] p-5 text-white">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">✓ Check-in analysé</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">✓ Bilan analysé</p>
           <h3 className="mt-2 text-xl font-bold">{adaptation.title}</h3>
           <p className="mt-1 text-sm leading-6 text-emerald-100">{adaptation.reason}</p>
           {adaptation.changes.length > 0 && <ul className="mt-3 space-y-1 text-sm font-medium">{adaptation.changes.map((change) => <li key={change}>✓ {change}</li>)}</ul>}
