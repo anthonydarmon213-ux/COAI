@@ -91,6 +91,7 @@ export function ExerciceCard({
     (nom ? photoFiablePourNom(nom) : null) ??
     (photoQuery ? photosParExercice?.[photoQuery] ?? null : null);
   const videoUrl = nom ? videoCoaiPourNom(nom) : null;
+  const hasTechniqueValidee = Boolean(videoUrl || (nom && animationPourExercice(nom)));
   const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
   const consignesLongues = CHAMPS.flatMap(({ cle, label }) => {
@@ -107,7 +108,7 @@ export function ExerciceCard({
     <div className="coai-exercise-card group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 pl-5 transition duration-300 hover:border-laiton-400/25 hover:bg-white/[0.035]">
       <div className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-laiton-400 via-laiton-500/70 to-transparent" />
 
-      {photoUrl && nom && !videoOuverte && (
+      {photoUrl && nom && !videoOuverte && hasTechniqueValidee && (
         <button
           type="button"
           onClick={() => setVideoOuverte(true)}
@@ -131,9 +132,20 @@ export function ExerciceCard({
         </button>
       )}
 
+      {photoUrl && nom && !videoOuverte && !hasTechniqueValidee && (
+        <div className="relative h-44 w-full overflow-hidden rounded-lg">
+          {/* eslint-disable-next-line @next/next/no-img-element -- cascade locale/Free Exercise DB/Pexels */}
+          <img src={photoUrl} alt={`Position de référence : ${nom}`} className="h-full w-full object-cover" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden="true" />
+          <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
+            Position de référence
+          </span>
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <h4 className="text-sm font-semibold text-graphite-50">{nom ?? "Exercice"}</h4>
-        {nom && !photoUrl && (
+        {nom && !photoUrl && hasTechniqueValidee && (
           <button
             type="button"
             onClick={() => setVideoOuverte((v) => !v)}
@@ -143,7 +155,7 @@ export function ExerciceCard({
             {videoOuverte ? "✕ Fermer" : "▶ Technique"}
           </button>
         )}
-        {nom && photoUrl && videoOuverte && (
+        {nom && photoUrl && videoOuverte && hasTechniqueValidee && (
           <button
             type="button"
             onClick={() => setVideoOuverte(false)}
@@ -262,22 +274,6 @@ export function ExerciceCard({
 
       {videoOuverte && nom && !videoUrl && animationPourExercice(nom) && (
         <ExerciceAnimation nom={nom} className="w-full" />
-      )}
-
-      {videoOuverte && nom && !videoUrl && !animationPourExercice(nom) && (
-        <div className="w-full rounded-lg border border-white/[0.08] bg-black/30 p-4 text-center">
-          <p className="text-xs leading-5 text-graphite-300">
-            Voir une démonstration de <span className="font-semibold text-white">{nom}</span> sur YouTube.
-          </p>
-          <a
-            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${nom} technique musculation`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-2 rounded-full border border-laiton-400/35 bg-laiton-400/10 px-4 py-2 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
-          >
-            ▶ Ouvrir la démonstration
-          </a>
-        </div>
       )}
 
       {/* Les phases d'exécution étaient rendues ici ET dans la double vue
