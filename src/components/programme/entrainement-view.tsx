@@ -5,6 +5,7 @@ import { ContreIndications } from "@/components/programme/contre-indications";
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import Link from "next/link";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
 // semaine, puis replie chaque séance (fermée par défaut) pour éviter
@@ -50,6 +51,16 @@ export function EntrainementView({
       {/* Séance du jour en tête (22/08/2026) — le lecteur est accessible en
           un clic, sans avoir à deviner quel jour ouvrir dans l'accordéon. */}
       <SeanceDuJourHero contenu={data} photosParExercice={photosParExercice} dureeProfil={dureeProfil} />
+      <Link
+        href="/suivi/progression#charges"
+        className="group flex items-center justify-between gap-4 rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/[0.08] to-laiton-400/[0.07] p-4 transition hover:border-cyan-300/40"
+      >
+        <span>
+          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.17em] text-cyan-200">Progression des charges</span>
+          <strong className="mt-1 block text-sm text-white">Chaque charge saisie pendant ta séance alimente automatiquement ta courbe.</strong>
+        </span>
+        <span className="shrink-0 text-xl text-cyan-200 transition group-hover:translate-x-1">↗</span>
+      </Link>
       <SemainePlan
         titre={titre}
         badges={badges}

@@ -11,6 +11,7 @@ import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { DebriefSemaineCard } from "@/components/coach/debrief-semaine-card";
 import { getDebriefSemaine } from "@/lib/insight/debrief-semaine";
 import { prisma } from "@/lib/db/client";
+import { CoaiMark } from "@/components/brand/coai-mark";
 
 // Hub de suivi (21/08/2026, demande Anthony) — la page ne se limite plus à
 // un champ de question : débrief hebdomadaire calculé sur données réelles,
@@ -44,18 +45,43 @@ export default async function CoachPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="animate-reveal flex flex-col gap-2">
-        <SectionLabel>Mon Coach</SectionLabel>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
-          Ton suivi, en un seul endroit.
-        </h1>
-        {plan === "GRATUIT" && <Badge tone="warning">{quota.remaining} question(s) restante(s) sur 4</Badge>}
-      </div>
+      <section className="coai-coach-hero animate-reveal relative overflow-hidden rounded-[2rem] border border-white/10 p-6 sm:p-8">
+        <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full border border-cyan-300/20 shadow-[0_0_90px_rgba(76,201,240,.15)]" />
+        <div className="pointer-events-none absolute right-16 top-12 h-32 w-32 rounded-full bg-cyan-300/10 blur-3xl" />
+        <div className="relative grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">COAI Intelligence</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-1 text-[10px] font-semibold text-emerald-200"><i className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-emerald-300" /> En ligne</span>
+            </div>
+            <h1 className="mt-5 max-w-2xl font-editorial text-4xl font-normal tracking-tight text-white sm:text-6xl">
+              Ton coach augmenté.
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-graphite-200 sm:text-base">
+              Tes séances, tes charges et ta récupération analysées au même endroit. Une réponse claire, puis une décision utile.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2 font-mono text-[9px] uppercase tracking-[0.13em] text-graphite-300">
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Contexte mémorisé</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Progression mesurée</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Supervision humaine</span>
+            </div>
+          </div>
+          <div className="coai-core relative mx-auto h-52 w-52 sm:h-64 sm:w-64" aria-label="COAI Core actif">
+            <div className="coai-core-grid absolute inset-0" />
+            <div className="coai-core-ring coai-core-ring-a absolute inset-[8%] rounded-full" />
+            <div className="coai-core-ring coai-core-ring-b absolute inset-[20%] rounded-full" />
+            <div className="coai-core-ring coai-core-ring-c absolute inset-[31%] rounded-full" />
+            <div className="coai-core-center absolute inset-[37%] flex items-center justify-center rounded-full">
+              <CoaiMark size={58} />
+            </div>
+            <span className="absolute bottom-[17%] right-[9%] rounded-full border border-cyan-200/30 bg-black/70 px-2.5 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-cyan-200">Live</span>
+          </div>
+        </div>
+        {plan === "GRATUIT" && <div className="relative mt-5"><Badge tone="warning">{quota.remaining} question(s) restante(s) sur 4</Badge></div>}
+      </section>
 
-      <DebriefSemaineCard debrief={debrief} />
-
-      <div className="grid gap-5 lg:grid-cols-3 lg:items-start">
-        <div className="lg:col-span-2">
+      <div className="grid gap-5 xl:grid-cols-3 xl:items-start">
+        <div className="xl:col-span-2">
           <AskCoach initialQuotaRemaining={plan === "GRATUIT" ? quota.remaining : null} />
         </div>
 
@@ -102,6 +128,8 @@ export default async function CoachPage() {
           </section>
         </div>
       </div>
+
+      <DebriefSemaineCard debrief={debrief} />
     </div>
   );
 }

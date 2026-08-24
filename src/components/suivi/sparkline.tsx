@@ -45,7 +45,7 @@ export function Sparkline({
           />
         </svg>
       ) : (
-        <p className="text-sm text-graphite-400">Pas encore assez de données.</p>
+        <p className="text-sm text-graphite-400">Première charge enregistrée. La courbe apparaîtra dès la prochaine séance.</p>
       )}
     </Card>
   );

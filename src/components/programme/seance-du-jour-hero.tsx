@@ -42,13 +42,11 @@ export function SeanceDuJourHero({
   const exercices = Array.isArray(seance.exercices) ? seance.exercices : [];
   const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
   const retourAuCalme = typeof seance.retourAuCalme === "string" ? seance.retourAuCalme : undefined;
-  const photoQuery = typeof seance.photoQuerySeance === "string" ? seance.photoQuerySeance : undefined;
+  void photosParExercice;
   const premierNom = isPlainObject(exercices[0]) && typeof exercices[0].nom === "string"
     ? exercices[0].nom
     : null;
-  const photoUrl =
-    (premierNom ? photoCoaiPourNom(premierNom) : null) ??
-    (photoQuery ? photosParExercice?.[photoQuery] : null);
+  const photoUrl = premierNom ? photoCoaiPourNom(premierNom) : null;
   const minutes = getSessionDuration(seance, dureeProfil ?? 45);
 
   return (
@@ -56,7 +54,7 @@ export function SeanceDuJourHero({
       {photoUrl && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- source Pexels externe */}
-          <img src={photoUrl} alt="" className="h-40 w-full object-cover" loading="lazy" />
+          <img src={photoUrl} alt="" className="h-40 w-full bg-black object-contain" loading="lazy" />
           <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-t from-[#0d0e10] via-[#0d0e10]/40 to-transparent" aria-hidden="true" />
         </>
       )}

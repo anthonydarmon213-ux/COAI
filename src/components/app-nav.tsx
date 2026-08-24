@@ -132,14 +132,16 @@ export function AppNav() {
             <Link
               href={onglet.href}
               aria-current={active ? "page" : undefined}
-              className={`relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3.5 py-3 font-semibold transition ${
-                active ? "bg-white/[0.08] text-white shadow-sm" : "text-graphite-300 hover:bg-white/[0.06] hover:text-white"
+              className={`group/nav relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 font-semibold transition duration-300 ${
+                active ? "border border-cyan-300/15 bg-[linear-gradient(110deg,rgba(201,162,98,.16),rgba(76,201,240,.08),rgba(255,255,255,.04))] text-white shadow-[0_14px_35px_-24px_rgba(76,201,240,.85),inset_0_1px_rgba(255,255,255,.08)]" : "border border-transparent text-graphite-200 hover:border-white/10 hover:bg-white/[0.05] hover:text-white"
               }`}
             >
               {active && (
                 <span aria-hidden="true" className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-laiton-400 md:inset-y-2" />
               )}
-              <Icon size={18} strokeWidth={2} className={active ? "text-laiton-300" : "text-graphite-500"} aria-hidden="true" />
+              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition duration-300 ${active ? "border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_22px_-6px_rgba(76,201,240,.9)]" : "border-white/10 bg-white/[0.035] group-hover/nav:border-laiton-400/30 group-hover/nav:bg-laiton-400/10"}`}>
+                <Icon size={19} strokeWidth={active ? 2.35 : 2.1} className={active ? "text-cyan-200 drop-shadow-[0_0_7px_rgba(76,201,240,.9)]" : "text-graphite-300 group-hover/nav:text-laiton-200"} aria-hidden="true" />
+              </span>
               {onglet.label}
             </Link>
 
