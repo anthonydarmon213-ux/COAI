@@ -42,12 +42,37 @@ export function ProgrammeShareButton({ cartes }: { cartes: CarteStory[] }) {
       if (!ctx) throw new Error("Canvas indisponible");
       ctx.fillStyle = "#0D0E12";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Emblème COAI dessiné en vectoriel pour rester parfaitement net en Story.
+      // L'anneau ouvert reprend le symbole de la marque, avec le cœur cyan tech.
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#D4AF37";
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.arc(104, 89, 34, -0.72, Math.PI * 1.72);
+      ctx.stroke();
+      ctx.strokeStyle = "#00F0FF";
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.arc(104, 89, 17, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      const marque = ctx.createLinearGradient(148, 0, 330, 0);
+      marque.addColorStop(0, "#FFFDF8");
+      marque.addColorStop(0.72, "#F0D59D");
+      marque.addColorStop(1, "#D4AF37");
+      ctx.fillStyle = marque;
+      ctx.font = "800 55px system-ui";
+      ctx.fillText("COAI", 154, 105);
+      ctx.fillStyle = "#A9ADB5";
+      ctx.font = "600 13px system-ui";
+      ctx.fillText("PERSONAL TRAINING, REIMAGINED.", 156, 132);
+
       ctx.fillStyle = "#D4AF37";
       ctx.font = "700 24px system-ui";
       ctx.fillText("MON PROGRAMME", 760, 92);
-      ctx.fillStyle = "#fffdf8";
-      ctx.font = "800 56px system-ui";
-      ctx.fillText("COAI", 70, 105);
       ctx.fillStyle = "#00F0FF";
       ctx.font = "600 21px system-ui";
       ctx.fillText("3 PILIERS. UNE DIRECTION.", 70, 190);
