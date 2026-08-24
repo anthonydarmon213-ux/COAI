@@ -38,7 +38,7 @@ export default async function ProgrammesPretsPage() {
           personnalisé généré par IA. À suivre en plus, jamais à la place.
         </p>
       </div>
-      <ProgrammesPretsGrid items={items} />
+      <ProgrammesPretsGrid items={items} sexe={sexe} />
     </div>
   );
 }

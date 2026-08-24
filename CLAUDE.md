@@ -20,8 +20,9 @@ Un programme statique « Spécial bureau — Bouger sans quitter sa chaise » a 
 ajouté aux programmes prêts à l'emploi. Il cible le cœur de clientèle COAI
 (dirigeants, indépendants et salariés longtemps assis), avec cinq micro-séances
 hebdomadaires de 8 à 12 minutes, sans matériel, sans transpiration et sans appel
-IA. Ses visuels femme/homme sont dans `public/programmes/` et choisis selon le
-profil. Cette logique de catalogue déterministe doit rester prioritaire pour le
+IA. Six mouvements fondamentaux disposent chacun d'une démonstration femme et
+homme dans `public/programmes/`; la galerie choisit le modèle selon le profil.
+Cette logique de catalogue déterministe doit rester prioritaire pour le
 Pass IA afin de protéger la marge ; l'IA sur mesure est réservée aux profils
 hors socle ou aux offres avec davantage d'accompagnement.
 

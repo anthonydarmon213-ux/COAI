@@ -39,6 +39,12 @@ export type JourProgrammePret = {
   contenu: string;
 };
 
+export type VisuelProgrammePret = {
+  nom: string;
+  photoFemme: string;
+  photoHomme: string;
+};
+
 export type ProgrammePret = {
   slug: string;
   nom: string;
@@ -52,6 +58,7 @@ export type ProgrammePret = {
   photoQuery: string;
   photoFemme?: string;
   photoHomme?: string;
+  visuels?: VisuelProgrammePret[];
   jours: JourProgrammePret[];
 };
 
@@ -75,6 +82,38 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "office worker seated chair mobility exercise",
     photoFemme: "/programmes/bureau-femme-blonde-premium.jpg",
     photoHomme: "/programmes/bureau-homme-blond-premium.jpg",
+    visuels: [
+      {
+        nom: "Rotation thoracique assise",
+        photoFemme: "/programmes/bureau-femme-blonde-premium.jpg",
+        photoHomme: "/programmes/bureau-homme-blond-premium.jpg",
+      },
+      {
+        nom: "Extension de genou assise",
+        photoFemme: "/programmes/bureau/femme-extension-genou.jpg",
+        photoHomme: "/programmes/bureau/homme-extension-genou.jpg",
+      },
+      {
+        nom: "Étirement fessier assis",
+        photoFemme: "/programmes/bureau/femme-etirement-fessier.jpg",
+        photoHomme: "/programmes/bureau/homme-etirement-fessier.jpg",
+      },
+      {
+        nom: "Ouverture de poitrine assise",
+        photoFemme: "/programmes/bureau/femme-ouverture-poitrine.jpg",
+        photoHomme: "/programmes/bureau/homme-ouverture-poitrine.jpg",
+      },
+      {
+        nom: "Marche assise & gainage",
+        photoFemme: "/programmes/bureau/femme-marche-assise.jpg",
+        photoHomme: "/programmes/bureau/homme-marche-assise.jpg",
+      },
+      {
+        nom: "Mollets assis",
+        photoFemme: "/programmes/bureau/femme-mollets-assis.jpg",
+        photoHomme: "/programmes/bureau/homme-mollets-assis.jpg",
+      },
+    ],
     jours: [
       {
         jour: "Jour 1",

@@ -9,7 +9,7 @@ type Item = { programme: ProgrammePret; photoUrl: string | null };
 // Filtre 100% client — les photos sont déjà résolues côté serveur pour tous
 // les programmes en une fois (ProgrammesPretsPage), donc changer de filtre
 // ici ne déclenche jamais de nouvel appel réseau.
-export function ProgrammesPretsGrid({ items }: { items: Item[] }) {
+export function ProgrammesPretsGrid({ items, sexe }: { items: Item[]; sexe?: string | null }) {
   const [categorie, setCategorie] = useState<CategorieProgrammePret | null>(null);
 
   const filtres = useMemo(
@@ -46,7 +46,7 @@ export function ProgrammesPretsGrid({ items }: { items: Item[] }) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtres.map(({ programme, photoUrl }) => (
-          <ProgrammePretCard key={programme.slug} programme={programme} photoUrl={photoUrl} />
+          <ProgrammePretCard key={programme.slug} programme={programme} photoUrl={photoUrl} sexe={sexe} />
         ))}
       </div>
     </div>
