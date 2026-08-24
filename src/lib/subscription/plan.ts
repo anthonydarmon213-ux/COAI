@@ -54,6 +54,15 @@ export function hasSuiviAccess(subscription?: Subscription | null): boolean {
   return Boolean(subscription && ACTIVE_STATUSES.has(subscription.status));
 }
 
+// Le streaming exclusif fait partie de l'écosystème COAI dès le Pass IA.
+// L'ancien déblocage à vie reste reconnu comme pour les programmes.
+export function hasStreamingAccess(
+  user: { programmeUnlockedAt: Date | null },
+  subscription?: Subscription | null
+): boolean {
+  return hasProgrammeAccess(user, subscription);
+}
+
 // Noms marketing (08/08/2026) : GRATUIT = "Pass IA", STANDARD = "Coaching Hybride"
 // — les identifiants techniques historiques sont conservés pour compatibilité.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {

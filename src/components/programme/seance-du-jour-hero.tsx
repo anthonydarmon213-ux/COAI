@@ -1,5 +1,6 @@
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { getWorkoutForDate, getSessionDuration } from "@/lib/daily/session";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 
 // Séance du jour mise en avant (22/08/2026, demande Anthony : "le bouton
 // Démarrer la séance doit immédiatement lancer le Player"). Jusqu'ici le
@@ -42,7 +43,12 @@ export function SeanceDuJourHero({
   const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
   const retourAuCalme = typeof seance.retourAuCalme === "string" ? seance.retourAuCalme : undefined;
   const photoQuery = typeof seance.photoQuerySeance === "string" ? seance.photoQuerySeance : undefined;
-  const photoUrl = photoQuery ? photosParExercice?.[photoQuery] : null;
+  const premierNom = isPlainObject(exercices[0]) && typeof exercices[0].nom === "string"
+    ? exercices[0].nom
+    : null;
+  const photoUrl =
+    (premierNom ? photoCoaiPourNom(premierNom) : null) ??
+    (photoQuery ? photosParExercice?.[photoQuery] : null);
   const minutes = getSessionDuration(seance, dureeProfil ?? 45);
 
   return (

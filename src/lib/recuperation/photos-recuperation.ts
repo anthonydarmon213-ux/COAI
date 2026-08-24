@@ -9,11 +9,41 @@
 // Les fichiers vivent dans /public/recuperation. Un fichier absent n'est pas
 // une erreur : l'appelant retombe sur Pexels, comme avant.
 
-type EntreeRecup = { motifs: string[]; fichier: string };
+type EntreeRecup = {
+  motifs: string[];
+  fichier: string;
+  fichierFemme?: string;
+  fichierHomme?: string;
+};
 
 // L'ordre compte : "rouleau" seul est trop générique, les zones précises
 // passent donc avant. "Sommeil" avant "repos", plus spécifique.
 const TABLE: EntreeRecup[] = [
+  // Protocoles premium — visuels COAI dédiés, générés une seule fois puis
+  // réutilisés sans coût pour tous les membres.
+  { motifs: ["hammam"], fichier: "hammam-femme-blonde-premium" },
+  {
+    motifs: ["sauna"],
+    fichier: "sauna-premium",
+    fichierFemme: "sauna-femme-blonde-premium",
+    fichierHomme: "sauna-homme-blond-premium",
+  },
+  {
+    motifs: ["bain froid", "immersion froide", "eau froide", "cold plunge"],
+    fichier: "bain-froid-premium",
+    fichierFemme: "bain-froid-femme-blonde-premium",
+    fichierHomme: "bain-froid-homme-blond-premium",
+  },
+
+  // Deuxième série récupération/mobilité — modèles et cadrages différents
+  // pour qu'une rotation de 14 jours ne ressemble pas à sept cartes dupliquées.
+  { motifs: ["90/90", "mobilité de hanche", "mobilite de hanche"], fichier: "recup2-10-mobilite-hanche-90-90" },
+  { motifs: ["world's greatest", "worlds greatest", "étirement global", "etirement global"], fichier: "recup2-14-worlds-greatest-stretch" },
+  { motifs: ["mobilité de cheville", "mobilite de cheville"], fichier: "recup2-09-mobilite-cheville" },
+  { motifs: ["rotation thoracique"], fichier: "recup2-11-mobilite-thoracique-rotation" },
+  { motifs: ["psoas", "fléchisseur de hanche", "flechisseur de hanche"], fichier: "recup2-12-etirement-psoas-hip-flexor" },
+  { motifs: ["chat-vache", "chat vache", "cat-cow", "cat cow"], fichier: "recup2-13-cat-cow-chat-vache" },
+
   // Récupération active
   { motifs: ["quadriceps", "avant de cuisse"], fichier: "rouleau-quadriceps" },
   { motifs: ["ischio"], fichier: "rouleau-ischios" },
@@ -22,8 +52,8 @@ const TABLE: EntreeRecup[] = [
   { motifs: ["rouleau", "foam roller", "auto-massage", "automassage"], fichier: "rouleau-quadriceps" },
 
   // Respiration et mental
-  { motifs: ["méditation", "meditation", "en tailleur", "pleine conscience"], fichier: "meditation-assise" },
-  { motifs: ["diaphragm", "respiration ventrale", "cohérence cardiaque", "coherence cardiaque"], fichier: "respiration-diaphragmatique" },
+  { motifs: ["méditation", "meditation", "en tailleur", "pleine conscience", "body scan"], fichier: "recup2-07-meditation-assise" },
+  { motifs: ["breathwork", "diaphragm", "respiration ventrale", "cohérence cardiaque", "coherence cardiaque"], fichier: "recup2-06-respiration-diaphragmatique" },
   { motifs: ["respiration", "respirer"], fichier: "respiration-diaphragmatique" },
 
   // Sommeil et repos
@@ -43,7 +73,7 @@ const TABLE: EntreeRecup[] = [
  * Photo COAI pour un contenu de récupération, ou null si aucune ne
  * correspond nettement.
  */
-export function photoRecuperationPourTexte(texte: string): string | null {
+export function photoRecuperationPourTexte(texte: string, sexe?: string | null): string | null {
   const normalise = texte
     .toLowerCase()
     .normalize("NFD")
@@ -51,5 +81,12 @@ export function photoRecuperationPourTexte(texte: string): string | null {
   const entree = TABLE.find((e) =>
     e.motifs.some((m) => normalise.includes(m.normalize("NFD").replace(/[̀-ͯ]/g, "")))
   );
-  return entree ? `/recuperation/${entree.fichier}.jpg` : null;
+  if (!entree) return null;
+  const genre = (sexe ?? "").toLowerCase();
+  const fichier = genre === "femme"
+    ? entree.fichierFemme ?? entree.fichier
+    : genre === "homme"
+      ? entree.fichierHomme ?? entree.fichier
+      : entree.fichier;
+  return `/recuperation/${fichier}.jpg`;
 }

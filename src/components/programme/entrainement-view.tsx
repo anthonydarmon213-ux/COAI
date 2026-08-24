@@ -4,6 +4,7 @@ import { SemainePlan } from "@/components/programme/semaine-plan";
 import { ContreIndications } from "@/components/programme/contre-indications";
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
 // semaine, puis replie chaque séance (fermée par défaut) pour éviter
@@ -26,7 +27,8 @@ export function EntrainementView({
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="exercice" />;
 
-  const { titre, frequenceParSemaine, dureeProgramme, vueEnsemble, contreIndications, seances, ...reste } = data as {
+  const { _source, titre, frequenceParSemaine, dureeProgramme, vueEnsemble, contreIndications, seances, ...reste } = data as {
+    _source?: string;
     titre?: string;
     frequenceParSemaine?: string;
     dureeProgramme?: string;
@@ -35,6 +37,7 @@ export function EntrainementView({
     seances?: Record<string, unknown>[];
     [key: string]: unknown;
   };
+  void _source;
 
   const badges = [
     frequenceParSemaine ? { icone: "📅", texte: String(frequenceParSemaine) } : null,
@@ -65,8 +68,15 @@ export function EntrainementView({
             photoQuerySeance?: string;
             [key: string]: unknown;
           };
+          const premierExercice = Array.isArray(exercices) && isPlainObject(exercices[0])
+            ? exercices[0]
+            : null;
+          const premierNom = premierExercice && typeof premierExercice.nom === "string"
+            ? premierExercice.nom
+            : null;
           const photoSeanceUrl =
-            typeof photoQuerySeance === "string" ? photosParExercice?.[photoQuerySeance] : null;
+            (premierNom ? photoCoaiPourNom(premierNom) : null) ??
+            (typeof photoQuerySeance === "string" ? photosParExercice?.[photoQuerySeance] : null);
           return (
             <>
               {photoSeanceUrl && (

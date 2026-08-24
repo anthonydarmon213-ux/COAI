@@ -1,5 +1,47 @@
 # Notes stratégiques COAI
 
+## Direction visuelle et programmes rentables (24/08/2026)
+
+Direction validée par Anthony : esthétique COAI premium sombre, pierre noire,
+bois noyer, lumière architecturale ambre/or et touches cyan. Les modèles sont
+des adultes athlétiques en tenue noire sobre. Pour aider chaque membre à se
+projeter, produire autant que possible une version femme et une version homme
+du même visuel, avec cadrage, exercice et décor identiques. La femme blonde et
+l'homme blond déjà présents dans la médiathèque sont les références d'identité.
+Ne pas régénérer un visuel qui existe déjà.
+
+Récupération : les versions sauna et bain froid femme/homme sont intégrées dans
+`public/recuperation/` et choisies selon le sexe déclaré du profil. Le bikini
+deux-pièces a été refusé deux fois par le filtre de génération ; conserver la
+version femme en maillot une pièce noir, crédible pour le sauna et le bain
+froid. Le hammam femme blonde validé reste la référence esthétique.
+
+Un programme statique « Spécial bureau — Bouger sans quitter sa chaise » a été
+ajouté aux programmes prêts à l'emploi. Il cible le cœur de clientèle COAI
+(dirigeants, indépendants et salariés longtemps assis), avec cinq micro-séances
+hebdomadaires de 8 à 12 minutes, sans matériel, sans transpiration et sans appel
+IA. Six mouvements fondamentaux disposent chacun d'une démonstration femme et
+homme dans `public/programmes/`; la galerie choisit le modèle selon le profil.
+Cette logique de catalogue déterministe doit rester prioritaire pour le
+Pass IA afin de protéger la marge ; l'IA sur mesure est réservée aux profils
+hors socle ou aux offres avec davantage d'accompagnement.
+
+## Relais Codex — Yoga, Pilates et sauvegarde de la bibliothèque (24/08/2026)
+
+Les 16 photos validées avec le modèle féminin blond (8 Yoga + 8 Pilates)
+sont intégrées dans `public/exercices/` : JPEG 4:3 de 900 × 675 px, avec les
+préfixes `yoga-` et `pilates-`. Le registre
+`src/lib/exercices/photos-coai.ts` contient leurs correspondances, placées
+avant les motifs génériques pour éviter notamment que « plank Pilates »
+retombe sur la photo de gainage standard. Ne pas régénérer ces images.
+
+La bibliothèque source complète (154 fichiers, environ 260 Mo) est conservée
+hors du dépôt pour ne pas alourdir GitHub, dans :
+`/Users/anthonydarmon/Documents/Codex/2026-08-21/j-x20/coai-bibliotheque-exercices-claude-code/`.
+Elle regroupe notamment boxe/kickboxing, poids du corps, duo, récupération,
+mobilité, Yoga et Pilates, avec les différents modèles validés. Utiliser ces
+fichiers en priorité avant de générer un exercice déjà présent.
+
 Ce fichier sert de mémoire persistante entre les sessions pour les idées et
 décisions business d'Anthony (pas de la doc technique — voir README.md pour
 ça). Il est lu automatiquement au démarrage de chaque session Claude Code.

@@ -1,9 +1,18 @@
 import { CATEGORIE_PROGRAMME_LABEL, type ProgrammePret } from "@/lib/programmes-prets/catalogue";
+import Image from "next/image";
 
 // Carte programme prêt à l'emploi (19/08/2026), même langage visuel que
 // RecetteCard : photo Pexels en fond, badges catégorie/durée, détail
 // (semaine type / journées) replié dans un <details> natif.
-export function ProgrammePretCard({ programme, photoUrl }: { programme: ProgrammePret; photoUrl: string | null }) {
+export function ProgrammePretCard({
+  programme,
+  photoUrl,
+  sexe,
+}: {
+  programme: ProgrammePret;
+  photoUrl: string | null;
+  sexe?: string | null;
+}) {
   return (
     <article className="animate-reveal group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111518] shadow-[0_24px_70px_-46px_rgba(0,0,0,.7)] transition hover:border-white/20">
       <div className="relative h-40 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.25),transparent_60%),#171b1d]">
@@ -49,6 +58,32 @@ export function ProgrammePretCard({ programme, photoUrl }: { programme: Programm
             Voir le programme →
           </summary>
           <div className="mt-3 flex flex-col gap-3">
+            {programme.visuels && programme.visuels.length > 0 && (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">
+                  Démonstrations · modèle {sexe === "Homme" ? "homme" : "femme"}
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {programme.visuels.map((visuel) => {
+                    const src = sexe === "Homme" ? visuel.photoHomme : visuel.photoFemme;
+                    return (
+                      <figure key={visuel.nom} className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+                        <Image
+                          src={src}
+                          alt={`${visuel.nom} — démonstration COAI`}
+                          width={900}
+                          height={675}
+                          className="h-24 w-full object-cover sm:h-28"
+                        />
+                        <figcaption className="px-2.5 py-2 text-[10px] leading-4 text-graphite-300">
+                          {visuel.nom}
+                        </figcaption>
+                      </figure>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-500">Objectifs</p>
               <ul className="mt-1.5 flex flex-col gap-1 text-graphite-300">

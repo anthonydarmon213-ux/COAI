@@ -20,8 +20,8 @@ import type { Pilier } from "@prisma/client";
 // avec le moteur d'adaptation.
 export const maxDuration = 60;
 
-// Génère dynamiquement les 3 piliers du programme (pas de bibliothèque
-// pré-construite — décision actée) à partir du Profile courant de l'utilisateur.
+// Sert les 3 piliers. Pour Pass IA, le catalogue COAI déterministe évite les
+// appels payants ; les profils hors socle conservent la génération sur mesure.
 export async function POST() {
   const authUser = await getCurrentUser();
   if (!authUser) {

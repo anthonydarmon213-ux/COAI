@@ -17,6 +17,7 @@ export type CategorieProgrammePret =
   | "PERTE_DE_POIDS"
   | "POIDS_DU_CORPS"
   | "FESSIERS"
+  | "BUREAU"
   | "CHALLENGE_30_JOURS"
   | "RECUPERATION";
 
@@ -27,6 +28,7 @@ export const CATEGORIE_PROGRAMME_LABEL: Record<CategorieProgrammePret, string> =
   PERTE_DE_POIDS: "Perte de poids",
   POIDS_DU_CORPS: "Poids du corps",
   FESSIERS: "Fessiers",
+  BUREAU: "Bureau & chaise",
   CHALLENGE_30_JOURS: "Challenge 30 jours",
   RECUPERATION: "Récupération",
 };
@@ -35,6 +37,12 @@ export type JourProgrammePret = {
   jour: string;
   focus: string;
   contenu: string;
+};
+
+export type VisuelProgrammePret = {
+  nom: string;
+  photoFemme: string;
+  photoHomme: string;
 };
 
 export type ProgrammePret = {
@@ -48,10 +56,97 @@ export type ProgrammePret = {
   description: string;
   objectifs: string[];
   photoQuery: string;
+  photoFemme?: string;
+  photoHomme?: string;
+  visuels?: VisuelProgrammePret[];
   jours: JourProgrammePret[];
 };
 
 export const PROGRAMMES_PRETS: ProgrammePret[] = [
+  {
+    slug: "special-bureau-chaise",
+    nom: "Spécial bureau — Bouger sans quitter sa chaise",
+    categorie: "BUREAU",
+    niveau: "Tous niveaux",
+    duree: "4 semaines",
+    frequence: "5 micro-séances / semaine, 8-12 min",
+    accroche: "Déverrouille ton corps entre deux réunions, sans matériel et sans transpirer.",
+    description:
+      "Pensé pour les dirigeants, indépendants et salariés qui passent l'essentiel de leur journée assis. Toutes les séances se font sur une chaise stable : mobilité, activation musculaire, posture, circulation et respiration. Le but n'est pas de remplacer l'entraînement principal, mais de casser les longues périodes d'inactivité avec une routine réellement tenable.",
+    objectifs: [
+      "Réduire les raideurs liées à la position assise prolongée",
+      "Réactiver jambes, fessiers, dos et sangle abdominale sans se changer",
+      "Améliorer la mobilité thoracique et le confort des épaules",
+      "Installer cinq pauses actives faciles à tenir chaque semaine",
+    ],
+    photoQuery: "office worker seated chair mobility exercise",
+    photoFemme: "/programmes/bureau-femme-blonde-premium.jpg",
+    photoHomme: "/programmes/bureau-homme-blond-premium.jpg",
+    visuels: [
+      {
+        nom: "Rotation thoracique assise",
+        photoFemme: "/programmes/bureau-femme-blonde-premium.jpg",
+        photoHomme: "/programmes/bureau-homme-blond-premium.jpg",
+      },
+      {
+        nom: "Extension de genou assise",
+        photoFemme: "/programmes/bureau/femme-extension-genou.jpg",
+        photoHomme: "/programmes/bureau/homme-extension-genou.jpg",
+      },
+      {
+        nom: "Étirement fessier assis",
+        photoFemme: "/programmes/bureau/femme-etirement-fessier.jpg",
+        photoHomme: "/programmes/bureau/homme-etirement-fessier.jpg",
+      },
+      {
+        nom: "Ouverture de poitrine assise",
+        photoFemme: "/programmes/bureau/femme-ouverture-poitrine.jpg",
+        photoHomme: "/programmes/bureau/homme-ouverture-poitrine.jpg",
+      },
+      {
+        nom: "Marche assise & gainage",
+        photoFemme: "/programmes/bureau/femme-marche-assise.jpg",
+        photoHomme: "/programmes/bureau/homme-marche-assise.jpg",
+      },
+      {
+        nom: "Mollets assis",
+        photoFemme: "/programmes/bureau/femme-mollets-assis.jpg",
+        photoHomme: "/programmes/bureau/homme-mollets-assis.jpg",
+      },
+    ],
+    jours: [
+      {
+        jour: "Jour 1",
+        focus: "Nuque, épaules & haut du dos",
+        contenu:
+          "Assis au bord d'une chaise stable : 8 rentrées de menton lentes, 12 rétractions d'omoplates, 8 rotations thoraciques par côté, puis 5 respirations profondes avec une expiration longue. Deux tours, sans forcer l'amplitude.",
+      },
+      {
+        jour: "Jour 2",
+        focus: "Jambes & circulation",
+        contenu:
+          "3 tours : 12 extensions de genou par jambe, 20 montées de mollets assis, 30 secondes de marche assise genoux alternés, puis 20 secondes de contraction volontaire des fessiers. Repos 30 secondes entre les tours.",
+      },
+      {
+        jour: "Jour 3",
+        focus: "Hanches & mobilité",
+        contenu:
+          "Cheville posée sur le genou opposé : étirement fessier 30 secondes par côté. Enchaîne 10 ouvertures de genou par côté, 8 bascules contrôlées du bassin et 8 inclinaisons du buste vers l'avant, dos long. Deux tours.",
+      },
+      {
+        jour: "Jour 4",
+        focus: "Posture & sangle abdominale",
+        contenu:
+          "Assis grandis-toi : 5 fois 10 secondes de gainage en pressant les mains contre les cuisses, 10 levées de genou alternées sans t'affaisser, 12 tirages de coudes imaginaires vers l'arrière et 30 secondes de maintien postural. Deux tours.",
+      },
+      {
+        jour: "Jour 5",
+        focus: "Reset complet",
+        contenu:
+          "Circuit calme : 8 rotations thoraciques par côté, 12 extensions de genou, 20 mollets assis, 30 secondes de marche assise, 30 secondes d'étirement fessier par côté, puis 2 minutes de respiration 4 secondes à l'inspiration et 6 secondes à l'expiration.",
+      },
+    ],
+  },
   {
     slug: "mobilite-totale",
     nom: "Mobilité totale — Débloque tes articulations",

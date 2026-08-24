@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, type LucideIcon } from "lucide-react";
+import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
@@ -86,6 +86,7 @@ const ONGLETS: {
       { href: "/programme/evolution", label: "Courbes d’évolution" },
     ],
   },
+  { href: "/videos", label: "Streaming", icon: Play, match: "/videos" },
   { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
 ];
 
