@@ -10,7 +10,6 @@ import {
   MATERIEL_LABEL,
   TYPE_LABEL,
   NIVEAU_EXERCICE_LABEL,
-  buildFreeExerciseDbPhotoUrl,
   type GroupePrincipal,
   type Materiel,
   type TypeExercice,
@@ -69,11 +68,9 @@ function FilterGroup<T extends string>({
 // matériel et type — jamais sur le niveau, affiché seulement en info sur
 // chaque carte pour rester simple.
 //
-// Photos Pexels ajoutées le même jour (même traitement que les recettes) :
-// résolues une seule fois côté serveur pour les 48 exercices (page.tsx),
-// passées ici en prop — changer un filtre ne déclenche jamais de nouvel
-// appel réseau.
-export function ExerciceCatalogue({ photos }: { photos: Record<string, string | null> }) {
+// Les anciennes photos externes ont été retirées : une fiche montre
+// uniquement un média COAI validé pour le mouvement exact.
+export function ExerciceCatalogue() {
   const [groupes, setGroupes] = useState<GroupePrincipal[]>([]);
   const [materiels, setMateriels] = useState<Materiel[]>([]);
   const [types, setTypes] = useState<TypeExercice[]>([]);
@@ -113,41 +110,36 @@ export function ExerciceCatalogue({ photos }: { photos: Record<string, string | 
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtres.map((ex) => {
-          // Free Exercise DB en priorité (20/08/2026, retour Anthony :
-          // photos Pexels parfois fausses) — photo choisie une fois pour
-          // l'exercice exact plutôt que trouvée par mots-clés à chaque
-          // résolution. Repli Pexels seulement pour les exercices sans
-          // correspondance fiable (cf. commentaires dans catalogue.ts).
-          const photoUrl = ex.freeExerciseDbId
-            ? buildFreeExerciseDbPhotoUrl(ex.freeExerciseDbId)
-            : photos[ex.photoQuery] ?? null;
-          // Photo COAI prioritaire (23/08/2026) — seule source tournée dans
-          // la charte, et dont l'exercice est garanti par le nom du fichier
-          // plutôt que déduit par rapprochement de mots.
+          // Une photo COAI exacte, ou aucune photo. Aucun ancien visuel de
+          // stock et aucun rapprochement approximatif par groupe musculaire.
           const photoCoai = photoCoaiPourNom(ex.nom);
-          const photoFinale = photoCoai ?? photoUrl;
           const hasVideoReelle = Boolean(videoCoaiPourNom(ex.nom));
           return (
             <article
               key={ex.id}
               className="flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_-48px_rgba(0,0,0,0.9)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-laiton-400/25"
             >
-              <div className="relative h-36 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.2),transparent_60%),#171b1d]">
-                {photoFinale && (
-                  // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, cf. RecetteCard pour la même justification
+              {photoCoai && (
+                <div className="relative h-36 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.2),transparent_60%),#171b1d]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- photo COAI locale déjà optimisée */}
                   <img
-                    src={photoFinale}
+                    src={photoCoai}
                     alt=""
-                    className={`h-full w-full ${photoCoai ? "object-contain" : "object-cover"}`}
+                    className="h-full w-full object-contain"
                     loading="lazy"
                   />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-transparent to-transparent" aria-hidden="true" />
-                <div className="absolute right-2.5 top-2.5">
-                  <Badge tone="neutral">{NIVEAU_EXERCICE_LABEL[ex.niveau]}</Badge>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-transparent to-transparent" aria-hidden="true" />
+                  <div className="absolute right-2.5 top-2.5">
+                    <Badge tone="neutral">{NIVEAU_EXERCICE_LABEL[ex.niveau]}</Badge>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex flex-col gap-2 p-4">
+                {!photoCoai && (
+                  <div className="self-start">
+                    <Badge tone="neutral">{NIVEAU_EXERCICE_LABEL[ex.niveau]}</Badge>
+                  </div>
+                )}
                 <h3 className="text-sm font-semibold text-white">{ex.nom}</h3>
                 <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-graphite-500">
                   <span>{GROUPE_PRINCIPAL_LABEL[ex.groupePrincipal]}</span>
