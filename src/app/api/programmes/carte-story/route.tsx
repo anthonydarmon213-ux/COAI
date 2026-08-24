@@ -1,11 +1,21 @@
 import { ImageResponse } from "next/og";
 import { NextResponse } from "next/server";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { photoRepasPourNom } from "@/lib/nutrition/photos-repas";
 import { photoRecuperationPourTexte } from "@/lib/recuperation/photos-recuperation";
 import type { Pilier } from "@prisma/client";
+
+export const runtime = "nodejs";
+
+async function imageLocaleDataUrl(chemin: string): Promise<string> {
+  const relatif = chemin.replace(/^\//, "");
+  const buffer = await readFile(path.join(process.cwd(), "public", relatif));
+  return `data:image/jpeg;base64,${buffer.toString("base64")}`;
+}
 
 function textes(contenu: unknown): string[] {
   const resultat: string[] = [];
@@ -76,8 +86,7 @@ export async function GET(request: Request) {
   );
 
   if (!programmes.some(Boolean)) return NextResponse.json({ error: "Programme introuvable" }, { status: 404 });
-  const origine = new URL(request.url).origin;
-  const absolu = (chemin: string) => new URL(chemin, origine).toString();
+  void request;
   const replis = [
     "/exercices/back-squat-barre.jpg",
     "/repas/plat-saumon-quinoa-brocolis.jpg",
@@ -85,11 +94,17 @@ export async function GET(request: Request) {
       ? "/recuperation/sauna-homme-blond-premium.jpg"
       : "/recuperation/sauna-femme-blonde-premium.jpg",
   ] as const;
-  const cartes = [
+  const cartesBrutes = [
     { numero: "01", label: "ENTRAÎNEMENT", titre: titre(programmes[0]?.contenu, "Bouger avec intention"), image: premierVisuel(programmes[0]?.contenu, "ENTRAINEMENT") ?? replis[0] },
     { numero: "02", label: "ALIMENTATION", titre: titre(programmes[1]?.contenu, "Manger pour progresser"), image: premierVisuel(programmes[1]?.contenu, "NUTRITION") ?? replis[1] },
     { numero: "03", label: "RÉCUPÉRATION", titre: titre(programmes[2]?.contenu, "Récupérer pour durer"), image: premierVisuel(programmes[2]?.contenu, "RECUPERATION", user.profile?.sexe) ?? replis[2] },
   ];
+  // Les images sont intégrées dans la réponse plutôt que re-téléchargées
+  // depuis coai.fr pendant le rendu. Cela évite la requête circulaire qui
+  // faisait échouer la génération Story en production.
+  const cartes = await Promise.all(
+    cartesBrutes.map(async (carte) => ({ ...carte, image: await imageLocaleDataUrl(carte.image) }))
+  );
 
   return new ImageResponse(
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "76px 68px", background: "radial-gradient(circle at 90% 0%,rgba(0,240,255,.12),transparent 32%),radial-gradient(circle at 5% 78%,rgba(212,175,55,.18),transparent 35%),#0D0E12", color: "#fffdf8", fontFamily: "system-ui,sans-serif" }}>
@@ -110,7 +125,7 @@ export async function GET(request: Request) {
         {cartes.map((carte) => (
           <div key={carte.numero} style={{ position: "relative", display: "flex", height: 285, overflow: "hidden", borderRadius: 28, border: "1px solid rgba(255,255,255,.14)", background: "#16181b" }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- rendu next/og */}
-            <img src={absolu(carte.image)} alt="" width={944} height={285} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", opacity: .62 }} />
+            <img src={carte.image} alt="" width={944} height={285} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", opacity: .62 }} />
             <div style={{ position: "absolute", inset: 0, display: "flex", background: "linear-gradient(90deg,rgba(5,6,8,.96) 0%,rgba(5,6,8,.72) 52%,rgba(5,6,8,.12) 100%)" }} />
             <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: "34px 40px", width: 650 }}>
               <span style={{ fontSize: 17, color: carte.numero === "02" ? "#00F0FF" : "#D4AF37", letterSpacing: 5 }}>{carte.numero} · {carte.label}</span>
