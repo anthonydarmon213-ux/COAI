@@ -3,9 +3,14 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { ProgrammePdf } from "@/lib/pdf/programme-pdf";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import type { Pilier } from "@prisma/client";
 
 export const runtime = "nodejs";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 // Mêmes slugs que les routes /programme/* (entrainement, alimentation,
 // recuperation) pour rester cohérent avec le reste de l'app.
@@ -55,8 +60,20 @@ export async function GET(request: Request, { params }: { params: { pilier: stri
   };
   const heroUrl = new URL(heroPath[pilier], request.url).toString();
 
+  const exerciseImages: Record<string, string> = {};
+  if (pilier === "ENTRAINEMENT" && isRecord(affiche.contenu)) {
+    const seances = Array.isArray(affiche.contenu.seances) ? affiche.contenu.seances : [];
+    const premiereSeance = isRecord(seances[0]) ? seances[0] : null;
+    const exercices = premiereSeance && Array.isArray(premiereSeance.exercices) ? premiereSeance.exercices : [];
+    for (const exercice of exercices.slice(0, 6)) {
+      if (!isRecord(exercice) || typeof exercice.nom !== "string") continue;
+      const photo = photoCoaiPourNom(exercice.nom);
+      if (photo) exerciseImages[exercice.nom] = new URL(photo, request.url).toString();
+    }
+  }
+
   const buffer = await renderToBuffer(
-    <ProgrammePdf pilier={pilier} data={affiche.contenu} prenom={user.prenom} generatedAt={affiche.generatedAt} heroUrl={heroUrl} />
+    <ProgrammePdf pilier={pilier} data={affiche.contenu} prenom={user.prenom} generatedAt={affiche.generatedAt} heroUrl={heroUrl} exerciseImages={exerciseImages} />
   );
 
   return new NextResponse(new Uint8Array(buffer), {

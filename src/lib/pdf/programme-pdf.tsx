@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Link, StyleSheet, Image as PdfImage } from "@react-pdf/renderer";
+import { Document, Page, View, Text, StyleSheet, Image as PdfImage } from "@react-pdf/renderer";
 import type { Pilier } from "@prisma/client";
 
 // Export PDF des programmes générés — porte l'identité visuelle du site
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   h1: { fontSize: 21, fontFamily: "Helvetica-Bold", color: C.textPrimary, letterSpacing: -0.3, marginBottom: 4 },
   genereLe: { fontSize: 7.5, color: C.textFaint, marginBottom: 16 },
-  heroImage: { width: "100%", height: 170, objectFit: "cover", borderRadius: 10, marginBottom: 14 },
+  heroImage: { width: "100%", height: 105, objectFit: "cover", borderRadius: 10, marginBottom: 10 },
 
   // --- Badges ---
   badgeRow: { flexDirection: "row", flexWrap: "wrap", marginBottom: 14 },
@@ -199,29 +199,35 @@ const styles = StyleSheet.create({
 
   // --- Exercices (chips HUD) ---
   exerciceCard: {
+    width: "48.5%",
+    minHeight: 92,
+    flexDirection: "row",
     backgroundColor: C.panel,
     borderWidth: 0.75,
     borderColor: C.panelBorder,
     borderLeftWidth: 2,
     borderLeftColor: C.gold,
     borderRadius: 5,
-    padding: 10,
+    padding: 6,
     marginBottom: 7,
   },
+  exercicesGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
+  exerciceImage: { width: 78, height: 78, objectFit: "cover", borderRadius: 4, marginRight: 7 },
+  exerciceContent: { flex: 1, minWidth: 0 },
   exerciceHeaderRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 },
-  exerciceNom: { fontSize: 10.5, fontFamily: "Helvetica-Bold", color: C.textPrimary, flex: 1 },
+  exerciceNom: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: C.textPrimary, flex: 1 },
   exerciceLink: { fontSize: 7, color: C.steel, letterSpacing: 0.3 },
   chipRow: { flexDirection: "row", flexWrap: "wrap" },
   chip: {
-    width: 152,
+    width: "48%",
     borderWidth: 0.75,
     borderColor: C.hairline,
     backgroundColor: "rgba(255,255,255,0.02)",
     borderRadius: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 7,
-    marginRight: 6,
-    marginBottom: 6,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
+    marginRight: 3,
+    marginBottom: 3,
   },
   chipLabel: { fontSize: 6, color: C.textFaint, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 2 },
   chipValue: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: C.textPrimary },
@@ -312,40 +318,48 @@ const CHAMPS_EXERCICE: { cle: string; label: string }[] = [
   { cle: "series", label: "Séries" },
   { cle: "repetitions", label: "Répétitions" },
   { cle: "repos", label: "Repos" },
-  { cle: "charge", label: "Charge" },
   { cle: "methode", label: "Méthode" },
+  { cle: "charge", label: "Charge" },
 ];
 
-function PdfExercice({ exercice }: { exercice: unknown }) {
+function reposLisible(value: string): string {
+  const secondes = value.match(/(\d+)\s*(?:s|sec|seconde)/i);
+  if (!secondes) return value;
+  const total = Number(secondes[1]);
+  if (!Number.isFinite(total) || total < 60) return value;
+  const minutes = Math.floor(total / 60);
+  const reste = total % 60;
+  return `${value} · ${minutes} min${reste ? ` ${reste}` : ""}`;
+}
+
+function PdfExercice({ exercice, imageUrl }: { exercice: unknown; imageUrl?: string }) {
   if (!isPlainObject(exercice)) return null;
   const nom = typeof exercice.nom === "string" ? exercice.nom : "Exercice";
   const chips = CHAMPS_EXERCICE.map(({ cle, label }) => {
     const v = exercice[cle];
     if (v === undefined || v === null || v === "") return null;
-    return { label, value: String(v) };
+    const value = String(v);
+    return { label, value: cle === "repos" ? reposLisible(value) : value };
   }).filter((v): v is { label: string; value: string } => v !== null);
 
   return (
     <View style={styles.exerciceCard} wrap={false}>
-      <View style={styles.exerciceHeaderRow}>
-        <Text style={styles.exerciceNom}>{nom}</Text>
-        <Link
-          src={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${nom} technique musculation`)}`}
-          style={styles.exerciceLink}
-        >
-          Voir la technique
-        </Link>
-      </View>
-      {chips.length > 0 && (
-        <View style={styles.chipRow}>
-          {chips.map((c, i) => (
-            <View key={i} style={styles.chip}>
-              <Text style={styles.chipLabel}>{c.label}</Text>
-              <Text style={styles.chipValue}>{c.value}</Text>
-            </View>
-          ))}
+      {imageUrl && <PdfImage src={imageUrl} style={styles.exerciceImage} />}
+      <View style={styles.exerciceContent}>
+        <View style={styles.exerciceHeaderRow}>
+          <Text style={styles.exerciceNom}>{nom}</Text>
         </View>
-      )}
+        {chips.length > 0 && (
+          <View style={styles.chipRow}>
+            {chips.slice(0, 4).map((c, i) => (
+              <View key={i} style={styles.chip}>
+                <Text style={styles.chipLabel}>{c.label}</Text>
+                <Text style={styles.chipValue}>{c.value}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -377,7 +391,7 @@ function JourHeader({ index, titre, sousTitre }: { index: number; titre: string;
   );
 }
 
-function EntrainementBody({ data }: { data: Record<string, unknown> }) {
+function EntrainementBody({ data, exerciseImages }: { data: Record<string, unknown>; exerciseImages?: Record<string, string> }) {
   const { frequenceParSemaine, dureeProgramme, seances } = data as {
     frequenceParSemaine?: string;
     dureeProgramme?: string;
@@ -410,25 +424,16 @@ function EntrainementBody({ data }: { data: Record<string, unknown> }) {
           return (
             <View key={i} style={styles.jourBlock}>
               <JourHeader index={i} titre={nom} sousTitre={jour} />
-              {echauffement && (
-                <>
-                  <Text style={styles.subLabel}>Échauffement</Text>
-                  <Text style={styles.paragraph}>{echauffement}</Text>
-                </>
-              )}
+              {echauffement && <Text style={styles.paragraph}>Échauffement · {echauffement.slice(0, 180)}{echauffement.length > 180 ? "…" : ""}</Text>}
               {exercices.length > 0 && (
-                <View style={{ marginTop: 4 }}>
-                  {exercices.slice(0, 6).map((ex, j) => (
-                    <PdfExercice key={j} exercice={ex} />
-                  ))}
+                <View style={styles.exercicesGrid}>
+                  {exercices.slice(0, 6).map((ex, j) => {
+                    const nomExercice = isPlainObject(ex) && typeof ex.nom === "string" ? ex.nom : "";
+                    return <PdfExercice key={j} exercice={ex} imageUrl={exerciseImages?.[nomExercice]} />;
+                  })}
                 </View>
               )}
-              {retourAuCalme && (
-                <>
-                  <Text style={styles.subLabel}>Retour au calme</Text>
-                  <Text style={styles.paragraph}>{retourAuCalme}</Text>
-                </>
-              )}
+              {retourAuCalme && <Text style={styles.paragraph}>Retour au calme · {retourAuCalme.slice(0, 120)}{retourAuCalme.length > 120 ? "…" : ""}</Text>}
             </View>
           );
         })}
@@ -575,12 +580,14 @@ export function ProgrammePdf({
   prenom,
   generatedAt,
   heroUrl,
+  exerciseImages,
 }: {
   pilier: Pilier;
   data: unknown;
   prenom?: string | null;
   generatedAt: Date;
   heroUrl?: string;
+  exerciseImages?: Record<string, string>;
 }) {
   const contenu = isPlainObject(data) ? data : {};
   const titre = typeof contenu.titre === "string" ? contenu.titre : PILIER_LABEL[pilier];
@@ -592,7 +599,7 @@ export function ProgrammePdf({
 
   return (
     <Document title={`COAI — Programme ${PILIER_LABEL[pilier]}`}>
-      <Page size="A4" style={styles.page} wrap>
+      <Page size="A4" style={styles.page} wrap={false}>
         <HeaderFixed pilier={pilier} prenom={prenom} dateFormatee={dateFormatee} />
 
         <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>
@@ -600,7 +607,7 @@ export function ProgrammePdf({
         <Text style={styles.genereLe}>Généré le {dateFormatee} par l&apos;IA COAI</Text>
         {heroUrl && <PdfImage src={heroUrl} style={styles.heroImage} />}
 
-        {pilier === "ENTRAINEMENT" && <EntrainementBody data={contenu} />}
+        {pilier === "ENTRAINEMENT" && <EntrainementBody data={contenu} exerciseImages={exerciseImages} />}
         {pilier === "NUTRITION" && <NutritionBody data={contenu} />}
         {pilier === "RECUPERATION" && <RecuperationBody data={contenu} />}
 
