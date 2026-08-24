@@ -15,7 +15,7 @@ const SLUG_TO_PILIER: Record<string, Pilier> = {
   recuperation: "RECUPERATION",
 };
 
-export async function GET(_request: Request, { params }: { params: { pilier: string } }) {
+export async function GET(request: Request, { params }: { params: { pilier: string } }) {
   const pilier = SLUG_TO_PILIER[params.pilier];
   if (!pilier) {
     return NextResponse.json({ error: "Pilier inconnu" }, { status: 400 });
@@ -46,8 +46,17 @@ export async function GET(_request: Request, { params }: { params: { pilier: str
     return NextResponse.json({ error: "Aucun programme généré" }, { status: 404 });
   }
 
+  const heroPath: Record<Pilier, string> = {
+    ENTRAINEMENT: "/exercices/back-squat-barre.jpg",
+    NUTRITION: "/repas/plat-saumon-quinoa-brocolis.jpg",
+    RECUPERATION: user.profile?.sexe?.toLowerCase() === "homme"
+      ? "/recuperation/sauna-homme-blond-premium.jpg"
+      : "/recuperation/sauna-femme-blonde-premium.jpg",
+  };
+  const heroUrl = new URL(heroPath[pilier], request.url).toString();
+
   const buffer = await renderToBuffer(
-    <ProgrammePdf pilier={pilier} data={affiche.contenu} prenom={user.prenom} generatedAt={affiche.generatedAt} />
+    <ProgrammePdf pilier={pilier} data={affiche.contenu} prenom={user.prenom} generatedAt={affiche.generatedAt} heroUrl={heroUrl} />
   );
 
   return new NextResponse(new Uint8Array(buffer), {

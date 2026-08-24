@@ -21,6 +21,7 @@ import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import { ProgrammeShareButton } from "@/components/programme/programme-share-button";
+import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
@@ -152,6 +153,12 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
     { pilier: "RECUPERATION" as Pilier, numero: "03", titre: "Récupérer", sousTitre: "Sommeil, mobilité et détente", image: recupHero },
   ];
 
+  const titresApercu = contenusAffiches.map((contenu, index) => {
+    if (typeof contenu !== "object" || contenu === null || Array.isArray(contenu)) return etapes[index]?.sousTitre ?? "Programme prêt";
+    const titre = (contenu as Record<string, unknown>).titre;
+    return typeof titre === "string" && titre.trim() ? titre : etapes[index]?.sousTitre ?? "Programme prêt";
+  });
+
   return (
     <div className="coai-programme-page flex flex-col gap-8">
       {derniers[0] && derniers[0].version === 1 && <TrackConversion name="first_programme_viewed" />}
@@ -164,9 +171,9 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
                 <span>Ton parcours personnalisé</span>
               </div>
-              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Aujourd&apos;hui, fais simple.</h1>
+              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Ton plan en un coup d&apos;œil.</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
-                Suis les trois étapes dans l&apos;ordre. Ton entraînement, ta diète et ta récupération sont déjà coordonnés.
+                Trois fiches visuelles. Ouvre seulement le niveau de détail dont tu as besoin.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -186,7 +193,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
           </div>
 
           <div className="grid gap-3 md:grid-cols-3">
-            {etapes.map((etape) => {
+            {etapes.map((etape, etapeIndex) => {
               const disponible = Boolean(contenusAffiches[piliersAffiches.indexOf(etape.pilier)]);
               return (
                 <a
@@ -200,7 +207,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                     <span>
                       <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-laiton-300">ÉTAPE {etape.numero}</span>
                       <strong className="mt-1 block text-base text-white">{etape.titre}</strong>
-                      <span className="mt-0.5 block text-xs text-graphite-300">{etape.sousTitre}</span>
+                      <span className="mt-0.5 block line-clamp-2 text-xs leading-5 text-graphite-200">{titresApercu[etapeIndex]}</span>
                     </span>
                     <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${disponible ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-graphite-400"}`}>
                       {disponible ? "Prêt" : "À créer"}
@@ -269,12 +276,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               </div>
               <div className="flex items-center gap-2">
                 {affiche && (
-                  <a
-                    href={`/api/programmes/${PDF_SLUG[pilier]}/pdf`}
-                    className="rounded-full border border-graphite-800 px-4 py-2 text-sm text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
-                  >
-                    PDF
-                  </a>
+                  <ProgrammePdfButton slug={PDF_SLUG[pilier]} label="Aperçu 1 page" />
                 )}
               </div>
             </div>

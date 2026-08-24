@@ -19,9 +19,17 @@ export function ProgrammeShareButton() {
         setEtat("idle");
         return;
       }
+      // Après un fetch asynchrone, Safari et Chrome peuvent bloquer
+      // window.open comme une pop-up. Un vrai lien de téléchargement créé
+      // dans le document reste fiable sur ordinateur et mobile.
       const href = URL.createObjectURL(blob);
-      window.open(href, "_blank", "noopener,noreferrer");
-      if (navigator.clipboard) await navigator.clipboard.writeText(`${text} — https://coai.fr/diagnostic`);
+      const lien = document.createElement("a");
+      lien.href = href;
+      lien.download = "mon-programme-coai-story.png";
+      document.body.appendChild(lien);
+      lien.click();
+      lien.remove();
+      window.setTimeout(() => URL.revokeObjectURL(href), 1_000);
       setEtat("done");
       window.setTimeout(() => setEtat("idle"), 3500);
     } catch (error) {
@@ -40,7 +48,7 @@ export function ProgrammeShareButton() {
       disabled={etat === "loading"}
       className="rounded-full border border-laiton-400/35 bg-laiton-400/[0.08] px-4 py-2 text-sm font-semibold text-laiton-200 transition hover:bg-laiton-400/[0.16]"
     >
-      {etat === "loading" ? "Création de la Story…" : etat === "done" ? "Story ouverte ✓" : etat === "error" ? "Réessayer" : "Partager en Story"}
+      {etat === "loading" ? "Création de la Story…" : etat === "done" ? "Story téléchargée ✓" : etat === "error" ? "Réessayer" : "Télécharger ma Story"}
     </button>
   );
 }
