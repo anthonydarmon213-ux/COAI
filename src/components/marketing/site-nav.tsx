@@ -22,12 +22,8 @@ const LIENS = [
 // la friction pour peu de valeur — remplacé par une seule action, affichée
 // directement dans le header, sans bouton hamburger ni panneau à ouvrir.
 //
-// Un seul bouton d'action, pas deux (14/08/2026, correction Anthony) —
-// "Se connecter" et "Commencer" pointaient tous les deux vers /dashboard
-// une fois connecté (bug réel, pas juste une redondance visuelle) : gardé
-// uniquement le bouton qui a du sens dans chaque état. Un visiteur non
-// connecté qui clique "Faire mon bilan" suit le parcours gratuit avant
-// toute création de compte ou sélection de formule.
+// Le bilan reste l'action principale. La connexion est toutefois toujours
+// accessible séparément pour les membres déjà inscrits.
 export function SiteNav({ connecte }: { connecte: boolean }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const menuMobileRef = useRef<HTMLDivElement>(null);
@@ -79,12 +75,22 @@ export function SiteNav({ connecte }: { connecte: boolean }) {
         ))}
       </nav>
 
-      <Link
-        href={actionHref}
-        className="hidden rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300 lg:inline-block"
-      >
-        {actionLabel}
-      </Link>
+      <div className="hidden items-center gap-3 lg:flex">
+        {!connecte && (
+          <Link
+            href="/sign-in"
+            className="rounded-full border border-white/15 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-white transition hover:border-laiton-300/45 hover:bg-white/[0.05]"
+          >
+            Se connecter
+          </Link>
+        )}
+        <Link
+          href={actionHref}
+          className="rounded-full bg-laiton-400 px-5 py-2.5 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-graphite-950 transition hover:bg-laiton-300"
+        >
+          {actionLabel}
+        </Link>
+      </div>
 
       <div ref={menuMobileRef} className="relative lg:hidden">
         <button
@@ -104,6 +110,11 @@ export function SiteNav({ connecte }: { connecte: boolean }) {
           {LIENS.map((lien) => (
             <Link onClick={() => setMenuOuvert(false)} key={lien.label} href={lien.href} className="coai-public-menu-link rounded-xl px-4 py-3 text-sm font-semibold transition">{lien.label}</Link>
           ))}
+          {!connecte && (
+            <Link onClick={() => setMenuOuvert(false)} href="/sign-in" className="coai-public-menu-link rounded-xl px-4 py-3 text-sm font-semibold transition">
+              Se connecter
+            </Link>
+          )}
           <Link onClick={() => setMenuOuvert(false)} href={actionHref} className="coai-public-menu-action mt-2 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em]">{actionLabel}</Link>
         </nav>}
       </div>

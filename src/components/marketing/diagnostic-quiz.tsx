@@ -512,14 +512,6 @@ function AssessmentRow({ number, title, instruction, options, value, onChange }:
   );
 }
 
-// Photo par pilier (20/08/2026, retour Anthony : l'aperçu "ne donne pas
-// envie") — vignette à gauche plutôt qu'une photo pleine largeur, pour
-// répondre en même temps à l'autre retour de la même session ("réduire le
-// diagnostic, aller à l'essentiel") : format compact, pas de scroll
-// supplémentaire sur l'écran résultat. `accentColor` reprend la couleur déjà
-// utilisée pour le gauge du même pilier plus haut sur l'écran (Entraînement
-// #ff8a3d, Alimentation #ffd84d, Récupération #39e67b), pour que la carte se
-// lise comme le prolongement du gauge plutôt qu'un élément déconnecté.
 function VoletCard({
   label,
   photoUrl,
@@ -532,26 +524,27 @@ function VoletCard({
   children: ReactNode;
 }) {
   return (
-    <div className="flex w-full items-stretch gap-3 overflow-hidden rounded-xl border border-graphite-800 bg-graphite-900/50 text-left">
+    <article className="group relative flex min-h-[280px] w-full flex-col justify-end overflow-hidden rounded-[1.4rem] border border-white/[0.1] bg-graphite-950 text-left shadow-[0_20px_55px_rgba(0,0,0,.28)]">
       <div
-        className="relative h-auto w-[72px] flex-none overflow-hidden bg-graphite-800 sm:w-20"
-        style={accentColor ? { boxShadow: `inset 3px 0 0 ${accentColor}` } : undefined}
+        className="absolute inset-0 overflow-hidden bg-graphite-900"
+        style={accentColor ? { boxShadow: `inset 0 3px 0 ${accentColor}` } : undefined}
       >
         {photoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
-          <img src={photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+          // eslint-disable-next-line @next/next/no-img-element -- chemin local fourni par le serveur, dimensions gérées par la carte responsive
+          <img src={photoUrl} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" loading="lazy" />
         )}
       </div>
-      <div className="flex flex-1 flex-col justify-center px-1 py-4 pr-4">
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/5" />
+      <div className="relative z-10 flex flex-col justify-end px-5 py-5">
         <span
-          className="font-mono text-[10px] uppercase tracking-[0.14em]"
+          className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
           style={{ color: accentColor ?? "#767c86" }}
         >
           {label}
         </span>
-        <div className="mt-1.5 text-sm leading-6 text-graphite-300">{children}</div>
+        <div className="mt-2 text-sm leading-6 text-white/90">{children}</div>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -648,7 +641,7 @@ export function DiagnosticQuiz({
   // Événement émotionnel déclencheur (19/08/2026, demande Anthony — façon
   // MyFitCoach) : utilisé uniquement pour la projection affichée sur
   // l'écran de résultat, jamais persisté sur Profile.
-  const [declencheur, setDeclencheur] = useState<string | null>(null);
+  const [declencheur, setDeclencheur] = useState<string[]>([]);
   const [personaAutreTexte, setPersonaAutreTexte] = useState("");
   const [objectifAutreTexte, setObjectifAutreTexte] = useState("");
   const [santeAutreTexte, setSanteAutreTexte] = useState("");
@@ -674,6 +667,20 @@ export function DiagnosticQuiz({
 
   function toggle(list: string[], value: string, setter: (v: string[]) => void) {
     setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+
+  function toggleDeclencheur(value: string) {
+    const sansEvenement = "Pas d'événement précis, juste pour moi";
+    if (value === sansEvenement) {
+      setDeclencheur(declencheur.includes(value) ? [] : [value]);
+      return;
+    }
+    const choixActuels = declencheur.filter((item) => item !== sansEvenement);
+    setDeclencheur(
+      choixActuels.includes(value)
+        ? choixActuels.filter((item) => item !== value)
+        : [...choixActuels, value]
+    );
   }
 
   // "Aucune, je suis en pleine forme" est exclusif avec toute vraie
@@ -919,7 +926,8 @@ export function DiagnosticQuiz({
     if (typeof saved.maxDeadlift === "string") setMaxDeadlift(saved.maxDeadlift);
     if (typeof saved.prioriteTravail === "string") setPrioriteTravail(saved.prioriteTravail);
     if (typeof saved.echeance === "string") setEcheance(saved.echeance);
-    if (typeof saved.declencheur === "string") setDeclencheur(saved.declencheur);
+    if (Array.isArray(saved.declencheur)) setDeclencheur(saved.declencheur as string[]);
+    else if (typeof saved.declencheur === "string") setDeclencheur([saved.declencheur]);
     if (typeof saved.mobiliteRepere === "string") setMobiliteRepere(saved.mobiliteRepere);
     if (typeof saved.cardioRepere === "string") setCardioRepere(saved.cardioRepere);
     if (typeof saved.forceRepere === "string") setForceRepere(saved.forceRepere);
@@ -1031,7 +1039,7 @@ export function DiagnosticQuiz({
     if (step === "objectif") return objectifsPrincipaux.length > 0 || Boolean(objectif);
     if (step === "accompagnement") return true;
     if (step === "echeance") return Boolean(echeance);
-    if (step === "declencheur") return Boolean(declencheur);
+    if (step === "declencheur") return declencheur.length > 0;
     if (step === "equipement") return equipement.length > 0;
     if (step === "lieu") return Boolean(lieu);
     if (step === "duree") return Boolean(duree);
@@ -1119,7 +1127,7 @@ export function DiagnosticQuiz({
             objectif: resolveObjectif(objectif, objectifAutreTexte),
             poidsKg,
             echeance,
-            evenement: declencheur,
+            evenement: declencheur.join(" · ") || null,
             indiceCoaiScore: diagnostic.indiceCoai.score,
           })
         : null,
@@ -1218,7 +1226,7 @@ export function DiagnosticQuiz({
         sourceDecouverteLibre.trim() ? `a connu COAI via : ${sourceDecouverteLibre.trim()}` : null,
         prioriteTravail.trim() ? `priorité actuelle : ${prioriteTravail.trim()}` : null,
         echeance ? `échéance : ${echeance}` : null,
-        declencheur ? `déclencheur : ${declencheur}` : null,
+        declencheur.length ? `déclencheurs : ${declencheur.join(", ")}` : null,
         personaAutreResolue,
       ].filter(Boolean).join(" — ") || undefined,
       equipementDisponible: equipement.length ? resolveAutre(equipement, equipementAutreTexte).join(", ") : undefined,
@@ -1339,7 +1347,7 @@ export function DiagnosticQuiz({
             attentesCoai: resolveAutre(attentesCoai, attentesCoaiAutreTexte),
             prioriteOptimisation: prioriteOptimisation.trim(),
             echeance,
-            declencheur,
+            declencheur: declencheur.join(", "),
             mobiliteRepere,
             cardioRepere,
             forceRepere,
@@ -1589,10 +1597,17 @@ export function DiagnosticQuiz({
               <div>
                 <p className="coai-consultation-phase">Entretien · Motivation</p>
                 <h2 className="mt-2 font-display text-xl font-semibold text-white">Qu&apos;est-ce qui rend ce moment important pour toi ?</h2>
-                <p className="mt-1.5 text-sm text-graphite-400">On s&apos;en sert pour te montrer une vraie trajectoire, pas juste des chiffres abstraits.</p>
+                <p className="mt-1.5 text-sm text-graphite-400">Plusieurs réponses sont possibles. On s&apos;en sert pour te montrer une vraie trajectoire, pas juste des chiffres abstraits.</p>
               </div>
-              <div className="flex flex-col gap-2">
-                {EVENEMENTS_DECLENCHEURS.map((item) => <OptionCard key={item} label={item} active={declencheur === item} onClick={() => setDeclencheur(item)} />)}
+              <div className="grid gap-2 sm:grid-cols-2">
+                {EVENEMENTS_DECLENCHEURS.map((item) => (
+                  <OptionCard
+                    key={item}
+                    label={item}
+                    active={declencheur.includes(item)}
+                    onClick={() => toggleDeclencheur(item)}
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -2252,7 +2267,7 @@ export function DiagnosticQuiz({
                   <SectionLabel>Aperçu de ton programme</SectionLabel>
                   <p className="mt-2 text-sm leading-6 text-graphite-200">{diagnostic.pitchEvolution}</p>
                 </div>
-                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
                   <VoletCard label="Entraînement" photoUrl={pilierPhotos.entrainement} accentColor="#ff8a3d">
                     {diagnostic.split && <p>{diagnostic.split}</p>}
                     <ul className="mt-2 flex flex-col gap-1 text-graphite-400">

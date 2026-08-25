@@ -5,20 +5,13 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { getStockPhotos } from "@/lib/media/pexels";
-
-// Une photo par pilier sur "Aperçu de ton programme" (20/08/2026, retour
-// Anthony : l'aperçu "ne donne pas envie, trop de texte") — générique par
-// pilier, pas par réponse précise (le texte de chaque VoletCard dépend de la
-// réponse de l'utilisateur, mais illustrer "Nutrition" avec une photo
-// différente selon la réponse serait plus de travail que de valeur pour un
-// simple repère visuel). Résolu ici, côté serveur, une fois pour tous les
-// visiteurs de la page — même mécanisme que RecetteCard/ExerciceCard.
-const PILIER_PHOTO_QUERIES: Record<keyof PilierPhotos, string> = {
-  entrainement: "strength training gym athlete",
-  nutrition: "healthy meal prep nutrition",
-  recuperation: "yoga stretching recovery",
-  hydratation: "water bottle hydration lifestyle",
+// Visuels éditoriaux COAI : stables, rapides et cohérents avec la marque.
+// Aucun appel à une banque d'images externe n'est nécessaire sur le diagnostic.
+const PILIER_PHOTOS: PilierPhotos = {
+  entrainement: "/exercices/back-squat-barre.jpg",
+  nutrition: "/repas/plat-saumon-quinoa-brocolis.jpg",
+  recuperation: "/recuperation/hammam-femme-blonde-premium.jpg",
+  hydratation: "/recuperation/hydratation-eau.jpg",
 };
 
 // Nombre de questions codé en dur ici (metadata = export statique, ne peut
@@ -61,14 +54,6 @@ export default async function DiagnosticPage({
     : null;
   const arriveParDefi = !user && scoreDefi !== null;
 
-  const photosResolues = await getStockPhotos(Object.values(PILIER_PHOTO_QUERIES));
-  const pilierPhotos: PilierPhotos = {
-    entrainement: photosResolues[PILIER_PHOTO_QUERIES.entrainement] ?? null,
-    nutrition: photosResolues[PILIER_PHOTO_QUERIES.nutrition] ?? null,
-    recuperation: photosResolues[PILIER_PHOTO_QUERIES.recuperation] ?? null,
-    hydratation: photosResolues[PILIER_PHOTO_QUERIES.hydratation] ?? null,
-  };
-
   return (
     <main className="coai-diagnostic-page flex min-h-screen flex-col items-center gap-8 px-5 py-8 sm:px-6 sm:py-14">
       {inviteParUnMembre && <TrackConversion name="referral_invitation_opened" />}
@@ -90,7 +75,7 @@ export default async function DiagnosticPage({
         </Card>
       )}
       <div className="relative z-10 w-full">
-        <DiagnosticQuiz connecte={!!user} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={pilierPhotos} />
+        <DiagnosticQuiz connecte={!!user} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
       </div>
     </main>
   );

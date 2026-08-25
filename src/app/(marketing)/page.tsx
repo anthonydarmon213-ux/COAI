@@ -492,14 +492,14 @@ function LandingPageHistorique() {
       <section id="fondateur" className="coai-founder-stage relative mx-auto my-8 grid w-[calc(100%-2rem)] max-w-6xl items-center gap-10 overflow-hidden rounded-[2.5rem] border border-white/[0.08] px-6 py-16 text-center shadow-2xl sm:px-12 md:grid-cols-2 md:py-20 md:text-left">
         <div className="coai-founder-orbit" aria-hidden="true" />
         <div className="mx-auto flex flex-col items-center gap-4 md:order-first md:items-start">
-          <div className="relative aspect-square w-64 overflow-hidden rounded-[2rem] border border-laiton-300/35 shadow-[0_28px_80px_rgba(0,0,0,.48),0_0_45px_rgba(201,162,98,.12)] sm:w-80">
+          <div className="relative aspect-[2/3] w-64 overflow-hidden rounded-[2rem] border border-laiton-300/35 shadow-[0_28px_80px_rgba(0,0,0,.48),0_0_45px_rgba(201,162,98,.12)] sm:w-80">
             <Image
               src="/anthony-trx-studio-premium.jpg"
               alt="Anthony Darmon en séance TRX dans un studio de coaching premium"
               fill
               priority
               sizes="(min-width: 640px) 20rem, 16rem"
-              className="object-cover"
+              className="object-cover object-top"
             />
           </div>
           <div className="flex items-center justify-center gap-2.5">
@@ -844,8 +844,8 @@ export default function LandingPage() {
             COAI transforme ton bilan en actions concrètes. Selon la formule choisie, Anthony apporte aussi son regard humain sur les décisions importantes.
           </p>
         </div>
-        <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20">
-          <Image src="/anthony-studio-premium.jpg" alt="Anthony Darmon, coach sportif diplômé d'État" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover object-center" />
+        <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20 sm:min-h-[420px]">
+          <Image src="/anthony-studio-premium.jpg" alt="Anthony Darmon, coach sportif diplômé d'État" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover object-[center_30%]" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </div>
       </section>
