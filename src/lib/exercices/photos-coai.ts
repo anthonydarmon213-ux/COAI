@@ -50,6 +50,19 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["rowing à l'élastique", "rowing a l'elastique", "rowing élastique", "rowing elastique", "resistance band row"], fichier: "rowing-elastique-homme-blond" },
   { motifs: ["pompes", "pompe au sol", "push-up", "push up"], fichier: "pompes-femme-eurasienne" },
 
+  // Complément catalogue (25/08/2026) — modèles métis, tenue noire COAI.
+  // Ces neuf correspondances terminent la couverture visuelle exacte des
+  // exercices actuellement publiés dans la bibliothèque.
+  { motifs: ["curl biceps haltères", "curl biceps halteres", "dumbbell bicep curl"], fichier: "curl-biceps-halteres-femme-metisse-v2" },
+  { motifs: ["curl barre ez", "ez-bar curl", "ez bar curl"], fichier: "curl-barre-ez-homme-metis-v2" },
+  { motifs: ["squat poids du corps", "bodyweight squat"], fichier: "squat-poids-du-corps-femme-metisse-v2" },
+  { motifs: ["pont fessier", "glute bridge"], fichier: "pont-fessier-homme-metis-v2" },
+  { motifs: ["mollets debout (machine)", "mollets debout machine", "standing calf raise machine"], fichier: "mollets-debout-machine-femme-metisse-v2" },
+  { motifs: ["mollets assis (machine)", "mollets assis machine", "seated calf raise machine"], fichier: "mollets-assis-machine-homme-metis-v2" },
+  { motifs: ["mollets unilatéral haltère", "mollets unilateral haltere", "single leg calf raise"], fichier: "mollets-unilateral-haltere-femme-metisse-v2" },
+  { motifs: ["mollets debout élastique", "mollets debout elastique", "calf raise resistance band"], fichier: "mollets-debout-elastique-homme-metis-v2" },
+  { motifs: ["marche sur pointes", "walking on toes"], fichier: "marche-sur-pointes-femme-metisse-v2" },
+
   { motifs: ["fentes avant", "fente avant", "fentes haltères", "lunge"], fichier: "fentes-avant-halteres" },
   { motifs: ["leg curl", "ischio"], fichier: "leg-curl-allonge" },
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split", "split squat"], fichier: "fentes-bulgares" },

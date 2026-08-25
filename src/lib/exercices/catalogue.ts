@@ -159,12 +159,9 @@ export const EXERCICES: Exercice[] = [
   // MOLLETS
   { id: "mollets-debout-machine", nom: "Mollets debout (machine)", groupePrincipal: "MOLLETS", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Monte sur la pointe des pieds en contractant les mollets, redescends jusqu'à un étirement léger.", photoQuery: "standing calf raise machine gym", freeExerciseDbId: "Standing_Calf_Raises" },
   { id: "mollets-assis-machine", nom: "Mollets assis (machine)", groupePrincipal: "MOLLETS", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Genoux fléchis, monte sur la pointe des pieds en contrôlant chaque répétition.", photoQuery: "seated calf raise machine gym", freeExerciseDbId: "Seated_Calf_Raise" },
-  // Pas de variante unilatérale haltère trouvée — repli Pexels conservé.
   { id: "mollets-halteres-unilateral", nom: "Mollets unilatéral haltère", groupePrincipal: "MOLLETS", materiel: ["HALTERES"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "En équilibre sur une marche, monte sur la pointe du pied puis descends sous le niveau de la marche pour l'amplitude.", photoQuery: "single leg calf raise exercise" },
   // Aucune corde à sauter dans la base — repli Pexels conservé.
   { id: "sauts-a-la-corde", nom: "Sauts à la corde", groupePrincipal: "MOLLETS", materiel: ["POIDS_DU_CORPS"], type: "CARDIO", niveau: "DEBUTANT", consigne: "Petits sauts sur l'avant du pied, coudes proches du corps, rythme régulier plutôt que sauts hauts.", photoQuery: "jump rope exercise athlete" },
   { id: "mollets-elastique", nom: "Mollets debout élastique", groupePrincipal: "MOLLETS", materiel: ["ELASTIQUE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Élastique sous la plante du pied, pointe le pied vers le bas en résistant à la tension.", photoQuery: "calf raise resistance band exercise", freeExerciseDbId: "Calf_Raises_-_With_Bands" },
-  // Pas de correspondance "marche sur pointes" (mobilité, pas un exercice
-  // de force standard) — repli Pexels conservé.
   { id: "marche-sur-pointes", nom: "Marche sur pointes", groupePrincipal: "MOLLETS", materiel: ["POIDS_DU_CORPS"], type: "MOBILITE", niveau: "DEBUTANT", consigne: "Marche sur la pointe des pieds sur une courte distance, en gardant les mollets contractés.", photoQuery: "walking on toes calf exercise" },
 ];
