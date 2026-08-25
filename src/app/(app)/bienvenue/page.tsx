@@ -201,7 +201,7 @@ export default async function BienvenuePage({
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).
   const enEssai = plan !== "PREMIUM" && searchParams.essai !== "0";
-  const valeurMensuelle = plan === "PREMIUM" ? 199 : plan === "STANDARD" ? 89 : 49;
+  const valeurMensuelle = plan === "PREMIUM" ? 199 : plan === "STANDARD" ? 99 : 19.99;
   const metaEventAchat = enEssai ? "StartTrial" : "Subscribe";
 
   return (
@@ -215,15 +215,19 @@ export default async function BienvenuePage({
       <TrackConversion name="checkout_completed" params={{ plan }} />
 
       <div className="flex flex-col items-center gap-3">
-        <SectionLabel>Accès confirmé</SectionLabel>
+        <SectionLabel>{enEssai ? "Étape 6 sur 7 · Essai activé" : "Accès confirmé"}</SectionLabel>
         <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
-          Bienvenue{prenom ? `, ${prenom}` : ""}.
+          {enEssai ? "Tes 7 jours d'essai commencent." : `Bienvenue${prenom ? `, ${prenom}` : ""}.`}
         </h1>
         <p className="max-w-md text-sm leading-6 text-graphite-400">
-          À partir d&apos;ici, on s&apos;occupe de tout — jusqu&apos;à l&apos;atteinte de ton
-          objectif.
+          COAI prépare ton programme. Ta première séance sera accessible juste ici, sans chercher dans les menus.
         </p>
       </div>
+
+      <ActivationFlow
+        coachValidationRequise={coachValidationRequise}
+        profilInitial={user.profile ?? null}
+      />
 
       {/* Carte d'embarquement COAI — écho volontaire au "salon privé avant
           d'embarquer" évoqué par Anthony comme référence d'expérience. */}
@@ -290,11 +294,6 @@ export default async function BienvenuePage({
           </div>
         ))}
       </div>
-
-      <ActivationFlow
-        coachValidationRequise={coachValidationRequise}
-        profilInitial={user.profile ?? null}
-      />
 
       <Link href="/dashboard" className="text-sm text-graphite-500 underline hover:text-laiton-400">
         Retour au tableau de bord

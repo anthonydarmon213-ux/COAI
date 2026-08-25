@@ -13,7 +13,6 @@ import {
   saveDiagnosticProgress,
 } from "@/lib/diagnostic/progress-storage";
 import { readUtmCookie } from "@/lib/attribution/utm-cookie";
-import { storeIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
@@ -1262,19 +1261,8 @@ export function DiagnosticQuiz({
   }
 
   function handleCreerCompte() {
-    trackFunnelEvent("plan_selected", { plan: "GRATUIT" });
     storeDiagnosticAnswers(reponsesEnProfil());
     window.localStorage.setItem("coai_dashboard_intro_pending", "1");
-    // Essai Pass IA avec carte requise dès la sortie du diagnostic
-    // (20/08/2026, demande Anthony) — revient sur le "accès libre" du
-    // 13/08 pour CE parcours précis, sans y toucher ailleurs : le cookie
-    // d'intention (déjà utilisé par /pricing) est lu par
-    // CompleterInscriptionForm, qui déclenche maintenant le checkout Stripe
-    // au lieu de rediriger vers /pricing. Le reveal gratuit et partageable
-    // (score, jauges) n'est pas concerné — seule l'entrée dans le vrai
-    // programme, après ce reveal, est concernée. VIP garde trialDays: 0
-    // côté /api/stripe/checkout, jamais proposé ici.
-    storeIntendedPlanCookie("GRATUIT", 1);
   }
 
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
@@ -2241,7 +2229,23 @@ export function DiagnosticQuiz({
                   (19/08/2026, audit conversion demandé par Anthony) : elle vivait jusqu'ici
                   tout en bas de l'écran, après ~6 sections éducatives supplémentaires — le
                   point de conversion le plus important de la page était le plus enterré. */}
-              <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
+              {connecte ? (
+                <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
+              ) : (
+                <div className="w-full rounded-[1.6rem] border border-laiton-400/35 bg-laiton-400/[0.07] px-6 py-7 text-center">
+                  <SectionLabel>Étape 3 · conserve ton résultat</SectionLabel>
+                  <h3 className="mt-3 font-display text-2xl font-semibold text-white">
+                    Crée gratuitement ton espace COAI.
+                  </h3>
+                  <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-graphite-300">
+                    Ton diagnostic et cet aperçu seront enregistrés. Tu choisiras ta formule
+                    seulement à l&apos;étape suivante, sans paiement automatique.
+                  </p>
+                  <Link href={signUpHref()} onClick={handleCreerCompte} className="mt-5 inline-flex">
+                    <Button className="px-8 py-4">Créer mon compte gratuit →</Button>
+                  </Link>
+                </div>
+              )}
 
               <div className="flex w-full flex-col gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-6 text-left">
                 <div>
@@ -2400,34 +2404,24 @@ export function DiagnosticQuiz({
                   )}
                 </div>
               ) : (
-                // Essai Pass IA carte requise (20/08/2026, demande Anthony) :
-                // remplace le "accès libre" du 13/08 à cet endroit précis —
-                // voir handleCreerCompte(). Le reveal gratuit et partageable
-                // (score, jauges, DiagnosticShareButton plus haut) reste
-                // intact ; c'est seulement l'entrée dans le programme réel
-                // qui passe maintenant par le tunnel Stripe (7 jours offerts,
-                // carte enregistrée dès l'essai — cf. OFFER_BY_PLAN.GRATUIT
-                // dans /api/stripe/checkout). Les réponses du diagnostic
-                // restent mémorisées (pont pré-inscription existant) et
-                // appliquées à son profil dès la création du compte.
                 <div className="relative mt-4 flex w-full flex-col items-center gap-4 overflow-hidden rounded-[1.6rem] border-2 border-laiton-400/45 bg-[radial-gradient(circle_at_50%_0%,rgba(201,162,98,.16),transparent_20rem),#111518] px-5 py-8 text-center shadow-[0_24px_70px_-24px_rgba(0,0,0,.9)] sm:px-8 sm:py-10">
                   <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-laiton-300 via-laiton-500 to-acier-400" aria-hidden="true" />
                   <div className="coai-diagnostic-kicker">
                     <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                    <span>Étape suivante · ton essai t&apos;attend</span>
+                    <span>Étape suivante · ton espace personnel</span>
                   </div>
-                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Commence ton essai Pass IA, 7 jours offerts.</h3>
+                  <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Garde ton résultat et poursuis gratuitement.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
-                    Programme, check-ins et Coach IA 24/7, sans limite. Tu ne payes rien pendant 7
-                    jours ; annulable en un clic avant la fin de l&apos;essai.
+                    Crée ton compte sans carte bancaire. Tu choisiras ensuite ta formule, puis tu
+                    pourras démarrer les 7 jours d&apos;essai si tu le souhaites.
                   </p>
                   <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-300">Clique ci-dessous pour continuer</span>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="w-full max-w-md">
                     <Button className="coai-rainbow-cta w-full border-0 px-6 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-16px_rgba(201,162,98,.9)] sm:text-lg">
-                      Démarrer mon essai gratuit →
+                      Créer mon compte gratuit →
                     </Button>
                   </Link>
-                  <span className="text-xs font-medium text-graphite-500">0€ pendant 7 jours · carte requise · résiliable à tout moment</span>
+                  <span className="text-xs font-medium text-graphite-500">Gratuit · sans carte bancaire · moins d&apos;une minute</span>
                   <div className="-mx-5 w-[calc(100%+2.5rem)] sm:-mx-8 sm:w-[calc(100%+4rem)]">
                     <FondateurTicker />
                   </div>
@@ -2438,9 +2432,11 @@ export function DiagnosticQuiz({
                   aucun accès direct aux tarifs à cet endroit — le seul lien
                   "Comparer les 3 formules" vit dans FormuleRecommandeeCard,
                   plus haut sur l'écran. Ajouté ici aussi, à la vraie sortie. */}
-              <Link href="/pricing" className="text-sm font-semibold text-laiton-300 underline decoration-laiton-300/40 underline-offset-4 hover:text-laiton-200">
-                Voir les formules →
-              </Link>
+              {connecte ? (
+                <Link href="/pricing" className="text-sm font-semibold text-laiton-300 underline decoration-laiton-300/40 underline-offset-4 hover:text-laiton-200">
+                  Voir les formules →
+                </Link>
+              ) : null}
 
               <p className="max-w-lg text-sm leading-6 text-graphite-300">
                 Cette expérience t&apos;a plu ? Parles-en à quelqu&apos;un qui a besoin de s&apos;y

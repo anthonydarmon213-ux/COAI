@@ -10,7 +10,11 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { storeParrainageCookie } from "@/lib/parrainage/cookie";
-import { storeIntendedPlanCookie, type IntendedPlan } from "@/lib/checkout/intended-plan-cookie";
+import {
+  storeIntendedPlanCookie,
+  type IntendedBilling,
+  type IntendedPlan,
+} from "@/lib/checkout/intended-plan-cookie";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
@@ -42,19 +46,27 @@ import Link from "next/link";
 // pas de session → écran "vérifie ta boîte mail").
 export default function SignUpPage() {
   const searchParams = useSearchParams();
+  const planParam = searchParams.get("plan");
+  const requestedPlan: IntendedPlan | null =
+    planParam === "GRATUIT" || planParam === "STANDARD" || planParam === "PREMIUM"
+      ? planParam
+      : null;
+  const requestedBilling: IntendedBilling = searchParams.get("billing") === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+  const pricingReturn = requestedPlan
+    ? `/pricing?from=signin&selected=${requestedPlan}&billing=${requestedBilling}`
+    : "/pricing?from=signin";
 
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) storeParrainageCookie(ref);
-    const requestedPlan = searchParams.get("plan");
-    if (requestedPlan === "GRATUIT" || requestedPlan === "STANDARD" || requestedPlan === "PREMIUM") {
+    if (requestedPlan) {
       const requestedSessions = Number(searchParams.get("vipSessions"));
       const vipSessions = requestedSessions === 2 || requestedSessions === 3 || requestedSessions === 4
         ? requestedSessions
         : 1;
-      storeIntendedPlanCookie(requestedPlan as IntendedPlan, vipSessions);
+      storeIntendedPlanCookie(requestedPlan, vipSessions, requestedBilling);
     }
-  }, [searchParams]);
+  }, [requestedBilling, requestedPlan, searchParams]);
 
   useEffect(() => {
     trackFunnelEvent("signup_started", {});
@@ -134,18 +146,18 @@ export default function SignUpPage() {
           <div>
             <div className="coai-diagnostic-kicker">
               <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-              <span>Diagnostic enregistré</span>
+            <span>Étape 3 · création du compte</span>
             </div>
             <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
               Entre dans ton espace COAI.
             </h1>
             <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
-              Retrouve ton profil et le niveau d&apos;accompagnement que tu viens de choisir. Après
-              cette étape, tu pourras démarrer ton abonnement en toute sécurité.
+              Ton résultat personnalisé est conservé. Crée gratuitement ton espace, puis choisis
+              tranquillement la formule qui te convient.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {["Ton diagnostic conservé", "Accès immédiat à l'interface", "Aucune carte bancaire"].map((item) => (
+            {["Ton résultat conservé", "Compte gratuit", "Formule choisie ensuite"].map((item) => (
               <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
             ))}
           </div>
@@ -157,7 +169,7 @@ export default function SignUpPage() {
             <h2 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h2>
             <p className="text-sm leading-6 text-graphite-400">Une minute suffit pour retrouver ton analyse.</p>
           </div>
-          <GoogleSignInButton />
+          <GoogleSignInButton redirectTo={pricingReturn} />
           <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
             <div className="h-px flex-1 bg-graphite-800" />
             ou
@@ -188,12 +200,12 @@ export default function SignUpPage() {
             </Field>
             {error && <p className="text-sm text-red-400">{error}</p>}
             <Button type="submit" disabled={loading}>
-              {loading ? "Création de ton espace…" : "Créer mon espace personnalisé →"}
+              {loading ? "Création de ton espace…" : "Créer mon compte gratuit →"}
             </Button>
           </form>
           <p className="text-sm text-graphite-400">
             Déjà un compte ?{" "}
-            <Link href="/sign-in" className="underline">
+            <Link href={`/sign-in?redirect_to=${encodeURIComponent(pricingReturn)}`} className="underline">
               Se connecter
             </Link>
           </p>

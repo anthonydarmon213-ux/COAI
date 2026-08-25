@@ -251,8 +251,8 @@ const STRUCTURED_DATA = {
       areaServed: "FR",
       description: DESCRIPTION,
       offers: [
-        { "@type": "Offer", name: "Pass IA", price: "49", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Coaching Hybride", price: "89", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Pass IA", price: "19.99", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Coaching Hybride", price: "99", priceCurrency: "EUR" },
         { "@type": "Offer", name: "VIP", price: "199", priceCurrency: "EUR" },
       ],
     },
@@ -267,7 +267,7 @@ const STRUCTURED_DATA = {
   ],
 };
 
-export default function LandingPage() {
+function LandingPageHistorique() {
   return (
     <main className="coai-color-surface bg-lab-grid flex flex-col after:hidden">
       <script
@@ -783,6 +783,93 @@ export default function LandingPage() {
         </div>
       </section>
       </Reveal>
+    </main>
+  );
+}
+
+const PARCOURS_COURT = [
+  ["01", "Bilan gratuit", "Moins de 5 minutes, sans carte bancaire."],
+  ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
+  ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
+  ["04", "Choix de la formule", "Pass IA, Coaching Hybride ou VIP."],
+  ["05", "Essai de 7 jours", "Tu testes avant le premier prélèvement."],
+  ["06", "Programme activé", "Entraînement, alimentation et récupération coordonnés."],
+  ["07", "Première séance", "COAI te guide immédiatement, étape par étape."],
+] as const;
+
+export default function LandingPage() {
+  return (
+    <main className="coai-color-surface bg-lab-grid flex flex-col after:hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c") }}
+      />
+      <TrackConversion name="landing_viewed" />
+      <CoaiIntro />
+
+      <section id="parcours" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-20 sm:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <SectionLabel>Simple du début à la première séance</SectionLabel>
+          <h2 className="mt-5 font-display text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+            Tu sais toujours où tu en es.
+          </h2>
+          <p className="mt-4 text-base leading-7 text-graphite-300">
+            Ton bilan et ton résultat restent gratuits. Tu crées ensuite ton compte, choisis ta formule et testes COAI pendant 7 jours.
+          </p>
+        </div>
+        <ol className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          {PARCOURS_COURT.map(([numero, titre, texte], index) => (
+            <li key={numero} className={`rounded-3xl border px-5 py-6 ${index === PARCOURS_COURT.length - 1 ? "border-laiton-300/45 bg-laiton-300/[0.08]" : "border-white/[0.08] bg-white/[0.03]"}`}>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-300">ÉTAPE {numero}</span>
+              <h3 className="mt-3 text-lg font-semibold text-white">{titre}</h3>
+              <p className="mt-2 text-sm leading-6 text-graphite-400">{texte}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-9 text-center">
+          <Link href="/diagnostic"><Button>Commencer mon bilan gratuit</Button></Link>
+          <p className="mt-3 text-xs text-graphite-500">Aucune carte bancaire · résultat immédiat · sans engagement</p>
+        </div>
+      </section>
+
+      <PiliersVisuelsSection />
+
+      <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 py-20 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
+        <div>
+          <SectionLabel>17 ans de terrain</SectionLabel>
+          <h2 className="mt-5 font-display text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+            La technologie accélère. Le coach garde le cap.
+          </h2>
+          <p className="mt-5 text-base leading-7 text-graphite-300">
+            COAI transforme ton bilan en actions concrètes. Selon la formule choisie, Anthony apporte aussi son regard humain sur les décisions importantes.
+          </p>
+        </div>
+        <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20">
+          <Image src="/anthony-studio-premium.jpg" alt="Anthony Darmon, coach sportif diplômé d'État" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover object-center" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        </div>
+      </section>
+
+      <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-16">
+        <div className="text-center"><SectionLabel>Questions essentielles</SectionLabel></div>
+        <div className="flex flex-col gap-3">
+          {FAQ.slice(0, 4).map((item) => (
+            <Card key={item.question}>
+              <details>
+                <summary className="cursor-pointer list-none text-base font-semibold text-white marker:content-none">{item.question}</summary>
+                <p className="mt-3 text-sm leading-6 text-graphite-300">{item.reponse}</p>
+              </details>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center">
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Étape 1 sur 7</span>
+        <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
+        <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir une formule.</p>
+        <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>
+      </section>
     </main>
   );
 }

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
 import {
-  clearIntendedPlanCookie,
+  readIntendedBillingCookie,
   readIntendedPlanCookie,
   readIntendedVipSessionsCookie,
 } from "@/lib/checkout/intended-plan-cookie";
@@ -15,14 +15,9 @@ import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 
-// Le "accès libre" du 13/08/2026 (aucun paiement déclenché ici, même quand
-// un plan était visé) reste le comportement par défaut d'un compte sans
-// intention déclarée. Corrigé le 20/08/2026 (demande Anthony, sortie du
-// diagnostic public) : quand coai_plan existe, on ne redirige plus vers
-// /pricing pour un second clic — on déclenche directement /api/stripe/checkout
-// (7 jours offerts, carte requise dès l'essai pour Pass IA/Coaching Hybride).
-// Sans cookie d'intention (signup "nu", parcours toujours gratuit), rien ne
-// change : direction /bienvenue comme avant.
+// La création du compte reste une étape réellement gratuite. Même si une
+// offre a été repérée avant l'inscription, Stripe ne s'ouvre jamais sans une
+// confirmation explicite sur l'écran des formules.
 export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {
   const [prenom, setPrenom] = useState(prenomSuggere);
   const [consentRgpd, setConsentRgpd] = useState(false);
@@ -60,33 +55,21 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
       const intendedPlan = readIntendedPlanCookie();
       const intendedVipSessions = readIntendedVipSessionsCookie();
+      const intendedBilling = readIntendedBillingCookie();
       clearParrainageCookie();
-      clearIntendedPlanCookie();
       clearUtmCookie();
 
       trackEvent("compte_cree", {});
       trackMetaEvent("CompleteRegistration");
       trackFunnelEvent("signup_completed", {});
 
+      const params = new URLSearchParams({ from: "signup" });
       if (intendedPlan) {
-        const checkoutRes = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan: intendedPlan, vipSessions: intendedVipSessions }),
-        });
-        const checkoutData = await checkoutRes.json().catch(() => null);
-        if (checkoutRes.ok && checkoutData?.url) {
-          window.location.href = checkoutData.url;
-          return;
-        }
-        // Checkout indisponible (Stripe en échec, etc.) : direction /pricing
-        // plutôt que de bloquer l'utilisateur sur une erreur sans issue —
-        // il retrouve son compte créé et peut réessayer depuis là.
-        window.location.href = `/pricing#${intendedPlan === "GRATUIT" ? "autonome" : intendedPlan === "STANDARD" ? "hybride" : "vip"}`;
-        return;
+        params.set("selected", intendedPlan);
+        params.set("billing", intendedBilling);
+        params.set("vipSessions", String(intendedVipSessions));
       }
-
-      window.location.href = "/bienvenue";
+      window.location.href = `/pricing?${params.toString()}`;
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -125,7 +108,7 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       </label>
       {error && <p className="text-sm text-red-400">{error}</p>}
       <Button type="submit" disabled={loading}>
-        {loading ? "Création du compte…" : "Créer mon compte gratuit"}
+        {loading ? "Création du compte…" : "Créer mon compte et choisir ma formule →"}
       </Button>
     </form>
   );

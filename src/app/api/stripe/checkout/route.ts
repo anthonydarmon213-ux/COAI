@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}`,
-    cancel_url: `${appUrl}/pricing?checkout=cancel`,
+    cancel_url: `${appUrl}/pricing?checkout=cancel&selected=${plan}&billing=${billing}#${plan === "GRATUIT" ? "pass-ia" : plan === "STANDARD" ? "coaching-hybride" : "vip"}`,
     // Acceptation des CGV déplacée ici (21/08/2026, audit tunnel demandé par
     // Anthony, point #7 : la case à cocher sur /pricing bloquait chaque
     // bouton avant même la décision, "alourdit la comparaison des offres").
