@@ -15,7 +15,41 @@
 
 type EntreePhoto = { motifs: string[]; fichier: string };
 
+export type GenreVisuel = "femme" | "homme";
+
+type EntreeVariante = EntreePhoto & {
+  femme?: string;
+  homme?: string;
+};
+
+// Variantes de modèle vérifiées pour un même mouvement. Les visuels homme
+// TRX sont des arrêts sur image extraits des vidéos réelles validées par
+// Anthony : aucune pose générée ou techniquement approximative.
+const VARIANTES: EntreeVariante[] = [
+  { motifs: ["rowing trx", "rowing suspension", "rowing sangles"], femme: "suspension-rowing", homme: "trx-rowing-homme-coai", fichier: "suspension-rowing" },
+  { motifs: ["pompes trx", "pompes suspension"], femme: "suspension-pompes", homme: "trx-pompes-homme-coai", fichier: "suspension-pompes" },
+  { motifs: ["extension triceps trx", "triceps suspension"], femme: "suspension-extension-triceps", homme: "trx-extension-triceps-homme-coai", fichier: "suspension-extension-triceps" },
+  { motifs: ["fente arrière trx", "fente arriere trx", "fente trx", "fente suspension"], femme: "suspension-fente-arriere", homme: "trx-fente-arriere-homme-coai", fichier: "suspension-fente-arriere" },
+  { motifs: ["pistol squat assisté trx", "pistol squat assiste trx", "pistol squat trx"], homme: "trx-pistol-squat-homme-coai", fichier: "trx-pistol-squat-homme-coai" },
+  { motifs: ["montées de genoux trx", "montees de genoux trx", "montée de genou trx", "montee de genou trx"], homme: "trx-montee-genou-homme-coai", fichier: "trx-montee-genou-homme-coai" },
+];
+
 const TABLE: EntreePhoto[] = [
+  // Arrêts sur image issus des vidéos réelles : le visuel correspond donc
+  // exactement au mouvement montré, sans photo de stock approximative.
+  { motifs: ["ballon lesté par-dessus l'épaule", "ballon leste par-dessus l'epaule"], fichier: "medecine-ball-par-dessus-epaule" },
+  { motifs: ["devil press"], fichier: "devil-press-halteres" },
+  { motifs: ["windmill haltère", "windmill haltere"], fichier: "windmill-haltere" },
+  { motifs: ["cordes ondulatoires alternées", "cordes ondulatoires alternees"], fichier: "cordes-ondulatoires-alternees" },
+  { motifs: ["cordes ondulatoires doubles"], fichier: "cordes-ondulatoires-doubles" },
+  { motifs: ["sauts à la corde", "sauts a la corde"], fichier: "sauts-corde-reel" },
+  { motifs: ["box jump", "saut sur caisson"], fichier: "box-jump" },
+  { motifs: ["soulevé de terre trap bar", "souleve de terre trap bar"], fichier: "souleve-terre-trap-bar" },
+  { motifs: ["poussée de traîneau", "poussee de traineau"], fichier: "poussee-traineau" },
+  { motifs: ["tirage de traîneau à la corde", "tirage de traineau a la corde"], fichier: "tirage-traineau-corde" },
+  { motifs: ["burpee avec saut en longueur", "burpee broad jump"], fichier: "burpee-saut-longueur" },
+  { motifs: ["marche du fermier kettlebells", "farmer walk kettlebells"], fichier: "marche-fermier-kettlebells" },
+
   // Yoga & Pilates (24/08/2026) — modèle féminin blond, même studio COAI.
   // Ces motifs spécifiques restent avant « planche » et les autres motifs
   // génériques afin de ne jamais afficher une photo de musculation à la place.
@@ -177,13 +211,22 @@ const TABLE: EntreePhoto[] = [
  * Photo COAI pour un exercice, ou null si aucune ne lui correspond
  * exactement. Aucun visuel générique ne doit être utilisé en remplacement.
  */
-export function photoCoaiPourNom(nom: string): string | null {
-  const normalise = nom
+function normaliser(nom: string) {
+  return nom
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "");
-  const entree = TABLE.find((e) =>
-    e.motifs.some((m) => normalise.includes(m.normalize("NFD").replace(/[̀-ͯ]/g, "")))
-  );
+}
+
+function correspond(entree: EntreePhoto, normalise: string) {
+  return entree.motifs.some((m) => normalise.includes(normaliser(m)));
+}
+
+export function photoCoaiPourNom(nom: string, genre?: GenreVisuel): string | null {
+  const normalise = normaliser(nom);
+  const variante = VARIANTES.find((e) => correspond(e, normalise));
+  if (variante && genre && variante[genre]) return `/exercices/${variante[genre]}.jpg`;
+  if (variante && !genre) return `/exercices/${variante.fichier}.jpg`;
+  const entree = TABLE.find((e) => correspond(e, normalise));
   return entree ? `/exercices/${entree.fichier}.jpg` : null;
 }

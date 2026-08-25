@@ -13,6 +13,31 @@ export type VideoCoai = {
 type Entree = { motifs: string[]; video: VideoCoai };
 
 const TABLE: Entree[] = [
+  // Lot fonctionnel réel du 25/08/2026. Les variantes précises restent
+  // avant les motifs génériques (notamment « burpee »).
+  { motifs: ["ballon leste par-dessus l'epaule", "medecine ball par-dessus l'epaule"], video: { fichier: "medecine-ball-par-dessus-epaule", description: "Ballon lesté par-dessus l’épaule" } },
+  { motifs: ["devil press"], video: { fichier: "devil-press-halteres", description: "Devil press aux haltères" } },
+  { motifs: ["windmill haltere", "moulin haltere"], video: { fichier: "windmill-haltere", description: "Windmill avec haltère" } },
+  { motifs: ["cordes ondulatoires alternees", "battle rope alternees"], video: { fichier: "cordes-ondulatoires-alternees", description: "Cordes ondulatoires alternées" } },
+  { motifs: ["cordes ondulatoires doubles", "battle rope doubles"], video: { fichier: "cordes-ondulatoires-doubles", description: "Cordes ondulatoires doubles" } },
+  { motifs: ["sauts a la corde", "corde a sauter"], video: { fichier: "sauts-corde-reel", description: "Sauts à la corde" } },
+  { motifs: ["box jump", "saut sur caisson"], video: { fichier: "box-jump", description: "Saut sur caisson" } },
+  { motifs: ["souleve de terre trap bar", "souleve de terre hex bar"], video: { fichier: "souleve-terre-trap-bar", description: "Soulevé de terre à la trap bar" } },
+  { motifs: ["poussee de traineau", "sled push"], video: { fichier: "poussee-traineau", description: "Poussée de traîneau" } },
+  { motifs: ["tirage de traineau a la corde", "sled rope pull"], video: { fichier: "tirage-traineau-corde", description: "Tirage de traîneau à la corde" } },
+  { motifs: ["burpee avec saut en longueur", "burpee broad jump"], video: { fichier: "burpee-saut-longueur", description: "Burpee avec saut en longueur" } },
+  { motifs: ["marche du fermier kettlebells", "farmer walk kettlebells"], video: { fichier: "marche-fermier-kettlebells", description: "Marche du fermier avec kettlebells" } },
+
+  // TRX — vidéos réelles tournées par Anthony le 25/08/2026. Ces motifs
+  // restent avant « pompes », « rowing » et « fente » afin que la version
+  // avec sangles ne soit jamais remplacée par un autre mouvement.
+  { motifs: ["rowing trx", "rowing suspension", "rowing sangles"], video: { fichier: "rowing-trx", description: "Rowing avec sangles TRX" } },
+  { motifs: ["pompes trx", "pompe trx", "pompes suspension"], video: { fichier: "pompes-trx", description: "Pompes avec sangles TRX" } },
+  { motifs: ["extension triceps trx", "triceps trx", "triceps suspension"], video: { fichier: "extension-triceps-trx", description: "Extension des triceps avec sangles TRX" } },
+  { motifs: ["pistol squat assiste trx", "pistol squat trx", "squat une jambe trx"], video: { fichier: "pistol-squat-assiste-trx", description: "Pistol squat assisté avec sangles TRX" } },
+  { motifs: ["fente arriere trx", "fentes arriere trx", "fente trx"], video: { fichier: "fente-arriere-trx", description: "Fente arrière avec sangles TRX" } },
+  { motifs: ["montee de genou trx", "montees de genoux trx", "genou trx"], video: { fichier: "montee-genou-trx", description: "Montées de genoux avec sangles TRX" } },
+
   { motifs: ["overhead squat", "squat au-dessus de la tete"], video: { fichier: "overhead-squat-barre", description: "Squat barre au-dessus de la tête" } },
   { motifs: ["front squat"], video: { fichier: "front-squat-barre", description: "Front squat barre" } },
   { motifs: ["back squat", "squat barre", "squat arriere"], video: { fichier: "back-squat-barre", description: "Squat arrière à la barre" } },

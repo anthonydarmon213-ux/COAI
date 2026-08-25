@@ -14,7 +14,7 @@ import {
   type Materiel,
   type TypeExercice,
 } from "@/lib/exercices/catalogue";
-import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { photoCoaiPourNom, type GenreVisuel } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
@@ -75,6 +75,7 @@ export function ExerciceCatalogue() {
   const [groupes, setGroupes] = useState<GroupePrincipal[]>([]);
   const [materiels, setMateriels] = useState<Materiel[]>([]);
   const [types, setTypes] = useState<TypeExercice[]>([]);
+  const [genreVisuel, setGenreVisuel] = useState<GenreVisuel>("femme");
 
   const filtres = useMemo(() => {
     return EXERCICES.filter((ex) => {
@@ -93,6 +94,27 @@ export function ExerciceCatalogue() {
         <FilterGroup titre="Groupe musculaire" options={GROUPES} labels={GROUPE_PRINCIPAL_LABEL} actifs={groupes} onToggle={(v) => setGroupes((prev) => toggle(prev, v))} />
         <FilterGroup titre="Matériel" options={MATERIELS} labels={MATERIEL_LABEL} actifs={materiels} onToggle={(v) => setMateriels((prev) => toggle(prev, v))} />
         <FilterGroup titre="Type" options={TYPES} labels={TYPE_LABEL} actifs={types} onToggle={(v) => setTypes((prev) => toggle(prev, v))} />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-graphite-400">Modèle du visuel</span>
+          <div className="flex gap-2">
+            {(["femme", "homme"] as GenreVisuel[]).map((genre) => (
+              <button
+                key={genre}
+                type="button"
+                onClick={() => setGenreVisuel(genre)}
+                aria-pressed={genreVisuel === genre}
+                className={`rounded-full border px-4 py-2 text-xs font-semibold capitalize transition ${
+                  genreVisuel === genre
+                    ? "border-laiton-400/50 bg-laiton-400/15 text-laiton-200"
+                    : "border-graphite-800 text-graphite-400 hover:text-white"
+                }`}
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+          <span className="text-[11px] text-graphite-500">Selon les versions actuellement disponibles.</span>
+        </div>
         {!aucunFiltre && (
           <button
             type="button"
@@ -113,7 +135,7 @@ export function ExerciceCatalogue() {
         {filtres.map((ex) => {
           // Une photo COAI exacte, ou aucune photo. Aucun ancien visuel de
           // stock et aucun rapprochement approximatif par groupe musculaire.
-          const photoCoai = photoCoaiPourNom(ex.nom);
+          const photoCoai = photoCoaiPourNom(ex.nom, genreVisuel) ?? photoCoaiPourNom(ex.nom);
           const hasVideoReelle = Boolean(videoCoaiPourNom(ex.nom));
           return (
             <article

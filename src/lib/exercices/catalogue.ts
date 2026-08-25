@@ -22,7 +22,7 @@ export type GroupePrincipal =
   | "ABDOMINAUX"
   | "MOLLETS";
 
-export type Materiel = "POIDS_DU_CORPS" | "HALTERES" | "BARRE" | "MACHINE" | "ELASTIQUE" | "KETTLEBELL" | "TRX";
+export type Materiel = "POIDS_DU_CORPS" | "HALTERES" | "BARRE" | "MACHINE" | "ELASTIQUE" | "KETTLEBELL" | "TRX" | "MEDECINE_BALL" | "CORDE" | "BOX" | "TRAINEAU" | "TRAP_BAR";
 
 export type TypeExercice = "FORCE" | "GAINAGE" | "MOBILITE" | "CARDIO";
 
@@ -77,6 +77,11 @@ export const MATERIEL_LABEL: Record<Materiel, string> = {
   ELASTIQUE: "Élastique",
   KETTLEBELL: "Kettlebell",
   TRX: "TRX / sangles",
+  MEDECINE_BALL: "Ballon lesté",
+  CORDE: "Corde",
+  BOX: "Caisson",
+  TRAINEAU: "Traîneau",
+  TRAP_BAR: "Trap bar",
 };
 
 export const TYPE_LABEL: Record<TypeExercice, string> = {
@@ -102,6 +107,7 @@ export const EXERCICES: Exercice[] = [
   // Pas de correspondance Free Exercise DB fiable (rowing spécifiquement à
   // l'élastique) — repli Pexels conservé plutôt qu'un mouvement approchant.
   { id: "rowing-elastique", nom: "Rowing élastique", groupePrincipal: "DOS", materiel: ["ELASTIQUE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Élastique fixé devant toi, tire les poignées vers le buste en rapprochant les omoplates.", photoQuery: "resistance band row exercise" },
+  { id: "rowing-trx", nom: "Rowing TRX", groupePrincipal: "DOS", materiel: ["TRX"], type: "FORCE", niveau: "DEBUTANT", consigne: "Corps gainé et incliné en arrière, tire les poignées vers les côtes en rapprochant les omoplates.", photoQuery: "trx suspension row exercise" },
 
   // PECTORAUX
   { id: "developpe-couche-barre", nom: "Développé couché (barre)", groupePrincipal: "PECTORAUX", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Descends la barre jusqu'à effleurer la poitrine, coudes à environ 45° du buste, pousse sans verrouiller brutalement les coudes.", photoQuery: "barbell bench press gym", freeExerciseDbId: "Barbell_Bench_Press_-_Medium_Grip" },
@@ -113,6 +119,7 @@ export const EXERCICES: Exercice[] = [
   // barre) — afficher une photo barre pour un exercice filtré "machine"
   // recréerait le même type d'erreur que celle signalée. Repli Pexels.
   { id: "developpe-incline-machine", nom: "Développé incliné (machine)", groupePrincipal: "PECTORAUX", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Dos calé contre le dossier incliné, pousse devant toi sans décoller les omoplates du siège.", photoQuery: "incline chest press machine gym" },
+  { id: "pompes-trx", nom: "Pompes TRX", groupePrincipal: "PECTORAUX", materiel: ["TRX"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Mains dans les poignées, garde le corps aligné puis fléchis les coudes sans laisser les sangles s'écarter.", photoQuery: "trx suspension push up exercise" },
 
   // EPAULES
   { id: "developpe-militaire-halteres", nom: "Développé militaire haltères", groupePrincipal: "EPAULES", materiel: ["HALTERES"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Pousse les haltères au-dessus de la tête sans cambrer le bas du dos, redescends jusqu'aux épaules.", photoQuery: "dumbbell shoulder press exercise", freeExerciseDbId: "Dumbbell_Shoulder_Press" },
@@ -129,6 +136,7 @@ export const EXERCICES: Exercice[] = [
   { id: "dips-banc-triceps", nom: "Dips sur banc (triceps)", groupePrincipal: "BRAS", materiel: ["POIDS_DU_CORPS"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Mains sur le bord d'un banc, descends en pliant les coudes vers l'arrière, jambes tendues pour plus d'intensité.", photoQuery: "bench dips triceps exercise", freeExerciseDbId: "Bench_Dips" },
   { id: "curl-barre-ez", nom: "Curl barre EZ", groupePrincipal: "BRAS", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Coudes fixes, remonte la barre sans balancer le buste en arrière pour t'aider.", photoQuery: "ez bar curl exercise gym", freeExerciseDbId: "EZ-Bar_Curl" },
   { id: "extension-triceps-unilaterale", nom: "Extension triceps haltère unilatérale", groupePrincipal: "BRAS", materiel: ["HALTERES"], type: "FORCE", niveau: "DEBUTANT", consigne: "Bras tendu au-dessus de la tête, descends l'haltère derrière la nuque en gardant le coude fixe.", photoQuery: "overhead triceps extension dumbbell", freeExerciseDbId: "Dumbbell_One-Arm_Triceps_Extension" },
+  { id: "extension-triceps-trx", nom: "Extension triceps TRX", groupePrincipal: "BRAS", materiel: ["TRX"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Corps incliné vers l'avant, garde les coudes fixes puis tends les bras sans casser l'alignement du corps.", photoQuery: "trx suspension triceps extension" },
 
   // JAMBES
   { id: "squat-barre", nom: "Squat barre", groupePrincipal: "JAMBES", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Descends genoux dans l'axe des pieds, dos gainé, jusqu'à ce que les hanches passent sous les genoux si la mobilité le permet.", photoQuery: "barbell back squat gym", freeExerciseDbId: "Barbell_Squat" },
@@ -137,6 +145,8 @@ export const EXERCICES: Exercice[] = [
   { id: "presse-a-cuisses", nom: "Presse à cuisses (machine)", groupePrincipal: "JAMBES", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Pieds écartés largeur d'épaules sur le plateau, descends sans décoller le bas du dos de l'assise.", photoQuery: "leg press machine gym", freeExerciseDbId: "Leg_Press" },
   { id: "leg-curl-machine", nom: "Leg curl (machine)", groupePrincipal: "JAMBES", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Fléchis les jambes vers l'arrière en contrôlant la remontée, sans à-coup.", photoQuery: "leg curl machine gym", freeExerciseDbId: "Seated_Leg_Curl" },
   { id: "squat-poids-du-corps", nom: "Squat poids du corps", groupePrincipal: "JAMBES", materiel: ["POIDS_DU_CORPS"], type: "FORCE", niveau: "DEBUTANT", consigne: "Descends comme pour t'asseoir sur une chaise, poids réparti sur tout le pied, genoux dans l'axe.", photoQuery: "bodyweight squat exercise athlete", freeExerciseDbId: "Bodyweight_Squat" },
+  { id: "pistol-squat-assiste-trx", nom: "Pistol squat assisté TRX", groupePrincipal: "JAMBES", materiel: ["TRX"], type: "FORCE", niveau: "AVANCE", consigne: "Tiens les sangles, tends une jambe devant toi et descends sur l'autre en utilisant juste assez d'assistance pour rester stable.", photoQuery: "trx assisted pistol squat exercise" },
+  { id: "fente-arriere-trx", nom: "Fente arrière TRX", groupePrincipal: "JAMBES", materiel: ["TRX"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Tiens les sangles, recule un pied et descends le genou vers le sol en gardant le buste haut et le genou avant dans l'axe.", photoQuery: "trx reverse lunge exercise" },
 
   // FESSIERS
   { id: "hip-thrust-barre", nom: "Hip thrust barre", groupePrincipal: "FESSIERS", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Dos calé sur un banc, pousse les hanches vers le haut jusqu'à l'alignement épaules-hanches-genoux, sans cambrer excessivement.", photoQuery: "barbell hip thrust exercise", freeExerciseDbId: "Barbell_Hip_Thrust" },
@@ -155,6 +165,7 @@ export const EXERCICES: Exercice[] = [
   { id: "russian-twist", nom: "Russian twist", groupePrincipal: "ABDOMINAUX", materiel: ["POIDS_DU_CORPS"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Buste légèrement en arrière, pivote le buste d'un côté à l'autre en gardant le dos droit.", photoQuery: "russian twist exercise core", freeExerciseDbId: "Russian_Twist" },
   { id: "gainage-lateral", nom: "Gainage latéral", groupePrincipal: "ABDOMINAUX", materiel: ["POIDS_DU_CORPS"], type: "GAINAGE", niveau: "INTERMEDIAIRE", consigne: "Appui sur un avant-bras, corps aligné sur le côté, hanches ni en avant ni en arrière.", photoQuery: "side plank exercise core", freeExerciseDbId: "Side_Bridge" },
   { id: "roue-abdominale", nom: "Roue abdominale", groupePrincipal: "ABDOMINAUX", materiel: ["POIDS_DU_CORPS"], type: "FORCE", niveau: "AVANCE", consigne: "Fais rouler la roue devant toi en gardant le dos gainé, ne descends que jusqu'où tu peux remonter en contrôle.", photoQuery: "ab wheel rollout exercise", freeExerciseDbId: "Ab_Roller" },
+  { id: "montee-genou-trx", nom: "Montées de genoux TRX", groupePrincipal: "ABDOMINAUX", materiel: ["TRX"], type: "CARDIO", niveau: "DEBUTANT", consigne: "Tiens les sangles, monte alternativement chaque genou vers la poitrine sans te balancer ni arrondir le dos.", photoQuery: "trx standing knee drive exercise" },
 
   // MOLLETS
   { id: "mollets-debout-machine", nom: "Mollets debout (machine)", groupePrincipal: "MOLLETS", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Monte sur la pointe des pieds en contractant les mollets, redescends jusqu'à un étirement léger.", photoQuery: "standing calf raise machine gym", freeExerciseDbId: "Standing_Calf_Raises" },
@@ -164,4 +175,17 @@ export const EXERCICES: Exercice[] = [
   { id: "sauts-a-la-corde", nom: "Sauts à la corde", groupePrincipal: "MOLLETS", materiel: ["POIDS_DU_CORPS"], type: "CARDIO", niveau: "DEBUTANT", consigne: "Petits sauts sur l'avant du pied, coudes proches du corps, rythme régulier plutôt que sauts hauts.", photoQuery: "jump rope exercise athlete" },
   { id: "mollets-elastique", nom: "Mollets debout élastique", groupePrincipal: "MOLLETS", materiel: ["ELASTIQUE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Élastique sous la plante du pied, pointe le pied vers le bas en résistant à la tension.", photoQuery: "calf raise resistance band exercise", freeExerciseDbId: "Calf_Raises_-_With_Bands" },
   { id: "marche-sur-pointes", nom: "Marche sur pointes", groupePrincipal: "MOLLETS", materiel: ["POIDS_DU_CORPS"], type: "MOBILITE", niveau: "DEBUTANT", consigne: "Marche sur la pointe des pieds sur une courte distance, en gardant les mollets contractés.", photoQuery: "walking on toes calf exercise" },
+
+  // Fonctionnel — vidéos réelles tournées et validées par Anthony (25/08/2026).
+  { id: "ballon-leste-dessus-epaule", nom: "Ballon lesté par-dessus l’épaule", groupePrincipal: "JAMBES", materiel: ["MEDECINE_BALL"], type: "CARDIO", niveau: "INTERMEDIAIRE", consigne: "Soulève le ballon jambes fléchies, redresse les hanches puis fais-le passer au-dessus de l’épaule sans arrondir le dos.", photoQuery: "medicine ball over shoulder exercise" },
+  { id: "devil-press-halteres", nom: "Devil press haltères", groupePrincipal: "EPAULES", materiel: ["HALTERES"], type: "CARDIO", niveau: "AVANCE", consigne: "Enchaîne un burpee mains sur haltères puis une extension complète au-dessus de la tête, avec un dos gainé.", photoQuery: "devil press dumbbells exercise" },
+  { id: "windmill-haltere", nom: "Windmill haltère", groupePrincipal: "ABDOMINAUX", materiel: ["HALTERES"], type: "MOBILITE", niveau: "INTERMEDIAIRE", consigne: "Garde le bras chargé vertical, pousse la hanche sur le côté et descends la main libre en suivant la jambe.", photoQuery: "dumbbell windmill exercise" },
+  { id: "cordes-ondulees-alternees", nom: "Cordes ondulatoires alternées", groupePrincipal: "BRAS", materiel: ["CORDE"], type: "CARDIO", niveau: "DEBUTANT", consigne: "Genoux souples et buste gainé, crée des vagues régulières en alternant rapidement les bras.", photoQuery: "alternating battle ropes exercise" },
+  { id: "cordes-ondulees-doubles", nom: "Cordes ondulatoires doubles", groupePrincipal: "BRAS", materiel: ["CORDE"], type: "CARDIO", niveau: "INTERMEDIAIRE", consigne: "Fais monter puis claquer les deux cordes ensemble en gardant une position athlétique stable.", photoQuery: "double battle ropes exercise" },
+  { id: "box-jump", nom: "Box jump", groupePrincipal: "JAMBES", materiel: ["BOX"], type: "CARDIO", niveau: "INTERMEDIAIRE", consigne: "Saute sur le caisson, réceptionne-toi avec les genoux dans l’axe puis redresse-toi avant de redescendre.", photoQuery: "box jump exercise" },
+  { id: "souleve-terre-trap-bar", nom: "Soulevé de terre trap bar", groupePrincipal: "JAMBES", materiel: ["TRAP_BAR"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Pousse le sol avec les jambes, poitrine haute et dos neutre, jusqu’à te tenir droit sans tirer avec le bas du dos.", photoQuery: "trap bar deadlift exercise" },
+  { id: "poussee-traineau", nom: "Poussée de traîneau", groupePrincipal: "JAMBES", materiel: ["TRAINEAU"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Bras tendus, buste incliné et tronc gainé, pousse avec des pas courts et puissants.", photoQuery: "sled push exercise" },
+  { id: "tirage-traineau-corde", nom: "Tirage de traîneau à la corde", groupePrincipal: "DOS", materiel: ["TRAINEAU", "CORDE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Reste stable, tire la corde main après main vers le buste et garde les épaules basses.", photoQuery: "sled rope pull exercise" },
+  { id: "burpee-saut-longueur", nom: "Burpee avec saut en longueur", groupePrincipal: "JAMBES", materiel: ["POIDS_DU_CORPS"], type: "CARDIO", niveau: "AVANCE", consigne: "Après le burpee, projette-toi vers l’avant et réceptionne-toi souplement avant la répétition suivante.", photoQuery: "burpee broad jump exercise" },
+  { id: "marche-fermier-kettlebells", nom: "Marche du fermier kettlebells", groupePrincipal: "BRAS", materiel: ["KETTLEBELL"], type: "FORCE", niveau: "DEBUTANT", consigne: "Marche droit, épaules basses et prises fermes, sans laisser les charges te faire pencher.", photoQuery: "kettlebell farmers walk exercise" },
 ];
