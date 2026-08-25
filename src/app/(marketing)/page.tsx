@@ -159,6 +159,68 @@ const PILIERS_VISUELS = [
   },
 ];
 
+function PiliersVisuelsSection() {
+  return (
+    <Reveal>
+      <section id="piliers" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-16 sm:py-20">
+        <div className="text-center">
+          <SectionLabel>Une méthode complète</SectionLabel>
+          <h2 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">
+            Trois piliers. Une seule direction.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+            Ton corps ne progresse pas uniquement pendant la séance. COAI coordonne ton entraînement,
+            ton alimentation et ta récupération.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-3">
+          {PILIERS_VISUELS.map((pilier) => (
+            <div key={pilier.titre} className="flex flex-col gap-4">
+              <article className="group relative min-h-[30rem] overflow-hidden rounded-[2rem] border border-white/[0.1] bg-graphite-900 shadow-[0_32px_90px_-42px_rgba(0,0,0,.95)]">
+                <Image
+                  src={pilier.image}
+                  alt={`${pilier.titre} avec COAI`}
+                  fill
+                  sizes="(max-width: 767px) calc(100vw - 3rem), 33vw"
+                  className={`object-cover transition duration-700 ease-out group-hover:scale-[1.035] ${pilier.position}`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-black/5" />
+                <div className="absolute inset-x-0 bottom-0 p-7 sm:p-8">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-laiton-300">
+                    {pilier.numero} · {pilier.categorie}
+                  </p>
+                  <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-white">
+                    {pilier.titre}
+                  </h3>
+                  <p className="mt-3 max-w-xs text-sm leading-6 text-white/75">{pilier.description}</p>
+                </div>
+              </article>
+              {pilier.categorie === "Récupération" ? (
+                <Link
+                  href="/diagnostic"
+                  className="inline-flex min-h-14 items-center justify-center rounded-full bg-laiton-400 px-6 text-center text-sm font-semibold text-graphite-950 shadow-[0_16px_45px_-18px_rgba(212,175,55,.8)] transition hover:-translate-y-0.5 hover:bg-laiton-300"
+                >
+                  Faire mon bilan initial offert →
+                </Link>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        <div className="mx-auto max-w-3xl border-t border-white/[0.08] pt-10 text-center">
+          <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
+            Ton entraînement, ta nutrition et ta récupération,
+            <span className="text-laiton-300"> personnalisés par l&apos;IA et validés par un coach diplômé d&apos;État.</span>
+          </p>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+            Parce que deux coachs valent mieux qu&apos;un, COAI réunit l&apos;intelligence artificielle
+            et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
+          </p>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
 const STRUCTURED_DATA = {
   "@context": "https://schema.org",
   "@graph": [
@@ -215,6 +277,10 @@ export default function LandingPage() {
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
       <MarqueeBanner />
+
+      {/* Les trois visuels incarnent l'offre dès le haut de la page, avant
+          les explications produit plus détaillées. */}
+      <PiliersVisuelsSection />
 
       {/* Maquette de l'app (23/08/2026, fournie par Anthony) — remplace la
           vidéo anatomique qui s'affichait en rectangle noir : preload="none"
@@ -605,56 +671,6 @@ export default function LandingPage() {
             <p className="mt-3 text-xs text-graphite-500">Gratuit · moins de 5 minutes · sans carte bancaire</p>
           </div>
         </section>
-      </Reveal>
-
-      {/* Les 3 piliers visuels */}
-      <Reveal>
-      <section id="piliers" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-24">
-        <div className="text-center">
-          <SectionLabel>Une méthode complète</SectionLabel>
-          <h2 className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl">Trois piliers. Une seule direction.</h2>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
-            Ton corps ne progresse pas uniquement pendant la séance. COAI coordonne ton entraînement,
-            ton alimentation et ta récupération.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {PILIERS_VISUELS.map((pilier) => (
-            <article
-              key={pilier.titre}
-              className="group relative min-h-[30rem] overflow-hidden rounded-[2rem] border border-white/[0.1] bg-graphite-900 shadow-[0_32px_90px_-42px_rgba(0,0,0,.95)]"
-            >
-              <Image
-                src={pilier.image}
-                alt={`${pilier.titre} avec COAI`}
-                fill
-                sizes="(max-width: 767px) calc(100vw - 3rem), 33vw"
-                className={`object-cover transition duration-700 ease-out group-hover:scale-[1.035] ${pilier.position}`}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-black/5" />
-              <div className="absolute inset-x-0 bottom-0 p-7 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-laiton-300">
-                  {pilier.numero} · {pilier.categorie}
-                </p>
-                <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-white">
-                  {pilier.titre}
-                </h3>
-                <p className="mt-3 max-w-xs text-sm leading-6 text-white/75">{pilier.description}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-        <div className="mx-auto max-w-3xl border-t border-white/[0.08] pt-10 text-center">
-          <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
-            Ton entraînement, ta nutrition et ta récupération,
-            <span className="text-laiton-300"> personnalisés par l&apos;IA et validés par un coach diplômé d&apos;État.</span>
-          </p>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
-            Parce que deux coachs valent mieux qu&apos;un, COAI réunit l&apos;intelligence artificielle
-            et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
-          </p>
-        </div>
-      </section>
       </Reveal>
 
       <Reveal>
