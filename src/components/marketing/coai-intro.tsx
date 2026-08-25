@@ -70,7 +70,7 @@ export function CoaiIntro() {
                 Faire mon bilan initial offert
               </Button>
             </Link>
-            <Link href="#parcours" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
+            <Link href="#comment-ca-marche" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
               Voir les étapes →
             </Link>
           </div>

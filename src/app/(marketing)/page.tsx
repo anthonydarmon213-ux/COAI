@@ -807,7 +807,7 @@ export default function LandingPage() {
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
 
-      <section id="parcours" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-20 sm:py-24">
+      <section id="comment-ca-marche" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-20 sm:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <SectionLabel>Simple du début à la première séance</SectionLabel>
           <h2 className="mt-5 font-display text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
