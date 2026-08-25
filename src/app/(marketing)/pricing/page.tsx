@@ -52,8 +52,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           Choisis ton niveau d&apos;accompagnement.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
-          Ton bilan et ton résultat sont enregistrés. Choisis maintenant la formule qui te correspond :
-          l&apos;essai de 7 jours démarre ensuite, avant ta première séance.
+          Ton bilan et ton résultat sont enregistrés. Choisis maintenant la formule qui te correspond.
+          Pass IA et Coaching Hybride incluent 7 jours d&apos;essai ; pour VIP, un échange confirme d&apos;abord ton accompagnement.
         </p>
       </div>
 
@@ -95,7 +95,11 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
-              {selectedPlan === tier.plan ? <Badge tone="warning">Ton choix</Badge> : tier.mostPopular && <Badge tone="warning">Offre phare</Badge>}
+              {selectedPlan === tier.plan ? (
+                <Badge tone="warning">
+                  {tier.plan === "GRATUIT" && selectedBilling === "ANNUAL" ? "Ton choix · annuel" : "Ton choix"}
+                </Badge>
+              ) : tier.mostPopular && <Badge tone="warning">Offre phare</Badge>}
             </div>
             <div>
               <h2 className="text-3xl font-semibold text-white">{tier.nom}</h2>
@@ -128,21 +132,39 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             <div className="flex-1" />
             {!tier.sessions && (
               <>
-                <SubscribeButton
-                  plan={tier.plan}
-                  label={tier.trial ? `Choisir ${tier.nom} · 7 jours offerts` : `Choisir ${tier.nom}`}
-                  className="coai-rainbow-cta w-full border-0 text-[#111216]"
-                />
-                {/* Option annuelle (22/08/2026) — proposée uniquement sur
-                    Pass IA : c'est le seul plan dont le checkout accepte
-                    réellement les deux rythmes (cf. OFFER_BY_PLAN). */}
-                {tier.plan === "GRATUIT" && (
-                  <SubscribeButton
-                    plan="GRATUIT"
-                    billing="ANNUAL"
-                    label="Choisir l'annuel · 119€/an"
-                    className={`w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200 ${selectedBilling === "ANNUAL" ? "ring-2 ring-laiton-300/60" : ""}`}
-                  />
+                {tier.plan === "GRATUIT" && selectedBilling === "ANNUAL" ? (
+                  <>
+                    <SubscribeButton
+                      plan="GRATUIT"
+                      billing="ANNUAL"
+                      label="Confirmer l'annuel · 119€/an"
+                      className="coai-rainbow-cta w-full border-0 text-[#111216]"
+                    />
+                    <SubscribeButton
+                      plan="GRATUIT"
+                      billing="MONTHLY"
+                      label="Choisir le mensuel · 19,99€/mois"
+                      className="w-full border border-white/15 bg-white/[0.035] text-white"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <SubscribeButton
+                      plan={tier.plan}
+                      billing="MONTHLY"
+                      label={tier.trial ? `Choisir ${tier.nom} · 7 jours offerts` : `Choisir ${tier.nom}`}
+                      className="coai-rainbow-cta w-full border-0 text-[#111216]"
+                    />
+                    {/* Option annuelle proposée uniquement sur Pass IA. */}
+                    {tier.plan === "GRATUIT" && (
+                      <SubscribeButton
+                        plan="GRATUIT"
+                        billing="ANNUAL"
+                        label="Choisir l'annuel · 119€/an"
+                        className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
+                      />
+                    )}
+                  </>
                 )}
                 {/* Réassurance sous le bouton (22/08/2026, demande
                     Anthony). Apple Pay / Google Pay apparaissent
@@ -174,8 +196,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
-        <p className="text-sm font-semibold text-white">Étapes 5 à 7 : essai de 7 jours → programme activé → première séance</p>
-        <p className="mt-1 text-xs text-graphite-400">Stripe demande un moyen de paiement, mais aucun prélèvement n&apos;est effectué avant la fin de l&apos;essai pour Pass IA et Coaching Hybride.</p>
+        <p className="text-sm font-semibold text-white">Étapes 5 à 7 : essai → programme activé → première séance</p>
+        <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. VIP : accompagnement confirmé avec toi avant le démarrage.</p>
       </div>
 
       <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">

@@ -723,7 +723,7 @@ function LandingPageHistorique() {
             </div>
           ))}
         </div>
-        <Link href="/sign-up" className="mt-4">
+        <Link href="/diagnostic" className="mt-4">
           <Button>Essayer le Coach IA</Button>
         </Link>
       </section>
@@ -792,7 +792,7 @@ const PARCOURS_COURT = [
   ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
   ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
   ["04", "Choix de la formule", "Pass IA, Coaching Hybride ou VIP."],
-  ["05", "Essai de 7 jours", "Tu testes avant le premier prélèvement."],
+  ["05", "Essai de 7 jours", "Inclus avec Pass IA et Coaching Hybride, avant le premier prélèvement."],
   ["06", "Programme activé", "Entraînement, alimentation et récupération coordonnés."],
   ["07", "Première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;

@@ -26,13 +26,13 @@ const LIENS = [
 // "Se connecter" et "Commencer" pointaient tous les deux vers /dashboard
 // une fois connecté (bug réel, pas juste une redondance visuelle) : gardé
 // uniquement le bouton qui a du sens dans chaque état. Un visiteur non
-// connecté qui clique "Commencer" et a déjà un compte retrouve "Se
-// connecter" directement sur /sign-up (lien déjà présent là-bas).
+// connecté qui clique "Faire mon bilan" suit le parcours gratuit avant
+// toute création de compte ou sélection de formule.
 export function SiteNav({ connecte }: { connecte: boolean }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const menuMobileRef = useRef<HTMLDivElement>(null);
-  const actionHref = connecte ? "/dashboard" : "/sign-up";
-  const actionLabel = connecte ? "Mon compte" : "Commencer";
+  const actionHref = connecte ? "/dashboard" : "/diagnostic";
+  const actionLabel = connecte ? "Mon compte" : "Bilan gratuit";
 
   useEffect(() => {
     if (!menuOuvert) return;

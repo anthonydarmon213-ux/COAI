@@ -79,8 +79,8 @@ export default function ProgrammeMusculationIaPage() {
           un coach diplômé d&apos;État le relit avant qu&apos;il t&apos;arrive.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/sign-up">
-            <Button>Créer mon programme — 7 jours d&apos;essai</Button>
+          <Link href="/diagnostic">
+            <Button>Faire mon bilan gratuit</Button>
           </Link>
           <Link href="/pricing">
             <Button variant="secondary">Voir les tarifs</Button>
@@ -117,8 +117,8 @@ export default function ProgrammeMusculationIaPage() {
         <h2 className="font-display text-2xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
           Prêt à voir ton programme ?
         </h2>
-        <Link href="/sign-up">
-          <Button>Commencer — 7 jours d&apos;essai</Button>
+        <Link href="/diagnostic">
+          <Button>Faire mon bilan gratuit</Button>
         </Link>
       </section>
     </main>
