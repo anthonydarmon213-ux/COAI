@@ -15,6 +15,7 @@ import {
   type TypeExercice,
 } from "@/lib/exercices/catalogue";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 const GROUPES = Object.keys(GROUPE_PRINCIPAL_LABEL) as GroupePrincipal[];
@@ -129,6 +130,7 @@ export function ExerciceCatalogue() {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-transparent to-transparent" aria-hidden="true" />
+                  <CoaiImageMark />
                   <div className="absolute right-2.5 top-2.5">
                     <Badge tone="neutral">{NIVEAU_EXERCICE_LABEL[ex.niveau]}</Badge>
                   </div>

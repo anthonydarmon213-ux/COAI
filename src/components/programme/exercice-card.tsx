@@ -6,6 +6,7 @@ import { ExerciceVideo } from "@/components/programme/exercice-video";
 import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
@@ -109,6 +110,7 @@ export function ExerciceCard({
               <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
                 Position de référence
               </span>
+              <CoaiImageMark />
             </div>
           )}
           {hasVideoReelle && <ExerciceVideo nom={nom} className="w-full" />}

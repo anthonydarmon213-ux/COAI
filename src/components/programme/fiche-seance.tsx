@@ -1,6 +1,7 @@
 import { MUSCLE_LABEL, musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 
 // Fiche de séance partageable (23/08/2026, format validé par Anthony sur
 // maquette) — pensée pour être imprimée en PDF et postée en story.
@@ -160,6 +161,7 @@ export function FicheSeance({
               <span className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-md bg-laiton-400 font-display text-[13px] font-black text-[#0D0E12]">
                 {i + 1}
               </span>
+              {photo && <CoaiImageMark className="bottom-2 right-2" />}
             </div>
 
             <div className="flex flex-col justify-center gap-1.5 px-4 py-4">

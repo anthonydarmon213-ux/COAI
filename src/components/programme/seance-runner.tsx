@@ -5,6 +5,7 @@ import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopp
 import { MuscleMap } from "@/components/programme/muscle-map";
 import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { MotionCheck } from "@/components/programme/motion-check";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 
@@ -582,8 +583,11 @@ export function SeanceRunner({
                     })()}
 
                     {photoUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element -- cascade visuel COAI puis stock
-                      <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full max-w-sm rounded-2xl object-cover" loading="eager" />
+                      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- cascade visuel COAI puis stock */}
+                        <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full object-cover" loading="eager" />
+                        <CoaiImageMark />
+                      </div>
                     )}
                   </div>
 

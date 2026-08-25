@@ -37,6 +37,19 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["bridge pilates", "pont pilates", "pilates bridge"], fichier: "pilates-07-bridge-pont-pilates" },
   { motifs: ["spine stretch forward", "étirement colonne pilates", "etirement colonne pilates"], fichier: "pilates-08-spine-stretch-forward" },
 
+  // Compléments parité & catalogue (25/08/2026) — nouveaux visuels COAI
+  // générés dans la même DA premium. Les noms exacts du catalogue passent
+  // avant les motifs plus larges (« rowing », « tirage », « curl », etc.).
+  { motifs: ["tirage horizontal (machine)", "tirage horizontal machine", "seated cable row"], fichier: "tirage-horizontal-machine" },
+  { motifs: ["tirage vertical (poulie)", "tirage vertical poulie", "lat pulldown"], fichier: "tirage-vertical-poulie" },
+  { motifs: ["curl marteau", "hammer curl"], fichier: "curl-marteau-homme-blond" },
+  { motifs: ["presse à cuisses (machine)", "presse a cuisses machine", "leg press"], fichier: "presse-a-cuisses-machine" },
+  { motifs: ["hip thrust barre", "barbell hip thrust"], fichier: "hip-thrust-barre" },
+  { motifs: ["rowing haltère unilatéral", "rowing haltere unilateral", "one arm dumbbell row", "single arm dumbbell row"], fichier: "rowing-haltere-unilateral-homme-arabe" },
+  { motifs: ["traction à la barre fixe", "traction a la barre fixe", "tractions barre fixe", "pull-up", "pull up"], fichier: "traction-barre-fixe-femme-blonde" },
+  { motifs: ["rowing à l'élastique", "rowing a l'elastique", "rowing élastique", "rowing elastique", "resistance band row"], fichier: "rowing-elastique-homme-blond" },
+  { motifs: ["pompes", "pompe au sol", "push-up", "push up"], fichier: "pompes-femme-eurasienne" },
+
   { motifs: ["fentes avant", "fente avant", "fentes haltères", "lunge"], fichier: "fentes-avant-halteres" },
   { motifs: ["leg curl", "ischio"], fichier: "leg-curl-allonge" },
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split", "split squat"], fichier: "fentes-bulgares" },
