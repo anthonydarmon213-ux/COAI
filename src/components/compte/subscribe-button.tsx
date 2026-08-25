@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { clearIntendedPlanCookie } from "@/lib/checkout/intended-plan-cookie";
 
 export function SubscribeButton({
   plan,
@@ -34,11 +35,12 @@ export function SubscribeButton({
       if (res.status === 401) {
         // Préserve l'intention (Coaching Hybride) à travers l'inscription —
         // sinon /sign-up créait toujours un abonnement Pass IA par défaut.
-        window.location.href = `/sign-up?plan=${plan}&vipSessions=${vipSessions}`;
+        window.location.href = `/sign-up?plan=${plan}&billing=${billing}&vipSessions=${vipSessions}`;
         return;
       }
       const data = await res.json();
       if (!res.ok || !data.url) throw new Error(data.error ?? "Impossible de démarrer le paiement.");
+      clearIntendedPlanCookie();
       window.location.href = data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");

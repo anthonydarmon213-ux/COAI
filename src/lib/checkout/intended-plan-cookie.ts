@@ -8,14 +8,27 @@
 // client uniquement), courte durée de vie, aucune donnée sensible.
 const COOKIE_NAME = "coai_plan";
 const VIP_SESSIONS_COOKIE_NAME = "coai_vip_sessions";
+const BILLING_COOKIE_NAME = "coai_billing";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 3; // 3 jours
 
 export type IntendedPlan = "GRATUIT" | "STANDARD" | "PREMIUM";
+export type IntendedBilling = "MONTHLY" | "ANNUAL";
 
-export function storeIntendedPlanCookie(plan: IntendedPlan, vipSessions: 1 | 2 | 3 | 4 = 1) {
+export function storeIntendedPlanCookie(
+  plan: IntendedPlan,
+  vipSessions: 1 | 2 | 3 | 4 = 1,
+  billing: IntendedBilling = "MONTHLY"
+) {
   if (typeof document === "undefined") return;
   document.cookie = `${COOKIE_NAME}=${plan}; path=/; max-age=${MAX_AGE_SECONDS}; SameSite=Lax`;
   document.cookie = `${VIP_SESSIONS_COOKIE_NAME}=${vipSessions}; path=/; max-age=${MAX_AGE_SECONDS}; SameSite=Lax`;
+  document.cookie = `${BILLING_COOKIE_NAME}=${billing}; path=/; max-age=${MAX_AGE_SECONDS}; SameSite=Lax`;
+}
+
+export function readIntendedBillingCookie(): IntendedBilling {
+  if (typeof document === "undefined") return "MONTHLY";
+  const match = document.cookie.match(new RegExp(`(?:^|; )${BILLING_COOKIE_NAME}=([^;]*)`));
+  return match?.[1] === "ANNUAL" ? "ANNUAL" : "MONTHLY";
 }
 
 export function readIntendedPlanCookie(): IntendedPlan | null {
@@ -37,4 +50,5 @@ export function clearIntendedPlanCookie() {
   if (typeof document === "undefined") return;
   document.cookie = `${COOKIE_NAME}=; path=/; max-age=0`;
   document.cookie = `${VIP_SESSIONS_COOKIE_NAME}=; path=/; max-age=0`;
+  document.cookie = `${BILLING_COOKIE_NAME}=; path=/; max-age=0`;
 }

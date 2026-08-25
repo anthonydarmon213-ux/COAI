@@ -70,8 +70,8 @@ export function CoaiIntro() {
                 Faire mon bilan initial offert
               </Button>
             </Link>
-            <Link href="/pricing#impulsion" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
-              Découvrir les accompagnements →
+            <Link href="#comment-ca-marche" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
+              Voir les étapes →
             </Link>
           </div>
           <p className="mt-3 text-xs text-graphite-500">Bilan initial en moins de 5 minutes · Score COAI personnalisé · aucune carte bancaire</p>
@@ -80,9 +80,9 @@ export function CoaiIntro() {
 
       <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
         {[
-          ["01", "Bilan initial offert", "Tes besoins, ton niveau et ton Score COAI."],
-          ["02", "Pass IA pour commencer", "Ton programme et tes séances adaptatives."],
-          ["03", "Tu évolues si nécessaire", "Coaching Hybride ou VIP selon l'attention souhaitée."],
+          ["01", "Bilan offert", "Tu réponds, sans carte bancaire."],
+          ["02", "Résultat personnalisé", "Tu comprends ton point de départ."],
+          ["03", "Première séance", "Tu testes COAI pendant 7 jours."],
         ].map(([numero, titre, texte]) => (
           <div key={numero} className="border-white/[0.08] px-6 py-6 text-left sm:border-r sm:last:border-r-0">
             <span className="font-mono text-[10px] tracking-[0.18em] text-laiton-300">{numero}</span>

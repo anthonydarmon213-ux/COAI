@@ -10,6 +10,10 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
+import {
+  readIntendedBillingCookie,
+  readIntendedPlanCookie,
+} from "@/lib/checkout/intended-plan-cookie";
 import Link from "next/link";
 
 export default function SignInPage() {
@@ -28,6 +32,14 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  function destinationApresConnexion() {
+    if (returnTo) return returnTo;
+    const intendedPlan = readIntendedPlanCookie();
+    if (!intendedPlan) return "/dashboard";
+    const billing = readIntendedBillingCookie();
+    return `/pricing?from=signin&selected=${intendedPlan}&billing=${billing}`;
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -37,7 +49,7 @@ export default function SignInPage() {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
 
-      router.push(returnTo ?? "/dashboard");
+      router.push(destinationApresConnexion());
       router.refresh();
     } catch (err) {
       console.error("[sign-in]", err);
