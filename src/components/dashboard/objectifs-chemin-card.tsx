@@ -40,10 +40,11 @@ const NIVEAU_LABELS: Record<string, string> = {
 
 function getObjectifDisplay(objectifs: string | null | undefined): string[] {
   if (!objectifs) return [];
-  return objectifs.split(",").map((o) => {
-    const trimmed = o.trim();
-    return OBJECTIF_LABELS[trimmed] ?? trimmed;
-  }).filter(Boolean);
+  return objectifs
+    .split(/\s*[,\n]\s*|\s+—\s+|\s+–\s+|\s*:\s*/)
+    .map((o) => o.trim())
+    .filter((o) => o.length > 0 && o.length <= 60)
+    .map((o) => OBJECTIF_LABELS[o] ?? o);
 }
 
 export function ObjectifsCheminCard({
