@@ -15,13 +15,13 @@ export function ProgrammePretCard({
 }) {
   return (
     <article className="animate-reveal group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111518] shadow-[0_24px_70px_-46px_rgba(0,0,0,.7)] transition hover:border-white/20">
-      <div className="relative h-40 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.25),transparent_60%),#171b1d]">
+      <div className="relative h-52 w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.25),transparent_60%),#171b1d]">
         {photoUrl && (
           // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
           <img
             src={photoUrl}
             alt=""
-            className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
+            className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
             loading="lazy"
           />
         )}
