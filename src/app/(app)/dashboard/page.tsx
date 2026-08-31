@@ -29,6 +29,7 @@ import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
+import { ObjectifsCheminCard } from "@/components/dashboard/objectifs-chemin-card";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -84,7 +85,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, diesRecents, gamification, programmeNutrition] = await Promise.all([
+  const [validated, latest, daily, insight, diesRecents, gamification, programmeNutrition, seanceLogs] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -109,6 +110,11 @@ export default async function DashboardPage() {
       where: { userId: user.id, pilier: "NUTRITION" },
       orderBy: { generatedAt: "desc" },
       select: { contenu: true },
+    }),
+    prisma.seanceLog.findMany({
+      where: { userId: user.id, date: { gte: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) } },
+      orderBy: { date: "desc" },
+      select: { date: true, exercices: true },
     }),
   ]);
 
@@ -143,6 +149,25 @@ export default async function DashboardPage() {
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
   const hasAccess = hasProgrammeAccess(user, user.subscription);
   const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
+
+  type SetD = { reps?: number; charge?: number };
+  type ExD = { nom?: string; chargeKg?: number; series?: number; repetitions?: number; sets?: SetD[] };
+  const seancesDuMoisCount = seanceLogs.length;
+  let tonnageTotal = 0;
+  for (const s of seanceLogs) {
+    const exs = Array.isArray(s.exercices) ? (s.exercices as ExD[]) : [];
+    for (const ex of exs) {
+      if (ex.sets && ex.sets.length > 0) {
+        tonnageTotal += ex.sets.reduce((acc, set) => acc + (set.reps ?? 0) * (set.charge ?? 0), 0);
+      } else if (typeof ex.chargeKg === "number") {
+        tonnageTotal += (ex.series ?? 1) * (ex.repetitions ?? 1) * ex.chargeKg;
+      }
+    }
+  }
+  const tonnageMoyen = seancesDuMoisCount > 0 ? tonnageTotal / seancesDuMoisCount : 0;
+  const uniqueDays = new Set(seanceLogs.map((s) => s.date.toISOString().slice(0, 10)));
+  const dashboardStats = { seancesDuMois: seancesDuMoisCount, tonnageMoyen, streakJours: uniqueDays.size };
+  const hasNutrition = Boolean(programmeNutrition);
 
   // Une seule direction claire à chaque connexion (19/08/2026, demande
   // Anthony : "être pédagogue... indiquer ce que doit faire la personne").
@@ -224,6 +249,14 @@ export default async function DashboardPage() {
           <ReadinessCard readiness={readiness} compact />
         </div>
       </header>
+
+      {/* Objectifs & Chemin recommandé */}
+      <ObjectifsCheminCard
+        profile={user.profile}
+        stats={dashboardStats}
+        hasProgramme={Boolean(programme)}
+        hasNutrition={hasNutrition}
+      />
 
       {/* BLOC 2 — L'action principale du jour, seule décision à prendre */}
       <div className="relative">
