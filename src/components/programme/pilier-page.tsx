@@ -212,7 +212,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
             href={`#pilier-${pilierActif.toLowerCase()}`}
             className="group relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-black/30 sm:min-h-64"
           >
-            <Image src={etapeActive.image} alt="" fill sizes="(max-width: 768px) 100vw, 900px" className="object-cover opacity-60 transition duration-500 group-hover:scale-[1.02] group-hover:opacity-75" />
+            <Image src={etapeActive.image} alt="" fill sizes="(max-width: 768px) 100vw, 900px" className="object-cover object-center opacity-60 transition duration-500 group-hover:scale-[1.02] group-hover:opacity-75" />
             <span className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" aria-hidden="true" />
             <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 sm:p-6">
               <span>

@@ -62,7 +62,7 @@ export function RecuperationView({
       <div className="overflow-hidden rounded-2xl border border-laiton-400/25 bg-white/[0.025] shadow-[0_24px_70px_-45px_rgba(201,162,98,0.65)]">
         {photoJourUrl && (
           <div className="relative h-52 overflow-hidden bg-black sm:h-64">
-            <Image src={photoJourUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 760px" />
+            <Image src={photoJourUrl} alt="" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 760px" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
@@ -130,7 +130,7 @@ export function RecuperationView({
                       alt=""
                       width={900}
                       height={675}
-                      className="h-36 w-full object-cover"
+                      className="h-36 w-full object-cover object-center"
                     />
                   )}
                   <div className="flex flex-col gap-2 p-4">

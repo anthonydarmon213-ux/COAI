@@ -1,27 +1,17 @@
 import { ProgrammesPretsGrid } from "@/components/programme/programmes-prets-grid";
 import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
-import { getStockPhotos } from "@/lib/media/pexels";
 import { getCurrentAppUser } from "@/lib/auth/server";
 
-// Bibliothèque de programmes prêts à l'emploi (19/08/2026, demande Anthony) —
-// même gabarit que /programme/exercices et /programme/recettes : une
-// bibliothèque indépendante du programme généré par l'IA, jamais bloquante
-// ni en remplacement. Photos résolues côté serveur en une fois.
 export default async function ProgrammesPretsPage() {
   const user = await getCurrentAppUser();
   const sexe = user?.profile?.sexe;
   const photoLocale = (programme: (typeof PROGRAMMES_PRETS)[number]) =>
-    sexe === "Femme"
-      ? programme.photoFemme
-      : sexe === "Homme"
-        ? programme.photoHomme
-        : programme.photoFemme ?? programme.photoHomme;
-  const photos = await getStockPhotos(
-    PROGRAMMES_PRETS.filter((programme) => !photoLocale(programme)).map((programme) => programme.photoQuery)
-  );
+    sexe === "Homme"
+      ? (programme.photoHomme ?? programme.photoFemme)
+      : (programme.photoFemme ?? programme.photoHomme);
   const items = PROGRAMMES_PRETS.map((programme) => ({
     programme,
-    photoUrl: photoLocale(programme) ?? photos[programme.photoQuery] ?? null,
+    photoUrl: photoLocale(programme) ?? null,
   }));
 
   return (

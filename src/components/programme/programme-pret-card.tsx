@@ -21,7 +21,7 @@ export function ProgrammePretCard({
           <img
             src={photoUrl}
             alt=""
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+            className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
             loading="lazy"
           />
         )}
@@ -73,7 +73,7 @@ export function ProgrammePretCard({
                           alt={`${visuel.nom} — démonstration COAI`}
                           width={900}
                           height={675}
-                          className="h-24 w-full object-cover sm:h-28"
+                          className="h-24 w-full object-cover object-center sm:h-28"
                         />
                         <figcaption className="px-2.5 py-2 text-[10px] leading-4 text-graphite-300">
                           {visuel.nom}

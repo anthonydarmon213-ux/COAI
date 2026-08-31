@@ -585,7 +585,7 @@ export function SeanceRunner({
                     {photoUrl && (
                       <div className="relative w-full max-w-sm overflow-hidden rounded-2xl">
                         {/* eslint-disable-next-line @next/next/no-img-element -- cascade visuel COAI puis stock */}
-                        <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full object-cover" loading="eager" />
+                        <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full object-cover object-center" loading="eager" />
                         <CoaiImageMark />
                       </div>
                     )}

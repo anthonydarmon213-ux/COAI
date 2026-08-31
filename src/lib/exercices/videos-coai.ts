@@ -60,6 +60,13 @@ const TABLE: Entree[] = [
   { motifs: ["pompe", "push up", "push-up"], video: { fichier: "pompes", description: "Pompes au sol" } },
   { motifs: ["dips sur banc", "dips banc", "bench dips"], video: { fichier: "dips-banc", description: "Dips sur banc" } },
 
+  { motifs: ["tirage horizontal", "tirage horizontal poulie", "seated cable row", "cable row"], video: { fichier: "tirage-horizontal", description: "Tirage horizontal à la poulie" } },
+  { motifs: ["tirage vertical", "lat pulldown", "tirage poulie haute", "tirage vertical poulie"], video: { fichier: "tirage-vertical", description: "Tirage vertical à la poulie haute" } },
+  { motifs: ["curl poulie basse", "bicep curl poulie", "cable curl"], video: { fichier: "bicep-curl-poulie-basse", description: "Curl biceps à la poulie basse" } },
+  { motifs: ["developpe couche classique", "developpe couche barre", "bench press barre", "bench press"], video: { fichier: "developpe-couche-classique", description: "Développé couché classique à la barre" } },
+  { motifs: ["developpe couche incline", "developpe incline barre", "incline bench press"], video: { fichier: "developpe-couche-incline", description: "Développé couché incliné à la barre" } },
+  { motifs: ["press machine incline", "chest press incline", "press incline machine"], video: { fichier: "press-machin-incline", description: "Press machine incliné" } },
+
   { motifs: ["rowing halteres", "rowing buste penche", "bent over row"], video: { fichier: "rowing-halteres", description: "Rowing buste penché aux haltères" } },
   { motifs: ["rowing menton", "tirage menton", "upright row"], video: { fichier: "rowing-menton-barre", description: "Rowing menton à la barre" } },
   { motifs: ["chin up", "chin-up", "traction supination"], video: { fichier: "chin-up", description: "Traction en supination" } },

@@ -164,6 +164,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Améliorer la qualité de mouvement au quotidien",
     ],
     photoQuery: "person stretching mobility exercise",
+    photoFemme: "/exercices/mobilite-ouverture-epaules-baton.jpg",
+    photoHomme: "/exercices/mobilite-fente-basse-ouverture-hanche.jpg",
     jours: [
       {
         jour: "Jour 1",
@@ -202,6 +204,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Arriver reposé·e le jour de la course",
     ],
     photoQuery: "person running outdoor training",
+    photoFemme: "/exercices/sauts-corde-reel.jpg",
+    photoHomme: "/exercices/sauts-corde-reel.jpg",
     jours: [
       {
         jour: "Jour 1",
@@ -245,6 +249,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Construire la résistance mentale sur un effort long",
     ],
     photoQuery: "functional fitness training sled push",
+    photoFemme: "/exercices/hyrox-kettlebell-swing.jpg",
+    photoHomme: "/exercices/hyrox-burpee-position-basse.jpg",
     jours: [
       {
         jour: "Jour 1",
@@ -288,7 +294,7 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Garder de l'énergie au quotidien malgré le déficit",
     ],
     photoQuery: "athletic person barbell squat dark premium gym",
-    photoFemme: "/exercices/back-squat-barre.jpg",
+    photoFemme: "/exercices/deadlift-conventionnel-femme-blonde-v2.jpg",
     photoHomme: "/exercices/back-squat-barre.jpg",
     jours: [
       {
@@ -332,6 +338,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Poser une base solide avant d'ajouter du matériel",
     ],
     photoQuery: "bodyweight workout push up",
+    photoFemme: "/exercices/pompes-femme-eurasienne.jpg",
+    photoHomme: "/exercices/gainage-planche.jpg",
     jours: [
       {
         jour: "Jour 1",
@@ -374,6 +382,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Progresser sans solliciter excessivement le bas du dos",
     ],
     photoQuery: "glute bridge hip thrust workout",
+    photoFemme: "/exercices/squat-poids-du-corps-femme-metisse-v2.jpg",
+    photoHomme: "/exercices/hip-thrust-barre.jpg",
     jours: [
       {
         jour: "Jour 1",
@@ -411,6 +421,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Terminer le mois avec une routine qui tient",
     ],
     photoQuery: "motivation fitness challenge calendar",
+    photoFemme: "/exercices/burpee-saut-longueur.jpg",
+    photoHomme: "/exercices/burpee-saut-longueur.jpg",
     jours: [
       { jour: "Jour 1", focus: "Mouvement", contenu: "10 minutes de marche, dehors si possible." },
       { jour: "Jour 2", focus: "Nutrition", contenu: "Bois un grand verre d'eau au réveil, avant même le café." },
@@ -465,6 +477,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Améliorer la qualité perçue du sommeil, pas seulement sa durée",
     ],
     photoQuery: "peaceful bedroom night sleep",
+    photoFemme: "/exercices/yoga-08-savasana.jpg",
+    photoHomme: "/exercices/yoga-08-savasana.jpg",
     jours: [
       { jour: "Jour 1", focus: "Horaire fixe", contenu: "Choisis une heure de coucher et de lever réaliste, et tiens-la ce soir — même le week-end." },
       { jour: "Jour 2", focus: "Caféine", contenu: "Plus aucune caféine après 14h aujourd'hui (café, thé noir, certains sodas)." },
@@ -499,6 +513,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Avoir un outil simple à utiliser n'importe où",
     ],
     photoQuery: "calm breathing exercise relaxation",
+    photoFemme: "/exercices/yoga-04-arbre.jpg",
+    photoHomme: "/exercices/yoga-04-arbre.jpg",
     jours: [
       {
         jour: "Technique 1",
@@ -540,6 +556,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Installer une pause mentale régulière dans la semaine",
     ],
     photoQuery: "person meditating calm peaceful",
+    photoFemme: "/exercices/mobilite-posture-enfant.jpg",
+    photoHomme: "/exercices/mobilite-posture-enfant.jpg",
     jours: [
       { jour: "Jour 1", focus: "La respiration", contenu: "5 minutes assis·e, les yeux fermés, à simplement observer ta respiration sans essayer de la changer." },
       { jour: "Jour 2", focus: "Le corps", contenu: "5 minutes de scan corporel : parcours mentalement ton corps des pieds à la tête, en relâchant chaque zone tendue." },
@@ -567,6 +585,8 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
       "Éviter les erreurs qui transforment la récupération en fatigue supplémentaire",
     ],
     photoQuery: "sauna wellness relaxation spa",
+    photoFemme: "/exercices/mobilite-etirement-fessier-assis.jpg",
+    photoHomme: "/exercices/mobilite-etirement-fessier-assis.jpg",
     jours: [
       {
         jour: "Protocole 1",

@@ -92,7 +92,7 @@ export function EntrainementView({
             <>
               {photoSeanceUrl && (
                 // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
-                <img src={photoSeanceUrl} alt="" className="h-36 w-full rounded-xl object-cover" loading="lazy" />
+                <img src={photoSeanceUrl} alt="" className="h-36 w-full rounded-xl object-cover object-center" loading="lazy" />
               )}
               {Array.isArray(exercices) && exercices.length > 0 && (
                 <DemarrerSeanceButton
