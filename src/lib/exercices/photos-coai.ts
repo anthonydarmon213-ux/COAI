@@ -197,7 +197,8 @@ const TABLE: EntreePhoto[] = [
 
   // KETTLEBELL — "goblet squat" avant "squat", "swing" avant tout.
   { motifs: ["kettlebell swing", "swing kettlebell", "swing"], fichier: "kettlebell-swing" },
-  { motifs: ["goblet squat", "squat gobelet"], fichier: "kettlebell-goblet-squat" },
+  // kettlebell-goblet-squat.jpg retiré : montre un air squat, pas un goblet.
+  // La vidéo goblet-squat.mp4 reste la seule démo pour ce mouvement.
   { motifs: ["turkish get-up", "turkish getup", "get-up turc"], fichier: "kettlebell-turkish-get-up" },
   { motifs: ["clean kettlebell", "kettlebell clean", "position rack"], fichier: "kettlebell-clean-rack" },
   { motifs: ["snatch"], fichier: "kettlebell-snatch" },
