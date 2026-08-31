@@ -52,21 +52,47 @@ export default async function ProgressionPage() {
     points: mesures.map(metrique.valeurs).filter((v): v is number => v !== null),
   })).filter((g) => g.points.length > 0);
 
+  type SetDetail = { reps?: number; charge?: number };
+  type ExData = { nom?: string; chargeKg?: number; series?: number; repetitions?: number; sets?: SetDetail[] };
+
   const chargesParExercice = new Map<string, number[]>();
+  const tonnageParExercice = new Map<string, number[]>();
+  const tonnageParSeance: number[] = [];
+
   for (const seance of seances) {
     const exercices = Array.isArray(seance.exercices)
-      ? (seance.exercices as { nom?: string; chargeKg?: number }[])
+      ? (seance.exercices as ExData[])
       : [];
+    let tonnageSeance = 0;
     for (const ex of exercices) {
-      if (!ex.nom || typeof ex.chargeKg !== "number") continue;
+      if (!ex.nom) continue;
       const nom = ex.nom.trim();
-      const liste = chargesParExercice.get(nom) ?? [];
-      liste.push(ex.chargeKg);
-      chargesParExercice.set(nom, liste);
+      if (typeof ex.chargeKg === "number") {
+        const liste = chargesParExercice.get(nom) ?? [];
+        liste.push(ex.chargeKg);
+        chargesParExercice.set(nom, liste);
+      }
+      let vol = 0;
+      if (ex.sets && ex.sets.length > 0) {
+        vol = ex.sets.reduce((s, set) => s + (set.reps ?? 0) * (set.charge ?? 0), 0);
+      } else if (typeof ex.chargeKg === "number") {
+        vol = (ex.series ?? 1) * (ex.repetitions ?? 1) * ex.chargeKg;
+      }
+      if (vol > 0) {
+        const liste = tonnageParExercice.get(nom) ?? [];
+        liste.push(vol);
+        tonnageParExercice.set(nom, liste);
+      }
+      tonnageSeance += vol;
     }
+    if (tonnageSeance > 0) tonnageParSeance.push(tonnageSeance);
   }
+
   const graphiquesForce = Array.from(chargesParExercice.entries())
     .filter(([, points]) => points.length > 0)
+    .map(([nom, points]) => ({ nom, points }));
+  const graphiquesTonnage = Array.from(tonnageParExercice.entries())
+    .filter(([, points]) => points.length > 1)
     .map(([nom, points]) => ({ nom, points }));
   const debutBilan = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const seancesDuMois = seances.filter((seance) => seance.date >= debutBilan).length;
@@ -168,12 +194,32 @@ export default async function ProgressionPage() {
         </Card>
       ) : (
         <>
+          {tonnageParSeance.length > 1 && (
+            <div className="flex flex-col gap-3">
+              <SectionLabel>Tonnage par séance</SectionLabel>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Sparkline label="Volume total" unite="kg" points={tonnageParSeance} />
+              </div>
+            </div>
+          )}
+
           {graphiquesForce.length > 0 && (
             <div id="charges" className="scroll-mt-8 flex flex-col gap-3">
-              <SectionLabel>Force</SectionLabel>
+              <SectionLabel>Force · charge max</SectionLabel>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {graphiquesForce.map((g) => (
                   <Sparkline key={g.nom} label={g.nom} unite="kg" points={g.points} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {graphiquesTonnage.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <SectionLabel>Volume par exercice</SectionLabel>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {graphiquesTonnage.map((g) => (
+                  <Sparkline key={`vol-${g.nom}`} label={g.nom} unite="kg" points={g.points} />
                 ))}
               </div>
             </div>

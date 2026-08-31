@@ -10,6 +10,8 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { ScalePicker } from "@/components/ui/scale-picker";
 
 type NiveauDouleur = "AUCUNE" | "LEGERE" | "IMPORTANTE";
+type SetEntry = { reps: string; charge: string };
+type ExerciceEntry = { nom: string; sets: SetEntry[] };
 
 const ZONES_DOULEUR = ["Dos", "Épaule", "Genou", "Cheville", "Poignet", "Hanche", "Cou", "Autre"];
 
@@ -19,16 +21,18 @@ const DOULEUR_OPTIONS: { value: NiveauDouleur; label: string }[] = [
   { value: "IMPORTANTE", label: "Importante" },
 ];
 
-// Check-in post-séance (11/08/2026) — intégré directement au formulaire de
-// log existant plutôt qu'un écran séparé : la cible COAI logue déjà sa
-// séance ici, ajouter une étape distincte aurait dupliqué la friction.
-// Objectif explicite : moins de 30 secondes à remplir, boutons plutôt que
-// texte, tout facultatif.
+function newSet(): SetEntry {
+  return { reps: "", charge: "" };
+}
+
+function newExercice(): ExerciceEntry {
+  return { nom: "", sets: [newSet()] };
+}
+
 export function SeanceForm() {
   const router = useRouter();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [exercice, setExercice] = useState("");
-  const [charge, setCharge] = useState("");
+  const [exercices, setExercices] = useState<ExerciceEntry[]>([newExercice()]);
   const [duree, setDuree] = useState("");
   const [difficulte, setDifficulte] = useState<number | null>(null);
   const [energie, setEnergie] = useState<number | null>(null);
@@ -37,6 +41,45 @@ export function SeanceForm() {
   const [commentaire, setCommentaire] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function updateExercice(idx: number, patch: Partial<ExerciceEntry>) {
+    setExercices((prev) => prev.map((ex, i) => (i === idx ? { ...ex, ...patch } : ex)));
+  }
+
+  function updateSet(exIdx: number, setIdx: number, patch: Partial<SetEntry>) {
+    setExercices((prev) =>
+      prev.map((ex, i) =>
+        i === exIdx
+          ? { ...ex, sets: ex.sets.map((s, j) => (j === setIdx ? { ...s, ...patch } : s)) }
+          : ex
+      )
+    );
+  }
+
+  function addSet(exIdx: number) {
+    setExercices((prev) =>
+      prev.map((ex, i) => (i === exIdx ? { ...ex, sets: [...ex.sets, newSet()] } : ex))
+    );
+  }
+
+  function removeSet(exIdx: number, setIdx: number) {
+    setExercices((prev) =>
+      prev.map((ex, i) =>
+        i === exIdx && ex.sets.length > 1
+          ? { ...ex, sets: ex.sets.filter((_, j) => j !== setIdx) }
+          : ex
+      )
+    );
+  }
+
+  function addExercice() {
+    setExercices((prev) => [...prev, newExercice()]);
+  }
+
+  function removeExercice(idx: number) {
+    if (exercices.length <= 1) return;
+    setExercices((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   function selectDouleur(value: NiveauDouleur) {
     setDouleur(value);
@@ -48,14 +91,32 @@ export function SeanceForm() {
     setLoading(true);
     setError(null);
     try {
+      const payload = exercices
+        .filter((ex) => ex.nom.trim())
+        .map((ex) => {
+          const sets = ex.sets
+            .map((s, i) => ({
+              set: i + 1,
+              reps: Number(s.reps) || 0,
+              charge: Number(s.charge) || 0,
+            }))
+            .filter((s) => s.reps > 0);
+          const totalSeries = sets.length || ex.sets.length;
+          const lastCharge = sets.at(-1)?.charge;
+          return {
+            nom: ex.nom.trim(),
+            series: totalSeries,
+            chargeKg: lastCharge,
+            sets: sets.length > 0 ? sets : undefined,
+          };
+        });
+
       const res = await fetch("/api/seances", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
-          exercices: exercice
-            ? [{ nom: exercice, chargeKg: charge ? Number(charge) : undefined }]
-            : [],
+          exercices: payload,
           notes: commentaire || undefined,
           difficulte: difficulte ?? undefined,
           energie: energie ?? undefined,
@@ -66,8 +127,7 @@ export function SeanceForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
-      setExercice("");
-      setCharge("");
+      setExercices([newExercice()]);
       setDuree("");
       setDifficulte(null);
       setEnergie(null);
@@ -88,24 +148,82 @@ export function SeanceForm() {
         <Field label="Date">
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
-        <Field label="Exercice principal">
-          <Input
-            type="text"
-            placeholder="ex: squat 5x5"
-            value={exercice}
-            onChange={(e) => setExercice(e.target.value)}
-          />
-        </Field>
-        <Field label="Charge (kg)">
-          <Input
-            type="number"
-            min="0"
-            step="0.5"
-            placeholder="ex: 80"
-            value={charge}
-            onChange={(e) => setCharge(e.target.value)}
-          />
-        </Field>
+
+        <div className="flex flex-col gap-4">
+          <SectionLabel>Exercices</SectionLabel>
+          {exercices.map((ex, exIdx) => (
+            <div
+              key={exIdx}
+              className="relative flex flex-col gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3"
+            >
+              {exercices.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeExercice(exIdx)}
+                  className="absolute right-2 top-2 text-xs text-graphite-500 hover:text-red-400"
+                >
+                  ✕
+                </button>
+              )}
+              <Input
+                type="text"
+                placeholder="Nom de l'exercice"
+                value={ex.nom}
+                onChange={(e) => updateExercice(exIdx, { nom: e.target.value })}
+              />
+              <div className="flex flex-col gap-1.5">
+                {ex.sets.map((s, setIdx) => (
+                  <div key={setIdx} className="flex items-center gap-2">
+                    <span className="w-6 text-center font-mono text-[10px] text-graphite-500">
+                      S{setIdx + 1}
+                    </span>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="Reps"
+                      value={s.reps}
+                      onChange={(e) => updateSet(exIdx, setIdx, { reps: e.target.value })}
+                      className="flex-1"
+                    />
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      placeholder="kg"
+                      value={s.charge}
+                      onChange={(e) => updateSet(exIdx, setIdx, { charge: e.target.value })}
+                      className="flex-1"
+                    />
+                    {ex.sets.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeSet(exIdx, setIdx)}
+                        className="text-xs text-graphite-500 hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addSet(exIdx)}
+                  className="self-start rounded-lg border border-dashed border-graphite-700 px-3 py-1.5 text-[11px] text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
+                >
+                  + Série
+                </button>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addExercice}
+            className="self-start rounded-lg border border-dashed border-graphite-700 px-4 py-2 text-xs text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
+          >
+            + Exercice
+          </button>
+        </div>
+
         <Field label="Durée de la séance (minutes, facultatif)">
           <Input
             type="number"

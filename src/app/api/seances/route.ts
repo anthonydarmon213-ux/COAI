@@ -4,6 +4,13 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { trackServerEvent } from "@/lib/analytics/product-events";
 
+const setSchema = z.object({
+  set: z.number().int().positive(),
+  reps: z.number().int().nonnegative(),
+  charge: z.number().nonnegative(),
+  rpe: z.number().min(1).max(10).optional(),
+});
+
 const bodySchema = z.object({
   date: z.coerce.date(),
   exercices: z.array(
@@ -12,6 +19,7 @@ const bodySchema = z.object({
       series: z.number().int().positive().optional(),
       repetitions: z.number().int().positive().optional(),
       chargeKg: z.number().nonnegative().optional(),
+      sets: z.array(setSchema).optional(),
     })
   ),
   ressenti: z.string().max(500).optional(),

@@ -333,20 +333,20 @@ export function SeanceRunner({
   async function terminerSeance() {
     setEnvoiEnCours(true);
     const dureeMinutes = Math.max(1, Math.round((Date.now() - debutRef.current) / 60000));
-    // Les reps/charges réellement saisies remontent au suivi, série par
-    // série — jamais les valeurs "visées" du programme si l'utilisateur
-    // n'a rien saisi (on n'envoie alors que le nom).
-    const parExercice = new Map<string, { nom: string; series: number; repetitions?: number; chargeKg?: number }>();
+    type SetDetail = { set: number; reps: number; charge: number };
+    const parExercice = new Map<string, { nom: string; series: number; chargeKg?: number; sets: SetDetail[] }>();
     steps.forEach((s, i) => {
       if (s.type !== "set" || i >= index + 1) return;
       const cle = `${s.exerciceIndex}-${s.setIndex}`;
       const saisi = realise[cle];
-      const entree = parExercice.get(s.nom) ?? { nom: s.nom, series: 0 };
+      const entree = parExercice.get(s.nom) ?? { nom: s.nom, series: 0, sets: [] };
       entree.series += 1;
       const reps = Number(saisi?.reps);
       const charge = Number(saisi?.charge);
-      if (Number.isFinite(reps) && reps > 0) entree.repetitions = reps;
-      if (Number.isFinite(charge) && charge > 0) entree.chargeKg = charge;
+      if (Number.isFinite(reps) && reps > 0 && Number.isFinite(charge) && charge >= 0) {
+        entree.sets.push({ set: entree.series, reps, charge });
+        entree.chargeKg = charge;
+      }
       parExercice.set(s.nom, entree);
     });
     try {
