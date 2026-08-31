@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import { SectionLabel } from "@/components/ui/section-label";
 import { DailyExperience } from "@/components/daily/daily-experience";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
@@ -9,22 +8,12 @@ import { computeProfilCompletion } from "@/lib/profil/completion";
 import { hasProgrammeAccess } from "@/lib/subscription/plan";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
-import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
-import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
-import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
-import { ScoreAgeCoaiCard } from "@/components/dashboard/score-age-coai-card";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
-import { RecuperationMusculaireCard } from "@/components/dashboard/recuperation-musculaire-card";
-import { StreakBadgesCard } from "@/components/dashboard/streak-badges-card";
 import { DeskResetCard } from "@/components/dashboard/desk-reset-card";
-import { RoutineRecuperation } from "@/components/dashboard/routine-recuperation";
-import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
-import { getGamification } from "@/lib/insight/gamification";
 import { AnneauxMacros } from "@/components/programme/anneaux-macros";
 import { ReadinessCard } from "@/components/dashboard/readiness-card";
-import { MonitoringSanteCard } from "@/components/dashboard/monitoring-sante-card";
 import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
@@ -41,8 +30,6 @@ const MANTRAS = [
   "Écoute ton corps, respecte le plan, célèbre le progrès.",
 ];
 
-const JOURS_COURTS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-
 function nomSeanceCourt(nom: string) {
   const normalise = nom.toLowerCase();
   if (normalise.includes("full body") || normalise.includes("corps entier")) {
@@ -52,26 +39,6 @@ function nomSeanceCourt(nom: string) {
     return "Corps entier";
   }
   return nom.length > 42 ? `${nom.slice(0, 39).trim()}…` : nom;
-}
-
-function startOfWeek(date: Date) {
-  const result = new Date(date);
-  const day = result.getDay() || 7;
-  result.setDate(result.getDate() - day + 1);
-  return result;
-}
-
-function getWeek(date: Date, contenu: unknown) {
-  const monday = startOfWeek(date);
-  return Array.from({ length: 7 }, (_, index) => {
-    const current = new Date(monday);
-    current.setDate(monday.getDate() + index);
-    return {
-      date: current,
-      workout: getWorkoutForDate(contenu, current),
-      today: current.toDateString() === date.toDateString(),
-    };
-  });
 }
 
 function today() {
@@ -85,7 +52,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, diesRecents, gamification, programmeNutrition, seanceLogs] = await Promise.all([
+  const [validated, latest, daily, diesRecents, programmeNutrition, seanceLogs] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -95,17 +62,10 @@ export default async function DashboardPage() {
       orderBy: { generatedAt: "desc" },
     }),
     prisma.dailySession.findUnique({ where: { userId_date: { userId: user.id, date } } }),
-    getCoaiInsight(user.id),
-    // Fenêtre de 90 jours pour le Score & Âge COAI (19/08/2026) — assez
-    // large pour ne pas dépendre d'une série sans trou, sans remonter à
-    // des habitudes trop anciennes pour rester représentatif.
     prisma.dailySession.findMany({
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
-    getGamification(user.id),
-    // Programme nutrition (23/08/2026) — uniquement pour les anneaux de
-    // macros du bloc 3. Le dashboard ne chargeait que l'entraînement.
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "NUTRITION" },
       orderBy: { generatedAt: "desc" },
@@ -140,8 +100,6 @@ export default async function DashboardPage() {
 
   const programme = validated ?? latest;
   const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
-  const week = getWeek(date, programme?.contenu);
-  const weeklyWorkoutCount = week.filter((day) => day.workout).length;
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
   const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
@@ -149,6 +107,7 @@ export default async function DashboardPage() {
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
   const hasAccess = hasProgrammeAccess(user, user.subscription);
   const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
+  const insight = !programme && !hasAccess ? await getCoaiInsight(user.id) : null;
 
   type SetD = { reps?: number; charge?: number };
   type ExD = { nom?: string; chargeKg?: number; series?: number; repetitions?: number; sets?: SetD[] };
@@ -271,7 +230,7 @@ export default async function DashboardPage() {
             </section>
           ) : !programme ? (
             !hasAccess ? (
-              <AujourdhuiGuideCard mission={mission} insight={insight} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
+              <AujourdhuiGuideCard mission={mission} insight={insight!} hasAccess={hasAccess} serviceRecommande={serviceRecommande} />
             ) : (
               <section id="programme-a-generer" className="coai-glass scroll-mt-6 flex flex-col gap-4 p-6">
                 <div className="text-center">
