@@ -303,15 +303,29 @@ type Step =
 // — jamais de nouvelle donnée inventée, juste le même résultat déjà
 // construit, montré en rythme plutôt que d'un bloc. La page "result"
 // complète n'est ni coupée ni dupliquée, elle arrive telle quelle ensuite.
+// Parcours resserré le 01/09/2026 (Anthony : « il faut moins d'étapes, il y
+// a trop de frictions », « il faut faire goûter d'abord »).
+//
+// Ne restent avant l'entrée dans l'app que les questions alimentant un champ
+// STRUCTURÉ du profil, c'est-à-dire réellement exploité par le générateur de
+// programme (cf. ProfilUtilisateur dans src/lib/ai/client.ts) : morphologie,
+// niveau, objectif, équipement, lieu, durée, fréquence, alimentation,
+// sommeil et contraintes de santé.
+//
+// Retirées d'ici : "quotidien", "accompagnement", "echeance", "declencheur".
+// Elles n'étaient concaténées que dans la chaîne de texte libre `objectifs`
+// — utiles au ton du coaching, jamais déterminantes pour construire une
+// séance. Elles sont désormais proposées après l'inscription, à quelqu'un
+// qui a déjà goûté au produit. Leur état et leur rendu restent en place :
+// remettre une étape dans ce tableau suffit à la réactiver.
+//
+// "santeFeminine" reste ici : c'est une donnée de SÉCURITÉ (grossesse,
+// post-partum) qui conditionne de vraies adaptations, pas un enrichissement.
 const QUESTION_STEPS: Step[] = [
   "profilPhysique",
   "santeFeminine",
-  "quotidien",
   "niveau",
   "objectif",
-  "accompagnement",
-  "echeance",
-  "declencheur",
   "equipement",
   "lieu",
   "duree",
@@ -735,7 +749,11 @@ export function DiagnosticQuiz({
   // "profilPhysique" est passé en tête de quiz (19/08/2026) : l'ancre de
   // respire2 est déplacée sur "frequence" pour rester à ~2/3 du parcours,
   // comme avant ce changement.
-  const BREATHER_APRES: Partial<Record<Step, Step>> = { echeance: "respire1", frequence: "respire2" };
+  // Une seule respiration depuis le resserrage : deux pauses sur un parcours
+  // réduit d'un tiers cassaient le rythme au lieu de le soutenir. Placée
+  // après "frequence", à mi-chemin. ("echeance" ne fait plus partie du
+  // parcours, son entrée n'aurait plus jamais été atteinte.)
+  const BREATHER_APRES: Partial<Record<Step, Step>> = { frequence: "respire2" };
   const STEP_ORDER: Step[] = ["intro"];
   for (const s of questionSteps) {
     STEP_ORDER.push(s);
