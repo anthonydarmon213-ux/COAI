@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { generateWithVision } from "@/lib/ai/client";
 import { buildMenuRestaurantPrompt } from "@/lib/ai/prompts/menu-restaurant-extraction";
+import { hasPaidSubscription } from "@/lib/subscription/plan";
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
@@ -48,10 +49,16 @@ export async function POST(request: Request) {
 
   const user = await prisma.user.findUnique({
     where: { supabaseAuthId: authUser.id },
-    include: { profile: true },
+    include: { profile: true, subscription: true },
   });
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+  }
+  if (!hasPaidSubscription(user.subscription)) {
+    return NextResponse.json(
+      { error: "Le scanner de menu est réservé à COAI Premium et COAI Elite." },
+      { status: 403 }
+    );
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());

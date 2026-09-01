@@ -1,5 +1,6 @@
 import type { Recette } from "@/lib/nutrition/recettes";
 import { REGIME_LABEL, TYPE_REPAS_LABEL } from "@/lib/nutrition/recettes";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 
 // Carte recette (19/08/2026, demande Anthony — "de belles images", direction
 // Whoop/MyFitnessCoach) : photo Pexels en fond avec dégradé sombre, macros en
@@ -24,9 +25,10 @@ export function RecetteCard({ recette, photoUrl }: { recette: Recette; photoUrl:
         <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm">
           {TYPE_REPAS_LABEL[recette.typeRepas]}
         </span>
-        <span className="absolute bottom-3 right-3 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+        <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
           {recette.tempsMinutes} min
         </span>
+        {photoUrl && <CoaiImageMark />}
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
@@ -62,6 +64,13 @@ export function RecetteCard({ recette, photoUrl }: { recette: Recette; photoUrl:
           </div>
         </div>
 
+        {(recette.portion || recette.conservation) && (
+          <div className="flex flex-wrap gap-1.5 text-[10px] text-graphite-400">
+            {recette.portion && <span className="rounded-full border border-white/10 px-2 py-1">Portion · {recette.portion}</span>}
+            {recette.conservation && <span className="rounded-full border border-white/10 px-2 py-1">Batch cooking compatible</span>}
+          </div>
+        )}
+
         <details className="group/details mt-1 text-xs">
           <summary className="cursor-pointer list-none font-semibold text-laiton-300 transition hover:text-laiton-200">
             Voir la recette →
@@ -89,6 +98,33 @@ export function RecetteCard({ recette, photoUrl }: { recette: Recette; photoUrl:
                 ))}
               </ol>
             </div>
+            {recette.variantes && (
+              <div className="rounded-xl border border-laiton-400/20 bg-laiton-400/[0.05] p-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-300">Adapter à mon programme</p>
+                <ul className="mt-2 flex flex-col gap-2 text-graphite-300">
+                  {Object.entries(recette.variantes).map(([objectif, conseil]) => (
+                    <li key={objectif}>
+                      <strong className="text-[10px] text-laiton-200">
+                        {objectif === "RESET_TRX" ? "RESET / TRX" : objectif} —
+                      </strong>{" "}
+                      {conseil}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {(recette.allergenes || recette.conservation) && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.025] p-3 text-[10px] leading-4 text-graphite-400">
+                {recette.allergenes && recette.allergenes.length > 0 && (
+                  <p><strong className="text-graphite-200">Allergènes :</strong> {recette.allergenes.join(", ")}.</p>
+                )}
+                {recette.conservation && (
+                  <p className={recette.allergenes && recette.allergenes.length > 0 ? "mt-1" : undefined}>
+                    <strong className="text-graphite-200">Conservation :</strong> {recette.conservation}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </details>
       </div>

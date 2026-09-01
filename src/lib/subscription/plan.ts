@@ -4,6 +4,17 @@ export type EffectivePlan = "GRATUIT" | "STANDARD" | "PREMIUM";
 
 const ACTIVE_STATUSES = new Set(["ACTIVE", "PAST_DUE"]);
 
+/** Un accès facturé (ou en période d'essai) donne accès aux fonctions IA coûteuses. */
+export function hasPaidSubscription(subscription?: Subscription | null): boolean {
+  return Boolean(subscription && ACTIVE_STATUSES.has(subscription.status));
+}
+
+/** Noms produits courts, visibles dans l'app : Free / Premium / Elite. */
+export function getMembershipLabel(subscription?: Subscription | null): string {
+  if (!hasPaidSubscription(subscription)) return "COAI Free";
+  return subscription?.plan === "PREMIUM" ? "COAI Elite" : "COAI Premium";
+}
+
 // Sans abonnement actif, l'utilisateur retombe sur "GRATUIT" par défaut.
 export function getEffectivePlan(subscription?: Subscription | null): EffectivePlan {
   if (!subscription || !ACTIVE_STATUSES.has(subscription.status)) return "GRATUIT";
@@ -46,6 +57,13 @@ export function hasProgrammeAccess(
   subscription?: Subscription | null
 ): boolean {
   if (user.programmeUnlockedAt) return true;
+  return Boolean(subscription && ACTIVE_STATUSES.has(subscription.status));
+}
+
+// La boutique distingue l'accès historique à un programme de l'accès au
+// catalogue complet : un achat à l'unité ou un ancien déblocage ne doit pas
+// ouvrir tous les packs. Seul un abonnement actif (y compris l'essai) le fait.
+export function hasCatalogueAccess(subscription?: Subscription | null): boolean {
   return Boolean(subscription && ACTIVE_STATUSES.has(subscription.status));
 }
 

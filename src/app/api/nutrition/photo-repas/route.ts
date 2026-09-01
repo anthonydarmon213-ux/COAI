@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { generateWithVision } from "@/lib/ai/client";
 import { buildMealPhotoExtractionPrompt } from "@/lib/ai/prompts/meal-photo-extraction";
+import { hasPaidSubscription } from "@/lib/subscription/plan";
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
@@ -47,9 +48,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image trop volumineuse (10 Mo max)" }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
+  const user = await prisma.user.findUnique({
+    where: { supabaseAuthId: authUser.id },
+    include: { subscription: true },
+  });
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+  }
+  if (!hasPaidSubscription(user.subscription)) {
+    return NextResponse.json(
+      { error: "L’analyse photo est réservée à COAI Premium et COAI Elite." },
+      { status: 403 }
+    );
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
