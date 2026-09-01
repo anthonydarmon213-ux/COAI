@@ -18,11 +18,25 @@ const STATUTS = [
 // remplir à chaque repas — cohérent avec la cible COAI (débutants,
 // sédentaires déjà submergés), et suffisant pour repérer une tendance sur
 // la semaine sans demander de peser/lister chaque aliment.
+// Chaîne vide ou invalide -> undefined, jamais 0.
+function entier(v: string): number | undefined {
+  const n = Number.parseInt(v, 10);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
 export function RepasForm() {
   const router = useRouter();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [statut, setStatut] = useState<(typeof STATUTS)[number]["value"] | null>(null);
   const [notes, setNotes] = useState("");
+  // Macros facultatifs : chaînes en état, converties à l'envoi. Stocker des
+  // nombres obligerait à gérer NaN à chaque frappe pendant que le champ est
+  // vide ou en cours de saisie.
+  const [libelle, setLibelle] = useState("");
+  const [calories, setCalories] = useState("");
+  const [proteines, setProteines] = useState("");
+  const [glucides, setGlucides] = useState("");
+  const [lipides, setLipides] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +52,18 @@ export function RepasForm() {
       const res = await fetch("/api/repas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, statut, notes: notes || undefined }),
+        body: JSON.stringify({
+          date,
+          statut,
+          notes: notes || undefined,
+          libelle: libelle.trim() || undefined,
+          // undefined plutôt que 0 quand le champ est vide : un champ non
+          // renseigné n'est pas un repas à zéro calorie.
+          calories: entier(calories),
+          proteines: entier(proteines),
+          glucides: entier(glucides),
+          lipides: entier(lipides),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
@@ -77,6 +102,29 @@ export function RepasForm() {
             ))}
           </div>
         </Field>
+        <Field label="Ce que tu as mangé (optionnel)">
+          <Input
+            type="text"
+            placeholder="ex: poulet, riz et brocolis"
+            value={libelle}
+            onChange={(e) => setLibelle(e.target.value)}
+            maxLength={120}
+          />
+        </Field>
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <Field label="Calories">
+            <Input type="number" min="0" inputMode="numeric" placeholder="kcal" value={calories} onChange={(e) => setCalories(e.target.value)} />
+          </Field>
+          <Field label="Protéines">
+            <Input type="number" min="0" inputMode="numeric" placeholder="g" value={proteines} onChange={(e) => setProteines(e.target.value)} />
+          </Field>
+          <Field label="Glucides">
+            <Input type="number" min="0" inputMode="numeric" placeholder="g" value={glucides} onChange={(e) => setGlucides(e.target.value)} />
+          </Field>
+          <Field label="Lipides">
+            <Input type="number" min="0" inputMode="numeric" placeholder="g" value={lipides} onChange={(e) => setLipides(e.target.value)} />
+          </Field>
+        </div>
         <Field label="Note (optionnel)">
           <Textarea
             placeholder="ex: repas de famille le midi, sinon suivi le plan"

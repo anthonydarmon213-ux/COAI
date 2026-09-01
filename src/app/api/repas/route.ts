@@ -7,6 +7,14 @@ const bodySchema = z.object({
   date: z.coerce.date(),
   statut: z.enum(["COMME_PREVU", "PETIT_ECART", "GROS_ECART"]),
   notes: z.string().max(2000).optional(),
+  // Macros facultatifs (01/09/2026) : un repas peut être noté sans être
+  // pesé. Bornes hautes larges mais finies, pour écarter les saisies
+  // aberrantes (un doigt qui glisse sur le pavé numérique).
+  libelle: z.string().trim().max(120).optional(),
+  calories: z.number().int().min(0).max(10000).optional(),
+  proteines: z.number().int().min(0).max(1000).optional(),
+  glucides: z.number().int().min(0).max(2000).optional(),
+  lipides: z.number().int().min(0).max(1000).optional(),
 });
 
 export async function GET() {
@@ -45,6 +53,11 @@ export async function POST(request: Request) {
       date: parsed.data.date,
       statut: parsed.data.statut,
       notes: parsed.data.notes,
+      libelle: parsed.data.libelle,
+      calories: parsed.data.calories,
+      proteines: parsed.data.proteines,
+      glucides: parsed.data.glucides,
+      lipides: parsed.data.lipides,
     },
   });
 

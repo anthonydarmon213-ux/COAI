@@ -555,6 +555,18 @@ model RepasLog {
   notes     String?
   createdAt DateTime    @default(now())
 
+  // Compteur de calories (01/09/2026, demande Anthony). Le journal ne
+  // stockait qu'un statut « comme prévu / écart » : impossible d'additionner
+  // quoi que ce soit. Tous ces champs sont facultatifs — les entrées déjà
+  // enregistrées n'en ont aucun, et un utilisateur doit pouvoir noter un
+  // repas sans le peser.
+  libelle   String?
+  calories  Int?
+  proteines Int?
+  glucides  Int?
+  lipides   Int?
+
+  @@index([userId, date])
   @@map("repas_log")
 }
 

@@ -1,6 +1,7 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { RepasForm } from "@/components/suivi/repas-form";
+import { CompteurCalories } from "@/components/suivi/compteur-calories";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -16,11 +17,41 @@ export default async function AlimentationSuiviPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const repasLogs = await prisma.repasLog.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "desc" },
-    take: 20,
-  });
+  // Bornes du jour côté serveur : filtrer en JS obligerait à charger tout
+  // l'historique pour n'en garder qu'une journée.
+  const debutJour = new Date();
+  debutJour.setHours(0, 0, 0, 0);
+  const finJour = new Date(debutJour);
+  finJour.setDate(finJour.getDate() + 1);
+
+  const [repasLogs, repasDuJour, programmeNutrition] = await Promise.all([
+    prisma.repasLog.findMany({ where: { userId: user.id }, orderBy: { date: "desc" }, take: 20 }),
+    prisma.repasLog.findMany({
+      where: { userId: user.id, date: { gte: debutJour, lt: finJour } },
+      select: { calories: true, proteines: true, glucides: true, lipides: true },
+    }),
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "NUTRITION" },
+      orderBy: { generatedAt: "desc" },
+      select: { contenu: true },
+    }),
+  ]);
+
+  // Même source que le tableau de bord : objectifsJournaliers à la racine du
+  // contenu nutrition généré. Absent tant que le programme n'existe pas — le
+  // compteur affiche alors le total sans jauge, plutôt qu'une cible inventée.
+  const brut =
+    programmeNutrition?.contenu && typeof programmeNutrition.contenu === "object" && !Array.isArray(programmeNutrition.contenu)
+      ? (programmeNutrition.contenu as Record<string, unknown>).objectifsJournaliers
+      : null;
+  const nombre = (v: unknown): number | undefined => {
+    const n = typeof v === "number" ? v : Number.parseInt(String(v ?? "").replace(/[^0-9]/g, ""), 10);
+    return Number.isFinite(n) && n > 0 ? n : undefined;
+  };
+  const o = brut && typeof brut === "object" ? (brut as Record<string, unknown>) : null;
+  const objectifs = o
+    ? { calories: nombre(o.calories), proteines: nombre(o.proteines), glucides: nombre(o.glucides), lipides: nombre(o.lipides) }
+    : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -34,6 +65,7 @@ export default async function AlimentationSuiviPage() {
           Un bilan rapide par jour, pas un journal alimentaire complet à remplir à chaque repas.
         </p>
       </div>
+      <CompteurCalories repasDuJour={repasDuJour} objectifs={objectifs} />
       <RepasForm />
       <div className="flex flex-col gap-2">
         {repasLogs.map((r) => {
