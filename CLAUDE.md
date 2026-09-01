@@ -1,5 +1,9 @@
 # Notes stratégiques COAI
 
+> **Règles de travail partagées avec Codex : voir [AGENTS.md](AGENTS.md).**
+> Un seul clone, rien de non commité en fin de session, audit des images
+> avant commit, aucune association média approximative.
+
 ## Direction visuelle et programmes rentables (24/08/2026)
 
 Direction validée par Anthony : esthétique COAI premium sombre, pierre noire,
