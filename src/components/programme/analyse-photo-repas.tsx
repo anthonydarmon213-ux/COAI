@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 type Resultat = {
@@ -25,11 +26,17 @@ export function AnalysePhotoRepas() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultat, setResultat] = useState<Resultat | null>(null);
+  // Enregistrement au journal (01/09/2026, demande Anthony) : jusqu'ici
+  // l'estimation était affichée puis perdue. L'utilisateur photographiait,
+  // obtenait des chiffres, et rien n'était compté.
+  const [enregistrement, setEnregistrement] = useState<"idle" | "envoi" | "ok" | "erreur">("idle");
+  const router = useRouter();
 
   async function handleFile(file: File) {
     setLoading(true);
     setError(null);
     setResultat(null);
+    setEnregistrement("idle");
     try {
       const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
@@ -108,6 +115,60 @@ export function AnalysePhotoRepas() {
             </div>
           )}
           {resultat.resume && <p className="text-xs italic leading-5 text-graphite-500">{resultat.resume}</p>}
+
+          {/* L'estimation ne sert à rien si elle n'est pas comptée. Le bouton
+              n'apparaît que si au moins les calories ont pu être estimées :
+              enregistrer une ligne vide polluerait le journal. */}
+          {resultat.caloriesEstimees !== null && (
+            <div className="flex flex-col gap-1.5">
+              <button
+                type="button"
+                disabled={enregistrement === "envoi" || enregistrement === "ok"}
+                onClick={async () => {
+                  setEnregistrement("envoi");
+                  try {
+                    const r = await fetch("/api/repas", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        date: new Date().toISOString().slice(0, 10),
+                        // L'estimation d'une photo ne dit rien de l'écart au
+                        // plan : on n'invente pas un jugement, on enregistre
+                        // le repas tel qu'il a été mangé.
+                        statut: "COMME_PREVU",
+                        libelle: resultat.nomPlat ?? (resultat.aliments.slice(0, 3).join(", ") || undefined),
+                        calories: resultat.caloriesEstimees ?? undefined,
+                        proteines: resultat.proteinesG ?? undefined,
+                        glucides: resultat.glucidesG ?? undefined,
+                        lipides: resultat.lipidesG ?? undefined,
+                        notes: "Estimé depuis une photo — valeurs approximatives.",
+                      }),
+                    });
+                    if (!r.ok) throw new Error();
+                    setEnregistrement("ok");
+                    router.refresh();
+                  } catch {
+                    setEnregistrement("erreur");
+                  }
+                }}
+                className="rounded-full bg-laiton-300 px-5 py-2.5 text-sm font-bold text-[#101214] transition hover:bg-laiton-200 disabled:opacity-60"
+              >
+                {enregistrement === "envoi"
+                  ? "Enregistrement…"
+                  : enregistrement === "ok"
+                    ? "Ajouté à ton journal ✓"
+                    : "Ajouter à mon journal"}
+              </button>
+              {enregistrement === "erreur" && (
+                <p className="text-[11px] text-red-400">Enregistrement impossible, réessaie.</p>
+              )}
+              {enregistrement === "ok" && (
+                <p className="text-[11px] text-graphite-400">
+                  Ces valeurs sont des estimations : ajuste-les depuis ton journal si besoin.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
