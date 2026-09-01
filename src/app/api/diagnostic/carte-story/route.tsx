@@ -39,13 +39,15 @@ export function GET(request: Request) {
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <span style={{ fontSize: 28, color: "#ddc191", letterSpacing: 7 }}>{ageValide ? "MON ÂGE COAI" : "MON SCORE"}</span>
         {ageValide ? (
-          <>
-            <div style={{ display: "flex", alignItems: "baseline", marginTop: 28 }}><strong style={{ fontSize: 300, lineHeight: .85, letterSpacing: -22 }}>{ageCoai}</strong><span style={{ marginLeft: 24, color: "#c8c6bf", fontSize: 56 }}>ans</span></div>
-            <span style={{ marginTop: 26, color: ecart <= 0 ? "#7ee2b8" : "#efd9ad", fontSize: 40, fontWeight: 700 }}>
+          // Satori n'hérite pas de direction : sans flexDirection explicite,
+          // les trois blocs se posaient en ligne et se chevauchaient.
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "baseline", marginTop: 28 }}><strong style={{ fontSize: 260, lineHeight: .9, letterSpacing: -18 }}>{ageCoai}</strong><span style={{ marginLeft: 20, color: "#c8c6bf", fontSize: 52 }}>ans</span></div>
+            <span style={{ marginTop: 20, color: ecart <= 0 ? "#7ee2b8" : "#efd9ad", fontSize: 38, fontWeight: 700, textAlign: "center" }}>
               {ecart === 0 ? `Pile mes ${ageReel} ans` : ecart < 0 ? `${Math.abs(ecart)} ans de moins que mes ${ageReel} ans` : `${ecart} ans de plus que mes ${ageReel} ans`}
             </span>
-            <div style={{ display: "flex", alignItems: "baseline", marginTop: 30 }}><span style={{ color: "#ddc191", fontSize: 26, letterSpacing: 5 }}>SCORE COAI</span><strong style={{ marginLeft: 18, fontSize: 58, lineHeight: 1 }}>{score}</strong><span style={{ marginLeft: 8, color: "#c8c6bf", fontSize: 30 }}>/100</span></div>
-          </>
+            <div style={{ display: "flex", alignItems: "baseline", marginTop: 34 }}><span style={{ color: "#ddc191", fontSize: 26, letterSpacing: 5 }}>SCORE COAI</span><strong style={{ marginLeft: 18, fontSize: 58, lineHeight: 1 }}>{score}</strong><span style={{ marginLeft: 8, color: "#c8c6bf", fontSize: 30 }}>/100</span></div>
+          </div>
         ) : (
           <div style={{ display: "flex", alignItems: "baseline", marginTop: 28 }}><strong style={{ fontSize: 330, lineHeight: .85, letterSpacing: -24 }}>{score}</strong><span style={{ marginLeft: 24, color: "#c8c6bf", fontSize: 48 }}>/100</span></div>
         )}
