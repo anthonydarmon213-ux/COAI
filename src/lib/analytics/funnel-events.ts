@@ -21,6 +21,12 @@ export type FunnelEventName =
   | "pricing_viewed"
   | "plan_selected"
   | "checkout_started"
+  // Navigateur intégré d'Instagram : il ne partage pas les cookies de
+  // Safari, donc un visiteur déjà connecté y apparaît déconnecté et le
+  // paiement échouait sans explication. Ces deux événements mesurent
+  // combien de personnes rencontrent le cas et combien s'en sortent.
+  | "instagram_checkout_help_viewed"
+  | "instagram_safari_link_copied"
   | "checkout_completed"
   | "first_programme_viewed"
   | "first_workout_started"
