@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Flame, Repeat, Timer, TrendingUp } from "lucide-react";
+import { SeanceShareButton } from "@/components/programme/seance-share-button";
 
 // Écran de fin de séance (01/09/2026, demande Anthony — « marquer les
 // esprits »). L'ancien écran affichait une coche et un chrono : le moment le
@@ -124,6 +125,12 @@ export function SeanceBilan({
           })}
         </div>
       )}
+
+      <SeanceShareButton
+        exercices={exercices}
+        chronoFormate={chronoFormate}
+        ecartPourcent={ecart}
+      />
 
       <button
         type="button"
