@@ -159,6 +159,18 @@ export const EXERCICES: Exercice[] = [
   { id: "abduction-hanche-elastique", nom: "Abduction de hanche élastique", groupePrincipal: "FESSIERS", materiel: ["ELASTIQUE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Élastique au-dessus des genoux, écarte une jambe sur le côté en gardant le bassin stable.", photoQuery: "hip abduction resistance band exercise" },
 
   // ABDOMINAUX
+  // Lot Codex récupéré le 01/09/2026 : fiches présentes sur sa branche et
+  // absentes de la production. Deux identifiants ont été renommés — Codex
+  // réutilisait « extension-triceps-trx » et « releve-jambes-suspendu »,
+  // déjà pris par d'autres fiches.
+  { id: "traction-guidee-machine", nom: "Traction guidée (machine)", groupePrincipal: "DOS", materiel: ["MACHINE"], type: "FORCE", niveau: "DEBUTANT", consigne: "Genoux posés sur le plateau d'assistance, tire la poitrine vers les poignées en gardant les épaules basses, puis redescends sans te laisser tomber.", photoQuery: "assisted pull up machine gym" },
+  { id: "planche-dynamique-trx", nom: "Planche dynamique TRX", groupePrincipal: "ABDOMINAUX", materiel: ["TRX"], type: "GAINAGE", niveau: "INTERMEDIAIRE", consigne: "Mains dans les poignées, corps aligné en planche, avance puis ramène les bras en gardant le bassin stable et les lombaires neutres.", photoQuery: "dynamic trx suspension plank" },
+  { id: "souleve-terre-conventionnel", nom: "Soulevé de terre conventionnel", groupePrincipal: "JAMBES", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Barre proche des tibias, dos neutre et hanches stables : pousse le sol pour te redresser sans tirer avec les lombaires.", photoQuery: "conventional barbell deadlift exercise" },
+  { id: "front-squat-barre", nom: "Front squat barre", groupePrincipal: "JAMBES", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Barre posée sur les épaules, coudes hauts et tronc vertical : descends entre les hanches puis remonte sans perdre l'alignement.", photoQuery: "front barbell squat exercise" },
+  { id: "kettlebell-swing", nom: "Kettlebell swing", groupePrincipal: "JAMBES", materiel: ["KETTLEBELL"], type: "CARDIO", niveau: "INTERMEDIAIRE", consigne: "Charge entre les jambes, dos neutre : propulse-la avec les hanches, bras relâchés, puis accompagne le retour sans squatter.", photoQuery: "kettlebell swing exercise" },
+  { id: "fentes-arriere-halteres", nom: "Fentes arrière haltères", groupePrincipal: "JAMBES", materiel: ["HALTERES"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Recule une jambe, descends le genou vers le sol en gardant le buste haut, puis pousse dans le pied avant pour revenir.", photoQuery: "dumbbell reverse lunge exercise" },
+  { id: "mountain-climber", nom: "Mountain climber", groupePrincipal: "ABDOMINAUX", materiel: ["POIDS_DU_CORPS"], type: "CARDIO", niveau: "INTERMEDIAIRE", consigne: "En planche, ramène les genoux alternativement vers la poitrine en gardant les épaules au-dessus des mains et le bassin stable.", photoQuery: "mountain climber exercise" },
+  { id: "releve-genoux-suspendu", nom: "Relevé de genoux suspendu", groupePrincipal: "ABDOMINAUX", materiel: ["BARRE"], type: "FORCE", niveau: "INTERMEDIAIRE", consigne: "Suspendu à une barre, remonte les genoux vers la poitrine en contrôlant, sans te balancer ni tirer avec les épaules.", photoQuery: "hanging knee raise exercise" },
   // Mobilité et souplesse (01/09/2026) — tournées par Anthony, segments
   // extraits de routines plus longues. Aucun groupe « mobilité » n'existe
   // dans GroupePrincipal : chaque fiche est rattachée à la zone travaillée,
