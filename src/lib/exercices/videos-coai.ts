@@ -59,6 +59,9 @@ const TABLE: Entree[] = [
   { motifs: ["pompes inclinees", "pompe inclinee", "incline push up"], video: { fichier: "pompes-inclinees", description: "Pompes inclinées" } },
   { motifs: ["pompe", "push up", "push-up"], video: { fichier: "pompes", description: "Pompes au sol" } },
   { motifs: ["dips sur banc", "dips banc", "bench dips"], video: { fichier: "dips-banc", description: "Dips sur banc" } },
+  // « dips » seul reste APRES « dips sur banc » : le nom de la fiche banc
+  // contient « dips », il serait sinon capte par ce motif generique.
+  { motifs: ["dips"], video: { fichier: "dips-machine", description: "Dips à la station" } },
 
   { motifs: ["tirage horizontal", "tirage horizontal poulie", "seated cable row", "cable row"], video: { fichier: "tirage-horizontal", description: "Tirage horizontal à la poulie" } },
   { motifs: ["tirage vertical", "lat pulldown", "tirage poulie haute", "tirage vertical poulie"], video: { fichier: "tirage-vertical", description: "Tirage vertical à la poulie haute" } },
@@ -67,6 +70,7 @@ const TABLE: Entree[] = [
   { motifs: ["developpe couche incline", "developpe incline barre", "incline bench press"], video: { fichier: "developpe-couche-incline", description: "Développé couché incliné à la barre" } },
   { motifs: ["press machine incline", "chest press incline", "press incline machine"], video: { fichier: "press-machin-incline", description: "Press machine incliné" } },
 
+  { motifs: ["rowing haltere unilateral", "one arm dumbbell row"], video: { fichier: "rowing-haltere-unilateral", description: "Rowing haltère unilatéral" } },
   { motifs: ["rowing halteres", "rowing buste penche", "bent over row"], video: { fichier: "rowing-halteres", description: "Rowing buste penché aux haltères" } },
   { motifs: ["rowing menton", "tirage menton", "upright row"], video: { fichier: "rowing-menton-barre", description: "Rowing menton à la barre" } },
   { motifs: ["chin up", "chin-up", "traction supination"], video: { fichier: "chin-up", description: "Traction en supination" } },
@@ -78,6 +82,10 @@ const TABLE: Entree[] = [
   { motifs: ["curl biceps halteres", "curl halteres", "dumbbell curl"], video: { fichier: "curl-biceps", description: "Curl biceps aux haltères" } },
   { motifs: ["oiseau halteres", "reverse fly", "rear delt fly"], video: { fichier: "oiseau-halteres", description: "Oiseau aux haltères" } },
   { motifs: ["extension triceps couche", "skull crusher", "barre au front"], video: { fichier: "extension-triceps-couche", description: "Extension des triceps couché" } },
+  // Le nom de fiche porte ses parentheses (« Extension triceps (poulie) ») :
+  // le motif les reprend, sans quoi la correspondance echoue.
+  { motifs: ["extension triceps (poulie)", "triceps a la poulie", "triceps pushdown"], video: { fichier: "extension-triceps-poulie", description: "Extension des triceps à la poulie" } },
+  { motifs: ["leg curl", "ischio machine"], video: { fichier: "leg-curl-machine", description: "Leg curl à la machine" } },
   { motifs: ["pullover halteres", "pull over halteres", "dumbbell pullover"], video: { fichier: "pullover-halteres", description: "Pull-over aux haltères" } },
   { motifs: ["thruster halteres", "dumbbell thruster"], video: { fichier: "thruster-halteres", description: "Thruster aux haltères" } },
 
@@ -90,6 +98,7 @@ const TABLE: Entree[] = [
   { motifs: ["gainage lateral", "side plank"], video: { fichier: "gainage-lateral", description: "Gainage latéral" } },
   { motifs: ["gainage planche", "planche avant-bras", "forearm plank"], video: { fichier: "gainage-planche", description: "Gainage sur les avant-bras" } },
   { motifs: ["crunch"], video: { fichier: "crunch", description: "Crunch au sol" } },
+  { motifs: ["releve de jambes suspendu", "hanging leg raise"], video: { fichier: "releve-jambes-suspendu", description: "Relevé de jambes suspendu" } },
   { motifs: ["releve de genoux suspendu", "hanging knee raise"], video: { fichier: "releve-genoux-suspendu", description: "Relevé de genoux suspendu" } },
   { motifs: ["burpee"], video: { fichier: "burpees", description: "Burpee" } },
   { motifs: ["shadow boxing", "boxe dans le vide"], video: { fichier: "shadow-boxing", description: "Enchaînement de boxe dans le vide" } },
