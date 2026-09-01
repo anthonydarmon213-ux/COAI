@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { ageCoaiDeclaratif, AGE_COAI_DECLARATIF_DISCLAIMER } from "@/lib/diagnostic/age-coai-declaratif";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -324,6 +325,10 @@ type Step =
 const QUESTION_STEPS: Step[] = [
   "profilPhysique",
   "santeFeminine",
+  // Rétablie le 01/09/2026 : je l'avais classée à tort en "texte libre".
+  // Elle alimente calculerIndiceCoai (assis toute la journée = -4 points) et
+  // la sédentarité est LE marqueur central d'un positionnement longévité.
+  "quotidien",
   "niveau",
   "objectif",
   "equipement",
@@ -1461,29 +1466,31 @@ export function DiagnosticQuiz({
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
               <div className="coai-diagnostic-kicker" aria-label="Ton bilan initial et ton Score COAI">
                 <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                <span>Bilan initial offert · Score COAI</span>
+                <span>Bilan offert · Âge COAI &amp; Score COAI</span>
               </div>
               <h1 className="max-w-xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl">
-                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Ton corps. Ta vie. Ton programme."}
+                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Quel âge a vraiment ton corps ?"}
               </h1>
               <p className="max-w-lg text-base leading-7 text-graphite-400">
                 {resumable ? (
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    En moins de 5 minutes, fais le point comme avec un Personal Trainer : besoins, niveau,
-                    contraintes, objectif et Score COAI mesurable.
+                    En 5 minutes, découvre ton <strong className="text-graphite-100">Âge COAI</strong> — le
+                    reflet de ton hygiène de vie réelle : sommeil, alimentation, activité, régularité.
+                    Il peut être plus jeune que ton âge. Ou plus vieux.
                   </>
                 )}
               </p>
               {!resumable && (
                 <p className="max-w-lg rounded-xl border border-laiton-400/20 bg-laiton-400/[0.07] px-4 py-3 text-sm leading-6 text-laiton-100">
-                  Plus tes réponses sont précises, plus ton programme pourra l&apos;être. Réponds simplement : quelques clics suffisent.
+                  Ce ne sont pas les kilos qui décident de ta longévité, mais ce que tu fais chaque jour.
+                  Le bilan mesure ces habitudes-là, puis te dit lesquelles changer en premier.
                 </p>
               )}
               {!resumable && (
                 <div className="grid w-full max-w-xl grid-cols-3 gap-2 text-left sm:gap-3">
-                  {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "100 %", label: "personnalisé" }, { value: "0 €", label: "pour commencer" }].map((proof) => (
+                  {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "5 min", label: "et tu as ton âge" }, { value: "0 €", label: "sans carte bancaire" }].map((proof) => (
                     <div key={proof.label} className="coai-diagnostic-proof">
                       <strong>{proof.value}</strong>
                       <span>{proof.label}</span>
@@ -1504,11 +1511,11 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="mt-2 whitespace-nowrap px-5 py-3.5 text-[0.78rem] min-[390px]:px-8 min-[390px]:text-sm">
-                  Commencer mon bilan — 5 min max
+                  Découvrir mon Âge COAI
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
-                Gratuit · sans carte bancaire · résultat immédiat
+                Gratuit · résultat immédiat · estimation de forme, pas une mesure médicale
               </span>
             </div>
           )}
@@ -2167,6 +2174,34 @@ export function DiagnosticQuiz({
                   <span><i />4 capacités physiques évaluées</span>
                   <span><i />1 trajectoire personnelle</span>
                 </div>
+                {(() => {
+                  // L'âge est l'accroche (partageable), le score la preuve.
+                  // Rien n'est affiché sans âge déclaré : inventer une
+                  // référence produirait un écart qui ne veut rien dire.
+                  const a = ageCoaiDeclaratif(age ? Number(age) : null, diagnostic.indiceCoai.score);
+                  if (!a) return null;
+                  const plusJeune = a.sens === "plus_jeune";
+                  return (
+                    <div className="mt-2 w-full max-w-2xl rounded-2xl border border-laiton-300/25 bg-[linear-gradient(140deg,rgba(201,162,98,.12),rgba(76,201,240,.05),rgba(255,255,255,.02))] p-6 text-center">
+                      <p className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-laiton-300">
+                        Ton Âge COAI
+                      </p>
+                      <p className="mt-2 font-display text-6xl font-extrabold tabular-nums text-[#fffdf8] sm:text-7xl">
+                        {a.ageCoai}<span className="ml-2 text-2xl text-graphite-400">ans</span>
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-graphite-200">
+                        {a.sens === "egal"
+                          ? `Ton hygiène de vie est au niveau de tes ${a.ageChronologique} ans.`
+                          : plusJeune
+                            ? `Soit ${a.ecartAnnees} an${a.ecartAnnees > 1 ? "s" : ""} de moins que tes ${a.ageChronologique} ans. Ce que tu fais au quotidien te protège.`
+                            : `Soit ${a.ecartAnnees} an${a.ecartAnnees > 1 ? "s" : ""} de plus que tes ${a.ageChronologique} ans. C'est réversible — et c'est précisément ce que COAI travaille.`}
+                      </p>
+                      <p className="mt-3 text-[11px] leading-4 text-graphite-500">
+                        {AGE_COAI_DECLARATIF_DISCLAIMER}
+                      </p>
+                    </div>
+                  );
+                })()}
                 <div className="coai-index-reveal mt-2 grid w-full max-w-2xl gap-5 rounded-2xl p-5 text-left sm:grid-cols-[auto_1fr] sm:items-center sm:p-7">
                   <div className="coai-index-ring" style={{ "--coai-score": `${diagnostic.indiceCoai.score * 3.6}deg` } as React.CSSProperties}>
                     <div>
