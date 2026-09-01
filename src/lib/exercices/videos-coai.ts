@@ -42,6 +42,7 @@ const TABLE: Entree[] = [
   { motifs: ["front squat"], video: { fichier: "front-squat-barre", description: "Front squat barre" } },
   { motifs: ["back squat", "squat barre", "squat arriere"], video: { fichier: "back-squat-barre", description: "Squat arrière à la barre" } },
   { motifs: ["goblet squat", "squat gobelet"], video: { fichier: "goblet-squat", description: "Squat gobelet" } },
+  { motifs: ["squat poids du corps", "air squat", "squat sans charge"], video: { fichier: "squat-poids-du-corps", description: "Squat au poids du corps" } },
   { motifs: ["squat jump", "squat saute"], video: { fichier: "squat-jump", description: "Squat sauté" } },
   { motifs: ["step up", "montee sur banc", "montee sur step"], video: { fichier: "step-up", description: "Montée sur step" } },
   { motifs: ["sauts lateraux step", "saut lateral step", "sauts lateraux au-dessus", "lateral step over"], video: { fichier: "sauts-lateraux-step", description: "Sauts latéraux au-dessus d’un step" } },
@@ -87,6 +88,7 @@ const TABLE: Entree[] = [
   // Le nom de fiche porte ses parentheses (« Extension triceps (poulie) ») :
   // le motif les reprend, sans quoi la correspondance echoue.
   { motifs: ["extension triceps (poulie)", "triceps a la poulie", "triceps pushdown"], video: { fichier: "extension-triceps-poulie", description: "Extension des triceps à la poulie" } },
+  { motifs: ["extension triceps haltere unilaterale", "extension triceps haltere"], video: { fichier: "extension-triceps-haltere-unilaterale", description: "Extension des triceps à l’haltère, un bras" } },
   { motifs: ["leg curl", "ischio machine"], video: { fichier: "leg-curl-machine", description: "Leg curl à la machine" } },
   { motifs: ["pullover halteres", "pull over halteres", "dumbbell pullover"], video: { fichier: "pullover-halteres", description: "Pull-over aux haltères" } },
   { motifs: ["thruster halteres", "dumbbell thruster"], video: { fichier: "thruster-halteres", description: "Thruster aux haltères" } },
