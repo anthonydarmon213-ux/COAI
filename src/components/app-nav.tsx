@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, type LucideIcon } from "lucide-react";
+import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, LayoutGrid, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
@@ -45,7 +45,6 @@ const ONGLETS: {
       { href: "/programme/seance-du-jour", label: "Ma fiche séance" },
       { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
       { href: "/programme/programmes-prets", label: "Programmes prêts" },
-      { href: "/suivi/seances", label: "Historique des séances" },
     ],
   },
   {
@@ -69,10 +68,11 @@ const ONGLETS: {
     label: "Récupération",
     icon: Moon,
     match: "/programme/recuperation",
-    sous: [
-      { href: "/programme/recuperation", label: "Plan de récupération" },
-      { href: "/suivi/mesures", label: "Sommeil & mesures" },
-    ],
+    // Pas de sous-menu : la page de récupération est unique. Le lien
+    // « Sommeil & mesures » pointait en réalité vers /suivi/mesures, qui ne
+    // contient que des mesures corporelles (poids, tour de taille) et aucun
+    // contenu sommeil — libellé trompeur, et doublon de « Mesures » sous
+    // Progression.
   },
   {
     href: "/suivi/progression",
@@ -80,6 +80,7 @@ const ONGLETS: {
     icon: TrendingUp,
     match: "/suivi",
     sous: [
+      { href: "/suivi/seances", label: "Historique des séances" },
       { href: "/suivi/progression", label: "Tonnage & volume" },
       { href: "/suivi/tests-maxi", label: "PRs & records" },
       { href: "/suivi/mesures", label: "Mesures" },
@@ -88,6 +89,13 @@ const ONGLETS: {
   },
   { href: "/videos", label: "Vidéos", icon: Play, match: "/videos" },
   { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
+  // Une entrée unique vers la page qui présente toutes les fonctions COAI
+  // et ce qui est inclus ou payant. Volontairement SANS sous-menu : les
+  // dix sous-liens envisagés pointaient tous vers des pages déjà
+  // présentes ailleurs dans cette colonne — neuf doublons sur neuf, pour
+  // un menu passant à 30 liens dans 224 px. La pédagogie se fait sur la
+  // page, pas dans la barre.
+  { href: "/fonctionnalites", label: "Fonctionnalités", icon: LayoutGrid, match: "/fonctionnalites" },
 ];
 
 function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
@@ -177,6 +185,8 @@ export function AppNav() {
         <div className="grid grid-cols-2 gap-2 text-xs text-graphite-400">
           <Link href="/compte/profil" className="hover:text-white">Profil</Link>
           <Link href="/compte/parametres" className="hover:text-white">Réglages</Link>
+          <Link href="/compte/abonnement" className="hover:text-white">Abonnement</Link>
+          <Link href="/avis" className="hover:text-white">Mon avis</Link>
         </div>
       </div>
     </aside>
