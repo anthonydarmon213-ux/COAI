@@ -1992,3 +1992,45 @@ html {
 
 /* Gris trop pâles sur fond sombre : un cran de contraste en plus. */
 .text-graphite-500 { color: #8b9298 !important; }
+
+/* ---------------------------------------------------------------------------
+   SIGNATURE COAI — anneau de fin de séance (01/09/2026).
+   Reprend le vocabulaire de coai-core-ring plutôt que d'inventer une seconde
+   identité : même laiton, même cyan, même respiration lente. C'est la marque
+   qu'on doit reconnaître sans lire le logo.
+
+   L'anneau est en position absolue derrière le chiffre et ne capte jamais le
+   pointeur : il décore, il n'interagit pas.
+--------------------------------------------------------------------------- */
+.coai-bilan { position: relative; isolation: isolate; }
+
+.coai-bilan-anneau {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  z-index: -1;
+  width: min(30rem, 92vw);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  pointer-events: none;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(201,162,98,.16), transparent 62%),
+    conic-gradient(from 0deg, rgba(201,162,98,.32), rgba(76,201,240,.20), rgba(201,162,98,.32));
+  -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%, #000 68%, transparent 70%);
+          mask: radial-gradient(circle, transparent 58%, #000 60%, #000 68%, transparent 70%);
+  animation: coai-core-spin 26s linear infinite, coai-ring-breathe 7s ease-in-out infinite;
+  opacity: .85;
+}
+
+/* Le chiffre arrive après l'anneau : l'œil voit d'abord la forme, puis lit. */
+.coai-bilan > * { animation: coai-reveal-up .55s cubic-bezier(.22,.8,.24,1) both; }
+.coai-bilan > *:nth-child(2) { animation-delay: .10s; }
+.coai-bilan > *:nth-child(3) { animation-delay: .22s; }
+.coai-bilan > *:nth-child(4) { animation-delay: .32s; }
+.coai-bilan > *:nth-child(5) { animation-delay: .42s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .coai-bilan-anneau { animation: none; }
+  .coai-bilan > * { animation: none; }
+}

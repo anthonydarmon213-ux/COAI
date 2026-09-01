@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
 import { MuscleMap } from "@/components/programme/muscle-map";
+import { SeanceBilan, type BilanExercice } from "@/components/programme/seance-bilan";
 import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
@@ -273,6 +274,10 @@ export function SeanceRunner({
   const [secondesRestantes, setSecondesRestantes] = useState(0);
   const [chronoGlobal, setChronoGlobal] = useState(0);
   const [termine, setTermine] = useState(false);
+  // Bilan conservé pour l'écran de fin : les steps sont figés une fois la
+  // séance terminée, mais on évite de les reparcourir au rendu.
+  const [bilan, setBilan] = useState<BilanExercice[]>([]);
+  const [tonnagePrecedent, setTonnagePrecedent] = useState<number | null>(null);
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
@@ -349,6 +354,27 @@ export function SeanceRunner({
       }
       parExercice.set(s.nom, entree);
     });
+    const listeBilan: BilanExercice[] = [...parExercice.values()].map((e) => ({
+      nom: e.nom, series: e.series, sets: e.sets.map((x) => ({ reps: x.reps, charge: x.charge })),
+    }));
+    setBilan(listeBilan);
+
+    // Tonnage de la séance précédente, pour la comparaison. Best-effort :
+    // sans lui l'écran s'affiche simplement sans écart, jamais d'erreur.
+    try {
+      const r = await fetch("/api/seances");
+      if (r.ok) {
+        const seances = (await r.json()) as { exercices?: unknown }[];
+        const precedente = seances?.[0];
+        if (precedente && Array.isArray(precedente.exercices)) {
+          const t = (precedente.exercices as { sets?: { reps?: number; charge?: number }[] }[])
+            .reduce((tot, ex) => tot + (ex.sets ?? []).reduce(
+              (s, x) => s + (Number(x.reps) || 0) * (Number(x.charge) || 0), 0), 0);
+          if (t > 0) setTonnagePrecedent(t);
+        }
+      }
+    } catch { /* comparaison facultative */ }
+
     try {
       await fetch("/api/seances", {
         method: "POST",
@@ -457,16 +483,13 @@ export function SeanceRunner({
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
       {termine ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-          <span className="text-5xl">✅</span>
-          <h2 className="font-display text-2xl font-semibold text-white">Séance terminée</h2>
-          <p className="text-sm text-graphite-400">
-            {formatChrono(chronoGlobal)} d&apos;effort. Ta séance a été enregistrée dans ton suivi.
-          </p>
-          <button type="button" onClick={onClose} className="coai-rainbow-cta mt-2 rounded-full border-0 px-8 py-3 text-sm font-bold text-[#111216]">
-            Fermer
-          </button>
-        </div>
+        <SeanceBilan
+          exercices={bilan}
+          dureeSecondes={chronoGlobal}
+          tonnagePrecedent={tonnagePrecedent}
+          chronoFormate={formatChrono(chronoGlobal)}
+          onFermer={onClose}
+        />
       ) : (
         <>
           <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
