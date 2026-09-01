@@ -108,7 +108,11 @@ function normaliser(texte: string): string {
   return texte
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    // Les fiches du catalogue emploient l'apostrophe typographique (U+2019)
+    // et les motifs l'apostrophe droite : sans cette ligne, « Ballon lesté
+    // par-dessus l’épaule » ne trouvait jamais sa vidéo pourtant présente.
+    .replace(/[\u2019\u02bc]/g, "'");
 }
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {

@@ -41,6 +41,13 @@ const VARIANTES: EntreeVariante[] = [
   { motifs: ["fentes bulgares", "fente bulgare"], femme: "fentes-bulgares-femme-coai", homme: "fentes-bulgares-homme-coai", fichier: "fentes-bulgares-femme-coai" },
   { motifs: ["mollets unilatéral haltère", "mollets unilateral haltere"], femme: "mollets-unilateral-haltere-femme-coai", homme: "mollets-unilateral-haltere-homme-coai", fichier: "mollets-unilateral-haltere-femme-coai" },
   { motifs: ["abduction de hanche élastique", "abduction de hanche elastique", "abduction hanche"], femme: "abduction-hanche-elastique-femme-coai", homme: "abduction-hanche-elastique-homme-coai", fichier: "abduction-hanche-elastique-femme-coai" },
+
+  // Second lot COAI du 01/09/2026 : les trois fiches qui n'avaient aucune
+  // photo. Motifs volontairement longs — « traction » ou « squat » seuls
+  // captureraient les fiches voisines (Squat barre, Pistol squat, etc.).
+  { motifs: ["traction (barre fixe)", "traction barre fixe"], femme: "traction-barre-fixe-femme-coai", homme: "traction-barre-fixe-homme-coai", fichier: "traction-barre-fixe-femme-coai" },
+  { motifs: ["squat gobelet"], femme: "squat-gobelet-kettlebell-femme-coai", homme: "squat-gobelet-kettlebell-homme-coai", fichier: "squat-gobelet-kettlebell-femme-coai" },
+  { motifs: ["ballon leste par-dessus l'epaule", "ballon leste"], femme: "ballon-leste-dessus-epaule-femme-coai", homme: "ballon-leste-dessus-epaule-homme-coai", fichier: "ballon-leste-dessus-epaule-femme-coai" },
 ];
 
 const TABLE: EntreePhoto[] = [
@@ -226,7 +233,10 @@ function normaliser(nom: string) {
   return nom
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
+    .replace(/[̀-ͯ]/g, "")
+    // Même règle que dans videos-coai : apostrophe typographique ramenée à
+    // l'apostrophe droite utilisée par les motifs.
+    .replace(/[’ʼ]/g, "'");
 }
 
 function correspond(entree: EntreePhoto, normalise: string) {
