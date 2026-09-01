@@ -8,6 +8,8 @@ export function MetricRing({
   min,
   max,
   precedente,
+  color = "#c9a262",
+  variant = "ring",
 }: {
   label: string;
   unite: string;
@@ -15,6 +17,8 @@ export function MetricRing({
   min: number;
   max: number;
   precedente: number | null;
+  color?: string;
+  variant?: "ring" | "pie" | "bars";
 }) {
   const size = 132;
   const stroke = 10;
@@ -26,18 +30,33 @@ export function MetricRing({
 
   const delta = precedente !== null ? valeur - precedente : null;
   const deltaSign = delta !== null && delta !== 0 ? (delta > 0 ? "+" : "") : "";
+  const visualPercent = unite === "%" ? Math.min(100, Math.max(0, valeur)) : Math.round(clamped * 100);
 
   return (
     <Card className="flex flex-col items-center gap-3 text-center">
       <SectionLabel>{label}</SectionLabel>
       <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+        {variant === "pie" ? (
+          <div
+            className="absolute inset-0 rounded-full shadow-[0_14px_35px_-18px_currentColor]"
+            style={{ color, background: `conic-gradient(${color} 0 ${visualPercent}%, #d9e0e2 ${visualPercent}% 100%)` }}
+          >
+            <div className="absolute inset-[18%] rounded-full border border-white/70 bg-[#f9f7f2]/90 shadow-inner" />
+          </div>
+        ) : variant === "bars" ? (
+          <div className="absolute inset-2 flex items-end justify-center gap-1.5 rounded-[1.7rem] border border-black/[0.05] bg-white/45 px-5 pb-5 pt-4">
+            {[38, 58, 48, 76, 64].map((height, index) => (
+              <i key={height} className="w-3 rounded-full opacity-80" style={{ height: `${Math.max(18, height * (0.55 + visualPercent / 220))}%`, backgroundColor: index === 3 ? color : `${color}65` }} />
+            ))}
+          </div>
+        ) : (
         <svg width={size} height={size} className="-rotate-90">
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="currentColor"
+            stroke={color}
             strokeWidth={stroke}
             className="text-acier/50"
           />
@@ -51,9 +70,11 @@ export function MetricRing({
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className="text-laiton-400 transition-all drop-shadow-[0_0_4px_rgba(201,162,98,0.25)]"
+            className="transition-all"
+            style={{ filter: `drop-shadow(0 0 5px ${color}55)` }}
           />
         </svg>
+        )}
         <div className="absolute flex flex-col items-center">
           <span className="font-mono text-2xl font-semibold text-graphite-50">{valeur}</span>
           <span className="font-mono text-xs text-graphite-400">{unite}</span>
@@ -61,7 +82,7 @@ export function MetricRing({
       </div>
       {delta !== null && (
         <p className="text-xs text-graphite-400">
-          <span className={delta === 0 ? "text-graphite-400" : "text-laiton-300"}>
+          <span className={delta === 0 ? "text-graphite-400" : "font-semibold"} style={delta !== 0 ? { color } : undefined}>
             {deltaSign}
             {delta.toFixed(1)} {unite}
           </span>{" "}

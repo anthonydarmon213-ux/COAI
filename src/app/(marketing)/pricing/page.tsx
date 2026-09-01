@@ -23,9 +23,9 @@ export const metadata: Metadata = {
 
 export default function PricingPage({ searchParams }: { searchParams?: { checkout?: string } }) {
   return (
-    <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-10 px-6 py-24">
+    <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-8 px-6 pb-20 pt-16 sm:pt-20">
       <TrackConversion name="pricing_viewed" />
-      <div className="w-full max-w-6xl pt-8"><BackLink /></div>
+      <div className="w-full max-w-6xl"><BackLink /></div>
       <div className="max-w-4xl text-center">
         <SectionLabel>Personal Training, Reimagined</SectionLabel>
         <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
@@ -51,18 +51,18 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
         <h2 id="comparatif-rapide" className="text-center text-sm font-semibold uppercase tracking-[0.16em] text-laiton-300">
           Choisir en 10 secondes
         </h2>
-        <div className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-graphite-700 bg-graphite-700 md:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
           {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
-            <a key={nom} href={`#${nom.toLowerCase()}`} className="bg-graphite-950 px-6 py-5 text-center transition hover:bg-graphite-900 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-laiton-300">
-              <strong className="block text-lg text-white">{nom}</strong>
-              <span className="mt-2 block text-sm font-medium text-laiton-300">{besoin}</span>
-              <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
+            <a key={nom} href={`#${nom.toLowerCase()}`} className="rounded-2xl border border-[#d9d2c6] bg-white px-5 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#b99452] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b99452]">
+              <strong className="block text-base text-[#171a18]">{nom}</strong>
+              <span className="mt-1.5 block text-sm font-semibold text-[#72501f]">{besoin}</span>
+              <span className="mt-1 block text-xs leading-5 text-[#59615d]">{niveau}</span>
             </a>
           ))}
         </div>
       </section>
 
-      <div className="grid w-full max-w-7xl grid-cols-1 gap-5 lg:grid-cols-3">
+      <div className="grid w-full max-w-7xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-3">
         {TIERS.map((tier) => (
           <Card key={tier.nom} id={tier.nom.toLowerCase()} className={`flex flex-col gap-5 px-6 py-8 ${tier.mostPopular ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">

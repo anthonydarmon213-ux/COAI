@@ -203,7 +203,7 @@ const STRUCTURED_DATA = {
 
 export default function LandingPage() {
   return (
-    <main className="bg-lab-grid flex flex-col">
+    <main className="coai-color-surface bg-lab-grid flex flex-col after:hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c") }}
@@ -212,13 +212,46 @@ export default function LandingPage() {
       <CoaiIntro />
       <MarqueeBanner />
 
+      <section className="coai-live-signals mx-auto w-full max-w-6xl px-6 pt-10 sm:px-10" aria-label="Les signaux suivis par COAI">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.09] bg-[#111518] px-5 py-7 sm:px-8">
+          <div className="coai-live-signals-glow" aria-hidden="true" />
+          <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-sm">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">COAI Intelligence · En mouvement</p>
+              <h2 className="mt-2 font-display text-2xl text-white sm:text-3xl">Ton évolution devient visible.</h2>
+              <p className="mt-2 text-sm leading-6 text-graphite-400">Des chiffres simples, des couleurs vivantes et un point de départ que tu peux réellement faire progresser.</p>
+              <div className="coai-motion-copy mt-5" aria-label="COAI analyse tes données puis adapte ton programme">
+                <span>01 · COAI comprend ton point de départ</span>
+                <span>02 · Tes signaux deviennent des décisions</span>
+                <span>03 · Ton programme évolue avec toi</span>
+              </div>
+            </div>
+            <div className="coai-motion-dashboard relative grid grid-cols-5 gap-2 overflow-hidden rounded-2xl border border-white/[0.06] bg-black/10 px-2 py-5 sm:gap-4 sm:px-4">
+              <i className="coai-motion-scan" aria-hidden="true" />
+              {[
+                ["Entraînement", "#ff8a3d", "72"],
+                ["Nutrition", "#ffd84d", "81"],
+                ["Récupération", "#39e67b", "64"],
+                ["Sommeil", "#4cc9f0", "76"],
+                ["Score COAI", "#c56cff", "74"],
+              ].map(([label, color, score], index) => (
+                <div key={label} className="coai-mini-signal" style={{ "--signal-color": color, "--signal-delay": `${index * 120}ms` } as React.CSSProperties}>
+                  <div className="coai-mini-signal-ring"><strong>{score}</strong><span>%</span></div>
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Ligne de fonctionnalités sous le hero — reprend exactement les
           garde-fous déjà mis en avant ailleurs sur la page (adaptatif,
           suivi, validation humaine, sécurité), condensés en un coup d'œil. */}
-      <section className="mx-auto w-full max-w-6xl border-t border-white/[0.06] px-6 py-12 sm:px-10">
+      <section className="coai-color-features mx-auto w-full max-w-6xl border-t border-white/[0.06] px-6 py-12 sm:px-10">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {FONCTIONNALITES_HERO.map((item) => (
-            <div key={item.titre} className="flex flex-col gap-2">
+            <div key={item.titre} className="coai-color-feature flex flex-col gap-2 rounded-2xl px-4 py-5">
               <item.icon className="h-6 w-6 text-laiton-400" />
               <p className="text-sm font-semibold text-white">{item.titre}</p>
               <p className="text-xs leading-5 text-graphite-400">{item.description}</p>
@@ -238,7 +271,7 @@ export default function LandingPage() {
         </div>
         <ol className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {COMMENT_CA_MARCHE.map(([numero, titre, description]) => (
-            <li key={numero} className="flex flex-col items-center gap-3 text-center">
+            <li key={numero} className="coai-color-step flex flex-col items-center gap-3 rounded-[1.5rem] px-5 py-6 text-center">
               <span className="flex h-10 w-10 items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-base font-semibold text-laiton-300">
                 {numero}
               </span>
@@ -264,7 +297,7 @@ export default function LandingPage() {
           {PARCOURS_PERSONAL_TRAINING.map((phase) => (
             <article
               key={phase.plage}
-              className={`flex flex-col rounded-[1.75rem] border p-6 ${phase.miseEnAvant ? "border-laiton-300/70 bg-laiton-300/[0.10] shadow-[0_28px_80px_-35px_rgba(201,162,98,.65)]" : "border-white/[0.09] bg-white/[0.035]"}`}
+              className={`coai-color-phase flex flex-col rounded-[1.75rem] border p-6 ${phase.miseEnAvant ? "border-laiton-300/70 bg-laiton-300/[0.10] shadow-[0_28px_80px_-35px_rgba(201,162,98,.65)]" : "border-white/[0.09] bg-white/[0.035]"}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="font-mono text-xs tracking-[0.16em] text-laiton-300">{phase.plage}</span>

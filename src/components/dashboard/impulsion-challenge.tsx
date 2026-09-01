@@ -7,7 +7,7 @@ import { trackEvent } from "@/lib/analytics";
 const STORAGE_KEY_PREFIX = "coai_defi_7_jours_v1_";
 
 const JOURS = [
-  { titre: "Clarifie ton point de départ", texte: "Vérifie les repères essentiels que COAI utilisera pour personnaliser la suite.", action: "Vérifier mon profil", href: "/compte/profil?onboarding=1" },
+  { titre: "Découvre ton programme ultra-personnalisé", texte: "Explore tes recommandations d’entraînement, d’alimentation et de récupération construites à partir de ton diagnostic.", action: "Voir mon programme", href: "/programme/entrainement" },
   { titre: "Observe ta vraie journée", texte: "Renseigne ton activité du jour pour que COAI parte de ta réalité, pas d’une moyenne générique.", action: "Noter mon activité", href: "/dashboard#activite-quotidienne" },
   { titre: "Améliore un repas", texte: "Choisis un seul ajustement nutritionnel simple et applicable aujourd’hui.", action: "Voir mes repères nutrition", href: "/programme/alimentation" },
   { titre: "Prépare ta récupération", texte: "Identifie l’action qui aura le plus d’impact sur ton sommeil ou ton énergie demain.", action: "Voir ma récupération", href: "/programme/recuperation" },
@@ -46,14 +46,17 @@ export function ImpulsionChallenge({ createdAt, userId }: { createdAt: string; u
 
   if (!loaded) return null;
 
-  const currentDay = completed.includes(unlockedDay)
-    ? Math.min(7, JOURS.findIndex((_, index) => index + 1 <= unlockedDay && !completed.includes(index + 1)) + 1 || unlockedDay)
-    : unlockedDay;
+  // Toujours proposer la première étape disponible non terminée. Sinon une
+  // personne qui revient quatre jours après son inscription tombe directement
+  // sur l'étape 4 sans avoir vu les trois premières, ce qui rend le parcours
+  // incompréhensible.
+  const firstIncompleteDay = JOURS.findIndex((_, index) => index + 1 <= unlockedDay && !completed.includes(index + 1));
+  const currentDay = firstIncompleteDay >= 0 ? firstIncompleteDay + 1 : unlockedDay;
   const current = JOURS[currentDay - 1] ?? JOURS[0];
   const progress = Math.round((completed.length / 7) * 100);
 
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-laiton-400/30 bg-[linear-gradient(145deg,rgba(239,217,173,.16),rgba(255,255,255,.035))] p-6 shadow-[0_26px_80px_-45px_rgba(201,162,98,.75)] sm:p-8">
+    <section className="coai-impulsion-challenge relative overflow-hidden rounded-[1.75rem] border border-laiton-400/30 p-6 shadow-[0_26px_80px_-45px_rgba(201,162,98,.75)] sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-laiton-300">Défi COAI · 7 jours</p>
@@ -68,7 +71,7 @@ export function ImpulsionChallenge({ createdAt, userId }: { createdAt: string; u
       </div>
 
       <div className="mt-6 rounded-2xl border border-white/[0.08] bg-[#101211]/80 p-5 sm:p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.15em] text-laiton-300">Jour {currentDay} · action du jour</p>
+        <p className="text-xs font-bold uppercase tracking-[0.15em] text-laiton-300">Étape {currentDay} sur 7 · à faire maintenant</p>
         <h3 className="mt-2 text-xl font-bold text-white">{current.titre}</h3>
         <p className="mt-2 text-sm leading-6 text-graphite-300">{current.texte}</p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
@@ -77,14 +80,20 @@ export function ImpulsionChallenge({ createdAt, userId }: { createdAt: string; u
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-7 gap-1.5" aria-label="Les sept jours du défi">
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold text-graphite-300">Les 7 étapes du défi</p>
+        <p className="text-right text-[11px] text-graphite-500">Une étape se débloque chaque jour</p>
+      </div>
+      <div className="mt-2 grid grid-cols-7 gap-1.5" aria-label="Les sept étapes du défi">
         {JOURS.map((jour, index) => {
           const day = index + 1;
           const locked = day > unlockedDay;
           const done = completed.includes(day);
-          return <div key={jour.titre} title={locked ? `Jour ${day} disponible plus tard` : jour.titre} className={`flex h-9 items-center justify-center rounded-lg border text-xs font-bold ${done ? "border-emerald-500/35 bg-emerald-500/15 text-emerald-200" : locked ? "border-white/[0.04] bg-white/[0.02] text-graphite-700" : "border-laiton-400/25 bg-laiton-400/[0.07] text-laiton-200"}`}>{done ? "✓" : day}</div>;
+          const currentStep = day === currentDay;
+          return <div key={jour.titre} title={locked ? `Étape ${day} disponible plus tard` : jour.titre} aria-current={currentStep ? "step" : undefined} className={`flex h-9 items-center justify-center rounded-lg border text-xs font-bold ${done ? "border-emerald-500/35 bg-emerald-500/15 text-emerald-200" : currentStep ? "border-laiton-300 bg-laiton-300/20 text-white ring-2 ring-laiton-300/25" : locked ? "border-white/[0.04] bg-white/[0.02] text-graphite-700" : "border-laiton-400/25 bg-laiton-400/[0.07] text-laiton-200"}`}>{done ? "✓" : day}</div>;
         })}
       </div>
+      <p className="mt-2 text-[11px] leading-5 text-graphite-500">Ces numéros représentent les étapes de ton défi, pas les dates du calendrier affiché plus bas.</p>
     </section>
   );
 }

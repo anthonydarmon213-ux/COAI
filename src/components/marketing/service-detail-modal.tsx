@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { OffreConsentGate } from "@/components/compte/offre-consent-gate";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
@@ -29,36 +29,49 @@ export function ServiceDetailModal({
   // Le mensuel réduit la friction au premier achat. L'annuel reste visible
   // comme économie, sans être imposé au prospect.
   const tier = TIER_BY_SERVICE[initialService];
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  const close = useCallback(() => {
+    if (window.history.state?.coaiServiceModal) window.history.back();
+    else onCloseRef.current();
+  }, []);
 
   useEffect(() => {
+    window.history.pushState({ ...window.history.state, coaiServiceModal: true }, "");
+    const onPopState = () => onCloseRef.current();
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") close();
     };
+    window.addEventListener("popstate", onPopState);
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("popstate", onPopState);
       document.body.style.overflow = "";
     };
-  }, [onClose]);
+  }, [close]);
 
   return (
-    <div className="coai-service-modal fixed inset-0 z-[100] overflow-y-auto bg-[#0b0c0e]" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Fermer"
-        className="fixed left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/40 text-xl text-white backdrop-blur"
-      >
-        ×
-      </button>
+    <div className="coai-service-modal fixed inset-0 z-[100] overflow-y-auto bg-[#f8f4ec]" role="dialog" aria-modal="true">
+      <div className="sticky top-0 z-10 border-b border-[#ddd6ca] bg-[#f8f4ec]/95 px-4 py-3 backdrop-blur">
+        <button
+          type="button"
+          onClick={close}
+          aria-label="Retour à mon espace"
+          className="mx-auto flex w-full max-w-lg items-center gap-2 text-sm font-semibold text-[#343a37]"
+        >
+          <span aria-hidden="true">←</span> Retour à mon espace
+        </button>
+      </div>
 
-      <div className="mx-auto flex max-w-lg flex-col items-center gap-6 px-6 pb-16 pt-20 text-center">
-        <h1 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">{tier.nom}</h1>
-        <p className="max-w-sm text-sm leading-6 text-graphite-300">{tier.description}</p>
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-6 px-6 pb-16 pt-10 text-center">
+        <h1 className="font-display text-4xl font-semibold tracking-tight text-[#181b19] sm:text-5xl">{tier.nom}</h1>
+        <p className="max-w-sm text-base leading-7 text-[#4d5651]">{tier.description}</p>
 
         {/* Liste des bénéfices, présentée pédagogiquement */}
-        <div className="w-full rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 text-left">
+        <div className="w-full rounded-3xl border border-[#ddd6ca] bg-white p-6 text-left shadow-sm">
           <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">
             Ce que {tier.nom} comprend exactement
           </p>
@@ -68,7 +81,7 @@ export function ServiceDetailModal({
                 <span className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-full border border-laiton-400/30 bg-laiton-400/10 text-xs text-laiton-300">
                   ✓
                 </span>
-                <span className="text-sm leading-6 text-graphite-200">{feature}</span>
+                <span className="text-sm leading-6 text-[#343a37]">{feature}</span>
               </li>
             ))}
           </ul>
@@ -77,13 +90,13 @@ export function ServiceDetailModal({
         {/* Bloc prix — volontairement la dernière chose montrée : la
             personne a déjà compris ce que la formule fait avant de voir le
             prix, jamais l'inverse. */}
-        <p className="text-sm font-medium text-graphite-300">
+        <p className="text-sm font-medium text-[#4d5651]">
           Cette formule te correspond ? Voici le prix.
         </p>
         {!tier.sessions && (
           <div className="flex items-baseline gap-1.5">
-            <span className="font-display text-4xl font-semibold text-white">{tier.prix}</span>
-            <span className="text-sm text-graphite-400">{tier.suffixe}</span>
+            <span className="font-display text-4xl font-semibold text-[#181b19]">{tier.prix}</span>
+            <span className="text-sm text-[#68716c]">{tier.suffixe}</span>
           </div>
         )}
 
@@ -92,10 +105,10 @@ export function ServiceDetailModal({
           {tier.sessions ? (
             <>
               <div className="flex items-baseline gap-1.5">
-                <span className="font-display text-4xl font-semibold text-white">199€</span>
-                <span className="text-sm text-graphite-400">/mois</span>
+                <span className="font-display text-4xl font-semibold text-[#181b19]">199€</span>
+                <span className="text-sm text-[#68716c]">/mois</span>
               </div>
-              <p className="text-sm text-graphite-300">1 séance privée mensuelle incluse</p>
+              <p className="text-sm text-[#4d5651]">1 séance privée mensuelle incluse</p>
               <OffreConsentGate resumeConditions={<>Abonnement VIP de 199€/mois, résiliable à tout moment, incluant 1 séance privée par mois.</>}>
                 <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP" className="coai-rainbow-cta w-full border-0" />
               </OffreConsentGate>
@@ -123,7 +136,7 @@ export function ServiceDetailModal({
           {tier.plan === "PREMIUM" && <a href={vipReservationHref("une transformation privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">Parler d&apos;une transformation plus longue</a>}
         </div>
 
-        <p className="text-xs text-graphite-500">
+        <p className="text-xs text-[#68716c]">
           En débloquant une offre, tu acceptes nos{" "}
           <Link href="/cgv" target="_blank" className="underline hover:text-laiton-400">
             CGV

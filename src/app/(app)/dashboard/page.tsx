@@ -15,7 +15,7 @@ import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies
 import { WeeklyCheckinCard } from "@/components/dashboard/weekly-checkin-card";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { ImpulsionChallenge } from "@/components/dashboard/impulsion-challenge";
-import { getSignedProgressPhotoUrl } from "@/lib/storage/progress-photos";
+import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, insight, avatarUrl] = await Promise.all([
+  const [validated, latest, daily, insight] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -71,7 +71,6 @@ export default async function DashboardPage() {
     }),
     prisma.dailySession.findUnique({ where: { userId_date: { userId: user.id, date } } }),
     getCoaiInsight(user.id),
-    user.avatarPath ? getSignedProgressPhotoUrl(user.avatarPath) : Promise.resolve(null),
   ]);
 
   const programme = validated ?? latest;
@@ -84,6 +83,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="coai-dashboard flex flex-col gap-7">
+      <DashboardIntroVideo />
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-5 px-6 py-7 sm:px-8 sm:py-9">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
           <span>Aujourd&apos;hui</span>
         </div>
         <div className="flex items-center gap-5 sm:gap-7">
-          <DashboardAvatar initialUrl={avatarUrl} prenom={user.prenom} />
+          <DashboardAvatar score={completion.pourcentage} />
           <div>
             <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
               {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
@@ -112,6 +112,27 @@ export default async function DashboardPage() {
           </a>
         )}
       </header>
+
+      <section className="coai-intelligence-panel relative overflow-hidden rounded-[1.75rem] border border-[#4cc9f0]/35 px-6 py-6 text-white shadow-[0_28px_80px_-44px_rgba(76,201,240,.65)] sm:px-8" aria-labelledby="coai-intelligence-title">
+        <div className="relative grid gap-6 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
+          <div>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">Intelligence COAI · Pas une IA généraliste</p>
+            <h2 id="coai-intelligence-title" className="mt-2 font-display text-2xl sm:text-3xl">L&apos;expérience terrain devient ton avantage.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#b8c0c4]">
+              Le moteur COAI structure plus de 17 ans de coaching réel : progression, dosage de l&apos;effort, récupération et prudence face aux douleurs. Il croise ces règles avec ton profil, tes séances et tes retours pour décider quoi ajuster — pas simplement pour produire une réponse plausible.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
+              <span className="rounded-full border border-[#ff8a3d]/25 bg-[#ff8a3d]/10 px-3 py-1.5 text-[#ffb17d]">17 ans de terrain</span>
+              <span className="rounded-full border border-[#39e67b]/25 bg-[#39e67b]/10 px-3 py-1.5 text-[#76eea3]">Tes données réelles</span>
+              <span className="rounded-full border border-[#c56cff]/25 bg-[#c56cff]/10 px-3 py-1.5 text-[#dca2ff]">Décisions explicables</span>
+            </div>
+          </div>
+          <blockquote className="rounded-2xl border border-white/10 bg-white/[0.045] px-5 py-5 text-center font-editorial text-xl leading-8 text-[#fffdf8] sm:text-2xl">
+            “{MANTRAS[date.getDay()]}”
+            <footer className="mt-3 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-[#8f9aa0]">Ton impulsion du jour</footer>
+          </blockquote>
+        </div>
+      </section>
 
       {!user.subscription && <ImpulsionChallenge createdAt={user.createdAt.toISOString()} userId={user.id} />}
 
@@ -148,7 +169,7 @@ export default async function DashboardPage() {
             <p className="coai-eyebrow">Aujourd’hui</p>
             <h2 id="today-title" className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Ton briefing en trois décisions.</h2>
           </div>
-          <blockquote>“{MANTRAS[date.getDay()]}”</blockquote>
+          <span className="rounded-full border border-[#c56cff]/20 bg-[#c56cff]/[0.07] px-4 py-2 text-xs font-bold text-[#8d4cba]">3 décisions utiles aujourd&apos;hui</span>
         </div>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <Link href={sourceSession ? "#check-in-du-jour" : "/programme/entrainement"} className="coai-brief-card coai-brief-training">

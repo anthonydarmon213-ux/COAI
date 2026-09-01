@@ -52,6 +52,14 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
     setLoading(false);
   }
 
+  async function partagerEmail() {
+    setLoading(true);
+    const lien = await getShareLink();
+    window.location.href = `mailto:?subject=${encodeURIComponent(`Mon Score COAI · ${score}/100`)}&body=${encodeURIComponent(shareText(lien))}`;
+    trackFunnelEvent("diagnostic_result_shared", { support: "email", referral: connecte, challenge: "compare_score" });
+    setLoading(false);
+  }
+
   async function partagerStory(platform: "instagram" | "tiktok") {
     setLoading(true);
     setMessage(null);
@@ -66,14 +74,16 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       // de la feuille de partage iOS. Le lien reste déjà imprimé sur la carte.
       if (platform === "instagram" && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
         await navigator.share({ files: [file] });
-        setMessage("Dans Instagram, choisis « Story » pour publier ta carte.");
+        setMessage("Carte prête ✓ Dans Instagram : appuie sur +, choisis Story, puis sélectionne la carte.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_native`, referral: connecte, challenge: "compare_score" });
       } else {
         const href = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = href; anchor.download = file.name; anchor.click(); URL.revokeObjectURL(href);
         if (navigator.clipboard) await navigator.clipboard.writeText(lien);
-        setMessage(`Carte enregistrée · ouvre ${platform === "instagram" ? "Instagram" : "TikTok"}, crée une Story et sélectionne l’image.`);
+        setMessage(platform === "instagram"
+          ? "Carte enregistrée ✓ Ouvre Instagram → + → Story → sélectionne la carte. Le lien du défi est copié."
+          : "Carte enregistrée ✓ Ouvre TikTok, crée une Story et sélectionne la carte.");
         trackFunnelEvent("diagnostic_result_shared", { support: `story_${platform}_download`, referral: connecte, challenge: "compare_score" });
       }
     } catch (caught) {
@@ -108,33 +118,29 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
   }
 
   return (
-    <div className="coai-score-challenge flex flex-col items-center gap-2.5 text-center">
-      <span className="coai-score-challenge-badge">Défi COAI · {score}/100</span>
-      <p className="max-w-sm text-lg font-semibold text-white">Qui de tes proches fera mieux que toi ?</p>
-      <p className="max-w-md text-sm leading-6 text-graphite-300">Partage ton Score COAI. Ton proche arrive avec {score}/100 à battre, fait le même bilan gratuitement, puis vous comparez vos points de départ.</p>
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-[#25D366]/20 bg-[#25D366]/[0.055] px-5 py-4 text-center">
+      <p className="text-sm font-medium text-white">Fier de ton Score COAI&nbsp;? Lance le défi à un proche.</p>
       {connecte && (
-        <p className="rounded-full border border-laiton-300/25 bg-laiton-300/[0.08] px-4 py-2 text-xs font-semibold text-laiton-200">
-          Ton proche devient abonné après son essai → tu gagnes 1 mois offert.
+        <p className="text-xs text-graphite-500">
+          Si un proche rejoint COAI avec ton lien, un mois t’est offert.
         </p>
       )}
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-wrap justify-center gap-2">
         <button
           type="button"
           onClick={partagerWhatsApp}
           disabled={loading}
-          className="rounded-full bg-[#25D366] px-6 py-3 text-sm font-bold text-[#0b2916] shadow-[0_12px_38px_-14px_rgba(37,211,102,.8)] transition hover:-translate-y-0.5 hover:bg-[#35df75]"
+          className="rounded-full border border-[#25D366]/45 bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-[#102016] shadow-[0_8px_24px_rgba(37,211,102,0.16)] transition hover:-translate-y-0.5 hover:bg-[#35df76] disabled:opacity-50"
         >
-          WhatsApp →
+          Partager sur WhatsApp
         </button>
-        <button type="button" onClick={() => partagerStory("instagram")} disabled={loading} className="coai-instagram-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Partager sur Instagram</button>
-        <button type="button" onClick={() => partagerStory("tiktok")} disabled={loading} className="coai-tiktok-button rounded-full px-6 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50">Télécharger pour TikTok</button>
         <button
           type="button"
-          onClick={partager}
+          onClick={partagerEmail}
           disabled={loading}
-          className="rounded-full border border-laiton-300/30 bg-white/[0.05] px-6 py-3 text-sm font-bold text-white transition hover:bg-white/[0.1] disabled:opacity-50"
+          className="rounded-full border border-white/15 bg-transparent px-4 py-2 text-xs font-semibold text-graphite-300 transition hover:bg-white/[0.06] hover:text-white disabled:opacity-50"
         >
-          {loading ? "Création…" : "Autres options"}
+          E-mail
         </button>
       </div>
       {message && <span className="text-xs text-graphite-500">{message}</span>}

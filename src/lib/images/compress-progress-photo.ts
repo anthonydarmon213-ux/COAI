@@ -1,9 +1,9 @@
-const MAX_INPUT_BYTES = 10 * 1024 * 1024;
+const MAX_INPUT_BYTES = 40 * 1024 * 1024;
 const MAX_OUTPUT_BYTES = 2 * 1024 * 1024;
 const MAX_DIMENSION = 1600;
 const WEBP_QUALITY = 0.78;
 
-const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 
 export type OptimizedPhoto = {
   file: File;
@@ -13,10 +13,10 @@ export type OptimizedPhoto = {
 
 export async function compressProgressPhoto(file: File): Promise<OptimizedPhoto> {
   if (!ALLOWED_TYPES.has(file.type)) {
-    throw new Error("Choisis une image JPG, PNG ou WebP.");
+    throw new Error("Choisis une photo JPG, PNG, WebP, HEIC ou HEIF.");
   }
   if (file.size > MAX_INPUT_BYTES) {
-    throw new Error("Cette image dépasse la limite de 10 Mo.");
+    throw new Error("Cette photo dépasse 40 Mo.");
   }
 
   const image = await loadImage(file);

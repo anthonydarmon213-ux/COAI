@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 type Extraction = {
   pasMoyenParJour: number | null;
@@ -27,8 +28,9 @@ export function WatchScreenshotCta() {
     setError(null);
     setResultat(null);
     try {
+      const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", optimized.file);
       const res = await fetch("/api/profil/montre", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse du screenshot.");
@@ -63,7 +65,7 @@ export function WatchScreenshotCta() {
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp"
+        accept="image/*,.heic,.heif"
         className="hidden"
         disabled={loading}
         onChange={(e) => {
@@ -72,6 +74,7 @@ export function WatchScreenshotCta() {
           e.target.value = "";
         }}
       />
+      <p className="text-xs text-graphite-500">Jusqu’à 40 Mo · optimisation 4K automatique.</p>
       <button
         type="button"
         onClick={() => inputRef.current?.click()}

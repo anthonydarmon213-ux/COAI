@@ -5,6 +5,7 @@ import "../../sentry.client.config";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <GoogleAnalytics />
         <MetaPixel />
+        <MicrosoftClarity />
         <Analytics />
       </body>
     </html>
