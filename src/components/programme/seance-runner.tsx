@@ -217,6 +217,53 @@ function CercleMinuteur({ secondesRestantes, secondesTotal }: { secondesRestante
 
 type Realise = { reps: string; charge: string };
 
+// Reprise d'entraînement (01/09/2026, demande Anthony). Jusqu'ici le
+// lecteur ne persistait rien : le chrono repartait de Date.now() au montage
+// et l'état vivait uniquement en mémoire. Téléphone rangé dans la poche
+// entre deux séries, onglet déchargé par le navigateur — et la séance
+// entière était perdue, chrono, position et séries saisies comprises.
+//
+// localStorage plutôt qu'une écriture serveur : la sauvegarde doit survivre
+// à une coupure réseau en salle, et une séance en cours n'a aucune valeur
+// pour un autre appareil.
+const CLE_SEANCE = "coai:seance-en-cours";
+const EXPIRATION_H = 8; // au-delà, ce n'est plus une séance mais un oubli
+
+type SeanceSauvegardee = {
+  nomSeance: string;
+  debut: number;
+  index: number;
+  realise: Record<string, Realise>;
+};
+
+function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const brut = window.localStorage.getItem(CLE_SEANCE);
+    if (!brut) return null;
+    const d = JSON.parse(brut) as SeanceSauvegardee;
+    // On ne reprend que LA MÊME séance : restaurer la position d'une autre
+    // séance sur des exercices différents produirait un état incohérent.
+    if (d?.nomSeance !== nomSeance || typeof d.debut !== "number") return null;
+    if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
+      window.localStorage.removeItem(CLE_SEANCE);
+      return null;
+    }
+    return d;
+  } catch {
+    return null;
+  }
+}
+
+function effacerSauvegarde() {
+  try {
+    window.localStorage.removeItem(CLE_SEANCE);
+  } catch {
+    // localStorage indisponible (navigation privée, quota) : sans gravité,
+    // la séance reste simplement non reprise.
+  }
+}
+
 export function SeanceRunner({
   nomSeance,
   echauffement,
@@ -270,7 +317,11 @@ export function SeanceRunner({
     const aGarder = new Set(indexExercices.filter((_, i) => i === 0 || i % 2 === 1).slice(0, cible));
     return tousLesSteps.filter((s) => s.type !== "set" || aGarder.has(s.exerciceIndex));
   }, [tousLesSteps, seanceCondensee]);
-  const [index, setIndex] = useState(0);
+  // Restauration synchrone à l'initialisation : passer par un useEffect
+  // ferait clignoter l'écran sur l'état vierge avant de sauter à la reprise.
+  const sauvegarde = useMemo(() => lireSauvegarde(nomSeance), [nomSeance]);
+  const [reprise] = useState(() => sauvegarde !== null);
+  const [index, setIndex] = useState(() => sauvegarde?.index ?? 0);
   const [secondesRestantes, setSecondesRestantes] = useState(0);
   const [chronoGlobal, setChronoGlobal] = useState(0);
   const [termine, setTermine] = useState(false);
@@ -281,8 +332,24 @@ export function SeanceRunner({
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
-  const [realise, setRealise] = useState<Record<string, Realise>>({});
-  const debutRef = useRef(Date.now());
+  const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
+  const debutRef = useRef(sauvegarde?.debut ?? Date.now());
+
+  // Sauvegarde continue tant que la séance n'est pas terminée. Écrire à
+  // chaque frappe serait inutilement coûteux, mais index et séries changent
+  // rarement — quelques fois par minute au plus.
+  useEffect(() => {
+    if (termine) return;
+    try {
+      window.localStorage.setItem(
+        CLE_SEANCE,
+        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise } satisfies SeanceSauvegardee)
+      );
+    } catch {
+      // Quota dépassé ou navigation privée : la séance continue normalement,
+      // elle ne sera simplement pas reprenable.
+    }
+  }, [termine, nomSeance, index, realise]);
   const bip = useBip();
 
   const step = steps[index];
@@ -391,6 +458,10 @@ export function SeanceRunner({
       // le log échoue (réseau, etc.) — jamais bloquer sur ça après l'effort
       // réel qu'il vient de fournir.
     } finally {
+      // La séance est enregistrée côté serveur : la sauvegarde locale n'a
+      // plus lieu d'être, et la laisser proposerait de « reprendre » une
+      // séance déjà terminée.
+      effacerSauvegarde();
       setEnvoiEnCours(false);
       setTermine(true);
     }
@@ -482,6 +553,11 @@ export function SeanceRunner({
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
+      {!termine && reprise && (
+        <div className="border-b border-laiton-300/25 bg-laiton-400/[0.08] px-4 py-2.5 text-center text-xs text-laiton-100">
+          Séance reprise là où tu l&apos;avais laissée — chrono et séries conservés.
+        </div>
+      )}
       {termine ? (
         <SeanceBilan
           exercices={bilan}
@@ -493,7 +569,7 @@ export function SeanceRunner({
       ) : (
         <>
           <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-            <button type="button" onClick={() => window.confirm("Quitter la séance ? Ta progression ne sera pas enregistrée.") && onClose()} aria-label="Fermer" className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-white/10 text-graphite-300">
+            <button type="button" onClick={() => window.confirm("Quitter la séance ? Elle reste reprenable pendant 8 heures, mais elle n'est pas encore enregistrée dans ton suivi.") && onClose()} aria-label="Fermer" className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-white/10 text-graphite-300">
               ✕
             </button>
             <div className="min-w-0 flex-1">
