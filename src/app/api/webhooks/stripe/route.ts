@@ -5,12 +5,83 @@ import { prisma } from "@/lib/db/client";
 import { appliquerRecompenseParrainageSiEligible } from "@/lib/parrainage/reward";
 import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
+import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
   GRATUIT: "Pass IA — 19,99€/mois",
   STANDARD: "Coaching Hybride — 99€/mois",
   PREMIUM: "VIP — à partir de 199€/mois",
 };
+
+const PROGRAMME_PAR_SLUG = new Map(PROGRAMMES_PRETS.map((programme) => [programme.slug, programme]));
+
+async function enregistrerAchatProgrammes(session: Stripe.Checkout.Session) {
+  if (
+    session.mode !== "payment" ||
+    session.metadata?.programmePurchase !== "UNITAIRE_RENTREE" ||
+    !["paid", "no_payment_required"].includes(session.payment_status)
+  ) return;
+
+  const userId = session.client_reference_id;
+  const programmePrincipal = session.metadata.programmePrincipal;
+  const programmeOffert = session.metadata.programmeOffert;
+  if (
+    !userId ||
+    !programmePrincipal ||
+    !programmeOffert ||
+    programmePrincipal === programmeOffert ||
+    !PROGRAMME_PAR_SLUG.has(programmePrincipal) ||
+    !PROGRAMME_PAR_SLUG.has(programmeOffert)
+  ) {
+    throw new Error(`Métadonnées achat programme invalides pour la session ${session.id}`);
+  }
+
+  const paymentIntentId = typeof session.payment_intent === "string"
+    ? session.payment_intent
+    : session.payment_intent?.id ?? null;
+  try {
+    await prisma.programmePurchase.create({
+      data: {
+        userId,
+        programmePrincipal,
+        programmeOffert,
+        stripeCheckoutSessionId: session.id,
+        stripePaymentIntentId: paymentIntentId,
+        amountTotal: session.amount_total ?? 0,
+        currency: session.currency ?? "eur",
+      },
+    });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) return;
+    throw error;
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return;
+  const principal = PROGRAMME_PAR_SLUG.get(programmePrincipal)!;
+  const offert = PROGRAMME_PAR_SLUG.get(programmeOffert)!;
+  const montant = ((session.amount_total ?? 0) / 100).toFixed(2).replace(".", ",");
+  await Promise.all([
+    sendAdminNotification(
+      "Nouvel achat de programmes COAI",
+      `${user.prenom ?? "Un client"} (${user.email}) a acheté « ${principal.nom} » et choisi « ${offert.nom} » offert — ${montant} €.`
+    ),
+    sendEmail(
+      user.email,
+      "Tes deux programmes COAI sont disponibles",
+      `Bonjour${user.prenom ? ` ${user.prenom}` : ""},\n\n` +
+        `Ton achat est confirmé. Tu as maintenant un accès permanent à :\n` +
+        `• ${principal.nom}\n• ${offert.nom} — offert\n\n` +
+        `${process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr"}/boutique\n\n` +
+        `À très vite,\nL'équipe COAI`
+    ),
+  ]);
+}
 
 function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
   switch (status) {
@@ -173,6 +244,7 @@ export async function POST(request: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.client_reference_id;
+      await enregistrerAchatProgrammes(session);
       // Déblocage Pass IA (13/08/2026) : paiement unique, pas
       // d'abonnement Stripe créé — géré à part de upsertFromSubscription
       // (qui suppose toujours session.subscription).
@@ -212,6 +284,11 @@ export async function POST(request: Request) {
           );
         }
       }
+      break;
+    }
+    case "checkout.session.async_payment_succeeded": {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await enregistrerAchatProgrammes(session);
       break;
     }
     case "customer.subscription.updated": {

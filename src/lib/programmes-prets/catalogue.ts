@@ -143,6 +143,13 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
         photoHomme: "/programmes/bureau/homme-mollets-assis.jpg",
       },
     ],
+    medias: [
+      "Gainage planche",
+      "Gainage latéral",
+      "Superman",
+      "Élévations latérales",
+      "Windmill haltère",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -195,6 +202,14 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "person stretching mobility exercise",
     photoFemme: "/exercices/traction-barre-fixe-femme-blonde.jpg",
     photoHomme: "/exercices/trx-rowing-homme-coai.jpg",
+    medias: [
+      "Windmill haltère",
+      "Superman",
+      "Gainage planche",
+      "Gainage latéral",
+      "Fente arrière TRX",
+      "Pistol squat assisté TRX",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -235,6 +250,13 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "person running outdoor training",
     photoFemme: "/exercices/marche-sur-pointes-femme-metisse-v2.jpg",
     photoHomme: "/exercices/mollets-debout-elastique-homme-metis-v2.jpg",
+    medias: [
+      "Sauts à la corde",
+      "Box jump",
+      "Fente arrière TRX",
+      "Soulevé de terre roumain haltères",
+      "Gainage planche",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -280,6 +302,16 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "functional fitness training sled push",
     photoFemme: "/exercices/deadlift-conventionnel-femme-blonde-v2.jpg",
     photoHomme: "/exercices/fentes-bulgares-homme-blond-v2.jpg",
+    medias: [
+      "Poussée de traîneau",
+      "Tirage de traîneau à la corde",
+      "Marche du fermier kettlebells",
+      "Burpee avec saut en longueur",
+      "Box jump",
+      "Soulevé de terre trap bar",
+      "Devil press haltères",
+      "Sauts à la corde",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -325,6 +357,15 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "athletic person barbell squat dark premium gym",
     photoFemme: "/exercices/squat-poids-du-corps-femme-metisse-v2.jpg",
     photoHomme: "/exercices/developpe-couche-barre-homme-arabe-v2.jpg",
+    medias: [
+      "Devil press haltères",
+      "Burpee avec saut en longueur",
+      "Cordes ondulatoires alternées",
+      "Squat barre",
+      "Développé couché haltères",
+      "Rowing TRX",
+      "Sauts à la corde",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -369,6 +410,16 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "bodyweight workout push up",
     photoFemme: "/exercices/pompes-femme-eurasienne.jpg",
     photoHomme: "/exercices/trx-pompes-homme-coai.jpg",
+    medias: [
+      "Pompes",
+      "Dips sur banc (triceps)",
+      "Superman",
+      "Gainage planche",
+      "Gainage latéral",
+      "Crunch",
+      "Russian twist",
+      "Burpee avec saut en longueur",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -413,6 +464,13 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "glute bridge hip thrust workout",
     photoFemme: "/exercices/mollets-debout-machine-femme-metisse-v2.jpg",
     photoHomme: "/exercices/pont-fessier-homme-metis-v2.jpg",
+    medias: [
+      "Soulevé de terre roumain haltères",
+      "Squat barre",
+      "Fente arrière TRX",
+      "Pistol squat assisté TRX",
+      "Box jump",
+    ],
     jours: [
       {
         jour: "Jour 1",
@@ -452,6 +510,14 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "motivation fitness challenge calendar",
     photoFemme: "/exercices/curl-marteau-femme-eurasienne-v2.jpg",
     photoHomme: "/exercices/curl-marteau-homme-blond.jpg",
+    medias: [
+      "Pompes",
+      "Squat barre",
+      "Gainage planche",
+      "Crunch",
+      "Burpee avec saut en longueur",
+      "Sauts à la corde",
+    ],
     jours: [
       { jour: "Jour 1", focus: "Mouvement", contenu: "10 minutes de marche, dehors si possible." },
       { jour: "Jour 2", focus: "Nutrition", contenu: "Bois un grand verre d'eau au réveil, avant même le café." },
@@ -508,6 +574,12 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "peaceful bedroom night sleep",
     photoFemme: "/exercices/mollets-unilateral-haltere-femme-metisse-v2.jpg",
     photoHomme: "/exercices/rowing-elastique-homme-blond.jpg",
+    medias: [
+      "Windmill haltère",
+      "Superman",
+      "Gainage planche",
+      "Gainage latéral",
+    ],
     jours: [
       { jour: "Jour 1", focus: "Horaire fixe", contenu: "Choisis une heure de coucher et de lever réaliste, et tiens-la ce soir — même le week-end." },
       { jour: "Jour 2", focus: "Caféine", contenu: "Plus aucune caféine après 14h aujourd'hui (café, thé noir, certains sodas)." },
@@ -544,6 +616,11 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "calm breathing exercise relaxation",
     photoFemme: "/exercices/curl-biceps-halteres-femme-metisse-v2.jpg",
     photoHomme: "/exercices/rowing-haltere-unilateral-homme-arabe.jpg",
+    medias: [
+      "Windmill haltère",
+      "Gainage planche",
+      "Superman",
+    ],
     jours: [
       {
         jour: "Technique 1",
@@ -587,6 +664,11 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "person meditating calm peaceful",
     photoFemme: "/exercices/developpe-couche-barre-femme-blonde-v2.jpg",
     photoHomme: "/exercices/curl-barre-ez-homme-metis-v2.jpg",
+    medias: [
+      "Windmill haltère",
+      "Superman",
+      "Gainage latéral",
+    ],
     jours: [
       { jour: "Jour 1", focus: "La respiration", contenu: "5 minutes assis·e, les yeux fermés, à simplement observer ta respiration sans essayer de la changer." },
       { jour: "Jour 2", focus: "Le corps", contenu: "5 minutes de scan corporel : parcours mentalement ton corps des pieds à la tête, en relâchant chaque zone tendue." },
@@ -616,6 +698,11 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     photoQuery: "sauna wellness relaxation spa",
     photoFemme: "/exercices/mollets-debout-machine-femme-metisse-v2.jpg",
     photoHomme: "/exercices/mollets-assis-machine-homme-metis-v2.jpg",
+    medias: [
+      "Windmill haltère",
+      "Superman",
+      "Gainage planche",
+    ],
     jours: [
       {
         jour: "Protocole 1",
