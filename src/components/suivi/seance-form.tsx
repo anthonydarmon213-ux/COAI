@@ -29,7 +29,16 @@ function newExercice(): ExerciceEntry {
   return { nom: "", sets: [newSet()] };
 }
 
-export function SeanceForm() {
+// `exercicesConnus` vient du serveur (page /suivi/seances) et ne contient
+// que les noms d'exercices réellement démontrés. Passé en prop plutôt
+// qu'importé ici : importer le catalogue dans un composant client
+// embarquerait les 77 fiches et leurs consignes dans le bundle.
+//
+// Volontairement un <datalist> et non un <select> : la saisie libre reste
+// possible pour un mouvement absent du catalogue, mais la proposition
+// oriente vers un nom reconnu — condition pour que la fiche affiche sa
+// photo et sa vidéo.
+export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[] }) {
   const router = useRouter();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [exercices, setExercices] = useState<ExerciceEntry[]>([newExercice()]);
@@ -144,6 +153,13 @@ export function SeanceForm() {
 
   return (
     <Card>
+      {/* Une seule datalist pour tous les champs d'exercice du formulaire :
+          la dupliquer par exercice ajouterait N fois la même liste au DOM. */}
+      <datalist id="coai-exercices">
+        {exercicesConnus.map((nom) => (
+          <option key={nom} value={nom} />
+        ))}
+      </datalist>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Field label="Date">
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -167,7 +183,9 @@ export function SeanceForm() {
               )}
               <Input
                 type="text"
-                placeholder="Nom de l'exercice"
+                list="coai-exercices"
+                autoComplete="off"
+                placeholder="Nom de l'exercice — commence à taper"
                 value={ex.nom}
                 onChange={(e) => updateExercice(exIdx, { nom: e.target.value })}
               />

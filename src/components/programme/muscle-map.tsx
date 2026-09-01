@@ -20,14 +20,27 @@ export function MuscleMap({
   activeMuscles,
   vue = "front",
   compact = false,
+  intensites,
+  echelle,
+  sansLegende = false,
 }: {
   activeMuscles: MuscleSlug[];
   vue?: "front" | "back";
   compact?: boolean;
+  // Intensité par muscle (0 à 1) : sert la synthèse 30 jours, où la teinte
+  // traduit le volume réellement travaillé sur chaque zone. Sans elle, tous
+  // les muscles sont pleins — le comportement d'origine sur une fiche
+  // d'exercice, où la notion de volume n'a pas de sens.
+  intensites?: Partial<Record<MuscleSlug, number>>;
+  echelle?: number;
+  sansLegende?: boolean;
 }) {
   if (activeMuscles.length === 0) return null;
 
-  const data = activeMuscles.map((slug) => ({ slug, intensity: 1 }));
+  const data = activeMuscles.map((slug) => ({
+    slug,
+    intensity: intensites ? Math.max(0.12, Math.min(1, intensites[slug] ?? 0)) : 1,
+  }));
   const libelles = activeMuscles.map((m) => MUSCLE_LABEL[m]).filter(Boolean);
 
   return (
@@ -43,7 +56,7 @@ export function MuscleMap({
           data={data}
           side={vue}
           gender="male"
-          scale={compact ? 0.62 : 0.85}
+          scale={echelle ?? (compact ? 0.62 : 0.85)}
           colors={[OR]}
           defaultFill={FOND}
           defaultStroke={CONTOUR}
@@ -52,7 +65,7 @@ export function MuscleMap({
         />
       </div>
 
-      {libelles.length > 0 && (
+      {!sansLegende && libelles.length > 0 && (
         <p className="text-center font-mono text-[10px] font-bold uppercase tracking-[0.16em]">
           <span className="text-graphite-500">Target : </span>
           <span style={{ color: OR }}>{libelles.join(" · ")}</span>

@@ -97,7 +97,7 @@ const ONGLETS: {
       { href: "/suivi/progression", label: "Poids soulevé" },
       { href: "/suivi/tests-maxi", label: "Mes records" },
       { href: "/suivi/mesures", label: "Poids & mensurations" },
-      { href: "/programme/evolution", label: "Courbes" },
+      { href: "/programme/evolution", label: "Activité quotidienne" },
     ],
   },
   { href: "/videos", label: "Vidéos exclusives", icon: Play, match: "/videos", teinte: "244,114,182" },

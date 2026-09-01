@@ -1,6 +1,8 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { SeanceForm } from "@/components/suivi/seance-form";
+import { EXERCICES } from "@/lib/exercices/catalogue";
+import { exerciceAvecMediasCoai } from "@/lib/exercices/media-coai";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Badge } from "@/components/ui/badge";
@@ -48,7 +50,7 @@ export default async function SeancesPage() {
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Journal de séances.</h1>
       </div>
-      <SeanceForm />
+      <SeanceForm exercicesConnus={EXERCICES.filter((e) => exerciceAvecMediasCoai(e.nom)).map((e) => e.nom).sort((a, b) => a.localeCompare(b))} />
       <div className="flex flex-col gap-3">
         {seances.map((s) => {
           const exercices = Array.isArray(s.exercices)
