@@ -28,6 +28,20 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Les fichiers statiques ne passent JAMAIS par l'authentification
+  // (01/09/2026). Le motif "/videos/:path*" visait la page des vidéos
+  // exclusives, mais il attrapait aussi /videos/exercices/*.mp4 : les 79
+  // vidéos de démonstration étaient redirigées vers /sign-in et
+  // s'affichaient en noir dans les fiches d'exercice. Elles n'avaient
+  // jamais fonctionné en production.
+  //
+  // Un <video> ne suit pas une redirection HTML : il reçoit du texte là où
+  // il attend un flux, et échoue en silence — d'où l'absence de message
+  // d'erreur qui rendait le défaut si difficile à voir.
+  if (/\.[a-z0-9]{2,5}$/i.test(request.nextUrl.pathname)) {
+    return response;
+  }
+
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/programme") ||
     request.nextUrl.pathname.startsWith("/coach") ||
