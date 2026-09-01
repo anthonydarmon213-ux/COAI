@@ -134,3 +134,7 @@ export function videoCoaiPourNom(nom: string): VideoCoai | null {
 export function urlVideoCoai(fichier: string): string {
   return `/videos/exercices/${fichier}.mp4`;
 }
+
+export function urlPosterVideoCoai(fichier: string): string {
+  return `/videos/exercices/posters/${fichier}.jpg`;
+}
