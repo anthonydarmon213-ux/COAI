@@ -2219,7 +2219,18 @@ export function DiagnosticQuiz({
                     </p>
                   </div>
                 </div>
-                <DiagnosticShareButton connecte={connecte} objectif={diagnostic.profil.objectif} score={diagnostic.indiceCoai.score} />
+                {(() => {
+                  const a = ageCoaiDeclaratif(age ? Number(age) : null, diagnostic.indiceCoai.score);
+                  return (
+                    <DiagnosticShareButton
+                      connecte={connecte}
+                      objectif={diagnostic.profil.objectif}
+                      score={diagnostic.indiceCoai.score}
+                      ageCoai={a?.ageCoai}
+                      ageReel={a?.ageChronologique}
+                    />
+                  );
+                })()}
                 <p className="max-w-xl text-base leading-7 text-graphite-300">{diagnostic.profilParagraphe}</p>
                 {diagnostic.alerte && (
                   <p className="max-w-md rounded-lg border border-acier/40 bg-acier/10 px-3 py-2 text-xs leading-5 text-acier">

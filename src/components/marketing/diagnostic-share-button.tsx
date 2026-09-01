@@ -44,7 +44,24 @@ function telechargerFichier(blob: Blob, nom: string) {
   setTimeout(() => URL.revokeObjectURL(href), 10_000);
 }
 
-export function DiagnosticShareButton({ connecte, objectif, score }: { connecte: boolean; objectif: string; score: number }) {
+export function DiagnosticShareButton({
+  connecte,
+  objectif,
+  score,
+  ageCoai,
+  ageReel,
+}: {
+  connecte: boolean;
+  objectif: string;
+  score: number;
+  // Âge COAI (01/09/2026) : facultatif — absent si l'âge n'a pas été
+  // déclaré. La carte et les textes retombent alors sur le score seul.
+  ageCoai?: number;
+  ageReel?: number;
+}) {
+  const avecAge = Number.isFinite(ageCoai) && Number.isFinite(ageReel) && (ageCoai ?? 0) > 0 && (ageReel ?? 0) > 0;
+  const ecartAge = avecAge ? (ageCoai as number) - (ageReel as number) : 0;
+  const paramsAge = avecAge ? `&age=${ageCoai}&ageReel=${ageReel}` : "";
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -119,6 +136,15 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
   }
 
   function shareText(lien: string) {
+    if (avecAge) {
+      const phrase =
+        ecartAge === 0
+          ? `Mon Âge COAI est pile mon âge réel (${ageReel} ans)`
+          : ecartAge < 0
+            ? `Mon corps a ${Math.abs(ecartAge)} an${Math.abs(ecartAge) > 1 ? "s" : ""} de moins que moi (${ageCoai} au lieu de ${ageReel})`
+            : `Mon corps a ${ecartAge} an${ecartAge > 1 ? "s" : ""} de plus que moi (${ageCoai} au lieu de ${ageReel})`;
+      return `${phrase}, avec un Score COAI de ${score}/100. Et toi, quel âge a vraiment ton corps ? Le bilan est gratuit 👇\n${lien}`;
+    }
     return `J’ai obtenu ${score}/100 à mon Score COAI pour ${objectif.toLowerCase()}. Essaie de battre mon score : le bilan est gratuit 👇\n${lien}`;
   }
 
@@ -136,7 +162,7 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
     try {
       const lien = await getShareLink();
       const text = shareText(lien);
-      const subject = `Mon Score COAI · ${score}/100`;
+      const subject = avecAge ? `Mon Âge COAI · ${ageCoai} ans` : `Mon Score COAI · ${score}/100`;
 
       // Un lien mailto: ne peut techniquement joindre aucun fichier — la
       // carte-image du score n'était donc jamais insérée, seulement le texte
@@ -144,10 +170,10 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
       // avec fichier permet de choisir l'app Mail depuis la vraie feuille de
       // partage du système, qui l'insère alors comme une pièce jointe réelle
       // — même mécanisme déjà utilisé pour Instagram/TikTok ci-dessus.
-      const cardUrl = `/api/diagnostic/carte-story?score=${score}&objectif=${encodeURIComponent(objectif)}`;
+      const cardUrl = `/api/diagnostic/carte-story?score=${score}&objectif=${encodeURIComponent(objectif)}${paramsAge}`;
       const response = await fetch(cardUrl).catch(() => null);
       const file = response?.ok
-        ? new File([await response.blob()], `score-coai-${score}.png`, { type: "image/png" })
+        ? new File([await response.blob()], avecAge ? `age-coai-${ageCoai}-ans.png` : `score-coai-${score}.png`, { type: "image/png" })
         : null;
 
       if (file && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
@@ -176,11 +202,11 @@ export function DiagnosticShareButton({ connecte, objectif, score }: { connecte:
     setLoading(true);
     setMessage(null);
     try {
-      const url = `/api/diagnostic/carte-story?score=${score}&objectif=${encodeURIComponent(objectif)}`;
+      const url = `/api/diagnostic/carte-story?score=${score}&objectif=${encodeURIComponent(objectif)}${paramsAge}`;
       const [response, lien] = await Promise.all([fetch(url), getShareLink()]);
       if (!response.ok) throw new Error("Carte indisponible");
       const blob = await response.blob();
-      const file = new File([blob], `score-coai-${score}.png`, { type: "image/png" });
+      const file = new File([blob], avecAge ? `age-coai-${ageCoai}-ans.png` : `score-coai-${score}.png`, { type: "image/png" });
       // Bug corrigé (21/08/2026, signalé par Anthony : le bouton TikTok l'a
       // éjecté de la page diagnostic sans retour possible) — le partage
       // natif (navigator.share) était réservé à Instagram ; TikTok tombait
