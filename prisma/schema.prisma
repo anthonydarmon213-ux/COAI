@@ -734,6 +734,16 @@ model Video {
   categorie   String?
   createdAt   DateTime @default(now())
 
+  // Aperçu offert (01/09/2026, demande Anthony : « les 5 premières minutes
+  // offertes »). Deux identifiants YouTube DISTINCTS, jamais un minuteur
+  // sur la vidéo complète : l'identifiant est visible dans le HTML de la
+  // page, donc n'importe qui pourrait ouvrir la vidéo entière sur
+  // youtube.com. Un non-abonné ne reçoit que `youtubeIdApercu` ; le champ
+  // `youtubeId` n'est simplement pas envoyé.
+  youtubeIdApercu String?
+  dureeMinutes    Int?
+  apercuMinutes   Int?
+
   @@map("videos")
 }
 

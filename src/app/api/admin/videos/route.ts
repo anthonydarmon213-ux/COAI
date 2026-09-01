@@ -9,6 +9,12 @@ const bodySchema = z.object({
   description: z.string().trim().max(2000).optional().or(z.literal("")),
   lien: z.string().trim().min(1),
   categorie: z.string().trim().max(60).optional().or(z.literal("")),
+  // Aperçu offert (01/09/2026) : un SECOND lien YouTube, vers un extrait
+  // publié séparément. Jamais un découpage de la vidéo complète — son
+  // identifiant ne doit jamais parvenir à un non-abonné.
+  lienApercu: z.string().trim().min(1).optional().or(z.literal("")),
+  dureeMinutes: z.coerce.number().int().min(1).max(600).optional(),
+  apercuMinutes: z.coerce.number().int().min(1).max(120).optional(),
 });
 
 export async function POST(request: Request) {
@@ -37,6 +43,9 @@ export async function POST(request: Request) {
       titre: parsed.data.titre,
       description: parsed.data.description || null,
       youtubeId,
+      youtubeIdApercu: parsed.data.lienApercu ? extractYoutubeId(parsed.data.lienApercu) : null,
+      dureeMinutes: parsed.data.dureeMinutes ?? null,
+      apercuMinutes: parsed.data.apercuMinutes ?? null,
       categorie: parsed.data.categorie || null,
     },
   });
