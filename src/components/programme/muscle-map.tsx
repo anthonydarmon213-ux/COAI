@@ -1,10 +1,12 @@
 "use client";
 
-import Body from "react-muscle-highlighter";
+import { SilhouetteMusculaire } from "@/lib/vendor/muscle-body";
 import { MUSCLE_LABEL, type MuscleSlug } from "@/lib/exercices/muscles";
 
-// Cartographie anatomique (22/08/2026, demande Anthony) — s'appuie sur
-// react-muscle-highlighter (MIT), dont les slugs de muscles sont ceux
+// Cartographie anatomique (22/08/2026, demande Anthony) — s'appuie sur les
+// silhouettes de react-muscle-highlighter (MIT), internalisées le 01/09/2026
+// dans src/lib/vendor/muscle-body pour ne plus livrer les tracés féminins
+// jamais affichés (29,5 Ko gzip sur 58,7). Les slugs de muscles sont ceux
 // utilisés dans src/lib/exercices/muscles.ts : aucune traduction
 // intermédiaire, donc aucun risque de décalage entre l'exercice et le
 // schéma allumé.
@@ -52,16 +54,15 @@ export function MuscleMap({
         className="coai-muscle-map"
         style={{ filter: `drop-shadow(0 0 6px ${OR}66) drop-shadow(0 0 14px ${OR}33)` }}
       >
-        <Body
+        <SilhouetteMusculaire
           data={data}
-          side={vue}
-          gender="male"
-          scale={echelle ?? (compact ? 0.62 : 0.85)}
-          colors={[OR]}
-          defaultFill={FOND}
-          defaultStroke={CONTOUR}
-          defaultStrokeWidth={1}
-          border="none"
+          vue={vue}
+          echelle={echelle ?? (compact ? 0.62 : 0.85)}
+          couleurs={[OR]}
+          remplissageDefaut={FOND}
+          contourDefaut={CONTOUR}
+          epaisseurDefaut={1}
+          contour="none"
         />
       </div>
 
