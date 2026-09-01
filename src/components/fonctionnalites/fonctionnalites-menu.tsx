@@ -26,12 +26,10 @@ const GRATUITES: Fonction[] = [
   { titre: "Records et tests maxi", description: "Garde la trace de tes maxima et vois tes records tomber.", href: "/suivi/tests-maxi", icon: Trophy },
   { titre: "Mesures corporelles", description: "Poids, tours de taille et de hanches, suivis dans le temps.", href: "/suivi/mesures", icon: Ruler },
   { titre: "Bibliothèque d’exercices", description: "77 exercices avec photos et vidéos de démonstration filmées par COAI.", href: "/programme/exercices", icon: BookOpen },
-  { titre: "Catalogue de recettes", description: "164 recettes avec leurs macros, leurs étapes et leurs visuels.", href: "/programme/recettes", icon: Salad },
+  { titre: "3 recettes offertes", description: "Goûte la bibliothèque : macros, étapes et visuels. Les 161 autres arrivent avec l’abonnement.", href: "/programme/recettes", icon: Salad },
   { titre: "Suivi des macros", description: "Journal de repas et repères nutritionnels du jour.", href: "/suivi/alimentation", icon: Apple },
-  { titre: "Vidéos de démonstration", description: "Les mouvements filmés en salle, à revoir avant chaque série.", href: "/videos", icon: Play },
   { titre: "Plan de récupération", description: "Mobilité, étirements, respiration et sommeil pour encaisser la charge.", href: "/programme/recuperation", icon: Moon },
   { titre: "Bilan quotidien", description: "Forme, sommeil, douleurs : deux minutes pour ajuster ta journée.", href: "/dashboard", icon: HeartPulse },
-  { titre: "Analyse de ta montre", description: "Envoie une capture de ton app santé (Whoop, Oura, Garmin) : COAI en extrait tes indicateurs. Ce n’est pas une synchronisation automatique.", href: "/compte/profil", icon: Watch },
   { titre: "Parrainage", description: "Invite un proche et débloque une récompense sur ton abonnement.", href: "/compte/profil", icon: Gift },
 ];
 
@@ -41,18 +39,24 @@ const PAYANTES: Fonction[] = [
   { titre: "Menu restaurant", description: "Photographie une carte : COAI te dit quoi commander selon ton objectif.", href: "/programme/alimentation", icon: UtensilsCrossed },
   { titre: "Catalogue complet de programmes", description: "Les 12 programmes prêts à l’emploi. Le programme Mobilité reste offert.", href: "/programme/programmes-prets", icon: Dumbbell },
   { titre: "Coaching humain", description: "Échange avec Anthony : ajustements, questions technique, suivi personnalisé.", href: "/coach", icon: MessageSquare },
+  { titre: "Analyse de ta montre", description: "Envoie une capture de Whoop, Oura ou Garmin : COAI en extrait tes indicateurs. Lecture d’image, pas une synchronisation.", href: "/compte/profil", icon: Watch },
+  { titre: "Vidéos exclusives", description: "Yoga, mobilité et récupération filmés par Anthony. Une séance de démonstration reste offerte.", href: "/videos", icon: Play },
+  { titre: "Coach IA", description: "Pose tes questions technique, nutrition ou récupération : réponse immédiate, adaptée à ton profil.", href: "/coach", icon: Brain },
+  { titre: "Bibliothèque complète de recettes", description: "Les 164 recettes, avec portions, conservation et variantes par programme.", href: "/programme/recettes", icon: Salad },
 ];
 
 function Bloc({ fonctions, verrouille }: { fonctions: Fonction[]; verrouille: boolean }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      {fonctions.map((f) => {
+      {fonctions.map((f, i) => {
         const Icon = f.icon;
         return (
-          <Link key={f.titre + f.href} href={f.href} className="group block">
-            <Card className="h-full p-4 transition hover:border-white/20">
+          <Link key={f.titre + f.href} href={f.href} className="group block" style={{ ["--i" as string]: i }}>
+            <Card
+              className={`coai-fonction-card h-full p-4 ${verrouille ? "coai-fonction-verrouillee" : "coai-fonction-incluse"}`}
+            >
               <div className="flex items-start gap-3">
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${verrouille ? "border-laiton-300/25 bg-laiton-400/10" : "border-emerald-300/20 bg-emerald-400/10"}`}>
+                <span className={`coai-fonction-icone flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${verrouille ? "border-laiton-300/25 bg-laiton-400/10" : "border-emerald-300/20 bg-emerald-400/10"}`}>
                   <Icon size={17} className={verrouille ? "text-laiton-200" : "text-emerald-200"} aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
@@ -72,8 +76,43 @@ function Bloc({ fonctions, verrouille }: { fonctions: Fonction[]; verrouille: bo
 }
 
 export function FonctionnalitesMenu({ abonne }: { abonne: boolean }) {
+  const total = GRATUITES.length + PAYANTES.length;
+  const pct = Math.round((abonne ? total : GRATUITES.length) / total * 100);
+
   return (
     <div className="flex flex-col gap-10">
+      {/* Synthèse en tête, même langage que le tableau de bord : une jauge
+          qui dit d'un coup d'œil ce qui est ouvert. */}
+      <div className="animate-reveal rounded-2xl border border-white/10 bg-[linear-gradient(130deg,rgba(201,162,98,.10),rgba(76,201,240,.05),rgba(255,255,255,.02))] p-5">
+        <div className="flex items-baseline justify-between gap-4">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-graphite-400">
+            Ton accès COAI
+          </p>
+          <p className="font-display text-3xl font-extrabold text-[#fffdf8]">
+            {pct}<span className="ml-0.5 text-base text-graphite-400">%</span>
+          </p>
+        </div>
+        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+          <div
+            className="h-full rounded-full bg-[linear-gradient(90deg,#34d399,#c9a262)] transition-[width] duration-700"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-emerald-300/15 bg-emerald-400/[0.06] px-3 py-2.5">
+            <p className="font-display text-xl font-bold text-emerald-200">{GRATUITES.length}</p>
+            <p className="text-[10px] uppercase tracking-wide text-graphite-400">Incluses</p>
+          </div>
+          <div className="rounded-xl border border-laiton-300/20 bg-laiton-400/[0.07] px-3 py-2.5">
+            <p className="font-display text-xl font-bold text-laiton-200">{PAYANTES.length}</p>
+            <p className="text-[10px] uppercase tracking-wide text-graphite-400">Avec l&apos;abonnement</p>
+          </div>
+          <div className="col-span-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 sm:col-span-1">
+            <p className="font-display text-xl font-bold text-[#fffdf8]">{total}</p>
+            <p className="text-[10px] uppercase tracking-wide text-graphite-400">Fonctions au total</p>
+          </div>
+        </div>
+      </div>
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <SectionLabel>Inclus, sans abonnement</SectionLabel>

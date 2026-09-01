@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
+import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { prisma } from "@/lib/db/client";
 import { generateWithVision } from "@/lib/ai/client";
 import { buildBodyPhotoExtractionPrompt } from "@/lib/ai/prompts/body-photo-extraction";
@@ -48,7 +49,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image trop volumineuse (10 Mo max)" }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
+  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id },
+    include: { subscription: true },
+  });
+  // Chaque appel IA a un coût réel : réservé aux abonnés (01/09/2026).
+  if (!hasPaidSubscription(user?.subscription)) {
+    return NextResponse.json(
+      { error: "Un abonnement actif est nécessaire pour l’analyse morphologique.", upgrade: "/pricing" },
+      { status: 402 }
+    );
+  }
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }

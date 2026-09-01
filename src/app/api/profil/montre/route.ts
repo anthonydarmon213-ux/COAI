@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
+import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { prisma } from "@/lib/db/client";
 import { generateWithVision } from "@/lib/ai/client";
 import { buildWatchScreenshotExtractionPrompt } from "@/lib/ai/prompts/watch-screenshot-extraction";
@@ -45,7 +46,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
+  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id },
+    include: { subscription: true },
+  });
+  // Chaque appel IA a un coût réel : réservé aux abonnés (01/09/2026).
+  if (!hasPaidSubscription(user?.subscription)) {
+    return NextResponse.json(
+      { error: "Un abonnement actif est nécessaire pour l’analyse de ta montre.", upgrade: "/pricing" },
+      { status: 402 }
+    );
+  }
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }

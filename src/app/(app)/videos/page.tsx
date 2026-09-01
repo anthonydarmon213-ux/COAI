@@ -12,8 +12,12 @@ export default async function VideosPage() {
   if (!user) return null;
 
   const aAcces = hasStreamingAccess(user, user.subscription);
-  const videos =
-    aAcces ? await prisma.video.findMany({ orderBy: { createdAt: "desc" } }) : [];
+  // Une vidéo de démonstration reste offerte (01/09/2026, demande Anthony) :
+  // sans elle, un non-abonné ne voit qu'une page vide et ne peut pas juger
+  // de la qualité avant de payer.
+  const toutes = await prisma.video.findMany({ orderBy: { createdAt: "desc" } });
+  const videos = aAcces ? toutes : toutes.slice(0, 1);
+  const restantes = toutes.length - videos.length;
 
   return (
     <div className="flex flex-col gap-8">

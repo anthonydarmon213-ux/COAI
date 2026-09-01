@@ -1848,3 +1848,147 @@ html {
     page-break-inside: avoid;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Cartes de fonctionnalités (01/09/2026, demande Anthony — « des effets wouah,
+   marquer les esprits »). Réutilise le vocabulaire COAI (laiton, cyan, halo)
+   plutôt qu'un style parallèle.
+
+   Les effets portent sur transform et opacity, composés par le GPU : une
+   bordure animée en background-position ferait ramer une grille de 17 cartes
+   sur mobile. L'entrée est décalée carte par carte via --i.
+--------------------------------------------------------------------------- */
+.coai-fonction-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: coai-reveal-up .5s cubic-bezier(.22,.8,.24,1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+  transition: transform .35s cubic-bezier(.22,.8,.24,1), border-color .35s ease, box-shadow .35s ease;
+}
+.coai-fonction-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Halo qui suit la nature de la carte : émeraude si incluse, laiton si
+   verrouillée. Piloté par une variable pour n'avoir qu'une règle. */
+.coai-fonction-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--coai-fc-accent, rgba(255,255,255,.18)), transparent 45%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+.coai-fonction-card:hover::before { opacity: 1; }
+
+/* Balayage lumineux au survol — une seule passe, pas une boucle : en boucle
+   permanente sur 17 cartes, l'écran devient une guirlande. */
+.coai-fonction-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform .8s cubic-bezier(.22,.8,.24,1);
+  pointer-events: none;
+}
+.coai-fonction-card:hover::after { transform: translateX(120%); }
+
+.coai-fonction-incluse {
+  --coai-fc-accent: rgba(52,211,153,.55);
+}
+.coai-fonction-incluse:hover {
+  border-color: rgba(52,211,153,.28);
+  box-shadow: 0 22px 55px -32px rgba(52,211,153,.55);
+}
+.coai-fonction-verrouillee {
+  --coai-fc-accent: rgba(201,162,98,.65);
+}
+.coai-fonction-verrouillee:hover {
+  border-color: rgba(201,162,98,.35);
+  box-shadow: 0 22px 55px -30px rgba(201,162,98,.6);
+}
+
+/* L'icône respire au survol de la carte entière, pas seulement d'elle-même. */
+.coai-fonction-card .coai-fonction-icone {
+  transition: transform .35s cubic-bezier(.22,.8,.24,1), box-shadow .35s ease;
+}
+.coai-fonction-card:hover .coai-fonction-icone {
+  transform: scale(1.08) rotate(-3deg);
+}
+.coai-fonction-incluse:hover .coai-fonction-icone {
+  box-shadow: 0 0 22px -4px rgba(52,211,153,.75);
+}
+.coai-fonction-verrouillee:hover .coai-fonction-icone {
+  box-shadow: 0 0 22px -4px rgba(201,162,98,.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coai-fonction-card,
+  .coai-fonction-card .coai-fonction-icone { animation: none; transition: none; }
+  .coai-fonction-card::after { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   NAVIGATION — code couleur par pilier (01/09/2026, demande Anthony).
+   Chaque onglet porte sa teinte via --teinte (RGB brut). Une seule règle sert
+   le halo, la bordure et l'icône : ajouter un pilier ne demande qu'une valeur.
+--------------------------------------------------------------------------- */
+.coai-nav-lien { border: 1px solid transparent; }
+.coai-nav-lien .coai-nav-icone {
+  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.035);
+  color: #aeb5ba;
+}
+.coai-nav-lien:hover .coai-nav-icone {
+  border-color: rgb(var(--teinte) / .35);
+  background: rgb(var(--teinte) / .12);
+  color: rgb(var(--teinte));
+}
+.coai-nav-lien:hover { background: rgb(var(--teinte) / .07); border-color: rgb(var(--teinte) / .18); }
+
+.coai-nav-actif {
+  border-color: rgb(var(--teinte) / .30);
+  background: linear-gradient(110deg, rgb(var(--teinte) / .16), rgba(255,255,255,.04));
+  box-shadow: 0 14px 35px -24px rgb(var(--teinte) / .9), inset 0 1px rgba(255,255,255,.08);
+}
+.coai-nav-actif .coai-nav-icone {
+  border-color: rgb(var(--teinte) / .45);
+  background: rgb(var(--teinte) / .14);
+  color: rgb(var(--teinte));
+  box-shadow: 0 0 22px -6px rgb(var(--teinte) / .95);
+}
+
+/* ---------------------------------------------------------------------------
+   LISIBILITÉ (01/09/2026, Anthony : « ce n'est pas très lisible », « partout »).
+   L'app comptait 283 libellés en 9 ou 10 px avec un tracking jusqu'à 0.2em :
+   à cette taille, l'interlettrage disperse le mot au lieu de le structurer, et
+   les libellés longs se cassaient sur trois lignes.
+
+   Corrigé ici plutôt que dans 283 fichiers : on relève le plancher et on
+   resserre le tracking uniquement sur les très petites tailles. Les tailles
+   supérieures ne sont pas touchées.
+--------------------------------------------------------------------------- */
+.text-\[9px\]  { font-size: 10.5px !important; line-height: 1.45 !important; }
+.text-\[10px\] { font-size: 11.5px !important; line-height: 1.45 !important; }
+.text-\[11px\] { font-size: 12px !important; line-height: 1.5 !important; }
+
+.text-\[9px\].tracking-\[0\.16em\],
+.text-\[10px\].tracking-\[0\.2em\],
+.text-\[10px\].tracking-\[0\.18em\],
+.text-\[10px\].tracking-\[0\.16em\],
+.text-\[10px\].tracking-\[0\.14em\] { letter-spacing: .09em !important; }
+
+/* Les libellés courts en capitales ne doivent jamais se briser en trois
+   lignes à côté de leur valeur : on équilibre le retour à la ligne. */
+.uppercase { text-wrap: balance; }
+
+/* Gris trop pâles sur fond sombre : un cran de contraste en plus. */
+.text-graphite-500 { color: #8b9298 !important; }

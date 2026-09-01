@@ -24,19 +24,25 @@ import { SignOutButton } from "@/components/compte/sign-out-button";
 // exactement la surcharge que la simplification voulait supprimer.
 type SousLien = { href: string; label: string };
 
+// Code couleur par pilier (01/09/2026, demande Anthony) : chaque univers a
+// sa teinte, l'utilisateur se repère à la couleur avant même de lire. Les
+// valeurs sont des RGB bruts pour être injectées en variable CSS et servir à
+// la fois au halo, à la bordure et au liseré actif.
 const ONGLETS: {
   href: string;
   label: string;
   icon: LucideIcon;
   match: string;
+  teinte: string;
   sous?: SousLien[];
 }[] = [
-  { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard" },
+  { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard", teinte: "201,162,98" },
   {
     href: "/programme/entrainement",
     label: "Entraînement",
     icon: Dumbbell,
     match: "/programme",
+    teinte: "76,201,240",
     sous: [
       { href: "/programme/entrainement", label: "Séance du jour" },
       // "Ma fiche séance" plutôt que "Fiche imprimable" (23/08/2026,
@@ -52,6 +58,7 @@ const ONGLETS: {
     label: "Nutrition",
     icon: Apple,
     match: "/programme/alimentation",
+    teinte: "52,211,153",
     sous: [
       { href: "/programme/alimentation", label: "Plan du jour" },
       { href: "/programme/recettes", label: "Catalogue de recettes" },
@@ -68,6 +75,7 @@ const ONGLETS: {
     label: "Récupération",
     icon: Moon,
     match: "/programme/recuperation",
+    teinte: "167,139,250",
     // Pas de sous-menu : la page de récupération est unique. Le lien
     // « Sommeil & mesures » pointait en réalité vers /suivi/mesures, qui ne
     // contient que des mesures corporelles (poids, tour de taille) et aucun
@@ -79,6 +87,7 @@ const ONGLETS: {
     label: "Progression",
     icon: TrendingUp,
     match: "/suivi",
+    teinte: "251,146,60",
     sous: [
       { href: "/suivi/seances", label: "Historique des séances" },
       { href: "/suivi/progression", label: "Tonnage & volume" },
@@ -87,15 +96,15 @@ const ONGLETS: {
       { href: "/programme/evolution", label: "Courbes d’évolution" },
     ],
   },
-  { href: "/videos", label: "Vidéos", icon: Play, match: "/videos" },
-  { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach" },
+  { href: "/videos", label: "Vidéos exclusives", icon: Play, match: "/videos", teinte: "244,114,182" },
+  { href: "/coach", label: "Mon Coach", icon: MessageSquare, match: "/coach", teinte: "56,189,248" },
   // Une entrée unique vers la page qui présente toutes les fonctions COAI
   // et ce qui est inclus ou payant. Volontairement SANS sous-menu : les
   // dix sous-liens envisagés pointaient tous vers des pages déjà
   // présentes ailleurs dans cette colonne — neuf doublons sur neuf, pour
   // un menu passant à 30 liens dans 224 px. La pédagogie se fait sur la
   // page, pas dans la barre.
-  { href: "/fonctionnalites", label: "Fonctionnalités", icon: LayoutGrid, match: "/fonctionnalites" },
+  { href: "/fonctionnalites", label: "Fonctionnalités", icon: LayoutGrid, match: "/fonctionnalites", teinte: "148,163,184" },
 ];
 
 function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
@@ -140,15 +149,16 @@ export function AppNav() {
             <Link
               href={onglet.href}
               aria-current={active ? "page" : undefined}
-              className={`group/nav relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 font-semibold transition duration-300 ${
-                active ? "border border-cyan-300/15 bg-[linear-gradient(110deg,rgba(201,162,98,.16),rgba(76,201,240,.08),rgba(255,255,255,.04))] text-white shadow-[0_14px_35px_-24px_rgba(76,201,240,.85),inset_0_1px_rgba(255,255,255,.08)]" : "border border-transparent text-graphite-200 hover:border-white/10 hover:bg-white/[0.05] hover:text-white"
+              style={{ ["--teinte" as string]: onglet.teinte }}
+              className={`coai-nav-lien group/nav relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 font-semibold transition duration-300 ${
+                active ? "coai-nav-actif text-white" : "border border-transparent text-graphite-200 hover:text-white"
               }`}
             >
               {active && (
-                <span aria-hidden="true" className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-laiton-400 md:inset-y-2" />
+                <span aria-hidden="true" className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-[rgb(var(--teinte))] md:inset-y-2" />
               )}
-              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition duration-300 ${active ? "border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_22px_-6px_rgba(76,201,240,.9)]" : "border-white/10 bg-white/[0.035] group-hover/nav:border-laiton-400/30 group-hover/nav:bg-laiton-400/10"}`}>
-                <Icon size={19} strokeWidth={active ? 2.35 : 2.1} className={active ? "text-cyan-200 drop-shadow-[0_0_7px_rgba(76,201,240,.9)]" : "text-graphite-300 group-hover/nav:text-laiton-200"} aria-hidden="true" />
+              <span className="coai-nav-icone flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition duration-300">
+                <Icon size={19} strokeWidth={active ? 2.35 : 2.1} aria-hidden="true" />
               </span>
               {onglet.label}
             </Link>

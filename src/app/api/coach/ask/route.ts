@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
+import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { generateTextWithAI } from "@/lib/ai/client";
 import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
@@ -57,6 +58,13 @@ export async function POST(request: Request) {
     where: { supabaseAuthId: authUser.id },
     include: { profile: true, subscription: true },
   });
+  // Chaque appel IA a un coût réel : réservé aux abonnés (01/09/2026).
+  if (!hasPaidSubscription(user?.subscription)) {
+    return NextResponse.json(
+      { error: "Un abonnement actif est nécessaire pour le coach IA.", upgrade: "/pricing" },
+      { status: 402 }
+    );
+  }
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
