@@ -104,9 +104,6 @@ const TABLE: Entree[] = [
   { motifs: ["fente spiderman"], video: { fichier: "fente-spiderman", description: "Fente spiderman" } },
   { motifs: ["etirement assis ecarte"], video: { fichier: "etirement-assis-ecarte", description: "Étirement assis écarté" } },
   { motifs: ["glissement mural epaules", "wall slide"], video: { fichier: "glissement-mural-epaules", description: "Glissement mural pour les épaules" } },
-  // Version au poids du corps : le plan disponible montre le mouvement sans
-  // haltères, la fiche mentionne la charge en option.
-  { motifs: ["fentes bulgares", "fente bulgare"], video: { fichier: "fentes-bulgares-poids-du-corps", description: "Fentes bulgares (démonstration au poids du corps)" } },
   { motifs: ["gainage planche", "planche avant-bras", "forearm plank"], video: { fichier: "gainage-planche", description: "Gainage sur les avant-bras" } },
   { motifs: ["crunch"], video: { fichier: "crunch", description: "Crunch au sol" } },
   { motifs: ["releve de jambes suspendu", "hanging leg raise"], video: { fichier: "releve-jambes-suspendu", description: "Relevé de jambes suspendu" } },

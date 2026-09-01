@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, LayoutGrid, type LucideIcon } from "lucide-react";
+import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, LayoutGrid, ClipboardList, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
@@ -37,6 +37,11 @@ const ONGLETS: {
   sous?: SousLien[];
 }[] = [
   { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard", teinte: "201,162,98" },
+  // Le carnet de séances (RepCount) est promu en entrée principale
+  // (01/09/2026, demande Anthony : « en priorité et en avant »). Il était
+  // enterré comme 1er sous-lien de Progression, invisible tant que l'onglet
+  // n'était pas ouvert — alors que c'est le geste quotidien de l'app.
+  { href: "/suivi/seances", label: "Mes séances", icon: ClipboardList, match: "/suivi/seances", teinte: "244,63,94" },
   {
     href: "/programme/entrainement",
     label: "Entraînement",
@@ -89,11 +94,10 @@ const ONGLETS: {
     match: "/suivi",
     teinte: "251,146,60",
     sous: [
-      { href: "/suivi/seances", label: "Historique des séances" },
-      { href: "/suivi/progression", label: "Tonnage & volume" },
-      { href: "/suivi/tests-maxi", label: "PRs & records" },
-      { href: "/suivi/mesures", label: "Mesures" },
-      { href: "/programme/evolution", label: "Courbes d’évolution" },
+      { href: "/suivi/progression", label: "Poids soulevé" },
+      { href: "/suivi/tests-maxi", label: "Mes records" },
+      { href: "/suivi/mesures", label: "Poids & mensurations" },
+      { href: "/programme/evolution", label: "Courbes" },
     ],
   },
   { href: "/videos", label: "Vidéos exclusives", icon: Play, match: "/videos", teinte: "244,114,182" },
@@ -114,6 +118,13 @@ function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
   // onglets s'allumeraient ensemble sur les pages nutrition.
   // Entraînement couvre /programme SAUF les sections qui ont leur propre
   // onglet — sans ces exclusions, deux onglets s'allumeraient ensemble.
+  // Progression couvre tout /suivi SAUF le carnet de séances, qui a
+  // désormais son propre onglet : sans cette exclusion, ouvrir « Mes
+  // séances » allumerait Progression, exactement le défaut qu'on venait de
+  // corriger dans l'autre sens.
+  if (onglet.href === "/suivi/progression") {
+    return pathname.startsWith("/suivi") && !pathname.startsWith("/suivi/seances");
+  }
   if (onglet.href === "/programme/entrainement") {
     return (
       pathname.startsWith("/programme") &&
