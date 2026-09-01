@@ -4,6 +4,7 @@ import {
   type StructureEntrainement,
 } from "@/lib/ai/prompts/programme-entrainement-structure";
 import { buildProgrammeEntrainementSessionPrompt } from "@/lib/ai/prompts/programme-entrainement-session";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
 import {
   buildProgrammeNutritionStructurePrompt,
   type StructureNutrition,
@@ -64,11 +65,23 @@ async function genererEntrainement(profil: ProfilUtilisateur, usage: AIUsageCont
     }
   }
 
-  const seances = await Promise.all(
+  const seancesBrutes = await Promise.all(
     structure.jours.map((jour) =>
-      generateWithAI(buildProgrammeEntrainementSessionPrompt(profil, jour), usage)
+      generateWithAI<{ exercices?: unknown[] }>(buildProgrammeEntrainementSessionPrompt(profil, jour), usage)
     )
   );
+
+  // Filet de sécurité : le prompt impose déjà la liste blanche, mais un
+  // modèle peut dévier. On retire ici tout exercice sans démonstration
+  // plutôt que d'afficher une fiche vide à l'utilisateur. filtrerExercicesAvecMedias
+  // renvoie aussi le nom canonique, ce qui garantit que photo, vidéo et
+  // schéma musculaire décrivent bien le même mouvement.
+  const seances = seancesBrutes.map((seance) => ({
+    ...seance,
+    exercices: Array.isArray(seance?.exercices)
+      ? filtrerExercicesAvecMedias(seance.exercices)
+      : [],
+  }));
 
   return {
     titre: structure.titre,

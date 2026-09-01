@@ -1,10 +1,18 @@
 import type { ProfilUtilisateur } from "@/lib/ai/client";
 import type { JourEntrainement } from "@/lib/ai/prompts/programme-entrainement-structure";
+import { EXERCICES } from "@/lib/exercices/catalogue";
+import { exerciceAvecMediasCoai } from "@/lib/exercices/media-coai";
 
 // Étape 2/2 de la génération ENTRAÎNEMENT : détail complet d'UNE séance.
 // Génère chaque jour séparément (en parallèle depuis la route) plutôt qu'un
 // seul gros appel pour toute la semaine, pour rester sous la limite de temps
 // d'une fonction Vercel malgré le niveau de détail demandé par séance.
+// Liste blanche des exercices réellement démontrés (photo ET vidéo COAI).
+// Sans elle, l'IA inventait des noms hors bibliothèque — « Bird dog »,
+// « Rowing poitrine appuyée » — qui s'affichaient sans aucun visuel.
+// Calculée une fois au chargement du module, pas à chaque génération.
+const EXERCICES_AUTORISES = EXERCICES.filter((e) => exerciceAvecMediasCoai(e.nom)).map((e) => e.nom);
+
 export function buildProgrammeEntrainementSessionPrompt(
   profil: ProfilUtilisateur,
   jour: JourEntrainement
@@ -45,6 +53,16 @@ pour remplir la séance — mieux vaut un plan court, clair et réalisable qu'un
 Parmi ces exercices, termine la séance par 1 à 2 exercices d'abdominaux/gainage
 en dernière position dans le tableau "exercices" — sauf si la séance cible déjà principalement les
 abdominaux, ou si c'est un jour de sport existant/cardio pur où ça n'a pas de sens.
+
+CONTRAINTE ABSOLUE SUR LE CHOIX DES EXERCICES
+Le champ "nom" de chaque exercice doit être copié MOT POUR MOT depuis cette
+liste, sans reformulation, sans traduction, sans variante :
+${EXERCICES_AUTORISES.map((n) => `- ${n}`).join("\n")}
+
+N'invente jamais un nom absent de cette liste, même si l'exercice te semble
+pertinent : il ne dispose d'aucune démonstration et la fiche s'afficherait
+vide pour l'utilisateur. Si aucun exercice de la liste ne convient pour un
+créneau, choisis le plus proche disponible plutôt que d'en inventer un.
 
 Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "photoQuerySeance"
 (terme de recherche court EN ANGLAIS pour une photo de stock illustrant l'ambiance de CETTE séance
