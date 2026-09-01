@@ -10,6 +10,8 @@
 // "semaine type" de chaque programme est volontairement représentative
 // plutôt qu'un détail exhaustif semaine par semaine.
 
+import { ENRICHISSEMENTS_PROGRAMMES } from "./enrichissements";
+
 export type CategorieProgrammePret =
   | "MOBILITE"
   | "CARDIO_SEMI_MARATHON"
@@ -91,7 +93,7 @@ export type ProgrammePret = {
   jours: JourProgrammePret[];
 };
 
-export const PROGRAMMES_PRETS: ProgrammePret[] = [
+const PROGRAMMES_BRUTS: ProgrammePret[] = [
   {
     slug: "special-bureau-chaise",
     nom: "Spécial bureau — Bouger sans quitter sa chaise",
@@ -731,3 +733,12 @@ export const PROGRAMMES_PRETS: ProgrammePret[] = [
     ],
   },
 ];
+
+// Contenu editorial (progression, nutrition, recuperation, mise en garde)
+// valide par Anthony le 01/09/2026 : fusionne ici plutot que recopie dans
+// chaque programme, pour garder le catalogue lisible et la relecture du
+// contenu au meme endroit.
+export const PROGRAMMES_PRETS: ProgrammePret[] = PROGRAMMES_BRUTS.map((programme) => ({
+  ...programme,
+  ...(ENRICHISSEMENTS_PROGRAMMES[programme.slug] ?? {}),
+}));

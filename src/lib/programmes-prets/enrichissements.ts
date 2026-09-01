@@ -5,7 +5,6 @@ import type { ProgrammePret } from "./catalogue";
 // détail : progression, nutrition, récupération, visuels HD et limites claires.
 export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> = {
   "coai-reset-rentree": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Goblet squat", photoHomme: "/exercices/kettlebell-goblet-squat.jpg" },
       { nom: "Squat au poids du corps", photoFemme: "/exercices/squat-poids-du-corps-femme-metisse-v2.jpg" },
@@ -16,7 +15,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "La reprise doit rester progressive : en cas de douleur vive, malaise, blessure récente ou reprise après un problème médical, interromps la séance et demande un avis professionnel.",
   },
   "coai-lean-rentree": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Back squat", photoHomme: "/exercices/back-squat-barre.jpg" },
       { nom: "Deadlift conventionnel", photoFemme: "/exercices/deadlift-conventionnel-femme-blonde-v2.jpg" },
@@ -27,7 +25,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "La perte de poids varie selon le profil et aucune vitesse n'est garantie. Évite les déficits agressifs ; demande un suivi adapté en cas de grossesse, trouble alimentaire, traitement ou pathologie métabolique.",
   },
   "coai-hybrid-engine-rentree": {
-    badge: "Enrichi · À valider",
     photoHomme: "/exercices/hyrox-kettlebell-swing.jpg",
     visuels: [
       { nom: "Wall ball", photoFemme: "/exercices/hyrox-wall-ball.jpg" },
@@ -38,7 +35,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     ],
   },
   "coai-trx-sculpt-rentree": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Rowing suspension", photoFemme: "/exercices/suspension-rowing.jpg" },
       { nom: "Squat suspension", photoHomme: "/exercices/suspension-squat.jpg" },
@@ -50,7 +46,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Fixe les sangles sur un ancrage conçu pour supporter la charge et teste-le avant chaque séance. Éloigne les pieds progressivement et arrête si l'ancrage bouge ou si une douleur articulaire apparaît.",
   },
   "coai-mass-rentree": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Développé couché", photoHomme: "/exercices/developpe-couche-barre-homme-arabe-v2.jpg" },
       { nom: "Front squat", photoHomme: "/exercices/front-squat-barre.jpg" },
@@ -61,11 +56,10 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "La prise de masse dépend du niveau, du surplus énergétique, du sommeil et de la régularité. Progresse sans échec systématique et fais encadrer les mouvements lourds si tu débutes.",
   },
   "special-bureau-chaise": {
-    badge: "Enrichi · À valider",
     progression: [
       { periode: "Semaines 1-2", titre: "Déverrouillage", contenu: "Deux pauses de 5 minutes par jour, amplitude confortable et respiration lente." },
-      { periode: "Semaines 3-4", titre: "Régularité", contenu: "Passe à trois pauses actives et ajoute 2 répétitions sur les mouvements dynamiques." },
-      { periode: "Semaines 5-6", titre: "Autonomie", contenu: "Alterne les cinq routines selon ta zone la plus raide et conserve une pause toutes les 60 à 90 minutes." },
+      { periode: "Semaine 3", titre: "Régularité", contenu: "Passe à trois pauses actives et ajoute 2 répétitions sur les mouvements dynamiques." },
+      { periode: "Semaine 4", titre: "Autonomie", contenu: "Alterne les cinq routines selon ta zone la plus raide et conserve une pause toutes les 60 à 90 minutes." },
     ],
     nutrition: [
       { titre: "Déjeuner de travail", contenu: "Compose une assiette avec protéines, légumes et féculent adapté pour limiter le coup de fatigue de l'après-midi." },
@@ -80,7 +74,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Ces pauses ne traitent pas une douleur persistante. Engourdissement, perte de force, douleur irradiée ou céphalées inhabituelles justifient un avis médical.",
   },
   "prepa-semi-marathon": {
-    badge: "Enrichi · À valider",
     photoHomme: "/exercices/sauts-corde.jpg",
     visuels: [
       { nom: "Montées de mollets à l’élastique", photoHomme: "/exercices/mollets-debout-elastique-homme-metis-v2.jpg" },
@@ -109,7 +102,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Le plan suppose que tu peux déjà courir 45 minutes sans douleur. Toute douleur qui modifie la foulée, douleur thoracique, malaise ou essoufflement inhabituel impose l'arrêt et un avis professionnel.",
   },
   "prepa-hyrox": {
-    badge: "Enrichi · À valider",
     photoHomme: "/exercices/hyrox-kettlebell-swing.jpg",
     visuels: [
       { nom: "Wall ball", photoFemme: "/exercices/hyrox-wall-ball.jpg" },
@@ -137,7 +129,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Programme indépendant sans affiliation à HYROX. Adapte charges et ateliers à ton niveau ; demande un encadrement pour le traîneau et arrête en cas de douleur, vertige ou gêne thoracique.",
   },
   "perte-de-gras-maintien-musculaire": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Back squat", photoHomme: "/exercices/back-squat-barre.jpg" },
       { nom: "Développé couché", photoFemme: "/exercices/developpe-couche-barre-femme-blonde-v2.jpg" },
@@ -164,7 +155,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Aucune perte de poids précise n'est garantie. En cas de grossesse, trouble alimentaire, traitement ou pathologie, fais adapter l'alimentation et l'entraînement par un professionnel qualifié.",
   },
   "poids-du-corps": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Squat au poids du corps", photoFemme: "/exercices/squat-poids-du-corps-femme-metisse-v2.jpg" },
       { nom: "Pompes", photoFemme: "/exercices/pompes-femme-eurasienne.jpg" },
@@ -191,7 +181,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Le poids du corps n'est pas sans risque : stabilise les appuis, utilise une surface non glissante et remplace les sauts si douleur, reprise ou voisinage incompatible.",
   },
   "challenge-30-jours": {
-    badge: "Enrichi · À valider",
     visuels: [
       { nom: "Squat", photoFemme: "/exercices/squat-poids-du-corps-femme-metisse-v2.jpg" },
       { nom: "Pompes", photoFemme: "/exercices/pompes-femme-eurasienne.jpg" },
@@ -219,7 +208,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Le défi valorise la régularité, pas l'épuisement. Stoppe les impacts ou la séance en cas de douleur inhabituelle, vertige ou fatigue excessive.",
   },
   "sommeil-reparateur": {
-    badge: "Enrichi · À valider",
     progression: [
       { periode: "Jours 1-3", titre: "Observer", contenu: "Note heure de lever, coucher, éveils, caféine et énergie sans chercher à tout corriger." },
       { periode: "Jours 4-7", titre: "Ancrer", contenu: "Stabilise l'heure de lever, expose-toi à la lumière le matin et crée une routine de 20 minutes le soir." },
@@ -239,7 +227,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Ce programme améliore l'hygiène de sommeil mais ne traite pas une insomnie chronique, une apnée ou un trouble médical. Ronflements avec pauses, somnolence dangereuse ou symptômes persistants nécessitent une consultation.",
   },
   "respiration-anti-stress": {
-    badge: "Enrichi · À valider",
     progression: [
       { periode: "Semaine 1", titre: "Respirer sans forcer", contenu: "5 minutes par jour, expiration légèrement plus longue et aucune rétention inconfortable." },
       { periode: "Semaine 2", titre: "Réguler", contenu: "Passe à 6 à 8 minutes et teste la routine avant une situation modérément stressante." },
@@ -258,7 +245,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Arrête les rétentions si tu ressens vertige, fourmillements, oppression ou panique et reprends une respiration naturelle. Ne pratique jamais en conduisant, dans l'eau ou debout si tu es sujet aux malaises.",
   },
   "meditation-guidee": {
-    badge: "Enrichi · À valider",
     progression: [
       { periode: "Jours 1-2", titre: "Deux minutes", contenu: "Observe le souffle et reviens sans jugement dès que l'attention part." },
       { periode: "Jours 3-4", titre: "Balayage", contenu: "Passe à 4 ou 5 minutes et explore successivement visage, épaules, ventre et appuis." },
@@ -278,7 +264,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "La méditation ne remplace pas un accompagnement psychologique ou médical. Si elle intensifie durablement anxiété, dissociation ou souvenirs traumatiques, arrête et demande un accompagnement adapté.",
   },
   "recuperation-passive-sauna-hammam-massage": {
-    badge: "Enrichi · À valider",
     progression: [
       { periode: "Semaine 1", titre: "Tolérance", contenu: "Choisis une seule méthode, une durée courte et observe hydratation, vertiges et sommeil." },
       { periode: "Semaine 2", titre: "Régularité", contenu: "Répète au maximum deux expositions espacées, sans augmenter durée et température en même temps." },
@@ -297,7 +282,6 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "La chaleur est contre-indiquée ou nécessite un avis médical dans certaines situations : grossesse, maladie cardiovasculaire, tension non contrôlée, malaise récent ou médicaments affectant hydratation et thermorégulation. Jamais d'alcool ; sors immédiatement si vertige, nausée, palpitations ou confusion.",
   },
   "routine-recuperation-complete": {
-    badge: "Enrichi · À valider",
     progression: [
       { periode: "Semaine 1", titre: "Sélection", contenu: "Teste trois protocoles courts et note raideur, fatigue et qualité de sommeil avant et après." },
       { periode: "Semaine 2", titre: "Association", contenu: "Associe un protocole local de 5 minutes à une respiration de 3 à 5 minutes." },

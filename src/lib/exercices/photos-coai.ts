@@ -32,6 +32,15 @@ const VARIANTES: EntreeVariante[] = [
   { motifs: ["fente arrière trx", "fente arriere trx", "fente trx", "fente suspension"], femme: "suspension-fente-arriere", homme: "trx-fente-arriere-homme-coai", fichier: "suspension-fente-arriere" },
   { motifs: ["pistol squat assisté trx", "pistol squat assiste trx", "pistol squat trx"], homme: "trx-pistol-squat-homme-coai", fichier: "trx-pistol-squat-homme-coai" },
   { motifs: ["montées de genoux trx", "montees de genoux trx", "montée de genou trx", "montee de genou trx"], homme: "trx-montee-genou-homme-coai", fichier: "trx-montee-genou-homme-coai" },
+
+  // Lot COAI du 01/09/2026 (Anthony) : paires femme/homme sur fond noir,
+  // pour ces cinq fiches qui n'avaient qu'un seul visuel non genré. Le
+  // défaut reste la version féminine, comme sur le reste de la biblio.
+  { motifs: ["curl marteau"], femme: "curl-marteau-femme-coai", homme: "curl-marteau-homme-coai", fichier: "curl-marteau-femme-coai" },
+  { motifs: ["face pull élastique", "face pull elastique", "face pull"], femme: "face-pull-elastique-femme-coai", homme: "face-pull-elastique-homme-coai", fichier: "face-pull-elastique-femme-coai" },
+  { motifs: ["fentes bulgares", "fente bulgare"], femme: "fentes-bulgares-femme-coai", homme: "fentes-bulgares-homme-coai", fichier: "fentes-bulgares-femme-coai" },
+  { motifs: ["mollets unilatéral haltère", "mollets unilateral haltere"], femme: "mollets-unilateral-haltere-femme-coai", homme: "mollets-unilateral-haltere-homme-coai", fichier: "mollets-unilateral-haltere-femme-coai" },
+  { motifs: ["abduction de hanche élastique", "abduction de hanche elastique", "abduction hanche"], femme: "abduction-hanche-elastique-femme-coai", homme: "abduction-hanche-elastique-homme-coai", fichier: "abduction-hanche-elastique-femme-coai" },
 ];
 
 const TABLE: EntreePhoto[] = [
