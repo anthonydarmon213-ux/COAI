@@ -1,10 +1,12 @@
+import Link from "next/link";
+import { LockKeyhole } from "lucide-react";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Sparkline } from "@/components/suivi/sparkline";
 import { MetricRing } from "@/components/suivi/metric-ring";
 import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getEffectivePlan, hasPaidSubscription } from "@/lib/subscription/plan";
 import { Card } from "@/components/ui/card";
 import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 import { Gauge } from "@/components/ui/gauge";
@@ -24,6 +26,14 @@ type Metrique = {
   }) => number | null;
 };
 
+type SerieEnregistree = { repetitions?: number; chargeKg?: number };
+type ExerciceEnregistre = {
+  nom?: string;
+  repetitions?: number;
+  chargeKg?: number;
+  sets?: SerieEnregistree[];
+};
+
 const METRIQUES: Metrique[] = [
   { label: "Poids", unite: "kg", couleur: "#4cc9f0", visuel: "ring", valeurs: (m) => m.poidsKg },
   { label: "Masse grasse", unite: "%", couleur: "#ff8a3d", visuel: "pie", valeurs: (m) => m.masseGrassePourcent },
@@ -35,6 +45,8 @@ const METRIQUES: Metrique[] = [
 export default async function ProgressionPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
+
+  const hasPaidPlan = hasPaidSubscription(user.subscription);
 
   const [mesures, seances] = await Promise.all([
     prisma.mesure.findMany({
@@ -55,13 +67,21 @@ export default async function ProgressionPage() {
   const chargesParExercice = new Map<string, number[]>();
   for (const seance of seances) {
     const exercices = Array.isArray(seance.exercices)
-      ? (seance.exercices as { nom?: string; chargeKg?: number }[])
+      ? (seance.exercices as ExerciceEnregistre[])
       : [];
-    for (const ex of exercices) {
-      if (!ex.nom || typeof ex.chargeKg !== "number") continue;
-      const nom = ex.nom.trim();
+    for (const exercice of exercices) {
+      const chargesEnregistrees =
+        Array.isArray(exercice.sets) && exercice.sets.length > 0
+          ? exercice.sets
+              .map((serie) => serie.chargeKg)
+              .filter((charge): charge is number => typeof charge === "number")
+          : typeof exercice.chargeKg === "number"
+            ? [exercice.chargeKg]
+            : [];
+      if (!exercice.nom || chargesEnregistrees.length === 0) continue;
+      const nom = exercice.nom.trim();
       const liste = chargesParExercice.get(nom) ?? [];
-      liste.push(ex.chargeKg);
+      liste.push(...chargesEnregistrees);
       chargesParExercice.set(nom, liste);
     }
   }
@@ -161,64 +181,97 @@ export default async function ProgressionPage() {
         </div>
       </Card>
 
-      {graphiques.length === 0 && graphiquesForce.length === 0 ? (
-        <Card className="text-center">
-          <p className="font-semibold text-white">Tes courbes vont prendre vie ici.</p>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-graphite-400">Ajoute une première mesure ou termine une séance : COAI commencera à révéler tes tendances, au-delà des quatre indicateurs déjà visibles.</p>
-        </Card>
-      ) : (
-        <>
-          {graphiquesForce.length > 0 && (
-            <div id="charges" className="scroll-mt-8 flex flex-col gap-3">
-              <SectionLabel>Force</SectionLabel>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {graphiquesForce.map((g) => (
-                  <Sparkline key={g.nom} label={g.nom} unite="kg" points={g.points} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {graphiques.length > 0 && (
-            <>
-              <div className="flex flex-col gap-3">
-                <SectionLabel>Aujourd&apos;hui</SectionLabel>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {graphiques.map((g) => {
-                    const points = g.points;
-                    const valeur = points.at(-1);
-                    const precedente = points.length > 1 ? points.at(-2)! : null;
-                    if (valeur === undefined) return null;
-                    return (
-                      <MetricRing
-                        key={g.label}
-                        label={g.label}
-                        unite={g.unite}
-                        valeur={valeur}
-                        min={Math.min(...points)}
-                        max={Math.max(...points)}
-                        precedente={precedente}
-                        color={g.couleur}
-                        variant={g.visuel}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <SectionLabel>Tendance</SectionLabel>
+      {hasPaidPlan ? (
+        graphiques.length === 0 && graphiquesForce.length === 0 ? (
+          <Card className="text-center">
+            <p className="font-semibold text-white">Tes courbes vont prendre vie ici.</p>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-graphite-400">Ajoute une première mesure ou termine une séance : COAI commencera à révéler tes tendances, au-delà des quatre indicateurs déjà visibles.</p>
+          </Card>
+        ) : (
+          <>
+            {graphiquesForce.length > 0 && (
+              <div id="charges" className="scroll-mt-8 flex flex-col gap-3">
+                <SectionLabel>Force</SectionLabel>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {graphiques.map((g) => (
-                    <Sparkline key={g.label} label={g.label} unite={g.unite} points={g.points} />
+                  {graphiquesForce.map((g) => (
+                    <Sparkline key={g.nom} label={g.nom} unite="kg" points={g.points} />
                   ))}
                 </div>
               </div>
-            </>
-          )}
+            )}
 
-          <CoachingVisioCta plan={getEffectivePlan(user.subscription)} />
-        </>
+            {graphiques.length > 0 && (
+              <>
+                <div className="flex flex-col gap-3">
+                  <SectionLabel>Aujourd&apos;hui</SectionLabel>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    {graphiques.map((g) => {
+                      const points = g.points;
+                      const valeur = points.at(-1);
+                      const precedente = points.length > 1 ? points.at(-2)! : null;
+                      if (valeur === undefined) return null;
+                      return (
+                        <MetricRing
+                          key={g.label}
+                          label={g.label}
+                          unite={g.unite}
+                          valeur={valeur}
+                          min={Math.min(...points)}
+                          max={Math.max(...points)}
+                          precedente={precedente}
+                          color={g.couleur}
+                          variant={g.visuel}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <SectionLabel>Tendance</SectionLabel>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {graphiques.map((g) => (
+                      <Sparkline key={g.label} label={g.label} unite={g.unite} points={g.points} />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            <CoachingVisioCta plan={getEffectivePlan(user.subscription)} />
+          </>
+        )
+      ) : (
+        <Card className="relative overflow-hidden rounded-[2rem] border-cyan-300/20 bg-[radial-gradient(circle_at_100%_0%,rgba(76,201,240,.15),transparent_48%),rgba(255,255,255,.035)] p-6 sm:p-8">
+          <div className="pointer-events-none absolute -right-5 -top-6 text-cyan-200/10" aria-hidden="true">
+            <LockKeyhole size={128} strokeWidth={1} />
+          </div>
+          <div className="relative max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-cyan-200">
+              <LockKeyhole size={13} aria-hidden="true" />
+              Aperçu COAI Premium
+            </span>
+            <h2 className="mt-4 text-2xl font-semibold text-white sm:text-3xl">Tes données deviennent des décisions.</h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-graphite-300">
+              Le journal et la saisie de séries restent gratuits. Premium déverrouille les courbes détaillées et l&apos;historique par exercice.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                ["Courbes par exercice", "Charges, séries et répétitions"],
+                ["Tendances de progression", "Force, volume et régularité"],
+                ["Historique intelligent", "Comparer tes séances"],
+              ].map(([titre, detail]) => (
+                <div key={titre} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p className="text-sm font-semibold text-white">{titre}</p>
+                  <p className="mt-1 text-xs leading-5 text-graphite-400">{detail}</p>
+                </div>
+              ))}
+            </div>
+            <Link href="/pricing" className="mt-7 inline-flex items-center gap-2 rounded-full bg-laiton-400 px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-laiton-300">
+              Découvrir COAI Premium <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </Card>
       )}
     </div>
   );

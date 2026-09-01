@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, type LucideIcon } from "lucide-react";
+import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, LayoutGrid, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
@@ -32,6 +32,7 @@ const ONGLETS: {
   sous?: SousLien[];
 }[] = [
   { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard" },
+  { href: "/fonctionnalites", label: "Fonctionnalités", icon: LayoutGrid, match: "/fonctionnalites" },
   {
     href: "/programme/entrainement",
     label: "Entraînement",
@@ -44,7 +45,7 @@ const ONGLETS: {
       // consulter et de la partager ; le PDF n'est qu'une des sorties.
       { href: "/programme/seance-du-jour", label: "Ma fiche séance" },
       { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
-      { href: "/programme/programmes-prets", label: "Programmes prêts" },
+      { href: "/boutique", label: "Boutique programmes" },
       { href: "/suivi/seances", label: "Historique des séances" },
     ],
   },

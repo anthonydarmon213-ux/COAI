@@ -13,12 +13,19 @@ import {
 import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { clearDiagnosticAnswers, readDiagnosticAnswers } from "@/lib/diagnostic/storage";
 import Link from "next/link";
 
 // La création du compte reste une étape réellement gratuite. Même si une
 // offre a été repérée avant l'inscription, Stripe ne s'ouvre jamais sans une
 // confirmation explicite sur l'écran des formules.
-export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {
+export function CompleterInscriptionForm({
+  prenomSuggere,
+  redirectTo,
+}: {
+  prenomSuggere: string;
+  redirectTo?: string | null;
+}) {
   const [prenom, setPrenom] = useState(prenomSuggere);
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);
@@ -53,6 +60,21 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
         }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
+
+      // Le compte applicatif existe maintenant : applique immédiatement le
+      // diagnostic afin que le sexe, l'objectif et les contraintes pilotent
+      // déjà les visuels et les programmes de la Boutique. En cas d'échec,
+      // on conserve le brouillon local pour que /bienvenue puisse réessayer.
+      const diagnostic = readDiagnosticAnswers();
+      if (diagnostic) {
+        const profilRes = await fetch("/api/profil", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(diagnostic),
+        }).catch(() => null);
+        if (profilRes?.ok) clearDiagnosticAnswers();
+      }
+
       const intendedPlan = readIntendedPlanCookie();
       const intendedVipSessions = readIntendedVipSessionsCookie();
       const intendedBilling = readIntendedBillingCookie();
@@ -69,7 +91,7 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
         params.set("billing", intendedBilling);
         params.set("vipSessions", String(intendedVipSessions));
       }
-      window.location.href = `/pricing?${params.toString()}`;
+      window.location.href = redirectTo ?? `/pricing?${params.toString()}`;
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -108,7 +130,11 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       </label>
       {error && <p className="text-sm text-red-400">{error}</p>}
       <Button type="submit" disabled={loading}>
-        {loading ? "Création du compte…" : "Créer mon compte et choisir ma formule →"}
+        {loading
+          ? "Création du compte…"
+          : redirectTo?.startsWith("/boutique")
+            ? "Créer mon compte et accéder au programme offert →"
+            : "Créer mon compte et choisir ma formule →"}
       </Button>
     </form>
   );

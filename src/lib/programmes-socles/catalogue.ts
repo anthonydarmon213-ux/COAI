@@ -7,6 +7,8 @@ import type {
   ObjectifSocle,
   RegimeSocle,
 } from "@/lib/programmes-socles/cle";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import { sontSupersetAntagoniste } from "@/lib/programmes/supersets";
 
 // Bibliothèque éditoriale COAI : ces programmes sont construits une fois,
 // versionnés et servis à tous les abonnés Pass IA sans aucun appel à un
@@ -37,32 +39,32 @@ const SEANCES: SeanceModele[] = [
   {
     nom: "Full Body — les fondamentaux",
     exercices: [
-      { nom: "Back squat barre", phases: ["Pieds stables, poitrine haute", "Hanches en arrière, genoux alignés", "Pousse le sol, remonte gainé"] },
+      { nom: "Squat barre", phases: ["Pieds stables, poitrine haute", "Hanches en arrière, genoux alignés", "Pousse le sol, remonte gainé"] },
       { nom: "Développé couché haltères", phases: ["Pieds ancrés, omoplates serrées", "Descends les haltères sous contrôle", "Pousse sans décoller les épaules"] },
       { nom: "Rowing TRX", phases: ["Corps aligné, bras tendus", "Tire les coudes près du corps", "Serre les omoplates puis contrôle"] },
-      { nom: "Deadlift roumain", phases: ["Barre proche, dos neutre", "Recule les hanches, jambes souples", "Contracte les fessiers en haut"] },
+      { nom: "Soulevé de terre conventionnel", phases: ["Pieds stables, dos neutre", "Pousse le sol, barre proche", "Verrouille debout sans cambrer"] },
       { nom: "Gainage planche", phases: ["Corps aligné épaules-talons", "Ventre et fessiers contractés", "Respire sans creuser le dos"] },
-      { nom: "Crunch au sol", phases: ["Bas du dos plaqué", "Décolle seulement les omoplates", "Expire puis redescends lentement"] },
+      { nom: "Crunch", phases: ["Bas du dos plaqué", "Décolle seulement les omoplates", "Expire puis redescends lentement"] },
     ],
   },
   {
     nom: "Jambes & fessiers",
     exercices: [
-      { nom: "Fentes bulgares", phases: ["Pied arrière posé sur banc", "Descends le genou vers le sol", "Pousse dans le talon avant"] },
-      { nom: "Goblet squat kettlebell", phases: ["Charge contre la poitrine", "Descends entre les hanches", "Remonte sans rentrer les genoux"] },
-      { nom: "Leg curl allongé", phases: ["Bassin plaqué au support", "Ramène les talons aux fessiers", "Redescends lentement sans relâcher"] },
-      { nom: "Abduction de hanche à l’élastique", phases: ["Buste droit, bassin stable", "Écarte la jambe sans tourner", "Reviens lentement sous tension"] },
+      { nom: "Fentes arrière haltères", phases: ["Grand pas arrière, buste haut", "Descends le genou sous contrôle", "Pousse dans le pied avant"] },
+      { nom: "Air squat (poids du corps)", phases: ["Pieds stables, poitrine haute", "Descends genoux dans l’axe", "Pousse le sol, remonte gainé"] },
+      { nom: "Kettlebell swing", phases: ["Charnière de hanche, dos plat", "Projette les hanches vers l’avant", "Laisse la charge revenir seule"] },
+      { nom: "Fente arrière TRX", phases: ["Sangles tendues, buste vertical", "Recule et descends contrôlé", "Pousse dans le talon avant"] },
       { nom: "Russian twist", phases: ["Buste incliné, dos long", "Tourne les épaules et le tronc", "Contrôle chaque changement de côté"] },
     ],
   },
   {
     nom: "Haut du corps — posture & force",
     exercices: [
-      { nom: "Développé incliné haltères", phases: ["Banc à trente degrés", "Descends coudes sous les poignets", "Pousse et rapproche sans cogner"] },
-      { nom: "Dips aux barres parallèles", phases: ["Épaules basses, buste incliné", "Descends sous contrôle sans forcer", "Pousse les barres, poitrine engagée"] },
-      { nom: "Face pull à l’élastique", phases: ["Bras tendus à hauteur du visage", "Tire vers le front, coudes hauts", "Serre les omoplates sans cambrer"] },
-      { nom: "Élévations latérales haltères", phases: ["Épaules basses, coudes souples", "Monte jusqu’à hauteur d’épaule", "Redescends sans laisser tomber"] },
-      { nom: "Superman au sol", phases: ["Allongé, nuque dans l’axe", "Décolle bras et jambes ensemble", "Tiens puis repose sans à-coup"] },
+      { nom: "Développé couché haltères", phases: ["Pieds ancrés, omoplates serrées", "Descends les haltères sous contrôle", "Pousse sans décoller les épaules"] },
+      { nom: "Pompes TRX", phases: ["Corps aligné, sangles stables", "Descends les coudes à 45°", "Pousse sans creuser le dos"] },
+      { nom: "Rowing haltère unilatéral", phases: ["Buste incliné, dos neutre", "Tire le coude vers la hanche", "Contrôle la descente sans tourner"] },
+      { nom: "Élévations latérales", phases: ["Épaules basses, coudes souples", "Monte jusqu’à hauteur d’épaule", "Redescends sans laisser tomber"] },
+      { nom: "Superman", phases: ["Allongé, nuque dans l’axe", "Décolle bras et jambes ensemble", "Tiens puis repose sans à-coup"] },
       { nom: "Gainage latéral", phases: ["Coude placé sous l’épaule", "Hanches hautes, corps aligné", "Respire en gardant le bassin fixe"] },
     ],
   },
@@ -70,19 +72,19 @@ const SEANCES: SeanceModele[] = [
     nom: "Athlétique — puissance contrôlée",
     exercices: [
       { nom: "Kettlebell swing", phases: ["Charnière de hanche, dos plat", "Projette les hanches vers l’avant", "Laisse la kettlebell revenir seule"] },
-      { nom: "Fentes avant haltères", phases: ["Grand pas, buste vertical", "Genou arrière proche du sol", "Pousse dans le pied avant"] },
+      { nom: "Fentes arrière haltères", phases: ["Grand pas arrière, buste vertical", "Genou arrière proche du sol", "Pousse dans le pied avant"] },
       { nom: "Développé militaire haltères", phases: ["Haltères aux épaules, tronc gainé", "Pousse verticalement sans cambrer", "Redescends sous contrôle aux épaules"] },
-      { nom: "Rowing kettlebell penché", phases: ["Buste incliné, dos neutre", "Tire la charge vers la hanche", "Contrôle sans tourner le bassin"] },
-      { nom: "Roue abdominale", phases: ["Genoux au sol, bassin verrouillé", "Avance sans creuser le dos", "Ramène avec les abdominaux"] },
+      { nom: "Rowing haltère unilatéral", phases: ["Buste incliné, dos neutre", "Tire le coude vers la hanche", "Contrôle sans tourner le bassin"] },
+      { nom: "Mountain climber", phases: ["Mains sous les épaules", "Ramène un genou à la fois", "Bassin stable, rythme contrôlé"] },
     ],
   },
   {
     nom: "Force globale — progression",
     exercices: [
-      { nom: "Deadlift trap bar", phases: ["Pieds centrés, dos plat", "Pousse le sol, poitrine haute", "Verrouille debout sans te pencher"] },
+      { nom: "Soulevé de terre trap bar", phases: ["Pieds centrés, dos plat", "Pousse le sol, poitrine haute", "Verrouille debout sans te pencher"] },
       { nom: "Front squat barre", phases: ["Coudes hauts, tronc vertical", "Descends entre les hanches", "Remonte en gardant les coudes hauts"] },
-      { nom: "Développé couché barre", phases: ["Pieds ancrés, omoplates serrées", "Barre vers le bas des pectoraux", "Pousse en gardant le dos stable"] },
-      { nom: "Face pull à l’élastique", phases: ["Bras tendus à hauteur du visage", "Tire vers le front, coudes hauts", "Serre les omoplates sans cambrer"] },
+      { nom: "Développé couché haltères", phases: ["Pieds ancrés, omoplates serrées", "Descends les haltères sous contrôle", "Pousse sans décoller les épaules"] },
+      { nom: "Curl biceps haltères", phases: ["Coudes fixes près du buste", "Monte sans élan du dos", "Redescends lentement sous contrôle"] },
       { nom: "Gainage latéral", phases: ["Coude placé sous l’épaule", "Hanches hautes, corps aligné", "Respire en gardant le bassin fixe"] },
     ],
   },
@@ -161,7 +163,7 @@ export function construireSocleEntrainement(cle: CleEntrainement) {
     photoQuerySeance: modele.exercices[0]?.nom ?? modele.nom,
     echauffement:
       "7 min : cardio léger, mobilité des hanches et des épaules, puis 3 séries d’approche progressives sur le premier exercice (50 % × 10, 70 % × 6, 85 % × 3).",
-    exercices: modele.exercices.map((exercice, exerciceIndex) => ({
+    exercices: filtrerExercicesAvecMedias(modele.exercices.map((exercice) => ({
       nom: exercice.nom,
       series: exercice.nom.toLowerCase().includes("gainage") ? "3" : format.series,
       repetitions: exercice.nom.toLowerCase().includes("gainage") ? "30-45 sec" : format.repetitions,
@@ -169,10 +171,22 @@ export function construireSocleEntrainement(cle: CleEntrainement) {
       charge: /gainage|crunch|superman|roue abdominale|russian twist/i.test(exercice.nom)
         ? "poids du corps — exécution lente et contrôlée"
         : format.charge,
-      methode: niveau === "AVANCE" && exerciceIndex >= modele.exercices.length - 2 ? "Superset contrôlé" : "Série classique",
+      methode: "Série classique",
       photoQuery: exercice.nom,
       phases: exercice.phases,
-    })),
+    }))).map((exercice, exerciceIndex, exercices) => {
+      const suivant = exercices[exerciceIndex + 1];
+      const nom = typeof exercice.nom === "string" ? exercice.nom : "";
+      const nomSuivant = suivant && typeof suivant.nom === "string" ? suivant.nom : "";
+      if (niveau !== "DEBUTANT" && nomSuivant && sontSupersetAntagoniste(nom, nomSuivant)) {
+        return {
+          ...exercice,
+          methode: `Superset agoniste–antagoniste · enchaîner avec ${nomSuivant}`,
+          supersetAvec: nomSuivant,
+        };
+      }
+      return exercice;
+    }),
     retourAuCalme:
       "6 à 8 min : marche lente, étirements légers des zones travaillées, puis rouleau de mousse sur quadriceps ou haut du dos sans rechercher la douleur.",
   }));

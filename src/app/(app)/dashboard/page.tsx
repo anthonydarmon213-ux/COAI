@@ -6,7 +6,7 @@ import { DailyExperience } from "@/components/daily/daily-experience";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
-import { hasProgrammeAccess } from "@/lib/subscription/plan";
+import { getMembershipLabel, hasPaidSubscription, hasProgrammeAccess } from "@/lib/subscription/plan";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
 import { BesoinsIdentifiesCard } from "@/components/dashboard/besoins-identifies-card";
@@ -29,6 +29,9 @@ import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
+import { ObjectifCheminCard } from "@/components/dashboard/objectif-chemin-card";
+import { ParrainageCard } from "@/components/compte/parrainage-card";
+import { DashboardFeaturesCard } from "@/components/dashboard/dashboard-features-card";
 
 const MANTRAS = [
   "La régularité transforme ce que la motivation commence.",
@@ -142,6 +145,8 @@ export default async function DashboardPage() {
   const mantra = MANTRAS[Math.floor(date.getTime() / 86_400_000) % MANTRAS.length];
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
   const hasAccess = hasProgrammeAccess(user, user.subscription);
+  const hasPaidAccess = hasPaidSubscription(user.subscription);
+  const membershipLabel = getMembershipLabel(user.subscription);
   const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
 
   // Une seule direction claire à chaque connexion (19/08/2026, demande
@@ -208,10 +213,10 @@ export default async function DashboardPage() {
 
       {/* BLOC 1 — Hero + Readiness du jour */}
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-6 px-6 py-7 sm:px-8 sm:py-9">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-5">
+        <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-center">
+          <div className="flex min-w-0 flex-col items-start gap-5 sm:flex-row sm:items-center">
             <DashboardAvatar resultat={ageCoai} />
-            <div>
+            <div className="min-w-0">
               <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
                 {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
               </h1>
@@ -224,6 +229,28 @@ export default async function DashboardPage() {
           <ReadinessCard readiness={readiness} compact />
         </div>
       </header>
+
+      <ObjectifCheminCard
+        objectifs={user.profile?.objectifs}
+        completion={completion}
+        hasProgramme={Boolean(programme)}
+        premiereSeanceFaite={Boolean(daily?.completedAt)}
+      />
+
+      <DashboardFeaturesCard hasPaidAccess={hasPaidAccess} membershipLabel={membershipLabel} />
+
+      {/* Acquisition visible dès le dashboard : un membre satisfait peut
+          inviter un proche sans repasser par la page abonnement. Le proche
+          reçoit d'abord le diagnostic gratuit, puis le parrainage est suivi
+          automatiquement jusqu'à la conversion. */}
+      <section className="animate-reveal rounded-[1.75rem] border border-emerald-300/20 bg-[linear-gradient(135deg,rgba(52,211,153,.09),rgba(255,255,255,.025)_55%,rgba(255,255,255,.02))] p-6 sm:p-8" aria-labelledby="parrainage-dashboard-title">
+        <div className="mb-4 max-w-2xl">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Fais découvrir COAI</p>
+          <h2 id="parrainage-dashboard-title" className="mt-2 font-editorial text-3xl text-white sm:text-4xl">Un proche veut reprendre en main sa forme&nbsp;?</h2>
+          <p className="mt-2 text-sm leading-6 text-graphite-300">Partage ton lien personnel : son diagnostic est offert, et tu reçois automatiquement un mois offert s&apos;il devient abonné payant.</p>
+        </div>
+        <ParrainageCard />
+      </section>
 
       {/* BLOC 2 — L'action principale du jour, seule décision à prendre */}
       <div className="relative">
@@ -278,6 +305,16 @@ export default async function DashboardPage() {
       </div>
 
       <ReperesDuJour habitudeHydratation={user.profile?.hydratation} />
+
+      <section className="relative overflow-hidden rounded-3xl border border-cyan-300/15 bg-[radial-gradient(circle_at_85%_10%,rgba(0,240,255,.12),transparent_35%),linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.02))] p-6 sm:p-8">
+        <div aria-hidden="true" className="absolute right-8 top-8 h-20 w-20 rounded-full border border-laiton-400/25 shadow-[0_0_50px_rgba(0,240,255,.12)]" />
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">À votre écoute</p>
+        <h2 className="mt-3 max-w-xl font-editorial text-3xl text-white">Construisons le meilleur COAI, ensemble.</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">Une idée, un exercice manquant ou quelque chose à simplifier ? Chaque suggestion est lue et nous aide à améliorer votre expérience.</p>
+        <Link href="/avis" className="mt-5 inline-flex min-h-11 items-center rounded-full border border-laiton-400/40 bg-laiton-400/[0.1] px-5 py-2.5 text-sm font-bold text-laiton-100 transition hover:-translate-y-0.5 hover:bg-laiton-400/[0.18]">
+          Partager une suggestion →
+        </Link>
+      </section>
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link

@@ -52,7 +52,7 @@ export function AvisForm() {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Field label="Ta note sur ton expérience COAI">
+        <Field label="Ton expérience aujourd'hui">
           <div className="flex gap-2">
             {NOTES.map((n) => (
               <button
@@ -71,9 +71,9 @@ export function AvisForm() {
             ))}
           </div>
         </Field>
-        <Field label="Qu'est-ce qui marche, qu'est-ce qui pourrait être mieux ?">
+        <Field label="Que devons-nous améliorer ou ajouter ?">
           <Textarea
-            placeholder="Sois honnête — c'est justement pour améliorer COAI."
+            placeholder="Une fonctionnalité, un exercice, un visuel ou une idée…"
             value={commentaire}
             onChange={(e) => setCommentaire(e.target.value)}
             rows={5}
@@ -81,7 +81,7 @@ export function AvisForm() {
         </Field>
         {error && <p className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={loading}>
-          {loading ? "Envoi…" : "Envoyer mon avis"}
+          {loading ? "Envoi…" : "Envoyer ma suggestion"}
         </Button>
       </form>
     </Card>

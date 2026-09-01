@@ -36,6 +36,19 @@ function normalise(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
+function getWorkoutSessions(contenu: unknown): WorkoutSession[] {
+  if (!contenu || typeof contenu !== "object" || Array.isArray(contenu)) return [];
+  const seances = (contenu as { seances?: unknown }).seances;
+  if (!Array.isArray(seances)) return [];
+  return seances.filter((seance): seance is WorkoutSession =>
+    Boolean(seance && typeof seance === "object" && !Array.isArray(seance))
+  );
+}
+
+function hasExercises(session: WorkoutSession) {
+  return Array.isArray(session.exercices) && session.exercices.length > 0;
+}
+
 const CORE_PATTERN = /(abdo|gainage|planche|crunch|core|dead bug|hollow|bird dog|pallof)/i;
 
 export function isCoreExercise(exercise: Record<string, unknown>) {
@@ -75,15 +88,45 @@ export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSessi
 }
 
 export function getWorkoutForDate(contenu: unknown, date: Date): WorkoutSession | null {
-  if (!contenu || typeof contenu !== "object" || Array.isArray(contenu)) return null;
-  const seances = (contenu as { seances?: unknown }).seances;
-  if (!Array.isArray(seances)) return null;
+  const seances = getWorkoutSessions(contenu);
+  if (seances.length === 0) return null;
   const jour = JOURS[date.getDay()] ?? "";
-  return (seances.find((seance) => {
-    if (!seance || typeof seance !== "object" || Array.isArray(seance)) return false;
+  return seances.find((seance) => {
     const valeur = String((seance as { jour?: unknown }).jour ?? "");
     return normalise(valeur).includes(normalise(jour));
-  }) ?? null) as WorkoutSession | null;
+  }) ?? null;
+}
+
+export function getShareableWorkoutForDate(
+  contenu: unknown,
+  date: Date
+): { session: WorkoutSession | null; timing: "today" | "next" | "fallback"; label: string | null } {
+  const todaySession = getWorkoutForDate(contenu, date);
+  if (todaySession && hasExercises(todaySession)) {
+    return { session: todaySession, timing: "today", label: null };
+  }
+
+  const seances = getWorkoutSessions(contenu).filter(hasExercises);
+  if (seances.length === 0) {
+    return { session: null, timing: "fallback", label: null };
+  }
+
+  for (let offset = 1; offset <= 6; offset += 1) {
+    const targetDay = JOURS[(date.getDay() + offset) % 7] ?? "";
+    const session = seances.find((seance) =>
+      normalise(String(seance.jour ?? "")).includes(normalise(targetDay))
+    );
+    if (session) {
+      return { session, timing: "next", label: String(session.jour ?? targetDay) };
+    }
+  }
+
+  const firstSession = seances[0] ?? null;
+  return {
+    session: firstSession,
+    timing: "fallback",
+    label: firstSession ? String(firstSession.jour ?? firstSession.nom ?? "prochaine séance") : null,
+  };
 }
 
 function reduceSeries(exercice: Record<string, unknown>) {

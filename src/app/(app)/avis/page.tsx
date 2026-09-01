@@ -9,10 +9,10 @@ export default async function AvisPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <SectionLabel>Ton avis</SectionLabel>
-        <h1 className="text-2xl font-semibold">Donner mon avis</h1>
+        <SectionLabel>À votre écoute</SectionLabel>
+        <h1 className="text-2xl font-semibold">Vos suggestions font évoluer COAI.</h1>
         <p className="text-sm text-graphite-400">
-          Envoyé directement à l&apos;équipe COAI — jamais publié sans ton accord.
+          Une idée, un exercice manquant ou quelque chose à simplifier ? Chaque message est lu par l&apos;équipe COAI et n&apos;est jamais publié sans ton accord.
         </p>
       </div>
       <AvisForm />

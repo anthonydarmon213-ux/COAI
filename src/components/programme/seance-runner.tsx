@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
-import { MuscleMap } from "@/components/programme/muscle-map";
-import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
-import { MotionCheck } from "@/components/programme/motion-check";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
+import { ExerciceVideo } from "@/components/programme/exercice-video";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import { nettoyerSupersets } from "@/lib/programmes/supersets";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -82,7 +82,7 @@ function buildSteps(echauffement: string | undefined, exercices: unknown[], reto
   const steps: Step[] = [];
   if (echauffement) steps.push({ type: "echauffement", texte: echauffement });
 
-  const valides = exercices.filter(isPlainObject);
+  const valides = nettoyerSupersets(filtrerExercicesAvecMedias(exercices)).filter(isPlainObject);
   valides.forEach((exercice, i) => {
     const nom = typeof exercice.nom === "string" ? exercice.nom : `Exercice ${i + 1}`;
     const totalSets = parseSeries(exercice.series);
@@ -336,18 +336,35 @@ export function SeanceRunner({
     // Les reps/charges réellement saisies remontent au suivi, série par
     // série — jamais les valeurs "visées" du programme si l'utilisateur
     // n'a rien saisi (on n'envoie alors que le nom).
-    const parExercice = new Map<string, { nom: string; series: number; repetitions?: number; chargeKg?: number }>();
+  const parExercice = new Map<
+    string,
+    {
+      nom: string;
+      series: number;
+      repetitions?: number;
+      chargeKg?: number;
+      sets: { repetitions?: number; chargeKg?: number }[];
+    }
+  >();
     steps.forEach((s, i) => {
       if (s.type !== "set" || i >= index + 1) return;
       const cle = `${s.exerciceIndex}-${s.setIndex}`;
       const saisi = realise[cle];
-      const entree = parExercice.get(s.nom) ?? { nom: s.nom, series: 0 };
-      entree.series += 1;
-      const reps = Number(saisi?.reps);
-      const charge = Number(saisi?.charge);
-      if (Number.isFinite(reps) && reps > 0) entree.repetitions = reps;
-      if (Number.isFinite(charge) && charge > 0) entree.chargeKg = charge;
-      parExercice.set(s.nom, entree);
+    const entree = parExercice.get(s.nom) ?? { nom: s.nom, series: 0, sets: [] };
+    entree.series += 1;
+    const reps = Number(saisi?.reps);
+    const charge = Number(saisi?.charge);
+    const serie: { repetitions?: number; chargeKg?: number } = {};
+    if (Number.isFinite(reps) && reps > 0) {
+      entree.repetitions = reps;
+      serie.repetitions = reps;
+    }
+    if (Number.isFinite(charge) && charge > 0) {
+      entree.chargeKg = charge;
+      serie.chargeKg = charge;
+    }
+    if (Object.keys(serie).length > 0) entree.sets.push(serie);
+    parExercice.set(s.nom, entree);
     });
     try {
       await fetch("/api/seances", {
@@ -556,8 +573,7 @@ export function SeanceRunner({
             })()}
 
             {step.type === "set" && (() => {
-              const photoQuery = typeof step.exercice.photoQuery === "string" ? step.exercice.photoQuery : undefined;
-              const photoUrl = photoCoaiPourNom(step.nom) ?? (photoQuery ? photosParExercice?.[photoQuery] : null);
+              const photoUrl = photoCoaiPourNom(step.nom);
               const cle = `${step.exerciceIndex}-${step.setIndex}`;
               const saisi = realise[cle] ?? { reps: "", charge: "" };
               return (
@@ -573,22 +589,14 @@ export function SeanceRunner({
                    rendraient le schéma et les champs de saisie trop étroits. */
                 <div className="grid w-full max-w-4xl items-center gap-6 lg:grid-cols-2 lg:gap-8 lg:text-left">
                   <div className="flex flex-col items-center gap-4">
-                    {/* Cartographie anatomique (22/08/2026) — ne s'affiche que
-                        si l'exercice est reconnu dans la table des muscles :
-                        une silhouette éteinte laisserait croire à un bug. */}
-                    {(() => {
-                      const cible = musclesPourExercice(step.nom);
-                      if (!cible) return null;
-                      return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
-                    })()}
-
                     {photoUrl && (
                       <div className="relative w-full max-w-sm overflow-hidden rounded-2xl">
-                        {/* eslint-disable-next-line @next/next/no-img-element -- cascade visuel COAI puis stock */}
+                        {/* eslint-disable-next-line @next/next/no-img-element -- visuel COAI local vérifié */}
                         <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full object-cover" loading="eager" />
                         <CoaiImageMark />
                       </div>
                     )}
+                    <ExerciceVideo nom={step.nom} className="w-full max-w-sm" />
                   </div>
 
                   <div className="flex flex-col items-center gap-4 lg:items-start">
@@ -607,7 +615,6 @@ export function SeanceRunner({
                     )}
                   </div>
 
-                  {estPolyarticulaire(step.nom) && <MotionCheck nomExercice={step.nom} />}
 
                   {/* La consigne reste derrière un bouton plutôt qu'affichée
                       en clair : c'est une phrase longue (repère de charge

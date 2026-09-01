@@ -60,12 +60,6 @@ const TABLE: Entree[] = [
     animation: { fichier: "pompe", description: "Poussée horizontale, pectoraux et triceps engagés" },
   },
   {
-    // Traction verticale : poulie haute et traction partagent le même
-    // schéma moteur.
-    motifs: ["tirage vertical", "tirage poulie haute", "poulie haute", "lat pulldown", "traction", "pull up", "pull-up"],
-    animation: { fichier: "tirage-vertical", description: "Tirage vertical, dorsaux et biceps sollicités" },
-  },
-  {
     // Tirage horizontal. "Rowing menton" est un upright row (épaules) :
     // exclu explicitement malgré le mot "rowing".
     motifs: ["tirage horizontal", "rowing haltère", "rowing haltere", "rowing élastique", "rowing elastique", "seated row", "tirage poulie basse"],
@@ -101,9 +95,12 @@ const TABLE: Entree[] = [
  * le lien de démonstration à la place.
  */
 export function animationPourExercice(nom: string): AnimationExercice | null {
-  const normalise = nom.toLowerCase();
-  const entree = TABLE.find((e) => e.motifs.some((m) => normalise.includes(m)));
-  return entree ? entree.animation : null;
+  void nom;
+  // Désactivé le 28/08/2026 à la demande d'Anthony : les vidéos mannequin
+  // avec muscles en surbrillance contenaient des erreurs. Le site ne doit
+  // plus afficher d'animation technique tant qu'elles n'ont pas été
+  // recréées et validées une par une.
+  return null;
 }
 
 export function urlAnimation(fichier: string): string {

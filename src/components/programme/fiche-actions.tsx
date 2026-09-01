@@ -17,13 +17,19 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 // quand il existe, sinon ouverture dans un nouvel onglet — jamais un
 // <a download> sur un blob:, qui éjectait l'utilisateur de la page sur
 // Safari iOS (bug corrigé le 21/08).
-export function FicheActions({ nomSeance }: { nomSeance: string }) {
+export function FicheActions({
+  nomSeance,
+  partageLabel = "Ma séance COAI du jour",
+}: {
+  nomSeance: string;
+  partageLabel?: string;
+}) {
   const [message, setMessage] = useState<string | null>(null);
 
   async function partager() {
     setMessage(null);
     const url = window.location.href;
-    const texte = `Ma séance COAI du jour : ${nomSeance}`;
+    const texte = `${partageLabel} : ${nomSeance}`;
     try {
       if (navigator.share) {
         await navigator.share({ title: texte, text: texte, url });

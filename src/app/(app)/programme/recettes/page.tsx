@@ -1,15 +1,16 @@
 import { RecettesGrid } from "@/components/nutrition/recettes-grid";
 import { RECETTES } from "@/lib/nutrition/recettes";
-import { getStockPhotos } from "@/lib/media/pexels";
 
 // Bibliothèque de recettes (19/08/2026, demande Anthony). Même gabarit que
 // /programme/exercices (kicker + titre + intro, bibliothèque indépendante du
-// plan nutrition généré par l'IA). Les photos Pexels sont résolues ici,
-// côté serveur, une seule fois pour toute la liste — la clé PEXELS_API_KEY
-// ne quitte jamais le serveur.
-export default async function RecettesPage() {
-  const photos = await getStockPhotos(RECETTES.map((r) => r.photoQuery));
-  const items = RECETTES.map((recette) => ({ recette, photoUrl: photos[recette.photoQuery] ?? null }));
+// plan nutrition généré par l'IA). Une photo COAI explicitement associée au
+// plat passe toujours avant Pexels : on ne montre jamais une assiette voisine
+// sous prétexte qu'elle partage un ingrédient.
+export default function RecettesPage() {
+  const items = RECETTES.map((recette) => ({
+    recette,
+    photoUrl: recette.photoLocale ?? null,
+  }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -20,9 +21,9 @@ export default async function RecettesPage() {
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Recettes.</h1>
         <p className="max-w-2xl text-base leading-7 text-graphite-300">
-          Une sélection de recettes simples et équilibrées, indépendante de ton plan nutrition
-          personnalisé — de quoi t&apos;inspirer au quotidien. Les macros indiquées sont des
-          estimations par portion, pas un calcul exact.
+          {RECETTES.length} recettes simples et équilibrées avec portions, préparation, conservation et variantes
+          pour les programmes LEAN, RESET, TRX, HYBRID et MASS. Les macros restent des estimations
+          par portion : adapte les quantités à ton profil et vérifie toujours les allergènes.
         </p>
       </div>
       <RecettesGrid items={items} />

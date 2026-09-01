@@ -192,12 +192,11 @@ function construireProfilParagraphe(r: ReponsesDiagnostic, profil: ProfilStructu
   return `Tu es ${niveauTxt}, avec l'objectif de ${profil.objectif.toLowerCase()}. Tu comptes t'entraîner ${rythmeTxt}, principalement dans cet environnement : ${environnementTxt}.${freinTxt} C'est exactement ce que COAI utilise pour construire — puis faire évoluer — ton programme.`;
 }
 
-// Message sur le délai de résultats — volontairement identique pour tout le
-// monde plutôt que fragmenté par niveau (demande d'Anthony du 11/08 d'être
-// "le plus simple et efficace" ; le niveau influence déjà le programme via
-// SERIES_PAR_NIVEAU, pas la peine de dupliquer la nuance ici).
+// Message sur les résultats : aucun délai universel ni promesse d'atteinte.
+// Le diagnostic donne un point de départ ; les résultats dépendent ensuite
+// du profil, de la régularité et du contexte de santé.
 export const RESULTATS_TIMELINE =
-  "Avec un programme adapté et un vrai suivi, les premiers effets se font généralement sentir dès 6 semaines, et l'atteinte de ton objectif sous 3 mois.";
+  "Tes premiers repères seront la régularité, l'énergie et les performances. Les changements physiques et leur délai varient selon ton profil, ta régularité et ton contexte.";
 
 const STRUCTURE_PERSONAS = [
   "Je ne sais pas quoi faire à la salle",

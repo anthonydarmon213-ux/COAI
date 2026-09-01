@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { LockKeyhole } from "lucide-react";
 
 // Restaurant Decoder (22/08/2026, demande Anthony) — photographie la carte,
 // COAI propose les 2 meilleurs choix et l'ajustement à demander au serveur.
@@ -40,16 +42,29 @@ type Resultat = {
   resume: string | null;
 };
 
-export function MenuRestaurant() {
+export function MenuRestaurant({ hasPaidAccess, membershipLabel }: { hasPaidAccess: boolean; membershipLabel: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [chargement, setChargement] = useState(false);
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!previewUrl) return;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
 
   async function analyser(fichier: File) {
+    const nextPreviewUrl = URL.createObjectURL(fichier);
+    setPreviewUrl(nextPreviewUrl);
     setChargement(true);
     setErreur(null);
     setResultat(null);
+    if (!hasPaidAccess) {
+      setChargement(false);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
     try {
       const compresse = await compresser(fichier);
       const form = new FormData();
@@ -71,7 +86,12 @@ export function MenuRestaurant() {
 
   return (
     <section className="coai-glass p-5">
-      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Au restaurant</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Au restaurant</p>
+        <span className={`rounded-full border px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] ${hasPaidAccess ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-200" : "border-white/15 bg-white/[0.04] text-graphite-300"}`}>
+          {hasPaidAccess ? membershipLabel : "COAI Free"}
+        </span>
+      </div>
       <h2 className="mt-1.5 text-lg font-semibold text-white">📜 Scanner un menu</h2>
       <p className="mt-1 text-xs leading-5 text-graphite-400">
         Photographie la carte : COAI te propose deux plats cohérents avec ton objectif, et quoi demander au serveur.
@@ -97,6 +117,38 @@ export function MenuRestaurant() {
       >
         {chargement ? "Lecture de la carte…" : "Photographier le menu →"}
       </button>
+
+      {previewUrl && (
+        <div className="mt-3 flex items-center gap-3 rounded-xl border border-white/[0.08] bg-black/20 p-2.5" aria-live="polite">
+          {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local d'un fichier choisi, impossible à passer par next/image */}
+          <img src={previewUrl} alt="Aperçu du menu sélectionné" className="h-16 w-16 rounded-lg object-cover" />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-white">Aperçu du menu</p>
+            <p className="mt-0.5 text-xs text-graphite-400">
+              {chargement ? "Analyse en cours…" : erreur ? "Analyse impossible" : resultat ? "Analyse terminée" : !hasPaidAccess ? "Aperçu gratuit · analyse verrouillée" : "Image prête à analyser"}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {previewUrl && !hasPaidAccess && (
+        <div className="mt-3 rounded-xl border border-laiton-400/30 bg-laiton-400/[0.08] p-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-laiton-400/30 bg-laiton-400/10 text-laiton-200">
+              <LockKeyhole size={15} aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-white">Scanner IA verrouillé</p>
+              <p className="mt-1 text-xs leading-5 text-graphite-300">
+                L’aperçu du menu reste gratuit. La lecture et les recommandations sont disponibles avec Premium et Elite.
+              </p>
+              <Link href="/pricing" className="mt-2 inline-flex text-xs font-semibold text-laiton-200 underline-offset-2 hover:underline">
+                Débloquer le scanner →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {erreur && <p className="mt-3 text-xs text-red-400">{erreur}</p>}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MessageCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
@@ -62,6 +63,13 @@ export function ParrainageCard() {
     trackFunnelEvent("referral_link_shared", { support: "clipboard" });
   }
 
+  function partagerWhatsApp() {
+    if (!lien) return;
+    const text = `Je progresse avec COAI. Fais ton diagnostic gratuit et découvre ton programme personnalisé :\n${lien}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+    trackFunnelEvent("referral_link_shared", { support: "whatsapp" });
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <SectionLabel>Parrainage</SectionLabel>
@@ -90,6 +98,15 @@ export function ParrainageCard() {
               className="rounded-lg border border-laiton-400/30 px-4 py-2 text-sm font-medium text-laiton-300 transition hover:border-laiton-400/60 hover:text-laiton-200"
             >
               Partager
+            </button>
+            <button
+              type="button"
+              onClick={partagerWhatsApp}
+              aria-label="Partager mon lien COAI sur WhatsApp"
+              className="inline-flex items-center gap-2 rounded-lg border border-emerald-300/30 bg-emerald-400/[0.08] px-4 py-2 text-sm font-medium text-emerald-200 transition hover:border-emerald-300/55 hover:bg-emerald-400/[0.14]"
+            >
+              <MessageCircle size={16} strokeWidth={2} aria-hidden="true" />
+              WhatsApp
             </button>
           </div>
         )}

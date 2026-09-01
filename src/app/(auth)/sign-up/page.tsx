@@ -16,6 +16,7 @@ import {
   type IntendedPlan,
 } from "@/lib/checkout/intended-plan-cookie";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
 import Link from "next/link";
 
 // L'inscription reste gratuite et ne déclenche aucun paiement. Le choix
@@ -52,9 +53,11 @@ export default function SignUpPage() {
       ? planParam
       : null;
   const requestedBilling: IntendedBilling = searchParams.get("billing") === "ANNUAL" ? "ANNUAL" : "MONTHLY";
-  const pricingReturn = requestedPlan
+  const arriveDepuisInstagram = searchParams.get("source") === "instagram";
+  const requestedReturn = sanitizeReturnTo(searchParams.get("redirect_to"));
+  const destinationApresInscription = requestedPlan
     ? `/pricing?from=signin&selected=${requestedPlan}&billing=${requestedBilling}`
-    : "/pricing?from=signin";
+    : requestedReturn ?? "/pricing?from=signin";
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -73,7 +76,7 @@ export default function SignUpPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [prenom, setPrenom] = useState("");
+  const [prenom, setPrenom] = useState(() => searchParams.get("prenom") ?? "");
   // Pré-rempli si on vient du diagnostic public (/diagnostic), qui capture
   // déjà l'email juste avant de rediriger ici — évite de le ressaisir.
   const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
@@ -93,7 +96,11 @@ export default function SignUpPage() {
         password,
         options: {
           data: prenom ? { given_name: prenom } : undefined,
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: (() => {
+            const callbackUrl = new URL("/auth/callback", window.location.origin);
+            callbackUrl.searchParams.set("redirect_to", destinationApresInscription);
+            return callbackUrl.toString();
+          })(),
         },
       });
       if (signUpError) throw signUpError;
@@ -109,7 +116,7 @@ export default function SignUpPage() {
       // Confirmation déjà effective (email confirmation désactivée côté
       // Supabase) : le compte applicatif se crée sur /completer-inscription,
       // qui recueille RGPD/aptitude sportive puis appelle /api/compte/register.
-      window.location.href = "/completer-inscription";
+      window.location.href = `/completer-inscription?redirect_to=${encodeURIComponent(destinationApresInscription)}`;
     } catch (err) {
       console.error("[sign-up]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -146,18 +153,24 @@ export default function SignUpPage() {
           <div>
             <div className="coai-diagnostic-kicker">
               <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-            <span>Étape 3 · création du compte</span>
+              <span>
+                {arriveDepuisInstagram ? "Étape 1 sur 2 · compte puis Stripe" : "Après ton bilan · création du compte"}
+              </span>
             </div>
             <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
-              Entre dans ton espace COAI.
+              {arriveDepuisInstagram ? "Crée ton accès avant Stripe." : "Entre dans ton espace COAI."}
             </h1>
             <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
-              Ton résultat personnalisé est conservé. Crée gratuitement ton espace, puis choisis
-              tranquillement la formule qui te convient.
+              {arriveDepuisInstagram
+                ? "Instagram utilise une connexion séparée de Safari. Ton offre est conservée : crée ton accès ou connecte-toi, puis tu reviendras la confirmer avant Stripe."
+                : "Ton résultat personnalisé est conservé. Si tu viens du bilan express, tu accèdes d'abord au programme Mobilité totale offert."}
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {["Ton résultat conservé", "Compte gratuit", "Formule choisie ensuite"].map((item) => (
+            {(arriveDepuisInstagram
+              ? ["Ton offre conservée", "Connexion sécurisée", "Aucun débit aujourd'hui"]
+              : ["Ton résultat conservé", "Mobilité offerte", "Aucun paiement automatique"]
+            ).map((item) => (
               <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
             ))}
           </div>
@@ -169,7 +182,7 @@ export default function SignUpPage() {
             <h2 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h2>
             <p className="text-sm leading-6 text-graphite-400">Une minute suffit pour retrouver ton analyse.</p>
           </div>
-          <GoogleSignInButton redirectTo={pricingReturn} />
+          <GoogleSignInButton redirectTo={destinationApresInscription} />
           <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
             <div className="h-px flex-1 bg-graphite-800" />
             ou
@@ -205,7 +218,7 @@ export default function SignUpPage() {
           </form>
           <p className="text-sm text-graphite-400">
             Déjà un compte ?{" "}
-            <Link href={`/sign-in?redirect_to=${encodeURIComponent(pricingReturn)}`} className="underline">
+            <Link href={`/sign-in?redirect_to=${encodeURIComponent(destinationApresInscription)}`} className="underline">
               Se connecter
             </Link>
           </p>

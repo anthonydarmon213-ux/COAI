@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MuscleMap } from "@/components/programme/muscle-map";
 import { ExerciceVideo } from "@/components/programme/exercice-video";
-import { musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
@@ -84,7 +82,6 @@ export function ExerciceCard({
   // retirées : une absence est préférable à une démonstration trompeuse.
   const photoUrl = nom ? photoCoaiPourNom(nom) : null;
   const hasVideoReelle = Boolean(nom && videoCoaiPourNom(nom));
-  const cible = nom ? musclesPourExercice(nom) : null;
   const variantes = nom ? variantesPourExercice(nom) : [];
   const consignesLongues = CHAMPS.flatMap(({ cle, label }) => {
     const valeur = exercice[cle];
@@ -121,37 +118,19 @@ export function ExerciceCard({
         <h4 className="text-sm font-semibold text-graphite-50">{nom ?? "Exercice"}</h4>
       </div>
 
-      {/* Double vue (23/08/2026, demande Anthony) — anatomie à gauche,
-          repères d'exécution à droite. En colonne sur mobile : côte à côte
-          sous 640px, le schéma deviendrait trop petit pour distinguer les
-          faisceaux, ce qui est justement son intérêt.
-          Chaque moitié ne s'affiche que si elle a du contenu réel : un
-          mouvement non reconnu n'a pas de schéma (mieux vaut rien qu'un
-          schéma qui éclaire les mauvais muscles), et tous les exercices
-          générés n'ont pas encore de `phases`. */}
-      {(cible || phases.length === 3) && (
-        <div className={`grid gap-3 ${cible && phases.length === 3 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
-          {cible && (
-            <div className="coai-glass flex flex-col items-center justify-center px-3 py-4">
-              <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />
+      {phases.length === 3 && (
+        <div className="coai-glass flex flex-col gap-2.5 px-4 py-4">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-300">
+            Exécution · étape par étape
+          </p>
+          {phases.map((phase, i) => (
+            <div key={i} className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full border border-laiton-400/40 bg-laiton-400/10 font-mono text-[10px] font-bold text-laiton-200">
+                {i + 1}
+              </span>
+              <span className="text-[11px] leading-5 text-graphite-300">{phase}</span>
             </div>
-          )}
-
-          {phases.length === 3 && (
-            <div className="coai-glass flex flex-col gap-2.5 px-4 py-4">
-              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-300">
-                Exécution · étape par étape
-              </p>
-              {phases.map((phase, i) => (
-                <div key={i} className="flex items-start gap-2.5">
-                  <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full border border-laiton-400/40 bg-laiton-400/10 font-mono text-[10px] font-bold text-laiton-200">
-                    {i + 1}
-                  </span>
-                  <span className="text-[11px] leading-5 text-graphite-300">{phase}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       )}
 

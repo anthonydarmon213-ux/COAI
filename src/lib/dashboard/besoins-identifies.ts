@@ -15,8 +15,8 @@ export type BesoinIdentifie = {
 };
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
-  IMPULSION: { label: "Pass IA — 19,99€/mois ou 119€/an", href: "/pricing#impulsion" },
-  TRANSFORMATION: { label: "Coaching Hybride — 99€/mois", href: "/pricing#transformation" },
+  IMPULSION: { label: "Pass IA — 19,99€/mois ou 119€/an", href: "/pricing#pass-ia" },
+  TRANSFORMATION: { label: "Coaching Hybride — 99€/mois", href: "/pricing#coaching-hybride" },
   VIP: { label: "VIP — dès 199€/mois", href: "/pricing#vip" },
 };
 

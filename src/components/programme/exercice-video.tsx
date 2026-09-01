@@ -32,7 +32,7 @@ export function ExerciceVideo({ nom, className = "" }: { nom: string; className?
       {procheEcran ? (
         <video
           className="h-44 w-full bg-black object-contain"
-          src={urlVideoCoai(video.fichier)}
+          src={urlVideoCoai(video)}
           preload="metadata"
           autoPlay
           muted
@@ -46,7 +46,7 @@ export function ExerciceVideo({ nom, className = "" }: { nom: string; className?
         </div>
       )}
       <figcaption className="border-t border-white/[0.06] px-2.5 py-1.5 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-cyan-200/80">
-        Démonstration COAI · {video.description}
+        Démonstration réelle COAI · {video.description}
       </figcaption>
     </figure>
   );

@@ -110,8 +110,13 @@ export function ActivationFlow({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(reponses),
           });
-          clearDiagnosticAnswers();
-          if (res.ok) profilCourant = await res.json();
+          // Ne supprimer le diagnostic local qu'une fois son enregistrement
+          // réellement confirmé. En cas de coupure réseau ou d'erreur API,
+          // l'utilisateur peut ainsi reprendre sans perdre ses réponses.
+          if (res.ok) {
+            profilCourant = await res.json();
+            clearDiagnosticAnswers();
+          }
         }
 
         const calc = computeProfilCompletion(profilCourant);

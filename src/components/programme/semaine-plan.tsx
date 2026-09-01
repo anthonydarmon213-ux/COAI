@@ -15,6 +15,7 @@ export function SemainePlan({
   vueEnsembleLabel = "✨ Plan de ta semaine",
   jours,
   jourKey = "jour",
+  ouvrirPremierJour = true,
   labelJour,
   renderContenu,
 }: {
@@ -24,6 +25,7 @@ export function SemainePlan({
   vueEnsembleLabel?: string;
   jours: Record<string, unknown>[];
   jourKey?: string;
+  ouvrirPremierJour?: boolean;
   labelJour?: (jour: Record<string, unknown>, i: number) => string;
   renderContenu: (jour: Record<string, unknown>, i: number) => ReactNode;
 }) {
@@ -64,7 +66,7 @@ export function SemainePlan({
             return (
               <details
                 key={i}
-                open={i === 0}
+                open={ouvrirPremierJour && i === 0}
                 className="coai-week-day group overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02] transition duration-300 open:border-laiton-400/30 open:bg-white/[0.035] open:shadow-[0_0_0_1px_rgba(201,162,98,0.12),0_20px_50px_-30px_rgba(201,162,98,0.5)] hover:border-laiton-400/25"
               >
                 <summary className="flex cursor-pointer list-none items-center gap-3.5 p-4 marker:content-none">

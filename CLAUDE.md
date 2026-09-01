@@ -1,5 +1,20 @@
 # Notes stratégiques COAI
 
+## Règle permanente — médias et signature COAI (25/08/2026)
+
+Tout visuel d'exercice doit montrer exactement le mouvement annoncé. Ne jamais
+remplacer un exercice manquant par une photo générique ou une pose seulement
+approchante. Pour le TRX, les arrêts sur image issus des vidéos réelles validées
+par Anthony sont prioritaires sur les images générées.
+
+Chaque visuel affiché dans COAI porte systématiquement la signature COAI en bas
+à droite, discrète mais lisible. Pour les prochaines créations, ajouter aussi un
+petit emblème COAI naturel sur le haut gauche de la tenue quand le cadrage et la
+matière le permettent, sans logo tiers. Conserver la DA : fond sombre premium,
+or #D4AF37, cyan technologique, tenue noire. Produire une variante femme et une
+variante homme lorsque la technique exacte peut être garantie ; ne jamais créer
+une fausse parité avec un mouvement incorrect.
+
 ## Direction visuelle et programmes rentables (24/08/2026)
 
 Direction validée par Anthony : esthétique COAI premium sombre, pierre noire,

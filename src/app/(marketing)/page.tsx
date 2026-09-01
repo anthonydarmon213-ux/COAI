@@ -10,6 +10,7 @@ import { Reveal } from "@/components/marketing/reveal";
 import { AdaptatifIcon, SuiviIcon, ValidationIcon, SecuriteIcon } from "@/components/marketing/feature-icons";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { TrackConversion } from "@/components/analytics/track-conversion";
+import { NewsletterSignupSection } from "@/components/marketing/newsletter-signup";
 
 const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
 const DESCRIPTION =
@@ -50,7 +51,8 @@ const FAQ = [
   },
   {
     question: "Je peux résilier quand je veux ?",
-    reponse: "Oui. Les trois formules sont des abonnements mensuels sans engagement, résiliables à tout moment depuis ton compte.",
+    reponse:
+      "Oui. Les formules mensuelles sont sans engagement. Pour le Pass IA annuel, tu peux annuler le renouvellement depuis ton compte ; l'accès reste ouvert jusqu'à la fin de la période annuelle déjà réglée.",
   },
   {
     question: "Et si mon programme ne me convient pas ?",
@@ -103,7 +105,7 @@ const PARCOURS_PERSONAL_TRAINING = [
       "06 · Séance : technique, renforcement, cardio ou travail spécifique",
       "07 · Retour au calme : respiration, mobilité légère et récupération",
     ],
-    href: "/pricing#impulsion",
+    href: "/pricing#pass-ia",
     cta: "Commencer avec Pass IA",
     miseEnAvant: true,
   },
@@ -113,7 +115,7 @@ const PARCOURS_PERSONAL_TRAINING = [
     titre: "Ajouter le suivi humain",
     description: "Tu passes à Coaching Hybride seulement si tu veux un regard extérieur, des retours et des ajustements.",
     etapes: ["08 · Suivi : performances, sensations et douleurs consignées après chaque séance"],
-    href: "/pricing#transformation",
+    href: "/pricing#coaching-hybride",
     cta: "Découvrir Coaching Hybride",
     miseEnAvant: false,
   },
@@ -668,7 +670,7 @@ function LandingPageHistorique() {
             <Link href="/diagnostic" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-laiton-400 px-6 text-sm font-semibold text-graphite-950 transition hover:bg-laiton-300">
               Faire mon bilan COAI gratuit
             </Link>
-            <p className="mt-3 text-xs text-graphite-500">Gratuit · moins de 5 minutes · sans carte bancaire</p>
+            <p className="mt-3 text-xs text-graphite-500">Gratuit · moins de 2 minutes · sans carte bancaire</p>
           </div>
         </section>
       </Reveal>
@@ -781,6 +783,7 @@ function LandingPageHistorique() {
           <Link href="/diagnostic"><Button>Faire mon diagnostic offert</Button></Link>
           <Link href="/pricing"><Button variant="secondary">Voir les formules</Button></Link>
         </div>
+        <NewsletterSignupSection />
       </section>
       </Reveal>
     </main>
@@ -788,7 +791,7 @@ function LandingPageHistorique() {
 }
 
 const PARCOURS_COURT = [
-  ["01", "Bilan gratuit", "Moins de 5 minutes, sans carte bancaire."],
+  ["01", "Bilan gratuit", "Moins de 2 minutes, sans carte bancaire."],
   ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
   ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
   ["04", "Choix de la formule", "Pass IA, Coaching Hybride ou VIP."],
@@ -844,8 +847,14 @@ export default function LandingPage() {
             COAI transforme ton bilan en actions concrètes. Selon la formule choisie, Anthony apporte aussi son regard humain sur les décisions importantes.
           </p>
         </div>
-        <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20 sm:min-h-[420px]">
-          <Image src="/anthony-studio-premium.jpg" alt="Anthony Darmon, coach sportif diplômé d'État" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover object-[center_30%]" />
+        <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20 bg-graphite-950 sm:min-h-[420px]">
+          <Image
+            src="/anthony-trx-studio-premium.jpg"
+            alt="Anthony Darmon avec les sangles TRX dans la salle COAI"
+            fill
+            sizes="(max-width: 1024px) 100vw, 55vw"
+            className="object-cover object-[center_46%]"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </div>
       </section>
@@ -869,6 +878,7 @@ export default function LandingPage() {
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
         <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir une formule.</p>
         <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>
+        <NewsletterSignupSection />
       </section>
     </main>
   );

@@ -17,11 +17,12 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
+import { hasProgrammeAccess, getEffectivePlan, hasPaidSubscription, getMembershipLabel } from "@/lib/subscription/plan";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
-import { ProgrammeShareButton } from "@/components/programme/programme-share-button";
+import { ProgrammeShareButton, type CarteStory } from "@/components/programme/programme-share-button";
 import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 
@@ -78,6 +79,120 @@ const PDF_SLUG: Record<Pilier, string> = {
   RECUPERATION: "recuperation",
 };
 
+function lireObjet(valeur: unknown): Record<string, unknown> | null {
+  return typeof valeur === "object" && valeur !== null && !Array.isArray(valeur)
+    ? valeur as Record<string, unknown>
+    : null;
+}
+
+function lireTexte(valeur: unknown): string | null {
+  return typeof valeur === "string" && valeur.trim() ? valeur.trim() : null;
+}
+
+function lireValeur(valeur: unknown): string | null {
+  if (typeof valeur === "number" && Number.isFinite(valeur)) return String(valeur);
+  return lireTexte(valeur);
+}
+
+function avecUnite(valeur: unknown, unite: string, secours: string) {
+  const texte = lireValeur(valeur);
+  if (!texte) return secours;
+  return texte.toLowerCase().includes(unite.toLowerCase()) ? texte : `${texte} ${unite}`;
+}
+
+function lireListeObjets(valeur: unknown): Array<Record<string, unknown>> {
+  return Array.isArray(valeur)
+    ? valeur.map(lireObjet).filter((item): item is Record<string, unknown> => item !== null)
+    : [];
+}
+
+function raccourcir(texte: string, maximum: number) {
+  if (texte.length <= maximum) return texte;
+  const extrait = texte.slice(0, maximum - 1);
+  const derniereEspace = extrait.lastIndexOf(" ");
+  return `${extrait.slice(0, derniereEspace > maximum * 0.65 ? derniereEspace : maximum - 1).trim()}…`;
+}
+
+function assurerTroisActions(actions: string[], secours: string[]) {
+  return [...actions.filter(Boolean), ...secours].slice(0, 3);
+}
+
+function construireDonneesStory(
+  pilier: Pilier,
+  contenu: unknown,
+): Pick<CarteStory, "accroche" | "reperes" | "actions" | "invitation"> {
+  const programme = lireObjet(contenu) ?? {};
+  const vueEnsemble = lireTexte(programme.vueEnsemble);
+
+  if (pilier === "NUTRITION") {
+    const objectifs = lireObjet(programme.objectifsJournaliers) ?? {};
+    const conseils = lireListeObjets(programme.conseilsHabitudes)
+      .map((conseil) => lireTexte(conseil.conseil))
+      .filter((conseil): conseil is string => Boolean(conseil))
+      .map((conseil) => raccourcir(conseil, 72));
+
+    return {
+      accroche: raccourcir(vueEnsemble ?? "Des repères simples pour mieux manger sans peser chaque repas.", 125),
+      reperes: [
+        { label: "Calories", valeur: avecUnite(objectifs.calories, "kcal", "Adaptées") },
+        { label: "Protéines", valeur: avecUnite(objectifs.proteines, "g", "À chaque repas") },
+        { label: "Hydratation", valeur: raccourcir(avecUnite(objectifs.hydratation, "L", "1,5 à 2 L"), 22) },
+      ],
+      actions: assurerTroisActions(conseils, [
+        "Ajoute une source de protéines à chaque repas.",
+        "Mise sur des aliments simples et variés.",
+        "Bois régulièrement entre les repas.",
+      ]),
+      invitation: "Tu connais quelqu’un qui veut mieux manger sans tout peser ? Partage-lui ce plan.",
+    };
+  }
+
+  if (pilier === "RECUPERATION") {
+    const protocoles = lireListeObjets(programme.protocoles);
+    const actions = protocoles.map((protocole) => {
+      const nom = lireTexte(protocole.nom);
+      const duree = lireTexte(protocole.duree);
+      return [nom, duree].filter(Boolean).join(" · ");
+    }).filter(Boolean);
+
+    return {
+      accroche: raccourcir(vueEnsemble ?? "Récupère mieux aujourd’hui pour progresser durablement demain.", 125),
+      reperes: [
+        { label: "Protocoles", valeur: protocoles.length ? `${protocoles.length} au choix` : "Ciblés" },
+        { label: "Durée", valeur: lireTexte(protocoles[0]?.duree) ?? "5 à 15 min" },
+        { label: "Priorité", valeur: "Sommeil & mobilité" },
+      ],
+      actions: assurerTroisActions(actions, [
+        "Respire lentement pendant 5 minutes.",
+        "Relâche les zones les plus sollicitées.",
+        "Prépare une heure de coucher régulière.",
+      ]),
+      invitation: "Un proche a besoin de mieux récupérer ? Partage-lui cette routine simple.",
+    };
+  }
+
+  const seances = lireListeObjets(programme.seances);
+  const premiereSeance = seances[0] ?? {};
+  const exercices = lireListeObjets(premiereSeance.exercices);
+  const frequence = lireTexte(programme.frequenceParSemaine)
+    ?? (seances.length ? `${seances.length} séances / sem.` : "Rythme adapté");
+
+  return {
+    accroche: raccourcir(vueEnsemble ?? "Une séance claire, progressive et adaptée à ton niveau.", 125),
+    reperes: [
+      { label: "Fréquence", valeur: raccourcir(frequence, 22) },
+      { label: "Cycle", valeur: raccourcir(lireTexte(programme.dureeProgramme) ?? "4 semaines", 22) },
+      { label: "Séance", valeur: exercices.length ? `${exercices.length} exercices` : "Progressive" },
+    ],
+    actions: [
+      "Bloque tes séances dans ton agenda.",
+      "Note tes charges après chaque exercice.",
+      "Garde une technique propre avant d’alourdir.",
+    ],
+    invitation: "Tu connais quelqu’un qui veut reprendre l’entraînement ? Partage-lui ce plan.",
+  };
+}
+
 // Chaque pilier possède sa page dédiée. Le composant reste partagé pour
 // conserver la même qualité visuelle, mais il ne rend que le contenu demandé
 // par la route active : entraînement, alimentation ou récupération.
@@ -105,6 +220,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   ]);
 
   const plan = getEffectivePlan(user.subscription);
+  const hasPaidAccess = hasPaidSubscription(user.subscription);
+  const membershipLabel = getMembershipLabel(user.subscription);
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
   const indexPilierActif = PILIERS.indexOf(pilierActif);
   const aUnContenu = Boolean(valides[indexPilierActif] || derniers[indexPilierActif]);
@@ -169,6 +286,13 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
     const titre = (contenu as Record<string, unknown>).titre;
     return typeof titre === "string" && titre.trim() ? titre : etapes[index]?.sousTitre ?? "Programme prêt";
   });
+  const cartesStory: CarteStory[] = etapes.map((etape, index) => ({
+    numero: etape.numero,
+    label: LABELS[etape.pilier].toUpperCase(),
+    titre: titresApercu[index] ?? etape.sousTitre,
+    image: etape.image,
+    ...construireDonneesStory(etape.pilier, contenusAffiches[index]),
+  }));
 
   return (
     <div className="coai-programme-page flex flex-col gap-8">
@@ -187,13 +311,13 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 {heroParPilier[pilierActif].texte}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <ProgrammeShareButton cartes={[{
-                numero: etapeActive.numero,
-                label: LABELS[pilierActif].toUpperCase(),
-                titre: titresApercu[indexPilierActif] ?? etapeActive.sousTitre,
-                image: etapeActive.image,
-              }]} />
+            <div className="flex max-w-sm flex-col items-start gap-2 lg:items-end">
+              <ProgrammeShareButton cartes={cartesStory} />
+              <p className="text-left text-xs leading-5 text-graphite-400 lg:text-right">
+                Envoie cette fiche à un ami qui veut se remettre au sport.
+                Motivez-vous à deux — et tentez de gagner un coaching 1:1
+                offert.
+              </p>
             </div>
           </div>
 
@@ -213,6 +337,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
             className="group relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-black/30 sm:min-h-64"
           >
             <Image src={etapeActive.image} alt="" fill sizes="(max-width: 768px) 100vw, 900px" className="object-cover opacity-60 transition duration-500 group-hover:scale-[1.02] group-hover:opacity-75" />
+            <CoaiImageMark />
             <span className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" aria-hidden="true" />
             <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 sm:p-6">
               <span>
@@ -285,7 +410,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               </div>
               <div className="flex items-center gap-2">
                 {affiche && (
-                  <ProgrammePdfButton slug={PDF_SLUG[pilier]} label="Aperçu 1 page" />
+                  <ProgrammePdfButton slug={PDF_SLUG[pilier]} label="Télécharger le PDF" />
                 )}
               </div>
             </div>
@@ -353,8 +478,8 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                   "ajoute un composant bien visible en haut de page") — il
                   vivait sous la liste des repas, donc invisible sans
                   scroller toute la semaine. */}
-              {pilier === "NUTRITION" && <AnalysePhotoRepas />}
-              {pilier === "NUTRITION" && <MenuRestaurant />}
+              {pilier === "NUTRITION" && <AnalysePhotoRepas hasPaidAccess={hasPaidAccess} membershipLabel={membershipLabel} />}
+              {pilier === "NUTRITION" && <MenuRestaurant hasPaidAccess={hasPaidAccess} membershipLabel={membershipLabel} />}
 
               {(() => {
                 const contenu = affiche?.contenu ?? null;

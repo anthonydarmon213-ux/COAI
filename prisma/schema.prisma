@@ -10,23 +10,23 @@ datasource db {
 
 // Utilisateur applicatif, lié à l'identité gérée par Supabase Auth (auth.users.id)
 model User {
-  id             String    @id @default(uuid())
-  supabaseAuthId String    @unique
-  email          String    @unique
-  prenom         String?
-  nom            String?
-  dateNaissance  DateTime? @db.Date
-  phoneWhatsapp  String?   @unique
+  id                    String    @id @default(uuid())
+  supabaseAuthId        String    @unique
+  email                 String    @unique
+  prenom                String?
+  nom                   String?
+  dateNaissance         DateTime? @db.Date
+  phoneWhatsapp         String?   @unique
   // Photo choisie pour personnaliser l'accueil du dashboard. Stockée dans
   // le bucket privé progress-photos et servie uniquement par URL signée.
-  avatarPath     String?
-  consentRgpdAt  DateTime?
+  avatarPath            String?
+  consentRgpdAt         DateTime?
   // Certification santé recueillie à l'inscription : l'utilisateur déclare
   // être apte à la pratique sportive ou avoir consulté un médecin.
-  consentSanteAt DateTime?
+  consentSanteAt        DateTime?
   // Coach humain (Anthony Darmon) habilité à relire/valider les programmes
   // générés par l'IA avant qu'ils soient visibles par les abonnés.
-  isAdmin        Boolean   @default(false)
+  isAdmin               Boolean   @default(false)
   // Quota "coach IA" en palier Gratuit (4 questions/mois) — non utilisé
   // pour Standard/Premium (accès illimité). Fenêtre glissante de 30 jours
   // depuis coachQuestionsResetAt, pas un calendrier fixe.
@@ -37,8 +37,8 @@ model User {
   // Fenêtre glissante comme le quota coach, pas un calendrier fixe.
   generationsUsed       Int       @default(0)
   generationsResetAt    DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   // Attribution publicitaire (Phase 5B, 11/08/2026) — premier utm_* capturé
   // à l'arrivée (cookie, first-touch), rattaché au compte à l'inscription.
@@ -57,11 +57,11 @@ model User {
   // abonnement (coupon Stripe, cf. webhooks/stripe/route.ts).
   // recompenseParrainageAppliquee vit sur le FILLEUL : empêche une
   // notification Stripe rejouée de déclencher la récompense deux fois.
-  codeParrainage                String?  @unique
+  codeParrainage                String? @unique
   parraineParId                 String?
-  parrainePar                   User?    @relation("Parrainages", fields: [parraineParId], references: [id])
-  filleuls                      User[]   @relation("Parrainages")
-  recompenseParrainageAppliquee Boolean  @default(false)
+  parrainePar                   User?   @relation("Parrainages", fields: [parraineParId], references: [id])
+  filleuls                      User[]  @relation("Parrainages")
+  recompenseParrainageAppliquee Boolean @default(false)
 
   // Relance automatique des abonnés inactifs (09/08/2026, tous paliers
   // payants depuis le 11/08/2026) — sert uniquement à espacer les relances
@@ -111,27 +111,47 @@ model User {
   // génération et reste gérée par le modèle Subscription existant.
   programmeUnlockedAt DateTime?
 
-  subscription   Subscription?
-  profile        Profile?
-  programmes     ProgrammeGenerated[]
-  seances        SeanceLog[]
-  repasLogs      RepasLog[]
-  avis           Avis[]
-  mesures        Mesure[]
-  testsMaxi      TestMaxi[]
-  whatsappEvents WhatsAppEvent[]
-  weeklyCheckins WeeklyCheckin[]
-  adaptations    ProgrammeAdaptation[]
-  activitesJournalieres ActiviteJournaliere[]
-  dailySessions  DailySession[]
+  subscription             Subscription?
+  profile                  Profile?
+  programmes               ProgrammeGenerated[]
+  seances                  SeanceLog[]
+  repasLogs                RepasLog[]
+  avis                     Avis[]
+  mesures                  Mesure[]
+  testsMaxi                TestMaxi[]
+  whatsappEvents           WhatsAppEvent[]
+  weeklyCheckins           WeeklyCheckin[]
+  adaptations              ProgrammeAdaptation[]
+  activitesJournalieres    ActiviteJournaliere[]
+  dailySessions            DailySession[]
   recuperationsMusculaires RecuperationMusculaire[]
-  aiUsageEvents  AiUsageEvent[]
-  churnFeedback  ChurnFeedback?
-  coachNotesReceived CoachNote[] @relation("CoachNoteClient")
-  coachNotesAuthored CoachNote[] @relation("CoachNoteAuthor")
+  aiUsageEvents            AiUsageEvent[]
+  programmePurchases       ProgrammePurchase[]
+  churnFeedback            ChurnFeedback?
+  coachNotesReceived       CoachNote[]              @relation("CoachNoteClient")
+  coachNotesAuthored       CoachNote[]              @relation("CoachNoteAuthor")
 
   @@index([checkoutStartedAt, checkoutReminderSentAt])
   @@map("users")
+}
+
+// Achat permanent d'un pack de deux programmes prêts à l'emploi : un
+// programme choisi et un second offert dans le cadre de l'offre rentrée.
+// L'id de session Stripe rend le traitement webhook idempotent.
+model ProgrammePurchase {
+  id                      String   @id @default(uuid())
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programmePrincipal      String
+  programmeOffert         String
+  stripeCheckoutSessionId String   @unique
+  stripePaymentIntentId   String?  @unique
+  amountTotal             Int
+  currency                String   @default("eur")
+  createdAt               DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("programme_purchases")
 }
 
 // Notes de travail privées de l'espace coach. Elles ne sont jamais servies
@@ -223,31 +243,31 @@ enum DailyChargeMentale {
 // La séance source et sa version adaptée sont copiées ici : le contenu de
 // ProgrammeGenerated n'est jamais modifié par un check-in quotidien.
 model DailySession {
-  id                  String              @id @default(uuid())
-  userId              String
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date                DateTime            @db.Date
-  programmeSourceId   String?
-  programmeVersion    Int?
-  sourceSession       Json?
-  adaptedSession      Json?
-  adaptation          Json?
-  sleep               DailySleep?
-  energy              DailyEnergy?
-  chargeMentale       DailyChargeMentale?
+  id                String              @id @default(uuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              DateTime            @db.Date
+  programmeSourceId String?
+  programmeVersion  Int?
+  sourceSession     Json?
+  adaptedSession    Json?
+  adaptation        Json?
+  sleep             DailySleep?
+  energy            DailyEnergy?
+  chargeMentale     DailyChargeMentale?
   // Matériel disponible CE jour-là (22/08/2026) — distinct de
   // Profile.equipementDisponible (le matériel habituel). NULL = non
   // renseigné, la génération retombe alors sur celui du profil.
-  equipementDuJour    String?
-  pain                 Boolean?
-  painArea             String?
-  availableMinutes    Int?
-  completedAt         DateTime?
-  workoutRating       DailyWorkoutRating?
-  feedbackPain        Boolean?
-  feedbackComment     String?
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  equipementDuJour  String?
+  pain              Boolean?
+  painArea          String?
+  availableMinutes  Int?
+  completedAt       DateTime?
+  workoutRating     DailyWorkoutRating?
+  feedbackPain      Boolean?
+  feedbackComment   String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
   @@unique([userId, date])
   @@index([userId, date])
@@ -281,32 +301,32 @@ enum BillingInterval {
 }
 
 model Subscription {
-  id                   String             @id @default(uuid())
-  userId               String             @unique
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stripeCustomerId     String             @unique
-  stripeSubscriptionId String?            @unique
-  status               SubscriptionStatus @default(INCOMPLETE)
-  plan                 SubscriptionPlan   @default(STANDARD)
-  billingInterval      BillingInterval    @default(MONTHLY)
-  currentPeriodEnd     DateTime?
+  id                            String             @id @default(uuid())
+  userId                        String             @unique
+  user                          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId              String             @unique
+  stripeSubscriptionId          String?            @unique
+  status                        SubscriptionStatus @default(INCOMPLETE)
+  plan                          SubscriptionPlan   @default(STANDARD)
+  billingInterval               BillingInterval    @default(MONTHLY)
+  currentPeriodEnd              DateTime?
   // Fin de la période d'essai Stripe (7 jours). Null
   // hors essai — status reste "ACTIVE" pendant l'essai (trialing y est
   // mappé), donc c'est ce champ qui permet de distinguer "encore en essai"
   // de "déjà passé à 9€/mois".
-  trialEnd             DateTime?
+  trialEnd                      DateTime?
   // Rappel unique envoyé environ 48 h avant le premier prélèvement.
-  trialReminderSentAt  DateTime?
+  trialReminderSentAt           DateTime?
   // Relance d'activation unique pendant l'essai si aucun programme n'a été
   // généré dans les 24 premières heures.
   trialActivationReminderSentAt DateTime?
   // Dernier échec de prélèvement connu et relance de régularisation unique.
   // Aucun détail de carte ou moyen de paiement n'est conservé.
-  paymentFailedAt                DateTime?
+  paymentFailedAt               DateTime?
   paymentRecoveryReminderSentAt DateTime?
-  cancelAtPeriodEnd    Boolean            @default(false)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  cancelAtPeriodEnd             Boolean            @default(false)
+  createdAt                     DateTime           @default(now())
+  updatedAt                     DateTime           @updatedAt
 
   @@index([status, paymentFailedAt])
   @@map("subscriptions")
@@ -347,77 +367,77 @@ model BillingEvent {
 // Informations relativement stables (contrairement aux Mesure, qui suivent
 // leur évolution dans le temps).
 model Profile {
-  id                    String   @id @default(uuid())
-  userId                String   @unique
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  objectifs             String?
+  id                      String           @id @default(uuid())
+  userId                  String           @unique
+  user                    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objectifs               String?
   // Frustrations/points de départ cochés au diagnostic (ex: "Je ne sais pas
   // quoi faire à la salle", "Même programme depuis des années, sans
   // résultat") — distinct de objectifs (le but visé) : sert à identifier le
   // besoin réel plutôt que la destination, pour orienter vers le bon
   // service COAI sur le dashboard (14/08/2026).
-  persona               String?
+  persona                 String?
   // Style d'accompagnement choisi au diagnostic (16/08/2026, modèle
   // "Future" demandé par Anthony) — "IA_HOMME", "IA_FEMME" ou "ANTHONY" (pas
   // un enum rigide : d'autres coachs viendront s'ajouter si le modèle
   // marche, cf. section CLAUDE.md du même jour). Sert uniquement à orienter
   // la vitrine du dashboard, jamais à assigner automatiquement un vrai coach
   // humain (aucun système de ce type existe).
-  coachPreference       String?
-  niveau                String?
-  equipementDisponible  String?
+  coachPreference         String?
+  niveau                  String?
+  equipementDisponible    String?
   // Lieu d'entraînement habituel — distinct de l'équipement (Phase 5,
   // 11/08/2026) : deux personnes peuvent avoir le même matériel disponible
   // mais un lieu différent (ex: extérieur vs salle), ce qui change la
   // structure du programme (temps de trajet, disponibilité, ambiance).
-  lieuEntrainement      String?
+  lieuEntrainement        String?
   // Durée de séance visée, en minutes (Phase 5, 11/08/2026) — la génération
   // de programme utilisait jusque-là une durée implicite non renseignée par
   // l'utilisateur.
-  dureeSeanceMinutes    Int?
-  contraintesSante      String?
-  antecedentsMedicaux   String?
-  tailleCm              Float?
-  poidsKg               Float?
-  age                   Int?
-  sexe                  String?
-  morphologie           String?
-  frequenceEntrainement String?
-  sportsPratiques       String?
-  habitudesAlimentaires String?
+  dureeSeanceMinutes      Int?
+  contraintesSante        String?
+  antecedentsMedicaux     String?
+  tailleCm                Float?
+  poidsKg                 Float?
+  age                     Int?
+  sexe                    String?
+  morphologie             String?
+  frequenceEntrainement   String?
+  sportsPratiques         String?
+  habitudesAlimentaires   String?
   // Allergies, intolérances ou régime alimentaire particulier (végétarien,
   // sans gluten, sans lactose...) — distinct de contraintesSante/
   // antecedentsMedicaux qui couvrent la santé générale, pas l'alimentation.
-  allergiesAlimentaires String?
-  repasParJour          String?
-  hydratation           String?
-  consommationCafe      String?
-  consommationAlcool    String?
-  qualiteSommeil        String?
+  allergiesAlimentaires   String?
+  repasParJour            String?
+  hydratation             String?
+  consommationCafe        String?
+  consommationAlcool      String?
+  qualiteSommeil          String?
   // Données extraites automatiquement d'un screenshot de montre/app santé
   // connectée (cf. src/app/api/profil/montre/route.ts) — dernière analyse
   // écrase la précédente, pas d'historique conservé.
-  pasMoyenParJour           Int?
-  frequenceCardiaqueRepos   Int?
-  sommeilMoyenHeures        Float?
-  vo2Max                    Float?
-  caloriesMoyennesParJour   Int?
+  pasMoyenParJour         Int?
+  frequenceCardiaqueRepos Int?
+  sommeilMoyenHeures      Float?
+  vo2Max                  Float?
+  caloriesMoyennesParJour Int?
   // HRV (variabilité de fréquence cardiaque, en ms) — ajoutée Phase 3
   // (11/08/2026, "Données récupération" de la vision produit) : signal de
   // récupération/fatigue le plus direct parmi les métriques wearable
   // courantes, quand la montre l'affiche (Whoop, Oura, Garmin...).
-  hrv                       Float?
-  resumeMontre              String?
-  derniereAnalyseMontre     DateTime?
+  hrv                     Float?
+  resumeMontre            String?
+  derniereAnalyseMontre   DateTime?
   // Données extraites automatiquement d'une photo en tenue de sport (cf.
   // src/app/api/profil/photo-morphologie/route.ts) — observations
   // factuelles utiles à l'entraînement uniquement (posture, équilibre
   // musculaire apparent), jamais un jugement sur l'apparence. Dernière
   // analyse écrase la précédente, pas d'historique conservé, photo jamais
   // stockée.
-  morphologieDetectee       String?
-  observationsPosture       String?
-  derniereAnalysePhoto      DateTime?
+  morphologieDetectee     String?
+  observationsPosture     String?
+  derniereAnalysePhoto    DateTime?
   // Cycle menstruel / maternité (14/08/2026, demande Anthony suite à un
   // retour utilisatrice) — opt-in explicite, jamais présumé à partir du
   // sexe déclaré : cycleMenstruelSuivi doit être coché volontairement pour
@@ -425,10 +445,10 @@ model Profile {
   // (deviendrait obsolète en quelques jours) : calculée en code à partir de
   // dateDernieresRegles + dureeCycleJours (cf. src/lib/cycle/phase.ts),
   // moteur déterministe, aucun appel IA.
-  cycleMenstruelSuivi   Boolean?
-  dateDernieresRegles   DateTime?
-  dureeCycleJours       Int?
-  reglesDouloureuses    Boolean?
+  cycleMenstruelSuivi     Boolean?
+  dateDernieresRegles     DateTime?
+  dureeCycleJours         Int?
+  reglesDouloureuses      Boolean?
   // Grossesse / post-partum — garde-fou strict appliqué à la génération
   // (cf. /api/programmes/generate) : jamais de programme livré sans
   // relecture humaine pour ces statuts, quel que soit le palier choisi.
@@ -436,7 +456,7 @@ model Profile {
   // si POST_PARTUM — sert à calculer trimestre / semaines post-partum.
   statutMaternite         StatutMaternite?
   dateReferenceMaternite  DateTime?
-  updatedAt             DateTime @updatedAt
+  updatedAt               DateTime         @updatedAt
 
   @@map("profiles")
 }
@@ -521,10 +541,10 @@ model SeanceLog {
   // après la séance, distinct du champ libre "ressenti" existant (conservé
   // tel quel pour compatibilité avec les entrées déjà enregistrées). Sert de
   // signal d'entrée au moteur d'adaptation.
-  difficulte  Int?           // 1 (très facile) à 5 (très difficile)
-  energie     Int?           // 1 (à plat) à 5 (en pleine forme)
-  douleur     NiveauDouleur?
-  douleurZone String?
+  difficulte   Int? // 1 (très facile) à 5 (très difficile)
+  energie      Int? // 1 (à plat) à 5 (en pleine forme)
+  douleur      NiveauDouleur?
+  douleurZone  String?
   // Phase 2 (11/08/2026) : facultatif, alimente "Durée moyenne" dans "Ce
   // que COAI apprend sur toi" — absent sur toutes les séances déjà loguées,
   // donc cette conclusion ne s'affiche que si assez de séances récentes
@@ -579,21 +599,21 @@ model Avis {
 // Permet de la relancer par email même sans inscription immédiate (pas
 // d'envoi automatique pour l'instant, juste la capture).
 model DiagnosticLead {
-  id        String   @id @default(uuid())
-  email     String
+  id                       String    @id @default(uuid())
+  email                    String
   // Numéro de contact (16/08/2026, demande Anthony : "je veux avoir son
   // numéro de téléphone... pour le contacter par téléphone, par WhatsApp")
   // — collecté juste à côté de l'email sur la dernière étape du quiz,
   // jamais un champ obligatoire côté DB (un lead capturé avant ce
   // changement n'en a pas), surfacé dans la notification admin.
-  telephone String?
-  reponses  Json
-  createdAt DateTime @default(now())
+  telephone                String?
+  reponses                 Json
+  createdAt                DateTime  @default(now())
   // Protection contre les doubles envois (Phase 5.1, 11/08/2026) : posé
   // uniquement une fois l'email de résumé réellement envoyé avec succès —
   // avant d'en envoyer un nouveau pour la même adresse, on vérifie qu'aucun
   // lead récent (5 min) ne l'a déjà reçu (cf. /api/diagnostic-lead).
-  resultEmailSentAt DateTime?
+  resultEmailSentAt        DateTime?
   // Relance commerciale unique, envoyée 24 h après le diagnostic uniquement
   // si aucun compte ne correspond encore à cette adresse.
   conversionReminderSentAt DateTime?
@@ -604,24 +624,24 @@ model DiagnosticLead {
   // (invitation à échanger avec Anthony pour Transformation/VIP). Chacun ne
   // part jamais si un compte existe déjà pour cette adresse (même logique
   // stop-on-convert que conversionReminderSentAt) ni si optedOutAt est posé.
-  drip3SentAt DateTime?
-  drip5SentAt DateTime?
-  drip7SentAt DateTime?
+  drip3SentAt              DateTime?
+  drip5SentAt              DateTime?
+  drip7SentAt              DateTime?
   // Désinscription (RGPD/anti-spam) — posé sur toutes les lignes de cette
   // adresse dès qu'un clic sur le lien de désabonnement est vérifié
   // (cf. /api/diagnostic-lead/unsubscribe). Bloque tout envoi futur de la
   // séquence de nurture ; n'affecte jamais l'email de résultat lui-même
   // (transactionnel, déjà envoyé au moment où ce champ peut être posé).
-  optedOutAt DateTime?
+  optedOutAt               DateTime?
   // Attribution publicitaire (Phase 5B, 11/08/2026) — même principe que
   // User.utmSource et consorts, mais capturée dès le lead (avant même la
   // création de compte) : un visiteur qui ne convertit jamais reste
   // attribuable à sa source.
-  utmSource   String?
-  utmMedium   String?
-  utmCampaign String?
-  utmContent  String?
-  utmTerm     String?
+  utmSource                String?
+  utmMedium                String?
+  utmCampaign              String?
+  utmContent               String?
+  utmTerm                  String?
 
   @@index([email])
   @@index([createdAt])
@@ -860,31 +880,31 @@ enum StatutAdaptation {
 // affichable de façon uniforme quel que soit le type de changement :
 // [{ type: "LOAD"|"VOLUME"|"EXERCICE"|"CONTRAINTE", cible, avant, apres, raison }]
 model ProgrammeAdaptation {
-  id                    String             @id @default(uuid())
-  userId                String
-  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  pilier                Pilier
-  decision              DecisionAdaptation
-  confiance             Float?
-  changements           Json
-  resume                String
+  id                   String             @id @default(uuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pilier               Pilier
+  decision             DecisionAdaptation
+  confiance            Float?
+  changements          Json
+  resume               String
   // Références vers ProgrammeGenerated.id — pas de relation Prisma dédiée
   // (une seule ligne peut avoir besoin de pointer vers l'ancienne ET la
   // nouvelle version du même modèle ; deux relations nommées vers la même
   // table n'apportent pas de garantie supplémentaire ici, le lookup se fait
   // par id applicatif).
   programmePrecedentId String?
-  programmeSuivantId    String?
-  statut                StatutAdaptation   @default(APPLIQUEE)
-  noteCoach             String?
+  programmeSuivantId   String?
+  statut               StatutAdaptation   @default(APPLIQUEE)
+  noteCoach            String?
   // Métadonnées libres selon l'origine de l'adaptation (Phase 2, 11/08/2026)
   // — ex: { type: "VOYAGE", jours: 10, materiel: "Salle d'hôtel" } ou
   // { type: "DOULEUR", zone: "Épaule", intensite: "LEGERE" }. JSON plutôt
   // que des colonnes dédiées par type : la liste des contraintes ("Ma
   // semaine change") est amenée à s'étendre sans nouvelle migration à
   // chaque fois.
-  contexte              Json?
-  createdAt             DateTime           @default(now())
+  contexte             Json?
+  createdAt            DateTime           @default(now())
 
   @@index([userId, createdAt])
   @@map("programme_adaptations")
@@ -919,15 +939,15 @@ enum TypeTravail {
 // référence personnelle (moyenne 7j/28j) plutôt que de comparaison à un
 // objectif universel (10 000 pas) — cf. src/lib/neat/signaux.ts.
 model ActiviteJournaliere {
-  id          String          @id @default(uuid())
+  id          String         @id @default(uuid())
   userId      String
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date        DateTime        @db.Date
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime       @db.Date
   pas         Int?
-  source      SourceActivite  @default(SAISIE_MANUELLE)
+  source      SourceActivite @default(SAISIE_MANUELLE)
   typeJournee TypeJournee?
   typeTravail TypeTravail?
-  createdAt   DateTime        @default(now())
+  createdAt   DateTime       @default(now())
 
   @@unique([userId, date])
   @@index([userId, date])

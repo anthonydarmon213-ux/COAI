@@ -28,10 +28,10 @@ type EntreeVariante = EntreePhoto & {
 const VARIANTES: EntreeVariante[] = [
   { motifs: ["rowing trx", "rowing suspension", "rowing sangles"], femme: "suspension-rowing", homme: "trx-rowing-homme-coai", fichier: "suspension-rowing" },
   { motifs: ["pompes trx", "pompes suspension"], femme: "suspension-pompes", homme: "trx-pompes-homme-coai", fichier: "suspension-pompes" },
-  { motifs: ["extension triceps trx", "triceps suspension"], femme: "suspension-extension-triceps", homme: "trx-extension-triceps-homme-coai", fichier: "suspension-extension-triceps" },
+  { motifs: ["planche dynamique trx", "planche dynamique au trx", "gainage dynamique trx", "planche trx", "gainage trx", "gainage suspension"], femme: "suspension-gainage-planche", homme: "suspension-gainage-planche", fichier: "suspension-gainage-planche" },
   { motifs: ["fente arrière trx", "fente arriere trx", "fente trx", "fente suspension"], femme: "suspension-fente-arriere", homme: "trx-fente-arriere-homme-coai", fichier: "suspension-fente-arriere" },
-  { motifs: ["pistol squat assisté trx", "pistol squat assiste trx", "pistol squat trx"], homme: "trx-pistol-squat-homme-coai", fichier: "trx-pistol-squat-homme-coai" },
-  { motifs: ["montées de genoux trx", "montees de genoux trx", "montée de genou trx", "montee de genou trx"], homme: "trx-montee-genou-homme-coai", fichier: "trx-montee-genou-homme-coai" },
+  { motifs: ["pistol squat assisté trx", "pistol squat assiste trx", "pistol squat trx"], femme: "trx-pistol-squat-femme-coai", homme: "trx-pistol-squat-homme-coai", fichier: "trx-pistol-squat-homme-coai" },
+  { motifs: ["montées de genoux trx", "montees de genoux trx", "montée de genou trx", "montee de genou trx"], femme: "trx-montee-genou-femme-coai", homme: "trx-montee-genou-homme-coai", fichier: "trx-montee-genou-homme-coai" },
 ];
 
 const TABLE: EntreePhoto[] = [
@@ -61,6 +61,14 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["triangle yoga", "trikonasana", "triangle pose"], fichier: "yoga-06-triangle" },
   { motifs: ["pigeon yoga", "eka pada rajakapotasana", "pigeon pose"], fichier: "yoga-07-pigeon" },
   { motifs: ["savasana", "relaxation finale yoga", "corpse pose"], fichier: "yoga-08-savasana" },
+  { motifs: ["guerrier iii", "virabhadrasana iii", "warrior iii"], fichier: "yoga-10-guerrier-iii-homme" },
+  { motifs: ["guerrier i", "virabhadrasana i", "warrior i"], fichier: "yoga-09-guerrier-i-femme" },
+  { motifs: ["posture de la chaise", "chaise yoga", "utkatasana", "chair pose"], fichier: "yoga-11-chaise-femme" },
+  { motifs: ["demi-lune", "demi lune yoga", "ardha chandrasana", "half moon pose"], fichier: "yoga-12-demi-lune-homme" },
+  { motifs: ["posture de l'aigle", "aigle yoga", "garudasana", "eagle pose"], fichier: "yoga-13-aigle-homme" },
+  { motifs: ["posture du chameau", "chameau yoga", "ustrasana", "camel pose"], fichier: "yoga-14-chameau-femme" },
+  { motifs: ["posture du poisson", "poisson yoga", "matsyasana", "fish pose"], fichier: "yoga-15-poisson-homme" },
+  { motifs: ["flexion avant jambes écartées", "flexion avant jambes ecartees", "prasarita padottanasana", "wide-legged forward fold"], fichier: "yoga-16-flexion-avant-jambes-ecartees-femme" },
 
   { motifs: ["the hundred", "hundred pilates"], fichier: "pilates-01-the-hundred" },
   { motifs: ["roll-up", "roll up pilates"], fichier: "pilates-02-roll-up" },
@@ -70,17 +78,27 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["swimming pilates", "pilates swimming"], fichier: "pilates-06-swimming" },
   { motifs: ["bridge pilates", "pont pilates", "pilates bridge"], fichier: "pilates-07-bridge-pont-pilates" },
   { motifs: ["spine stretch forward", "étirement colonne pilates", "etirement colonne pilates"], fichier: "pilates-08-spine-stretch-forward" },
+  { motifs: ["single leg stretch", "étirement une jambe pilates", "etirement une jambe pilates"], fichier: "pilates-09-single-leg-stretch-femme" },
+  { motifs: ["double leg stretch", "étirement deux jambes pilates", "etirement deux jambes pilates"], fichier: "pilates-10-double-leg-stretch-homme" },
+  { motifs: ["criss-cross pilates", "criss cross pilates"], fichier: "pilates-11-criss-cross-femme" },
+  { motifs: ["scissors pilates", "ciseaux pilates"], fichier: "pilates-12-scissors-homme" },
+  { motifs: ["corkscrew pilates", "tire-bouchon pilates", "tire bouchon pilates"], fichier: "pilates-13-corkscrew-homme" },
+  { motifs: ["kneeling side kick", "side kick à genoux", "side kick a genoux"], fichier: "pilates-14-side-kick-kneeling-femme" },
+  { motifs: ["saw pilates", "la scie pilates"], fichier: "pilates-15-saw-femme" },
+  { motifs: ["seal pilates", "le phoque pilates"], fichier: "pilates-16-seal-homme" },
 
   // Compléments parité & catalogue (25/08/2026) — nouveaux visuels COAI
   // générés dans la même DA premium. Les noms exacts du catalogue passent
   // avant les motifs plus larges (« rowing », « tirage », « curl », etc.).
-  { motifs: ["tirage horizontal (machine)", "tirage horizontal machine", "seated cable row"], fichier: "tirage-horizontal-machine" },
-  { motifs: ["tirage vertical (poulie)", "tirage vertical poulie", "lat pulldown"], fichier: "tirage-vertical-poulie" },
+  { motifs: ["tirage horizontal (machine)", "tirage horizontal machine", "seated cable row"], fichier: "tirage-horizontal-machine-premium-v2" },
+  { motifs: ["tirage vertical (poulie)", "tirage vertical poulie", "lat pulldown"], fichier: "tirage-vertical-poulie-premium-v2" },
+  { motifs: ["traction guidée (machine)", "traction guidee machine", "traction assistée machine", "traction assistee machine", "assisted pull up machine", "assisted pull-up machine"], fichier: "traction-guidee-machine-premium-v2" },
   { motifs: ["curl marteau", "hammer curl"], fichier: "curl-marteau-homme-blond" },
-  { motifs: ["presse à cuisses (machine)", "presse a cuisses machine", "leg press"], fichier: "presse-a-cuisses-machine" },
+  { motifs: ["presse à cuisses (machine)", "presse a cuisses machine", "presse à cuisses", "presse a cuisses", "leg press"], fichier: "presse-a-cuisses-machine-premium-v2" },
+  { motifs: ["rowing poulie basse", "tirage poulie basse", "low cable row"], fichier: "tirage-horizontal-machine-premium-v2" },
   { motifs: ["hip thrust barre", "barbell hip thrust"], fichier: "hip-thrust-barre" },
   { motifs: ["rowing haltère unilatéral", "rowing haltere unilateral", "one arm dumbbell row", "single arm dumbbell row"], fichier: "rowing-haltere-unilateral-homme-arabe" },
-  { motifs: ["traction à la barre fixe", "traction a la barre fixe", "tractions barre fixe", "pull-up", "pull up"], fichier: "traction-barre-fixe-femme-blonde" },
+  { motifs: ["traction à la barre fixe", "traction a la barre fixe", "traction barre fixe", "tractions barre fixe", "pull-up", "pull up"], fichier: "traction-barre-fixe-femme-blonde" },
   { motifs: ["rowing à l'élastique", "rowing a l'elastique", "rowing élastique", "rowing elastique", "resistance band row"], fichier: "rowing-elastique-homme-blond" },
   { motifs: ["pompes", "pompe au sol", "push-up", "push up"], fichier: "pompes-femme-eurasienne" },
 
@@ -89,7 +107,7 @@ const TABLE: EntreePhoto[] = [
   // exercices actuellement publiés dans la bibliothèque.
   { motifs: ["curl biceps haltères", "curl biceps halteres", "dumbbell bicep curl"], fichier: "curl-biceps-halteres-femme-metisse-v2" },
   { motifs: ["curl barre ez", "ez-bar curl", "ez bar curl"], fichier: "curl-barre-ez-homme-metis-v2" },
-  { motifs: ["squat poids du corps", "bodyweight squat"], fichier: "squat-poids-du-corps-femme-metisse-v2" },
+  { motifs: ["air squat", "squat poids du corps", "bodyweight squat"], fichier: "squat-poids-du-corps-femme-metisse-v2" },
   { motifs: ["pont fessier", "glute bridge"], fichier: "pont-fessier-homme-metis-v2" },
   { motifs: ["mollets debout (machine)", "mollets debout machine", "standing calf raise machine"], fichier: "mollets-debout-machine-femme-metisse-v2" },
   { motifs: ["mollets assis (machine)", "mollets assis machine", "seated calf raise machine"], fichier: "mollets-assis-machine-homme-metis-v2" },
@@ -98,7 +116,7 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["marche sur pointes", "walking on toes"], fichier: "marche-sur-pointes-femme-metisse-v2" },
 
   { motifs: ["fentes avant", "fente avant", "fentes haltères", "lunge"], fichier: "fentes-avant-halteres" },
-  { motifs: ["leg curl", "ischio"], fichier: "leg-curl-allonge" },
+  { motifs: ["leg curl", "ischio"], fichier: "leg-curl-machine-premium-v2" },
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split", "split squat"], fichier: "fentes-bulgares" },
   { motifs: ["kickback"], fichier: "kickback-fessier-elastique" },
   { motifs: ["abduction"], fichier: "abduction-hanche-elastique" },
@@ -108,7 +126,7 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["gainage latéral", "gainage lateral", "side plank"], fichier: "gainage-lateral" },
   { motifs: ["gainage planche", "planche", "plank"], fichier: "gainage-planche" },
   { motifs: ["crunch"], fichier: "crunch-au-sol" },
-  { motifs: ["relevé de jambes", "releve de jambes", "hanging leg raise"], fichier: "releve-jambes-suspendu" },
+  { motifs: ["relevé de genoux", "releve de genoux", "hanging knee raise", "relevé de jambes", "releve de jambes", "hanging leg raise"], fichier: "releve-jambes-suspendu" },
   { motifs: ["russian twist"], fichier: "russian-twist" },
   { motifs: ["roue abdominale", "ab wheel", "ab roller"], fichier: "roue-abdominale" },
 
@@ -121,7 +139,7 @@ const TABLE: EntreePhoto[] = [
   // second les pectoraux — deux exercices et deux photos distinctes.
   { motifs: ["dips sur banc", "dips banc", "bench dips"], fichier: "dips-banc-triceps" },
   { motifs: ["dips"], fichier: "dips-pectoraux" },
-  { motifs: ["développé incliné", "developpe incline", "incline press"], fichier: "developpe-incline-machine" },
+  { motifs: ["développé incliné (machine)", "developpe incline machine", "incline chest press machine"], fichier: "developpe-incline-machine" },
   { motifs: ["développé arnold", "developpe arnold", "arnold press"], fichier: "developpe-arnold" },
   { motifs: ["développé militaire", "developpe militaire", "shoulder press", "overhead press"], fichier: "developpe-militaire-halteres" },
   { motifs: ["élévations latérales", "elevations laterales", "lateral raise"], fichier: "elevations-laterales" },
@@ -131,7 +149,7 @@ const TABLE: EntreePhoto[] = [
   // Extension triceps : la variante au-dessus de la tête d'abord, sinon le
   // motif "extension triceps" de la poulie capterait les deux.
   { motifs: ["extension triceps haltère", "extension triceps haltere", "au-dessus de la tête", "overhead triceps"], fichier: "extension-triceps-dessus-tete" },
-  { motifs: ["extension triceps", "triceps poulie", "pushdown"], fichier: "extension-triceps-poulie" },
+  { motifs: ["extension triceps", "triceps poulie", "pushdown"], fichier: "extension-triceps-poulie-premium-v2" },
   { motifs: ["sauts à la corde", "sauts a la corde", "corde à sauter", "corde a sauter", "jump rope"], fichier: "sauts-corde" },
 
   // Troisième lot (24/08/2026) — mobilité, Hyrox, suspension, kettlebell.
@@ -143,11 +161,11 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["chat-vache", "chat vache", "cat cow"], fichier: "mobilite-chat-vache-flexion" },
   { motifs: ["rotation thoracique"], fichier: "mobilite-rotation-thoracique-allongee" },
   { motifs: ["fente basse", "ouverture de hanche", "ouverture hanche"], fichier: "mobilite-fente-basse-ouverture-hanche" },
-  { motifs: ["étirement ischio", "etirement ischio"], fichier: "mobilite-etirement-ischio-debout-banc" },
+  // Visuel ischio debout rejeté : aucun remplacement par un autre geste.
   { motifs: ["posture de l'enfant", "posture enfant", "child pose"], fichier: "mobilite-posture-enfant" },
   { motifs: ["étirement pectoraux", "etirement pectoraux"], fichier: "mobilite-etirement-pectoraux-cadre-porte" },
   { motifs: ["étirement fessier", "etirement fessier"], fichier: "mobilite-etirement-fessier-assis" },
-  { motifs: ["mobilité cheville", "mobilite cheville"], fichier: "mobilite-cheville-fente" },
+  { motifs: ["squat profond assisté", "squat profond assiste", "mobilité hanches chevilles", "mobilite hanches chevilles"], fichier: "mobilite-squat-profond-assiste-homme-metis" },
   { motifs: ["ouverture d'épaules", "ouverture epaules", "épaules bâton"], fichier: "mobilite-ouverture-epaules-baton" },
   { motifs: ["psoas"], fichier: "mobilite-etirement-psoas-fente" },
 
@@ -163,8 +181,7 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["squat trx", "squat suspension"], fichier: "suspension-squat" },
   { motifs: ["fente trx", "fente suspension", "fente arrière trx"], fichier: "suspension-fente-arriere" },
   { motifs: ["curl trx", "curl suspension"], fichier: "suspension-curl-biceps" },
-  { motifs: ["extension triceps trx", "triceps suspension"], fichier: "suspension-extension-triceps" },
-  { motifs: ["gainage trx", "planche trx", "gainage suspension"], fichier: "suspension-gainage-planche" },
+  { motifs: ["planche dynamique trx", "planche dynamique au trx", "gainage dynamique trx", "planche trx", "gainage trx", "gainage suspension"], fichier: "suspension-gainage-planche" },
   { motifs: ["curl ischio trx", "ischio suspension", "curl ischio glissé"], fichier: "suspension-curl-ischio" },
 
   // FORCE BARRE & HALTÈRES (24/08/2026) — développés, deadlifts, squats.
@@ -189,7 +206,7 @@ const TABLE: EntreePhoto[] = [
   // Squats barre — "front squat" avant "squat" générique, variantes rares en fin.
   { motifs: ["box squat"], fichier: "box-squat-barre" },
   { motifs: ["overhead squat", "squat au-dessus de la tête"], fichier: "overhead-squat-barre" },
-  { motifs: ["zercher squat", "zercher"], fichier: "zercher-squat-barre" },
+  // Visuel Zercher rejeté : aucun back/front squat utilisé à sa place.
   { motifs: ["hack squat"], fichier: "hack-squat-machine" },
   { motifs: ["front squat"], fichier: "front-squat-barre" },
   { motifs: ["back squat", "squat barre", "squat arrière"], fichier: "back-squat-barre" },
@@ -215,7 +232,10 @@ function normaliser(nom: string) {
   return nom
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[’‘ʼ`]/g, "'")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 function correspond(entree: EntreePhoto, normalise: string) {

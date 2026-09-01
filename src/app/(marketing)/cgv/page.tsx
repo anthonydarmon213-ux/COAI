@@ -7,10 +7,10 @@ export const metadata = {
 
 export default function CgvPage() {
   return (
-    <LegalPage label="Contrat" titre="Conditions générales de vente" majLe="17 août 2026">
+    <LegalPage label="Contrat" titre="Conditions générales de vente" majLe="27 août 2026">
       <section>
         <h2>1. Objet</h2>
-        <p>Les présentes conditions régissent les abonnements COAI proposés par Anthony Darmon, auto-entrepreneur (SIRET 53438541400030). Le diagnostic est offert. Toute souscription payante implique l&apos;acceptation des présentes conditions.</p>
+        <p>Les présentes conditions régissent les abonnements et achats de programmes numériques COAI proposés par Anthony Darmon, auto-entrepreneur (SIRET 53438541400030). Le diagnostic est offert. Toute commande payante implique l&apos;acceptation des présentes conditions.</p>
       </section>
       <section>
         <h2>2. Abonnements proposés</h2>
@@ -22,27 +22,32 @@ export default function CgvPage() {
         <p>Une transformation privée plus longue ou plus intensive fait l&apos;objet d&apos;un échange préalable et d&apos;une proposition personnalisée. Le détail à jour figure sur la page <a href="/pricing">Tarifs</a>.</p>
       </section>
       <section>
-        <h2>3. Essai, prix et paiement</h2>
-        <p>Les prix sont indiqués en euros toutes taxes comprises. Pass IA et Coaching Hybride comprennent 7 jours d&apos;essai avec moyen de paiement requis. Sauf résiliation avant la fin de l&apos;essai, la facturation mensuelle débute automatiquement. VIP est facturé dès la souscription. Les paiements et renouvellements sont traités par Stripe ; COAI ne stocke pas les données bancaires.</p>
+        <h2>3. Programmes à l&apos;unité — offre rentrée</h2>
+        <p>Un utilisateur peut acheter un programme prêt à l&apos;emploi sans souscrire d&apos;abonnement. Le tarif de lancement du pack est de 19€ TTC en paiement unique. Pendant l&apos;offre rentrée affichée sur le site, l&apos;acheteur choisit un second programme distinct offert au moment de la commande. Les deux programmes restent accessibles dans son compte sans renouvellement automatique.</p>
+        <p>L&apos;offre s&apos;applique en une seule commande aux deux programmes sélectionnés avant le paiement. Le programme offert n&apos;est ni échangeable contre de l&apos;argent ni cumulable avec un programme déjà détenu.</p>
       </section>
       <section>
-        <h2>4. Durée et résiliation</h2>
-        <p>Chaque formule est un abonnement mensuel sans engagement de durée, renouvelé automatiquement. Il peut être résilié à tout moment depuis l&apos;espace personnel. La résiliation prend effet à la fin de la période en cours ; aucun remboursement au prorata n&apos;est dû, sauf disposition légale contraire.</p>
+        <h2>4. Essai, prix et paiement</h2>
+        <p>Les prix sont indiqués en euros toutes taxes comprises. Pass IA et Coaching Hybride comprennent 7 jours d&apos;essai avec moyen de paiement requis. Sauf annulation avant la fin de l&apos;essai, le premier prélèvement est effectué selon le rythme choisi : 19,99€ par mois ou 119€ par an pour Pass IA, 99€ par mois pour Coaching Hybride. VIP est facturé dès la souscription. Les achats à l&apos;unité sont débités immédiatement et ne se renouvellent pas. Les paiements et renouvellements sont traités par Stripe ; COAI ne stocke pas les données bancaires.</p>
       </section>
       <section>
-        <h2>5. Séances VIP</h2>
+        <h2>5. Durée et résiliation</h2>
+        <p>Les formules mensuelles sont renouvelées chaque mois sans durée minimale. Le Pass IA annuel est facturé 119€ pour une période de douze mois et renouvelé annuellement. Le renouvellement peut être annulé à tout moment depuis l&apos;espace personnel ; l&apos;accès reste alors disponible jusqu&apos;à la fin de la période déjà réglée. Aucun remboursement au prorata n&apos;est dû, sauf disposition légale contraire.</p>
+      </section>
+      <section>
+        <h2>6. Séances VIP</h2>
         <p>Les séances incluses correspondent au rythme sélectionné lors de la souscription. Leur date, leur lieu et leur format sont convenus directement avec Anthony Darmon, sous réserve de disponibilité. Les conditions de report ou d&apos;annulation applicables sont communiquées lors de la confirmation du créneau.</p>
       </section>
       <section>
-        <h2>6. Accès immédiat et rétractation</h2>
-        <p>L&apos;utilisateur demande l&apos;accès immédiat aux fonctionnalités numériques de COAI. Conformément au droit applicable, il reconnaît que les services déjà pleinement exécutés avec son accord peuvent ne plus être éligibles au droit de rétractation. Cette disposition ne limite pas la faculté de résilier l&apos;abonnement pour les périodes futures.</p>
+        <h2>7. Accès immédiat et rétractation</h2>
+        <p>Avant l&apos;achat d&apos;un programme à l&apos;unité, l&apos;utilisateur demande expressément que la fourniture du contenu numérique commence immédiatement et reconnaît expressément perdre son droit de rétractation dès sa mise à disposition. Sans cet accord, l&apos;achat et l&apos;accès immédiat ne peuvent pas être finalisés. Pour les abonnements, cette disposition ne limite pas la faculté de résilier les périodes futures.</p>
       </section>
       <section>
-        <h2>7. Nature du service et santé</h2>
+        <h2>8. Nature du service et santé</h2>
         <p>COAI fournit des recommandations sportives personnalisées à partir des informations déclarées par l&apos;utilisateur. Elles ne constituent ni un diagnostic médical ni un traitement et ne remplacent pas l&apos;avis d&apos;un professionnel de santé. En cas de douleur, pathologie, antécédent ou doute, l&apos;utilisateur doit demander un avis médical avant de pratiquer.</p>
       </section>
       <section>
-        <h2>8. Responsabilité et litiges</h2>
+        <h2>9. Responsabilité et litiges</h2>
         <p>COAI met en œuvre les moyens raisonnables pour assurer la disponibilité du service, sans garantir un résultat sportif. Les présentes conditions sont soumises au droit français. En cas de litige, une solution amiable sera recherchée avant toute action judiciaire.</p>
       </section>
     </LegalPage>

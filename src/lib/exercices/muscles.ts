@@ -42,7 +42,7 @@ const REGLES: Regle[] = [
     muscles: ["gluteal", "hamstring"], vue: "back" },
   { motifs: ["mollet", "calf"], muscles: ["calves"], vue: "back" },
   // — Tronc
-  { motifs: ["gainage", "planche", "plank", "crunch", "relevé de jambes", "releve de jambes", "roue abdominale", "ab wheel", "sit-up"],
+  { motifs: ["gainage", "planche", "plank", "crunch", "relevé de genoux", "releve de genoux", "relevé de jambes", "releve de jambes", "roue abdominale", "ab wheel", "sit-up"],
     muscles: ["abs"], vue: "front" },
   { motifs: ["russian twist", "oblique", "gainage latéral", "side plank"],
     muscles: ["obliques", "abs"], vue: "front" },

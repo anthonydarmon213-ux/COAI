@@ -1,6 +1,7 @@
 import { JsonView } from "@/components/programme/json-view";
 import Image from "next/image";
 import { ContreIndications } from "@/components/programme/contre-indications";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 
 import { photoRecuperationPourTexte } from "@/lib/recuperation/photos-recuperation";
 
@@ -64,6 +65,7 @@ export function RecuperationView({
           <div className="relative h-52 overflow-hidden bg-black sm:h-64">
             <Image src={photoJourUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 760px" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
+            <CoaiImageMark />
             <div className="absolute bottom-4 left-4 right-4">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
                 Récupération du jour
@@ -125,13 +127,16 @@ export function RecuperationView({
               return (
                 <article key={`${nom}-${index}`} className="coai-glass overflow-hidden rounded-2xl">
                   {photo && (
-                    <Image
-                      src={photo}
-                      alt=""
-                      width={900}
-                      height={675}
-                      className="h-36 w-full object-cover"
-                    />
+                    <div className="relative">
+                      <Image
+                        src={photo}
+                        alt=""
+                        width={900}
+                        height={675}
+                        className="h-36 w-full object-cover"
+                      />
+                      <CoaiImageMark />
+                    </div>
                   )}
                   <div className="flex flex-col gap-2 p-4">
                     <div className="flex items-start justify-between gap-3">

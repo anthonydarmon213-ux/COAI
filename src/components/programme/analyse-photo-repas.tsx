@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { LockKeyhole } from "lucide-react";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 type Resultat = {
@@ -20,16 +22,28 @@ type Resultat = {
 // (check-in repas prévu/écart) et du plan nutrition généré par l'IA — rien
 // n'est enregistré ici, c'est une estimation à la demande, jamais une donnée
 // de suivi durable (V1 volontairement simple).
-export function AnalysePhotoRepas() {
+export function AnalysePhotoRepas({ hasPaidAccess, membershipLabel }: { hasPaidAccess: boolean; membershipLabel: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultat, setResultat] = useState<Resultat | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!previewUrl) return;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
 
   async function handleFile(file: File) {
+    const nextPreviewUrl = URL.createObjectURL(file);
+    setPreviewUrl(nextPreviewUrl);
     setLoading(true);
     setError(null);
     setResultat(null);
+    if (!hasPaidAccess) {
+      setLoading(false);
+      return;
+    }
     try {
       const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
@@ -47,9 +61,14 @@ export function AnalysePhotoRepas() {
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
-        📷 Analyse ton plat
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
+          📷 Analyse ton plat
+        </p>
+        <span className={`rounded-full border px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] ${hasPaidAccess ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-200" : "border-white/15 bg-white/[0.04] text-graphite-300"}`}>
+          {hasPaidAccess ? membershipLabel : "COAI Free"}
+        </span>
+      </div>
       <p className="text-sm leading-6 text-graphite-300">
         Prends ton assiette en photo, COAI estime les calories et macros. Une estimation visuelle
         rapide, pas une mesure exacte de laboratoire.
@@ -75,6 +94,38 @@ export function AnalysePhotoRepas() {
       >
         {loading ? "Analyse en cours…" : "Prendre une photo de mon plat"}
       </button>
+
+      {previewUrl && (
+        <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-black/20 p-2.5" aria-live="polite">
+          {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local d'un fichier choisi, impossible à passer par next/image */}
+          <img src={previewUrl} alt="Aperçu du plat sélectionné" className="h-16 w-16 rounded-lg object-cover" />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-white">Aperçu de ton image</p>
+            <p className="mt-0.5 text-xs text-graphite-400">
+              {loading ? "Analyse en cours…" : error ? "Analyse impossible" : resultat ? "Analyse terminée" : !hasPaidAccess ? "Aperçu gratuit · analyse verrouillée" : "Image prête à analyser"}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {previewUrl && !hasPaidAccess && (
+        <div className="rounded-xl border border-laiton-400/30 bg-laiton-400/[0.08] p-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-laiton-400/30 bg-laiton-400/10 text-laiton-200">
+              <LockKeyhole size={15} aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-white">Analyse IA verrouillée</p>
+              <p className="mt-1 text-xs leading-5 text-graphite-300">
+                Ton aperçu est gratuit. L’estimation des calories, macros et le conseil COAI sont disponibles avec Premium et Elite.
+              </p>
+              <Link href="/pricing" className="mt-2 inline-flex text-xs font-semibold text-laiton-200 underline-offset-2 hover:underline">
+                Débloquer l’analyse →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 

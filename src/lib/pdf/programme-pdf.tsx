@@ -415,7 +415,7 @@ function EntrainementBody({ data, exerciseImages }: { data: Record<string, unkno
         </View>
       )}
       {Array.isArray(seances) &&
-        seances.slice(0, 1).map((seance, i) => {
+        seances.map((seance, i) => {
           const nom = typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`;
           const jour = typeof seance.jour === "string" ? seance.jour : undefined;
           const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
@@ -427,7 +427,7 @@ function EntrainementBody({ data, exerciseImages }: { data: Record<string, unkno
               {echauffement && <Text style={styles.paragraph}>Échauffement · {echauffement.slice(0, 180)}{echauffement.length > 180 ? "…" : ""}</Text>}
               {exercices.length > 0 && (
                 <View style={styles.exercicesGrid}>
-                  {exercices.slice(0, 6).map((ex, j) => {
+                  {exercices.map((ex, j) => {
                     const nomExercice = isPlainObject(ex) && typeof ex.nom === "string" ? ex.nom : "";
                     return <PdfExercice key={j} exercice={ex} imageUrl={exerciseImages?.[nomExercice]} />;
                   })}
@@ -465,7 +465,7 @@ function NutritionBody({ data }: { data: Record<string, unknown> }) {
         </View>
       )}
       {Array.isArray(jours) &&
-        jours.slice(0, 1).map((jourData, i) => {
+        jours.map((jourData, i) => {
           const jourNom = typeof jourData.jour === "string" ? jourData.jour : `Jour ${i + 1}`;
           const repas = Array.isArray(jourData.repas) ? jourData.repas : null;
           const { repas: _repas, jour: _jour, ...reste } = jourData;
@@ -475,7 +475,7 @@ function NutritionBody({ data }: { data: Record<string, unknown> }) {
             <View key={i} style={styles.jourBlock}>
               <JourHeader index={i} titre={jourNom} />
               {repas
-                ? repas.slice(0, 4).map((r, ri) => (
+                ? repas.map((r, ri) => (
                     <View key={ri} style={styles.subCard}>
                       <PdfKeyValue data={r} />
                     </View>
@@ -496,7 +496,7 @@ function RecuperationBody({ data }: { data: Record<string, unknown> }) {
   return (
     <>
       {Array.isArray(jours) &&
-        jours.slice(0, 2).map((jourData, i) => {
+        jours.map((jourData, i) => {
           const jour = typeof jourData.jour === "string" ? jourData.jour : `Jour ${i + 1}`;
           const type = typeof jourData.type === "string" ? jourData.type : undefined;
           const { jour: _jour, type: _type, ...reste } = jourData;
@@ -599,7 +599,7 @@ export function ProgrammePdf({
 
   return (
     <Document title={`COAI — Programme ${PILIER_LABEL[pilier]}`}>
-      <Page size="A4" style={styles.page} wrap={false}>
+      <Page size="A4" style={styles.page}>
         <HeaderFixed pilier={pilier} prenom={prenom} dateFormatee={dateFormatee} />
 
         <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>

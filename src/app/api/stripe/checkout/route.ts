@@ -9,7 +9,7 @@ import { prisma } from "@/lib/db/client";
 // rythme de facturation.
 // Tarifs (22/08/2026, repositionnement premium demandé par Anthony) :
 // Pass IA passe de 49€/an à 19,99€/mois, avec une option annuelle à 119€/an
-// (soit 9,99€/mois) — le choix mensuel/annuel est désormais réellement
+// (soit environ 9,92€/mois) — le choix mensuel/annuel est désormais réellement
 // proposé, alors que le paramètre "billing" envoyé par SubscribeButton
 // était jusqu'ici ignoré côté serveur.
 const OFFER_BY_PLAN = {
@@ -50,7 +50,8 @@ export async function POST(request: Request) {
   // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
   // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
   // envoyé par erreur ne peut pas facturer un montant inattendu.
-  const billing: "MONTHLY" | "ANNUAL" = body.billing === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+  const billing: "MONTHLY" | "ANNUAL" =
+    plan === "GRATUIT" && body.billing === "ANNUAL" ? "ANNUAL" : "MONTHLY";
   const tarif = planConfig[billing];
   const offer = { name: planConfig.name, trialDays: planConfig.trialDays, ...tarif };
 
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
           description: plan === "PREMIUM"
             ? `${vipSessions} séance${vipSessions > 1 ? "s" : ""} privée${vipSessions > 1 ? "s" : ""} par mois — visio ou Paris centre.`
             : offer.interval === "year"
-              ? "Personal Training réimaginé — 119€ facturés une fois par an, résiliable à tout moment."
+              ? "Personal Training réimaginé — 119€ facturés une fois par an. Renouvellement annulable à tout moment ; accès maintenu jusqu'à la fin de la période réglée."
               : "Personal Training réimaginé — accompagnement mensuel sans engagement, résiliable à tout moment.",
         },
       },

@@ -1,7 +1,9 @@
-import { MUSCLE_LABEL, musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
+import { ExerciceVideo } from "@/components/programme/exercice-video";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import { nettoyerSupersets } from "@/lib/programmes/supersets";
 
 // Fiche de séance partageable (23/08/2026, format validé par Anthony sur
 // maquette) — pensée pour être imprimée en PDF et postée en story.
@@ -21,45 +23,8 @@ function isObj(v: unknown): v is Record<string, unknown> {
 const texte = (v: unknown): string | null =>
   typeof v === "string" && v.trim() ? v.trim() : null;
 
-/** Silhouette simplifiée face/dos — un PDF ne peut pas embarquer le
- *  composant React MuscleMap. Les deux vues sont volontairement très
- *  différentes : sans ça, impossible de savoir si le schéma montre
- *  l'avant ou l'arrière du corps (retour d'Anthony sur la maquette). */
-function Silhouette({ muscles, vue }: { muscles: string[]; vue: "front" | "back" }) {
-  const OR = "#D4AF37";
-  const GRIS = "#2A2D35";
-  const actif = (...cles: string[]) =>
-    muscles.some((m) => cles.some((c) => m.includes(c))) ? OR : GRIS;
-
-  if (vue === "back") {
-    return (
-      <svg width="34" height="60" viewBox="0 0 30 54" aria-hidden="true">
-        <circle cx="15" cy="5" r="4.2" fill="#1E2128" />
-        <path d="M11 9.5 q4 2.5 8 0 v9 q-4 2 -8 0 z" fill={actif("lat", "trap", "back")} />
-        <path d="M10 18 l5 8 l5 -8 v6 l-5 7 l-5 -7 z" fill={actif("lat", "back")} />
-        <rect x="4" y="11" width="5" height="13" rx="2.5" fill={actif("bicep", "tricep", "forearm", "delt")} />
-        <rect x="21" y="11" width="5" height="13" rx="2.5" fill={actif("bicep", "tricep", "forearm", "delt")} />
-        <rect x="10.2" y="31" width="4.2" height="12" rx="2" fill={actif("glute", "hamstring", "calv")} />
-        <rect x="15.6" y="31" width="4.2" height="12" rx="2" fill={actif("glute", "hamstring", "calv")} />
-      </svg>
-    );
-  }
-  return (
-    <svg width="34" height="60" viewBox="0 0 30 54" aria-hidden="true">
-      <circle cx="15" cy="5" r="4.2" fill={GRIS} />
-      <circle cx="13.3" cy="4.4" r="0.7" fill="#0D0E12" />
-      <circle cx="16.7" cy="4.4" r="0.7" fill="#0D0E12" />
-      <path d="M10 10 h10 v7 h-10 z" fill={actif("chest", "pector")} />
-      <rect x="10" y="17.5" width="10" height="7" rx="1.5" fill={actif("abdomin", "oblique")} />
-      <rect x="4" y="11" width="5" height="13" rx="2.5" fill={actif("bicep", "tricep", "forearm", "delt", "shoulder")} />
-      <rect x="21" y="11" width="5" height="13" rx="2.5" fill={actif("bicep", "tricep", "forearm", "delt", "shoulder")} />
-      <rect x="10.2" y="26" width="4.2" height="17" rx="2" fill={actif("quad", "glute", "calv", "adduct")} />
-      <rect x="15.6" y="26" width="4.2" height="17" rx="2" fill={actif("quad", "glute", "calv", "adduct")} />
-    </svg>
-  );
-}
-
 export function FicheSeance({
+  label = "Séance du jour · COAI",
   nomSeance,
   dureeMinutes,
   echauffement,
@@ -67,6 +32,7 @@ export function FicheSeance({
   retourAuCalme,
   prenom,
 }: {
+  label?: string;
   nomSeance: string;
   dureeMinutes?: number | null;
   echauffement?: string | null;
@@ -74,7 +40,7 @@ export function FicheSeance({
   retourAuCalme?: string | null;
   prenom?: string | null;
 }) {
-  const valides = exercices.filter(isObj);
+  const valides = nettoyerSupersets(filtrerExercicesAvecMedias(exercices)).filter(isObj);
 
   return (
     <article className="fiche-seance mx-auto w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-[#0D0E12]">
@@ -82,7 +48,7 @@ export function FicheSeance({
       <header className="grid border-b border-white/10 sm:grid-cols-[1.35fr_1fr]">
         <div className="bg-gradient-to-br from-laiton-400/[0.12] to-transparent px-6 py-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-laiton-400">
-            Séance du jour · COAI
+            {label}
           </p>
           <h1 className="mt-2 font-display text-4xl font-black uppercase leading-none tracking-tight text-white">
             {nomSeance}
@@ -142,7 +108,6 @@ export function FicheSeance({
       {valides.map((ex, i) => {
         const nom = texte(ex.nom) ?? `Exercice ${i + 1}`;
         const photo = photoCoaiPourNom(nom);
-        const cible = musclesPourExercice(nom);
         const variante = variantesPourExercice(nom)[0];
         const methode = texte(ex.methode);
 
@@ -168,17 +133,7 @@ export function FicheSeance({
               <h2 className="font-display text-[17px] font-extrabold uppercase leading-tight tracking-tight text-white">
                 {nom}
               </h2>
-              {cible && (
-                <div className="mt-0.5 flex items-center gap-2.5">
-                  <Silhouette muscles={cible.muscles} vue={cible.vue} />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.09em] text-graphite-500">
-                    Vue de {cible.vue === "back" ? "dos" : "face"}
-                    <b className="mt-0.5 block text-[10px] tracking-[0.05em] text-laiton-400">
-                      {cible.muscles.map((m) => MUSCLE_LABEL[m]).filter(Boolean).join(" · ")}
-                    </b>
-                  </span>
-                </div>
-              )}
+              <ExerciceVideo nom={nom} className="mt-2 max-w-sm print:hidden" />
               {variante && (
                 <div className="mt-1 border-l-2 border-acier/50 pl-2">
                   <span className="block font-mono text-[8.5px] uppercase tracking-[0.14em] text-acier">

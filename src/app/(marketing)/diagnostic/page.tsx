@@ -14,13 +14,9 @@ const PILIER_PHOTOS: PilierPhotos = {
   hydratation: "/recuperation/hydratation-eau.jpg",
 };
 
-// Nombre de questions codé en dur ici (metadata = export statique, ne peut
-// pas lire QUESTION_STEPS de diagnostic-quiz.tsx) — à garder synchronisé si
-// le nombre de questions change à nouveau (cf. 10/08/2026 : oublié une
-// première fois lors du passage de 6 à 10 questions).
 const TITLE = "Diagnostic gratuit — quel programme te correspond ? — COAI";
 const DESCRIPTION =
-  "10 questions rapides pour voir à quoi ton programme d'entraînement pourrait ressembler — gratuit, sans inscription.";
+  "12 repères utiles en environ 2 minutes pour obtenir ton plan de départ entraînement, nutrition et récupération — gratuit, sans carte bancaire.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -70,7 +66,7 @@ export default async function DiagnosticPage({
               : "Un membre COAI t’a invité à découvrir ton profil sportif."}
           </p>
           <p className="mt-1 text-xs leading-5 text-graphite-400">
-            Moins de 5 minutes, gratuit et sans carte bancaire. Tu découvriras ton score avant de choisir quoi que ce soit.
+            Moins de 2 minutes, gratuit et sans carte bancaire. Tu découvriras ton score avant de choisir quoi que ce soit.
           </p>
         </Card>
       )}

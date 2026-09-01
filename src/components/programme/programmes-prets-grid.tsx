@@ -4,12 +4,20 @@ import { useMemo, useState } from "react";
 import { ProgrammePretCard } from "@/components/programme/programme-pret-card";
 import { CATEGORIE_PROGRAMME_LABEL, type CategorieProgrammePret, type ProgrammePret } from "@/lib/programmes-prets/catalogue";
 
-type Item = { programme: ProgrammePret; photoUrl: string | null };
+type Item = { programme: ProgrammePret; photoUrl: string | null; deverrouille: boolean; gratuit: boolean };
 
 // Filtre 100% client — les photos sont déjà résolues côté serveur pour tous
 // les programmes en une fois (ProgrammesPretsPage), donc changer de filtre
 // ici ne déclenche jamais de nouvel appel réseau.
-export function ProgrammesPretsGrid({ items, sexe }: { items: Item[]; sexe?: string | null }) {
+export function ProgrammesPretsGrid({
+  items,
+  connecte,
+  suiviInclus,
+}: {
+  items: Item[];
+  connecte: boolean;
+  suiviInclus: boolean;
+}) {
   const [categorie, setCategorie] = useState<CategorieProgrammePret | null>(null);
 
   const filtres = useMemo(
@@ -45,8 +53,19 @@ export function ProgrammesPretsGrid({ items, sexe }: { items: Item[]; sexe?: str
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtres.map(({ programme, photoUrl }) => (
-          <ProgrammePretCard key={programme.slug} programme={programme} photoUrl={photoUrl} sexe={sexe} />
+        {filtres.map(({ programme, photoUrl, deverrouille, gratuit }) => (
+          <ProgrammePretCard
+            key={programme.slug}
+            programme={programme}
+            photoUrl={photoUrl}
+            deverrouille={deverrouille}
+            connecte={connecte}
+            gratuit={gratuit}
+            suiviInclus={suiviInclus}
+            choixOfferts={items
+              .filter((item) => item.programme.slug !== programme.slug && !item.deverrouille)
+              .map((item) => ({ slug: item.programme.slug, nom: item.programme.nom }))}
+          />
         ))}
       </div>
     </div>

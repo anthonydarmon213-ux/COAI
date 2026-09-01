@@ -46,6 +46,26 @@ Parmi ces exercices, termine la séance par 1 à 2 exercices d'abdominaux/gainag
 en dernière position dans le tableau "exercices" — sauf si la séance cible déjà principalement les
 abdominaux, ou si c'est un jour de sport existant/cardio pur où ça n'a pas de sens.
 
+Chaque exercice affiché doit avoir sa photo ET sa vidéo COAI. Choisis donc EXCLUSIVEMENT le nom
+exact d'un mouvement dans cette bibliothèque validée, en respectant l'équipement disponible, le
+niveau et les contraintes de santé :
+- Traction à la barre fixe, Superman, Rowing TRX
+- Développé couché haltères, Pompes, Écarté haltères, Dips sur banc
+- Développé militaire haltères, Élévations latérales, Élévations frontales, Rowing menton
+- Curl biceps haltères
+- Squat barre, Front squat barre, Overhead squat barre, Air squat (poids du corps),
+  Soulevé de terre conventionnel, Soulevé de terre trap bar,
+  Kettlebell swing, Fente arrière TRX, Pistol squat assisté TRX
+- Gainage planche, Gainage latéral, Crunch, Russian twist, Superman, Mountain climber
+- Ballon lesté par-dessus l'épaule, Devil press haltères, Windmill haltère, Box jump,
+  Cordes ondulatoires alternées, Cordes ondulatoires doubles, Sauts à la corde,
+  Poussée de traîneau, Tirage de traîneau à la corde, Burpee avec saut en longueur,
+  Marche du fermier kettlebells
+- Planche dynamique TRX, Pompes TRX, Montées de genoux TRX
+N'invente aucune variante de nom, aucun suffixe de prise et aucune version machine absente de cette
+liste. Si un mouvement ne convient pas, sélectionne un autre mouvement de la liste travaillant le
+même schéma moteur avec le matériel disponible.
+
 Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "photoQuerySeance"
 (terme de recherche court EN ANGLAIS pour une photo de stock illustrant l'ambiance de CETTE séance
 dans son ensemble — une personne athlétique en train de s'entraîner, cohérente avec le focus du
@@ -65,7 +85,8 @@ Pour CHAQUE exercice, inclus obligatoirement :
 - "repetitions" (nombre ou fourchette précis, ex: "8-12 répétitions" — jamais vague comme "quelques répétitions")
 - "repos" (temps de récupération entre les séries, ex: "90 sec", adapté à l'objectif) — à placer juste après "repetitions"
 - "charge" : repère de difficulté/RPE pour choisir la bonne charge (l'IA ne connaît pas le poids max réel de la personne), ex: "charge permettant de sentir les 2 dernières répétitions difficiles mais réalisables avec une technique propre — arrête-toi 1 à 2 répétitions avant l'échec technique" — ou "poids du corps" pour les exercices au poids du corps.
-- "methode" ("Série classique" par défaut ; techniques d'intensification comme superset/bi-set/drop-set réservées aux niveaux intermédiaire/avancé, avec parcimonie, jamais pour un débutant)
+- "methode" ("Série classique" par défaut ; le seul format spécial autorisé est "Superset agoniste–antagoniste", réservé aux niveaux intermédiaire/avancé)
+- "supersetAvec" (nom exact du partenaire antagoniste, ou null)
 - "photoQuery" : un terme de recherche court EN ANGLAIS pour trouver une photo de stock illustrant
   ce mouvement précis (ex: "barbell bench press", "bodyweight squat", "seated cable row") — jamais
   le nom français traduit littéralement, une vraie requête de recherche naturelle en anglais.
@@ -79,8 +100,14 @@ Pour CHAQUE exercice, inclus obligatoirement :
   repère doit être un point de contrôle réel qu'une personne peut se répéter pendant le mouvement,
   jamais une description généraliste du geste.
 
+lorsqu'il est utilisé, un superset enchaîne deux mouvements de familles musculaires antagonistes :
+pectoraux ↔ dos, biceps ↔ triceps, quadriceps ↔ ischio-jambiers, ou épaules ↔ dos. Les deux
+mouvements doivent être consécutifs, avoir chacun une photo et une vidéo COAI validées, et le champ
+"supersetAvec" doit reprendre le nom exact du partenaire. N'utilise jamais un superset entre deux
+mouvements qui ciblent principalement le même groupe, ni un superset avec un exercice sans vidéo.
+
 IMPORTANT : respecte cet ordre exact des champs dans le JSON de chaque exercice (nom, series,
-repetitions, repos, charge, methode, photoQuery, phases) — c'est l'ordre d'affichage à
+repetitions, repos, charge, methode, supersetAvec, photoQuery, phases) — c'est l'ordre d'affichage à
 l'utilisateur (sauf photoQuery, jamais affiché tel quel, utilisé uniquement pour résoudre une
 photo). Au niveau de la séance, respecte aussi cet ordre : jour, nom, photoQuerySeance,
 echauffement, exercices, retourAuCalme.`;

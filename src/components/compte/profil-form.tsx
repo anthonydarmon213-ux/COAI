@@ -598,7 +598,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           )}
         </div>
 
-        <SectionLabel>Objectifs & niveau</SectionLabel>
+        <div id="objectifs" className="scroll-mt-6">
+          <SectionLabel>Objectifs & niveau</SectionLabel>
+        </div>
         <Field label="Objectifs">
           <Textarea
             placeholder="ex: prise de muscle, perte de poids, préparation à un objectif sportif..."

@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { LeadCtaLink } from "@/components/marketing/lead-cta";
 import { Button } from "@/components/ui/button";
 
 const BENEFICES = [
-  "Le coach quotidien « Aujourd'hui » : tu sais quoi faire, sans chercher",
-  "Une IA explicable — tu sais toujours pourquoi ta séance a changé",
-  "Le Coach IA disponible pendant ta séance, dans le contexte exact de ton exercice",
-  "Validation humaine selon ta formule : l'humain garde le dernier mot quand ça compte",
+  "Ton résultat personnalisé, immédiatement",
+  "Tes priorités claires : entraînement, alimentation et récupération",
+  "Une méthode construite avec 17 ans de coaching terrain",
 ];
 
 export function CoaiIntro() {
@@ -74,7 +74,7 @@ export function CoaiIntro() {
               Voir les étapes →
             </Link>
           </div>
-          <p className="mt-3 text-xs text-graphite-500">Bilan initial en moins de 5 minutes · Score COAI personnalisé · aucune carte bancaire</p>
+          <p className="mt-3 text-xs text-graphite-500">Bilan express en moins de 2 minutes · Score COAI personnalisé · aucune carte bancaire</p>
         </div>
       </div>
 

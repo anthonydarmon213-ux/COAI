@@ -12,6 +12,18 @@ const bodySchema = z.object({
       series: z.number().int().positive().optional(),
       repetitions: z.number().int().positive().optional(),
       chargeKg: z.number().nonnegative().optional(),
+      // Chaque série est conservée séparément afin de pouvoir afficher un
+      // vrai journal et calculer la progression à partir du travail réalisé.
+      sets: z
+        .array(
+          z.object({
+            repetitions: z.number().int().positive().optional(),
+            chargeKg: z.number().nonnegative().optional(),
+            notes: z.string().max(280).optional(),
+          })
+        )
+        .max(12)
+        .optional(),
     })
   ),
   ressenti: z.string().max(500).optional(),

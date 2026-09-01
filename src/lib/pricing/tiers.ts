@@ -13,8 +13,9 @@ export type Tier = {
   mostPopular?: boolean;
   limitedSpots?: boolean;
   trial?: boolean;
-  // Offre "membre fondateur" (19/08/2026) : prix bloqué à vie pour les 100
-  // premiers abonnés — cf. src/lib/pricing/membre-fondateur.ts pour le
+  // Offre "membre fondateur" (19/08/2026) : prix conservé tant que
+  // l'abonnement reste actif pour les 100 premiers abonnés — cf.
+  // src/lib/pricing/membre-fondateur.ts pour le
   // comptage réel (jamais un chiffre inventé).
   founderOffer?: boolean;
   sessions?: { count: 1 | 2 | 3 | 4; label: string; prix: string }[];
@@ -57,7 +58,7 @@ export const TIERS: Tier[] = [
     prix: "19,99€",
     suffixe: "/mois",
     factureAnnuellement: false,
-    noteFacturation: "Sans engagement · ou 9,99€/mois en annuel (119€ facturés une fois par an)",
+    noteFacturation: "Mensuel sans engagement · ou 9,92€/mois en annuel (119€ facturés une fois par an)",
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
     features: [

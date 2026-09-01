@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { SeanceRunner } from "@/components/programme/seance-runner";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import { nettoyerSupersets } from "@/lib/programmes/supersets";
 
 // Bouton client isolé (21/08/2026) : entrainement-view.tsx reste un
 // composant serveur, seul ce déclencheur + le lecteur plein écran ont
@@ -33,7 +35,10 @@ export function DemarrerSeanceButton({
     };
   }, [ouvert]);
 
-  if (!Array.isArray(exercices) || exercices.length === 0) return null;
+  const exercicesValides = Array.isArray(exercices)
+    ? nettoyerSupersets(filtrerExercicesAvecMedias(exercices))
+    : [];
+  if (exercicesValides.length === 0) return null;
 
   return (
     <>
@@ -48,7 +53,7 @@ export function DemarrerSeanceButton({
         <SeanceRunner
           nomSeance={nomSeance}
           echauffement={echauffement}
-          exercices={exercices}
+          exercices={exercicesValides}
           retourAuCalme={retourAuCalme}
           photosParExercice={photosParExercice}
           onClose={() => setOuvert(false)}

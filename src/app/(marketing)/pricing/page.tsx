@@ -30,6 +30,8 @@ const COMPARAISON_RAPIDE = [
   ["VIP", "Je veux une attention maximale", "1 séance privée par mois incluse"],
 ] as const;
 
+const VIP_TIER = TIERS.find((tier) => tier.plan === "PREMIUM")!;
+
 export const metadata: Metadata = {
   title: "Tarifs — Personal Training réimaginé | COAI",
   description: "Choisis le niveau d'attention dont tu as besoin : Pass IA, Coaching Hybride ou VIP.",
@@ -140,12 +142,18 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                       label="Confirmer l'annuel · 119€/an"
                       className="coai-rainbow-cta w-full border-0 text-[#111216]"
                     />
+                    <p className="text-center text-[11px] font-medium text-graphite-400">
+                      🔒 119€ facturés une fois par an · Renouvellement annulable en ligne
+                    </p>
                     <SubscribeButton
                       plan="GRATUIT"
                       billing="MONTHLY"
                       label="Choisir le mensuel · 19,99€/mois"
                       className="w-full border border-white/15 bg-white/[0.035] text-white"
                     />
+                    <p className="text-center text-[11px] font-medium text-graphite-400">
+                      Mensuel sans engagement · Annulation en ligne
+                    </p>
                   </>
                 ) : (
                   <>
@@ -155,14 +163,22 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                       label={tier.trial ? `Choisir ${tier.nom} · 7 jours offerts` : `Choisir ${tier.nom}`}
                       className="coai-rainbow-cta w-full border-0 text-[#111216]"
                     />
+                    <p className="text-center text-[11px] font-medium text-graphite-400">
+                      🔒 Mensuel sans engagement · Annulation en ligne
+                    </p>
                     {/* Option annuelle proposée uniquement sur Pass IA. */}
                     {tier.plan === "GRATUIT" && (
-                      <SubscribeButton
-                        plan="GRATUIT"
-                        billing="ANNUAL"
-                        label="Choisir l'annuel · 119€/an"
-                        className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
-                      />
+                      <>
+                        <SubscribeButton
+                          plan="GRATUIT"
+                          billing="ANNUAL"
+                          label="Choisir l'annuel · 119€/an"
+                          className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
+                        />
+                        <p className="text-center text-[11px] font-medium text-laiton-200/80">
+                          Soit 9,92€/mois · 119€ facturés une fois par an · Renouvellement annulable en ligne
+                        </p>
+                      </>
                     )}
                   </>
                 )}
@@ -172,9 +188,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                     activés côté dashboard Stripe — on ne les annonce donc
                     pas ici en dur, pour ne rien promettre que la page de
                     paiement n'afficherait pas réellement. */}
-                <p className="text-center text-[11px] font-medium text-graphite-400">
-                  🔒 Paiement sécurisé · Sans engagement · Annulation en 1 clic
-                </p>
                 <p className="text-center text-[11px] text-graphite-500">
                   En continuant, tu acceptes les <Link href="/cgv" target="_blank" className="underline">CGV</Link>
                   {tier.trial ? " — 7 jours d'essai, puis prélèvement sauf résiliation." : "."}
@@ -195,23 +208,66 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         ))}
       </div>
 
+      <Card
+        id="vip"
+        className={`w-full max-w-5xl scroll-mt-24 border-amber-300/30 bg-amber-300/[0.045] px-6 py-8 sm:px-8 ${
+          selectedPlan === "PREMIUM"
+            ? "border-amber-300/80 shadow-[0_28px_90px_-45px_rgba(251,191,36,.65)]"
+            : ""
+        }`}
+      >
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-200">
+                {VIP_TIER.eyebrow}
+              </span>
+              {selectedPlan === "PREMIUM" && <Badge tone="warning">Recommandé pour toi</Badge>}
+            </div>
+            <h2 className="mt-4 text-3xl font-semibold text-white">{VIP_TIER.nom}</h2>
+            <div className="mt-3 flex items-baseline gap-1">
+              <strong className="text-5xl tracking-[-0.05em] text-white">{VIP_TIER.prix}</strong>
+              <span className="text-sm text-graphite-400">{VIP_TIER.suffixe}</span>
+            </div>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-graphite-300">{VIP_TIER.description}</p>
+            <p className="mt-4 text-sm font-semibold text-amber-200">
+              Disponibilité vérifiée avec Anthony avant tout démarrage.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-200">
+              Ce que VIP ajoute à l&apos;Hybrid
+            </p>
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-graphite-200">
+              {VIP_TIER.features.slice(1, 5).map((feature) => (
+                <li key={feature} className="flex gap-3">
+                  <span className="text-amber-300">✓</span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              className="coai-rainbow-cta mt-6 flex min-h-12 w-full items-center justify-center rounded-full border-0 px-6 text-center text-sm font-bold text-[#111216]"
+              href={vipReservationHref("l'accompagnement VIP avec une séance privée par mois", "199€/mois") ?? "/vip"}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Vérifier les disponibilités avec Anthony →
+            </a>
+            <p className="mt-3 text-center text-[11px] leading-5 text-graphite-500">
+              Besoin d&apos;un cadre intensif sur 90 jours ?{" "}
+              <Link href="/vip" className="font-semibold text-laiton-300 underline underline-offset-4">
+                Découvrir COAI Privé
+              </Link>
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Étapes 5 à 7 : essai → programme activé → première séance</p>
         <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. VIP : accompagnement confirmé avec toi avant le démarrage.</p>
-      </div>
-
-      <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">
-        <p className="text-sm text-graphite-200">
-          Besoin d&apos;un accompagnement maximal, avec des séances privées ?
-        </p>
-        <a
-          className="mt-1.5 inline-block text-sm font-semibold text-laiton-300 underline underline-offset-4"
-          href={vipReservationHref("l'accompagnement VIP", "dès 199€/mois") ?? "/vip"}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Découvrir VIP, dès 199€/mois →
-        </a>
       </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">

@@ -32,7 +32,7 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
 
   if (!readiness.disponible) {
     return (
-      <section className={compact ? "coai-glass flex-none p-4 sm:w-64" : "coai-glass p-5"}>
+      <section className={compact ? "coai-glass w-full min-w-0 p-5 xl:w-72" : "coai-glass p-5"}>
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">État du jour</p>
         <h2 className="mt-2 text-lg font-semibold text-white">{readiness.titre}</h2>
         <p className="mt-1.5 text-xs leading-5 text-graphite-400">{readiness.recommandation}</p>
@@ -48,7 +48,7 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
 
   return (
     <section
-      className={`rounded-2xl border ${couleur.bord} bg-white/[0.03] ${compact ? "flex-none p-4 sm:w-64" : "p-5"}`}
+      className={`rounded-2xl border ${couleur.bord} bg-white/[0.03] ${compact ? "w-full min-w-0 p-5 xl:w-72" : "p-5"}`}
       aria-labelledby="etat-du-jour-titre"
     >
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">État du jour</p>

@@ -1,6 +1,9 @@
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { getWorkoutForDate, getSessionDuration } from "@/lib/daily/session";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import { nettoyerSupersets } from "@/lib/programmes/supersets";
 
 // Séance du jour mise en avant (22/08/2026, demande Anthony : "le bouton
 // Démarrer la séance doit immédiatement lancer le Player"). Jusqu'ici le
@@ -39,7 +42,9 @@ export function SeanceDuJourHero({
   }
 
   const nom = typeof seance.nom === "string" ? seance.nom : "Ta séance du jour";
-  const exercices = Array.isArray(seance.exercices) ? seance.exercices : [];
+  const exercices = Array.isArray(seance.exercices)
+    ? nettoyerSupersets(filtrerExercicesAvecMedias(seance.exercices))
+    : [];
   const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
   const retourAuCalme = typeof seance.retourAuCalme === "string" ? seance.retourAuCalme : undefined;
   void photosParExercice;
@@ -56,6 +61,7 @@ export function SeanceDuJourHero({
           {/* eslint-disable-next-line @next/next/no-img-element -- source Pexels externe */}
           <img src={photoUrl} alt="" className="h-40 w-full bg-black object-contain" loading="lazy" />
           <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-t from-[#0d0e10] via-[#0d0e10]/40 to-transparent" aria-hidden="true" />
+          <CoaiImageMark className="bottom-auto top-28" />
         </>
       )}
 

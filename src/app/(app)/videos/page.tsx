@@ -25,6 +25,32 @@ export default async function VideosPage() {
         </p>
       </div>
 
+      <Card id="bonus-mobilite" className="animate-reveal overflow-hidden border-emerald-300/30 bg-gradient-to-br from-emerald-950/40 via-[#111518] to-[#111518] p-0">
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,1fr)]">
+          <div className="relative aspect-video overflow-hidden bg-black lg:aspect-auto lg:min-h-[20rem]">
+            <video
+              className="h-full w-full object-cover"
+              controls
+              playsInline
+              preload="metadata"
+              poster="/videos/streaming/routine-mobilite-exclusive-poster.jpg"
+              src="/videos/streaming/routine-mobilite-exclusive.mp4"
+              aria-label="Routine mobilité exclusive COAI"
+            />
+          </div>
+          <div className="flex flex-col justify-center gap-3 p-5 sm:p-7">
+            <Badge tone="success">Bonus offert · Programme Mobilité</Badge>
+            <h2 className="font-editorial text-3xl font-normal tracking-tight text-white">Routine mobilité exclusive</h2>
+            <p className="text-sm leading-6 text-graphite-300">
+              Une routine guidée d&apos;environ 1 min 40 pour délier les hanches, la colonne et les épaules avant ou après ta séance.
+            </p>
+            <p className="text-xs leading-5 text-graphite-500">
+              Vidéo tournée par Anthony · accès inclus avec le programme Mobilité offert.
+            </p>
+          </div>
+        </div>
+      </Card>
+
       {!aAcces ? (
         <Card className="flex flex-col items-start gap-3">
           <Badge tone="warning">Réservé aux membres COAI</Badge>

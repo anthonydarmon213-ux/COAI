@@ -3,6 +3,7 @@
 // ExerciceCard (readout dense mais aéré) plutôt que le dump JsonView à plat
 // utilisé jusqu'ici pour chaque repas.
 import { photoRepasPourNom } from "@/lib/nutrition/photos-repas";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -52,6 +53,7 @@ export function RepasCard({
               {type}
             </span>
           )}
+          <CoaiImageMark />
         </div>
       )}
 

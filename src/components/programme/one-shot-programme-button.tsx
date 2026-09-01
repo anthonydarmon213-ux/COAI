@@ -14,7 +14,7 @@ export function OneShotProgrammeButton({
 }) {
   async function handleClick() {
     trackFunnelEvent("checkout_started", { plan: "GRATUIT" });
-    window.location.href = "/pricing#impulsion";
+    window.location.href = "/pricing#pass-ia";
   }
 
   return (

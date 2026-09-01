@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,7 @@ import {
   readDiagnosticProgress,
   saveDiagnosticProgress,
 } from "@/lib/diagnostic/progress-storage";
-import { readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
-import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { DiagnosticShareButton } from "@/components/marketing/diagnostic-share-button";
 import { FormuleRecommandeeCard } from "@/components/marketing/formule-recommandee-card";
@@ -22,6 +20,32 @@ import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { ProjectionEmotionnelleCard } from "@/components/marketing/projection-emotionnelle-card";
 import { construireProjection, EVENEMENTS_DECLENCHEURS } from "@/lib/diagnostic/projection-emotionnelle";
 import { Gauge } from "@/components/ui/gauge";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
+import { readUtmCookie } from "@/lib/attribution/utm-cookie";
+import {
+  Activity,
+  Armchair,
+  BadgeCheck,
+  Bone,
+  Building2,
+  Dumbbell,
+  Flame,
+  Footprints,
+  Hand,
+  House,
+  Leaf,
+  Medal,
+  PersonStanding,
+  Repeat2,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  TrendingUp,
+  UserRound,
+  Waves,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -239,6 +263,8 @@ function resolveAutre(list: string[], texteLibre: string): string[] {
 
 type Step =
   | "intro"
+  | "prenom"
+  | "sexe"
   | "persona"
   | "quotidien"
   | "niveau"
@@ -303,15 +329,17 @@ type Step =
 // — jamais de nouvelle donnée inventée, juste le même résultat déjà
 // construit, montré en rythme plutôt que d'un bloc. La page "result"
 // complète n'est ni coupée ni dupliquée, elle arrive telle quelle ensuite.
+// Parcours express de lancement : douze repères qui modifient réellement le
+// plan. Les informations plus fines (mensurations, échéance, cycle, passé
+// sportif...) restent disponibles dans le profil après la première valeur
+// délivrée. On ne bloque plus la découverte avec un interrogatoire de seize
+// écrans avant d'avoir montré ce que COAI sait faire.
 const QUESTION_STEPS: Step[] = [
-  "profilPhysique",
-  "santeFeminine",
-  "quotidien",
-  "niveau",
+  "prenom",
+  "sexe",
   "objectif",
-  "accompagnement",
-  "echeance",
-  "declencheur",
+  "niveau",
+  "quotidien",
   "equipement",
   "lieu",
   "duree",
@@ -319,7 +347,6 @@ const QUESTION_STEPS: Step[] = [
   "alimentation",
   "sommeil",
   "sante",
-  "email",
 ];
 
 function isValidEmail(value: string): boolean {
@@ -341,37 +368,37 @@ function isValidTelephone(value: string): boolean {
   return /^\+[1-9]\d{6,14}$/.test(normalizeTelephone(value));
 }
 
-// Icônes des cartes de choix (21/08/2026, demande Anthony : "remplace les
-// boutons texte par des cartes interactives avec icônes"). Emoji plutôt
-// qu'une bibliothèque d'icônes : rendu identique sur tous les appareils
-// sans dépendance ni requête réseau, et lisible à petite taille sur mobile.
-// Une entrée absente de la table retombe sur une puce neutre — jamais
-// d'icône approximative qui suggérerait autre chose que le libellé.
-const ICONE_CHOIX: Record<string, string> = {
+// Système d'icônes premium du diagnostic (28/08/2026) : SVG Lucide
+// cohérents, monochromes et indépendants des emojis natifs de l'appareil.
+// Chaque icône est choisie pour le sens du libellé, jamais pour décorer.
+const ICONE_CHOIX: Record<string, LucideIcon> = {
   // Objectifs
-  "Perdre du gras": "🔥",
-  "Prendre du muscle": "💪",
-  "Me sentir mieux au quotidien": "🌿",
-  "Progresser en force": "🏋️",
-  "Améliorer mes performances": "⚡",
-  "Gagner en mobilité": "🤸",
-  "Reprendre le sport": "🔄",
+  "Perdre du gras": Flame,
+  "Prendre du muscle": Dumbbell,
+  "Me sentir mieux au quotidien": Leaf,
+  "Progresser en force": Medal,
+  "Améliorer mes performances": Zap,
+  "Gagner en mobilité": Activity,
+  "Reprendre le sport": Repeat2,
   // Niveaux
-  "Débutant": "🌱",
-  "Intermédiaire": "📈",
-  "Avancé": "🎯",
+  "Débutant": Sparkles,
+  "Intermédiaire": TrendingUp,
+  "Avancé": Target,
+  Homme: UserRound,
+  Femme: UserRound,
   // Équipement
-  "Salle de sport complète": "🏟️",
-  "Matériel à la maison (haltères, bancs...)": "🏠",
-  "Élastiques / bandes de résistance": "🎗️",
-  "Kettlebell": "🔔",
-  "TRX / sangles de suspension": "🪢",
-  "Aucun matériel": "🧍",
+  "Salle de sport complète": Building2,
+  "Matériel à la maison (haltères, bancs...)": Armchair,
+  "Élastiques / bandes de résistance": Waves,
+  "Kettlebell": Dumbbell,
+  "TRX / sangles de suspension": Activity,
+  "Aucun matériel": PersonStanding,
+  [AUTRE_LABEL]: BadgeCheck,
   // Lieux
-  "Salle de sport": "🏟️",
-  "À la maison": "🏠",
-  "En extérieur": "🌳",
-  "Ça dépend des jours": "🔀",
+  "Salle de sport": Building2,
+  "À la maison": House,
+  "En extérieur": Footprints,
+  "Ça dépend des jours": Repeat2,
 };
 
 // Zones du corps pour la sélection des douleurs (21/08/2026, demande
@@ -380,15 +407,15 @@ const ICONE_CHOIX: Record<string, string> = {
 // silhouette. Les libellés doivent rester EXACTEMENT ceux de CONTRAINTES
 // pour "Dos", "Genoux" et "Épaules" : ce sont ces chaînes qui partent en
 // base, une variante casserait le pré-remplissage du profil.
-const ZONES_CORPS: { label: string; icone: string }[] = [
-  { label: "Épaules", icone: "🫱" },
-  { label: "Dos", icone: "🔙" },
-  { label: "Coudes", icone: "💪" },
-  { label: "Poignets", icone: "✋" },
-  { label: "Hanches", icone: "🦴" },
-  { label: "Genoux", icone: "🦵" },
-  { label: "Chevilles", icone: "🦶" },
-  { label: "Nuque / cervicales", icone: "🧣" },
+const ZONES_CORPS: { label: string; icone: LucideIcon }[] = [
+  { label: "Épaules", icone: UserRound },
+  { label: "Dos", icone: PersonStanding },
+  { label: "Coudes", icone: Activity },
+  { label: "Poignets", icone: Hand },
+  { label: "Hanches", icone: Bone },
+  { label: "Genoux", icone: PersonStanding },
+  { label: "Chevilles", icone: Footprints },
+  { label: "Nuque / cervicales", icone: ShieldCheck },
 ];
 
 // Grande carte de choix avec icône — remplace OptionCard sur les questions
@@ -406,7 +433,7 @@ function ChoixVisuel({
   active: boolean;
   onClick: () => void;
 }) {
-  const icone = ICONE_CHOIX[label];
+  const Icon = ICONE_CHOIX[label] ?? Sparkles;
   return (
     <button
       type="button"
@@ -420,11 +447,15 @@ function ChoixVisuel({
     >
       <span
         aria-hidden="true"
-        className={`flex h-11 w-11 flex-none items-center justify-center rounded-xl text-xl transition ${
+        className={`flex h-11 w-11 flex-none items-center justify-center rounded-xl border border-white/10 transition ${
           active ? "bg-laiton-400/20" : "bg-white/[0.05] group-hover:bg-white/[0.08]"
         }`}
       >
-        {icone ?? "•"}
+        <Icon
+          size={21}
+          strokeWidth={active ? 2.2 : 1.8}
+          className={active ? "text-laiton-200" : "text-graphite-300 group-hover:text-laiton-200"}
+        />
       </span>
       <span className="min-w-0 flex-1">
         <span className={`block text-sm font-semibold ${active ? "text-laiton-100" : "text-graphite-100"}`}>{label}</span>
@@ -530,8 +561,11 @@ function VoletCard({
         style={accentColor ? { boxShadow: `inset 0 3px 0 ${accentColor}` } : undefined}
       >
         {photoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element -- chemin local fourni par le serveur, dimensions gérées par la carte responsive
-          <img src={photoUrl} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" loading="lazy" />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element -- chemin local fourni par le serveur, dimensions gérées par la carte responsive */}
+            <img src={photoUrl} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" loading="lazy" />
+            <CoaiImageMark />
+          </>
         )}
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/5" />
@@ -568,6 +602,7 @@ export function DiagnosticQuiz({
   pilierPhotos = PILIER_PHOTOS_VIDE,
 }: { connecte?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
+  const [prenom, setPrenom] = useState("");
   const [persona, setPersona] = useState<string[]>([]);
   const [activiteQuotidienne, setActiviteQuotidienne] = useState<string | null>(null);
   const [niveau, setNiveau] = useState<string | null>(null);
@@ -650,7 +685,7 @@ export function DiagnosticQuiz({
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [consentEmail, setConsentEmail] = useState(false);
-  const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading">("idle");
+  const [leadEnvoi, setLeadEnvoi] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [applyStatus, setApplyStatus] = useState<
     "idle" | "loading" | "done" | "generation" | "pret" | "erreur"
   >("idle");
@@ -718,7 +753,10 @@ export function DiagnosticQuiz({
   // "profilPhysique" est passé en tête de quiz (19/08/2026) : l'ancre de
   // respire2 est déplacée sur "frequence" pour rester à ~2/3 du parcours,
   // comme avant ce changement.
-  const BREATHER_APRES: Partial<Record<Step, Step>> = { echeance: "respire1", frequence: "respire2" };
+  // Le parcours express n'insère pas d'écran intermédiaire : la pédagogie
+  // est maintenant donnée en contexte par `decisionImpact`, juste après le
+  // choix qui vient de modifier le plan.
+  const BREATHER_APRES: Partial<Record<Step, Step>> = {};
   const STEP_ORDER: Step[] = ["intro"];
   for (const s of questionSteps) {
     STEP_ORDER.push(s);
@@ -782,6 +820,7 @@ export function DiagnosticQuiz({
     if (step === "intro" || step === "analyse" || step === "reveal" || step === "result" || step === "respire1" || step === "respire2") return;
     saveDiagnosticProgress({
       step,
+      prenom,
       persona,
       personaAutreTexte,
       activiteQuotidienne,
@@ -842,6 +881,7 @@ export function DiagnosticQuiz({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     step,
+    prenom,
     persona,
     personaAutreTexte,
     activiteQuotidienne,
@@ -900,6 +940,7 @@ export function DiagnosticQuiz({
   ]);
 
   function applySavedProgress(saved: Record<string, unknown>) {
+    if (typeof saved.prenom === "string") setPrenom(saved.prenom);
     if (Array.isArray(saved.persona)) setPersona(saved.persona as string[]);
     if (typeof saved.personaAutreTexte === "string") setPersonaAutreTexte(saved.personaAutreTexte);
     if (typeof saved.activiteQuotidienne === "string") setActiviteQuotidienne(saved.activiteQuotidienne);
@@ -1034,6 +1075,8 @@ export function DiagnosticQuiz({
   }, [step]);
 
   const canContinue = useMemo(() => {
+    if (step === "prenom") return prenom.trim().length >= 2;
+    if (step === "sexe") return Boolean(sexe);
     if (step === "quotidien") return Boolean(activiteQuotidienne);
     if (step === "niveau") return Boolean(niveau);
     if (step === "objectif") return objectifsPrincipaux.length > 0 || Boolean(objectif);
@@ -1049,7 +1092,7 @@ export function DiagnosticQuiz({
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
-    if (step === "email") return isValidEmail(email) && isValidTelephone(telephone) && consentEmail;
+    if (step === "email") return isValidEmail(email) && (!telephone.trim() || isValidTelephone(telephone)) && consentEmail;
     return true;
     // persona / mobiliteRepere / cardioRepere / forceRepere /
     // mouvementRepere / coachPreference retirés (22/08/2026) : les étapes
@@ -1058,6 +1101,8 @@ export function DiagnosticQuiz({
     // remonter un warning react-hooks/exhaustive-deps à chaque build.
   }, [
     step,
+    prenom,
+    sexe,
     activiteQuotidienne,
     niveau,
     objectif,
@@ -1068,7 +1113,6 @@ export function DiagnosticQuiz({
     lieu,
     duree,
     frequence,
-    sexe,
     age,
     tailleCm,
     poidsKg,
@@ -1117,6 +1161,50 @@ export function DiagnosticQuiz({
       coachPreference,
     ]
   );
+
+  // Différenciation COAI : le visiteur voit immédiatement à quoi sert sa
+  // réponse. On ne se contente pas d'enregistrer des cases en silence.
+  const decisionImpact = useMemo(() => {
+    if (step === "sexe" && sexe) {
+      return `Les visuels et les repères de personnalisation seront adaptés au profil ${sexe.toLowerCase()}.`;
+    }
+    if (step === "objectif" && (objectifsPrincipaux.length > 0 || objectif)) {
+      const choix = objectifsPrincipaux.length > 0 ? objectifsPrincipaux : [objectif].filter(Boolean);
+      return `Priorité du plan définie : ${choix.slice(0, 2).join(" + ")}.`;
+    }
+    if (step === "niveau" && niveau) {
+      return niveau === "Débutant"
+        ? "Volume de départ réduit, technique prioritaire et progression sans échec."
+        : niveau === "Avancé"
+          ? "Variantes, volume et intensité calibrés pour continuer à progresser."
+          : "Progression structurée avec une charge stimulante mais contrôlable.";
+    }
+    if (step === "quotidien" && activiteQuotidienne) {
+      return activiteQuotidienne.startsWith("Assis")
+        ? "Mobilité des hanches, ouverture thoracique et pauses actives ajoutées au plan."
+        : "Le volume d'entraînement tiendra compte de la dépense physique de tes journées.";
+    }
+    if (step === "equipement" && equipement.length > 0) {
+      return `Exercices filtrés : COAI n'utilisera que ${resolveAutre(equipement, equipementAutreTexte).slice(0, 2).join(" et ")}.`;
+    }
+    if (step === "lieu" && lieu) return `Organisation adaptée à ton environnement réel : ${lieu.toLowerCase()}.`;
+    if (step === "duree" && duree) return `Chaque séance tiendra dans ${duree.toLowerCase()}, échauffement et retour au calme inclus.`;
+    if (step === "frequence" && frequence) return `Calendrier construit sur ${frequence.toLowerCase()}, sans ajouter de séance irréaliste.`;
+    if (step === "alimentation" && habitudesAlimentaires) {
+      return "Les recettes et repères alimentaires partiront de tes habitudes actuelles, sans menu punitif.";
+    }
+    if (step === "sommeil" && qualiteSommeil) {
+      return qualiteSommeil.startsWith("Mauvaise") || qualiteSommeil.startsWith("Moyenne")
+        ? "Récupération renforcée et intensité initiale protégée pour éviter d'accumuler de la fatigue."
+        : "Progression normale, avec contrôle du sommeil au check-in hebdomadaire.";
+    }
+    if (step === "sante") {
+      if (sante.includes(AUCUNE_DOULEUR_LABEL)) return "Aucune restriction signalée : progression standard, avec contrôle des sensations.";
+      const zones = resolveAutre(sante, santeAutreTexte).filter((item) => item !== AUCUNE_DOULEUR_LABEL);
+      if (zones.length > 0) return `Précautions activées pour : ${zones.slice(0, 3).join(", ")}. Les mouvements concernés seront adaptés ou remplacés.`;
+    }
+    return null;
+  }, [step, sexe, objectifsPrincipaux, objectif, niveau, activiteQuotidienne, equipement, equipementAutreTexte, lieu, duree, frequence, habitudesAlimentaires, qualiteSommeil, sante, santeAutreTexte]);
 
   // Projection émotionnelle (19/08/2026) : dépend de `diagnostic` (Score
   // COAI déjà calculé) donc déclarée après lui.
@@ -1190,6 +1278,8 @@ export function DiagnosticQuiz({
   function signUpHref(): string {
     const params = new URLSearchParams();
     if (email) params.set("email", email);
+    if (prenom.trim()) params.set("prenom", prenom.trim());
+    params.set("redirect_to", "/boutique#programme-mobilite-totale");
     const query = params.toString();
     return query ? `/sign-up?${query}` : "/sign-up";
   }
@@ -1273,6 +1363,51 @@ export function DiagnosticQuiz({
     window.localStorage.setItem("coai_dashboard_intro_pending", "1");
   }
 
+  async function envoyerBilanParEmail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!isValidEmail(email) || !consentEmail) return;
+
+    const telephoneNormalise = telephone.trim() ? normalizeTelephone(telephone) : undefined;
+    if (telephoneNormalise && !isValidTelephone(telephoneNormalise)) {
+      setLeadEnvoi("error");
+      return;
+    }
+
+    setLeadEnvoi("loading");
+    try {
+      const utm = readUtmCookie();
+      const res = await fetch("/api/diagnostic-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          telephone: telephoneNormalise,
+          reponses: {
+            ...reponsesEnProfil(),
+            persona: resolveAutre(persona, personaAutreTexte),
+            activiteQuotidienne,
+            niveau,
+            objectif: resolveObjectif(objectif, objectifAutreTexte),
+            equipement: resolveAutre(equipement, equipementAutreTexte),
+            lieu,
+            duree,
+            frequence,
+            habitudesAlimentaires,
+            qualiteSommeil,
+            sante: resolveAutre(sante, santeAutreTexte),
+            coachPreference,
+          },
+          ...utm,
+        }),
+      });
+      if (!res.ok) throw new Error("lead_capture_failed");
+      trackFunnelEvent("diagnostic_lead_captured");
+      setLeadEnvoi("sent");
+    } catch {
+      setLeadEnvoi("error");
+    }
+  }
+
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait
   // le diagnostic n'a besoin ni de créer un compte ni de repasser par le
   // pont localStorage — on met à jour son profil réel directement.
@@ -1318,88 +1453,13 @@ export function DiagnosticQuiz({
     }
   }
 
-  // Capture le lead avant de révéler le résultat — best-effort : n'importe
-  // quel souci réseau/serveur ne doit jamais empêcher la personne de voir
-  // son diagnostic, elle a déjà répondu à 10 questions pour ça.
-  async function submitLeadAndReveal() {
-    setLeadEnvoi("loading");
-    try {
-      const utm = readUtmCookie();
-      await fetch("/api/diagnostic-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          telephone: normalizeTelephone(telephone) || undefined,
-          ...utm,
-          reponses: {
-            persona: resolveAutre(persona, personaAutreTexte),
-            activiteQuotidienne,
-            niveau,
-            objectif: resolveObjectif(objectif, objectifAutreTexte),
-            objectifsPrincipaux: objectifsPrincipaux.map((item) =>
-              item === OBJECTIF_AUTRE_LABEL ? (objectifAutreTexte.trim() || item) : item
-            ),
-            objectifPrincipalLibre: objectifPrincipalLibre.trim(),
-            objectifSecondaire: objectifSecondaire.trim() || undefined,
-            importanceObjectif: importanceObjectif.trim(),
-            freinsPrincipaux: resolveAutre(freinsPrincipaux, freinsAutreTexte),
-            attentesCoai: resolveAutre(attentesCoai, attentesCoaiAutreTexte),
-            prioriteOptimisation: prioriteOptimisation.trim(),
-            echeance,
-            declencheur: declencheur.join(", "),
-            mobiliteRepere,
-            cardioRepere,
-            forceRepere,
-            mouvementRepere,
-            antecedentsMedicaux: antecedentsMedicaux.trim() || undefined,
-            equipement: resolveAutre(equipement, equipementAutreTexte),
-            lieu,
-            duree,
-            frequence,
-            sport: resolveAutre(sport, sportAutreTexte),
-            sexe,
-            age: age ? Number(age) : undefined,
-            tailleCm: tailleCm ? Number(tailleCm) : undefined,
-            poidsKg: poidsKg ? Number(poidsKg) : undefined,
-            habitudesAlimentaires,
-            qualiteSommeil,
-            sante: resolveAutre(sante, santeAutreTexte),
-            coachPreference,
-          },
-        }),
-      });
-    } catch {
-      // best-effort, cf. commentaire ci-dessus
-    } finally {
-      // Seul point d'entrée du funnel qui n'envoyait encore aucun signal de
-      // conversion (11/08/2026) — pourtant c'est la page vers laquelle
-      // pointent les pubs Meta actuelles (cf. CLAUDE.md, /coach-sportif-paris
-      // avec utm_source=meta). Déclenché sur la tentative, pas sur un succès
-      // serveur confirmé, pour rester cohérent avec le best-effort ci-dessus
-      // (l'utilisateur a bien complété le quiz, quoi qu'il arrive côté API).
-      trackEvent("lead_diagnostic");
-      trackMetaEvent("Lead");
-      trackFunnelEvent("diagnostic_completed");
-      setLeadEnvoi("idle");
-      goNext();
-    }
-  }
-
-  // Dernière question avant le résultat : capture le lead pour un visiteur
-  // anonyme (email + consentement déjà validés par canContinue), ou avance
-  // directement pour un visiteur connecté (parcours D — pas d'email à
-  // capturer, ce n'est pas un lead, c'est déjà un client). Anthony veut
-  // malgré tout être notifié dans les deux cas (14/08/2026) — best-effort,
-  // ne bloque jamais l'affichage du résultat si ça échoue.
+  // Le résultat est montré avant toute collecte de coordonnées. Le visiteur
+  // anonyme laisse son email uniquement s'il choisit ensuite d'enregistrer
+  // son résultat et d'accéder au programme Mobilité offert.
   function finishQuestions() {
-    if (connecte) {
-      trackFunnelEvent("diagnostic_completed");
-      fetch("/api/diagnostic/notify-connecte", { method: "POST" }).catch(() => {});
-      goNext();
-      return;
-    }
-    submitLeadAndReveal();
+    trackFunnelEvent("diagnostic_completed");
+    if (connecte) fetch("/api/diagnostic/notify-connecte", { method: "POST" }).catch(() => {});
+    goNext();
   }
 
   return (
@@ -1436,8 +1496,8 @@ export function DiagnosticQuiz({
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    En moins de 5 minutes, fais le point comme avec un Personal Trainer : besoins, niveau,
-                    contraintes, objectif et Score COAI mesurable.
+                    En environ 2 minutes, donne-nous douze repères utiles. COAI te montre immédiatement
+                    comment ils modifient ton entraînement, ta nutrition et ta récupération.
                   </>
                 )}
               </p>
@@ -1448,7 +1508,7 @@ export function DiagnosticQuiz({
               )}
               {!resumable && (
                 <div className="grid w-full max-w-xl grid-cols-3 gap-2 text-left sm:gap-3">
-                  {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "100 %", label: "personnalisé" }, { value: "0 €", label: "pour commencer" }].map((proof) => (
+                  {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "12", label: "repères utiles" }, { value: "0 €", label: "pour commencer" }].map((proof) => (
                     <div key={proof.label} className="coai-diagnostic-proof">
                       <strong>{proof.value}</strong>
                       <span>{proof.label}</span>
@@ -1469,12 +1529,52 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="mt-2 whitespace-nowrap px-5 py-3.5 text-[0.78rem] min-[390px]:px-8 min-[390px]:text-sm">
-                  Commencer mon bilan — 5 min max
+                  Commencer mon bilan — 2 min max
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
                 Gratuit · sans carte bancaire · résultat immédiat
               </span>
+            </div>
+          )}
+
+          {step === "prenom" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Faisons connaissance</p>
+                <h2 className="mt-2 font-display text-2xl font-semibold text-white">Comment doit-on t&apos;appeler ?</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Ton prénom suffit. Il servira à personnaliser ton résultat et ton espace COAI.</p>
+              </div>
+              <Field label="Ton prénom">
+                <Input
+                  type="text"
+                  value={prenom}
+                  onChange={(event) => setPrenom(event.target.value.slice(0, 60))}
+                  placeholder="Ex. Anthony"
+                  autoComplete="given-name"
+                  autoFocus
+                />
+              </Field>
+            </div>
+          )}
+
+          {step === "sexe" && (
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="coai-consultation-phase">Ton profil</p>
+                <h2 className="mt-2 font-display text-2xl font-semibold text-white">{prenom.trim()}, tu es un homme ou une femme ?</h2>
+                <p className="mt-1.5 text-sm leading-6 text-graphite-400">Cette réponse adapte les repères du programme et les visuels qui te seront présentés.</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {SEXES.map((item) => (
+                  <ChoixVisuel
+                    key={item}
+                    label={item}
+                    active={sexe === item}
+                    onClick={() => setSexe(item)}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
@@ -1874,7 +1974,9 @@ export function DiagnosticQuiz({
                     : "border-white/10 bg-white/[0.03] hover:border-emerald-400/30 hover:bg-white/[0.06]"
                 }`}
               >
-                <span aria-hidden="true" className="text-xl">✅</span>
+                <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-300/25 bg-emerald-400/[0.08] text-emerald-200">
+                  <ShieldCheck size={18} strokeWidth={2} />
+                </span>
                 <span className={`text-sm font-semibold ${sante.includes(AUCUNE_DOULEUR_LABEL) ? "text-emerald-200" : "text-graphite-100"}`}>
                   {AUCUNE_DOULEUR_LABEL}
                 </span>
@@ -1895,7 +1997,13 @@ export function DiagnosticQuiz({
                           : "border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-laiton-400/30 hover:bg-white/[0.06]"
                       }`}
                     >
-                      <span aria-hidden="true" className="text-xl">{zone.icone}</span>
+                      <span aria-hidden="true" className={`flex h-9 w-9 items-center justify-center rounded-xl border transition ${
+                        actif
+                          ? "border-laiton-300/40 bg-laiton-400/20 text-laiton-100"
+                          : "border-white/10 bg-white/[0.04] text-graphite-300"
+                      }`}>
+                        <zone.icone size={18} strokeWidth={actif ? 2.2 : 1.8} />
+                      </span>
                       <span className={`text-center text-[11px] font-semibold leading-tight ${actif ? "text-laiton-100" : "text-graphite-300"}`}>
                         {zone.label}
                       </span>
@@ -2125,12 +2233,12 @@ export function DiagnosticQuiz({
                   <span>Profil révélé</span>
                 </div>
                 <h2 className="coai-gradient-text max-w-2xl font-display text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
-                  Ton point de départ est clair. Voici la trajectoire.
+                  {prenom.trim() ? `${prenom.trim()}, ton point de départ est clair.` : "Ton point de départ est clair."} Voici la trajectoire.
                 </h2>
                 <div className="coai-analysis-proof" aria-label="Analyse personnalisée terminée">
-                  <span><i />16 dimensions explorées</span>
-                  <span><i />4 capacités physiques évaluées</span>
-                  <span><i />1 trajectoire personnelle</span>
+                  <span><i />12 repères utiles</span>
+                  <span><i />3 piliers coordonnés</span>
+                  <span><i />1 plan de départ concret</span>
                 </div>
                 <div className="coai-index-reveal mt-2 grid w-full max-w-2xl gap-5 rounded-2xl p-5 text-left sm:grid-cols-[auto_1fr] sm:items-center sm:p-7">
                   <div className="coai-index-ring" style={{ "--coai-score": `${diagnostic.indiceCoai.score * 3.6}deg` } as React.CSSProperties}>
@@ -2253,11 +2361,11 @@ export function DiagnosticQuiz({
                     Crée gratuitement ton espace COAI.
                   </h3>
                   <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-graphite-300">
-                    Ton diagnostic et cet aperçu seront enregistrés. Tu choisiras ta formule
-                    seulement à l&apos;étape suivante, sans paiement automatique.
+                    Ton diagnostic et cet aperçu seront enregistrés. Tu accéderas d&apos;abord à
+                    Mobilité totale, ton programme découverte offert, sans paiement automatique.
                   </p>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="mt-5 inline-flex">
-                    <Button className="px-8 py-4">Créer mon compte gratuit →</Button>
+                    <Button className="px-8 py-4">Enregistrer et démarrer gratuitement →</Button>
                   </Link>
                 </div>
               )}
@@ -2303,6 +2411,105 @@ export function DiagnosticQuiz({
                   séances.
                 </p>
               </div>
+
+              <div className="grid w-full gap-3 text-left sm:grid-cols-2 xl:grid-cols-5">
+                <Link href="/boutique#programme-mobilite-totale" className="rounded-2xl border border-emerald-300/30 bg-emerald-300/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-emerald-200/60">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-200">Commencer gratuitement</span>
+                  <strong className="mt-2 block text-lg text-white">Mobilité totale offerte</strong>
+                  <p className="mt-2 text-xs leading-5 text-graphite-300">Teste la qualité COAI avec un vrai programme, sans carte bancaire.</p>
+                </Link>
+                <Link href="/boutique" className="rounded-2xl border border-laiton-300/30 bg-laiton-300/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-laiton-200/60">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-laiton-200">Paiement unique</span>
+                  <strong className="mt-2 block text-lg text-white">Pack complet · 19 €</strong>
+                  <p className="mt-2 text-xs leading-5 text-graphite-300">Entraînement, recettes, récupération et bilan. Offre rentrée : le deuxième offert.</p>
+                </Link>
+                <Link href="/pricing" className="rounded-2xl border border-cyan-300/30 bg-cyan-300/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-cyan-200/60">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-200">Suivi adaptatif</span>
+                  <strong className="mt-2 block text-lg text-white">Programme personnalisé IA · 19,99 €/mois</strong>
+                  <p className="mt-2 text-xs leading-5 text-graphite-300">Check-ins, conseils et ajustements selon ton temps, ta fatigue, tes douleurs et tes résultats.</p>
+                </Link>
+                <Link href="/pricing?selected=STANDARD#coaching-hybride" className="rounded-2xl border border-violet-300/30 bg-violet-300/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-violet-200/60">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-violet-200">IA + coach humain</span>
+                  <strong className="mt-2 block text-lg text-white">Programme personnalisé Hybride · 99 €/mois</strong>
+                  <p className="mt-2 text-xs leading-5 text-graphite-300">Tout le Pass IA, avec programme relu, supervision humaine et ajustements d&apos;Anthony en cas de plateau, gêne ou changement d&apos;objectif.</p>
+                </Link>
+                <Link href="/pricing?selected=PREMIUM#vip" className="rounded-2xl border border-amber-300/35 bg-amber-300/[0.08] p-5 transition hover:-translate-y-0.5 hover:border-amber-200/70">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-amber-200">Attention maximale</span>
+                  <strong className="mt-2 block text-lg text-white">Accompagnement VIP · dès 199 €/mois</strong>
+                  <p className="mt-2 text-xs leading-5 text-graphite-300">Pour être accompagné au plus près : tout le suivi Hybrid, avec une séance privée mensuelle et une disponibilité confirmée avec Anthony avant le démarrage.</p>
+                </Link>
+              </div>
+
+              {!connecte && (
+                <div className="w-full rounded-[1.6rem] border border-cyan-300/20 bg-cyan-300/[0.045] px-5 py-6 text-left sm:px-7">
+                  {leadEnvoi === "sent" ? (
+                    <div className="text-center">
+                      <SectionLabel>Bilan envoyé</SectionLabel>
+                      <h3 className="mt-3 font-display text-2xl font-semibold text-white">
+                        Vérifie ta boîte mail, {prenom.trim()}.
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-graphite-300">
+                        Tu y retrouveras ton diagnostic et le lien pour reprendre ton parcours quand tu veux.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={envoyerBilanParEmail} className="grid gap-5 lg:grid-cols-[1fr_1.1fr] lg:items-end">
+                      <div>
+                        <SectionLabel>Pas encore prêt à créer ton compte ?</SectionLabel>
+                        <h3 className="mt-3 font-display text-2xl font-semibold text-white">
+                          Reçois ton bilan et tes trois premières actions.
+                        </h3>
+                        <p className="mt-2 text-sm leading-6 text-graphite-300">
+                          Garde ton résultat et reprends plus tard. Le téléphone reste facultatif.
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <Input
+                            type="email"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            placeholder="Ton email"
+                            autoComplete="email"
+                            aria-label="Email pour recevoir mon bilan"
+                          />
+                          <Input
+                            type="tel"
+                            value={telephone}
+                            onChange={(event) => setTelephone(event.target.value)}
+                            onBlur={() => setTelephone(normalizeTelephone(telephone))}
+                            placeholder="Téléphone (facultatif)"
+                            autoComplete="tel"
+                            inputMode="tel"
+                            aria-label="Téléphone facultatif"
+                          />
+                        </div>
+                        <label className="flex items-start gap-2 text-xs leading-5 text-graphite-400">
+                          <input
+                            type="checkbox"
+                            checked={consentEmail}
+                            onChange={(event) => setConsentEmail(event.target.checked)}
+                            className="mt-0.5"
+                          />
+                          J&apos;accepte de recevoir mon bilan et des informations COAI par email. Désinscription possible à tout moment.
+                        </label>
+                        {leadEnvoi === "error" && (
+                          <p className="text-xs leading-5 text-red-300">
+                            Vérifie ton email et, si tu l&apos;as renseigné, ton numéro au format français ou international.
+                          </p>
+                        )}
+                        <Button
+                          type="submit"
+                          disabled={leadEnvoi === "loading" || !isValidEmail(email) || !consentEmail}
+                          className="w-full"
+                        >
+                          {leadEnvoi === "loading" ? "Envoi…" : "M’envoyer mon bilan gratuit →"}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
 
               {/* Fusionné avec l'ancien bloc "Pourquoi COAI n'est pas une IA
                   classique" (20/08/2026, simplification demandée par Anthony
@@ -2427,13 +2634,13 @@ export function DiagnosticQuiz({
                   </div>
                   <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Garde ton résultat et poursuis gratuitement.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
-                    Crée ton compte sans carte bancaire. Tu choisiras ensuite ta formule, puis tu
-                    pourras démarrer les 7 jours d&apos;essai si tu le souhaites.
+                    Crée ton compte sans carte bancaire. Ton programme Mobilité totale sera accessible
+                    immédiatement ; les packs et le suivi adaptatif resteront entièrement optionnels.
                   </p>
                   <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-300">Clique ci-dessous pour continuer</span>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="w-full max-w-md">
                     <Button className="coai-rainbow-cta w-full border-0 px-6 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-16px_rgba(201,162,98,.9)] sm:text-lg">
-                      Créer mon compte gratuit →
+                      Enregistrer et accéder au programme offert →
                     </Button>
                   </Link>
                   <span className="text-xs font-medium text-graphite-500">Gratuit · sans carte bancaire · moins d&apos;une minute</span>
@@ -2459,6 +2666,13 @@ export function DiagnosticQuiz({
               </p>
             </div>
           )}
+
+          {decisionImpact && step !== "result" && (
+            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-left">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-cyan-200">Effet immédiat sur ton plan</p>
+              <p className="mt-1 text-xs leading-5 text-graphite-200">{decisionImpact}</p>
+            </div>
+          )}
         </div>
 
         {step !== "intro" && step !== "result" && step !== "analyse" && step !== "reveal" && step !== "respire1" && step !== "respire2" && (
@@ -2473,13 +2687,11 @@ export function DiagnosticQuiz({
             <Button
               variant="primary"
               onClick={step === lastQuestionStep ? finishQuestions : goNext}
-              disabled={!canContinue || leadEnvoi === "loading"}
+              disabled={!canContinue}
               className="px-6 py-2.5 text-sm"
             >
               {step === lastQuestionStep
-                ? leadEnvoi === "loading"
-                  ? "…"
-                  : "Voir mon diagnostic →"
+                ? "Voir mon diagnostic →"
                 : "Continuer"}
             </Button>
           </div>

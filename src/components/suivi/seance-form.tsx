@@ -28,7 +28,9 @@ export function SeanceForm() {
   const router = useRouter();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [exercice, setExercice] = useState("");
-  const [charge, setCharge] = useState("");
+  const [serieCharge, setSerieCharge] = useState("");
+  const [serieRepetitions, setSerieRepetitions] = useState("");
+  const [serieNotes, setSerieNotes] = useState("");
   const [duree, setDuree] = useState("");
   const [difficulte, setDifficulte] = useState<number | null>(null);
   const [energie, setEnergie] = useState<number | null>(null);
@@ -48,14 +50,32 @@ export function SeanceForm() {
     setLoading(true);
     setError(null);
     try {
+      const serie: { repetitions?: number; chargeKg?: number; notes?: string } = {};
+      if (serieRepetitions) serie.repetitions = Number(serieRepetitions);
+      if (serieCharge) serie.chargeKg = Number(serieCharge);
+      if (serieNotes.trim()) serie.notes = serieNotes.trim();
+
+      const exerciceRealise: {
+        nom: string;
+        series?: number;
+        repetitions?: number;
+        chargeKg?: number;
+        sets?: { repetitions?: number; chargeKg?: number; notes?: string }[];
+      } | null = exercice ? { nom: exercice } : null;
+
+      if (exerciceRealise && Object.keys(serie).length > 0) {
+        exerciceRealise.series = 1;
+        exerciceRealise.sets = [serie];
+        if (serie.repetitions !== undefined) exerciceRealise.repetitions = serie.repetitions;
+        if (serie.chargeKg !== undefined) exerciceRealise.chargeKg = serie.chargeKg;
+      }
+
       const res = await fetch("/api/seances", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
-          exercices: exercice
-            ? [{ nom: exercice, chargeKg: charge ? Number(charge) : undefined }]
-            : [],
+          exercices: exerciceRealise ? [exerciceRealise] : [],
           notes: commentaire || undefined,
           difficulte: difficulte ?? undefined,
           energie: energie ?? undefined,
@@ -67,7 +87,9 @@ export function SeanceForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
       setExercice("");
-      setCharge("");
+      setSerieCharge("");
+      setSerieRepetitions("");
+      setSerieNotes("");
       setDuree("");
       setDifficulte(null);
       setEnergie(null);
@@ -96,16 +118,44 @@ export function SeanceForm() {
             onChange={(e) => setExercice(e.target.value)}
           />
         </Field>
-        <Field label="Charge (kg)">
-          <Input
-            type="number"
-            min="0"
-            step="0.5"
-            placeholder="ex: 80"
-            value={charge}
-            onChange={(e) => setCharge(e.target.value)}
-          />
-        </Field>
+        <section className="rounded-2xl border border-laiton-400/20 bg-white/[0.03] p-4">
+          <SectionLabel>Série 1 · réalisée</SectionLabel>
+          <p className="mt-1 text-sm text-graphite-400">
+            Renseigne ce que tu as réellement fait. Ces données alimentent ton journal.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Field label="Charge (kg)">
+              <Input
+                type="number"
+                min="0"
+                step="0.5"
+                placeholder="ex: 80"
+                value={serieCharge}
+                onChange={(e) => setSerieCharge(e.target.value)}
+              />
+            </Field>
+            <Field label="Répétitions">
+              <Input
+                type="number"
+                min="0"
+                step="1"
+                placeholder="ex: 8"
+                value={serieRepetitions}
+                onChange={(e) => setSerieRepetitions(e.target.value)}
+              />
+            </Field>
+          </div>
+          <div className="mt-3">
+            <Field label="Note de série (facultatif)">
+              <Input
+                type="text"
+                placeholder="ex: RPE 8, propre..."
+                value={serieNotes}
+                onChange={(e) => setSerieNotes(e.target.value)}
+              />
+            </Field>
+          </div>
+        </section>
         <Field label="Durée de la séance (minutes, facultatif)">
           <Input
             type="number"
