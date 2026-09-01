@@ -48,6 +48,15 @@ const VARIANTES: EntreeVariante[] = [
   { motifs: ["traction (barre fixe)", "traction barre fixe"], femme: "traction-barre-fixe-femme-coai", homme: "traction-barre-fixe-homme-coai", fichier: "traction-barre-fixe-femme-coai" },
   { motifs: ["squat gobelet"], femme: "squat-gobelet-kettlebell-femme-coai", homme: "squat-gobelet-kettlebell-homme-coai", fichier: "squat-gobelet-kettlebell-femme-coai" },
   { motifs: ["ballon leste par-dessus l'epaule", "ballon leste"], femme: "ballon-leste-dessus-epaule-femme-coai", homme: "ballon-leste-dessus-epaule-homme-coai", fichier: "ballon-leste-dessus-epaule-femme-coai" },
+
+  // Troisième lot COAI du 01/09/2026 — les cinq dernières fiches sans photo.
+  // Motifs longs volontairement : « traction » ou « fentes » seuls
+  // captureraient Traction (barre fixe) et les autres fentes.
+  { motifs: ["fentes arriere halteres", "fentes arrière haltères"], femme: "fentes-arriere-halteres-femme-coai", homme: "fentes-arriere-halteres-homme-coai", fichier: "fentes-arriere-halteres-femme-coai" },
+  { motifs: ["fente spiderman"], femme: "fente-spiderman-femme-coai", homme: "fente-spiderman-homme-coai", fichier: "fente-spiderman-femme-coai" },
+  { motifs: ["glissement mural"], femme: "glissement-mural-epaules-femme-coai", homme: "glissement-mural-epaules-homme-coai", fichier: "glissement-mural-epaules-femme-coai" },
+  { motifs: ["traction guidee", "traction guidée"], femme: "traction-guidee-machine-femme-coai", homme: "traction-guidee-machine-homme-coai", fichier: "traction-guidee-machine-femme-coai" },
+  { motifs: ["releve de genoux suspendu", "relevé de genoux suspendu"], femme: "releve-genoux-suspendu-femme-coai", homme: "releve-genoux-suspendu-homme-coai", fichier: "releve-genoux-suspendu-femme-coai" },
 ];
 
 const TABLE: EntreePhoto[] = [
