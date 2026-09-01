@@ -2034,3 +2034,31 @@ html {
   .coai-bilan-anneau { animation: none; }
   .coai-bilan > * { animation: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   SILHOUETTE — bascule avant/arrière (01/09/2026).
+   Une rotation 3D entre les deux vues fournies par la librairie. Ce n'est pas
+   un vrai 360° : un modèle 3D pour les angles intermédiaires serait une
+   dépendance lourde pour un gain d'usage nul.
+--------------------------------------------------------------------------- */
+.coai-silhouette-scene { perspective: 1200px; display: flex; justify-content: center; }
+
+.coai-silhouette-flip {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .75s cubic-bezier(.22,.8,.24,1);
+}
+.coai-silhouette-dos { transform: rotateY(180deg); }
+
+/* La face arrière est superposée en absolu et pré-retournée : sans quoi elle
+   apparaîtrait en miroir une fois la rotation appliquée. */
+.coai-silhouette-face { backface-visibility: hidden; }
+.coai-silhouette-arriere {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coai-silhouette-flip { transition: none; }
+}

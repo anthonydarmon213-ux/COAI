@@ -1,4 +1,6 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { SyntheseCorporelle } from "@/components/suivi/synthese-corporelle";
+import { volumeParMuscle } from "@/lib/suivi/volume-musculaire";
 import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Sparkline } from "@/components/suivi/sparkline";
@@ -46,6 +48,10 @@ export default async function ProgressionPage() {
       orderBy: { date: "asc" },
     }),
   ]);
+
+  // Volume par zone musculaire sur 30 jours, calculé depuis les séances
+  // déjà chargées ci-dessus — aucune requête supplémentaire.
+  const carteMusculaire = volumeParMuscle(seances);
 
   const graphiques = METRIQUES.map((metrique) => ({
     ...metrique,
@@ -143,6 +149,12 @@ export default async function ProgressionPage() {
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Progression.</h1>
       </div>
+
+      <SyntheseCorporelle
+        intensites={carteMusculaire.intensites}
+        volumes={carteMusculaire.volumes}
+        nbSeances={carteMusculaire.nbSeances}
+      />
 
       {seancesDuMois > 0 && (
         <Card className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
