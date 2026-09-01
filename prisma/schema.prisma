@@ -127,6 +127,7 @@ model User {
   recuperationsMusculaires RecuperationMusculaire[]
   aiUsageEvents            AiUsageEvent[]
   programmePurchases       ProgrammePurchase[]
+  routines                 Routine[]
   churnFeedback            ChurnFeedback?
   coachNotesReceived       CoachNote[]              @relation("CoachNoteClient")
   coachNotesAuthored       CoachNote[]              @relation("CoachNoteAuthor")
@@ -952,4 +953,25 @@ model ProgrammePurchase {
 
   @@index([userId, createdAt])
   @@map("programme_purchases")
+}
+
+// Routine = modèle de séance réutilisable (01/09/2026, demande Anthony).
+// Sans elle, l'utilisateur ressaisit tous ses exercices à chaque séance,
+// ce qui condamne le carnet à l'abandon au bout de quelques jours.
+//
+// `exercices` est un Json (même choix que SeanceLog) : la liste n'est
+// jamais requêtée champ par champ, seulement lue en bloc pour préremplir
+// le formulaire. Une table d'exercices normalisée n'apporterait rien ici
+// et compliquerait la réorganisation par l'utilisateur.
+model Routine {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nom       String
+  exercices Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, nom])
+  @@map("routines")
 }

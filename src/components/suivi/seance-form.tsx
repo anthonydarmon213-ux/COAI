@@ -8,6 +8,7 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { ScalePicker } from "@/components/ui/scale-picker";
+import { RoutinesPanel, type ExerciceRoutine } from "@/components/suivi/routines-panel";
 
 type NiveauDouleur = "AUCUNE" | "LEGERE" | "IMPORTANTE";
 type SetEntry = { reps: string; charge: string };
@@ -151,7 +152,25 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
     }
   }
 
+  // Préremplissage depuis une routine : on crée autant de séries vides que
+  // la routine en prévoit, prêtes à recevoir reps et charge. Remplace la
+  // saisie en cours plutôt que de s'y ajouter — l'utilisateur choisit une
+  // routine pour partir d'elle, pas pour l'empiler sur un brouillon.
+  function appliquerRoutine(liste: ExerciceRoutine[], nomRoutine: string) {
+    setExercices(
+      liste.map((e) => ({
+        nom: e.nom,
+        sets: Array.from({ length: Math.max(1, e.series ?? 3) }, () => newSet()),
+      }))
+    );
+    setCommentaire((c: string) => (c.trim().length > 0 ? c : `Routine : ${nomRoutine}`));
+  }
+
   return (
+    <>
+      <div className="mb-4">
+        <RoutinesPanel onUtiliser={appliquerRoutine} />
+      </div>
     <Card>
       {/* Une seule datalist pour tous les champs d'exercice du formulaire :
           la dupliquer par exercice ajouterait N fois la même liste au DOM. */}
@@ -327,5 +346,6 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
         </Button>
       </form>
     </Card>
+    </>
   );
 }
