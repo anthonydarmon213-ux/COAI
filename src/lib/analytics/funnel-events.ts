@@ -9,6 +9,7 @@ import { trackEvent } from "@/lib/analytics";
 // l'instant) : juste s'assurer que chaque étape est bien instrumentée.
 export type FunnelEventName =
   | "landing_viewed"
+  | "landing_cta_clicked"
   | "diagnostic_started"
   | "diagnostic_step_completed"
   | "diagnostic_completed"

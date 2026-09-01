@@ -14,9 +14,15 @@ export type CategorieProgrammePret =
   | "MOBILITE"
   | "CARDIO_SEMI_MARATHON"
   | "CARDIO_HYROX"
+  | "FITNESS_HYBRIDE"
   | "PERTE_DE_POIDS"
+  | "REMISE_EN_FORME"
+  | "TRX"
+  | "PRISE_DE_MASSE"
   | "POIDS_DU_CORPS"
   | "FESSIERS"
+  | "STRETCH"
+  | "ABDOS"
   | "BUREAU"
   | "CHALLENGE_30_JOURS"
   | "RECUPERATION";
@@ -25,9 +31,15 @@ export const CATEGORIE_PROGRAMME_LABEL: Record<CategorieProgrammePret, string> =
   MOBILITE: "Mobilité",
   CARDIO_SEMI_MARATHON: "Semi-marathon",
   CARDIO_HYROX: "Hyrox",
+  FITNESS_HYBRIDE: "Fitness hybride",
   PERTE_DE_POIDS: "Perte de poids",
+  REMISE_EN_FORME: "Remise en forme",
+  TRX: "TRX",
+  PRISE_DE_MASSE: "Prise de masse",
   POIDS_DU_CORPS: "Poids du corps",
   FESSIERS: "Fessiers",
+  STRETCH: "Stretch",
+  ABDOS: "Abdos & Core",
   BUREAU: "Bureau & chaise",
   CHALLENGE_30_JOURS: "Challenge 30 jours",
   RECUPERATION: "Récupération",
@@ -41,8 +53,19 @@ export type JourProgrammePret = {
 
 export type VisuelProgrammePret = {
   nom: string;
-  photoFemme: string;
-  photoHomme: string;
+  photoFemme?: string;
+  photoHomme?: string;
+};
+
+export type PhaseProgrammePret = {
+  periode: string;
+  titre: string;
+  contenu: string;
+};
+
+export type ConseilProgrammePret = {
+  titre: string;
+  contenu: string;
 };
 
 export type ProgrammePret = {
@@ -59,6 +82,12 @@ export type ProgrammePret = {
   photoFemme?: string;
   photoHomme?: string;
   visuels?: VisuelProgrammePret[];
+  badge?: string;
+  medias?: string[];
+  progression?: PhaseProgrammePret[];
+  nutrition?: ConseilProgrammePret[];
+  recuperation?: ConseilProgrammePret[];
+  note?: string;
   jours: JourProgrammePret[];
 };
 

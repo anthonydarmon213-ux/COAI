@@ -65,7 +65,13 @@ export function ProgrammePretCard({
                 </p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {programme.visuels.map((visuel) => {
-                    const src = sexe === "Homme" ? visuel.photoHomme : visuel.photoFemme;
+                    // Un visuel n'illustre parfois qu'un seul modèle : on
+                    // bascule sur l'autre plutôt que d'afficher un trou.
+                    const src =
+                      sexe === "Homme"
+                        ? (visuel.photoHomme ?? visuel.photoFemme)
+                        : (visuel.photoFemme ?? visuel.photoHomme);
+                    if (!src) return null;
                     return (
                       <figure key={visuel.nom} className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
                         <Image
