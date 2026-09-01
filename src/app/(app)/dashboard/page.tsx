@@ -5,7 +5,8 @@ import { DailyExperience } from "@/components/daily/daily-experience";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
-import { hasProgrammeAccess } from "@/lib/subscription/plan";
+import { hasProgrammeAccess, hasPaidSubscription } from "@/lib/subscription/plan";
+import { OffresCard } from "@/components/dashboard/offres-card";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
@@ -270,6 +271,12 @@ export default async function DashboardPage() {
       </div>
 
       <ReperesDuJour habitudeHydratation={user.profile?.hydratation} />
+
+      {/* Les formules ne sont proposées qu'ici, une fois le produit vu
+          (01/09/2026) : l'inscription renvoyait auparavant vers /pricing,
+          soit un prix avant même la première séance. Masquée dès qu'un
+          abonnement est actif — inutile de vendre à qui a déjà acheté. */}
+      {!hasPaidSubscription(user.subscription) && <OffresCard />}
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link

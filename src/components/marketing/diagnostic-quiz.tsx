@@ -418,13 +418,17 @@ function ChoixVisuel({
           : "border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-laiton-400/30 hover:bg-white/[0.06]"
       }`}
     >
+      {/* Émojis retirés le 01/09/2026 (Anthony : « ça fait bas de gamme »).
+          Remplacés par l'initiale du libellé dans une pastille sobre : on
+          garde le repère visuel qui aide à balayer la liste, sans le registre
+          enfantin. */}
       <span
         aria-hidden="true"
-        className={`flex h-11 w-11 flex-none items-center justify-center rounded-xl text-xl transition ${
-          active ? "bg-laiton-400/20" : "bg-white/[0.05] group-hover:bg-white/[0.08]"
+        className={`flex h-11 w-11 flex-none items-center justify-center rounded-xl font-display text-sm font-bold tracking-wide transition ${
+          active ? "bg-laiton-400/20 text-laiton-200" : "bg-white/[0.05] text-graphite-500 group-hover:bg-white/[0.08]"
         }`}
       >
-        {icone ?? "•"}
+        {(label ?? "").trim().charAt(0).toUpperCase() || "·"}
       </span>
       <span className="min-w-0 flex-1">
         <span className={`block text-sm font-semibold ${active ? "text-laiton-100" : "text-graphite-100"}`}>{label}</span>
@@ -568,6 +572,19 @@ export function DiagnosticQuiz({
   pilierPhotos = PILIER_PHOTOS_VIDE,
 }: { connecte?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
+
+  // Remonte en haut à chaque changement d'étape (01/09/2026, Anthony : « on
+  // reste en bas, il faut scroller pour remonter, on perd en fluidité »).
+  // Sur mobile, une liste d'options longue laissait l'écran au niveau du
+  // bouton « Continuer » : la question suivante s'affichait hors champ et
+  // donnait l'impression que rien ne s'était passé.
+  //
+  // "auto" et non "smooth" : un défilement animé sur plusieurs centaines de
+  // pixels rend le passage d'une question à l'autre plus lent, pas plus fluide.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [step]);
   const [persona, setPersona] = useState<string[]>([]);
   const [activiteQuotidienne, setActiviteQuotidienne] = useState<string | null>(null);
   const [niveau, setNiveau] = useState<string | null>(null);
@@ -1895,7 +1912,7 @@ export function DiagnosticQuiz({
                           : "border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-laiton-400/30 hover:bg-white/[0.06]"
                       }`}
                     >
-                      <span aria-hidden="true" className="text-xl">{zone.icone}</span>
+                      <span aria-hidden="true" className={`font-display text-sm font-bold ${actif ? "text-laiton-200" : "text-graphite-500"}`}>{zone.label.charAt(0).toUpperCase()}</span>
                       <span className={`text-center text-[11px] font-semibold leading-tight ${actif ? "text-laiton-100" : "text-graphite-300"}`}>
                         {zone.label}
                       </span>

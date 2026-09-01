@@ -63,13 +63,23 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
       trackMetaEvent("CompleteRegistration");
       trackFunnelEvent("signup_completed", {});
 
-      const params = new URLSearchParams({ from: "signup" });
+      // Destination après inscription (01/09/2026, demande Anthony : « je veux
+      // que la personne rentre direct dans l'interface après le diag »).
+      //
+      // Deux intentions différentes, deux destinations :
+      // - venu des tarifs en ayant choisi une formule → on l'y ramène, sinon
+      //   on lui fait perdre son achat en cours ;
+      // - venu du diagnostic, sans formule choisie → il entre directement
+      //   dans l'app. Le renvoyer vers /pricing lui montrait un prix avant
+      //   d'avoir vu le produit : la friction que ce changement supprime.
       if (intendedPlan) {
-        params.set("selected", intendedPlan);
+        const params = new URLSearchParams({ from: "signup", selected: intendedPlan });
         params.set("billing", intendedBilling);
         params.set("vipSessions", String(intendedVipSessions));
+        window.location.href = `/pricing?${params.toString()}`;
+        return;
       }
-      window.location.href = `/pricing?${params.toString()}`;
+      window.location.href = "/dashboard?from=signup";
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
