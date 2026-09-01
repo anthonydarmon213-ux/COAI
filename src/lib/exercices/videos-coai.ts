@@ -66,9 +66,11 @@ const TABLE: Entree[] = [
   { motifs: ["tirage horizontal", "tirage horizontal poulie", "seated cable row", "cable row"], video: { fichier: "tirage-horizontal", description: "Tirage horizontal à la poulie" } },
   { motifs: ["tirage vertical", "lat pulldown", "tirage poulie haute", "tirage vertical poulie"], video: { fichier: "tirage-vertical", description: "Tirage vertical à la poulie haute" } },
   { motifs: ["curl poulie basse", "bicep curl poulie", "cable curl"], video: { fichier: "bicep-curl-poulie-basse", description: "Curl biceps à la poulie basse" } },
-  { motifs: ["developpe couche classique", "developpe couche barre", "bench press barre", "bench press"], video: { fichier: "developpe-couche-classique", description: "Développé couché classique à la barre" } },
+  { motifs: ["developpe couche (barre)", "developpe couche classique", "developpe couche barre", "bench press barre", "bench press"], video: { fichier: "developpe-couche-classique", description: "Développé couché classique à la barre" } },
   { motifs: ["developpe couche incline", "developpe incline barre", "incline bench press"], video: { fichier: "developpe-couche-incline", description: "Développé couché incliné à la barre" } },
-  { motifs: ["press machine incline", "chest press incline", "press incline machine"], video: { fichier: "press-machin-incline", description: "Press machine incliné" } },
+  // Le rush s'appelait « press machin incliné » mais montre une presse à
+  // cuisses inclinée (jambes sur le plateau), pas un développé pectoraux.
+  { motifs: ["presse a cuisses", "presse à cuisses", "leg press"], video: { fichier: "presse-a-cuisses", description: "Presse à cuisses inclinée" } },
 
   { motifs: ["rowing haltere unilateral", "one arm dumbbell row"], video: { fichier: "rowing-haltere-unilateral", description: "Rowing haltère unilatéral" } },
   { motifs: ["rowing halteres", "rowing buste penche", "bent over row"], video: { fichier: "rowing-halteres", description: "Rowing buste penché aux haltères" } },
