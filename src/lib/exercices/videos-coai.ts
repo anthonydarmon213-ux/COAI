@@ -13,6 +13,19 @@ export type VideoCoai = {
 type Entree = { motifs: string[]; video: VideoCoai };
 
 const TABLE: Entree[] = [
+  // Lot du 02/09/2026. Les variantes unilaterales precedent la version
+  // classique, et "developpe incline (machine)" porte un motif explicite :
+  // un motif generique "developpe incline" capterait la version barre.
+  { motifs: ["pont fessier unilateral", "hip bridge unilateral"], video: { fichier: "pont-fessier-unilateral", description: "Pont fessier unilatéral" } },
+  { motifs: ["pont fessier", "glute bridge"], video: { fichier: "pont-fessier", description: "Pont fessier au sol" } },
+  { motifs: ["developpe arnold", "arnold press"], video: { fichier: "developpe-arnold", description: "Développé Arnold assis" } },
+  { motifs: ["curl marteau", "hammer curl"], video: { fichier: "curl-marteau", description: "Curl marteau aux haltères" } },
+  { motifs: ["fentes avant halteres", "fente avant halteres"], video: { fichier: "fentes-avant-halteres", description: "Fentes avant aux haltères" } },
+  { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split squat"], video: { fichier: "fentes-bulgares", description: "Fentes bulgares aux haltères" } },
+  { motifs: ["mollets unilateral haltere", "mollet unilateral haltere"], video: { fichier: "mollets-unilateral-haltere", description: "Mollets unilatéral avec haltère" } },
+  { motifs: ["face pull elastique", "face pull"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
+  { motifs: ["kickback elastique", "kickback"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
+  { motifs: ["developpe incline (machine)", "developpe incline machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
   // Lot fonctionnel réel du 25/08/2026. Les variantes précises restent
   // avant les motifs génériques (notamment « burpee »).
   { motifs: ["ballon leste par-dessus l'epaule", "medecine ball par-dessus l'epaule"], video: { fichier: "medecine-ball-par-dessus-epaule", description: "Ballon lesté par-dessus l’épaule" } },
