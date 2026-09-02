@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Dumbbell, TrendingUp, Apple, MessageSquare, Moon, Play, LayoutGrid, ClipboardList, type LucideIcon } from "lucide-react";
+import { CalendarDays, Dumbbell, Timer, TrendingUp, Apple, MessageSquare, Moon, Play, LayoutGrid, ClipboardList, type LucideIcon } from "lucide-react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 import { SignOutButton } from "@/components/compte/sign-out-button";
 
@@ -42,6 +42,11 @@ const ONGLETS: {
   // enterré comme 1er sous-lien de Progression, invisible tant que l'onglet
   // n'était pas ouvert — alors que c'est le geste quotidien de l'app.
   { href: "/suivi/seances", label: "Mes séances", icon: ClipboardList, match: "/suivi/seances", teinte: "244,63,94" },
+  // RepCount en onglet de premier niveau (02/09/2026, demande Anthony —
+  // "fonction primordiale, en avant sur mobile") : la saisie des séries
+  // n'existait qu'à l'intérieur du lecteur de séance, donc invisible tant
+  // qu'une séance n'était pas lancée.
+  { href: "/suivi/repcount", label: "RepCount", icon: Timer, match: "/suivi/repcount", teinte: "34,211,238" },
   {
     href: "/programme/entrainement",
     label: "Entraînement",
