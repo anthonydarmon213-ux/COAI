@@ -1737,7 +1737,16 @@ const INGREDIENTS_ANIMAUX = [
 // "kefir" ecrit avec un accent aigu, et un produit laitier passait vegan.
 // On compare donc des chaines sans diacritiques des deux cotes.
 function sansAccents(valeur: string): string {
-  return valeur.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return valeur
+    .toLowerCase()
+    // Les ligatures ne sont pas des diacritiques : NFD ne les decompose pas,
+    // et \b ne les reconnait pas comme des lettres. Sans cette etape, le mot
+    // "oeuf" ne trouvait plus "oeuf" ecrit avec la ligature, et une omelette
+    // passait vegane.
+    .replace(/\u0153/g, "oe")
+    .replace(/\u00e6/g, "ae")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 // Les allergenes declares sont plus fiables que la lecture des ingredients :
@@ -1745,12 +1754,21 @@ function sansAccents(valeur: string): string {
 // soit la formulation de sa liste d'ingredients.
 const ALLERGENES_ANIMAUX = ["lait", "oeuf", "poisson", "crustace", "mollusque"];
 
+// La recherche par sous-chaine produisait des faux positifs : "laitue"
+// contient "lait", ce qui excluait du vegan un bowl dont la seule faute
+// etait sa salade. On compare donc des mots entiers, en tolerant le
+// pluriel pour que "oeuf" attrape aussi "oeufs".
+function contientLeMot(texte: string, mot: string): boolean {
+  const motif = new RegExp(`\\b${sansAccents(mot).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(s|x)?\\b`);
+  return motif.test(texte);
+}
+
 function estVegan(recette: Recette): boolean {
   if (!recette.regimes.includes("VEGETARIEN")) return false;
   const allergenes = sansAccents((recette.allergenes ?? []).join(" | "));
-  if (ALLERGENES_ANIMAUX.some((mot) => allergenes.includes(mot))) return false;
+  if (ALLERGENES_ANIMAUX.some((mot) => contientLeMot(allergenes, mot))) return false;
   const texte = sansAccents(recette.ingredients.join(" | "));
-  return !INGREDIENTS_ANIMAUX.some((mot) => texte.includes(sansAccents(mot)));
+  return !INGREDIENTS_ANIMAUX.some((mot) => contientLeMot(texte, mot));
 }
 
 // Definition usuelle du "riche en proteines" : au moins 30 % des calories
@@ -1758,8 +1776,13 @@ function estVegan(recette: Recette): boolean {
 // tres maigre passe le ratio sans apporter grand-chose.
 function estHyperProteine(recette: Recette): boolean {
   const { calories, proteines } = recette.macros;
-  if (!calories || proteines < 20) return false;
-  return (proteines * 4) / calories >= 0.3;
+  if (!calories) return false;
+  // Le seul ratio de 30 % vaut pour un produit, pas pour un repas complet :
+  // il ecartait des plats copieux et reellement proteines. Un plancher
+  // absolu de 40 g les rattrape sans elargir le filtre au point qu'il ne
+  // distingue plus rien (a 35 g, plus de la moitie du catalogue passait).
+  if (proteines >= 40) return true;
+  return proteines >= 20 && (proteines * 4) / calories >= 0.3;
 }
 
 // Regimes deduits des donnees plutot que saisis a la main : toute recette
