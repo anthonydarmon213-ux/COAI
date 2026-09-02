@@ -49,7 +49,7 @@ async function BoutiqueProgrammes() {
 
 function BoutiqueProgrammesSkeleton() {
   return (
-    <div aria-label="Chargement des programmes" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div aria-label="Chargement des programmes" className="grid gap-5 md:grid-cols-2">
       {Array.from({ length: 6 }, (_, index) => (
         <div key={index} className="overflow-hidden rounded-2xl border border-white/10 bg-[#111518]">
           <div className="h-40 animate-pulse bg-white/[0.06]" />

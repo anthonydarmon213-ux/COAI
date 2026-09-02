@@ -68,8 +68,10 @@ export function ProgrammePretCard({
             {programme.badge}
           </span>
         )}
+        {/* Deplace en haut a droite : centre en bas, il chevauchait la duree
+            et le libelle se retrouvait tronque. */}
         {gratuit && (
-          <span className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-emerald-300/50 bg-emerald-950/90 px-3 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-emerald-200 shadow-[0_6px_20px_rgba(16,185,129,.18)] backdrop-blur-sm">
+          <span className="absolute right-3 top-3 whitespace-nowrap rounded-full border border-emerald-300/60 bg-emerald-950/95 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-200 shadow-[0_6px_20px_rgba(16,185,129,.25)] backdrop-blur-sm">
             Programme offert
           </span>
         )}
@@ -79,15 +81,17 @@ export function ProgrammePretCard({
             aucune ressource externe : leur photo, simplement referencee et non
             embarquee, n'apparaissait jamais. On affiche donc la photo elle-meme
             et le titre revient ici. */}
-        <span className="absolute inset-x-5 top-5 block max-w-[62%]">
+        {/* Bloc titre borne en hauteur : "Prepa Semi-marathon" tenait sur
+            trois lignes et debordait sous le visuel. */}
+        <span className="absolute inset-x-5 top-4 block max-w-[68%]">
           <span className="block font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-300">
             {CATEGORIE_PROGRAMME_LABEL[programme.categorie]}
           </span>
-          <span className="mt-2 block font-display text-2xl font-bold uppercase leading-[1.05] tracking-[-0.02em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,.9)] sm:text-3xl">
+          <span className="mt-1.5 block font-display text-xl font-bold uppercase leading-[1.04] tracking-[-0.02em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,.9)] sm:text-2xl lg:text-[1.75rem]">
             {programme.nom.split(" — ")[0]}
           </span>
-          <span className="mt-2 block h-[3px] w-14 rounded-full bg-laiton-300" aria-hidden="true" />
-          <span className="mt-3 block text-[11px] font-semibold leading-4 text-graphite-200 drop-shadow-[0_2px_10px_rgba(0,0,0,.9)] sm:text-xs">
+          <span className="mt-2 block h-[3px] w-12 rounded-full bg-laiton-300" aria-hidden="true" />
+          <span className="mt-2 hidden text-[11px] font-semibold leading-4 text-graphite-200 drop-shadow-[0_2px_10px_rgba(0,0,0,.9)] sm:block">
             {programme.accroche}
           </span>
         </span>

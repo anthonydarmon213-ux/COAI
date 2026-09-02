@@ -52,7 +52,7 @@ export function ProgrammesPretsGrid({
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-2">
         {filtres.map(({ programme, photoUrl, deverrouille, gratuit }) => (
           <ProgrammePretCard
             key={programme.slug}
