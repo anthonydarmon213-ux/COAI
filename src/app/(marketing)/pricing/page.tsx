@@ -206,22 +206,44 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. Le Coaching VIP se règle à la séance, sans abonnement.</p>
       </div>
 
-      <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">
-        <p className="text-sm text-graphite-200">
-          Besoin d&apos;un accompagnement maximal, avec des séances privées ?
-        </p>
-        <a
-          className="mt-1.5 inline-block text-sm font-semibold text-laiton-300 underline underline-offset-4"
-          href={vipReservationHref("le coaching VIP", "200 € la séance") ?? "/vip"}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Découvrir le Coaching VIP, 200 € la séance →
-        </a>
+      {/* Le VIP ne se souscrit pas en ligne : il sort donc de la grille des
+          abonnements et devient une carte a part, conclue sur WhatsApp. */}
+      <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
+              Coaching VIP · sans abonnement
+            </p>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="font-display text-4xl font-semibold text-white">200 €</span>
+              <span className="text-sm text-graphite-400">la séance, puis sur devis</span>
+            </div>
+            <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
+              Séances privées avec Anthony, à domicile, en entreprise, en club ou à
+              distance. Les formules suivies et les groupes se chiffrent sur mesure.
+            </p>
+            <p className="mt-2 text-sm text-laiton-200">
+              Facture professionnelle fournie, déductible en frais d&apos;entreprise.
+            </p>
+          </div>
+          <div className="shrink-0">
+            <a
+              className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
+              href={vipReservationHref("le coaching VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Demander mon devis sur WhatsApp
+            </a>
+            <p className="mt-2 text-center text-[11px] text-graphite-500">
+              Réponse directe · places limitées
+            </p>
+          </div>
+        </div>
       </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
-        Abonnements mensuels sans engagement, résiliables à tout moment. VIP : visio partout ou présentiel à Paris centre, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
+        Abonnements mensuels sans engagement, résiliables à tout moment. Le Coaching VIP n&apos;est pas un abonnement : il se règle à la séance, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
       </p>
     </main>
   );
