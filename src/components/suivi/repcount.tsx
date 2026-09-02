@@ -206,7 +206,8 @@ export function RepCount({ exercices }: { exercices: string[] }) {
       {sets.length > 0 && (
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-400">
-            Séries du jour · volume {Math.round(volumeCourant)} kg
+            {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })} · volume{" "}
+            {Math.round(volumeCourant)} kg
           </p>
           <ul className="mt-2 flex flex-col gap-1.5">
             {sets.map((s, i) => (

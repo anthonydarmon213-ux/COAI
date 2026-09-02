@@ -14,10 +14,25 @@ export const metadata = {
 // format que le lecteur — elles alimentent donc les graphiques de
 // progression et le volume par muscle sans traitement supplémentaire.
 export default function RepCountPage() {
+  // Date rendue sur le serveur, forcee sur Europe/Paris : l'hebergeur tourne
+  // en UTC et afficherait la veille en soiree. C'est bien ce jour-la que les
+  // series seront enregistrees.
+  const aujourdhui = new Date().toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "Europe/Paris",
+  });
+
   return (
     <main className="mx-auto flex w-full max-w-lg flex-col gap-6">
       <header>
-        <SectionLabel>RepCount</SectionLabel>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SectionLabel>RepCount</SectionLabel>
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-200">
+            {aujourdhui}
+          </span>
+        </div>
         <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-white">
           Note ta série.
         </h1>
