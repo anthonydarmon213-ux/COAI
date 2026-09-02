@@ -20,7 +20,6 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
-import { ProgrammeShareButton } from "@/components/programme/programme-share-button";
 import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
@@ -187,13 +186,18 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                 {heroParPilier[pilierActif].texte}
               </p>
             </div>
+            {/* La carte Story a laisse place au telechargement de la fiche
+                (02/09/2026, demande Anthony : "je ne peux pas telecharger ma
+                story, aucun interet — la fiche seance, ca c'est beau, c'est
+                ca qu'il faut pouvoir telecharger"). La fiche reunit les trois
+                piliers en un seul PDF. */}
             <div className="flex flex-wrap gap-2">
-              <ProgrammeShareButton cartes={[{
-                numero: etapeActive.numero,
-                label: LABELS[pilierActif].toUpperCase(),
-                titre: titresApercu[indexPilierActif] ?? etapeActive.sousTitre,
-                image: etapeActive.image,
-              }]} />
+              <a
+                href="/api/programmes/fiche-complete"
+                className="inline-flex min-h-11 items-center rounded-full border border-laiton-400/40 bg-laiton-400/10 px-5 text-sm font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+              >
+                Télécharger ma fiche (PDF)
+              </a>
             </div>
           </div>
 

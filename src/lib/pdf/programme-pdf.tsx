@@ -91,7 +91,17 @@ const styles = StyleSheet.create({
   },
   h1: { fontSize: 21, fontFamily: "Helvetica-Bold", color: C.textPrimary, letterSpacing: -0.3, marginBottom: 4 },
   genereLe: { fontSize: 7.5, color: C.textFaint, marginBottom: 16 },
-  heroImage: { width: "100%", height: 105, objectFit: "cover", borderRadius: 10, marginBottom: 10 },
+  // 105 px de haut en cover recadrait au centre et coupait les visages :
+  // la bande est plus haute et cadree en haut, comme les couvertures de
+  // programmes.
+  heroImage: {
+    width: "100%",
+    height: 150,
+    objectFit: "cover",
+    objectPosition: "50% 20%",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
 
   // --- Badges ---
   badgeRow: { flexDirection: "row", flexWrap: "wrap", marginBottom: 14 },
@@ -599,20 +609,98 @@ export function ProgrammePdf({
 
   return (
     <Document title={`COAI — Programme ${PILIER_LABEL[pilier]}`}>
-      <Page size="A4" style={styles.page} wrap={false}>
-        <HeaderFixed pilier={pilier} prenom={prenom} dateFormatee={dateFormatee} />
+      <PagePilier
+        pilier={pilier}
+        contenu={contenu}
+        titre={titre}
+        prenom={prenom}
+        dateFormatee={dateFormatee}
+        heroUrl={heroUrl}
+        exerciseImages={exerciseImages}
+      />
+    </Document>
+  );
+}
 
-        <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>
-        <Text style={styles.h1}>{titre}</Text>
-        <Text style={styles.genereLe}>Généré le {dateFormatee} par l&apos;IA COAI</Text>
-        {heroUrl && <PdfImage src={heroUrl} style={styles.heroImage} />}
+// Page extraite du document pour pouvoir en composer plusieurs : la fiche
+// complète réunit les trois piliers en un seul fichier, plutôt que trois
+// téléchargements séparés qu'il faudrait ensuite rassembler à la main.
+function PagePilier({
+  pilier,
+  contenu,
+  titre,
+  prenom,
+  dateFormatee,
+  heroUrl,
+  exerciseImages,
+}: {
+  pilier: Pilier;
+  contenu: Record<string, unknown>;
+  titre: string;
+  prenom?: string | null;
+  dateFormatee: string;
+  heroUrl?: string;
+  exerciseImages?: Record<string, string>;
+}) {
+  return (
+    <Page size="A4" style={styles.page} wrap={false}>
+      <HeaderFixed pilier={pilier} prenom={prenom} dateFormatee={dateFormatee} />
 
-        {pilier === "ENTRAINEMENT" && <EntrainementBody data={contenu} exerciseImages={exerciseImages} />}
-        {pilier === "NUTRITION" && <NutritionBody data={contenu} />}
-        {pilier === "RECUPERATION" && <RecuperationBody data={contenu} />}
+      <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>
+      <Text style={styles.h1}>{titre}</Text>
+      <Text style={styles.genereLe}>Généré le {dateFormatee} par l&apos;IA COAI</Text>
+      {heroUrl && <PdfImage src={heroUrl} style={styles.heroImage} />}
 
-        <FooterFixed />
-      </Page>
+      {pilier === "ENTRAINEMENT" && <EntrainementBody data={contenu} exerciseImages={exerciseImages} />}
+      {pilier === "NUTRITION" && <NutritionBody data={contenu} />}
+      {pilier === "RECUPERATION" && <RecuperationBody data={contenu} />}
+
+      <FooterFixed />
+    </Page>
+  );
+}
+
+export type PilierPdfEntree = {
+  pilier: Pilier;
+  data: unknown;
+  generatedAt: Date;
+  heroUrl?: string;
+  exerciseImages?: Record<string, string>;
+};
+
+// Fiche complète : un document, une page par pilier disponible. Les piliers
+// non encore générés sont simplement absents plutôt que rendus vides.
+export function ProgrammeCompletPdf({
+  entrees,
+  prenom,
+}: {
+  entrees: PilierPdfEntree[];
+  prenom?: string | null;
+}) {
+  return (
+    <Document title="COAI — Ta fiche complète">
+      {entrees.map((entree) => {
+        const contenu = isPlainObject(entree.data) ? entree.data : {};
+        const titre =
+          typeof contenu.titre === "string" ? contenu.titre : PILIER_LABEL[entree.pilier];
+        const dateFormatee = entree.generatedAt.toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        return (
+          <PagePilier
+            key={entree.pilier}
+            pilier={entree.pilier}
+            contenu={contenu}
+            titre={titre}
+            prenom={prenom}
+            dateFormatee={dateFormatee}
+            heroUrl={entree.heroUrl}
+            exerciseImages={entree.exerciseImages}
+          />
+        );
+      })}
     </Document>
   );
 }
