@@ -146,6 +146,8 @@ function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
 export function AppNav() {
   const pathname = usePathname();
 
+  const ongletActif = ONGLETS.find((onglet) => isActive(pathname, onglet));
+
   return (
     <aside className="coai-app-nav z-20 shrink-0 border-b px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:px-5 md:py-7">
       <div className="flex items-center justify-between">
@@ -182,10 +184,11 @@ export function AppNav() {
               {onglet.label}
             </Link>
 
-            {/* Sous-liens visibles uniquement sous l'onglet actif, et
-                seulement sur desktop : la barre mobile défile
-                horizontalement, y empiler des sous-niveaux la rendrait
-                illisible. */}
+            {/* Sous-liens de l'onglet actif, version desktop en colonne.
+                Sur mobile ils sont rendus dans une seconde rangée sous la
+                barre : les masquer entièrement rendait le catalogue de
+                recettes et la bibliothèque d'exercices inaccessibles au
+                téléphone, d'où vient pourtant l'essentiel du trafic. */}
             {active && onglet.sous && (
               <div className="ml-3 mt-1 hidden flex-col gap-0.5 border-l border-white/10 pl-3 md:flex">
                 {onglet.sous.map((sl) => {
@@ -209,6 +212,34 @@ export function AppNav() {
           );
         })}
       </nav>
+
+      {/* Seconde rangée, mobile uniquement : la barre principale défile
+          horizontalement, on lui adjoint donc une rangée de même nature
+          plutôt qu'une colonne qui casserait la mise en page. */}
+      {ongletActif?.sous && (
+        <nav
+          aria-label={`Sous-navigation ${ongletActif.label}`}
+          className="coai-app-nav-scroll mt-2 flex gap-2 overflow-x-auto pb-1 md:hidden"
+        >
+          {ongletActif.sous.map((sl) => {
+            const sousActif = pathname === sl.href;
+            return (
+              <Link
+                key={sl.href}
+                href={sl.href}
+                aria-current={sousActif ? "page" : undefined}
+                className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-[12.5px] font-medium transition ${
+                  sousActif
+                    ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
+                    : "border-white/10 text-graphite-300"
+                }`}
+              >
+                {sl.label}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
 
       <div className="mt-6 hidden border-t border-laiton-500/15 pt-5 md:block">
         <div className="grid grid-cols-2 gap-2 text-xs text-graphite-400">
