@@ -101,12 +101,19 @@ export function ProgrammePretCard({
         {photoUrl && <CoaiImageMark />}
       </ProgrammeCoverAction>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div>
-          <h3 className="font-display text-base font-semibold text-[#fffdf8]">{programme.nom}</h3>
-          <p className="mt-1 text-xs leading-5 text-graphite-400">{programme.accroche}</p>
-        </div>
-
+      {/* Mode jaquette (02/09/2026, demande Anthony) : la carte n'affiche que
+          la couverture. Tout le detail — niveau, frequence, description, pack,
+          seances — attend derriere un clic, pour qu'une grille se parcoure a
+          l'oeil comme une etagere plutot qu'a la lecture. */}
+      <details className="group/jaquette">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 border-t border-white/[0.06] px-4 py-3 text-sm font-semibold text-graphite-200 transition hover:bg-white/[0.03] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-laiton-300">
+          <span className="truncate">{programme.nom.split(" — ")[0]}</span>
+          <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-laiton-300">
+            <span className="group-open/jaquette:hidden">Découvrir →</span>
+            <span className="hidden group-open/jaquette:inline">Fermer ↑</span>
+          </span>
+        </summary>
+      <div className="flex flex-1 flex-col gap-3 p-4 pt-1">
         <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-center">
           <div>
             <strong className="block text-xs text-[#fffdf8]">{programme.niveau}</strong>
@@ -374,6 +381,7 @@ export function ProgrammePretCard({
           </div>
         </details>}
       </div>
+      </details>
     </article>
   );
 }
