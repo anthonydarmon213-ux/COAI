@@ -16,7 +16,12 @@ const nextConfig = {
     // dépôt. La politique ci-dessous neutralise malgré tout tout script et
     // toute ressource externe, au cas où un SVG douteux arriverait un jour.
     dangerouslyAllowSVG: true,
-    contentDispositionType: "attachment",
+    // "inline" et non "attachment" : ce reglage s'applique a TOUTES les
+    // images optimisees, pas seulement aux SVG. En "attachment" le navigateur
+    // les traite comme des telechargements et n'affiche plus rien — toutes les
+    // photos de recettes et d'exercices sont devenues noires. La protection
+    // contre un SVG malveillant est assuree par la politique ci-dessous.
+    contentDispositionType: "inline",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   experimental: {
