@@ -82,11 +82,18 @@ const ONGLETS: {
     icon: Moon,
     match: "/programme/recuperation",
     teinte: "167,139,250",
-    // Pas de sous-menu : la page de récupération est unique. Le lien
-    // « Sommeil & mesures » pointait en réalité vers /suivi/mesures, qui ne
-    // contient que des mesures corporelles (poids, tour de taille) et aucun
-    // contenu sommeil — libellé trompeur, et doublon de « Mesures » sous
-    // Progression.
+    // Un sous-menu existait autrefois avec « Sommeil & mesures », qui pointait
+    // en réalité vers /suivi/mesures : libellé trompeur et doublon de
+    // « Mesures » sous Progression. Il revient aujourd'hui avec une
+    // destination réelle — les cinq protocoles de récupération, jusqu'ici
+    // noyés dans la liste complète des programmes.
+    sous: [
+      { href: "/programme/recuperation", label: "Plan du jour" },
+      {
+        href: "/programme/programmes-prets?categorie=RECUPERATION",
+        label: "Protocoles de récupération",
+      },
+    ],
   },
   {
     href: "/suivi/progression",

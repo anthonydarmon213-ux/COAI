@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProgrammePretCard } from "@/components/programme/programme-pret-card";
 import { CATEGORIE_PROGRAMME_LABEL, type CategorieProgrammePret, type ProgrammePret } from "@/lib/programmes-prets/catalogue";
 
@@ -18,7 +19,15 @@ export function ProgrammesPretsGrid({
   connecte: boolean;
   suiviInclus: boolean;
 }) {
-  const [categorie, setCategorie] = useState<CategorieProgrammePret | null>(null);
+  // Categorie lisible depuis l'URL : le menu peut ainsi pointer directement
+  // sur les protocoles de recuperation, au lieu d'ouvrir la liste complete en
+  // laissant l'utilisateur retrouver le bon filtre.
+  const params = useSearchParams();
+  const depuisUrl = params.get("categorie");
+  const initiale = (CATEGORIE_PROGRAMME_LABEL as Record<string, string>)[depuisUrl ?? ""]
+    ? (depuisUrl as CategorieProgrammePret)
+    : null;
+  const [categorie, setCategorie] = useState<CategorieProgrammePret | null>(initiale);
 
   const filtres = useMemo(
     () => (categorie ? items.filter((i) => i.programme.categorie === categorie) : items),

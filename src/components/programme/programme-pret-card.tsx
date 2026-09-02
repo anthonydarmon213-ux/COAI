@@ -1,4 +1,4 @@
-import { CATEGORIE_PROGRAMME_LABEL, type ProgrammePret } from "@/lib/programmes-prets/catalogue";
+import type { ProgrammePret } from "@/lib/programmes-prets/catalogue";
 import Image from "next/image";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { ExerciceVideo } from "@/components/programme/exercice-video";
@@ -60,9 +60,6 @@ export function ProgrammePretCard({
             className="object-cover object-center transition duration-500 group-hover:scale-[1.02]"
           />
         )}
-        {/* Voile de gauche a droite : les photos sont composees avec le sujet a
-            droite et du noir a gauche, exactement pour recevoir le titre. */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/95 via-[#050505]/45 to-transparent" aria-hidden="true" />
         {programme.badge && (
           <span className="absolute right-3 top-3 rounded-full border border-laiton-300/50 bg-black/55 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-laiton-200 backdrop-blur-sm">
             {programme.badge}
@@ -75,30 +72,9 @@ export function ProgrammePretCard({
             Programme offert
           </span>
         )}
-        {/* Titre en surimpression, a gauche, la ou la photo laisse du noir.
-            Les couvertures SVG de Codex portaient deja ce titre, mais un SVG
-            affiche dans une balise <img> est en mode securise et ne charge
-            aucune ressource externe : leur photo, simplement referencee et non
-            embarquee, n'apparaissait jamais. On affiche donc la photo elle-meme
-            et le titre revient ici. */}
-        {/* Bloc titre borne en hauteur : "Prepa Semi-marathon" tenait sur
-            trois lignes et debordait sous le visuel. */}
-        <span className="absolute inset-x-5 top-4 block max-w-[68%]">
-          <span className="block font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-300">
-            {CATEGORIE_PROGRAMME_LABEL[programme.categorie]}
-          </span>
-          <span className="mt-1.5 block font-display text-xl font-bold uppercase leading-[1.04] tracking-[-0.02em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,.9)] sm:text-2xl lg:text-[1.75rem]">
-            {programme.nom.split(" — ")[0]}
-          </span>
-          <span className="mt-2 block h-[3px] w-12 rounded-full bg-laiton-300" aria-hidden="true" />
-          <span className="mt-2 hidden text-[11px] font-semibold leading-4 text-graphite-200 drop-shadow-[0_2px_10px_rgba(0,0,0,.9)] sm:block">
-            {programme.accroche}
-          </span>
-        </span>
         <span className="absolute bottom-3 left-4 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
           {programme.duree}
         </span>
-        {photoUrl && <CoaiImageMark />}
       </ProgrammeCoverAction>
 
       {/* Mode jaquette (02/09/2026, demande Anthony) : la carte n'affiche que
