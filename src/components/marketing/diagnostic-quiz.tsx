@@ -2331,15 +2331,24 @@ export function DiagnosticQuiz({
                 <div className="w-full rounded-[1.6rem] border border-laiton-400/35 bg-laiton-400/[0.07] px-6 py-7 text-center">
                   <SectionLabel>Conserve ton résultat</SectionLabel>
                   <h3 className="mt-3 font-display text-2xl font-semibold text-white">
-                    Crée gratuitement ton espace COAI.
+                    Entre dans ton espace COAI.
                   </h3>
+                  {/* La formulation precedente annoncait le choix d'une formule
+                      comme etape suivante, alors que l'inscription mene
+                      directement au tableau de bord : elle promettait une
+                      friction qui n'existe pas et faisait fuir avant l'essai. */}
                   <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-graphite-300">
-                    Ton diagnostic et cet aperçu seront enregistrés. Tu choisiras ta formule
-                    seulement à l&apos;étape suivante, sans paiement automatique.
+                    Ton diagnostic est enregistré et tu arrives directement dans
+                    l&apos;application. Dix fonctions sont gratuites, sans carte bancaire :
+                    suivi de tes séances, records, mesures, bibliothèque d&apos;exercices,
+                    recettes. Tu ne choisiras une formule que si tu veux aller plus loin.
                   </p>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="mt-5 inline-flex">
-                    <Button className="px-8 py-4">Créer mon compte gratuit →</Button>
+                    <Button className="px-8 py-4">Entrer dans l&apos;application →</Button>
                   </Link>
+                  <p className="mt-3 text-xs text-graphite-400">
+                    Gratuit, sans engagement, sans paiement automatique.
+                  </p>
                 </div>
               )}
 
