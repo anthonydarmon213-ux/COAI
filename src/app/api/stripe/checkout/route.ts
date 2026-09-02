@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
 import { getCurrentUser } from "@/lib/auth/server";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
@@ -12,14 +13,16 @@ import { prisma } from "@/lib/db/client";
 // (soit 9,99€/mois) — le choix mensuel/annuel est désormais réellement
 // proposé, alors que le paramètre "billing" envoyé par SubscribeButton
 // était jusqu'ici ignoré côté serveur.
-const OFFER_BY_PLAN = {
+const offresParPlan = () => ({
   PASS_IA: {
     name: "COAI — Pass IA",
     trialDays: 7,
     MONTHLY: { amount: 1999, interval: "month", count: 1 },
     // 49 € les 3 mois, soit 16,33 €/mois : assez proche du mensuel pour ne
     // pas cannibaliser l'annuel, deja remise de moitie.
-    QUARTERLY: { amount: 4900, interval: "month", count: 3 },
+    // Prix lu a chaque demande : l'offre de rentree le ramene a 39 €
+    // jusqu'au 30 septembre, puis il revient a 49 € sans intervention.
+    QUARTERLY: { amount: prixTrimestreCentimes(), interval: "month", count: 3 },
     ANNUAL: { amount: 11900, interval: "year", count: 1 },
   },
   STANDARD: {
@@ -29,7 +32,7 @@ const OFFER_BY_PLAN = {
     QUARTERLY: { amount: 9900, interval: "month", count: 1 },
     ANNUAL: { amount: 9900, interval: "month", count: 1 },
   },
-} as const;
+}) as const;
 
 // PREMIUM (VIP) a ete retire de la vente en ligne le 02/09/2026 : le
 // coaching VIP se vend desormais a la seance (200 euros puis devis) et se
@@ -37,7 +40,7 @@ const OFFER_BY_PLAN = {
 // libelles pour ne pas casser les comptes qui la portent deja, mais aucun
 // nouveau checkout ne peut plus la creer.
 
-type Plan = keyof typeof OFFER_BY_PLAN;
+type Plan = keyof ReturnType<typeof offresParPlan>;
 
 export async function POST(request: Request) {
   const authUser = await getCurrentUser();
@@ -57,7 +60,7 @@ export async function POST(request: Request) {
   }
 
   const plan: Plan = body.plan === "PASS_IA" ? "PASS_IA" : "STANDARD";
-  const planConfig = OFFER_BY_PLAN[plan];
+  const planConfig = offresParPlan()[plan];
   // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
   // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
   // envoyé par erreur ne peut pas facturer un montant inattendu.
