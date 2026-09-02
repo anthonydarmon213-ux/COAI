@@ -574,8 +574,8 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Améliorer la qualité perçue du sommeil, pas seulement sa durée",
     ],
     photoQuery: "peaceful bedroom night sleep",
-    photoFemme: "/exercices/mollets-unilateral-haltere-femme-metisse-v2.jpg",
-    photoHomme: "/exercices/rowing-elastique-homme-blond.jpg",
+    photoFemme: "/programmes/recuperation/sommeil-reparateur-femme-v1.png",
+    photoHomme: "/programmes/recuperation/sommeil-reparateur-homme-v1.png",
     medias: [
       "Windmill haltère",
       "Superman",
@@ -616,8 +616,8 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Avoir un outil simple à utiliser n'importe où",
     ],
     photoQuery: "calm breathing exercise relaxation",
-    photoFemme: "/exercices/curl-biceps-halteres-femme-metisse-v2.jpg",
-    photoHomme: "/exercices/rowing-haltere-unilateral-homme-arabe.jpg",
+    photoFemme: "/programmes/recuperation/respiration-diaphragmatique-femme-v1.png",
+    photoHomme: "/programmes/recuperation/respiration-diaphragmatique-homme-v1.png",
     medias: [
       "Windmill haltère",
       "Gainage planche",
@@ -664,8 +664,8 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Installer une pause mentale régulière dans la semaine",
     ],
     photoQuery: "person meditating calm peaceful",
-    photoFemme: "/exercices/developpe-couche-barre-femme-blonde-v2.jpg",
-    photoHomme: "/exercices/curl-barre-ez-homme-metis-v2.jpg",
+    photoFemme: "/programmes/recuperation/meditation-guidee-femme-v1.png",
+    photoHomme: "/programmes/recuperation/meditation-guidee-homme-v1.png",
     medias: [
       "Windmill haltère",
       "Superman",
@@ -698,8 +698,8 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Éviter les erreurs qui transforment la récupération en fatigue supplémentaire",
     ],
     photoQuery: "sauna wellness relaxation spa",
-    photoFemme: "/exercices/mollets-debout-machine-femme-metisse-v2.jpg",
-    photoHomme: "/exercices/mollets-assis-machine-homme-metis-v2.jpg",
+    photoFemme: "/programmes/recuperation/auto-massage-foam-roller-femme-v1.png",
+    photoHomme: "/programmes/recuperation/auto-massage-foam-roller-homme-v1.png",
     medias: [
       "Windmill haltère",
       "Superman",

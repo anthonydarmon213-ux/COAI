@@ -128,6 +128,7 @@ model User {
   aiUsageEvents            AiUsageEvent[]
   programmePurchases       ProgrammePurchase[]
   routines                 Routine[]
+  formChecks               FormCheck[]
   churnFeedback            ChurnFeedback?
   coachNotesReceived       CoachNote[]              @relation("CoachNoteClient")
   coachNotesAuthored       CoachNote[]              @relation("CoachNoteAuthor")
@@ -996,4 +997,31 @@ model Routine {
 
   @@index([userId, nom])
   @@map("routines")
+}
+
+
+// Correction de mouvement (02/09/2026, demande Anthony) : un membre qui doute
+// de sa technique filme sa serie et l'envoie ; Anthony repond par un
+// ajustement ecrit. La video vit dans un bucket Supabase prive, jamais en
+// acces public — seul son chemin est stocke ici.
+enum StatutFormCheck {
+  EN_ATTENTE
+  REPONDU
+}
+
+model FormCheck {
+  id         String          @id @default(uuid())
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercice   String
+  videoPath  String
+  question   String?
+  statut     StatutFormCheck @default(EN_ATTENTE)
+  reponse    String?
+  repondueAt DateTime?
+  createdAt  DateTime        @default(now())
+
+  @@index([statut, createdAt])
+  @@index([userId, createdAt])
+  @@map("form_checks")
 }

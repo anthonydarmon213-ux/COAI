@@ -56,6 +56,7 @@ const ONGLETS: {
       { href: "/programme/seance-du-jour", label: "Ma fiche séance" },
       { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
       { href: "/programme/programmes-prets", label: "Programmes prêts" },
+      { href: "/programme/correction-mouvement", label: "Correction de mouvement" },
     ],
   },
   {
