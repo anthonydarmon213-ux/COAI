@@ -6,21 +6,21 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
-  title: "COAI Privé — Coaching Hybride 90 jours",
-  description: "Accompagnement privé de 90 jours avec Anthony Darmon : stratégie, entraînement, nutrition, récupération et suivi COAI quotidien.",
+  title: "Coaching VIP — À domicile, en entreprise, en club ou à distance",
+  description: "Coaching VIP avec Anthony Darmon, sur devis à partir de 200 € : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
   alternates: { canonical: "/vip" },
 };
 
 const INCLUS = [
   ["Diagnostic privé", "Objectif, contraintes, douleurs, habitudes et données : Anthony construit le point de départ avec toi."],
-  ["Plan sur mesure", "Entraînement, nutrition et récupération organisés autour de ton agenda et de ton résultat à 90 jours."],
+  ["Plan sur mesure", "Entraînement, nutrition et récupération organisés autour de ton agenda et de ton objectif."],
   ["Ajustements continus", "Le plan évolue chaque semaine selon ta forme, tes retours, tes mesures et tes progrès."],
   ["Accès direct", "Anthony pilote les décisions importantes ; COAI t'accompagne et te guide chaque jour entre les rendez-vous."],
 ];
 
 export default function VipPage() {
   const whatsappHref = buildWhatsAppLink(
-    "Bonjour Anthony, je souhaite échanger avec vous au sujet de l’accompagnement COAI Privé sur 90 jours."
+    "Bonjour Anthony, je souhaite un devis pour un coaching VIP COAI."
   );
 
   return (
@@ -32,18 +32,18 @@ export default function VipPage() {
 
         <div className="mt-12 grid items-start gap-14 lg:grid-cols-[1fr_.82fr] lg:gap-20">
           <div>
-            <SectionLabel>COAI Privé · 90 jours</SectionLabel>
+            <SectionLabel>Coaching VIP · sur devis</SectionLabel>
             <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-6xl">
               Ta transformation ne sera plus laissée au hasard.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-graphite-300">
-              Pendant 90 jours, Anthony pilote personnellement ta transformation : bilan initial,
-              programme sur mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI.
-              Tu sais quoi faire, quand le faire et pourquoi.
+              Anthony pilote personnellement ta transformation : bilan initial, programme sur
+              mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI. Chez toi, dans
+              ton entreprise, en club ou à distance — tu sais quoi faire, quand le faire et pourquoi.
             </p>
 
             <div className="mt-8 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-6 py-5">
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-laiton-200">Concrètement, pendant 90 jours</p>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-laiton-200">Concrètement</p>
               <p className="mt-2 text-base font-semibold leading-7 text-white">
                 Un objectif chiffré, une feuille de route claire, des points réguliers avec Anthony
                 et un programme qui s&apos;adapte à ta vraie vie jusqu&apos;au résultat.
@@ -68,12 +68,12 @@ export default function VipPage() {
             </div>
 
             <div className="mt-10 flex items-end gap-3">
-              <span className="font-display text-4xl font-semibold text-white">À partir de 2 500 €</span>
-              <span className="pb-1 text-sm text-graphite-500">pour 90 jours</span>
+              <span className="font-display text-4xl font-semibold text-white">À partir de 200 €</span>
+              <span className="pb-1 text-sm text-graphite-500">sur devis</span>
             </div>
             <p className="mt-2 text-sm text-laiton-200">Nombre de nouveaux accompagnements volontairement limité.</p>
             <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
-              Vérifier si COAI Privé est fait pour moi
+              Demander mon devis
             </a>
           </div>
 

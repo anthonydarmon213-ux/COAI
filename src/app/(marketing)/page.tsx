@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
@@ -798,6 +799,10 @@ const PARCOURS_COURT = [
 ] as const;
 
 export default function LandingPage() {
+  const whatsappVip = buildWhatsAppLink(
+    "Bonjour Anthony, je souhaite un devis pour un coaching VIP COAI."
+  );
+
   return (
     <main className="coai-color-surface bg-lab-grid flex flex-col after:hidden">
       <script
@@ -851,69 +856,89 @@ export default function LandingPage() {
       </section>
 
 
-      {/* COAI à domicile — coaching VIP en présentiel, Paris centre */}
+      {/* Coaching VIP : sur devis, 4 modalites, contact WhatsApp direct */}
       <Reveal>
       <section
-        id="a-domicile"
+        id="coaching-vip"
         className="mx-auto my-8 w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-laiton-300/25 bg-laiton-300/[0.04] px-6 py-16 sm:px-12 sm:py-20"
-        aria-labelledby="a-domicile-title"
+        aria-labelledby="coaching-vip-title"
       >
         <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
           <div>
-            <SectionLabel>Coaching VIP à domicile</SectionLabel>
+            <SectionLabel>Coaching VIP</SectionLabel>
             <h2
-              id="a-domicile-title"
+              id="coaching-vip-title"
               className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
             >
-              Anthony vient chez toi.
+              Anthony te coache
               <br />
-              Paris centre.
+              en personne.
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-8 text-graphite-300">
-              Pas de salle, pas de trajet, pas d&apos;horaire à négocier. Ton coach se
-              déplace à ton domicile avec le matériel, et la séance s&apos;inscrit dans
-              ton agenda — pas l&apos;inverse.
+              Chez toi, dans ton entreprise, en club ou à distance. Le format
+              s&apos;adapte à ton agenda et à ton objectif — pas l&apos;inverse.
             </p>
             <p className="mt-5 max-w-xl text-base leading-7 text-graphite-400">
-              17 ans de terrain auprès de dirigeants et d&apos;entrepreneurs. L&apos;objectif
-              n&apos;est pas la performance d&apos;un jour : c&apos;est ta longévité, ton
-              énergie quotidienne et la régularité qui les rend possibles.
+              17 ans de terrain auprès de dirigeants et d&apos;entrepreneurs.
+              L&apos;objectif n&apos;est pas la performance d&apos;un jour : c&apos;est ta
+              longévité, ton énergie quotidienne et la régularité qui les rend possibles.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <Link
-                href="/vip"
-                className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
-              >
-                Demander une séance à domicile
-              </Link>
+            <div className="mt-8 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-6 py-5">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-200">
+                Tarif
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">
+                À partir de 200 €{" "}
+                <span className="text-base font-normal text-graphite-300">· sur devis</span>
+              </p>
+              <p className="mt-2 text-sm leading-6 text-graphite-400">
+                Chaque accompagnement est construit sur mesure. On en parle
+                directement, sans formulaire.
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              {whatsappVip ? (
+                <a
+                  href={whatsappVip}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
+                >
+                  Demander mon devis sur WhatsApp
+                </a>
+              ) : (
+                <Link
+                  href="/vip"
+                  className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
+                >
+                  Demander mon devis
+                </Link>
+              )}
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">
-                Sur candidature · places limitées
+                Réponse directe · places limitées
               </span>
             </div>
           </div>
 
-          <div className="grid gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-1">
+          <div className="grid gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-2">
             {[
               {
-                titre: "Chez toi, matériel fourni",
-                texte:
-                  "Anthony se déplace équipé. Ton salon suffit — aucun achat, aucun abonnement de salle.",
+                titre: "À domicile",
+                texte: "Anthony se déplace équipé. Ton salon suffit, aucun achat de matériel.",
               },
               {
-                titre: "Un plan tenu par un humain",
-                texte:
-                  "Entraînement, nutrition et récupération pilotés par Anthony, ajustés à tes contraintes réelles.",
+                titre: "En entreprise",
+                texte: "Séances au bureau pour toi ou tes équipes, calées sur vos créneaux.",
               },
               {
-                titre: "COAI entre les séances",
-                texte:
-                  "L'application t'accompagne les autres jours : séances guidées, suivi et rappels.",
+                titre: "En club",
+                texte: "On se retrouve dans ta salle et on exploite tout l'équipement disponible.",
               },
               {
-                titre: "Paris centre",
-                texte:
-                  "Déplacement dans Paris intra-muros. Créneaux tôt le matin ou en fin de journée.",
+                titre: "À distance",
+                texte: "Visio et suivi continu, où que tu sois, avec l'application entre les séances.",
               },
             ].map((bloc) => (
               <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6">
