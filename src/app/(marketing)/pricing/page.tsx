@@ -93,6 +93,28 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           colonnes, le VIP écrasait visuellement les deux offres réellement
           souscrites en ligne. Depuis le 02/09/2026 il n'est plus vendu par
           abonnement : séances à 200 € puis devis, conclu sur WhatsApp. */}
+      {/* Sortie gratuite (02/09/2026, demande Anthony — "je ne peux pas entrer
+          sans prendre un abo ?"). Le tunnel du diagnostic proposait bien
+          l'entree libre, mais quiconque arrivait ici par le menu ou par un
+          lien externe ne voyait que des boutons payants : la page ressemblait
+          a un mur alors que l'application est ouverte sans carte bancaire. */}
+      <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
+        <p className="text-sm font-semibold text-white">
+          Tu peux entrer dans l&apos;application sans payer.
+        </p>
+        <p className="mx-auto mt-1 max-w-2xl text-xs leading-5 text-graphite-300">
+          Dix fonctions sont gratuites, sans carte bancaire : suivi de tes séances,
+          RepCount, records, mesures, bibliothèque d&apos;exercices et recettes. Tu
+          choisiras une formule seulement si tu veux aller plus loin.
+        </p>
+        <Link
+          href="/dashboard"
+          className="mt-3 inline-flex rounded-full border border-cyan-300/40 bg-cyan-300/10 px-6 py-2.5 text-sm font-bold text-cyan-100"
+        >
+          Entrer dans l&apos;application →
+        </Link>
+      </div>
+
       <CompteAReboursRentree className="w-full max-w-5xl" />
 
       <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
