@@ -23,7 +23,7 @@ export function SubscribeButton({
   plan: "PASS_IA" | "STANDARD" | "PREMIUM";
   label: string;
   className?: string;
-  billing?: "MONTHLY" | "ANNUAL";
+  billing?: "MONTHLY" | "QUARTERLY" | "ANNUAL";
   vipSessions?: 1 | 2 | 3 | 4;
 }) {
   const [loading, setLoading] = useState(false);

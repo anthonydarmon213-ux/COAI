@@ -12,7 +12,7 @@ const BILLING_COOKIE_NAME = "coai_billing";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 3; // 3 jours
 
 export type IntendedPlan = "PASS_IA" | "STANDARD" | "PREMIUM";
-export type IntendedBilling = "MONTHLY" | "ANNUAL";
+export type IntendedBilling = "MONTHLY" | "QUARTERLY" | "ANNUAL";
 
 export function storeIntendedPlanCookie(
   plan: IntendedPlan,
@@ -28,7 +28,9 @@ export function storeIntendedPlanCookie(
 export function readIntendedBillingCookie(): IntendedBilling {
   if (typeof document === "undefined") return "MONTHLY";
   const match = document.cookie.match(new RegExp(`(?:^|; )${BILLING_COOKIE_NAME}=([^;]*)`));
-  return match?.[1] === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+  if (match?.[1] === "ANNUAL") return "ANNUAL";
+  if (match?.[1] === "QUARTERLY") return "QUARTERLY";
+  return "MONTHLY";
 }
 
 export function readIntendedPlanCookie(): IntendedPlan | null {

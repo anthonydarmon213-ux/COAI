@@ -57,7 +57,7 @@ export const TIERS: Tier[] = [
     prix: "19,99€",
     suffixe: "/mois",
     factureAnnuellement: false,
-    noteFacturation: "Sans engagement · ou 9,99€/mois en annuel (119€ facturés une fois par an)",
+    noteFacturation: "Sans engagement · 49€ les 3 mois, ou 9,99€/mois en annuel (119€ facturés une fois par an)",
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
     features: [

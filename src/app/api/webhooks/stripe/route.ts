@@ -120,8 +120,16 @@ function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
   return "STANDARD";
 }
 
-function mapBillingInterval(subscription: Stripe.Subscription): "MONTHLY" | "ANNUAL" {
-  return subscription.items.data[0]?.price.recurring?.interval === "year" ? "ANNUAL" : "MONTHLY";
+function mapBillingInterval(
+  subscription: Stripe.Subscription
+): "MONTHLY" | "QUARTERLY" | "ANNUAL" {
+  const recurring = subscription.items.data[0]?.price.recurring;
+  if (recurring?.interval === "year") return "ANNUAL";
+  // Le trimestriel est un intervalle mensuel repete trois fois, pas un
+  // intervalle distinct chez Stripe : sans lire interval_count il serait
+  // enregistre comme un simple mensuel.
+  if (recurring?.interval === "month" && recurring.interval_count === 3) return "QUARTERLY";
+  return "MONTHLY";
 }
 
 // Stripe a déplacé current_period_end du niveau abonnement vers chaque

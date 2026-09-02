@@ -282,6 +282,9 @@ enum SubscriptionPlan {
 
 enum BillingInterval {
   MONTHLY
+  // Trimestriel (02/09/2026) : marche intermediaire, l'annuel a 50 % de
+  // remise laissait un ecart trop grand avec le mensuel.
+  QUARTERLY
   ANNUAL
 }
 

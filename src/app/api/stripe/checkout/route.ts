@@ -16,14 +16,18 @@ const OFFER_BY_PLAN = {
   PASS_IA: {
     name: "COAI — Pass IA",
     trialDays: 7,
-    MONTHLY: { amount: 1999, interval: "month" },
-    ANNUAL: { amount: 11900, interval: "year" },
+    MONTHLY: { amount: 1999, interval: "month", count: 1 },
+    // 49 € les 3 mois, soit 16,33 €/mois : assez proche du mensuel pour ne
+    // pas cannibaliser l'annuel, deja remise de moitie.
+    QUARTERLY: { amount: 4900, interval: "month", count: 3 },
+    ANNUAL: { amount: 11900, interval: "year", count: 1 },
   },
   STANDARD: {
     name: "COAI — Coaching Hybride",
     trialDays: 7,
-    MONTHLY: { amount: 9900, interval: "month" },
-    ANNUAL: { amount: 9900, interval: "month" },
+    MONTHLY: { amount: 9900, interval: "month", count: 1 },
+    QUARTERLY: { amount: 9900, interval: "month", count: 1 },
+    ANNUAL: { amount: 9900, interval: "month", count: 1 },
   },
 } as const;
 
@@ -57,7 +61,11 @@ export async function POST(request: Request) {
   // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
   // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
   // envoyé par erreur ne peut pas facturer un montant inattendu.
-  const billing: "MONTHLY" | "ANNUAL" = body.billing === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+  // Seul Pass IA propose reellement les trois rythmes ; pour les autres les
+  // trois entrees pointent sur le meme tarif mensuel, donc une valeur
+  // inattendue ne peut pas facturer un montant surprise.
+  const billing: "MONTHLY" | "QUARTERLY" | "ANNUAL" =
+    body.billing === "ANNUAL" ? "ANNUAL" : body.billing === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
   const tarif = planConfig[billing];
   const offer = { name: planConfig.name, trialDays: planConfig.trialDays, ...tarif };
 
@@ -77,7 +85,7 @@ export async function POST(request: Request) {
       price_data: {
         currency: "eur",
         unit_amount: offer.amount,
-        recurring: { interval: offer.interval },
+        recurring: { interval: offer.interval, interval_count: offer.count },
         product_data: {
           name: offer.name,
           description: offer.interval === "year"

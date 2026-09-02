@@ -163,12 +163,23 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                     />
                     {/* Option annuelle proposée uniquement sur Pass IA. */}
                     {tier.plan === "PASS_IA" && (
-                      <SubscribeButton
-                        plan="PASS_IA"
-                        billing="ANNUAL"
-                        label="Choisir l'annuel · 119€/an"
-                        className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
-                      />
+                      <>
+                        <SubscribeButton
+                          plan="PASS_IA"
+                          billing="ANNUAL"
+                          label="Choisir l'annuel · 119€/an"
+                          className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
+                        />
+                        {/* Marche intermediaire (02/09/2026) : l'ecart entre
+                            19,99 €/mois et 9,92 €/mois en annuel laissait
+                            partir ceux que l'engagement d'un an rebute. */}
+                        <SubscribeButton
+                          plan="PASS_IA"
+                          billing="QUARTERLY"
+                          label="Choisir 3 mois · 49€"
+                          className="w-full border border-white/15 bg-white/[0.035] text-white"
+                        />
+                      </>
                     )}
                   </>
                 )}
