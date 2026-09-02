@@ -21,7 +21,7 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
 const RESUME_COMPARATIF: Record<ServiceKey, string> = {
   IMPULSION: "Coach personnel autonome et adaptatif — 19,99 €/mois",
   TRANSFORMATION: "IA 24/7 + regard et ajustements humains — 99€/mois",
-  VIP: "1 à 4 séances privées par mois, présentiel ou visio — dès 199€/mois",
+  VIP: "Séances privées avec Anthony — à domicile, en entreprise, en club ou à distance, 200 € la séance",
 };
 
 // Carte "Ta formule" (16/08/2026, demande Anthony) : jusqu'ici rien sur

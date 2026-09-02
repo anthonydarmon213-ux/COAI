@@ -10,7 +10,7 @@ import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
   GRATUIT: "Pass IA — 19,99€/mois",
   STANDARD: "Coaching Hybride — 99€/mois",
-  PREMIUM: "VIP — à partir de 199€/mois",
+  PREMIUM: "Coaching VIP — 200 € la séance",
 };
 
 const PROGRAMME_PAR_SLUG = new Map(PROGRAMMES_PRETS.map((programme) => [programme.slug, programme]));

@@ -364,7 +364,7 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
     return {
       service: "VIP",
       label: "VIP",
-      raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, en présentiel à Paris centre ou en visio.",
+      raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, à domicile, en entreprise, en club ou à distance.",
     };
   }
   if (sante.length > 0) {

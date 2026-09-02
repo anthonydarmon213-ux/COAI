@@ -17,7 +17,7 @@ export type BesoinIdentifie = {
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
   IMPULSION: { label: "Pass IA — 19,99€/mois ou 119€/an", href: "/pricing#impulsion" },
   TRANSFORMATION: { label: "Coaching Hybride — 99€/mois", href: "/pricing#transformation" },
-  VIP: { label: "VIP — dès 199€/mois", href: "/pricing#vip" },
+  VIP: { label: "Coaching VIP — 200 € la séance", href: "/pricing#vip" },
 };
 
 function contient(valeur: string | null | undefined, motif: string): boolean {

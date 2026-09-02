@@ -172,7 +172,7 @@ export function ActivationFlow({
         <SectionLabel>Ton profil est prêt</SectionLabel>
         <p className="max-w-md text-sm leading-6 text-graphite-300">
           Choisis le niveau d&apos;attention qui te correspond : Pass IA à 19,99€/mois,
-          Coaching Hybride à 99€/mois, ou VIP dès 199€/mois.
+          Coaching Hybride à 99€/mois, ou le Coaching VIP à 200 € la séance.
         </p>
         <Link href="/pricing">
           <Button className="px-8 py-3">Choisir mon accompagnement</Button>

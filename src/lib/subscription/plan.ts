@@ -86,5 +86,5 @@ export function hasStreamingAccess(
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
   GRATUIT: "Pass IA — 19,99€/mois ou 119€/an",
   STANDARD: "Coaching Hybride — 99€/mois",
-  PREMIUM: "VIP — à partir de 199€/mois",
+  PREMIUM: "Coaching VIP — 200 € la séance",
 };

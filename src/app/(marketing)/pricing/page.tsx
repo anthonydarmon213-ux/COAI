@@ -27,7 +27,7 @@ function tierId(plan: string) {
 const COMPARAISON_RAPIDE = [
   ["Pass IA", "Je veux avancer en autonomie", "IA 24h/24 · programme adaptatif"],
   ["Coaching Hybride", "Je veux aussi un regard humain", "Supervision et ajustements du coach"],
-  ["VIP", "Je veux une attention maximale", "1 séance privée par mois incluse"],
+  ["Coaching VIP", "Je veux une attention maximale", "200 € la séance, sans abonnement"],
 ] as const;
 
 export const metadata: Metadata = {
