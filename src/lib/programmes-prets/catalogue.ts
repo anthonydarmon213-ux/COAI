@@ -732,6 +732,43 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       },
     ],
   },
+  {
+    slug: "foam-roller-reset-complet",
+    nom: "Foam Roller Reset — Corps complet",
+    categorie: "RECUPERATION",
+    niveau: "Tous niveaux",
+    duree: "8 protocoles",
+    frequence: "10 à 15 minutes, 2 à 4 fois par semaine",
+    accroche: "Huit zones, une méthode simple et une pression toujours contrôlée.",
+    description:
+      "Un programme progressif d’auto-massage au foam roller pour les principales zones sollicitées par l’entraînement. Chaque protocole dure 60 à 90 secondes par côté avec des passages lents, une respiration régulière et une pression modérée. Le rouleau reste sur les tissus musculaires : jamais directement sur une articulation, la nuque, la colonne lombaire ou une douleur aiguë.",
+    objectifs: [
+      "Réduire la sensation de raideur après l’entraînement",
+      "Apprendre huit placements simples et sûrs",
+      "Adapter la pression sans rechercher la douleur",
+      "Installer une routine courte de récupération autonome",
+    ],
+    photoQuery: "woman full body foam roller recovery premium dark studio",
+    photoFemme: "/programmes/recuperation/foam-roller/quadriceps-femme-v1.png",
+    photoHomme: "/programmes/recuperation/auto-massage-foam-roller-homme-v1.png",
+    medias: ["Foam roller mollets", "Foam roller ischio-jambiers", "Foam roller quadriceps", "Foam roller fessiers", "Foam roller haut du dos"],
+    jours: [
+      { jour: "Protocole 1", focus: "Mollets", contenu: "Assis·e, mains derrière le bassin, place le rouleau sous le ventre du mollet. Soulève légèrement les hanches et effectue de petits passages entre la cheville et le dessous du genou, sans rouler sur le tendon d’Achille ni l’articulation. 60 secondes par côté." },
+      { jour: "Protocole 2", focus: "Ischio-jambiers", contenu: "Assis·e, place le rouleau sous l’arrière de la cuisse. Garde l’autre pied au sol pour doser la charge et roule lentement du dessous du fessier jusqu’à quelques centimètres au-dessus du genou. 60 à 90 secondes par côté." },
+      { jour: "Protocole 3", focus: "Quadriceps", contenu: "En appui sur les avant-bras, place le rouleau sous le milieu de la face avant d’une cuisse. Garde le bassin neutre et effectue de courts passages entre le haut de la cuisse et quelques centimètres au-dessus du genou. 60 secondes par côté." },
+      { jour: "Protocole 4", focus: "Fessiers", contenu: "Assis·e sur le rouleau, décale légèrement le poids sur un fessier. Pour cibler la zone profonde, pose naturellement la cheville du même côté sur la cuisse opposée, sans forcer le genou. Réalise de petits passages pendant 60 secondes par côté." },
+      { jour: "Protocole 5", focus: "Face externe de cuisse", contenu: "Allongé·e sur le côté, place le rouleau sous la partie musculaire externe de la cuisse. Pose le pied supérieur devant toi pour contrôler la pression. Reste sur une petite amplitude confortable et évite la hanche comme le genou. 45 à 60 secondes par côté." },
+      { jour: "Protocole 6", focus: "Adducteurs", contenu: "Sur les avant-bras, ouvre doucement une jambe sur le côté et place le rouleau sous l’intérieur de la cuisse. Garde le bassin stable et roule sur une courte distance, sans atteindre l’aine ni le genou. 45 à 60 secondes par côté." },
+      { jour: "Protocole 7", focus: "Haut du dos", contenu: "Allongé·e, genoux pliés et pieds au sol, place le rouleau horizontalement sous le haut du dos, sous les omoplates. Soutiens la tête avec les mains et effectue de petits passages thoraciques. Ne roule jamais sur la nuque ni sur les lombaires. 60 secondes." },
+      { jour: "Protocole 8", focus: "Grand dorsal", contenu: "Allongé·e sur le côté, bras inférieur allongé au-dessus de la tête, place le rouleau sous le bord externe du haut du dos, sous l’aisselle. Avance et recule sur une petite amplitude sans comprimer directement l’épaule. 45 à 60 secondes par côté." },
+    ],
+    recuperation: [
+      { titre: "Pression", contenu: "Reste autour de 4 à 6 sur 10 : une gêne tolérable peut être normale, une douleur vive ne l’est pas." },
+      { titre: "Respiration", contenu: "Expire lentement pendant les zones tendues et ralentis encore le mouvement plutôt que d’ajouter du poids." },
+      { titre: "Quand arrêter", contenu: "Arrête en cas de douleur aiguë, engourdissement, gonflement ou aggravation des symptômes et demande un avis professionnel." },
+    ],
+    note: "L’auto-massage peut améliorer temporairement la sensation de mobilité et de confort, mais ne traite pas une blessure. Évite les zones inflammées, les varices douloureuses, les plaies et toute zone contre-indiquée par un professionnel de santé.",
+  },
 ];
 
 // Contenu editorial (progression, nutrition, recuperation, mise en garde)
