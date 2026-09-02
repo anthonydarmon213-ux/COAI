@@ -19,10 +19,8 @@ export function CompteAReboursRentree({ className = "" }: { className?: string }
   // démarre qu'après le montage, sinon l'heure du serveur et celle du
   // visiteur divergent et React signale une hydratation incohérente.
   const [temps, setTemps] = useState<ReturnType<typeof restant>>(null);
-  const [monte, setMonte] = useState(false);
 
   useEffect(() => {
-    setMonte(true);
     setTemps(restant(OFFRE_RENTREE_FIN, new Date()));
     const id = window.setInterval(() => {
       setTemps(restant(OFFRE_RENTREE_FIN, new Date()));
@@ -30,14 +28,16 @@ export function CompteAReboursRentree({ className = "" }: { className?: string }
     return () => window.clearInterval(id);
   }, []);
 
-  if (!monte || !temps) return null;
-
-  const cases: [number, string][] = [
+  // Le message promo est rendu cote serveur : le masquer entierement jusqu'au
+  // montage le rendait invisible aux moteurs de recherche et aux connexions
+  // lentes. Seuls les chiffres attendent le client, l'heure du serveur et
+  // celle du visiteur ne pouvant pas concorder.
+  const cases: [number, string][] = temps ? [
     [temps.jours, temps.jours > 1 ? "jours" : "jour"],
     [temps.heures, "h"],
     [temps.minutes, "min"],
     [temps.secondes, "s"],
-  ];
+  ] : [];
 
   return (
     <div
@@ -53,7 +53,7 @@ export function CompteAReboursRentree({ className = "" }: { className?: string }
           {" "}Le tarif passera à {PRIX_APRES_OFFRE} pour les nouveaux membres.
         </span>
       </p>
-      <div className="mt-3 flex items-center justify-center gap-2">
+      <div className="mt-3 flex min-h-[3.25rem] items-center justify-center gap-2">
         {cases.map(([valeur, label]) => (
           <span
             key={label}
