@@ -547,81 +547,6 @@ function LandingPageHistorique() {
       </section>
       </Reveal>
 
-      {/* COAI à domicile — coaching VIP en présentiel, Paris centre */}
-      <Reveal>
-      <section
-        id="a-domicile"
-        className="mx-auto my-8 w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-laiton-300/25 bg-laiton-300/[0.04] px-6 py-16 sm:px-12 sm:py-20"
-        aria-labelledby="a-domicile-title"
-      >
-        <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
-          <div>
-            <SectionLabel>Coaching VIP à domicile</SectionLabel>
-            <h2
-              id="a-domicile-title"
-              className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
-            >
-              Anthony vient chez toi.
-              <br />
-              Paris centre.
-            </h2>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-graphite-300">
-              Pas de salle, pas de trajet, pas d&apos;horaire à négocier. Ton coach se
-              déplace à ton domicile avec le matériel, et la séance s&apos;inscrit dans
-              ton agenda — pas l&apos;inverse.
-            </p>
-            <p className="mt-5 max-w-xl text-base leading-7 text-graphite-400">
-              17 ans de terrain auprès de dirigeants et d&apos;entrepreneurs. L&apos;objectif
-              n&apos;est pas la performance d&apos;un jour : c&apos;est ta longévité, ton
-              énergie quotidienne et la régularité qui les rend possibles.
-            </p>
-
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <Link
-                href="/vip"
-                className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
-              >
-                Demander une séance à domicile
-              </Link>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">
-                Sur candidature · places limitées
-              </span>
-            </div>
-          </div>
-
-          <div className="grid gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-1">
-            {[
-              {
-                titre: "Chez toi, matériel fourni",
-                texte:
-                  "Anthony se déplace équipé. Ton salon suffit — aucun achat, aucun abonnement de salle.",
-              },
-              {
-                titre: "Un plan tenu par un humain",
-                texte:
-                  "Entraînement, nutrition et récupération pilotés par Anthony, ajustés à tes contraintes réelles.",
-              },
-              {
-                titre: "COAI entre les séances",
-                texte:
-                  "L'application t'accompagne les autres jours : séances guidées, suivi et rappels.",
-              },
-              {
-                titre: "Paris centre",
-                texte:
-                  "Déplacement dans Paris intra-muros. Créneaux tôt le matin ou en fin de journée.",
-              },
-            ].map((bloc) => (
-              <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6">
-                <p className="font-semibold text-white">{bloc.titre}</p>
-                <p className="mt-2 text-sm leading-6 text-graphite-400">{bloc.texte}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      </Reveal>
-
       {/* L'histoire */}
       <section id="histoire" className="mx-auto w-full max-w-3xl px-6 py-24 sm:py-28">
         <SectionLabel>L&apos;histoire</SectionLabel>
@@ -924,6 +849,82 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </div>
       </section>
+
+
+      {/* COAI à domicile — coaching VIP en présentiel, Paris centre */}
+      <Reveal>
+      <section
+        id="a-domicile"
+        className="mx-auto my-8 w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-laiton-300/25 bg-laiton-300/[0.04] px-6 py-16 sm:px-12 sm:py-20"
+        aria-labelledby="a-domicile-title"
+      >
+        <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
+          <div>
+            <SectionLabel>Coaching VIP à domicile</SectionLabel>
+            <h2
+              id="a-domicile-title"
+              className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
+            >
+              Anthony vient chez toi.
+              <br />
+              Paris centre.
+            </h2>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-graphite-300">
+              Pas de salle, pas de trajet, pas d&apos;horaire à négocier. Ton coach se
+              déplace à ton domicile avec le matériel, et la séance s&apos;inscrit dans
+              ton agenda — pas l&apos;inverse.
+            </p>
+            <p className="mt-5 max-w-xl text-base leading-7 text-graphite-400">
+              17 ans de terrain auprès de dirigeants et d&apos;entrepreneurs. L&apos;objectif
+              n&apos;est pas la performance d&apos;un jour : c&apos;est ta longévité, ton
+              énergie quotidienne et la régularité qui les rend possibles.
+            </p>
+
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <Link
+                href="/vip"
+                className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
+              >
+                Demander une séance à domicile
+              </Link>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">
+                Sur candidature · places limitées
+              </span>
+            </div>
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-1">
+            {[
+              {
+                titre: "Chez toi, matériel fourni",
+                texte:
+                  "Anthony se déplace équipé. Ton salon suffit — aucun achat, aucun abonnement de salle.",
+              },
+              {
+                titre: "Un plan tenu par un humain",
+                texte:
+                  "Entraînement, nutrition et récupération pilotés par Anthony, ajustés à tes contraintes réelles.",
+              },
+              {
+                titre: "COAI entre les séances",
+                texte:
+                  "L'application t'accompagne les autres jours : séances guidées, suivi et rappels.",
+              },
+              {
+                titre: "Paris centre",
+                texte:
+                  "Déplacement dans Paris intra-muros. Créneaux tôt le matin ou en fin de journée.",
+              },
+            ].map((bloc) => (
+              <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6">
+                <p className="font-semibold text-white">{bloc.titre}</p>
+                <p className="mt-2 text-sm leading-6 text-graphite-400">{bloc.texte}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      </Reveal>
 
       <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-16">
         <div className="text-center"><SectionLabel>Questions essentielles</SectionLabel></div>
