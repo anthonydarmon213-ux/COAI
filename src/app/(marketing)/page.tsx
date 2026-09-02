@@ -889,12 +889,13 @@ export default function LandingPage() {
                 Tarif
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">
-                À partir de 200 €{" "}
-                <span className="text-base font-normal text-graphite-300">· sur devis</span>
+                200 € la séance{" "}
+                <span className="text-base font-normal text-graphite-300">· puis sur devis</span>
               </p>
               <p className="mt-2 text-sm leading-6 text-graphite-400">
-                Chaque accompagnement est construit sur mesure. On en parle
-                directement, sans formulaire.
+                Tarif de départ pour une séance individuelle. Les formules
+                suivies, l&apos;entreprise et les groupes se chiffrent sur mesure —
+                on en parle directement, sans formulaire.
               </p>
             </div>
 
