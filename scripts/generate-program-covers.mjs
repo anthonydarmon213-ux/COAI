@@ -17,6 +17,16 @@ const programmes = [
   { slug: "meditation-guidee", title: ["MÉDITATION", "GUIDÉE"], pitch: ["Assieds-toi. Respire.", "Découvre la méditation sans pression."], meta: "7 JOURS  ·  PRÉSENCE  ·  RESPIRATION", category: "PROGRAMME RÉCUPÉRATION" },
   { slug: "recuperation-passive", title: ["RÉCUPÉRATION", "PASSIVE"], pitch: ["Sauna, hammam, massage.", "Le bon protocole, les bonnes précautions."], meta: "CHALEUR  ·  MASSAGE  ·  PRÉCAUTIONS", category: "PROGRAMME RÉCUPÉRATION" },
   { slug: "foam-roller-reset", title: ["FOAM ROLLER", "RESET"], pitch: ["Déverrouille ton corps. Récupère mieux.", "Reviens plus fort."], meta: "8 PROTOCOLES  ·  10–15 MIN  ·  CORPS COMPLET", category: "PROGRAMME RÉCUPÉRATION" },
+  { slug: "yoga-21-jours", title: ["YOGA", "21 JOURS"], pitch: ["Respire. Étire.", "Retrouve ton calme."], meta: "21 JOURS  ·  15–30 MIN  ·  SANS MATÉRIEL", category: "PROGRAMME YOGA" },
+  { slug: "pilates-centre-posture", title: ["PILATES", "CENTRE & POSTURE"], pitch: ["Gaine profond. Tiens-toi droit.", "Bouge sans douleur."], meta: "4 SEMAINES  ·  20–30 MIN  ·  SANS MATÉRIEL", category: "PROGRAMME PILATES" },
+  { slug: "prise-de-masse-8-semaines", title: ["PRISE DE MASSE", "8 SEMAINES"], pitch: ["Mange. Charge.", "Prends du muscle pour de bon."], meta: "4 SÉANCES  ·  SURCHARGE  ·  NUTRITION", category: "PROGRAMME MUSCULATION" },
+  { slug: "prepa-boxe-6-semaines", title: ["PRÉPA BOXE", "6 SEMAINES"], pitch: ["Encaisse. Enchaîne.", "Tiens les trois minutes."], meta: "APPUIS  ·  GAINAGE  ·  INTERVALLES", category: "PROGRAMME CONDITIONING" },
+  { slug: "premier-muscle-up", title: ["MUSCLE-UP", "TON PREMIER"], pitch: ["Tire fort. Bascule.", "Passe au-dessus de la barre."], meta: "8 SEMAINES  ·  FORCE  ·  TECHNIQUE", category: "PROGRAMME POIDS DU CORPS" },
+  { slug: "isometrie-du-coureur", title: ["ISOMÉTRIE", "DU COUREUR"], pitch: ["Tiens la position. Blinde tes tendons.", "Cours sans casser."], meta: "4 SEMAINES  ·  TENDONS  ·  STABILITÉ", category: "PROGRAMME RUNNING" },
+  { slug: "dos-sans-douleur-4-semaines", title: ["DOS SANS DOULEUR", "4 SEMAINES"], pitch: ["Décompresse. Renforce.", "Retrouve un dos silencieux."], meta: "MOBILITÉ  ·  STABILITÉ  ·  POSTURE", category: "PROGRAMME DOS" },
+  { slug: "posture-21-jours", title: ["POSTURE", "21 JOURS"], pitch: ["Ouvre les épaules. Aligne-toi.", "Tiens sans y penser."], meta: "21 JOURS  ·  10–15 MIN  ·  ALIGNEMENT", category: "PROGRAMME POSTURE" },
+  { slug: "heros-20-min-par-jour", title: ["HÉROS", "20 MIN PAR JOUR"], pitch: ["Vingt minutes. Aucun matériel.", "Le physique d'un héros."], meta: "4 SEMAINES  ·  20 MIN  ·  CORPS COMPLET", category: "PROGRAMME FITNESS" },
+  { slug: "odyssee-8-semaines", title: ["L'ODYSSÉE", "8 SEMAINES"], pitch: ["Pars loin. Encaisse tout.", "Reviens transformé."], meta: "8 SEMAINES  ·  FORCE  ·  ENDURANCE", category: "PROGRAMME HYBRIDE" },
 ];
 
 const esc = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("'", "&apos;");
