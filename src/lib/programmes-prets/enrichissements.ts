@@ -102,13 +102,16 @@ export const ENRICHISSEMENTS_PROGRAMMES: Record<string, Partial<ProgrammePret>> 
     note: "Le plan suppose que tu peux déjà courir 45 minutes sans douleur. Toute douleur qui modifie la foulée, douleur thoracique, malaise ou essoufflement inhabituel impose l'arrêt et un avis professionnel.",
   },
   "prepa-hyrox": {
-    photoHomme: "/exercices/hyrox-kettlebell-swing.jpg",
+    // Aucune photo forcee ici : elle ecrasait la couverture du programme.
+    // Le kettlebell swing a ete retire, ce n'est pas une station Hyrox —
+    // les ateliers reels sont le traineau, le burpee saut en longueur, la
+    // marche du fermier, les fentes sandbag et le wall ball.
     visuels: [
+      { nom: "Poussée de traîneau", photoHomme: "/exercices/poussee-traineau.jpg" },
+      { nom: "Tirage de traîneau à la corde", photoHomme: "/exercices/tirage-traineau-corde.jpg" },
       { nom: "Wall ball", photoFemme: "/exercices/hyrox-wall-ball.jpg" },
-      { nom: "Kettlebell swing", photoHomme: "/exercices/hyrox-kettlebell-swing.jpg" },
       { nom: "Burpee", photoHomme: "/exercices/hyrox-burpee-position-basse.jpg" },
-      { nom: "Mountain climber", photoFemme: "/exercices/hyrox-mountain-climber.jpg" },
-      { nom: "Fente en rack", photoHomme: "/exercices/kettlebell-fente-rack.jpg" },
+      { nom: "Marche du fermier kettlebells", photoHomme: "/exercices/marche-fermier-kettlebells.jpg" },
     ],
     progression: [
       { periode: "Semaines 1-2", titre: "Technique", contenu: "Apprends chaque atelier à effort 6/10, développe la course facile et garde 2 à 3 répétitions en réserve." },
