@@ -32,7 +32,9 @@ export function FondateurTicker() {
 
   if (placesRestantes === null || placesRestantes <= 0) return null;
 
-  const message = `🚀 Offre membre fondateur — ${placesRestantes}/${MEMBRES_FONDATEURS_MAX} places restantes · Prix Pass IA bloqué à vie, même si le tarif augmente plus tard`;
+  // Le nombre restant est volontairement tu : l'afficher revenait à
+  // annoncer le nombre de places vides.
+  const message = `🔒 Prix Pass IA bloqué à vie · Le tarif auquel tu souscris reste le tien, même quand il augmentera pour les nouveaux membres`;
 
   return (
     <div
