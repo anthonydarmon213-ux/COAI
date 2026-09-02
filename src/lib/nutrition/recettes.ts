@@ -10,7 +10,12 @@ import { RECETTES_V6 } from "./recettes-v6";
 
 export type ObjectifRecette = "PERTE_DE_POIDS" | "PRISE_DE_MASSE" | "EQUILIBRE";
 export type TypeRepas = "PETIT_DEJEUNER" | "DEJEUNER" | "DINER" | "COLLATION";
-export type RegimeRecette = "VEGETARIEN" | "SANS_GLUTEN" | "ANTI_INFLAMMATOIRE";
+export type RegimeRecette =
+  | "VEGETARIEN"
+  | "VEGAN"
+  | "SANS_GLUTEN"
+  | "ANTI_INFLAMMATOIRE"
+  | "HYPERPROTEINE";
 export type VarianteRecette = "LEAN" | "RESET_TRX" | "HYBRID" | "MASS";
 
 export type Recette = {
@@ -1706,6 +1711,64 @@ export const RECETTES: Recette[] = [
 RECETTES.push(...RECETTES_EXTENSION);
 RECETTES.push(...RECETTES_V6);
 
+// Ingredients d'origine animale. Volontairement large : un faux positif ferait
+// manger un produit animal a quelqu'un qui l'exclut, alors qu'un faux negatif
+// se contente de masquer une recette. Le doute retire donc le label vegan.
+const INGREDIENTS_ANIMAUX = [
+  "oeuf", "œuf", "lait", "yaourt", "skyr", "fromage", "feta", "mozzarella",
+  "parmesan", "ricotta", "mascarpone", "halloumi", "chevre", "chèvre",
+  "beurre", "creme", "crème", "miel", "whey", "caseine", "caséine",
+  "gelatine", "gélatine", "ghee", "kefir", "képhir", "petit-suisse",
+  "cottage", "burrata", "comte", "comté", "gruyere", "gruyère", "cheddar",
+  "poulet", "dinde", "boeuf", "bœuf", "porc", "jambon", "bacon", "agneau",
+  "veau", "canard", "lardons", "chorizo", "thon", "saumon", "cabillaud",
+  "crevette", "sardine", "maquereau", "anchois", "poisson", "colin",
+  "truite", "hareng", "moule", "calamar", "surimi", "bresaola", "viande",
+  // Ambigu plutot qu'animal : une "poudre proteinee" non qualifiee est du
+  // whey dans la quasi-totalite des cas. Le doute retire le label vegan.
+  "poudre proteinee", "proteine en poudre", "proteines en poudre",
+];
+
+// Les accents faisaient echouer la comparaison : "kefir" ne trouvait pas
+// "kefir" ecrit avec un accent aigu, et un produit laitier passait vegan.
+// On compare donc des chaines sans diacritiques des deux cotes.
+function sansAccents(valeur: string): string {
+  return valeur.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+// Les allergenes declares sont plus fiables que la lecture des ingredients :
+// une recette qui annonce "Lait" ou "Oeufs" n'est pas vegane, quelle que
+// soit la formulation de sa liste d'ingredients.
+const ALLERGENES_ANIMAUX = ["lait", "oeuf", "poisson", "crustace", "mollusque"];
+
+function estVegan(recette: Recette): boolean {
+  if (!recette.regimes.includes("VEGETARIEN")) return false;
+  const allergenes = sansAccents((recette.allergenes ?? []).join(" | "));
+  if (ALLERGENES_ANIMAUX.some((mot) => allergenes.includes(mot))) return false;
+  const texte = sansAccents(recette.ingredients.join(" | "));
+  return !INGREDIENTS_ANIMAUX.some((mot) => texte.includes(sansAccents(mot)));
+}
+
+// Definition usuelle du "riche en proteines" : au moins 30 % des calories
+// viennent des proteines. Le plancher de 20 g evite qu'une petite collation
+// tres maigre passe le ratio sans apporter grand-chose.
+function estHyperProteine(recette: Recette): boolean {
+  const { calories, proteines } = recette.macros;
+  if (!calories || proteines < 20) return false;
+  return (proteines * 4) / calories >= 0.3;
+}
+
+// Regimes deduits des donnees plutot que saisis a la main : toute recette
+// ajoutee ensuite est classee automatiquement, sans risque d'oubli.
+for (const recette of RECETTES) {
+  if (estVegan(recette) && !recette.regimes.includes("VEGAN")) {
+    recette.regimes.push("VEGAN");
+  }
+  if (estHyperProteine(recette) && !recette.regimes.includes("HYPERPROTEINE")) {
+    recette.regimes.push("HYPERPROTEINE");
+  }
+}
+
 export function filtrerRecettes(recettes: Recette[], filtres: { typeRepas?: TypeRepas; objectif?: ObjectifRecette; regime?: RegimeRecette }) {
   return recettes.filter((r) => {
     if (filtres.typeRepas && r.typeRepas !== filtres.typeRepas) return false;
@@ -1730,6 +1793,8 @@ export const OBJECTIF_RECETTE_LABEL: Record<ObjectifRecette, string> = {
 
 export const REGIME_LABEL: Record<RegimeRecette, string> = {
   VEGETARIEN: "Végétarien",
+  VEGAN: "Vegan",
   SANS_GLUTEN: "Sans gluten",
   ANTI_INFLAMMATOIRE: "Anti-inflammatoire",
+  HYPERPROTEINE: "Hyper-protéiné",
 };
