@@ -994,15 +994,19 @@ export default function LandingPage() {
           <br className="hidden sm:block" /> et tout ce qui arrive.
         </h2>
 
-        <div className="mx-auto mt-12 grid max-w-4xl gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto mt-12 grid max-w-5xl gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { chiffre: "189", titre: "recettes", texte: "Avec leurs macros, filtrables par régime et par objectif." },
+            { chiffre: "189", titre: "recettes", texte: "Avec leurs macros. Végétarien, vegan, sans gluten, hyper-protéiné." },
+            { chiffre: "13", titre: "programmes prêts", texte: "Dont 5 protocoles de récupération : sommeil, respiration, foam roller." },
             { chiffre: "58", titre: "exercices filmés", texte: "Démontrés par Anthony, pas des animations génériques." },
             { chiffre: "1", titre: "séance par jour", texte: "Recalculée selon ton sommeil, ta forme et ton temps." },
+            { chiffre: "Rep", titre: "carnet de séances", texte: "Chaque série, chaque charge, ton tonnage et tes records." },
+            { chiffre: "kcal", titre: "compteur intégré", texte: "Calories et macros au quotidien, sans peser si tu ne veux pas." },
             { chiffre: "24/7", titre: "coach IA", texte: "Disponible pendant la séance, dans le contexte de ton exercice." },
+            { chiffre: "1-1", titre: "coach humain", texte: "Anthony relit et ajuste ton programme, selon ta formule." },
           ].map((bloc) => (
             <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6 text-left">
-              <p className="font-display text-4xl font-semibold tracking-[-0.04em] text-laiton-300">{bloc.chiffre}</p>
+              <p className="font-display text-3xl font-semibold tracking-[-0.04em] text-laiton-300">{bloc.chiffre}</p>
               <p className="mt-1 text-sm font-semibold text-white">{bloc.titre}</p>
               <p className="mt-2 text-sm leading-6 text-graphite-400">{bloc.texte}</p>
             </div>
