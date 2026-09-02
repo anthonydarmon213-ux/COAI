@@ -303,9 +303,18 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
   let rappels = 0;
   for (const subscription of candidats) {
     if (!subscription.trialEnd) continue;
-    const prixMensuel = subscription.plan === "PASS_IA" ? 49 : subscription.plan === "STANDARD" ? 89 : 199;
-    const prixAnnuel = prixMensuel * 12;
-    const prix = subscription.billingInterval === "ANNUAL" ? `${prixAnnuel} €/an` : `${prixMensuel} €/mois`;
+    // Ces montants annonçaient 49 €/mois pour le Pass IA facturé 19,99 €, et
+    // multipliaient par douze pour l'annuel — soit 588 € au lieu de 119 €.
+    // Un tarif faux, juste avant le premier prélèvement. Les valeurs sont
+    // désormais celles réellement facturées par OFFER_BY_PLAN.
+    const prix =
+      subscription.plan === "STANDARD"
+        ? "99 €/mois"
+        : subscription.billingInterval === "ANNUAL"
+          ? "119 €/an"
+          : subscription.billingInterval === "QUARTERLY"
+            ? "49 € tous les 3 mois"
+            : "19,99 €/mois";
     const date = subscription.trialEnd.toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "long",
@@ -380,7 +389,7 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Choisis ta formule : ${appUrl}/pricing\n\n` +
         `Pass IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
         `Coaching Hybride : 7 jours d'essai, puis 99 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
-        `VIP : à partir de 199 €/mois, avec une séance privée mensuelle.\n\n` +
+        `Coaching VIP : 200 € la séance, sans abonnement, à domicile, en entreprise, en club ou à distance.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;

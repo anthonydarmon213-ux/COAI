@@ -18,7 +18,7 @@ export const GENERATION_QUOTA_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 export const GENERATION_QUOTA_PAR_PLAN: Record<PlanCode, number> = {
   PASS_IA: 2, // Pass IA — ~4 €/mois
   STANDARD: 6, // Coaching Hybride — 89 €/mois
-  PREMIUM: 15, // VIP — 199 €/mois
+  PREMIUM: 15, // Coaching VIP (plan historique, plus vendu en ligne)
 };
 
 export function getGenerationQuotaState(
