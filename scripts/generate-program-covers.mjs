@@ -16,6 +16,7 @@ const programmes = [
   { slug: "respiration-anti-stress", title: ["RESPIRATION", "ANTI-STRESS"], pitch: ["Inspire. Ralentis. Calme ton système nerveux", "en quelques minutes."], meta: "RESPIRATION  ·  CALME  ·  RÉGULATION", category: "PROGRAMME RÉCUPÉRATION" },
   { slug: "meditation-guidee", title: ["MÉDITATION", "GUIDÉE"], pitch: ["Assieds-toi. Respire.", "Découvre la méditation sans pression."], meta: "7 JOURS  ·  PRÉSENCE  ·  RESPIRATION", category: "PROGRAMME RÉCUPÉRATION" },
   { slug: "recuperation-passive", title: ["RÉCUPÉRATION", "PASSIVE"], pitch: ["Sauna, hammam, massage.", "Le bon protocole, les bonnes précautions."], meta: "CHALEUR  ·  MASSAGE  ·  PRÉCAUTIONS", category: "PROGRAMME RÉCUPÉRATION" },
+  { slug: "foam-roller-reset", title: ["FOAM ROLLER", "RESET"], pitch: ["Déverrouille ton corps. Récupère mieux.", "Reviens plus fort."], meta: "8 PROTOCOLES  ·  10–15 MIN  ·  CORPS COMPLET", category: "PROGRAMME RÉCUPÉRATION" },
 ];
 
 const esc = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("'", "&apos;");

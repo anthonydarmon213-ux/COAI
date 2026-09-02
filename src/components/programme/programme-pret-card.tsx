@@ -54,10 +54,10 @@ export function ProgrammePretCard({
             alt={`${programme.nom} — visuel COAI`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            // Cadrage haut (demande Anthony) : les modèles sont debout, un
-            // centrage vertical coupait les visages sur les couvertures.
-            className="object-cover object-top transition duration-500 group-hover:scale-[1.02]"
-            style={{ objectPosition: "center top" }}
+            // Les couvertures sont dessinées en 16/9, exactement le format du
+            // conteneur : object-cover n'a donc plus rien à rogner. Le cadrage
+            // haut d'avant coupait le titre, qui est composé dans l'image.
+            className="object-cover object-center transition duration-500 group-hover:scale-[1.02]"
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-[#0c0e10]/40 via-30% to-transparent" aria-hidden="true" />

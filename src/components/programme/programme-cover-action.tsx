@@ -24,7 +24,7 @@ export function ProgrammeCoverAction({
       type="button"
       onClick={ouvrirProgramme}
       aria-label={label}
-      className="group/cover relative block h-64 w-full cursor-pointer overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.25),transparent_60%),#171b1d] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-laiton-300 sm:h-72"
+      className="group/cover relative block aspect-[16/9] w-full cursor-pointer overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(196,154,82,.25),transparent_60%),#171b1d] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-laiton-300"
     >
       {children}
       <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover/cover:bg-black/20 group-focus-visible/cover:bg-black/20">

@@ -749,8 +749,8 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Installer une routine courte de récupération autonome",
     ],
     photoQuery: "woman full body foam roller recovery premium dark studio",
-    photoFemme: "/programmes/recuperation/foam-roller/foam-roller-reset-couverture.svg",
-    photoHomme: "/programmes/recuperation/auto-massage-foam-roller-homme-v1.png",
+    photoFemme: "/programmes/couvertures/foam-roller-reset-femme.svg",
+    photoHomme: "/programmes/couvertures/foam-roller-reset-homme.svg",
     medias: ["Foam roller mollets", "Foam roller ischio-jambiers", "Foam roller quadriceps", "Foam roller fessiers", "Foam roller haut du dos"],
     jours: [
       { jour: "Protocole 1", focus: "Mollets", contenu: "Assis·e, mains derrière le bassin, place le rouleau sous le ventre du mollet. Soulève légèrement les hanches et effectue de petits passages entre la cheville et le dessous du genou, sans rouler sur le tendon d’Achille ni l’articulation. 60 secondes par côté." },
