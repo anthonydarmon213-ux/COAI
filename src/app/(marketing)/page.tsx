@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
+import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -970,6 +971,10 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      <div className="mx-auto w-[calc(100%-2rem)] max-w-2xl">
+        <CompteAReboursRentree />
+      </div>
 
       {/* Ce que contient l'abonnement, en chiffres verifiables. La page
           expliquait comment COAI fonctionne sans jamais dire ce qu'on y

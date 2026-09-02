@@ -4,6 +4,7 @@ import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
+import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
@@ -91,6 +92,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           colonnes, le VIP écrasait visuellement les deux offres réellement
           souscrites en ligne. Depuis le 02/09/2026 il n'est plus vendu par
           abonnement : séances à 200 € puis devis, conclu sur WhatsApp. */}
+      <CompteAReboursRentree className="w-full max-w-5xl" />
+
       <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
         {TIERS.filter((tier) => tier.plan !== "PREMIUM").map((tier) => (
           <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
