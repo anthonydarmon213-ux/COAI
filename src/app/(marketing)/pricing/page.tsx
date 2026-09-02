@@ -88,8 +88,9 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       {/* Deux cartes principales (22/08/2026, demande Anthony) — VIP sort
           de la grille et devient un lien d'upsell sous les cartes : à trois
-          colonnes, l'offre à 199€/mois écrasait visuellement les deux
-          offres réellement souscrites en ligne. */}
+          colonnes, le VIP écrasait visuellement les deux offres réellement
+          souscrites en ligne. Depuis le 02/09/2026 il n'est plus vendu par
+          abonnement : séances à 200 € puis devis, conclu sur WhatsApp. */}
       <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
         {TIERS.filter((tier) => tier.plan !== "PREMIUM").map((tier) => (
           <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
@@ -115,17 +116,22 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             {tier.sessions && (
               <div className="space-y-4 rounded-2xl border border-laiton-300/20 bg-laiton-300/[0.05] p-5">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-laiton-300">L’essentiel du VIP</p>
-                  <p className="mt-2 text-sm font-semibold text-white">1 séance privée chaque mois</p>
-                  <p className="mt-1 text-xs leading-5 text-graphite-400">En visio partout ou en présentiel à Paris centre.</p>
+                  <p className="text-xs uppercase tracking-widest text-laiton-300">Coaching VIP</p>
+                  <p className="mt-2 text-sm font-semibold text-white">200 € la séance, puis sur devis</p>
+                  <p className="mt-1 text-xs leading-5 text-graphite-400">À domicile, en entreprise, en club ou à distance.</p>
                 </div>
-                <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP — 199€/mois" className="coai-rainbow-cta w-full border-0" />
-                <p className="text-center text-[11px] text-graphite-500">
-                  En continuant, tu acceptes les <Link href="/cgv" target="_blank" className="underline">CGV</Link>.
-                </p>
-                <a className="block text-center text-xs font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("un rythme VIP de 2 à 4 séances par mois", "sur mesure") ?? "/vip"} target="_blank" rel="noreferrer">
-                  Besoin de 2 à 4 séances par mois ? Parlons-en
+                <a
+                  className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
+                  href={vipReservationHref("le coaching VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Demander mon devis sur WhatsApp
                 </a>
+                <p className="text-center text-[11px] text-graphite-500">
+                  Séances à l&apos;unité ou suivies, sans abonnement. Facture
+                  déductible pour les entreprises.
+                </p>
               </div>
             )}
 
@@ -197,7 +203,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Étapes 5 à 7 : essai → programme activé → première séance</p>
-        <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. VIP : accompagnement confirmé avec toi avant le démarrage.</p>
+        <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. Le Coaching VIP se règle à la séance, sans abonnement.</p>
       </div>
 
       <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center">
@@ -206,11 +212,11 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </p>
         <a
           className="mt-1.5 inline-block text-sm font-semibold text-laiton-300 underline underline-offset-4"
-          href={vipReservationHref("l'accompagnement VIP", "dès 199€/mois") ?? "/vip"}
+          href={vipReservationHref("le coaching VIP", "200 € la séance") ?? "/vip"}
           target="_blank"
           rel="noreferrer"
         >
-          Découvrir VIP, dès 199€/mois →
+          Découvrir le Coaching VIP, 200 € la séance →
         </a>
       </div>
 

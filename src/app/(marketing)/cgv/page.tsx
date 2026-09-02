@@ -17,7 +17,7 @@ export default function CgvPage() {
         <ul>
           <li><strong>Pass IA — 19,99€/mois ou 119€/an</strong> : bilan, programme adaptatif, check-ins, entraînement, nutrition, récupération, suivi des progrès et Coach IA disponible 24h/24.</li>
           <li><strong>Coaching Hybride — 99€/mois</strong> : tous les services Pass IA, complétés par le regard, la supervision et les ajustements d&apos;un coach humain.</li>
-          <li><strong>VIP — dès 199€/mois</strong> : tous les services Coaching Hybride et des séances privées mensuelles avec Anthony Darmon, en visio ou à Paris centre. Le tarif est de 199€/mois pour 1 séance, 398€/mois pour 2 séances, 597€/mois pour 3 séances et 796€/mois pour 4 séances. Les créneaux et accompagnements sont volontairement très limités.</li>
+          <li><strong>Coaching VIP — 200 € la séance</strong> : séances privées avec Anthony Darmon, à domicile, en entreprise, en club ou à distance. Il ne s&apos;agit pas d&apos;un abonnement : les séances se règlent à l&apos;unité, et tout accompagnement suivi fait l&apos;objet d&apos;un devis établi avant le démarrage. Les créneaux sont volontairement très limités.</li>
         </ul>
         <p>Une transformation privée plus longue ou plus intensive fait l&apos;objet d&apos;un échange préalable et d&apos;une proposition personnalisée. Le détail à jour figure sur la page <a href="/pricing">Tarifs</a>.</p>
       </section>

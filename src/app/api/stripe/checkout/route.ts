@@ -25,13 +25,13 @@ const OFFER_BY_PLAN = {
     MONTHLY: { amount: 9900, interval: "month" },
     ANNUAL: { amount: 9900, interval: "month" },
   },
-  PREMIUM: {
-    name: "COAI — VIP",
-    trialDays: 0,
-    MONTHLY: { amount: 19900, interval: "month" },
-    ANNUAL: { amount: 19900, interval: "month" },
-  },
 } as const;
+
+// PREMIUM (VIP) a ete retire de la vente en ligne le 02/09/2026 : le
+// coaching VIP se vend desormais a la seance (200 euros puis devis) et se
+// conclut sur WhatsApp. La valeur reste dans l'enum Prisma et dans les
+// libelles pour ne pas casser les comptes qui la portent deja, mais aucun
+// nouveau checkout ne peut plus la creer.
 
 type Plan = keyof typeof OFFER_BY_PLAN;
 
@@ -42,10 +42,17 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const plan: Plan = body.plan === "PREMIUM" ? "PREMIUM" : body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
-  const vipSessions = plan === "PREMIUM" && [1, 2, 3, 4].includes(Number(body.vipSessions))
-    ? Number(body.vipSessions)
-    : 1;
+  // Une demande PREMIUM est refusee plutot que rabattue silencieusement sur
+  // une autre formule : mieux vaut une erreur explicite qu'un client facture
+  // pour un plan qu'il n'a pas choisi.
+  if (body.plan === "PREMIUM") {
+    return NextResponse.json(
+      { error: "Le Coaching VIP ne se souscrit plus en ligne : 200 € la séance, puis sur devis." },
+      { status: 400 }
+    );
+  }
+
+  const plan: Plan = body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
   const planConfig = OFFER_BY_PLAN[plan];
   // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
   // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
@@ -63,7 +70,7 @@ export async function POST(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (!appUrl) return NextResponse.json({ error: "Configuration Stripe manquante" }, { status: 500 });
 
-  const metadata = { plan, billing, vipSessions: String(vipSessions) };
+  const metadata = { plan, billing };
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{
@@ -73,14 +80,12 @@ export async function POST(request: Request) {
         recurring: { interval: offer.interval },
         product_data: {
           name: offer.name,
-          description: plan === "PREMIUM"
-            ? `${vipSessions} séance${vipSessions > 1 ? "s" : ""} privée${vipSessions > 1 ? "s" : ""} par mois — visio ou Paris centre.`
-            : offer.interval === "year"
-              ? "Personal Training réimaginé — 119€ facturés une fois par an, résiliable à tout moment."
-              : "Personal Training réimaginé — accompagnement mensuel sans engagement, résiliable à tout moment.",
+          description: offer.interval === "year"
+            ? "Personal Training réimaginé — 119€ facturés une fois par an, résiliable à tout moment."
+            : "Personal Training réimaginé — accompagnement mensuel sans engagement, résiliable à tout moment.",
         },
       },
-      quantity: vipSessions,
+      quantity: 1,
     }],
     ...(user.subscription?.stripeCustomerId
       ? { customer: user.subscription.stripeCustomerId }

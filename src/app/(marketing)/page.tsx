@@ -47,7 +47,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Pass IA coûte 19,99€/mois (ou 119€/an), Coaching Hybride 99€/mois et VIP démarre à 199€/mois. Les deux premières formules incluent 7 jours d'essai.",
+      "Le diagnostic est offert. Ensuite, Pass IA coûte 19,99€/mois (ou 119€/an) et Coaching Hybride 99€/mois, avec 7 jours d'essai. Le Coaching VIP avec Anthony n'est pas un abonnement : 200 € la séance, puis sur devis.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -120,7 +120,7 @@ const PARCOURS_PERSONAL_TRAINING = [
   },
   {
     plage: "09—10",
-    offre: "VIP · dès 199€/mois",
+    offre: "Coaching VIP · 200 € la séance",
     titre: "Atteindre un objectif exigeant",
     description: "Le VIP intervient uniquement si ton objectif demande une attention maximale et des ajustements approfondis.",
     etapes: [
@@ -254,7 +254,7 @@ const STRUCTURED_DATA = {
       offers: [
         { "@type": "Offer", name: "Pass IA", price: "19.99", priceCurrency: "EUR" },
         { "@type": "Offer", name: "Coaching Hybride", price: "99", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "VIP", price: "199", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Coaching VIP", price: "200", priceCurrency: "EUR" },
       ],
     },
     {
@@ -741,7 +741,7 @@ function LandingPageHistorique() {
           Commence à ton rythme.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Pass IA à 19,99€/mois (ou 119€/an), Coaching Hybride à 99€/mois ou VIP dès 199€/mois. Trois niveaux
+          Pass IA à 19,99€/mois (ou 119€/an), Coaching Hybride à 99€/mois ou Coaching VIP à 200 € la séance. Trois niveaux
           d&apos;attention, un même objectif : te guider simplement jusqu&apos;au résultat.
         </p>
         <Link href="/pricing">
@@ -897,6 +897,10 @@ export default function LandingPage() {
                 suivies, l&apos;entreprise et les groupes se chiffrent sur mesure —
                 on en parle directement, sans formulaire.
               </p>
+              <p className="mt-3 text-sm leading-6 text-laiton-200">
+                Facture professionnelle fournie, déductible en frais
+                d&apos;entreprise.
+              </p>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -931,7 +935,8 @@ export default function LandingPage() {
               },
               {
                 titre: "En entreprise",
-                texte: "Séances au bureau pour toi ou tes équipes, calées sur vos créneaux.",
+                texte:
+                  "Séances au bureau pour toi ou tes équipes, calées sur vos créneaux. Facture déductible.",
               },
               {
                 titre: "En club",

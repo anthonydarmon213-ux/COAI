@@ -71,7 +71,8 @@ export default function VipPage() {
               <span className="font-display text-4xl font-semibold text-white">200 € la séance</span>
               <span className="pb-1 text-sm text-graphite-500">puis sur devis</span>
             </div>
-            <p className="mt-2 text-sm text-laiton-200">Nombre de nouveaux accompagnements volontairement limité.</p>
+            <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise.</p>
+            <p className="mt-1 text-sm text-graphite-400">Nombre de nouveaux accompagnements volontairement limité.</p>
             <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
               Demander mon devis
             </a>

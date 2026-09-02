@@ -125,14 +125,23 @@ export function ServiceDetailModal({
           {tier.sessions ? (
             <>
               <div className="flex items-baseline gap-1.5">
-                <span className="font-display text-4xl font-semibold text-white">199€</span>
-                <span className="text-sm text-graphite-400">/mois</span>
+                <span className="font-display text-4xl font-semibold text-white">200 €</span>
+                <span className="text-sm text-graphite-400">la séance</span>
               </div>
-              <p className="text-sm text-graphite-300">1 séance privée mensuelle incluse</p>
-              <SubscribeButton plan="PREMIUM" vipSessions={1} label="Choisir VIP" className="coai-rainbow-cta w-full border-0" />
-              <a href={vipReservationHref("un rythme VIP de 2 à 4 séances par mois", "sur mesure") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">
-                Besoin de davantage de séances ? Parlons-en
+              <p className="text-sm text-graphite-300">
+                À domicile, en entreprise, en club ou à distance — sans abonnement.
+              </p>
+              <a
+                href={vipReservationHref("le coaching VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+                target="_blank"
+                rel="noreferrer"
+                className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
+              >
+                Demander mon devis sur WhatsApp
               </a>
+              <p className="text-center text-xs text-graphite-400">
+                Facture professionnelle fournie, déductible en frais d&apos;entreprise.
+              </p>
             </>
           ) : (
             <SubscribeButton
