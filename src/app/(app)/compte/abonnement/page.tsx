@@ -14,7 +14,7 @@ import { ChurnFeedbackForm } from "@/components/compte/churn-feedback-form";
 import { TIER_BY_SERVICE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { ScrollToHash } from "@/components/compte/scroll-to-hash";
 
-const PRIX_MENSUELS = { GRATUIT: 49, STANDARD: 89, PREMIUM: 199 } as const;
+const PRIX_MENSUELS = { PASS_IA: 49, STANDARD: 89, PREMIUM: 199 } as const;
 
 const STATUT_LABELS: Record<string, string> = {
   ACTIVE: "Actif",

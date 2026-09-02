@@ -1,7 +1,7 @@
 import type { EffectivePlan } from "@/lib/subscription/plan";
 
 export const PLAN_FEATURES: Record<EffectivePlan, string[]> = {
-  GRATUIT: [
+  PASS_IA: [
     "Bilan initial et programme personnalisé",
     "Check-in quotidien et séance adaptée à la forme du jour",
     "Entraînement, nutrition et récupération",

@@ -139,7 +139,7 @@ async function envoyerBilansMensuels(appUrl: string): Promise<number> {
   const candidats = await prisma.user.findMany({
     where: {
       subscription: {
-        plan: { in: ["GRATUIT", "STANDARD", "PREMIUM"] },
+        plan: { in: ["PASS_IA", "STANDARD", "PREMIUM"] },
         status: { in: ["ACTIVE", "PAST_DUE"] },
       },
     },

@@ -19,7 +19,7 @@ type PricingSearchParams = {
 };
 
 function tierId(plan: string) {
-  if (plan === "GRATUIT") return "pass-ia";
+  if (plan === "PASS_IA") return "pass-ia";
   if (plan === "STANDARD") return "coaching-hybride";
   return "vip";
 }
@@ -98,7 +98,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
               {selectedPlan === tier.plan ? (
                 <Badge tone="warning">
-                  {tier.plan === "GRATUIT" && selectedBilling === "ANNUAL" ? "Ton choix · annuel" : "Ton choix"}
+                  {tier.plan === "PASS_IA" && selectedBilling === "ANNUAL" ? "Ton choix · annuel" : "Ton choix"}
                 </Badge>
               ) : tier.mostPopular && <Badge tone="warning">Offre phare</Badge>}
             </div>
@@ -138,16 +138,16 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             <div className="flex-1" />
             {!tier.sessions && (
               <>
-                {tier.plan === "GRATUIT" && selectedBilling === "ANNUAL" ? (
+                {tier.plan === "PASS_IA" && selectedBilling === "ANNUAL" ? (
                   <>
                     <SubscribeButton
-                      plan="GRATUIT"
+                      plan="PASS_IA"
                       billing="ANNUAL"
                       label="Confirmer l'annuel · 119€/an"
                       className="coai-rainbow-cta w-full border-0 text-[#111216]"
                     />
                     <SubscribeButton
-                      plan="GRATUIT"
+                      plan="PASS_IA"
                       billing="MONTHLY"
                       label="Choisir le mensuel · 19,99€/mois"
                       className="w-full border border-white/15 bg-white/[0.035] text-white"
@@ -162,9 +162,9 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                       className="coai-rainbow-cta w-full border-0 text-[#111216]"
                     />
                     {/* Option annuelle proposée uniquement sur Pass IA. */}
-                    {tier.plan === "GRATUIT" && (
+                    {tier.plan === "PASS_IA" && (
                       <SubscribeButton
-                        plan="GRATUIT"
+                        plan="PASS_IA"
                         billing="ANNUAL"
                         label="Choisir l'annuel · 119€/an"
                         className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"

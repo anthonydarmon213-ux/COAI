@@ -22,7 +22,7 @@ export function AdaptationNotificationCard({
   plan,
 }: {
   notification: NotificationAdaptation;
-  plan: "GRATUIT" | "STANDARD" | "PREMIUM";
+  plan: "PASS_IA" | "STANDARD" | "PREMIUM";
 }) {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
@@ -80,7 +80,7 @@ export function AdaptationNotificationCard({
   // plateau, contrainte...) : c'est précisément le genre de moment où un
   // coach humain apporte une vraie valeur. Jamais affiché en dehors de ce
   // contexte précis (pas de paywall générique plaqué partout).
-  const momentUpgrade = plan === "GRATUIT" && notification.decision === "REDUIRE";
+  const momentUpgrade = plan === "PASS_IA" && notification.decision === "REDUIRE";
 
   const titre =
     etat === "accepte"

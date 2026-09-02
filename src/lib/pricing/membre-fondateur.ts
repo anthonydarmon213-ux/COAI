@@ -13,6 +13,6 @@ import { MEMBRES_FONDATEURS_MAX } from "@/lib/pricing/membre-fondateur-constants
 export { MEMBRES_FONDATEURS_MAX };
 
 export async function placesFondateursRestantes(): Promise<number> {
-  const count = await prisma.subscription.count({ where: { plan: "GRATUIT" } });
+  const count = await prisma.subscription.count({ where: { plan: "PASS_IA" } });
   return Math.max(0, MEMBRES_FONDATEURS_MAX - count);
 }

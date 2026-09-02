@@ -1,6 +1,6 @@
 import type { Subscription } from "@prisma/client";
 
-export type EffectivePlan = "GRATUIT" | "STANDARD" | "PREMIUM";
+export type EffectivePlan = "PASS_IA" | "STANDARD" | "PREMIUM";
 
 const ACTIVE_STATUSES = new Set(["ACTIVE", "PAST_DUE"]);
 
@@ -15,9 +15,9 @@ export function getMembershipLabel(subscription?: Subscription | null): string {
   return subscription?.plan === "PREMIUM" ? "COAI Elite" : "COAI Premium";
 }
 
-// Sans abonnement actif, l'utilisateur retombe sur "GRATUIT" par défaut.
+// Sans abonnement actif, l'utilisateur retombe sur "PASS_IA" par défaut.
 export function getEffectivePlan(subscription?: Subscription | null): EffectivePlan {
-  if (!subscription || !ACTIVE_STATUSES.has(subscription.status)) return "GRATUIT";
+  if (!subscription || !ACTIVE_STATUSES.has(subscription.status)) return "PASS_IA";
   return subscription.plan;
 }
 
@@ -38,12 +38,12 @@ export function isInTrial(subscription?: Subscription | null): boolean {
 // Stripe réel, actif (ou en retard de paiement, encore toléré) — y compris
 // pendant l'essai offert (11/08/2026 : l'essai doit donner un accès réel,
 // immédiat, pas un accès différé à la fin des 7 jours). Contrairement à
-// getEffectivePlan (qui retombe volontairement sur "GRATUIT" en l'absence
+// getEffectivePlan (qui retombe volontairement sur "PASS_IA" en l'absence
 // d'abonnement — utile pour l'UI juste après l'inscription, avant que le
 // webhook Stripe n'ait tourné), cette fonction ne doit JAMAIS autoriser
 // l'absence totale d'abonnement : sans elle, quelqu'un qui abandonne la
 // page de paiement Stripe (jamais de CB saisie, jamais d'essai démarré)
-// se retrouvait traité comme "GRATUIT" par défaut et pouvait générer un
+// se retrouvait traité comme "PASS_IA" par défaut et pouvait générer un
 // programme complet sans jamais avoir payé (09/08/2026).
 export function canGenerateProgramme(subscription?: Subscription | null): boolean {
   if (!subscription) return false;
@@ -84,7 +84,7 @@ export function hasStreamingAccess(
 // Noms marketing (08/08/2026) : GRATUIT = "Pass IA", STANDARD = "Coaching Hybride"
 // — les identifiants techniques historiques sont conservés pour compatibilité.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
-  GRATUIT: "Pass IA — 19,99€/mois ou 119€/an",
+  PASS_IA: "Pass IA — 19,99€/mois ou 119€/an",
   STANDARD: "Coaching Hybride — 99€/mois",
   PREMIUM: "Coaching VIP — 200 € la séance",
 };

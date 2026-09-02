@@ -77,7 +77,7 @@ export default async function AdminBusinessPage() {
   const activeSubs = subscriptions.filter((s) => s.status === "ACTIVE");
   const essaisActifs = activeSubs.filter((s) => s.trialEnd && s.trialEnd > maintenant);
   const abonnesPayants = activeSubs.filter((s) => !s.trialEnd || s.trialEnd <= maintenant);
-  const nbImpulsion = abonnesPayants.filter((s) => s.plan === "GRATUIT").length;
+  const nbImpulsion = abonnesPayants.filter((s) => s.plan === "PASS_IA").length;
   const nbStandard = abonnesPayants.filter((s) => s.plan === "STANDARD").length;
   const nbPremium = abonnesPayants.filter((s) => s.plan === "PREMIUM").length;
   const nbActifs = activeSubs.length;
@@ -110,7 +110,7 @@ export default async function AdminBusinessPage() {
   // MRR conservateur : exclut les essais non encore facturés et inclut bien
   // Pass IA, qui était auparavant oubliée du calcul.
   const mrr = abonnesPayants.reduce((total, subscription) => {
-    const monthlyPrice = subscription.plan === "GRATUIT" ? PRIX_IMPULSION : subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM;
+    const monthlyPrice = subscription.plan === "PASS_IA" ? PRIX_IMPULSION : subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM;
     const annualPrice = monthlyPrice * 12;
     return total + (subscription.billingInterval === "ANNUAL" ? annualPrice / 12 : monthlyPrice);
   }, 0);

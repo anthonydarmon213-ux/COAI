@@ -13,7 +13,7 @@ export function OneShotProgrammeButton({
   className?: string;
 }) {
   async function handleClick() {
-    trackFunnelEvent("checkout_started", { plan: "GRATUIT" });
+    trackFunnelEvent("checkout_started", { plan: "PASS_IA" });
     window.location.href = "/pricing#impulsion";
   }
 

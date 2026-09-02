@@ -84,7 +84,7 @@ export async function POST() {
   // Éligibilité au socle calculée avant le contrôle de quota : un abonné
   // Pass IA qui peut recevoir un socle n'est jamais bloqué, puisque le
   // servir ne coûte aucun appel IA.
-  const eligibleAuSocle = plan === "GRATUIT" && socleAcceptable(user.profile ?? {});
+  const eligibleAuSocle = plan === "PASS_IA" && socleAcceptable(user.profile ?? {});
   const quota = getGenerationQuotaState(plan, user.generationsUsed, user.generationsResetAt);
 
   // Vérifié avant le quota : un abonné Pass IA éligible à un socle n'est
@@ -107,7 +107,7 @@ export async function POST() {
 
   const enceinteOuPostPartum =
     user.profile?.statutMaternite === "ENCEINTE" || user.profile?.statutMaternite === "POST_PARTUM";
-  const statutInitial = plan === "GRATUIT" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE";
+  const statutInitial = plan === "PASS_IA" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE";
 
   const profil = {
     objectifs: user.profile?.objectifs,

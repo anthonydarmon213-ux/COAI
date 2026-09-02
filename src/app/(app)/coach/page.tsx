@@ -79,12 +79,12 @@ export default async function CoachPage() {
             </span>
           </div>
         </div>
-        {plan === "GRATUIT" && <div className="relative mt-5"><Badge tone="warning">{quota.remaining} question(s) restante(s) sur 4</Badge></div>}
+        {plan === "PASS_IA" && <div className="relative mt-5"><Badge tone="warning">{quota.remaining} question(s) restante(s) sur 4</Badge></div>}
       </section>
 
       <div className="grid gap-5 xl:grid-cols-3 xl:items-start">
         <div className="xl:col-span-2">
-          <AskCoach initialQuotaRemaining={plan === "GRATUIT" ? quota.remaining : null} />
+          <AskCoach initialQuotaRemaining={plan === "PASS_IA" ? quota.remaining : null} />
         </div>
 
         <div className="flex flex-col gap-4">

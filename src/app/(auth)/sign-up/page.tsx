@@ -49,7 +49,7 @@ export default function SignUpPage() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get("plan");
   const requestedPlan: IntendedPlan | null =
-    planParam === "GRATUIT" || planParam === "STANDARD" || planParam === "PREMIUM"
+    planParam === "PASS_IA" || planParam === "STANDARD" || planParam === "PREMIUM"
       ? planParam
       : null;
   const requestedBilling: IntendedBilling = searchParams.get("billing") === "ANNUAL" ? "ANNUAL" : "MONTHLY";

@@ -8,7 +8,7 @@ import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  GRATUIT: "Pass IA — 19,99€/mois",
+  PASS_IA: "Pass IA — 19,99€/mois",
   STANDARD: "Coaching Hybride — 99€/mois",
   PREMIUM: "Coaching VIP — 200 € la séance",
 };
@@ -102,7 +102,12 @@ function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus
 // d'abonnement, en comparant aux ids configurés en env.
 function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
   const metadataPlan = subscription.metadata?.plan;
-  if (metadataPlan === "GRATUIT" || metadataPlan === "STANDARD" || metadataPlan === "PREMIUM") {
+  // Les abonnements crees avant le 02/09/2026 portent "GRATUIT" dans leurs
+  // metadonnees Stripe, et le porteront toujours : Stripe ne reecrit pas
+  // l'historique. Sans cette equivalence, chacun de leurs webhooks retomberait
+  // sur STANDARD et facturerait le mauvais palier.
+  if (metadataPlan === "GRATUIT") return "PASS_IA";
+  if (metadataPlan === "PASS_IA" || metadataPlan === "STANDARD" || metadataPlan === "PREMIUM") {
     return metadataPlan;
   }
   const priceId = subscription.items.data[0]?.price.id;
@@ -111,7 +116,7 @@ function mapStripePlan(subscription: Stripe.Subscription): SubscriptionPlan {
     priceId &&
     (priceId === process.env.STRIPE_PRICE_ID_GRATUIT ||
       priceId === process.env.STRIPE_PRICE_ID_GRATUIT_ANNUAL)
-  ) return "GRATUIT";
+  ) return "PASS_IA";
   return "STANDARD";
 }
 

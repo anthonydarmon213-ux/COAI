@@ -21,14 +21,14 @@ import { ParrainageCard } from "@/components/compte/parrainage-card";
 // les routes de paiement elles-mêmes (jamais par une simple intention côté
 // client) : ?plan=... (Coaching Hybride) ou ?unlock=programme (Pass IA).
 const CONTENU_PAR_PLAN: Record<
-  "GRATUIT" | "STANDARD" | "PREMIUM",
+  "PASS_IA" | "STANDARD" | "PREMIUM",
   {
     formule: string;
     sousTitre: string;
     etapes: { titre: string; texte: string }[];
   }
 > = {
-  GRATUIT: {
+  PASS_IA: {
     formule: "Pass IA",
     sousTitre: "Ton coach personnel augmenté reste disponible 24h/24 et fait évoluer ton programme.",
     etapes: [
@@ -191,13 +191,13 @@ export default async function BienvenuePage({
     );
   }
 
-  const plan: "GRATUIT" | "STANDARD" | "PREMIUM" =
-    searchParams.plan === "PREMIUM" ? "PREMIUM" : searchParams.plan === "STANDARD" ? "STANDARD" : "GRATUIT";
+  const plan: "PASS_IA" | "STANDARD" | "PREMIUM" =
+    searchParams.plan === "PREMIUM" ? "PREMIUM" : searchParams.plan === "STANDARD" ? "STANDARD" : "PASS_IA";
   const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
   // Pass IA en paiement unique (unlock=programme) tombait dans le même
-  // calcul que les abonnements (plan="GRATUIT" par défaut → "Subscribe")
+  // calcul que les abonnements (plan="PASS_IA" par défaut → "Subscribe")
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).
   const enEssai = plan !== "PREMIUM" && searchParams.essai !== "0";

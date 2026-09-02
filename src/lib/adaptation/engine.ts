@@ -320,14 +320,14 @@ export async function confirmerAdaptation(
       userId,
       pilier: adaptation.pilier,
       contenu: contenu as object,
-      statut: plan === "GRATUIT" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE",
+      statut: plan === "PASS_IA" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE",
       version,
       temporaire,
       finPrevue,
     },
   });
 
-  const statutFinal = plan === "GRATUIT" && !enceinteOuPostPartum ? "APPLIQUEE" : "EN_ATTENTE";
+  const statutFinal = plan === "PASS_IA" && !enceinteOuPostPartum ? "APPLIQUEE" : "EN_ATTENTE";
   await prisma.programmeAdaptation.update({
     where: { id: adaptationId },
     data: { programmeSuivantId: nouveauProgramme.id, statut: statutFinal },

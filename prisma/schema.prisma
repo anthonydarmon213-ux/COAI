@@ -273,7 +273,9 @@ enum SubscriptionStatus {
 // l'inscription avant que le webhook Stripe n'ait tourné) est aussi
 // considéré Gratuit par getEffectivePlan().
 enum SubscriptionPlan {
-  GRATUIT
+  // Renomme le 02/09/2026 : "GRATUIT" designait une formule a 19,99 euros
+  // par mois et se confondait avec un compte sans abonnement.
+  PASS_IA
   STANDARD
   PREMIUM
 }

@@ -11,7 +11,7 @@ const VIP_SESSIONS_COOKIE_NAME = "coai_vip_sessions";
 const BILLING_COOKIE_NAME = "coai_billing";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 3; // 3 jours
 
-export type IntendedPlan = "GRATUIT" | "STANDARD" | "PREMIUM";
+export type IntendedPlan = "PASS_IA" | "STANDARD" | "PREMIUM";
 export type IntendedBilling = "MONTHLY" | "ANNUAL";
 
 export function storeIntendedPlanCookie(
@@ -34,7 +34,11 @@ export function readIntendedBillingCookie(): IntendedBilling {
 export function readIntendedPlanCookie(): IntendedPlan | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_NAME}=([^;]*)`));
-  return match?.[1] === "GRATUIT" || match?.[1] === "STANDARD" || match?.[1] === "PREMIUM"
+  // Un visiteur entre dans le tunnel avant le renommage garde "GRATUIT" dans
+  // son navigateur : sans cette equivalence son intention serait perdue et il
+  // arriverait au paiement sans formule selectionnee.
+  if (match?.[1] === "GRATUIT") return "PASS_IA";
+  return match?.[1] === "PASS_IA" || match?.[1] === "STANDARD" || match?.[1] === "PREMIUM"
     ? match[1]
     : null;
 }

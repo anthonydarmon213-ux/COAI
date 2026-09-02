@@ -73,7 +73,7 @@ function buildEmail(
 ) {
   const nom = prenom ? ` ${prenom}` : "";
 
-  if (plan === "GRATUIT") {
+  if (plan === "PASS_IA") {
     return {
       subject: "Ton programme t'attend",
       text:
@@ -106,7 +106,7 @@ async function relancerInactifs(appUrl: string): Promise<number> {
 
   const candidats = await prisma.user.findMany({
     where: {
-      subscription: { plan: { in: ["GRATUIT", "STANDARD", "PREMIUM"] }, status: { in: ["ACTIVE", "PAST_DUE"] } },
+      subscription: { plan: { in: ["PASS_IA", "STANDARD", "PREMIUM"] }, status: { in: ["ACTIVE", "PAST_DUE"] } },
       programmes: { some: {} },
     },
     select: {
@@ -137,7 +137,7 @@ async function relancerInactifs(appUrl: string): Promise<number> {
 
     // subscription ne peut pas être null ici (filtré par le where ci-dessus),
     // le ?? est une garde TypeScript pure.
-    const plan = user.subscription?.plan ?? "GRATUIT";
+    const plan = user.subscription?.plan ?? "PASS_IA";
     const { subject, text } = buildEmail(user.prenom, joursInactif, appUrl, plan);
     const envoye = await sendEmail(user.email, subject, text);
 
@@ -164,7 +164,7 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
   const maintenant = Date.now();
 
   const candidats = await prisma.user.findMany({
-    where: { subscription: { plan: "GRATUIT", status: { in: ["ACTIVE", "PAST_DUE"] } } },
+    where: { subscription: { plan: "PASS_IA", status: { in: ["ACTIVE", "PAST_DUE"] } } },
     select: {
       id: true,
       email: true,
@@ -303,7 +303,7 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
   let rappels = 0;
   for (const subscription of candidats) {
     if (!subscription.trialEnd) continue;
-    const prixMensuel = subscription.plan === "GRATUIT" ? 49 : subscription.plan === "STANDARD" ? 89 : 199;
+    const prixMensuel = subscription.plan === "PASS_IA" ? 49 : subscription.plan === "STANDARD" ? 89 : 199;
     const prixAnnuel = prixMensuel * 12;
     const prix = subscription.billingInterval === "ANNUAL" ? `${prixAnnuel} €/an` : `${prixMensuel} €/mois`;
     const date = subscription.trialEnd.toLocaleDateString("fr-FR", {

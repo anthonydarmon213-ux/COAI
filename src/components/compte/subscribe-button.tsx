@@ -20,7 +20,7 @@ export function SubscribeButton({
   billing = "MONTHLY",
   vipSessions = 1,
 }: {
-  plan: "GRATUIT" | "STANDARD" | "PREMIUM";
+  plan: "PASS_IA" | "STANDARD" | "PREMIUM";
   label: string;
   className?: string;
   billing?: "MONTHLY" | "ANNUAL";

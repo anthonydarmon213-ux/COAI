@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   // Même quota que le coach IA sur le site (4 questions/mois, Pass IA
   // uniquement) — sans ça WhatsApp serait une voie de contournement du
   // quota web pour le même service.
-  const estLimite = getEffectivePlan(user.subscription) === "GRATUIT";
+  const estLimite = getEffectivePlan(user.subscription) === "PASS_IA";
   if (estLimite) {
     const fenetreExpiree =
       !user.coachQuestionsResetAt ||

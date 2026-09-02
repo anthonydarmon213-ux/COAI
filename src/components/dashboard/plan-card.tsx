@@ -13,7 +13,7 @@ export function PlanCard({ plan }: { plan: EffectivePlan }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span className="text-base font-semibold text-graphite-50">{PLAN_LABELS[plan]}</span>
-            {plan === "GRATUIT" && <Badge tone="neutral">Sans engagement</Badge>}
+            {plan === "PASS_IA" && <Badge tone="neutral">Sans engagement</Badge>}
           </div>
           <Link
             href="/pricing"

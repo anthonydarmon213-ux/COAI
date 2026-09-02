@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
-  const estLimite = getEffectivePlan(user.subscription) === "GRATUIT";
+  const estLimite = getEffectivePlan(user.subscription) === "PASS_IA";
   let quotaReserved = false;
 
   if (estLimite) {

@@ -13,7 +13,7 @@ import { prisma } from "@/lib/db/client";
 // proposé, alors que le paramètre "billing" envoyé par SubscribeButton
 // était jusqu'ici ignoré côté serveur.
 const OFFER_BY_PLAN = {
-  GRATUIT: {
+  PASS_IA: {
     name: "COAI — Pass IA",
     trialDays: 7,
     MONTHLY: { amount: 1999, interval: "month" },
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const plan: Plan = body.plan === "GRATUIT" ? "GRATUIT" : "STANDARD";
+  const plan: Plan = body.plan === "PASS_IA" ? "PASS_IA" : "STANDARD";
   const planConfig = OFFER_BY_PLAN[plan];
   // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
   // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}`,
-    cancel_url: `${appUrl}/pricing?checkout=cancel&selected=${plan}&billing=${billing}#${plan === "GRATUIT" ? "pass-ia" : plan === "STANDARD" ? "coaching-hybride" : "vip"}`,
+    cancel_url: `${appUrl}/pricing?checkout=cancel&selected=${plan}&billing=${billing}#${plan === "PASS_IA" ? "pass-ia" : plan === "STANDARD" ? "coaching-hybride" : "vip"}`,
     // Acceptation des CGV déplacée ici (21/08/2026, audit tunnel demandé par
     // Anthony, point #7 : la case à cocher sur /pricing bloquait chaque
     // bouton avant même la décision, "alourdit la comparaison des offres").

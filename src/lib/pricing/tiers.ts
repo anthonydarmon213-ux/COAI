@@ -1,6 +1,6 @@
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
-export type PlanCode = "GRATUIT" | "STANDARD" | "PREMIUM";
+export type PlanCode = "PASS_IA" | "STANDARD" | "PREMIUM";
 
 export type Tier = {
   nom: string;
@@ -68,7 +68,7 @@ export const TIERS: Tier[] = [
       "Coach IA disponible 24h/24 et 7j/7",
       "Suivi des séances, mesures et progrès",
     ],
-    plan: "GRATUIT",
+    plan: "PASS_IA",
     mostPopular: true,
     trial: true,
     founderOffer: true,
