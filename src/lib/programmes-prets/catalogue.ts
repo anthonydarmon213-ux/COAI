@@ -734,12 +734,12 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
   },
   {
     slug: "foam-roller-reset-complet",
-    nom: "Foam Roller Reset — Corps complet",
+    nom: "Foam Roller Reset",
     categorie: "RECUPERATION",
     niveau: "Tous niveaux",
     duree: "8 protocoles",
     frequence: "10 à 15 minutes, 2 à 4 fois par semaine",
-    accroche: "Huit zones, une méthode simple et une pression toujours contrôlée.",
+    accroche: "Déverrouille ton corps. Récupère mieux. Reviens plus fort.",
     description:
       "Un programme progressif d’auto-massage au foam roller pour les principales zones sollicitées par l’entraînement. Chaque protocole dure 60 à 90 secondes par côté avec des passages lents, une respiration régulière et une pression modérée. Le rouleau reste sur les tissus musculaires : jamais directement sur une articulation, la nuque, la colonne lombaire ou une douleur aiguë.",
     objectifs: [
@@ -749,7 +749,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Installer une routine courte de récupération autonome",
     ],
     photoQuery: "woman full body foam roller recovery premium dark studio",
-    photoFemme: "/programmes/recuperation/foam-roller/quadriceps-femme-v1.png",
+    photoFemme: "/programmes/recuperation/foam-roller/foam-roller-reset-couverture.svg",
     photoHomme: "/programmes/recuperation/auto-massage-foam-roller-homme-v1.png",
     medias: ["Foam roller mollets", "Foam roller ischio-jambiers", "Foam roller quadriceps", "Foam roller fessiers", "Foam roller haut du dos"],
     jours: [

@@ -49,6 +49,11 @@ export function CoaiIntro() {
             <span className="mt-2 block text-laiton-200">malgré un agenda chargé.</span>
           </h1>
 
+          <p className="mt-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-laiton-200">
+            <span className="h-px w-8 bg-laiton-300/60" aria-hidden="true" />
+            L&apos;IA génère. Ton coach valide.
+          </p>
+
           <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
             COAI construit chaque jour la séance la plus utile selon ton temps disponible, ta
             forme réelle et tes contraintes — pas un programme figé que tu dois faire tenir dans

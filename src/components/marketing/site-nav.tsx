@@ -58,8 +58,12 @@ export function SiteNav({ connecte }: { connecte: boolean }) {
           <CoaiMark size={22} />
           <span className="font-display text-xl font-semibold tracking-[0.16em] text-white">COAI</span>
         </span>
+        {/* Baseline officielle, reprise du storyboard publicitaire ou elle
+            figure sous le logo. Elle remplace "Personal Training,
+            Reimagined." : en anglais et interchangeable, cette formule ne
+            disait pas ce que fait COAI. */}
         <span className="text-[0.55rem] font-medium uppercase tracking-[0.14em] text-laiton-200/80">
-          Personal Training, Reimagined.
+          L&apos;IA génère. Ton coach valide.
         </span>
       </Link>
 
