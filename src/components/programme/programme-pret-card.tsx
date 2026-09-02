@@ -60,7 +60,7 @@ export function ProgrammePretCard({
             style={{ objectPosition: "center top" }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-[#0c0e10]/70 via-40% to-transparent" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e10] via-[#0c0e10]/40 via-30% to-transparent" aria-hidden="true" />
         <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm">
           {CATEGORIE_PROGRAMME_LABEL[programme.categorie]}
         </span>
@@ -74,14 +74,9 @@ export function ProgrammePretCard({
             Programme offert
           </span>
         )}
-        {/* Le nom est pose sur la couverture plutot que sous elle : une
-            vignette doit se lire d'un coup d'oeil, sans descendre au texte. */}
-        <span className="absolute inset-x-4 bottom-11 block">
-          <span className="block font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.85)] sm:text-2xl">
-            {programme.nom.split(" — ")[0]}
-          </span>
-          <span className="mt-1.5 block h-px w-12 bg-laiton-300/80" aria-hidden="true" />
-        </span>
+        {/* Pas de titre en surimpression : il est incruste dans la couverture
+            elle-meme, pour qu'elle reste lisible hors de l'app — story,
+            miniature, publication. Un doublon apparaitrait sinon. */}
         <span className="absolute bottom-3 left-4 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
           {programme.duree}
         </span>

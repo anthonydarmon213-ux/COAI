@@ -101,7 +101,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "4 semaines",
     frequence: "5 micro-séances / semaine, 8-12 min",
-    accroche: "Déverrouille ton corps entre deux réunions, sans matériel et sans transpirer.",
+    accroche: "Bouge sans quitter ta chaise. Relâche les tensions. Repars concentré.",
     description:
       "Pensé pour les dirigeants, indépendants et salariés qui passent l'essentiel de leur journée assis. Toutes les séances se font sur une chaise stable : mobilité, activation musculaire, posture, circulation et respiration. Le but n'est pas de remplacer l'entraînement principal, mais de casser les longues périodes d'inactivité avec une routine réellement tenable.",
     objectifs: [
@@ -192,7 +192,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "4 semaines",
     frequence: "3 séances / semaine, 20-25 min",
-    accroche: "Regagne de l'amplitude, réduis les raideurs, bouge sans y penser.",
+    accroche: "Débloque tes articulations. Gagne en amplitude. Bouge sans y penser.",
     description:
       "Un programme court et régulier pour redonner de la liberté de mouvement aux articulations les plus sollicitées au quotidien — hanches, épaules, colonne thoracique, chevilles. Idéal en complément de ton entraînement principal ou en reprise en douceur.",
     objectifs: [
@@ -240,7 +240,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Intermédiaire",
     duree: "8 semaines",
     frequence: "4 séances / semaine",
-    accroche: "Construis ton endurance et arrive à la ligne de départ prêt·e.",
+    accroche: "Construis ton endurance. Tiens la distance. Arrive prêt·e au départ.",
     description:
       "Une trame progressive pour préparer un semi-marathon (21,1 km) sans te blesser : endurance fondamentale, fractionné pour développer ta vitesse, sortie longue pour habituer le corps à la distance, récupération active. À adapter selon ton niveau de course actuel.",
     objectifs: [
@@ -292,7 +292,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Intermédiaire à avancé",
     duree: "6 semaines",
     frequence: "4 séances / semaine",
-    accroche: "Course + ateliers fonctionnels : prépare-toi au format le plus exigeant du fitness compétitif.",
+    accroche: "Cours. Enchaîne les ateliers. Encaisse le format le plus exigeant.",
     description:
       "Hyrox alterne course à pied et ateliers fonctionnels (sled push/pull, wall balls, burpees broad jump, rowing, farmer carry...). Ce programme combine capacité cardio, force fonctionnelle et transitions rapides entre les efforts — le vrai facteur limitant de la discipline.",
     objectifs: [
@@ -347,7 +347,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Débutant à intermédiaire",
     duree: "8 semaines",
     frequence: "4 séances / semaine",
-    accroche: "Perdre du gras sans sacrifier la force ni la masse musculaire.",
+    accroche: "Perds le gras. Garde le muscle. Reste aussi fort qu'avant.",
     description:
       "Un plan rentable en énergie et efficace : trois séances de musculation avec surcharge progressive, une séance cardio en zone 2, un déficit calorique modéré et des protéines élevées. La priorité reste la performance : si les charges se maintiennent, le muscle est mieux protégé.",
     objectifs: [
@@ -400,7 +400,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "4 semaines",
     frequence: "3 à 4 séances / semaine",
-    accroche: "Aucun matériel, aucune excuse — chez toi, en voyage, où tu veux.",
+    accroche: "Aucun matériel. Aucune excuse. Chez toi, en voyage, partout.",
     description:
       "Un programme complet qui ne demande rien d'autre que ton corps et un peu d'espace. Idéal si tu voyages beaucoup, si tu n'as pas encore de salle, ou si tu veux simplement revenir à l'essentiel : le contrôle de ton propre poids.",
     objectifs: [
@@ -454,7 +454,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "4 semaines",
     frequence: "3 séances / semaine",
-    accroche: "Un focus dédié, pensé pour progresser vite et sans se blesser.",
+    accroche: "Renforce. Galbe. Progresse vite, sans te blesser.",
     description:
       "Un programme ciblé sur le renforcement des fessiers — souvent le groupe musculaire le plus sous-sollicité au quotidien (position assise prolongée). Ouvert à tous, particulièrement pensé pour les demandes récurrentes de nos abonnées : progression claire, mouvements variés, sans surcharger le bas du dos.",
     objectifs: [
@@ -500,7 +500,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "30 jours",
     frequence: "Un défi par jour",
-    accroche: "30 petites actions, un vrai changement d'habitude.",
+    accroche: "30 jours. 30 actions. Une habitude qui tient.",
     description:
       "Pas un programme d'entraînement classique : un défi quotidien pensé pour créer une habitude durable en 30 jours, en mêlant mouvement, nutrition, récupération et mental. Chaque jour prend quelques minutes — l'objectif n'est pas la performance, c'est la régularité.",
     objectifs: [
@@ -564,7 +564,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "14 jours",
     frequence: "Une habitude par jour, à garder ensuite",
-    accroche: "Un vrai sommeil de récupération ne s'improvise pas, il se construit jour après jour.",
+    accroche: "Endors-toi plus vite. Dors plus profond. Réveille-toi réparé.",
     description:
       "14 jours pour installer, une habitude à la fois, les repères qui font le plus de différence sur la qualité du sommeil — horaires, lumière, écrans, caféine, température de la chambre. Chaque jour ajoute une habitude à la précédente, sans jamais tout changer d'un coup.",
     objectifs: [
@@ -606,7 +606,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "4 techniques",
     frequence: "5 minutes, quand tu en as besoin",
-    accroche: "4 techniques de respiration simples pour calmer le système nerveux en quelques minutes.",
+    accroche: "Inspire. Ralentis. Calme ton système nerveux en quelques minutes.",
     description:
       "Des techniques de respiration courtes et concrètes, à utiliser avant de dormir, pendant une journée stressante, ou en récupération après une séance intense. Pas besoin de matériel ni d'expérience — juste 5 minutes et un endroit calme.",
     objectifs: [
@@ -654,7 +654,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "7 jours",
     frequence: "5 à 10 minutes par jour",
-    accroche: "Une courte pratique par jour pour découvrir la méditation sans pression de performance.",
+    accroche: "Assieds-toi. Respire. Découvre la méditation sans pression.",
     description:
       "7 courtes séances pour découvrir la méditation en douceur, sans application ni matériel — juste toi, un endroit calme et quelques minutes. Chaque jour propose un focus différent : ce n'est pas grave si l'esprit vagabonde, c'est normal, le but est de recommencer, pas d'y arriver parfaitement.",
     objectifs: [
@@ -688,7 +688,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
     niveau: "Tous niveaux",
     duree: "4 protocoles",
     frequence: "1 à 2 fois par semaine",
-    accroche: "Le bon protocole, avec les bonnes précautions — pas juste \"aller transpirer\".",
+    accroche: "Sauna, hammam, massage. Le bon protocole, les bonnes précautions.",
     description:
       "Sauna, hammam et massage sont d'excellents outils de récupération quand ils sont utilisés avec un vrai protocole — durée, cycles, hydratation. Utilisés n'importe comment, ils fatiguent plus qu'ils ne récupèrent. Toujours en dehors de toute contre-indication médicale (grossesse, problème cardiovasculaire, hypertension non contrôlée) — demande un avis médical en cas de doute.",
     objectifs: [
