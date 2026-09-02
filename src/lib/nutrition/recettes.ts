@@ -7,6 +7,7 @@
 // même principe de prudence que le reste du contenu nutrition de COAI.
 import { RECETTES_EXTENSION } from "./recettes-extension";
 import { RECETTES_V6 } from "./recettes-v6";
+import { RECETTES_V7 } from "./recettes-v7";
 
 export type ObjectifRecette = "PERTE_DE_POIDS" | "PRISE_DE_MASSE" | "EQUILIBRE";
 export type TypeRepas = "PETIT_DEJEUNER" | "DEJEUNER" | "DINER" | "COLLATION";
@@ -1710,6 +1711,7 @@ export const RECETTES: Recette[] = [
 
 RECETTES.push(...RECETTES_EXTENSION);
 RECETTES.push(...RECETTES_V6);
+RECETTES.push(...RECETTES_V7);
 
 // Ingredients d'origine animale. Volontairement large : un faux positif ferait
 // manger un produit animal a quelqu'un qui l'exclut, alors qu'un faux negatif
