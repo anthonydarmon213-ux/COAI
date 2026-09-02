@@ -60,12 +60,16 @@ export const TIERS: Tier[] = [
     noteFacturation: "Sans engagement · 49€ les 3 mois, ou 9,99€/mois en annuel (119€ facturés une fois par an)",
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
+    // La page tarifs n'affiche que les quatre premieres : le concret passe
+    // donc devant l'abstrait. Un visiteur ignorait qu'il obtient des
+    // centaines de contenus deja produits, et ne lisait que des promesses
+    // d'adaptation impossibles a evaluer avant d'avoir paye.
     features: [
+      "189 recettes avec leurs macros — végétarien, vegan, sans gluten, hyper-protéiné",
+      "13 programmes prêts à suivre et 58 exercices filmés par Anthony",
+      "Une séance recalculée chaque jour selon ton sommeil, ta forme et ton temps",
+      "Coach IA disponible pendant ta séance, 24h/24",
       "Programme ultra-personnalisé selon ton diagnostic",
-      "Entraînement, alimentation et récupération sur mesure",
-      "Check-in quotidien : sommeil, forme, douleurs et temps disponible",
-      "Séance adaptée chaque jour à tes réponses",
-      "Coach IA disponible 24h/24 et 7j/7",
       "Suivi des séances, mesures et progrès",
     ],
     plan: "PASS_IA",
