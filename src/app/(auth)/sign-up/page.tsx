@@ -154,7 +154,7 @@ export default function SignUpPage() {
             <div className="coai-diagnostic-kicker">
               <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
               <span>
-                {arriveDepuisInstagram ? "Étape 1 sur 2 · compte puis Stripe" : "Après ton bilan · création du compte"}
+                {arriveDepuisInstagram ? "Création du compte, puis paiement" : "Après ton bilan · création du compte"}
               </span>
             </div>
             <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">

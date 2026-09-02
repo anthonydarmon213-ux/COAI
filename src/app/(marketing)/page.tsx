@@ -972,7 +972,7 @@ export default function LandingPage() {
       </section>
 
       <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center">
-        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Étape 1 sur 7</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · 2 minutes</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
         <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir une formule.</p>
         <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>

@@ -47,7 +47,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       <FondateurTicker />
       <div className="w-full max-w-6xl"><BackLink /></div>
       <div className="max-w-4xl text-center">
-        <SectionLabel>Étape 4 sur 7 · Choisis ta formule</SectionLabel>
+        <SectionLabel>Choisis ta formule</SectionLabel>
         <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
           Choisis ton niveau d&apos;accompagnement.
         </h1>
@@ -202,7 +202,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
-        <p className="text-sm font-semibold text-white">Étapes 5 à 7 : essai → programme activé → première séance</p>
+        <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
         <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. Le Coaching VIP se règle à la séance, sans abonnement.</p>
       </div>
 

@@ -215,7 +215,7 @@ export default async function BienvenuePage({
       <TrackConversion name="checkout_completed" params={{ plan }} />
 
       <div className="flex flex-col items-center gap-3">
-        <SectionLabel>{enEssai ? "Étape 6 sur 7 · Essai activé" : "Accès confirmé"}</SectionLabel>
+        <SectionLabel>{enEssai ? "Essai activé" : "Accès confirmé"}</SectionLabel>
         <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
           {enEssai ? "Tes 7 jours d'essai commencent." : `Bienvenue${prenom ? `, ${prenom}` : ""}.`}
         </h1>

@@ -2329,7 +2329,7 @@ export function DiagnosticQuiz({
                 <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
               ) : (
                 <div className="w-full rounded-[1.6rem] border border-laiton-400/35 bg-laiton-400/[0.07] px-6 py-7 text-center">
-                  <SectionLabel>Étape 3 · conserve ton résultat</SectionLabel>
+                  <SectionLabel>Conserve ton résultat</SectionLabel>
                   <h3 className="mt-3 font-display text-2xl font-semibold text-white">
                     Crée gratuitement ton espace COAI.
                   </h3>
