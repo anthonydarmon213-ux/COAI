@@ -971,6 +971,51 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Ce que contient l'abonnement, en chiffres verifiables. La page
+          expliquait comment COAI fonctionne sans jamais dire ce qu'on y
+          trouve : un visiteur ignorait qu'il achete des centaines de
+          contenus deja produits. */}
+      <Reveal>
+      <section
+        className="mx-auto my-8 w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/[0.09] bg-white/[0.03] px-6 py-16 text-center sm:px-12 sm:py-20"
+        aria-labelledby="tout-inclus-title"
+      >
+        <SectionLabel>Tout COAI, inclus</SectionLabel>
+        <h2
+          id="tout-inclus-title"
+          className="mx-auto mt-5 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
+        >
+          Un seul accès. Tout ce qui existe,
+          <br className="hidden sm:block" /> et tout ce qui arrive.
+        </h2>
+
+        <div className="mx-auto mt-12 grid max-w-4xl gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { chiffre: "189", titre: "recettes", texte: "Avec leurs macros, filtrables par régime et par objectif." },
+            { chiffre: "58", titre: "exercices filmés", texte: "Démontrés par Anthony, pas des animations génériques." },
+            { chiffre: "1", titre: "séance par jour", texte: "Recalculée selon ton sommeil, ta forme et ton temps." },
+            { chiffre: "24/7", titre: "coach IA", texte: "Disponible pendant la séance, dans le contexte de ton exercice." },
+          ].map((bloc) => (
+            <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6 text-left">
+              <p className="font-display text-4xl font-semibold tracking-[-0.04em] text-laiton-300">{bloc.chiffre}</p>
+              <p className="mt-1 text-sm font-semibold text-white">{bloc.titre}</p>
+              <p className="mt-2 text-sm leading-6 text-graphite-400">{bloc.texte}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mx-auto mt-10 max-w-2xl text-base leading-7 text-graphite-300">
+          Chaque nouvelle recette, chaque nouvelle vidéo, chaque amélioration :
+          incluse, sans supplément.
+        </p>
+        <div className="mt-8 flex justify-center">
+          <Link href="/diagnostic">
+            <Button>Faire mon bilan offert</Button>
+          </Link>
+        </div>
+      </section>
+      </Reveal>
+
       <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center">
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · 2 minutes</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
