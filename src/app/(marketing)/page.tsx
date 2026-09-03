@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
+import { NB_EXERCICES_FILMES, NB_PROGRAMMES_PRETS, NB_RECETTES } from "@/lib/catalogue-chiffres";
 import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
@@ -996,9 +997,9 @@ export default function LandingPage() {
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { chiffre: "189", titre: "recettes", texte: "Avec leurs macros. Végétarien, vegan, sans gluten, hyper-protéiné." },
+            { chiffre: String(NB_RECETTES), titre: "recettes", texte: "Avec leurs macros. Végétarien, vegan, sans gluten, hyper-protéiné." },
             { chiffre: "13", titre: "programmes prêts", texte: "Dont 5 protocoles de récupération : sommeil, respiration, foam roller." },
-            { chiffre: "58", titre: "exercices filmés", texte: "Démontrés par Anthony, pas des animations génériques." },
+            { chiffre: String(NB_EXERCICES_FILMES), titre: "exercices filmés", texte: "Démontrés par Anthony, pas des animations génériques." },
             { chiffre: "1", titre: "séance par jour", texte: "Recalculée selon ton sommeil, ta forme et ton temps." },
             { chiffre: "Rep", titre: "carnet de séances", texte: "Chaque série, chaque charge, ton tonnage et tes records." },
             { chiffre: "kcal", titre: "compteur intégré", texte: "Calories et macros au quotidien, sans peser si tu ne veux pas." },
@@ -1026,7 +1027,7 @@ export default function LandingPage() {
       </Reveal>
 
       <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center">
-        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · 2 minutes</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · moins de 5 minutes</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
         <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir une formule.</p>
         <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>

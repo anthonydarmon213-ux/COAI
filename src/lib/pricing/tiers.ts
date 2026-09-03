@@ -1,4 +1,5 @@
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { NB_EXERCICES_FILMES, NB_PROGRAMMES_PRETS, NB_RECETTES } from "@/lib/catalogue-chiffres";
 
 export type PlanCode = "PASS_IA" | "STANDARD" | "PREMIUM";
 
@@ -65,8 +66,8 @@ export const TIERS: Tier[] = [
     // centaines de contenus deja produits, et ne lisait que des promesses
     // d'adaptation impossibles a evaluer avant d'avoir paye.
     features: [
-      "189 recettes avec leurs macros — végétarien, vegan, sans gluten, hyper-protéiné",
-      "13 programmes prêts à suivre et 58 exercices filmés par Anthony",
+      `${NB_RECETTES} recettes avec leurs macros — végétarien, vegan, sans gluten, hyper-protéiné`,
+      `${NB_PROGRAMMES_PRETS} programmes prêts à suivre et ${NB_EXERCICES_FILMES} exercices filmés par Anthony`,
       "Une séance recalculée chaque jour selon ton sommeil, ta forme et ton temps",
       "Coach IA disponible pendant ta séance, 24h/24",
       "Programme ultra-personnalisé selon ton diagnostic",
