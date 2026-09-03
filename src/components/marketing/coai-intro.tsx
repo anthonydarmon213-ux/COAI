@@ -80,6 +80,32 @@ export function CoaiIntro() {
             </Link>
           </div>
           <p className="mt-3 text-xs text-graphite-500">Bilan initial en moins de 5 minutes · Score COAI personnalisé · aucune carte bancaire</p>
+
+          {/* Preuve au niveau du premier appel a l'action (02/09/2026) : la
+              promesse reposait sur "des milliers de personnes accompagnees",
+              invérifiable et donc sans valeur.
+              Uniquement des faits contrôlables — diplôme, années d'exercice,
+              audience publique, et l'âge COAI d'Anthony lui-même. Aucun
+              témoignage n'est affiché tant qu'il n'y a pas de client à citer :
+              en inventer se verrait, et se paierait cher. */}
+          <ul
+            className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/[0.08] pt-5"
+            aria-label="Ce qui garantit le sérieux de COAI"
+          >
+            {[
+              { chiffre: "17 ans", texte: "de terrain, dirigeants et entrepreneurs" },
+              { chiffre: "DE", texte: "coach diplômé d'État" },
+              { chiffre: "24 ans", texte: "l'âge COAI d'Anthony, à plus de 40 ans" },
+              { chiffre: "3 100+", texte: "abonnés sur Instagram" },
+            ].map((preuve) => (
+              <li key={preuve.chiffre} className="flex items-baseline gap-2">
+                <span className="font-display text-lg font-semibold tracking-[-0.03em] text-laiton-300">
+                  {preuve.chiffre}
+                </span>
+                <span className="text-xs leading-4 text-graphite-400">{preuve.texte}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
