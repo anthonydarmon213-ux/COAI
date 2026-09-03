@@ -14,6 +14,9 @@ type Video = {
   description: string | null;
   youtubeId: string;
   categorie: string | null;
+  youtubeIdApercu: string | null;
+  dureeMinutes: number | null;
+  apercuMinutes: number | null;
 };
 
 export function AdminVideosManager({ videos }: { videos: Video[] }) {
@@ -22,6 +25,12 @@ export function AdminVideosManager({ videos }: { videos: Video[] }) {
   const [description, setDescription] = useState("");
   const [lien, setLien] = useState("");
   const [categorie, setCategorie] = useState("");
+  // Aperçu offert (02/09/2026) : le formulaire n'exposait pas ces trois
+  // champs alors que l'API les acceptait déjà — impossible de configurer
+  // un aperçu gratuit depuis l'admin depuis leur création.
+  const [lienApercu, setLienApercu] = useState("");
+  const [dureeMinutes, setDureeMinutes] = useState("");
+  const [apercuMinutes, setApercuMinutes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +42,15 @@ export function AdminVideosManager({ videos }: { videos: Video[] }) {
       const res = await fetch("/api/admin/videos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titre, description, lien, categorie }),
+        body: JSON.stringify({
+          titre,
+          description,
+          lien,
+          categorie,
+          lienApercu: lienApercu || undefined,
+          dureeMinutes: dureeMinutes || undefined,
+          apercuMinutes: apercuMinutes || undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "Échec de l'ajout.");
@@ -41,6 +58,9 @@ export function AdminVideosManager({ videos }: { videos: Video[] }) {
       setDescription("");
       setLien("");
       setCategorie("");
+      setLienApercu("");
+      setDureeMinutes("");
+      setApercuMinutes("");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -80,6 +100,35 @@ export function AdminVideosManager({ videos }: { videos: Video[] }) {
           <Field label="Description (optionnel)">
             <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
           </Field>
+
+          {/* Aperçu offert : un SECOND lien YouTube, jamais un minuteur sur
+              la vidéo complète — son identifiant est visible dans le HTML de
+              la page, donc n'importe qui pourrait l'ouvrir sur youtube.com. */}
+          <Field label="Lien de l'aperçu offert (optionnel)">
+            <Input
+              value={lienApercu}
+              onChange={(e) => setLienApercu(e.target.value)}
+              placeholder="https://youtu.be/... (extrait distinct, offert aux non-abonnés)"
+            />
+          </Field>
+          <div className="flex gap-3">
+            <Field label="Durée totale (minutes)">
+              <Input
+                type="number"
+                min={1}
+                value={dureeMinutes}
+                onChange={(e) => setDureeMinutes(e.target.value)}
+              />
+            </Field>
+            <Field label="Durée de l'aperçu (minutes)">
+              <Input
+                type="number"
+                min={1}
+                value={apercuMinutes}
+                onChange={(e) => setApercuMinutes(e.target.value)}
+              />
+            </Field>
+          </div>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading} className="self-start">
             {loading ? "Ajout…" : "Ajouter la vidéo"}
@@ -107,6 +156,14 @@ export function AdminVideosManager({ videos }: { videos: Video[] }) {
             </div>
             {video.description && <p className="text-sm text-graphite-400">{video.description}</p>}
             <p className="font-mono text-xs text-graphite-500">ID YouTube : {video.youtubeId}</p>
+            {video.youtubeIdApercu ? (
+              <p className="font-mono text-xs text-emerald-400">
+                Aperçu offert : {video.youtubeIdApercu}
+                {video.apercuMinutes ? ` (${video.apercuMinutes} min sur ${video.dureeMinutes ?? "?"} min)` : ""}
+              </p>
+            ) : (
+              <p className="font-mono text-xs text-graphite-600">Aucun aperçu configuré</p>
+            )}
           </Card>
         ))}
       </div>

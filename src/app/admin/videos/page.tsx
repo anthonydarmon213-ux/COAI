@@ -33,6 +33,9 @@ export default async function AdminVideosPage() {
             description: v.description,
             youtubeId: v.youtubeId,
             categorie: v.categorie,
+            youtubeIdApercu: v.youtubeIdApercu,
+            dureeMinutes: v.dureeMinutes,
+            apercuMinutes: v.apercuMinutes,
           }))}
         />
       </div>
