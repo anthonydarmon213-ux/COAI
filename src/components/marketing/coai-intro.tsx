@@ -110,6 +110,15 @@ export function CoaiIntro() {
               </li>
             ))}
           </ul>
+
+          {/* Les clubs sont des etablissements, pas des clients : les nommer
+              ne demande pas d'accord individuel, et c'est verifiable — donc
+              utile, contrairement a une reference anonyme. */}
+          <p className="mt-4 text-xs leading-5 text-graphite-400">
+            Intervient dans les clubs premium parisiens —{" "}
+            <span className="text-graphite-300">La Montgolfière Club</span> et{" "}
+            <span className="text-graphite-300">RITM Saint-Germain</span>.
+          </p>
         </div>
       </div>
 
