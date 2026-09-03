@@ -20,4 +20,4 @@
 // Dernière vérification : 2 septembre 2026.
 export const NB_RECETTES = 189;
 export const NB_PROGRAMMES_PRETS = 23;
-export const NB_EXERCICES_FILMES = 67;
+export const NB_EXERCICES_FILMES = 68;

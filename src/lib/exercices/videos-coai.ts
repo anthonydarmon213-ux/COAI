@@ -23,6 +23,7 @@ const TABLE: Entree[] = [
   { motifs: ["fentes avant halteres", "fente avant halteres"], video: { fichier: "fentes-avant-halteres", description: "Fentes avant aux haltères" } },
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split squat"], video: { fichier: "fentes-bulgares", description: "Fentes bulgares aux haltères" } },
   { motifs: ["mollets unilateral haltere", "mollet unilateral haltere"], video: { fichier: "mollets-unilateral-haltere", description: "Mollets unilatéral avec haltère" } },
+  { motifs: ["rowing elastique", "rowing a l'elastique"], video: { fichier: "rowing-elastique", description: "Rowing penché à l'élastique" } },
   { motifs: ["face pull elastique", "face pull"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
   { motifs: ["kickback elastique", "kickback"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
   { motifs: ["developpe incline (machine)", "developpe incline machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
