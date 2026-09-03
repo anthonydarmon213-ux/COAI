@@ -87,13 +87,17 @@ export function CoaiIntro() {
               Uniquement des faits contrôlables — diplôme, années d'exercice,
               audience publique, et l'âge COAI d'Anthony lui-même. Aucun
               témoignage n'est affiché tant qu'il n'y a pas de client à citer :
-              en inventer se verrait, et se paierait cher. */}
+              en inventer se verrait, et se paierait cher.
+              La clientèle est décrite par catégorie, jamais nommée ni rendue
+              identifiable : citer un client demande son accord écrit, et une
+              référence prestigieuse mais anonyme ne se vérifie pas — donc ne
+              convainc pas. */}
           <ul
             className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/[0.08] pt-5"
             aria-label="Ce qui garantit le sérieux de COAI"
           >
             {[
-              { chiffre: "17 ans", texte: "de terrain, dirigeants et entrepreneurs" },
+              { chiffre: "17 ans", texte: "auprès de dirigeants, d'entrepreneurs et de familles internationales" },
               { chiffre: "DE", texte: "coach diplômé d'État" },
               { chiffre: "24 ans", texte: "l'âge COAI d'Anthony, à plus de 40 ans" },
               { chiffre: "3 100+", texte: "abonnés sur Instagram" },
