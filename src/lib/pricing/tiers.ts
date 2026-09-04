@@ -18,7 +18,11 @@ export type Tier = {
   // premiers abonnés — cf. src/lib/pricing/membre-fondateur.ts pour le
   // comptage réel (jamais un chiffre inventé).
   founderOffer?: boolean;
-  sessions?: { count: 1 | 2 | 3 | 4; label: string; prix: string }[];
+  // 6 ajouté le 04/09/2026 (packs Full Remote / Full Présentiel VIP en
+  // engagement 3 ou 6 mois) — `count` n'est affiché nulle part (seuls
+  // `label`/`prix` le sont, cf. compte/abonnement/page.tsx), c'est un repère
+  // interne pour distinguer les entrées.
+  sessions?: { count: 1 | 2 | 3 | 4 | 6; label: string; prix: string }[];
   // Facturation annuelle (21/08/2026, Pass IA seulement — cf.
   // checkout/route.ts) : "prix"/"suffixe" affichent l'équivalent mensuel en
   // gros (repère familier), "noteFacturation" précise en petit le vrai
@@ -101,6 +105,33 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
 // recommandation calculée après coup (déjà existante, TIER_BY_SERVICE /
 // FormuleRecommandeeCard, mais jamais alimentée par un vrai choix explicite
 // jusqu'ici).
+//
+// Repositionnement "high ticket" (04/09/2026, même journée, nouveau retour
+// d'Anthony) : Full Remote et Full Présentiel VIP repassent d'un
+// prix/forfait fixe à un tarif par séance, en pack engagé de 3 ou 6 mois
+// (le forfait 1 200 €/3 mois ci-dessus n'aura donc vécu que quelques
+// heures — remplacé avant tout déploiement chez un abonné réel, aucun
+// risque). Décisions confirmées par Anthony :
+// - Full Remote : 80 €/séance (au lieu du forfait 1 200 €/3 mois).
+// - Full Présentiel VIP : 100 €/séance pour un particulier ; 200 €/séance
+//   pour une entreprise — "même accompagnement, tarif selon le payeur", pas
+//   deux offres différentes. Le tarif entreprise (200 €) reste volontairement
+//   hors du site public (uniquement communiqué sur devis via WhatsApp,
+//   comme c'était déjà le cas) : seul le tarif particulier (100 €) est
+//   affiché. Remplace l'ancien "10 séances/mois max" (pas d'abonnement,
+//   séances à l'unité) par un engagement pack 3 ou 6 mois.
+// - Cadence retenue pour le calcul des totaux affichés : 1 séance/semaine,
+//   soit ~4/mois (confirmé par Anthony) — donc environ 12 séances sur 3
+//   mois, ~24 sur 6 mois.
+// - Durées d'engagement : seulement 3 et 6 mois (le "12 mois" évoqué au
+//   tout premier message n'a pas été repris dans les chiffres détaillés
+//   d'Anthony ni confirmé — à ajouter facilement plus tard si besoin, cf.
+//   `sessions` sur chaque tier).
+// - Paiement du pack en une fois à la signature (pas de mensualisation),
+//   comme l'ancien forfait Full Remote.
+// - `PlanCode` (`STANDARD`/`PREMIUM`) et le fonctionnement "sur devis via
+//   WhatsApp, jamais de Stripe" restent inchangés — seul le mode de calcul
+//   du prix affiché change (par séance × pack, plutôt qu'un forfait unique).
 export const TIERS: Tier[] = [
   {
     nom: "Full IA",
@@ -131,10 +162,10 @@ export const TIERS: Tier[] = [
   {
     nom: "Full Remote",
     eyebrow: "COACHING 1:1 AVEC ANTHONY · 15 PLACES MAX",
-    prix: "1 200 €",
-    suffixe: "/ 3 mois",
+    prix: "80 €",
+    suffixe: "/ séance",
     description:
-      "Un coaching individuel à distance, piloté personnellement par moi, sur un engagement de 3 mois — soit 400 €/mois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
+      "Un coaching individuel à distance, piloté personnellement par moi — 80 € la séance, environ 1 séance par semaine, en pack engagé de 3 ou 6 mois payé en une fois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
     features: [
       "Suivi individuel 100% avec Anthony, à distance",
       "Programme construit et ajusté personnellement selon tes retours",
@@ -145,43 +176,50 @@ export const TIERS: Tier[] = [
     ],
     plan: "STANDARD",
     limitedSpots: true,
-    sessions: [{ count: 3, label: "Accompagnement 3 mois", prix: "1 200 € (soit 400 € / mois)" }],
-    devisTagline: "Suivi individuel à distance, 100 % avec moi — 1 200 € pour 3 mois (soit 400 €/mois), 15 places maximum.",
+    sessions: [
+      { count: 3, label: "Pack 3 mois (~12 séances, 1/semaine)", prix: "80 € / séance · 960 € au total" },
+      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "80 € / séance · 1 920 € au total" },
+    ],
+    devisTagline: "Suivi individuel à distance, 100 % avec moi — 80 €/séance, environ 1 séance par semaine, pack 3 ou 6 mois au choix. 15 places maximum.",
     devisWhatsappLabel: "le Full Remote",
-    devisFootnote: "Engagement de 3 mois, facturé en une fois. Places limitées à 15 pour garder un vrai suivi individuel.",
-    devisPriceLabel: "1 200 € pour 3 mois (soit 400 €/mois)",
+    devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel.",
+    devisPriceLabel: "80 € / séance (pack 3 ou 6 mois, payé en une fois)",
     // Demande Anthony (04/09/2026) : proposer un appel visio avant de
     // signer pour qui en a besoin, sans bloquer qui veut souscrire tout de
     // suite — les deux CTA restent visibles, au choix.
     devisSecondaryCta: {
       label: "Réserver un appel visio avant de signer",
-      whatsappMessage: "Bonjour Anthony, avant de m'engager sur Full Remote (1 200 € les 3 mois), je voudrais d'abord un appel visio avec toi.",
+      whatsappMessage: "Bonjour Anthony, avant de m'engager sur Full Remote (80 €/séance), je voudrais d'abord un appel visio avec toi.",
     },
   },
   {
     nom: "Full Présentiel VIP",
-    eyebrow: "SANS ABONNEMENT · 10 SÉANCES/MOIS MAX",
-    prix: "200 €",
-    suffixe: "la séance",
+    eyebrow: "SÉANCES PRIVÉES AVEC ANTHONY · PACK 3 OU 6 MOIS",
+    prix: "100 €",
+    suffixe: "/ séance",
     description:
-      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — jusqu'à 10 séances par mois.",
+      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — 100 € la séance, environ 1 séance par semaine, en pack engagé de 3 ou 6 mois payé en une fois.",
     features: [
       "Séances privées de Personal Training avec Anthony",
       "À domicile, en entreprise, en club ou à distance",
       "Analyse approfondie des objectifs, douleurs et contraintes",
-      "Formules suivies et groupes chiffrés sur devis",
+      "Tarif entreprise disponible sur devis (facture déductible)",
       "Facture professionnelle déductible en frais d'entreprise",
-      "Créneaux volontairement limités à 10 séances par mois",
+      "Pack payé en une fois à la signature",
     ],
     plan: "PREMIUM",
     limitedSpots: true,
     sessions: [
-      { count: 1, label: "Séance à l'unité", prix: "200 € la séance" },
-      { count: 2, label: "Accompagnement suivi", prix: "sur devis" },
+      { count: 3, label: "Pack 3 mois (~12 séances, 1/semaine)", prix: "100 € / séance · 1 200 € au total" },
+      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "100 € / séance · 2 400 € au total" },
     ],
-    devisTagline: "À domicile, en entreprise, en club ou à distance — 10 séances par mois maximum.",
+    // Tarif entreprise (200 €/séance) volontairement absent de tout texte
+    // public (décision Anthony, 04/09/2026) : communiqué uniquement sur
+    // devis via WhatsApp, jamais affiché en chiffres sur le site.
+    devisTagline: "À domicile, en entreprise, en club ou à distance — 100 €/séance, environ 1 séance par semaine, pack 3 ou 6 mois. Tarif entreprise sur devis.",
     devisWhatsappLabel: "le Full Présentiel VIP",
-    devisFootnote: "Séances à l'unité ou suivies, sans abonnement. Facture déductible pour les entreprises.",
+    devisFootnote: "Pack payé en une fois à la signature. Tarif entreprise (facture déductible) sur devis.",
+    devisPriceLabel: "100 € / séance (pack 3 ou 6 mois, payé en une fois)",
   },
 ];
 

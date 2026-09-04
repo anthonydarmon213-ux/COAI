@@ -216,8 +216,8 @@ export default async function AbonnementPage() {
               );
             })}
             <p className="text-xs leading-5 text-graphite-400">
-              Abonnement mensuel résiliable à tout moment. Les créneaux sont confirmés directement
-              avec Anthony ; report gratuit jusqu&apos;à 24 h avant la séance.
+              Pack payé en une fois à la signature, tarif entreprise sur devis. Les créneaux sont
+              confirmés directement avec Anthony ; report gratuit jusqu&apos;à 24 h avant la séance.
             </p>
           </div>
         )}

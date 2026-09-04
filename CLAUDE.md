@@ -109,6 +109,44 @@ ciblé confirmant qu'aucune ancienne ancre (`#coaching-hybride`) ni aucun
 texte "Coaching VIP"/"Coaching Hybride" ne subsiste dans les fichiers
 touchés (hors commentaires historiques). Branche `claude/simplifier-home-menu`.
 
+**Repositionnement "high ticket" : Full Remote et Full Présentiel VIP passent
+au tarif/séance (04/09/2026, même journée, nouveau retour d'Anthony)** : le
+forfait fixe Full Remote (1 200 €/3 mois) documenté ci-dessus au tout début
+de cette section n'aura vécu que quelques heures — remplacé avant tout
+déploiement réel, aucun abonné concerné. Décisions confirmées par Anthony :
+- **Full Remote : 80 €/séance** (au lieu du forfait fixe), en pack engagé de
+  3 ou 6 mois, payé en une fois à la signature.
+- **Full Présentiel VIP : 100 €/séance pour un particulier, 200 €/séance
+  pour une entreprise** — "même accompagnement, tarif selon le payeur", pas
+  deux offres distinctes. Le tarif entreprise (200 €) reste **volontairement
+  hors du site public** : seul le tarif particulier (100 €) est affiché, le
+  200 € entreprise se communique uniquement sur devis via WhatsApp (comme
+  c'était déjà le cas). Remplace l'ancien modèle "sans abonnement, jusqu'à 10
+  séances/mois" par un engagement pack 3 ou 6 mois.
+- **Cadence retenue pour les totaux affichés : ~1 séance/semaine (4/mois)**,
+  soit ~12 séances sur 3 mois et ~24 sur 6 mois (ex. Full Remote : 960 € les
+  3 mois, 1 920 € les 6 mois).
+- **Durées d'engagement : seulement 3 et 6 mois** — le "12 mois" évoqué au
+  tout premier message d'Anthony sur ce sujet n'a pas été repris dans ses
+  chiffres détaillés ni confirmé ; facile à ajouter plus tard sur `sessions`
+  si besoin (type déjà élargi à `1 | 2 | 3 | 4 | 6`).
+- **Paiement en une fois**, pas de mensualisation — comme l'ancien forfait
+  Full Remote.
+
+Implémentation : `src/lib/pricing/tiers.ts` (les deux tiers + `sessions`),
+répercuté dans `/pricing` (grille Full Remote + carte standalone Full
+Présentiel VIP), `/vip`, la modale service (déjà générique, aucun
+changement necessaire), home (FAQ, `STRUCTURED_DATA.offers`, teaser
+"Full Remote · Full Présentiel VIP"), `ma-formule-card.tsx`,
+`/compte/abonnement` (footnote pack), `besoins-identifies.ts`
+(`SERVICE_INFO`), et les messages d'erreur de `checkout/route.ts`. Au
+passage, corrigé un texte FAQ déjà obsolète avant ce changement ("Les trois
+formules sont des abonnements mensuels sans engagement" — faux pour Full
+Remote/VIP même du temps du forfait fixe). `PlanCode`/`ServiceKey`
+inchangés ; `Tier.sessions[].count` élargi de `1|2|3|4` à `1|2|3|4|6` (champ
+jamais affiché, seulement `.label`/`.prix` le sont côté UI — vérifié dans
+`compte/abonnement/page.tsx`, seul endroit qui itère sur `sessions`).
+
 ## Simplification de la home (04/09/2026)
 
 Anthony a reçu un retour d'un proche (Mickaël, capture WhatsApp) : la home et

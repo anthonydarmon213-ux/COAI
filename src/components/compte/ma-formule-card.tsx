@@ -20,8 +20,8 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
 // comparer d'un coup d'œil — le détail complet reste dans ServiceDetailModal.
 const RESUME_COMPARATIF: Record<ServiceKey, string> = {
   IMPULSION: "Coach personnel autonome et adaptatif — 19,99 €/mois",
-  TRANSFORMATION: "Coaching individuel 1:1 à distance avec Anthony — 1 200 € les 3 mois (400 €/mois), sur devis",
-  VIP: "Séances privées avec Anthony — à domicile, en entreprise, en club ou à distance, 200 € la séance (10/mois max)",
+  TRANSFORMATION: "Coaching individuel 1:1 à distance avec Anthony — 80 €/séance, pack 3 ou 6 mois, sur devis",
+  VIP: "Séances privées avec Anthony — à domicile, en entreprise, en club ou à distance, 100 €/séance, pack 3 ou 6 mois",
 };
 
 // Carte "Ta formule" (16/08/2026, demande Anthony) : jusqu'ici rien sur

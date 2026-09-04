@@ -7,7 +7,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Full Présentiel VIP — À domicile, en entreprise, en club ou à distance",
-  description: "Full Présentiel VIP avec Anthony Darmon, à partir de 200 € la séance, 10 séances par mois maximum : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
+  description: "Full Présentiel VIP avec Anthony Darmon, 100 € la séance (pack 3 ou 6 mois), tarif entreprise sur devis : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
   alternates: { canonical: "/vip" },
 };
 
@@ -40,7 +40,7 @@ export default function VipPage() {
               Anthony pilote personnellement ta transformation : bilan initial, programme sur
               mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI. Chez toi, dans
               ton entreprise, en club ou à distance — tu sais quoi faire, quand le faire et pourquoi.
-              Créneaux volontairement limités à 10 séances par mois.
+              Environ 1 séance par semaine, en pack engagé de 3 ou 6 mois.
             </p>
 
             <div className="mt-8 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-6 py-5">
@@ -69,11 +69,11 @@ export default function VipPage() {
             </div>
 
             <div className="mt-10 flex items-end gap-3">
-              <span className="font-display text-4xl font-semibold text-white">200 € la séance</span>
-              <span className="pb-1 text-sm text-graphite-500">puis sur devis</span>
+              <span className="font-display text-4xl font-semibold text-white">100 € la séance</span>
+              <span className="pb-1 text-sm text-graphite-500">pack 3 ou 6 mois</span>
             </div>
-            <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise.</p>
-            <p className="mt-1 text-sm text-graphite-400">10 séances par mois maximum, pour un suivi vraiment personnalisé. Nombre de nouveaux accompagnements volontairement limité.</p>
+            <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise. Tarif entreprise sur devis.</p>
+            <p className="mt-1 text-sm text-graphite-400">Environ 1 séance par semaine, pour un suivi vraiment personnalisé. Nombre de nouveaux accompagnements volontairement limité.</p>
             <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
               Demander mon devis
             </a>

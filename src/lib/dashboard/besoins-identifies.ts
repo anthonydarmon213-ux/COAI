@@ -16,8 +16,8 @@ export type BesoinIdentifie = {
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
   IMPULSION: { label: "Full IA — 19,99€/mois ou 119€/an", href: "/pricing#pass-ia" },
-  TRANSFORMATION: { label: "Full Remote — 1 200 €/3 mois (soit 400€/mois), sur devis", href: "/pricing#full-remote" },
-  VIP: { label: "Full Présentiel VIP — 200 € la séance", href: "/pricing#full-presentiel" },
+  TRANSFORMATION: { label: "Full Remote — 80€/séance, pack 3 ou 6 mois, sur devis", href: "/pricing#full-remote" },
+  VIP: { label: "Full Présentiel VIP — 100€/séance, pack 3 ou 6 mois", href: "/pricing#full-presentiel" },
 };
 
 function contient(valeur: string | null | undefined, motif: string): boolean {

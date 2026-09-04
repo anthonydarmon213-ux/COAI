@@ -28,14 +28,20 @@ const offresParPlan = () => ({
 }) as const;
 
 // PREMIUM (Full Présentiel VIP) a ete retire de la vente en ligne le
-// 02/09/2026 : il se vend desormais a la seance (200 euros puis devis) et se
-// conclut sur WhatsApp. STANDARD (ex-"Coaching Hybride", devenu Full Remote
-// le 04/09/2026 — cf. src/lib/pricing/tiers.ts) suit le meme chemin : sur
-// devis via WhatsApp, jamais de checkout Stripe en ligne (decision confirmee
-// par Anthony, aucun abonne actif sur ce plan au moment du changement). Les
-// deux valeurs restent dans l'enum Prisma et dans les libelles pour ne pas
-// casser les comptes qui les portent deja, mais aucun nouveau checkout ne
-// peut plus les creer.
+// 02/09/2026 : il se vend desormais a la seance et se conclut sur WhatsApp.
+// STANDARD (ex-"Coaching Hybride", devenu Full Remote le 04/09/2026 — cf.
+// src/lib/pricing/tiers.ts) suit le meme chemin : sur devis via WhatsApp,
+// jamais de checkout Stripe en ligne (decision confirmee par Anthony, aucun
+// abonne actif sur ce plan au moment du changement). Les deux valeurs
+// restent dans l'enum Prisma et dans les libelles pour ne pas casser les
+// comptes qui les portent deja, mais aucun nouveau checkout ne peut plus
+// les creer.
+//
+// Tarifs precises/revus le 04/09/2026 (meme journee) : les deux passent
+// d'un prix fixe a un tarif par seance en pack engage 3 ou 6 mois — Full
+// Remote 80€/seance, Full Presentiel VIP 100€/seance particulier (200€/
+// seance entreprise, jamais affiche publiquement, sur devis uniquement) —
+// cf. src/lib/pricing/tiers.ts pour le detail complet de la decision.
 
 type Plan = keyof ReturnType<typeof offresParPlan>;
 
@@ -51,13 +57,13 @@ export async function POST(request: Request) {
   // qu'un client facture pour un plan qu'il n'a pas choisi.
   if (body.plan === "PREMIUM") {
     return NextResponse.json(
-      { error: "Le Full Présentiel VIP ne se souscrit plus en ligne : 200 € la séance, puis sur devis." },
+      { error: "Le Full Présentiel VIP ne se souscrit plus en ligne : 100 €/séance (pack 3 ou 6 mois), sur devis via WhatsApp." },
       { status: 400 }
     );
   }
   if (body.plan === "STANDARD") {
     return NextResponse.json(
-      { error: "Le Full Remote ne se souscrit plus en ligne : 1 200 € les 3 mois (soit 400 €/mois), sur devis via WhatsApp." },
+      { error: "Le Full Remote ne se souscrit plus en ligne : 80 €/séance (pack 3 ou 6 mois), sur devis via WhatsApp." },
       { status: 400 }
     );
   }

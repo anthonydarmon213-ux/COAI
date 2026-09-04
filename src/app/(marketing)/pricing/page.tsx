@@ -29,8 +29,8 @@ function tierId(plan: string) {
 
 const COMPARAISON_RAPIDE = [
   ["Full IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
-  ["Full Remote", "Je veux un coaching 1:1 à distance", "1 200 €/3 mois, 15 places max"],
-  ["Full Présentiel VIP", "Je veux une attention maximale", "200 € la séance, 10/mois max"],
+  ["Full Remote", "Je veux un coaching 1:1 à distance", "80 €/séance, pack 3 ou 6 mois"],
+  ["Full Présentiel VIP", "Je veux une attention maximale", "100 €/séance, pack 3 ou 6 mois"],
 ] as const;
 
 export const metadata: Metadata = {
@@ -93,7 +93,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           de la grille et devient un lien d'upsell sous les cartes : à trois
           colonnes, le VIP écrasait visuellement les deux offres réellement
           souscrites en ligne. Depuis le 02/09/2026 il n'est plus vendu par
-          abonnement : séances à 200 € puis devis, conclu sur WhatsApp. */}
+          abonnement : pack de séances (100 €/séance particulier, 200 €/séance
+          entreprise sur devis) conclu sur WhatsApp. */}
       {/* Sortie gratuite (02/09/2026, demande Anthony — "je ne peux pas entrer
           sans prendre un abo ?"). Le tunnel du diagnostic proposait bien
           l'entree libre, mais quiconque arrivait ici par le menu ou par un
@@ -261,21 +262,24 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
           la grille des abonnements et devient une carte a part, conclue sur
-          WhatsApp — comme Full Remote (cf. tier.sessions plus haut). */}
+          WhatsApp — comme Full Remote (cf. tier.sessions plus haut). Tarif
+          entreprise (200 €/séance) volontairement absent d'ici (04/09/2026,
+          décision Anthony) : seul le tarif particulier (100 €) est public,
+          l'entreprise reste sur devis via WhatsApp. */}
       <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
-              Full Présentiel VIP · sans abonnement
+              Full Présentiel VIP · pack 3 ou 6 mois
             </p>
             <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="font-display text-4xl font-semibold text-white">200 €</span>
-              <span className="text-sm text-graphite-400">la séance, puis sur devis</span>
+              <span className="font-display text-4xl font-semibold text-white">100 €</span>
+              <span className="text-sm text-graphite-400">la séance, pack 3 ou 6 mois</span>
             </div>
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
               Séances privées avec Anthony, à domicile, en entreprise, en club ou à
-              distance — jusqu&apos;à 10 séances par mois. Les formules suivies et les
-              groupes se chiffrent sur mesure.
+              distance — environ 1 séance par semaine. Tarif entreprise et formules
+              suivies sur devis.
             </p>
             <p className="mt-2 text-sm text-laiton-200">
               Facture professionnelle fournie, déductible en frais d&apos;entreprise.
@@ -284,7 +288,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           <div className="shrink-0">
             <a
               className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
-              href={vipReservationHref("le Full Présentiel VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+              href={vipReservationHref("le Full Présentiel VIP", "100 € / séance (pack 3 ou 6 mois)") ?? "/vip"}
               target="_blank"
               rel="noreferrer"
             >
@@ -298,7 +302,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
-        Full IA est un abonnement mensuel sans engagement, résiliable à tout moment. Full Remote (abonnement mensuel) et Full Présentiel VIP (à la séance) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
+        Full IA est un abonnement mensuel sans engagement, résiliable à tout moment. Full Remote et Full Présentiel VIP (packs de séances engagés 3 ou 6 mois, payés en une fois) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
       </p>
     </main>
   );

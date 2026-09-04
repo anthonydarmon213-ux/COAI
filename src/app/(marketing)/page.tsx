@@ -52,11 +52,11 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Full IA coûte 19,99€/mois (ou 119€/an), avec 7 jours d'essai. Full Remote (coaching 1:1 à distance avec Anthony, 1 200 € les 3 mois soit 400€/mois, 15 places max) et Full Présentiel VIP (200 € la séance, 10/mois max) se règlent sur devis, via WhatsApp.",
+      "Le diagnostic est offert. Ensuite, Full IA coûte 19,99€/mois (ou 119€/an), avec 7 jours d'essai. Full Remote (coaching 1:1 à distance avec Anthony, 80 €/séance) et Full Présentiel VIP (100 €/séance particulier, tarif entreprise sur devis) se règlent sur devis, via WhatsApp, en pack engagé de 3 ou 6 mois payé en une fois.",
   },
   {
     question: "Je peux résilier quand je veux ?",
-    reponse: "Oui. Les trois formules sont des abonnements mensuels sans engagement, résiliables à tout moment depuis ton compte.",
+    reponse: "Full IA est un abonnement mensuel sans engagement, résiliable à tout moment depuis ton compte. Full Remote et Full Présentiel VIP sont des packs engagés sur 3 ou 6 mois, payés en une fois à la signature — pas d'abonnement résiliable, l'engagement se discute directement avec Anthony avant de signer.",
   },
   {
     question: "Et si mon programme ne me convient pas ?",
@@ -190,8 +190,8 @@ const STRUCTURED_DATA = {
       description: DESCRIPTION,
       offers: [
         { "@type": "Offer", name: "Full IA", price: "19.99", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Full Remote", price: "1200", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Full Présentiel VIP", price: "200", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Full Remote", price: "80", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Full Présentiel VIP", price: "100", priceCurrency: "EUR" },
       ],
     },
     {
@@ -290,8 +290,8 @@ export default function LandingPage() {
           Anthony te coache lui-même, à distance ou en personne.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Full Remote : coaching 1:1 à distance, 1 200 € les 3 mois (soit 400 €/mois), 15 places max. Full Présentiel VIP :
-          chez toi, en entreprise, en club ou à distance, 200 € la séance, 10/mois max. Les deux sur devis.
+          Full Remote : coaching 1:1 à distance, 80 €/séance, pack 3 ou 6 mois, 15 places max. Full Présentiel VIP :
+          chez toi, en entreprise, en club ou à distance, 100 €/séance, pack 3 ou 6 mois. Les deux sur devis.
         </p>
         <Link
           href="/pricing"
