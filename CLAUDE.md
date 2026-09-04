@@ -4,6 +4,40 @@
 > Un seul clone, rien de non commité en fin de session, audit des images
 > avant commit, aucune association média approximative.
 
+## Simplification de la home (04/09/2026)
+
+Anthony a reçu un retour d'un proche (Mickaël, capture WhatsApp) : la home et
+le menu ont « beaucoup d'éléments », ça complique et perd un peu le visiteur
+(retour secondaire sur les visuels IA, pas traité ici — pas d'action demandée
+dessus pour l'instant). Deux clarifications posées, deux réponses d'Anthony :
+
+1. **Code mort supprimé** — `src/app/(marketing)/page.tsx` contenait une
+   fonction `LandingPageHistorique` (~520 lignes) jamais exportée ni appelée
+   nulle part : une ancienne version complète de la home restée dans le
+   fichier après son remplacement par l'actuelle `LandingPage` (export
+   default). Elle causait des `id` HTML dupliqués (`comment-ca-marche`,
+   `coai-future-cta`) invisibles en prod puisque jamais rendue, mais
+   polluait le fichier (1037 → 369 lignes après nettoyage). Supprimée avec
+   ses consts et imports devenus orphelins (`FONCTIONNALITES_HERO`,
+   `COMMENT_CA_MARCHE`, `PARCOURS_PERSONAL_TRAINING`, `MarqueeBanner`,
+   les icônes `Adaptatif/Suivi/Validation/SecuriteIcon`,
+   `Instagram/LinkedinIcon`, l'import inutilisé `NB_PROGRAMMES_PRETS`).
+2. **Bloc Coaching VIP de la home condensé** — la home affichait le détail
+   complet (4 modalités À domicile/entreprise/club/distance + CTA WhatsApp),
+   qui double presque entièrement `/vip` (déjà liée dans le menu). Réduit à
+   un teaser court (titre, une phrase, tarif, un seul bouton vers `/vip`),
+   `whatsappVip`/`buildWhatsAppLink` retirés de ce fichier (plus utilisés).
+   Le menu (6 liens) n'a pas été touché — aucune option de simplification du
+   menu n'a été retenue par Anthony.
+
+Pas vérifié : pas de `next build`/`tsc` réel (sandbox sans accès npm, même
+limitation que d'habitude). À la place : `tsc` isolé sur le fichier (aucune
+erreur hors l'absence attendue des types React/JSX du sandbox) + script
+d'équilibre des accolades + vérif qu'aucun `id` HTML n'est dupliqué + grep
+confirmant qu'aucun symbole supprimé n'est encore référencé. Branche
+`claude/simplifier-home-menu`, à ouvrir en PR vers
+`claude/lab-coach-mvp-structure-5ij0tz` (branche par défaut du dépôt).
+
 ## Direction visuelle et programmes rentables (24/08/2026)
 
 Direction validée par Anthony : esthétique COAI premium sombre, pierre noire,
