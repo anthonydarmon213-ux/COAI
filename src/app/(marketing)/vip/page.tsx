@@ -7,8 +7,8 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { TIER_BY_SERVICE } from "@/lib/pricing/tiers";
 
 export const metadata: Metadata = {
-  title: "Full Présentiel VIP — À domicile, en entreprise, en club ou à distance",
-  description: "Full Présentiel VIP avec Anthony Darmon, 1 200 € le pack 3 mois minimum (soit 100 €/séance), tarif entreprise sur devis : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
+  title: "VIP Présentiel — À domicile, en entreprise, en club ou à distance",
+  description: "VIP Présentiel avec Anthony Darmon, 1 200 € le pack 3 mois minimum (soit 100 €/séance), tarif entreprise sur devis : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
   alternates: { canonical: "/vip" },
 };
 
@@ -21,7 +21,7 @@ const INCLUS = [
 
 export default function VipPage() {
   const whatsappHref = buildWhatsAppLink(
-    "Bonjour Anthony, je souhaite un devis pour le Full Présentiel VIP COAI."
+    "Bonjour Anthony, je souhaite un devis pour le VIP Présentiel COAI."
   );
 
   return (
@@ -33,7 +33,7 @@ export default function VipPage() {
 
         <div className="mt-12 grid items-start gap-14 lg:grid-cols-[1fr_.82fr] lg:gap-20">
           <div>
-            <SectionLabel>Full Présentiel VIP · sur devis</SectionLabel>
+            <SectionLabel>VIP Présentiel · sur devis</SectionLabel>
             <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-6xl">
               Ta transformation physique ne sera plus laissée au hasard.
             </h1>

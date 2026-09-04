@@ -29,7 +29,7 @@ const CONTENU_PAR_PLAN: Record<
   }
 > = {
   PASS_IA: {
-    formule: "Pass IA",
+    formule: "Standard IA",
     sousTitre: "Ton coach personnel augmenté reste disponible 24h/24 et fait évoluer ton programme.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
@@ -39,7 +39,7 @@ const CONTENU_PAR_PLAN: Record<
     ],
   },
   STANDARD: {
-    formule: "Coaching Hybride",
+    formule: "Premium Remote",
     sousTitre: "L'IA apporte la disponibilité ; le coach humain apporte le regard et la subtilité.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
@@ -49,7 +49,7 @@ const CONTENU_PAR_PLAN: Record<
     ],
   },
   PREMIUM: {
-    formule: "VIP",
+    formule: "VIP Présentiel",
     sousTitre: "L'attention maximale : ton système COAI et tes séances privées avec Anthony.",
     etapes: [
       { titre: "Bilan premium", texte: "Objectif, antécédents, mobilité, posture et contraintes analysés en profondeur." },

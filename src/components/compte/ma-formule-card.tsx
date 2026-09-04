@@ -55,7 +55,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
           </>
         ) : (
           <p className="mt-2 text-sm leading-6 text-graphite-300">
-            Choisis ton niveau d&apos;attention : Full IA, Full Remote ou Full Présentiel VIP.
+            Choisis ton niveau d&apos;attention : Standard IA, Premium Remote ou VIP Présentiel.
           </p>
         )}
       </div>

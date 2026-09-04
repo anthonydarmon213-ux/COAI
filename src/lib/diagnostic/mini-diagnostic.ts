@@ -363,41 +363,41 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   if (r.coachPreference === "VIP_PRESENTIEL") {
     return {
       service: "VIP",
-      label: "Full Présentiel VIP",
+      label: "VIP Présentiel",
       raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, à domicile, en entreprise, en club ou à distance.",
     };
   }
   if (sante.length > 0) {
     return {
       service: "TRANSFORMATION",
-      label: "Full Remote",
+      label: "Premium Remote",
       raison: "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant.",
     };
   }
   if (r.coachPreference === "HYBRIDE") {
     return {
       service: "TRANSFORMATION",
-      label: "Full Remote",
+      label: "Premium Remote",
       raison: "Tu as choisi de combiner la disponibilité de l'IA et le regard d'un coach humain.",
     };
   }
   if (avanceExigeant) {
     return {
       service: "VIP",
-      label: "Full Présentiel VIP",
+      label: "VIP Présentiel",
       raison: "Ton niveau et ton objectif de performance justifient un accompagnement 1-to-1, pas juste un programme à suivre seul.",
     };
   }
   if (plateau) {
     return {
       service: "TRANSFORMATION",
-      label: "Full Remote",
+      label: "Premium Remote",
       raison: "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
     };
   }
   return {
     service: "IMPULSION",
-    label: "Full IA",
+    label: "Standard IA",
     raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
   };
 }

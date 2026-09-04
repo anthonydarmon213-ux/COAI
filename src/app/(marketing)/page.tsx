@@ -42,7 +42,7 @@ const FAQ = [
   {
     question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
     reponse:
-      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Full Remote et en Full Présentiel VIP, Anthony lui-même apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
+      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Premium Remote et en VIP Présentiel, Anthony lui-même apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
   },
   {
     question: "C'est adapté si je suis débutant ?",
@@ -52,16 +52,16 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Full IA coûte 19,99€/mois (ou 119€/an), avec 7 jours d'essai. Full Remote (coaching 1:1 à distance avec Anthony, à partir de 960€ le pack 3 mois minimum) et Full Présentiel VIP (à partir de 1 200€ le pack 3 mois minimum, tarif entreprise sur devis) se règlent sur devis, via WhatsApp — packs de 3 ou 6 mois payés en une fois, une séance d'essai possible avant de s'engager.",
+      "Le diagnostic est offert. Ensuite, Standard IA coûte 19,99€/mois (ou 119€/an), avec 7 jours d'essai. Premium Remote (coaching 1:1 à distance avec Anthony, à partir de 960€ le pack 3 mois minimum) et VIP Présentiel (à partir de 1 200€ le pack 3 mois minimum, tarif entreprise sur devis) se règlent sur devis, via WhatsApp — packs de 3 ou 6 mois payés en une fois, une séance d'essai possible avant de s'engager.",
   },
   {
     question: "Je peux résilier quand je veux ?",
-    reponse: "Full IA est un abonnement mensuel sans engagement, résiliable à tout moment depuis ton compte. Full Remote et Full Présentiel VIP sont des packs engagés sur 3 ou 6 mois, payés en une fois à la signature — pas d'abonnement résiliable ni de séance isolée (sauf la séance d'essai), l'engagement se discute directement avec Anthony avant de signer.",
+    reponse: "Standard IA est un abonnement mensuel sans engagement, résiliable à tout moment depuis ton compte. Premium Remote et VIP Présentiel sont des packs engagés sur 3 ou 6 mois, payés en une fois à la signature — pas d'abonnement résiliable ni de séance isolée (sauf la séance d'essai), l'engagement se discute directement avec Anthony avant de signer.",
   },
   {
     question: "Et si mon programme ne me convient pas ?",
     reponse:
-      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Full Remote et en Full Présentiel VIP, Anthony peut aussi intervenir pour affiner les décisions importantes.",
+      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Premium Remote et en VIP Présentiel, Anthony peut aussi intervenir pour affiner les décisions importantes.",
   },
   {
     question: "Mes données sont-elles en sécurité ?",
@@ -189,9 +189,9 @@ const STRUCTURED_DATA = {
       areaServed: "FR",
       description: DESCRIPTION,
       offers: [
-        { "@type": "Offer", name: "Full IA", price: "19.99", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Full Remote", price: "960", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Full Présentiel VIP", price: "1200", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Standard IA", price: "19.99", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Premium Remote", price: "960", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "VIP Présentiel", price: "1200", priceCurrency: "EUR" },
       ],
     },
     {
@@ -209,8 +209,8 @@ const PARCOURS_COURT = [
   ["01", "Bilan gratuit", "Moins de 5 minutes, sans carte bancaire."],
   ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
   ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
-  ["04", "Choix de l'accompagnement", "Full IA, Full Remote ou Full Présentiel VIP."],
-  ["05", "Essai de 7 jours", "Inclus avec Full IA, avant le premier prélèvement."],
+  ["04", "Choix de l'accompagnement", "Standard IA, Premium Remote ou VIP Présentiel."],
+  ["05", "Essai de 7 jours", "Inclus avec Standard IA, avant le premier prélèvement."],
   ["06", "Programme activé", "Entraînement, alimentation et récupération coordonnés."],
   ["07", "Première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;
@@ -282,7 +282,7 @@ export default function LandingPage() {
         className="mx-auto my-8 flex w-[calc(100%-2rem)] max-w-4xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/25 bg-laiton-300/[0.04] px-6 py-14 text-center sm:px-12"
         aria-labelledby="coaching-anthony-title"
       >
-        <SectionLabel>Full Remote · Full Présentiel VIP</SectionLabel>
+        <SectionLabel>Premium Remote · VIP Présentiel</SectionLabel>
         <h2
           id="coaching-anthony-title"
           className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
@@ -290,7 +290,7 @@ export default function LandingPage() {
           Anthony te coache lui-même, à distance ou en personne.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Deux accompagnements pour une vraie transformation physique. Full Remote : coaching 1:1 à distance, à partir de 960 € le pack 3 mois minimum, 15 places max. Full Présentiel VIP :
+          Deux accompagnements pour une vraie transformation physique. Premium Remote : coaching 1:1 à distance, à partir de 960 € le pack 3 mois minimum, 15 places max. VIP Présentiel :
           chez toi, en entreprise, en club ou à distance, à partir de 1 200 € le pack 3 mois minimum, places extrêmement limitées. Les deux sur devis, séance d&apos;essai possible.
         </p>
         <Link

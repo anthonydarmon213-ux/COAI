@@ -15,7 +15,7 @@ import { prisma } from "@/lib/db/client";
 // était jusqu'ici ignoré côté serveur.
 const offresParPlan = () => ({
   PASS_IA: {
-    name: "COAI — Full IA",
+    name: "COAI — Standard IA",
     trialDays: 7,
     MONTHLY: { amount: 1999, interval: "month", count: 1 },
     // 49 € les 3 mois, soit 16,33 €/mois : assez proche du mensuel pour ne
@@ -62,13 +62,13 @@ export async function POST(request: Request) {
   // qu'un client facture pour un plan qu'il n'a pas choisi.
   if (body.plan === "PREMIUM") {
     return NextResponse.json(
-      { error: "Le Full Présentiel VIP ne se souscrit plus en ligne : à partir de 1 200 € le pack 3 mois minimum, sur devis via WhatsApp." },
+      { error: "Le VIP Présentiel ne se souscrit plus en ligne : à partir de 1 200 € le pack 3 mois minimum, sur devis via WhatsApp." },
       { status: 400 }
     );
   }
   if (body.plan === "STANDARD") {
     return NextResponse.json(
-      { error: "Le Full Remote ne se souscrit plus en ligne : à partir de 960 € le pack 3 mois minimum, sur devis via WhatsApp." },
+      { error: "Le Premium Remote ne se souscrit plus en ligne : à partir de 960 € le pack 3 mois minimum, sur devis via WhatsApp." },
       { status: 400 }
     );
   }

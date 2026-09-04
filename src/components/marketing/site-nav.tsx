@@ -11,7 +11,7 @@ const LIENS = [
   // reste le parcours principal recommandé, mais ne doit jamais être un mur
   // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
   { href: "/pricing", label: "Nos accompagnements" },
-  { href: "/vip", label: "Full Présentiel VIP" },
+  { href: "/vip", label: "VIP Présentiel" },
   { href: "/entreprise", label: "COAI Entreprise" },
   { href: "/a-propos", label: "À propos" },
 ];

@@ -387,9 +387,9 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
         `Ton profil est prêt : il ne te reste qu'à choisir l'accompagnement qui correspond au niveau de suivi que tu veux.\n\n` +
         `Choisis ton accompagnement : ${appUrl}/pricing\n\n` +
-        `Pass IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
-        `Coaching Hybride : 7 jours d'essai, puis 99 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
-        `Coaching VIP : 200 € la séance, sans abonnement, à domicile, en entreprise, en club ou à distance.\n\n` +
+        `Standard IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
+        `Premium Remote : 960 € le pack 3 mois minimum (soit 80 €/séance), coaching 1:1 à distance avec Anthony, sur devis via WhatsApp.\n` +
+        `VIP Présentiel : 1 200 € le pack 3 mois minimum (soit 100 €/séance), à domicile, en entreprise, en club ou à distance, sur devis via WhatsApp.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;

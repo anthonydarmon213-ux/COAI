@@ -156,7 +156,7 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
 //   bouton visio précédent n'existait que sur Full Remote.
 export const TIERS: Tier[] = [
   {
-    nom: "Full IA",
+    nom: "Standard IA",
     eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24 + WHATSAPP",
     prix: "19,99€",
     suffixe: "/mois",
@@ -182,7 +182,7 @@ export const TIERS: Tier[] = [
     founderOffer: true,
   },
   {
-    nom: "Full Remote",
+    nom: "Premium Remote",
     eyebrow: "COACHING 1:1 AVEC ANTHONY · 15 PLACES MAX",
     prix: "960 €",
     suffixe: "/ pack 3 mois minimum",
@@ -204,7 +204,7 @@ export const TIERS: Tier[] = [
       { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "1 920 € au total (soit 80 €/séance)" },
     ],
     devisTagline: "Une transformation physique encadrée par moi à distance — pack 3 mois minimum (960 €) ou 6 mois (1 920 €), payé en une fois. 15 places maximum.",
-    devisWhatsappLabel: "le Full Remote",
+    devisWhatsappLabel: "le Premium Remote",
     devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel. Pas de séance isolée en dehors de l'essai.",
     devisPriceLabel: "960 € pour 3 mois minimum (ou 1 920 € pour 6 mois)",
     // Séance d'essai (04/09/2026, remplace le bouton "appel visio avant de
@@ -214,11 +214,11 @@ export const TIERS: Tier[] = [
     // personne enchaîne).
     devisSecondaryCta: {
       label: "Réserver ma séance d'essai (80 €, déduite si je continue)",
-      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour Full Remote (80 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
+      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour Premium Remote (80 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
     },
   },
   {
-    nom: "Full Présentiel VIP",
+    nom: "VIP Présentiel",
     eyebrow: "L'OFFRE LA PLUS EXCLUSIVE · PLACES EXTRÊMEMENT LIMITÉES",
     prix: "1 200 €",
     suffixe: "/ pack 3 mois minimum",
@@ -232,7 +232,7 @@ export const TIERS: Tier[] = [
       "Tarif entreprise disponible sur devis (facture déductible)",
       "Facture professionnelle déductible en frais d'entreprise",
       "Pack payé en une fois à la signature",
-      "Accompagnements extrêmement limités, bien plus rares que le Full Remote",
+      "Accompagnements extrêmement limités, bien plus rares que le Premium Remote",
     ],
     plan: "PREMIUM",
     limitedSpots: true,
@@ -244,15 +244,15 @@ export const TIERS: Tier[] = [
     // public (décision Anthony, 04/09/2026) : communiqué uniquement sur
     // devis via WhatsApp, jamais affiché en chiffres sur le site.
     devisTagline: "Une expérience de transformation physique encadrée par moi en présentiel — pack 3 mois minimum (1 200 €) ou 6 mois (2 400 €), payé en une fois. Places extrêmement limitées. Tarif entreprise sur devis.",
-    devisWhatsappLabel: "le Full Présentiel VIP",
-    devisFootnote: "Pack payé en une fois à la signature. Places extrêmement limitées — bien plus rares que le Full Remote. Tarif entreprise (facture déductible) sur devis. Pas de séance isolée en dehors de l'essai.",
+    devisWhatsappLabel: "le VIP Présentiel",
+    devisFootnote: "Pack payé en une fois à la signature. Places extrêmement limitées — bien plus rares que le Premium Remote. Tarif entreprise (facture déductible) sur devis. Pas de séance isolée en dehors de l'essai.",
     devisPriceLabel: "1 200 € pour 3 mois minimum (ou 2 400 € pour 6 mois)",
     // Séance d'essai (04/09/2026) : même logique que Full Remote ci-dessus —
     // une seule séance test, payante, déduite du pack si la personne
     // enchaîne. Pas de vente à la séance en dehors de ce cas.
     devisSecondaryCta: {
       label: "Réserver ma séance d'essai (100 €, déduite si je continue)",
-      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour Full Présentiel VIP (100 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
+      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour VIP Présentiel (100 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
     },
   },
 ];

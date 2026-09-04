@@ -111,7 +111,7 @@ export async function POST(request: Request) {
         `<li>Nutrition : idées de repas et habitudes solides</li>`,
         `<li>Récupération : mobilité, sommeil, respiration</li>`,
         `</ul>`,
-        `<p>Nos offres : <strong>Pass IA</strong> (programme personnalisé), <strong>Coaching Hybride</strong> (ajustement humain), <strong>VIP</strong> (suivi premium).</p>`,
+        `<p>Nos offres : <strong>Standard IA</strong> (programme personnalisé), <strong>Premium Remote</strong> (ajustement humain à distance), <strong>VIP Présentiel</strong> (suivi premium en personne).</p>`,
         `<p><a href="${appUrl}/pricing">Voir les accompagnements</a></p>`,
         `${unsubscribe ? `<p><a href="${unsubscribe}">Désabonnement</a></p>` : ""}`,
       ].join("");

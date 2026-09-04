@@ -81,10 +81,16 @@ export function hasStreamingAccess(
   return hasProgrammeAccess(user, subscription);
 }
 
-// Noms marketing (08/08/2026) : GRATUIT = "Pass IA", STANDARD = "Coaching Hybride"
-// — les identifiants techniques historiques sont conservés pour compatibilité.
+// Noms marketing (08/08/2026, MAJ 04/09/2026 — repositionnement 3 offres) :
+// PASS_IA = "Standard IA", STANDARD = "Premium Remote", PREMIUM = "VIP
+// Présentiel" — les identifiants techniques historiques sont conservés pour
+// compatibilité (Prisma, Stripe). Prix STANDARD et PREMIUM corrigés au
+// passage : ils affichaient encore l'ancien modèle par abonnement mensuel
+// (99€/mois, 200€/séance) alors que ces deux offres sont depuis le
+// 04/09/2026 vendues en pack 3 ou 6 mois payé en une fois — cf.
+// src/lib/pricing/tiers.ts pour le détail complet.
 export const PLAN_LABELS: Record<EffectivePlan, string> = {
-  PASS_IA: "Pass IA — 19,99€/mois ou 119€/an",
-  STANDARD: "Coaching Hybride — 99€/mois",
-  PREMIUM: "Coaching VIP — 200 € la séance",
+  PASS_IA: "Standard IA — 19,99€/mois ou 119€/an",
+  STANDARD: "Premium Remote — 960€/pack 3 mois minimum",
+  PREMIUM: "VIP Présentiel — 1 200€/pack 3 mois minimum",
 };

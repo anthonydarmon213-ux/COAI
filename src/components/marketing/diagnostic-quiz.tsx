@@ -1601,19 +1601,19 @@ export function DiagnosticQuiz({
               <div className="flex flex-col gap-2">
                 <ChoixVisuel
                   label="En autonomie, avec l'IA"
-                  hint="Full IA — mon WhatsApp si besoin"
+                  hint="Standard IA — mon WhatsApp si besoin"
                   active={coachPreference === "FULL_IA"}
                   onClick={() => chooseSingle(setCoachPreference, "FULL_IA")}
                 />
                 <ChoixVisuel
                   label="À distance, en visio avec moi"
-                  hint="Full Remote — coaching individuel 1:1"
+                  hint="Premium Remote — coaching individuel 1:1"
                   active={coachPreference === "HYBRIDE"}
                   onClick={() => chooseSingle(setCoachPreference, "HYBRIDE")}
                 />
                 <ChoixVisuel
                   label="En présentiel avec moi, à Paris"
-                  hint="Full Présentiel VIP — à domicile, en club ou en entreprise"
+                  hint="VIP Présentiel — à domicile, en club ou en entreprise"
                   active={coachPreference === "VIP_PRESENTIEL"}
                   onClick={() => chooseSingle(setCoachPreference, "VIP_PRESENTIEL")}
                 />
@@ -2427,7 +2427,7 @@ export function DiagnosticQuiz({
                 </div>
                 <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
-                  Full Remote ou Full Présentiel VIP, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
+                  Premium Remote ou VIP Présentiel, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
                   valide ton programme et te suit dans la durée, pendant que ton{" "}
                   <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
                   séances.

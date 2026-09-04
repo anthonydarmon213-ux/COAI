@@ -28,14 +28,14 @@ function tierId(plan: string) {
 }
 
 const COMPARAISON_RAPIDE = [
-  ["Full IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
-  ["Full Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
-  ["Full Présentiel VIP", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
+  ["Standard IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
+  ["Premium Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
+  ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
 ] as const;
 
 export const metadata: Metadata = {
   title: "Tarifs — Personal Training réimaginé | COAI",
-  description: "Choisis le niveau d'attention dont tu as besoin : Full IA, Full Remote ou Full Présentiel VIP.",
+  description: "Choisis le niveau d'attention dont tu as besoin : Standard IA, Premium Remote ou VIP Présentiel.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -56,7 +56,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
           Ton bilan et ton résultat sont enregistrés. Choisis maintenant l&apos;accompagnement qui te correspond.
-          Full IA inclut 7 jours d&apos;essai ; Full Remote et Full Présentiel VIP se confirment sur devis, via WhatsApp.
+          Standard IA inclut 7 jours d&apos;essai ; Premium Remote et VIP Présentiel se confirment sur devis, via WhatsApp.
         </p>
       </div>
 
@@ -80,7 +80,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
-            <a key={nom} href={`#${nom === "Full IA" ? "pass-ia" : nom === "Full Remote" ? "full-remote" : "full-presentiel"}`} className="rounded-2xl border border-white/[0.08] bg-white/[0.035] px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-400/60">
+            <a key={nom} href={`#${nom === "Standard IA" ? "pass-ia" : nom === "Premium Remote" ? "full-remote" : "full-presentiel"}`} className="rounded-2xl border border-white/[0.08] bg-white/[0.035] px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-400/60">
               <strong className="block text-base text-white">{nom}</strong>
               <span className="mt-1.5 block text-sm font-semibold text-laiton-300">{besoin}</span>
               <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
@@ -257,7 +257,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
-        <p className="mt-1 text-xs text-graphite-400">Full IA : 7 jours d&apos;essai avant le premier prélèvement. Full Remote et Full Présentiel VIP se règlent sur devis, via WhatsApp — packs 3 ou 6 mois uniquement, pas de séance isolée en dehors de l&apos;essai.</p>
+        <p className="mt-1 text-xs text-graphite-400">Standard IA : 7 jours d&apos;essai avant le premier prélèvement. Premium Remote et VIP Présentiel se règlent sur devis, via WhatsApp — packs 3 ou 6 mois uniquement, pas de séance isolée en dehors de l&apos;essai.</p>
       </div>
 
       {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
@@ -318,7 +318,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
-        Full IA est un abonnement mensuel sans engagement, résiliable à tout moment. Full Remote et Full Présentiel VIP (packs de séances engagés 3 ou 6 mois, payés en une fois) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
+        Standard IA est un abonnement mensuel sans engagement, résiliable à tout moment. Premium Remote et VIP Présentiel (packs de séances engagés 3 ou 6 mois, payés en une fois) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
       </p>
     </main>
   );

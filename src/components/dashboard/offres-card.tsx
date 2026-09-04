@@ -4,17 +4,23 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 
 // Offres présentées DANS l'interface (01/09/2026, demande Anthony : « et
-// après on propose les formules »). Auparavant l'inscription renvoyait
+// après on propose les accompagnements »). Auparavant l'inscription renvoyait
 // directement vers /pricing : le prospect voyait un prix avant d'avoir vu
-// le produit. Il découvre maintenant l'app, puis les formules ici.
+// le produit. Il découvre maintenant l'app, puis les accompagnements ici.
 //
 // Les noms affichés sont les noms COMMERCIAUX. En base, les plans portent
-// des identifiants trompeurs — le plan « GRATUIT » correspond au Pass IA
+// des identifiants trompeurs — le plan « GRATUIT » correspond au Standard IA
 // facturé 19,99 €. Cette carte ne les expose jamais.
-
+//
+// Noms et prix mis à jour le 04/09/2026 : cette carte affichait encore
+// "Pass IA / Coaching Hybride / Coaching VIP" avec l'ancien modèle par
+// abonnement mensuel (99€/mois, 200€/séance) — jamais synchronisée avec le
+// repositionnement en pack 3/6 mois fait sur les pages publiques le même
+// jour, puis avec le renommage en Standard IA / Premium Remote / VIP
+// Présentiel. Prix repris de src/lib/pricing/tiers.ts.
 const OFFRES = [
   {
-    nom: "Pass IA",
+    nom: "Standard IA",
     prix: "19,99 €",
     unite: "/mois",
     note: "ou 119 €/an, soit 9,99 €/mois",
@@ -24,24 +30,24 @@ const OFFRES = [
     accent: false,
   },
   {
-    nom: "Coaching Hybride",
-    prix: "99 €",
-    unite: "/mois",
-    note: "l'IA au quotidien, Anthony quand ça compte",
+    nom: "Premium Remote",
+    prix: "960 €",
+    unite: "/pack 3 mois min.",
+    note: "soit 80 €/séance, sur devis via WhatsApp",
     pour: "Tu veux un humain qui suit ta progression",
-    inclus: ["Tout le Pass IA", "Échanges avec Anthony", "Ajustements personnalisés"],
+    inclus: ["Tout le Standard IA", "Échanges avec Anthony", "Ajustements personnalisés"],
     href: "/pricing",
     accent: true,
   },
   {
-    nom: "Coaching VIP",
-    prix: "200 €",
-    unite: "la séance",
-    note: "sans abonnement, puis sur devis",
+    nom: "VIP Présentiel",
+    prix: "1 200 €",
+    unite: "/pack 3 mois min.",
+    note: "soit 100 €/séance, sur devis via WhatsApp",
     pour: "Tu veux Anthony en personne",
     inclus: [
       "À domicile, en entreprise, en club ou à distance",
-      "Séances à l'unité ou suivies",
+      "Pack de séances suivies sur 3 ou 6 mois",
       "Facture déductible en frais d'entreprise",
     ],
     href: "/pricing",
