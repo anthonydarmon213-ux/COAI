@@ -40,7 +40,13 @@ export function CoaiIntro() {
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,9,9,.22)_0%,transparent_48%,rgba(8,9,9,.72)_100%)]" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl items-end justify-end md:min-h-[650px] md:items-center">
-        <div className="w-full max-w-xl animate-reveal rounded-[2rem] border border-laiton-300/20 bg-[#0b0b0a] p-6 text-left shadow-[0_35px_110px_rgba(0,0,0,.58)] sm:p-8 lg:p-10">
+        {/* Carte resserrée sur mobile (w-[84%] au lieu de w-full) — demande
+            Anthony du 04/09/2026 : en pleine largeur, la carte cachait
+            quasiment toute la photo réelle d'Anthony en TRX derrière elle
+            (juste un filet visible sur le bord). À partir de sm: (tablette
+            et plus), la mise en page a assez d'espace horizontal pour que
+            w-full ne pose plus ce problème, donc inchangé. */}
+        <div className="w-[84%] max-w-xl animate-reveal rounded-[2rem] border border-laiton-300/20 bg-[#0b0b0a] p-5 text-left shadow-[0_35px_110px_rgba(0,0,0,.58)] sm:w-full sm:p-8 lg:p-10">
           <div className="mb-7 inline-flex max-w-full items-start gap-2 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2 sm:rounded-full">
             <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
             {/* "Coaching santé et longévité" ajouté le 04/09/2026 (demande
