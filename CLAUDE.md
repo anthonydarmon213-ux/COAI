@@ -38,6 +38,29 @@ confirmant qu'aucun symbole supprimé n'est encore référencé. Branche
 `claude/simplifier-home-menu`, à ouvrir en PR vers
 `claude/lab-coach-mvp-structure-5ij0tz` (branche par défaut du dépôt).
 
+## Photo hero remplacée par une vraie photo (04/09/2026, suite)
+
+Même retour de Mickaël (visuels IA qui donnent moins confiance). Le vrai
+hero visuel de la home (`CoaiIntro`, image plein cadre tout en haut de
+page, pas visible avant car noyée dans le `page.tsx` de 1037 lignes) utilise
+`coai-diagnostic-clean.png` : un couple générique regardant un téléphone
+dans une salle de sport, généré par IA. Anthony a fourni une vraie photo de
+lui en séance TRX (garage/studio maison). Enregistrée en
+`public/anthony-trx-reel.jpg` (redimensionnée 1400px de large, JPEG
+qualité 85, orientation EXIF appliquée — 2,7 Mo → 289 Ko), référencée dans
+`src/components/marketing/coai-intro.tsx` à la place de l'ancienne image.
+Recadrage en `object-top` plutôt que `object-center` : la photo est en
+portrait (2832×4240) et le hero est très large en desktop — `object-cover`
+zoome fortement pour couvrir la largeur, un recadrage centré aurait coupé
+le visage. `object-top` garde le visage et la poignée TRX dans le cadre.
+
+`coai-diagnostic-clean.png` n'est plus référencé nulle part dans `src/`
+mais n'a pas été supprimé du dossier `public/` (pas demandé, pas
+strictement nécessaire).
+
+Même branche `claude/simplifier-home-menu`, même limitation de
+vérification (pas de `next build` réel dans ce sandbox).
+
 ## Direction visuelle et programmes rentables (24/08/2026)
 
 Direction validée par Anthony : esthétique COAI premium sombre, pierre noire,
