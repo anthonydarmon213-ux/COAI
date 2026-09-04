@@ -347,20 +347,15 @@ export default function LandingPage() {
             Réserver un appel découverte →
           </Link>
         </div>
-        {seanceEssaiHref && (
-          <p className="text-sm leading-6 text-graphite-400">
-            Tu préfères juger sur le terrain ?{" "}
-            <a
-              href={seanceEssaiHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4 transition hover:text-laiton-100"
-            >
-              Teste une séance d&apos;essai avec Anthony
-            </a>{" "}
-            avant de t&apos;engager.
-          </p>
-        )}
+        {/* Troisieme lien (seance d'essai WhatsApp) retire le 04/09/2026
+            (Anthony : « 0 friction, 0 dispersion », exemple cite : « trop de
+            boutons/liens qui se concurrencent » sur cette section precise —
+            2 boutons + ce lien, soit 3 chemins differents). La page
+            /appel-decouverte, destination du bouton secondaire juste
+            au-dessus, propose deja WhatsApp et mentionne la seance d'essai :
+            l'option n'est pas supprimee du parcours, seulement de cette
+            section, qui garde desormais un seul choix (bilan) et une seule
+            alternative (appel decouverte). */}
       </section>
       </Reveal>
 

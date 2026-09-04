@@ -4,14 +4,22 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CoaiMark } from "@/components/brand/coai-mark";
 
+// Nav ramenee de 6 a 4 liens le 04/09/2026 (demande Anthony : « je veux du
+// minimalisme, 0 friction, 0 dispersion », confirme avec « le menu de
+// navigation est charge »).
+// Retires :
+// - "Comment ca marche" : une ancre vers une section de la home, deja
+//   accessible en scrollant depuis l'accueil — redondant en haut de page.
+// - "VIP Presentiel" : un lien dedie a une seule des trois offres, alors que
+//   Standard IA et Premium Remote n'en ont pas — asymetrie qui donnait plus
+//   de poids visuel a une offre qu'aux deux autres. Reste accessible via
+//   "Nos accompagnements" (/pricing), qui liste les trois.
 const LIENS = [
   { href: "/", label: "Accueil" },
-  { href: "/#comment-ca-marche", label: "Comment ça marche" },
   // Accès direct aux tarifs (11/08/2026, correction Anthony) : le diagnostic
   // reste le parcours principal recommandé, mais ne doit jamais être un mur
   // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
   { href: "/pricing", label: "Nos accompagnements" },
-  { href: "/vip", label: "VIP Présentiel" },
   { href: "/entreprise", label: "COAI Entreprise" },
   { href: "/a-propos", label: "À propos" },
 ];
