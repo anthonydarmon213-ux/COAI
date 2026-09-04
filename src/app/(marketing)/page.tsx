@@ -224,9 +224,6 @@ const PARCOURS_COURT = [
 export default function LandingPage() {
   // Messages pre-remplis : la personne n'a plus qu'a envoyer, et Anthony sait
   // d'ou vient la demande sans avoir a la questionner.
-  const appelDecouverteHref = buildWhatsAppLink(
-    "Bonjour Anthony, j’aimerais réserver un appel découverte avec vous pour parler de mon objectif et voir quel accompagnement me correspond."
-  );
   const seanceEssaiHref = buildWhatsAppLink(
     "Bonjour Anthony, j’aimerais tester une séance d’essai avec vous avant de choisir un accompagnement."
   );
@@ -336,16 +333,19 @@ export default function LandingPage() {
               Faire mon bilan forme offert →
             </Link>
           </span>
-          {appelDecouverteHref && (
-            <a
-              href={appelDecouverteHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex rounded-full border border-laiton-300/45 px-8 py-4 text-sm font-bold uppercase tracking-[0.05em] text-laiton-100 transition hover:border-laiton-300/80 hover:bg-laiton-300/[0.08]"
-            >
-              Réserver un appel découverte →
-            </a>
-          )}
+          {/* Depuis le 04/09/2026 ce bouton mene a un formulaire de demande
+              d'appel (/appel-decouverte) et non plus directement a WhatsApp :
+              WhatsApp suppose que la personne ecrive elle-meme le premier
+              message, ce qui filtre beaucoup de monde et ne laisse aucune
+              trace exploitable. Le formulaire capte le lead meme si l'echange
+              n'a pas lieu tout de suite. WhatsApp reste propose sur la page
+              d'arrivee pour qui prefere. */}
+          <Link
+            href="/appel-decouverte"
+            className="inline-flex rounded-full border border-laiton-300/45 px-8 py-4 text-sm font-bold uppercase tracking-[0.05em] text-laiton-100 transition hover:border-laiton-300/80 hover:bg-laiton-300/[0.08]"
+          >
+            Réserver un appel découverte →
+          </Link>
         </div>
         {seanceEssaiHref && (
           <p className="text-sm leading-6 text-graphite-400">
