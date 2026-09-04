@@ -331,6 +331,15 @@ const QUESTION_STEPS: Step[] = [
   "quotidien",
   "niveau",
   "objectif",
+  // Rétablie le 04/09/2026 (Anthony, repositionnement 3 offres) : après
+  // avoir retiré cette question le 01/09 pour raccourcir le bilan, Anthony
+  // demande explicitement d'orienter la personne vers l'accompagnement
+  // qu'elle désire (Full IA / Full Remote / Full Présentiel VIP) dès le
+  // bilan plutôt que seulement via la recommandation calculée après coup —
+  // assumé comme une étape de plus, contrairement à la logique du 01/09.
+  // Alimente `coachPreference`, déjà lu par recommanderFormule() et
+  // detecterBesoins() (jusqu'ici jamais réellement capturé côté quiz).
+  "coach",
   "equipement",
   "lieu",
   "duree",
@@ -1077,6 +1086,7 @@ export function DiagnosticQuiz({
     if (step === "quotidien") return Boolean(activiteQuotidienne);
     if (step === "niveau") return Boolean(niveau);
     if (step === "objectif") return objectifsPrincipaux.length > 0 || Boolean(objectif);
+    if (step === "coach") return Boolean(coachPreference);
     if (step === "accompagnement") return true;
     if (step === "echeance") return Boolean(echeance);
     if (step === "declencheur") return declencheur.length > 0;
@@ -1091,17 +1101,18 @@ export function DiagnosticQuiz({
     if (step === "sante") return true; // peut n'avoir rien à signaler
     if (step === "email") return isValidEmail(email) && isValidTelephone(telephone) && consentEmail;
     return true;
-    // persona / mobiliteRepere / cardioRepere / forceRepere /
-    // mouvementRepere / coachPreference retirés (22/08/2026) : les étapes
-    // qui les utilisaient ont été supprimées avec le code mort du
-    // diagnostic, ces dépendances n'étaient plus lues ici et faisaient
-    // remonter un warning react-hooks/exhaustive-deps à chaque build.
+    // persona / mobiliteRepere / cardioRepere / forceRepere / mouvementRepere
+    // retirés (22/08/2026) : les étapes qui les utilisaient ont été
+    // supprimées avec le code mort du diagnostic, ces dépendances n'étaient
+    // plus lues ici. coachPreference, retiré en même temps, est rétabli le
+    // 04/09/2026 avec l'étape "coach".
   }, [
     step,
     activiteQuotidienne,
     niveau,
     objectif,
     objectifsPrincipaux,
+    coachPreference,
     echeance,
     declencheur,
     equipement,
@@ -1578,6 +1589,35 @@ export function DiagnosticQuiz({
                   className="w-full rounded-xl border border-graphite-700 bg-graphite-900/60 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-graphite-500 focus:border-laiton-400/60"
                 />
               )}
+            </div>
+          )}
+
+          {step === "coach" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Comment veux-tu être accompagné ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Ça nous aide à te proposer la bonne formule.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <ChoixVisuel
+                  label="En autonomie, avec l'IA"
+                  hint="Full IA — mon WhatsApp si besoin"
+                  active={coachPreference === "FULL_IA"}
+                  onClick={() => chooseSingle(setCoachPreference, "FULL_IA")}
+                />
+                <ChoixVisuel
+                  label="À distance, en visio avec moi"
+                  hint="Full Remote — coaching individuel 1:1"
+                  active={coachPreference === "HYBRIDE"}
+                  onClick={() => chooseSingle(setCoachPreference, "HYBRIDE")}
+                />
+                <ChoixVisuel
+                  label="En présentiel avec moi, à Paris"
+                  hint="Full Présentiel VIP — à domicile, en club ou en entreprise"
+                  active={coachPreference === "VIP_PRESENTIEL"}
+                  onClick={() => chooseSingle(setCoachPreference, "VIP_PRESENTIEL")}
+                />
+              </div>
             </div>
           )}
 

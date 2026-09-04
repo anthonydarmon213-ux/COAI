@@ -34,6 +34,17 @@ export type Tier = {
   devisTagline?: string;
   devisWhatsappLabel?: string;
   devisFootnote?: string;
+  // Ligne de prix affichée dans le bloc "sur devis" (04/09/2026, Full
+  // Remote) : par défaut composée de `prix`+`suffixe` ("200 € la séance,
+  // puis sur devis"), mais ce libellé ne convient pas à un forfait déjà
+  // fixe (pas de "puis sur devis" pour un prix qui ne varie pas) — ce champ
+  // permet de le remplacer entièrement quand c'est le cas.
+  devisPriceLabel?: string;
+  // Second CTA du bloc "sur devis" (04/09/2026, Full Remote uniquement,
+  // demande Anthony : proposer un appel visio avant de signer, en plus de
+  // la possibilité de souscrire tout de suite). Absent = un seul CTA
+  // ("Demander mon devis sur WhatsApp"), comme pour Full Présentiel VIP.
+  devisSecondaryCta?: { label: string; whatsappMessage: string };
 };
 
 export const ENTREPRISE = {
@@ -75,6 +86,21 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
 // VIP) le 02/09, Full Remote sort du checkout en ligne (cf.
 // api/stripe/checkout/route.ts) et se vend sur devis via WhatsApp — décision
 // confirmée par Anthony (pas de facturation Stripe en V1).
+//
+// Prix Full Remote précisé le 04/09/2026 (même échange) : pas un abonnement
+// mensuel résiliable, mais un forfait de 3 mois à 1 200 € (soit 400 €/mois en
+// équivalent affiché pour comparer aux autres offres). Anthony a aussi
+// demandé un second CTA "appel visio avant de signer", en plus de la
+// souscription directe — cf. `devisSecondaryCta` ci-dessous.
+//
+// Étape "coach" du bilan public rétablie le même jour (diagnostic-quiz.tsx,
+// QUESTION_STEPS) pour capturer `coachPreference` et orienter réellement
+// vers Full IA / Full Remote / Full Présentiel VIP dès le bilan — elle avait
+// été retirée le 01/09 pour raccourcir le parcours ; Anthony a tranché en
+// faveur d'une étape de plus plutôt que de ne compter que sur la
+// recommandation calculée après coup (déjà existante, TIER_BY_SERVICE /
+// FormuleRecommandeeCard, mais jamais alimentée par un vrai choix explicite
+// jusqu'ici).
 export const TIERS: Tier[] = [
   {
     nom: "Full IA",
@@ -105,10 +131,10 @@ export const TIERS: Tier[] = [
   {
     nom: "Full Remote",
     eyebrow: "COACHING 1:1 AVEC ANTHONY · 15 PLACES MAX",
-    prix: "400 €",
-    suffixe: "/mois",
+    prix: "1 200 €",
+    suffixe: "/ 3 mois",
     description:
-      "Un coaching individuel à distance, piloté personnellement par moi : ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
+      "Un coaching individuel à distance, piloté personnellement par moi, sur un engagement de 3 mois — soit 400 €/mois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
     features: [
       "Suivi individuel 100% avec Anthony, à distance",
       "Programme construit et ajusté personnellement selon tes retours",
@@ -119,10 +145,18 @@ export const TIERS: Tier[] = [
     ],
     plan: "STANDARD",
     limitedSpots: true,
-    sessions: [{ count: 1, label: "Suivi individuel à distance", prix: "400 € / mois" }],
-    devisTagline: "Suivi individuel à distance, 100 % avec moi — 15 places maximum.",
-    devisWhatsappLabel: "le Full Remote (400 €/mois, coaching individuel à distance avec Anthony)",
-    devisFootnote: "Abonnement mensuel sans engagement, résiliable à tout moment. Places limitées à 15 pour garder un vrai suivi individuel.",
+    sessions: [{ count: 3, label: "Accompagnement 3 mois", prix: "1 200 € (soit 400 € / mois)" }],
+    devisTagline: "Suivi individuel à distance, 100 % avec moi — 1 200 € pour 3 mois (soit 400 €/mois), 15 places maximum.",
+    devisWhatsappLabel: "le Full Remote",
+    devisFootnote: "Engagement de 3 mois, facturé en une fois. Places limitées à 15 pour garder un vrai suivi individuel.",
+    devisPriceLabel: "1 200 € pour 3 mois (soit 400 €/mois)",
+    // Demande Anthony (04/09/2026) : proposer un appel visio avant de
+    // signer pour qui en a besoin, sans bloquer qui veut souscrire tout de
+    // suite — les deux CTA restent visibles, au choix.
+    devisSecondaryCta: {
+      label: "Réserver un appel visio avant de signer",
+      whatsappMessage: "Bonjour Anthony, avant de m'engager sur Full Remote (1 200 € les 3 mois), je voudrais d'abord un appel visio avec toi.",
+    },
   },
   {
     nom: "Full Présentiel VIP",

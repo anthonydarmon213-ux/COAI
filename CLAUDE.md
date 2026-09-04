@@ -39,6 +39,39 @@ recommandation du diagnostic `mini-diagnostic.ts` + `besoins-identifies.ts`,
 une mention dans `diagnostic-quiz.tsx`, le lien nav "Coaching VIP" →
 "Full Présentiel VIP").
 
+**Complément le même jour (04/09/2026), après retour d'Anthony** :
+- **Prix Full Remote précisé** : pas un abonnement mensuel résiliable, mais
+  un forfait de **1 200 € pour 3 mois** (affiché aussi comme équivalent
+  400 €/mois pour comparer aux autres offres). Impacte `tiers.ts` et tous
+  les fichiers qui affichaient "400 €/mois" (home, `ma-formule-card.tsx`,
+  `besoins-identifies.ts`, `checkout/route.ts`).
+- **Second CTA sur Full Remote** : en plus de "Souscrire directement sur
+  WhatsApp", un bouton "Réserver un appel visio avant de signer" — pour qui
+  veut d'abord échanger avec Anthony sans bloquer qui veut signer tout de
+  suite. Nouveau champ `devisSecondaryCta` sur `Tier` (absent pour Full
+  Présentiel VIP, qui garde un seul CTA). Utilise `buildWhatsAppLink()`
+  directement (pas de Calendly — aucun lien de ce type confirmé pour COAI
+  spécifiquement, à corriger si Anthony en préfère un).
+- **Étape "coach" rétablie dans le bilan public** (`diagnostic-quiz.tsx`,
+  `QUESTION_STEPS`, entre "objectif" et "equipement") : demande
+  explicitement "Comment veux-tu être accompagné ?" (autonomie IA / visio à
+  distance / présentiel Paris) et alimente `coachPreference`. Ce champ
+  existait déjà dans le state et était déjà lu par `recommanderFormule()`
+  (mini-diagnostic.ts) et `detecterBesoins()` (besoins-identifies.ts), mais
+  n'était plus jamais capturé côté UI depuis le retrait de l'étape le
+  22/08 puis la refonte du parcours le 01/09 ("il faut faire goûter
+  d'abord", entrée directe dans l'app) — ces deux moteurs de recommandation
+  tournaient donc sans ce signal. Anthony a tranché pour une étape de plus
+  (bilan à 13 questions au lieu de 12) plutôt que de compter uniquement sur
+  la recommandation post-diagnostic (`FormuleRecommandeeCard`, déjà
+  existante et inchangée niveau logique — seuls les libellés de tiers.ts
+  s'y répercutent automatiquement).
+- Vérifié à la marge : `recommanderFormule()` priorise déjà volontairement
+  un signal de santé/sécurité au-dessus d'un choix explicite "Full IA"
+  (garde-fou documenté le 19/08, jamais un accompagnement 100% IA seul face
+  à une contrainte physique réelle) — comportement intentionnel, non
+  modifié.
+
 **Hors scope de cette passe (V1 = home/pricing/vip uniquement), à traiter
 séparément si besoin** — grep sur "Coaching Hybride"/"Pass IA"/"Coaching VIP"
 en dehors des fichiers ci-dessus fait remonter ~15 pages SEO

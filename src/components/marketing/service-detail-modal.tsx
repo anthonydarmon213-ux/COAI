@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIER_BY_SERVICE, vipReservationHref, type ServiceKey } from "@/lib/pricing/tiers";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 // Modal plein écran (14/08/2026, simplifié le 16/08/2026 — demande Anthony :
 // "il faut mettre une seule formule et ce qu'elle propose exactement et à la
@@ -130,13 +131,23 @@ export function ServiceDetailModal({
               </div>
               <p className="text-sm text-graphite-300">{tier.devisTagline}</p>
               <a
-                href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
+                href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, tier.devisPriceLabel ?? `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
                 target="_blank"
                 rel="noreferrer"
                 className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
               >
-                Demander mon devis sur WhatsApp
+                {tier.devisSecondaryCta ? "Souscrire directement sur WhatsApp" : "Demander mon devis sur WhatsApp"}
               </a>
+              {tier.devisSecondaryCta && (
+                <a
+                  href={buildWhatsAppLink(tier.devisSecondaryCta.whatsappMessage) ?? "/vip"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex w-full items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-6 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
+                >
+                  {tier.devisSecondaryCta.label}
+                </a>
+              )}
               <p className="text-center text-xs text-graphite-400">{tier.devisFootnote}</p>
             </>
           ) : (

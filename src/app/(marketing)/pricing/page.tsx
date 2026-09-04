@@ -11,6 +11,7 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 type PricingSearchParams = {
   checkout?: string;
@@ -28,7 +29,7 @@ function tierId(plan: string) {
 
 const COMPARAISON_RAPIDE = [
   ["Full IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
-  ["Full Remote", "Je veux un coaching 1:1 à distance", "400 €/mois, 15 places max"],
+  ["Full Remote", "Je veux un coaching 1:1 à distance", "1 200 €/3 mois, 15 places max"],
   ["Full Présentiel VIP", "Je veux une attention maximale", "200 € la séance, 10/mois max"],
 ] as const;
 
@@ -143,17 +144,27 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               <div className="space-y-4 rounded-2xl border border-laiton-300/20 bg-laiton-300/[0.05] p-5">
                 <div>
                   <p className="text-xs uppercase tracking-widest text-laiton-300">{tier.nom}</p>
-                  <p className="mt-2 text-sm font-semibold text-white">{tier.prix} {tier.suffixe}, puis sur devis</p>
+                  <p className="mt-2 text-sm font-semibold text-white">{tier.devisPriceLabel ?? `${tier.prix} ${tier.suffixe}, puis sur devis`}</p>
                   <p className="mt-1 text-xs leading-5 text-graphite-400">{tier.devisTagline}</p>
                 </div>
                 <a
                   className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
-                  href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
+                  href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, tier.devisPriceLabel ?? `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Demander mon devis sur WhatsApp
+                  {tier.devisSecondaryCta ? "Souscrire directement sur WhatsApp" : "Demander mon devis sur WhatsApp"}
                 </a>
+                {tier.devisSecondaryCta && (
+                  <a
+                    className="flex w-full items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-6 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
+                    href={buildWhatsAppLink(tier.devisSecondaryCta.whatsappMessage) ?? "/vip"}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {tier.devisSecondaryCta.label}
+                  </a>
+                )}
                 <p className="text-center text-[11px] text-graphite-500">
                   {tier.devisFootnote}
                 </p>

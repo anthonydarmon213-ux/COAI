@@ -16,7 +16,7 @@ export type BesoinIdentifie = {
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
   IMPULSION: { label: "Full IA — 19,99€/mois ou 119€/an", href: "/pricing#pass-ia" },
-  TRANSFORMATION: { label: "Full Remote — 400€/mois, sur devis", href: "/pricing#full-remote" },
+  TRANSFORMATION: { label: "Full Remote — 1 200 €/3 mois (soit 400€/mois), sur devis", href: "/pricing#full-remote" },
   VIP: { label: "Full Présentiel VIP — 200 € la séance", href: "/pricing#full-presentiel" },
 };
 

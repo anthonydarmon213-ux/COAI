@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   }
   if (body.plan === "STANDARD") {
     return NextResponse.json(
-      { error: "Le Full Remote ne se souscrit plus en ligne : 400 €/mois, sur devis via WhatsApp." },
+      { error: "Le Full Remote ne se souscrit plus en ligne : 1 200 € les 3 mois (soit 400 €/mois), sur devis via WhatsApp." },
       { status: 400 }
     );
   }
