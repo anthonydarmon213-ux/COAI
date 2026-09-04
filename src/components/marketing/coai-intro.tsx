@@ -97,6 +97,7 @@ export function CoaiIntro() {
         <p className="mt-8 text-xs leading-5 text-graphite-400 sm:text-sm">
           Intervient à La Montgolfière Club et RITM Saint-Germain · 3 100+ abonnés
         </p>
+      </div>
 
       {/* Photo réelle d'Anthony, sous l'accroche (structure charlesdenis.fr).
           Elle était jusqu'ici en fond derrière une carte opaque : sur mobile
@@ -125,9 +126,14 @@ export function CoaiIntro() {
             className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,#080909)]"
             aria-hidden="true"
           />
-          <p className="absolute inset-x-0 bottom-6 text-center font-display text-sm font-bold uppercase tracking-[0.18em] text-white/90">
-            Anthony Darmon
-          </p>
+          <div className="absolute inset-x-0 bottom-6 text-center">
+            <p className="font-display text-sm font-bold uppercase tracking-[0.18em] text-white/90">
+              Anthony Darmon
+            </p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-laiton-200">
+              Le fondateur
+            </p>
+          </div>
         </div>
       </div>
     </section>

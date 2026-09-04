@@ -263,7 +263,14 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20 sm:min-h-[420px]">
-          <Image src="/anthony-studio-premium.jpg" alt="Anthony Darmon, coach sportif diplômé d'État" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover object-[center_30%]" />
+          {/* Photo remplacee le 04/09/2026 (demande Anthony : « change cette
+              photo pour celle du TRX bras ouverts »). L'ancienne
+              (anthony-studio-premium.jpg) etait un visuel genere : salle
+              irreelle, pose bras croises, logo COAI incruste. Celle-ci est
+              une vraie photo, en mouvement. object-[center_40%] cadre sur le
+              visage : le tiers superieur de la source est le plafond et les
+              ancrages TRX. */}
+          <Image src="/anthony-trx-studio-premium.jpg" alt="Anthony Darmon, coach sportif diplômé d'État, bras ouverts sur des sangles TRX" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover object-[center_40%]" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </div>
       </section>
