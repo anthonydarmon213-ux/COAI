@@ -14,14 +14,21 @@ const BENEFICES = [
 export function CoaiIntro() {
   return (
     <section className="coai-future-hero coai-landing-hero relative min-h-screen overflow-hidden px-6 pb-16 pt-28 sm:px-10 sm:pt-36">
+      {/* Photo réelle d'Anthony en séance TRX (04/09/2026) — remplace le
+          visuel généré par IA (couple avec un téléphone) suite au retour
+          d'un proche d'Anthony sur coai.fr : les visuels IA donnaient moins
+          confiance, mieux vaut de vraies photos. object-top plutôt que
+          object-center : la photo est en portrait et le hero est très
+          large — un recadrage centré aurait coupé le visage, object-top
+          garde le visage et la poignée TRX dans le cadre sur desktop. */}
       <Image
-        src="/coai-diagnostic-clean.png"
+        src="/anthony-trx-reel.jpg"
         alt=""
         fill
         priority
         quality={95}
         sizes="100vw"
-        className="coai-palace-image object-cover object-center"
+        className="coai-palace-image object-cover object-top"
         aria-hidden="true"
       />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,9,.12)_0%,rgba(8,9,9,.08)_43%,rgba(8,9,9,.48)_67%,rgba(8,9,9,.78)_100%)]" aria-hidden="true" />
