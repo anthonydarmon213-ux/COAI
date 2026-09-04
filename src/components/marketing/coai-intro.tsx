@@ -69,13 +69,22 @@ export function CoaiIntro() {
               comme LE produit mais comme la porte d'entree pour qui n'a pas
               encore le budget d'un accompagnement humain. Volontairement en
               petit et sous le bouton : c'est un repli, pas la promesse. */}
+          {/* Prix retire du hero le 04/09/2026 (demande Anthony : « je ne
+              veux pas qu'on mette tout de suite les prix sur la landing, le
+              prospect est trop froid, il faut le chauffer et l'eduquer
+              d'abord », « on lui propose les tarifs apres le bilan et apres
+              qu'il a vu l'interface »). La ligne annoncait 19,99 EUR/mois des
+              le premier ecran : un chiffre lu avant d'avoir compris le
+              produit ne sert qu'a faire partir ceux qui ne sont pas encore
+              convaincus. Le repli vers l'offre IA reste, il envoie vers le
+              bilan — le prix arrive plus loin dans le parcours. */}
           <p className="mt-6 text-sm leading-6 text-graphite-400">
             Pas encore le budget d&apos;un accompagnement humain ?{" "}
             <Link
-              href="/pricing"
+              href="/diagnostic"
               className="font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4 transition hover:text-laiton-100"
             >
-              Commence avec Standard IA à 19,99 €/mois
+              Commence par le bilan, l&apos;application fait le reste
             </Link>
             .
           </p>

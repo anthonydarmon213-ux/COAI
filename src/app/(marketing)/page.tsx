@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { Reveal } from "@/components/marketing/reveal";
 import { TrackConversion } from "@/components/analytics/track-conversion";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
 // "Santé et longévité" ajouté le 04/09/2026 (demande Anthony, inspiration
@@ -52,7 +53,12 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Standard IA coûte 19,99€/mois (ou 119€/an), avec 7 jours d'essai. Premium Remote (coaching 1:1 à distance avec Anthony, à partir de 960€ le pack 3 mois minimum) et VIP Présentiel (à partir de 1 200€ le pack 3 mois minimum, tarif entreprise sur devis) se règlent sur devis, via WhatsApp — packs de 3 ou 6 mois payés en une fois, une séance d'essai possible avant de s'engager.",
+      // Montants retires de la home le 04/09/2026 (cf. commentaire dans le
+      // hero). La reponse ne se derobe pas pour autant : elle dit ce qui est
+      // gratuit, comment on paie, et renvoie vers la page tarifs pour qui
+      // veut les chiffres tout de suite. Masquer un prix a quelqu'un qui le
+      // demande le ferait fuir plus surement que le prix lui-meme.
+      "Non. Le bilan est offert, sans carte bancaire, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — l'offre IA par abonnement mensuel sans engagement, les deux accompagnements avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp, avec une séance d'essai possible avant de t'engager. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -216,6 +222,15 @@ const PARCOURS_COURT = [
 ] as const;
 
 export default function LandingPage() {
+  // Messages pre-remplis : la personne n'a plus qu'a envoyer, et Anthony sait
+  // d'ou vient la demande sans avoir a la questionner.
+  const appelDecouverteHref = buildWhatsAppLink(
+    "Bonjour Anthony, j’aimerais réserver un appel découverte avec vous pour parler de mon objectif et voir quel accompagnement me correspond."
+  );
+  const seanceEssaiHref = buildWhatsAppLink(
+    "Bonjour Anthony, j’aimerais tester une séance d’essai avec vous avant de choisir un accompagnement."
+  );
+
   return (
     <main className="coai-color-surface bg-lab-grid flex flex-col after:hidden">
       <script
@@ -297,15 +312,55 @@ export default function LandingPage() {
           Anthony te coache lui-même, à distance ou en personne.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Deux accompagnements pour une vraie transformation physique. Premium Remote : coaching 1:1 à distance, à partir de 960 € le pack 3 mois minimum, 15 places max. VIP Présentiel :
-          chez toi, en entreprise, en club ou à distance, à partir de 1 200 € le pack 3 mois minimum, places extrêmement limitées. Les deux sur devis, séance d&apos;essai possible.
+          Deux accompagnements pour une vraie transformation physique. Premium Remote : coaching
+          1:1 à distance, 15 places maximum. VIP Présentiel : chez toi, en entreprise, en club ou
+          à distance, places extrêmement limitées. Les deux sur devis, avec une séance d&apos;essai
+          possible avant de t&apos;engager.
         </p>
-        <Link
-          href="/pricing"
-          className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
-        >
-          Découvrir les accompagnements
-        </Link>
+        {/* Deux boutons, sur le modele de charlesdenis.fr (demande Anthony
+            du 04/09/2026 : « on lui propose aussi 1 seance d'essai et/ou un
+            appel decouverte avec moi », « comme Charles Denis je t'ai dit ») :
+            un bouton principal avec halo, un bouton secondaire en contour.
+            Lui non plus n'envoie pas vers ses tarifs a cet endroit — ses deux
+            boutons sont « Decouvrir les programmes » et « Reserver un appel
+            strategique ».
+            Ici le bouton principal envoie vers le bilan, pas vers la page
+            tarifs : decision Anthony du meme jour, le prix arrive apres le
+            bilan et apres avoir vu l'application, pas avant. */}
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <span className="coai-cta-glow">
+            <Link
+              href="/diagnostic"
+              className="inline-flex rounded-full bg-laiton-300 px-8 py-4 text-sm font-bold uppercase tracking-[0.05em] text-[#0d0d0c] transition hover:bg-laiton-200"
+            >
+              Faire mon bilan forme offert →
+            </Link>
+          </span>
+          {appelDecouverteHref && (
+            <a
+              href={appelDecouverteHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex rounded-full border border-laiton-300/45 px-8 py-4 text-sm font-bold uppercase tracking-[0.05em] text-laiton-100 transition hover:border-laiton-300/80 hover:bg-laiton-300/[0.08]"
+            >
+              Réserver un appel découverte →
+            </a>
+          )}
+        </div>
+        {seanceEssaiHref && (
+          <p className="text-sm leading-6 text-graphite-400">
+            Tu préfères juger sur le terrain ?{" "}
+            <a
+              href={seanceEssaiHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4 transition hover:text-laiton-100"
+            >
+              Teste une séance d&apos;essai avec Anthony
+            </a>{" "}
+            avant de t&apos;engager.
+          </p>
+        )}
       </section>
       </Reveal>
 

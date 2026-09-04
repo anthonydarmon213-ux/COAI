@@ -154,9 +154,24 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             )}
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
               Séances privées avec Anthony, à domicile, en entreprise, en club ou à
-              distance — environ 1 séance par semaine. Tarif entreprise et accompagnements
-              suivis sur devis.
+              distance — environ 1 séance par semaine.
             </p>
+            {/* Les deux tarifs sont affiches cote a cote depuis le 04/09/2026
+                (demande Anthony) : le prix entreprise etait jusque-la garde
+                pour le devis, ce qui obligeait une societe a ecrire avant de
+                savoir si elle etait dans les clous. TTC cote particulier (seul
+                affichage autorise pour un consommateur), HT cote entreprise
+                (usage entre professionnels). */}
+            <div className="mt-3 grid max-w-md gap-2 sm:grid-cols-2">
+              <p className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-xs leading-5 text-graphite-300">
+                <span className="block font-semibold text-white">Particulier</span>
+                100 €/séance TTC, soit 1 200 € le pack 3 mois.
+              </p>
+              <p className="rounded-xl border border-laiton-300/25 bg-laiton-300/[0.06] px-3 py-2.5 text-xs leading-5 text-graphite-300">
+                <span className="block font-semibold text-white">Entreprise</span>
+                200 € HT/séance (240 € TTC), facture déductible.
+              </p>
+            </div>
             <p className="mt-2 text-sm text-laiton-200">
               Facture professionnelle fournie, déductible en frais d&apos;entreprise.
             </p>
