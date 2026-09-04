@@ -169,7 +169,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               </p>
               <p className="rounded-xl border border-laiton-300/25 bg-laiton-300/[0.06] px-3 py-2.5 text-xs leading-5 text-graphite-300">
                 <span className="block font-semibold text-white">Entreprise</span>
-                200 € HT/séance (240 € TTC), facture déductible.
+                200 € HT/séance + TVA 20 % — soit 240 € TTC. Facture professionnelle déductible.
               </p>
             </div>
             <p className="mt-2 text-sm text-laiton-200">

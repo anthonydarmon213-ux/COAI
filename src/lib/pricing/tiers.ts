@@ -222,14 +222,14 @@ export const TIERS: Tier[] = [
     eyebrow: "L'OFFRE LA PLUS EXCLUSIVE · PLACES EXTRÊMEMENT LIMITÉES",
     prix: "1 200 €",
     suffixe: "/ pack 3 mois minimum",
-    noteFacturation: "Particulier : 100 €/séance TTC, environ 1 séance par semaine. Pack 6 mois : 2 400 € (même tarif à la séance). Entreprise : 200 € HT/séance (240 € TTC), facture professionnelle déductible.",
+    noteFacturation: "Particulier : 100 €/séance TTC, environ 1 séance par semaine. Pack 6 mois : 2 400 € (même tarif à la séance). Entreprise : 200 € HT/séance + TVA 20 % (240 € TTC), facture professionnelle déductible.",
     description:
       "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — une expérience de transformation physique encadrée en présentiel, sur un engagement minimum de 3 mois (ou 6 mois), payé en une fois.",
     features: [
       "Séances privées de Personal Training avec Anthony",
       "À domicile, en entreprise, en club ou à distance",
       "Analyse approfondie des objectifs, douleurs et contraintes",
-      "Tarif entreprise : 200 € HT/séance (240 € TTC), sur devis",
+      "Tarif entreprise : 200 € HT/séance + TVA 20 % (240 € TTC), sur devis",
       "Facture professionnelle déductible en frais d'entreprise",
       "Pack payé en une fois à la signature",
       "Accompagnements extrêmement limités, bien plus rares que le Premium Remote",
@@ -250,10 +250,15 @@ export const TIERS: Tier[] = [
     //
     // L'affichage TTC est obligatoire côté particulier, HT est l'usage entre
     // professionnels : d'où la double écriture. TVA à 20 % (taux normal des
-    // prestations de services).
-    devisTagline: "Une expérience de transformation physique encadrée par moi en présentiel — pack 3 mois minimum (1 200 €) ou 6 mois (2 400 €), payé en une fois. Places extrêmement limitées. Entreprise : 200 € HT/séance (240 € TTC), facture déductible.",
+    // prestations de services), ajoutée au tarif entreprise — confirmé par
+    // Anthony le 04/09/2026 (« on rajoute la TVA pour les entreprises »).
+    // Le tarif particulier est donc TTC, TVA déjà comprise ; le tarif
+    // entreprise est annoncé HT, la TVA venant s'ajouter. Ne jamais faire
+    // apparaître un montant sans préciser lequel des deux il est : c'est la
+    // seule erreur qui se retrouve directement sur une facture.
+    devisTagline: "Une expérience de transformation physique encadrée par moi en présentiel — pack 3 mois minimum (1 200 €) ou 6 mois (2 400 €), payé en une fois. Places extrêmement limitées. Entreprise : 200 € HT/séance + TVA 20 % (240 € TTC), facture déductible.",
     devisWhatsappLabel: "le VIP Présentiel",
-    devisFootnote: "Pack payé en une fois à la signature. Places extrêmement limitées — bien plus rares que le Premium Remote. Tarif entreprise : 200 € HT/séance (240 € TTC), facture professionnelle déductible. Pas de séance isolée en dehors de l'essai.",
+    devisFootnote: "Pack payé en une fois à la signature. Places extrêmement limitées — bien plus rares que le Premium Remote. Tarif entreprise : 200 € HT/séance + TVA 20 % (240 € TTC), facture professionnelle déductible. Pas de séance isolée en dehors de l'essai.",
     devisPriceLabel: "1 200 € pour 3 mois minimum (ou 2 400 € pour 6 mois)",
     // Séance d'essai (04/09/2026) : même logique que Full Remote ci-dessus —
     // une seule séance test, payante, déduite du pack si la personne
