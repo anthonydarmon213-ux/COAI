@@ -203,6 +203,22 @@ description des deux tiers, repris du vocabulaire exact d'Anthony. Rappel :
 la promesse de rareté passe par du texte libre, jamais par un vrai compteur
 serveur (V1, cf. note plus haut).
 
+**Quatrième ajustement le même jour : "transformation physique" explicite
+(04/09/2026)** : Anthony a demandé confirmation que le mot "transformation"
+utilisé partout (cf. ajustements précédents) précise bien "physique" — pas
+assez explicite jusqu'ici. Ajouté "physique" dans tous les endroits
+utilisateur où "transformation" apparaissait déjà : descriptions et
+`devisTagline` des deux tiers (`tiers.ts`), hero `/vip` ("Ta transformation
+physique ne sera plus laissée au hasard", "Anthony pilote personnellement
+ta transformation physique"), le lien "Parler d'une transformation physique
+plus longue" (`/pricing` et `service-detail-modal.tsx`, jusqu'ici sans
+"physique"), et la phrase d'intro du teaser home ("Deux accompagnements
+pour une vraie transformation physique", ajoutée — absente avant). Non
+touché : les résumés courts d'account (`ma-formule-card.tsx`,
+`besoins-identifies.ts`) — déjà denses en chiffres, pas le lieu où un
+prospect découvre l'offre. `ServiceKey.TRANSFORMATION` est un identifiant
+de code, jamais affiché tel quel, non concerné.
+
 ## Simplification de la home (04/09/2026)
 
 Anthony a reçu un retour d'un proche (Mickaël, capture WhatsApp) : la home et

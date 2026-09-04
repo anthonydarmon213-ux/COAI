@@ -35,10 +35,10 @@ export default function VipPage() {
           <div>
             <SectionLabel>Full Présentiel VIP · sur devis</SectionLabel>
             <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-6xl">
-              Ta transformation ne sera plus laissée au hasard.
+              Ta transformation physique ne sera plus laissée au hasard.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-graphite-300">
-              Anthony pilote personnellement ta transformation : bilan initial, programme sur
+              Anthony pilote personnellement ta transformation physique : bilan initial, programme sur
               mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI. Chez toi, dans
               ton entreprise, en club ou à distance — tu sais quoi faire, quand le faire et pourquoi.
               Environ 1 séance par semaine, en pack engagé de 3 ou 6 mois.

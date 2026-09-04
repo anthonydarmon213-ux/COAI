@@ -188,7 +188,7 @@ export const TIERS: Tier[] = [
     suffixe: "/ pack 3 mois minimum",
     noteFacturation: "Soit 80 €/séance, environ 1 séance par semaine. Pack 6 mois : 1 920 € (même tarif à la séance).",
     description:
-      "Une expérience de transformation encadrée personnellement par moi, à distance, sur un engagement minimum de 3 mois (ou 6 pour aller plus loin) — payé en une fois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
+      "Une expérience de transformation physique encadrée personnellement par moi, à distance, sur un engagement minimum de 3 mois (ou 6 pour aller plus loin) — payé en une fois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
     features: [
       "Suivi individuel 100% avec Anthony, à distance",
       "Programme construit et ajusté personnellement selon tes retours",
@@ -203,7 +203,7 @@ export const TIERS: Tier[] = [
       { count: 3, label: "Pack 3 mois minimum (~12 séances, 1/semaine)", prix: "960 € au total (soit 80 €/séance)" },
       { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "1 920 € au total (soit 80 €/séance)" },
     ],
-    devisTagline: "Une transformation encadrée par moi à distance — pack 3 mois minimum (960 €) ou 6 mois (1 920 €), payé en une fois. 15 places maximum.",
+    devisTagline: "Une transformation physique encadrée par moi à distance — pack 3 mois minimum (960 €) ou 6 mois (1 920 €), payé en une fois. 15 places maximum.",
     devisWhatsappLabel: "le Full Remote",
     devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel. Pas de séance isolée en dehors de l'essai.",
     devisPriceLabel: "960 € pour 3 mois minimum (ou 1 920 € pour 6 mois)",
@@ -224,7 +224,7 @@ export const TIERS: Tier[] = [
     suffixe: "/ pack 3 mois minimum",
     noteFacturation: "Soit 100 €/séance, environ 1 séance par semaine. Pack 6 mois : 2 400 € (même tarif à la séance). Tarif entreprise sur devis.",
     description:
-      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — une expérience de transformation encadrée en présentiel, sur un engagement minimum de 3 mois (ou 6 mois), payé en une fois.",
+      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — une expérience de transformation physique encadrée en présentiel, sur un engagement minimum de 3 mois (ou 6 mois), payé en une fois.",
     features: [
       "Séances privées de Personal Training avec Anthony",
       "À domicile, en entreprise, en club ou à distance",
@@ -243,7 +243,7 @@ export const TIERS: Tier[] = [
     // Tarif entreprise (200 €/séance) volontairement absent de tout texte
     // public (décision Anthony, 04/09/2026) : communiqué uniquement sur
     // devis via WhatsApp, jamais affiché en chiffres sur le site.
-    devisTagline: "Une expérience de transformation encadrée par moi en présentiel — pack 3 mois minimum (1 200 €) ou 6 mois (2 400 €), payé en une fois. Places extrêmement limitées. Tarif entreprise sur devis.",
+    devisTagline: "Une expérience de transformation physique encadrée par moi en présentiel — pack 3 mois minimum (1 200 €) ou 6 mois (2 400 €), payé en une fois. Places extrêmement limitées. Tarif entreprise sur devis.",
     devisWhatsappLabel: "le Full Présentiel VIP",
     devisFootnote: "Pack payé en une fois à la signature. Places extrêmement limitées — bien plus rares que le Full Remote. Tarif entreprise (facture déductible) sur devis. Pas de séance isolée en dehors de l'essai.",
     devisPriceLabel: "1 200 € pour 3 mois minimum (ou 2 400 € pour 6 mois)",

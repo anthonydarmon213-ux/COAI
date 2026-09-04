@@ -159,7 +159,7 @@ export function ServiceDetailModal({
             />
           )}
           {tier.trial && <span className="text-sm font-medium text-laiton-300">7 jours d&apos;essai</span>}
-          {tier.plan === "PREMIUM" && <a href={vipReservationHref("une transformation privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">Parler d&apos;une transformation plus longue</a>}
+          {tier.plan === "PREMIUM" && <a href={vipReservationHref("une transformation physique privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer" className="text-sm text-laiton-300 underline">Parler d&apos;une transformation physique plus longue</a>}
         </div>
 
         <p className="text-xs text-graphite-400">

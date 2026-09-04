@@ -247,8 +247,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             </ul>
 
             {tier.plan === "PREMIUM" && (
-              <a className="text-center text-sm font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("une transformation privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer">
-                Parler d&apos;une transformation privée plus longue
+              <a className="text-center text-sm font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("une transformation physique privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer">
+                Parler d&apos;une transformation physique privée plus longue
               </a>
             )}
           </Card>

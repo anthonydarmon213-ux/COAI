@@ -290,7 +290,7 @@ export default function LandingPage() {
           Anthony te coache lui-même, à distance ou en personne.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Full Remote : coaching 1:1 à distance, à partir de 960 € le pack 3 mois minimum, 15 places max. Full Présentiel VIP :
+          Deux accompagnements pour une vraie transformation physique. Full Remote : coaching 1:1 à distance, à partir de 960 € le pack 3 mois minimum, 15 places max. Full Présentiel VIP :
           chez toi, en entreprise, en club ou à distance, à partir de 1 200 € le pack 3 mois minimum, places extrêmement limitées. Les deux sur devis, séance d&apos;essai possible.
         </p>
         <Link
