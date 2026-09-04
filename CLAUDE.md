@@ -184,6 +184,25 @@ a un champ "niveau d'investissement" (2 500 à 4 000 € / 4 000 à 7 000 € /
 incohérence pré-existante repérée en passant, pas dans le périmètre demandé
 par Anthony aujourd'hui, à clarifier avec lui séparément si besoin.
 
+**Troisième ajustement le même jour : "ultra limité" pour Full Présentiel
+VIP (04/09/2026)** : Anthony a redit "on vend une transformation / une
+expérience", "on envoie sur WhatsApp" et "places limitées" (déjà en place
+pour Full Remote — 15 places, inchangé) en demandant explicitement que Full
+Présentiel VIP soit encore plus exclusif ("ultra limitée pour le vip").
+Précisé par clarification : pas de chiffre engageant affiché pour le VIP —
+juste une formulation "extrêmement limité" (contrairement à Full Remote qui
+garde son "15 places max" explicite). Modifs : eyebrow VIP devient
+"L'OFFRE LA PLUS EXCLUSIVE · PLACES EXTRÊMEMENT LIMITÉES" (au lieu de
+"SÉANCES PRIVÉES AVEC ANTHONY · PACK 3 OU 6 MOIS"), + mentions "extrêmement
+limité" dans `devisTagline`/`devisFootnote`/features, `/vip`, et la carte
+standalone sur `/pricing` (qui lit déjà `TIER_BY_SERVICE.VIP.eyebrow`
+depuis le refactor précédent — donc mise à jour automatique). Au passage,
+ajouté le mot "expérience" (pas seulement "transformation") dans la
+description des deux tiers, repris du vocabulaire exact d'Anthony. Rappel :
+`limitedSpots: true` sur `Tier` n'est jamais lu par aucun composant — toute
+la promesse de rareté passe par du texte libre, jamais par un vrai compteur
+serveur (V1, cf. note plus haut).
+
 ## Simplification de la home (04/09/2026)
 
 Anthony a reçu un retour d'un proche (Mickaël, capture WhatsApp) : la home et

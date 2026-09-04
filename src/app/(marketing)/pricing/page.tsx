@@ -311,7 +311,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               </a>
             )}
             <p className="text-center text-[11px] text-graphite-500">
-              Réponse directe · places limitées
+              Réponse directe · places extrêmement limitées
             </p>
           </div>
         </div>

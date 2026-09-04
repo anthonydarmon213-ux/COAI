@@ -81,7 +81,7 @@ export default function VipPage() {
               <p className="mt-1 text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
             )}
             <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise.</p>
-            <p className="mt-1 text-sm text-graphite-400">Nombre de nouveaux accompagnements volontairement limité. Pas de séance isolée en dehors de l&apos;essai ci-contre.</p>
+            <p className="mt-1 text-sm text-graphite-400">Accompagnements extrêmement limités, volontairement rares. Pas de séance isolée en dehors de l&apos;essai ci-contre.</p>
             <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
               Demander mon devis
             </a>
