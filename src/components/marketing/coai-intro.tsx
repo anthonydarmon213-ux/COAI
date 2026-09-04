@@ -36,7 +36,7 @@ export function CoaiIntro() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center">
         <p className="text-[11px] font-bold uppercase leading-4 tracking-[0.22em] text-laiton-300 sm:text-xs">
-          Coaching santé et longévité pour dirigeants
+          Coaching santé et longévité
         </p>
 
         <h1 className="mt-6 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
@@ -59,7 +59,7 @@ export function CoaiIntro() {
             </Link>
           </span>
           <p className="mt-4 text-xs text-graphite-500">
-            Moins de 5 minutes · résultat immédiat · aucune carte bancaire
+            Moins de 5 minutes · sans carte bancaire
           </p>
 
           {/* Repositionnement 04/09/2026 (demande Anthony : « mets l'accent
@@ -81,31 +81,22 @@ export function CoaiIntro() {
           </p>
         </div>
 
-        {/* Preuve juste sous le bouton, à l'emplacement où charlesdenis.fr
-            place ses étoiles : uniquement des faits contrôlables. */}
-        <ul
-          className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
-          aria-label="Ce qui garantit le sérieux de COAI"
-        >
-          {[
-            { chiffre: "17 ans", texte: "auprès de dirigeants" },
-            { chiffre: "DE", texte: "coach diplômé d’État" },
-            { chiffre: "24 ans", texte: "l’âge COAI d’Anthony, à plus de 40 ans" },
-            { chiffre: "3 100+", texte: "abonnés Instagram" },
-          ].map((preuve) => (
-            <li key={preuve.chiffre} className="flex items-baseline gap-2">
-              <span className="font-display text-lg font-bold tracking-[-0.03em] text-laiton-300">
-                {preuve.chiffre}
-              </span>
-              <span className="text-xs leading-4 text-graphite-400">{preuve.texte}</span>
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-4 text-xs leading-5 text-graphite-500">
-          Intervient dans les clubs premium parisiens — La Montgolfière Club et RITM Saint-Germain.
+        {/* Nettoyage 04/09/2026 (Anthony : « pas de doublon ! », « enleve les
+            mentions inutiles »). Trois problemes corriges d'un coup :
+            - « 17 ans aupres de dirigeants » etait ecrit deux fois, dans le
+              sous-titre ET dans la ligne de preuve, a trois lignes d'ecart.
+              Garde une seule fois, dans le sous-titre.
+            - « 24 ans, l'age COAI d'Anthony » retire du hero : la notion
+              d'age COAI demande une explication qui n'existe pas encore a
+              cet endroit de la page, donc elle intrigue au lieu de rassurer.
+              Elle reste presentee plus bas, la ou elle est expliquee.
+            - les quatre preuves + la ligne clubs + la ligne de reassurance
+              faisaient cinq lignes de petit texte empilees sous le bouton.
+              charlesdenis.fr n'en a qu'une (ses etoiles). Tout est ramene a
+              une seule ligne. */}
+        <p className="mt-8 text-xs leading-5 text-graphite-400 sm:text-sm">
+          Intervient à La Montgolfière Club et RITM Saint-Germain · 3 100+ abonnés
         </p>
-      </div>
 
       {/* Photo réelle d'Anthony, sous l'accroche (structure charlesdenis.fr).
           Elle était jusqu'ici en fond derrière une carte opaque : sur mobile
