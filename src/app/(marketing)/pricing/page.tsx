@@ -48,7 +48,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
   return (
     <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-8 px-6 pb-20 pt-16 sm:pt-20">
       <TrackConversion name="pricing_viewed" />
-      <FondateurTicker />
       <div className="w-full max-w-6xl"><BackLink /></div>
       <div className="max-w-4xl text-center">
         <SectionLabel>Choisis ton accompagnement</SectionLabel>
@@ -117,8 +116,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           Entrer dans l&apos;application →
         </Link>
       </div>
-
-      <CompteAReboursRentree className="w-full max-w-5xl" />
 
       {/* Ordre inverse le 04/09/2026 (demande Anthony : « mets l'accent sur
           l'humain d'abord, et si la personne n'a pas les moyens, guide-la
@@ -325,6 +322,23 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           </Card>
         ))}
       </div>
+
+      {/* Compte a rebours descendu ici le 04/09/2026 : place en haut de
+          page, il affichait 19,99 EUR/mois avant meme la premiere offre
+          humaine, ce qui annulait l'inversion d'ordre faite le meme jour
+          (« l'humain d'abord, l'IA pour qui n'a pas les moyens »). Il
+          promeut Standard IA : sa place est apres les trois offres, a cote
+          de celle qu'il concerne.
+          Note : la promesse « prix bloque a vie » et la date du 31 octobre
+          restent a verifier — elles n'ont pas ete revues ici. */}
+      {/* Bandeau descendu ici le 04/09/2026, meme raison que le compte a
+          rebours juste en dessous : il ouvrait la page tarifs en parlant du
+          prix du Pass IA, donc l'offre sans coach etait la premiere chose
+          lue, avant meme d'avoir vu Anthony. Les deux promos Standard IA
+          sont maintenant regroupees apres les trois offres. */}
+      <FondateurTicker />
+
+      <CompteAReboursRentree className="w-full max-w-5xl" />
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
