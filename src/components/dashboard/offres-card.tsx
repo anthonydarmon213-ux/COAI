@@ -56,7 +56,7 @@ export function OffresCard() {
         <SectionLabel>Passer à la vitesse supérieure</SectionLabel>
         <p className="mt-2 text-sm leading-6 text-graphite-300">
           Tu gardes gratuitement ton carnet de séances, tes mesures, la bibliothèque
-          d&apos;exercices et 3 recettes. Les formules ajoutent l&apos;intelligence qui
+          d&apos;exercices et 3 recettes. Les accompagnements ajoutent l&apos;intelligence qui
           construit et adapte ton programme.
         </p>
       </div>
@@ -98,7 +98,7 @@ export function OffresCard() {
           href="/pricing"
           className="rounded-full bg-laiton-300 px-5 py-2.5 text-sm font-bold text-[#101214] transition hover:bg-laiton-200"
         >
-          Comparer les formules →
+          Comparer les accompagnements →
         </Link>
         <p className="text-[11px] text-graphite-400">7 jours offerts · sans engagement</p>
       </div>

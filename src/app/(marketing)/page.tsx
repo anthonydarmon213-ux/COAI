@@ -209,7 +209,7 @@ const PARCOURS_COURT = [
   ["01", "Bilan gratuit", "Moins de 5 minutes, sans carte bancaire."],
   ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
   ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
-  ["04", "Choix de la formule", "Full IA, Full Remote ou Full Présentiel VIP."],
+  ["04", "Choix de l'accompagnement", "Full IA, Full Remote ou Full Présentiel VIP."],
   ["05", "Essai de 7 jours", "Inclus avec Full IA, avant le premier prélèvement."],
   ["06", "Programme activé", "Entraînement, alimentation et récupération coordonnés."],
   ["07", "Première séance", "COAI te guide immédiatement, étape par étape."],
@@ -232,7 +232,7 @@ export default function LandingPage() {
             Tu sais toujours où tu en es.
           </h2>
           <p className="mt-4 text-base leading-7 text-graphite-300">
-            Ton bilan et ton résultat restent gratuits. Tu crées ensuite ton compte, choisis ta formule et testes COAI pendant 7 jours.
+            Ton bilan et ton résultat restent gratuits. Tu crées ensuite ton compte, choisis ton accompagnement et testes COAI pendant 7 jours.
           </p>
         </div>
         <ol className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -259,7 +259,7 @@ export default function LandingPage() {
             La technologie accélère. Le coach garde le cap.
           </h2>
           <p className="mt-5 text-base leading-7 text-graphite-300">
-            COAI transforme ton bilan en actions concrètes. Selon la formule choisie, Anthony apporte aussi son regard humain sur les décisions importantes.
+            COAI transforme ton bilan en actions concrètes. Selon l&apos;accompagnement choisi, Anthony apporte aussi son regard humain sur les décisions importantes.
           </p>
         </div>
         <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-laiton-300/20 sm:min-h-[420px]">
@@ -297,7 +297,7 @@ export default function LandingPage() {
           href="/pricing"
           className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
         >
-          Découvrir les formules
+          Découvrir les accompagnements
         </Link>
       </section>
       </Reveal>
@@ -347,7 +347,7 @@ export default function LandingPage() {
             { chiffre: "Rep", titre: "carnet de séances", texte: "Chaque série, chaque charge, ton tonnage et tes records." },
             { chiffre: "kcal", titre: "compteur intégré", texte: "Calories et macros au quotidien, sans peser si tu ne veux pas." },
             { chiffre: "24/7", titre: "coach IA", texte: "Disponible pendant la séance, dans le contexte de ton exercice." },
-            { chiffre: "1-1", titre: "coach humain", texte: "Anthony relit et ajuste ton programme, selon ta formule." },
+            { chiffre: "1-1", titre: "coach humain", texte: "Anthony relit et ajuste ton programme, selon ton accompagnement." },
           ].map((bloc) => (
             <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6 text-left">
               <p className="font-display text-3xl font-semibold tracking-[-0.04em] text-laiton-300">{bloc.chiffre}</p>
@@ -372,7 +372,7 @@ export default function LandingPage() {
       <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center">
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · moins de 5 minutes</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
-        <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir une formule.</p>
+        <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir un accompagnement.</p>
         <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>
       </section>
     </main>

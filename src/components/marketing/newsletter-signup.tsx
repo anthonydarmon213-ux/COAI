@@ -102,7 +102,7 @@ export function NewsletterSignupSection() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/pricing" className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:border-laiton-300/60 hover:text-laiton-200">
-              Découvrir les formules
+              Découvrir les accompagnements
             </Link>
             <Link href="/diagnostic" className="inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950 transition hover:bg-laiton-300">
               Faire un bilan gratuit

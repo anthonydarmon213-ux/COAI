@@ -50,7 +50,7 @@ export function FormuleRecommandeeCard({
           Voir {tier.nom} en détail →
         </Button>
         <Link href="/pricing" className="text-sm text-graphite-300 underline transition hover:text-white">
-          Comparer les 3 formules
+          Comparer les 3 accompagnements
         </Link>
       </div>
 

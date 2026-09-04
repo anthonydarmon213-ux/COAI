@@ -112,7 +112,7 @@ export async function POST(request: Request) {
         `<li>Récupération : mobilité, sommeil, respiration</li>`,
         `</ul>`,
         `<p>Nos offres : <strong>Pass IA</strong> (programme personnalisé), <strong>Coaching Hybride</strong> (ajustement humain), <strong>VIP</strong> (suivi premium).</p>`,
-        `<p><a href="${appUrl}/pricing">Voir les formules</a></p>`,
+        `<p><a href="${appUrl}/pricing">Voir les accompagnements</a></p>`,
         `${unsubscribe ? `<p><a href="${unsubscribe}">Désabonnement</a></p>` : ""}`,
       ].join("");
 

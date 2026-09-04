@@ -1596,7 +1596,7 @@ export function DiagnosticQuiz({
             <div className="flex flex-col gap-4">
               <div>
                 <h2 className="font-display text-xl font-semibold text-white">Comment veux-tu être accompagné ?</h2>
-                <p className="mt-1.5 text-sm text-graphite-400">Ça nous aide à te proposer la bonne formule.</p>
+                <p className="mt-1.5 text-sm text-graphite-400">Ça nous aide à te proposer le bon accompagnement.</p>
               </div>
               <div className="flex flex-col gap-2">
                 <ChoixVisuel
@@ -2504,7 +2504,7 @@ export function DiagnosticQuiz({
                       </p>
                       {applyNeedsFormule ? (
                         <Link href="/pricing" className="text-sm text-laiton-300 underline">
-                          Choisir ma formule →
+                          Choisir mon accompagnement →
                         </Link>
                       ) : (
                         <Link href="/programme/entrainement" className="text-sm text-laiton-300 underline">
@@ -2557,7 +2557,7 @@ export function DiagnosticQuiz({
                   </div>
                   <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Garde ton résultat et poursuis gratuitement.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
-                    Crée ton compte sans carte bancaire. Tu choisiras ensuite ta formule, puis tu
+                    Crée ton compte sans carte bancaire. Tu choisiras ensuite ton accompagnement, puis tu
                     pourras démarrer les 7 jours d&apos;essai si tu le souhaites.
                   </p>
                   <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-300">Clique ci-dessous pour continuer</span>
@@ -2579,7 +2579,7 @@ export function DiagnosticQuiz({
                   plus haut sur l'écran. Ajouté ici aussi, à la vraie sortie. */}
               {connecte ? (
                 <Link href="/pricing" className="text-sm font-semibold text-laiton-300 underline decoration-laiton-300/40 underline-offset-4 hover:text-laiton-200">
-                  Voir les formules →
+                  Voir les accompagnements →
                 </Link>
               ) : null}
 

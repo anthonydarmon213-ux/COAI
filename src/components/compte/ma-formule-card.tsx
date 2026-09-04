@@ -39,7 +39,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-white/[0.08] bg-white/[0.02] px-6 py-6">
       <div>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Ta formule</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Ton accompagnement</p>
         {tierActuel ? (
           <>
             <h2 className="mt-2 font-display text-2xl text-white">{tierActuel.nom}</h2>
@@ -63,7 +63,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
       {autres.length > 0 && (
         <div className="border-t border-white/[0.07] pt-5">
           <p className="text-sm font-semibold text-white">
-            {tierActuel ? "Envie d'évoluer plus vite ?" : "Choisis ta formule"}
+            {tierActuel ? "Envie d'évoluer plus vite ?" : "Choisis ton accompagnement"}
           </p>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row">
             {autres.map((service) => (

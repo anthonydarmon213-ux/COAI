@@ -8,7 +8,7 @@ import { PLAN_FEATURES } from "@/lib/subscription/plan-features";
 export function PlanCard({ plan }: { plan: EffectivePlan }) {
   return (
     <div className="flex flex-col gap-3">
-      <SectionLabel>Votre formule</SectionLabel>
+      <SectionLabel>Votre accompagnement</SectionLabel>
       <Card className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -19,7 +19,7 @@ export function PlanCard({ plan }: { plan: EffectivePlan }) {
             href="/pricing"
             className="shrink-0 whitespace-nowrap text-sm font-medium text-laiton-400 underline hover:text-laiton-300"
           >
-            {plan === "PREMIUM" ? "Voir les formules" : "Changer d'offre →"}
+            {plan === "PREMIUM" ? "Voir les accompagnements" : "Changer d'offre →"}
           </Link>
         </div>
         <ul className="flex flex-col gap-1.5">

@@ -50,12 +50,12 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       <FondateurTicker />
       <div className="w-full max-w-6xl"><BackLink /></div>
       <div className="max-w-4xl text-center">
-        <SectionLabel>Choisis ta formule</SectionLabel>
+        <SectionLabel>Choisis ton accompagnement</SectionLabel>
         <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
           Choisis ton niveau d&apos;accompagnement.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
-          Ton bilan et ton résultat sont enregistrés. Choisis maintenant la formule qui te correspond.
+          Ton bilan et ton résultat sont enregistrés. Choisis maintenant l&apos;accompagnement qui te correspond.
           Full IA inclut 7 jours d&apos;essai ; Full Remote et Full Présentiel VIP se confirment sur devis, via WhatsApp.
         </p>
       </div>
@@ -107,7 +107,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         <p className="mx-auto mt-1 max-w-2xl text-xs leading-5 text-graphite-300">
           Dix fonctions sont gratuites, sans carte bancaire : suivi de tes séances,
           RepCount, records, mesures, bibliothèque d&apos;exercices et recettes. Tu
-          choisiras une formule seulement si tu veux aller plus loin.
+          choisiras un accompagnement seulement si tu veux aller plus loin.
         </p>
         <Link
           href="/dashboard"
@@ -284,8 +284,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             )}
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
               Séances privées avec Anthony, à domicile, en entreprise, en club ou à
-              distance — environ 1 séance par semaine. Tarif entreprise et formules
-              suivies sur devis.
+              distance — environ 1 séance par semaine. Tarif entreprise et accompagnements
+              suivis sur devis.
             </p>
             <p className="mt-2 text-sm text-laiton-200">
               Facture professionnelle fournie, déductible en frais d&apos;entreprise.

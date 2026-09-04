@@ -33,7 +33,7 @@ const INCLUS = [
   {
     titre: "Une prudence particulière quand ça compte",
     description:
-      "Grossesse ou post-partum déclarés : ton programme est systématiquement relu par un coach diplômé d'État avant de t'arriver, quelle que soit ta formule.",
+      "Grossesse ou post-partum déclarés : ton programme est systématiquement relu par un coach diplômé d'État avant de t'arriver, quel que soit ton accompagnement.",
   },
 ];
 

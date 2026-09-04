@@ -21,7 +21,7 @@ async function resoudreCta(email: string): Promise<{ label: string; href: string
     where: { email },
     select: { id: true },
   });
-  if (!user) return { label: "Voir mes formules", href: "/pricing" };
+  if (!user) return { label: "Voir mes accompagnements", href: "/pricing" };
 
   const aUnProgramme = await prisma.programmeGenerated.findFirst({
     where: { userId: user.id },

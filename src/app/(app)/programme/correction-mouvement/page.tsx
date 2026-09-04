@@ -84,17 +84,21 @@ export default async function CorrectionMouvementPage() {
         </section>
       ) : (
         <section className="rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] p-6">
-          <p className="font-semibold text-white">Inclus à partir du Coaching Hybride.</p>
+          {/* "Coaching Hybride" → "Full Remote" (04/09/2026) : nom de plan
+              obsolète depuis le repositionnement en 3 offres Full IA / Full
+              Remote / Full Présentiel VIP, corrigé au passage du remplacement
+              formule → accompagnement demandé par Anthony. */}
+          <p className="font-semibold text-white">Inclus à partir du Full Remote.</p>
           <p className="mt-2 text-sm leading-6 text-graphite-300">
             Anthony regarde ta vidéo et te répond personnellement. C&apos;est du
-            temps de coach : cette fonction est réservée aux formules qui
+            temps de coach : cette fonction est réservée aux accompagnements qui
             l&apos;incluent.
           </p>
           <Link
             href="/pricing"
             className="mt-5 inline-flex rounded-full bg-laiton-300 px-6 py-3 text-sm font-bold text-[#0d0d0c]"
           >
-            Voir les formules
+            Voir les accompagnements
           </Link>
         </section>
       )}

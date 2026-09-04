@@ -248,7 +248,7 @@ export default async function BienvenuePage({
               <p className="mt-1 text-sm font-medium text-white">{prenom || user.email}</p>
             </div>
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Formule</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-500">Accompagnement</p>
               <p className="mt-1 text-sm font-medium text-white">{formule}</p>
             </div>
             <div>

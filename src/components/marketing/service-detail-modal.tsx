@@ -109,7 +109,7 @@ export function ServiceDetailModal({
             personne a déjà compris ce que la formule fait avant de voir le
             prix, jamais l'inverse. */}
         <p className="text-sm font-medium text-graphite-300">
-          Cette formule te correspond ? Voici le prix.
+          Cet accompagnement te correspond ? Voici le prix.
         </p>
         {!tier.sessions && (
           <div className="flex flex-col gap-1">

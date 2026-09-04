@@ -49,7 +49,7 @@ const FAQ_ITEMS = [
   {
     question: "Je suis obligé·e de m'abonner après le bilan ?",
     reponse:
-      "Non. Le résultat du bilan t'appartient. Si tu veux aller plus loin, COAI te recommande la formule la plus adaptée à ton profil, mais rien n'est imposé.",
+      "Non. Le résultat du bilan t'appartient. Si tu veux aller plus loin, COAI te recommande l'accompagnement le plus adapté à ton profil, mais rien n'est imposé.",
   },
   {
     question: "Et si je veux un accompagnement ensuite ?",

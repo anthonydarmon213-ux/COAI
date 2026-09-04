@@ -19,7 +19,7 @@ export default async function FonctionnalitesPage() {
         </h1>
         <p className="max-w-2xl text-base leading-7 text-graphite-300">
           Les fonctions ouvertes à tous, et celles que débloque l&apos;abonnement.
-          Un cadenas signale ce qui demande une formule active.
+          Un cadenas signale ce qui demande un accompagnement actif.
         </p>
       </div>
       <FonctionnalitesMenu abonne={abonne} />

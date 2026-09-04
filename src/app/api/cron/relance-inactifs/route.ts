@@ -385,8 +385,8 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
       "Ton accompagnement COAI est prêt",
       `Bonjour,\n\n` +
         `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
-        `Ton profil est prêt : il ne te reste qu'à choisir la formule qui correspond au niveau de suivi que tu veux.\n\n` +
-        `Choisis ta formule : ${appUrl}/pricing\n\n` +
+        `Ton profil est prêt : il ne te reste qu'à choisir l'accompagnement qui correspond au niveau de suivi que tu veux.\n\n` +
+        `Choisis ton accompagnement : ${appUrl}/pricing\n\n` +
         `Pass IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
         `Coaching Hybride : 7 jours d'essai, puis 99 €/mois, avec le regard et les ajustements d'un coach humain.\n` +
         `Coaching VIP : 200 € la séance, sans abonnement, à domicile, en entreprise, en club ou à distance.\n\n` +
@@ -489,7 +489,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
       user.email,
       "Tu peux reprendre ton inscription COAI",
       `Bonjour${nom},\n\n` +
-        `Ton inscription à la formule ${plan} (${prix}) n'a pas été finalisée. ` +
+        `Ton inscription à l'accompagnement ${plan} (${prix}) n'a pas été finalisée. ` +
         `Aucun paiement n'a été enregistré.\n\n` +
         `Tu peux reprendre quand tu veux et profiter de tes 7 jours d'essai : ${appUrl}/pricing\n\n` +
         `Si tu as rencontré un problème, réponds simplement à cet email.\n\n` +

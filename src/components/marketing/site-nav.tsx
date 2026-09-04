@@ -10,7 +10,7 @@ const LIENS = [
   // Accès direct aux tarifs (11/08/2026, correction Anthony) : le diagnostic
   // reste le parcours principal recommandé, mais ne doit jamais être un mur
   // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
-  { href: "/pricing", label: "Nos formules" },
+  { href: "/pricing", label: "Nos accompagnements" },
   { href: "/vip", label: "Full Présentiel VIP" },
   { href: "/entreprise", label: "COAI Entreprise" },
   { href: "/a-propos", label: "À propos" },

@@ -8,7 +8,7 @@ const BENEFICES = [
   "Le coach quotidien « Aujourd'hui » : tu sais quoi faire, sans chercher",
   "Une IA explicable — tu sais toujours pourquoi ta séance a changé",
   "Le Coach IA disponible pendant ta séance, dans le contexte exact de ton exercice",
-  "Validation humaine selon ta formule : l'humain garde le dernier mot quand ça compte",
+  "Validation humaine selon ton accompagnement : l'humain garde le dernier mot quand ça compte",
 ];
 
 export function CoaiIntro() {
@@ -146,19 +146,15 @@ export function CoaiIntro() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto mt-20 grid w-full max-w-6xl grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
-        {[
-          ["01", "Bilan offert", "Tu réponds, sans carte bancaire."],
-          ["02", "Résultat personnalisé", "Tu comprends ton point de départ."],
-          ["03", "Première séance", "Tu testes COAI pendant 7 jours."],
-        ].map(([numero, titre, texte]) => (
-          <div key={numero} className="border-white/[0.08] px-6 py-6 text-left sm:border-r sm:last:border-r-0">
-            <span className="font-mono text-[10px] tracking-[0.18em] text-laiton-300">{numero}</span>
-            <p className="mt-2 font-semibold text-white">{titre}</p>
-            <p className="mt-1 text-sm text-graphite-400">{texte}</p>
-          </div>
-        ))}
-      </div>
+      {/* Mini-résumé "01 Bilan offert / 02 Résultat personnalisé / 03
+          Première séance" retiré le 04/09/2026 (demande Anthony : "enlève
+          les doublons, plus de simplicité, efficacité, clarté") — il
+          racontait exactement le même parcours que le bloc détaillé en 7
+          étapes plus bas sur la page (section #comment-ca-marche,
+          "SIMPLE DU DÉBUT À LA PREMIÈRE SÉANCE"), juste après. Un visiteur
+          lisait deux fois la même histoire à quelques secondes d'écart. Le
+          bloc 7 étapes est gardé car plus complet (va jusqu'à la première
+          séance activée, pas seulement le bilan). */}
     </section>
   );
 }

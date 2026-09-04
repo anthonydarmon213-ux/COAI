@@ -143,7 +143,7 @@ export function FonctionnalitesMenu({ abonne }: { abonne: boolean }) {
             href="/pricing"
             className="self-start rounded-full bg-laiton-300 px-5 py-2.5 text-sm font-bold text-[#101214] transition hover:bg-laiton-200"
           >
-            Voir les formules →
+            Voir les accompagnements →
           </Link>
         )}
       </section>

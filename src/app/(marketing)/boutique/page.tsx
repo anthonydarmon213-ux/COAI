@@ -96,7 +96,7 @@ export default function BoutiquePage({ searchParams }: { searchParams?: { achat?
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-cyan-200">Besoin de suivi ?</p>
             <p className="mt-2 text-lg font-semibold text-white">Passe au coaching adaptatif</p>
             <p className="mt-1 text-xs leading-5 text-graphite-300">Ajustements, conseils et adaptations selon tes résultats avec l&apos;abonnement.</p>
-            <Link href="/pricing" className="mt-2 inline-flex text-xs font-bold text-cyan-100 underline underline-offset-4">Voir les formules →</Link>
+            <Link href="/pricing" className="mt-2 inline-flex text-xs font-bold text-cyan-100 underline underline-offset-4">Voir les accompagnements →</Link>
           </div>
         </div>
 
