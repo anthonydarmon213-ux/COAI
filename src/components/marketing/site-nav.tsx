@@ -58,19 +58,15 @@ export function SiteNav({ connecte }: { connecte: boolean }) {
           <CoaiMark size={22} />
           <span className="font-display text-xl font-semibold tracking-[0.16em] text-white">COAI</span>
         </span>
-        {/* Baseline officielle, reprise du storyboard publicitaire ou elle
-            figure sous le logo. Elle remplace "Personal Training,
-            Reimagined." : en anglais et interchangeable, cette formule ne
-            disait pas ce que fait COAI. "Santé et longévité" ajouté le
-            04/09/2026 (demande Anthony, inspiration enseigne "bangji —
-            Longevity Skincare") : reprend la structure marque + ligne de
-            catégorie courte de cette enseigne, sans retirer la baseline
-            existante. Formulation précisée le même jour ("Santé et
-            longévité" plutôt que "Coaching longévité", retour direct
-            d'Anthony) ; "Coaching" gardé implicite ici car déjà porté par
-            le logo COAI juste au-dessus. */}
+        {/* Baseline officielle sous le logo. Historique : "Personal Training,
+            Reimagined." (trop générique, en anglais) → "Santé et longévité ·
+            L'IA génère, ton coach valide." (04/09/2026, inspiration enseigne
+            "bangji — Longevity Skincare") → "Coaching augmenté" (04/09/2026,
+            même jour, retour direct d'Anthony : remplace tout par cette
+            formule seule — plus courte, positionne directement l'IA +
+            coach humain sans lister les deux séparément). */}
         <span className="text-[0.55rem] font-medium uppercase tracking-[0.14em] text-laiton-200/80">
-          Santé et longévité · L&apos;IA génère, ton coach valide.
+          Coaching augmenté
         </span>
       </Link>
 
