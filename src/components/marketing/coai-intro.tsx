@@ -17,10 +17,15 @@ export function CoaiIntro() {
       {/* Photo réelle d'Anthony en séance TRX (04/09/2026) — remplace le
           visuel généré par IA (couple avec un téléphone) suite au retour
           d'un proche d'Anthony sur coai.fr : les visuels IA donnaient moins
-          confiance, mieux vaut de vraies photos. object-top plutôt que
-          object-center : la photo est en portrait et le hero est très
-          large — un recadrage centré aurait coupé le visage, object-top
-          garde le visage et la poignée TRX dans le cadre sur desktop. */}
+          confiance, mieux vaut de vraies photos. La photo est en portrait
+          et le hero très large en desktop : object-cover zoome fortement
+          pour couvrir la largeur, donc object-top (0%) ou object-center
+          (50%) coupaient le visage (l'un montrait le plafond, l'autre
+          l'épaule). object-[center_30%] a été choisi après avoir simulé
+          le recadrage réel sur desktop (1600×800) et mobile (420×700) :
+          seul ce réglage garde le visage souriant et la poignée TRX
+          visibles sur desktop, sans rien changer sur mobile (l'image y
+          tient déjà entièrement en hauteur). */}
       <Image
         src="/anthony-trx-reel.jpg"
         alt=""
@@ -28,7 +33,7 @@ export function CoaiIntro() {
         priority
         quality={95}
         sizes="100vw"
-        className="coai-palace-image object-cover object-top"
+        className="coai-palace-image object-cover object-[center_30%]"
         aria-hidden="true"
       />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,9,.12)_0%,rgba(8,9,9,.08)_43%,rgba(8,9,9,.48)_67%,rgba(8,9,9,.78)_100%)]" aria-hidden="true" />
