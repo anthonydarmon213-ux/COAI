@@ -11,8 +11,13 @@ import { Reveal } from "@/components/marketing/reveal";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 
 const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
+// "Longévité" ajouté le 04/09/2026 (demande Anthony, inspiration enseigne
+// "bangji — Longevity Skincare") : le thème existait déjà dans le
+// positionnement (âge métabolique, -15 ans visés) mais n'apparaissait pas
+// dans la promesse principale — ajout additif, sans retirer "Personal
+// Training, Reimagined." qui reste la baseline reconnue.
 const DESCRIPTION =
-  "Personal Training, Reimagined. Une expérience de coaching personnalisée, disponible 24h/24, avec la rapidité de l’IA et la précision d’un coach humain.";
+  "Coaching longévité, Personal Training réimaginé. Une expérience de coaching personnalisée, disponible 24h/24, avec la rapidité de l’IA et la précision d’un coach humain.";
 
 // 11/08/2026 : sans ce bloc openGraph/twitter dédié, chaque page publique
 // affichait le titre/description génériques du layout racine ("COAI — HI ×

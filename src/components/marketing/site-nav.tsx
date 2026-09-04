@@ -61,9 +61,13 @@ export function SiteNav({ connecte }: { connecte: boolean }) {
         {/* Baseline officielle, reprise du storyboard publicitaire ou elle
             figure sous le logo. Elle remplace "Personal Training,
             Reimagined." : en anglais et interchangeable, cette formule ne
-            disait pas ce que fait COAI. */}
+            disait pas ce que fait COAI. "Coaching longévité" ajouté le
+            04/09/2026 (demande Anthony, inspiration enseigne "bangji —
+            Longevity Skincare") : reprend la structure marque + ligne de
+            catégorie courte de cette enseigne, sans retirer la baseline
+            existante. */}
         <span className="text-[0.55rem] font-medium uppercase tracking-[0.14em] text-laiton-200/80">
-          L&apos;IA génère. Ton coach valide.
+          Coaching longévité · L&apos;IA génère, ton coach valide.
         </span>
       </Link>
 

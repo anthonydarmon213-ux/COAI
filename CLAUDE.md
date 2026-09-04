@@ -86,6 +86,20 @@ restent corrects fonctionnellement (aucun ne casse ni ne facture au mauvais
 prix) mais affichent encore les anciens noms — pure dette de cohérence
 éditoriale, pas un bug.
 
+**Ajout "longévité" dans le positionnement (04/09/2026, inspiration enseigne
+"bangji — Longevity Skincare" envoyée par Anthony)** : mot "longévité" ajouté
+en 3 points clés, en complément du texte existant (aucun retrait) — la
+metadata home (`page.tsx`, `DESCRIPTION` : "Coaching longévité, Personal
+Training réimaginé..."), le sous-titre du logo dans la nav (`site-nav.tsx` :
+"Coaching longévité · L'IA génère, ton coach valide."), et le badge en
+haut du hero (`coai-intro.tsx` : "Coaching longévité nourri par 17 ans
+d'expérience..."). Le thème longévité existait déjà dans le positionnement
+(âge métabolique, objectif -15 ans) mais n'apparaissait pas dans la promesse
+principale avant cet ajout. Hors scope volontairement : pas de nouvelle
+page/offre "longévité", pas de retrait de "Personal Training, Reimagined."
+qui reste la baseline reconnue — seulement du texte additif, comme demandé
+("on simplifie au maximum, moins de blabla").
+
 Pas vérifié : pas de `next build`/`tsc` réel (sandbox sans accès npm). À la
 place : script d'équilibre des accolades sur chaque fichier modifié + grep
 ciblé confirmant qu'aucune ancienne ancre (`#coaching-hybride`) ni aucun
