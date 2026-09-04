@@ -2387,7 +2387,7 @@ export function DiagnosticQuiz({
                 </div>
                 <p className="border-t border-white/[0.07] pt-4 text-sm leading-6 text-graphite-200">
                   <span className="font-semibold text-white">Jamais livré à toi-même :</span> avec
-                  Coaching Hybride ou VIP, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
+                  Full Remote ou Full Présentiel VIP, un <span className="text-laiton-300">coach diplômé d&apos;État</span>{" "}
                   valide ton programme et te suit dans la durée, pendant que ton{" "}
                   <span className="text-laiton-300">Coach IA répond 24h/24, 7j/7</span> entre deux
                   séances.

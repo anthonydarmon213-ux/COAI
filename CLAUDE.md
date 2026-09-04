@@ -4,6 +4,61 @@
 > Un seul clone, rien de non commité en fin de session, audit des images
 > avant commit, aucune association média approximative.
 
+## Repositionnement 3 offres : Full IA / Full Remote / Full Présentiel VIP (04/09/2026)
+
+Anthony a demandé un nouveau positionnement clair à 3 niveaux (cible :
+entrepreneurs 35-65 ans, forme/santé/longévité/perte de gras) : « full ia ton
+prog en autonomie mon whatsapp si besoin, full remote en 1:1 avec moi
+400€/mois limité à 15 places, full presentiel vip 200 la séance sur Paris en
+club limité à 10/mois ». V1 = copie/positionnement uniquement, aucun
+compteur de places réel (les « 15 places »/« 10 séances/mois » sont des
+promesses affichées, pas encore appliquées côté serveur).
+
+Décisions confirmées par Anthony avant implémentation :
+- **Full Remote sur devis WhatsApp**, pas de checkout Stripe en ligne — même
+  logique que Full Présentiel VIP (ex-Coaching VIP, retiré du checkout le
+  02/09/2026).
+- **STANDARD (ex-"Coaching Hybride", 99€/mois) repris tel quel pour devenir
+  Full Remote** plutôt que d'ajouter un 4ème `PlanCode` : Anthony a confirmé
+  0 abonné actif sur ce plan au moment du changement, donc aucun risque
+  d'afficher un mauvais prix à un abonné existant sur `/compte`.
+- **Full Présentiel VIP garde la modalité « à distance »** dans ses features
+  (pas de retrait malgré l'existence de Full Remote — chevauchement assumé).
+
+Implémentation : `src/lib/pricing/tiers.ts` reste la source unique (3
+entrées : `PASS_IA`→Full IA, `STANDARD`→Full Remote, `PREMIUM`→Full
+Présentiel VIP). Le bloc "sur devis" auparavant codé en dur ("Coaching VIP"
+partout) sur `/pricing` et dans `service-detail-modal.tsx` est généralisé via
+3 nouveaux champs sur `Tier` (`devisTagline`, `devisWhatsappLabel`,
+`devisFootnote`) pilotés par les données du tier — sert maintenant Full
+Remote et Full Présentiel VIP sans dupliquer de texte. `api/stripe/checkout/route.ts`
+rejette désormais aussi `STANDARD` (comme `PREMIUM` déjà) avec une erreur
+explicite. Fichiers mis à jour pour la cohérence directe (home, /pricing,
+/vip, modale service, `ma-formule-card.tsx`, `/compte/abonnement`, moteur de
+recommandation du diagnostic `mini-diagnostic.ts` + `besoins-identifies.ts`,
+une mention dans `diagnostic-quiz.tsx`, le lien nav "Coaching VIP" →
+"Full Présentiel VIP").
+
+**Hors scope de cette passe (V1 = home/pricing/vip uniquement), à traiter
+séparément si besoin** — grep sur "Coaching Hybride"/"Pass IA"/"Coaching VIP"
+en dehors des fichiers ci-dessus fait remonter ~15 pages SEO
+(`coach-sportif-ia`, `coach-sante-dirigeant`, `programme-*`, etc.), la page
+`/cgv` (texte légal — ne pas modifier sans relecture d'Anthony, cf. AGENTS.md
+règle #9 "contenu éditorial non relu"), les emails de relance (cron
+`relance-inactifs`, `drip-diagnostic`), la newsletter, les réponses du bot
+WhatsApp/ManyChat, les pages `/admin/*` et les CTA d'upsell dans le dashboard
+(`offres-card.tsx`, `adaptation-notification-card.tsx`,
+`coaching-visio-cta.tsx`, `ask-coach.tsx`, `activation-flow.tsx`). Ces textes
+restent corrects fonctionnellement (aucun ne casse ni ne facture au mauvais
+prix) mais affichent encore les anciens noms — pure dette de cohérence
+éditoriale, pas un bug.
+
+Pas vérifié : pas de `next build`/`tsc` réel (sandbox sans accès npm). À la
+place : script d'équilibre des accolades sur chaque fichier modifié + grep
+ciblé confirmant qu'aucune ancienne ancre (`#coaching-hybride`) ni aucun
+texte "Coaching VIP"/"Coaching Hybride" ne subsiste dans les fichiers
+touchés (hors commentaires historiques). Branche `claude/simplifier-home-menu`.
+
 ## Simplification de la home (04/09/2026)
 
 Anthony a reçu un retour d'un proche (Mickaël, capture WhatsApp) : la home et

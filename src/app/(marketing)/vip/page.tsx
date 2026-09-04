@@ -6,8 +6,8 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
-  title: "Coaching VIP — À domicile, en entreprise, en club ou à distance",
-  description: "Coaching VIP avec Anthony Darmon, à partir de 200 € la séance : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
+  title: "Full Présentiel VIP — À domicile, en entreprise, en club ou à distance",
+  description: "Full Présentiel VIP avec Anthony Darmon, à partir de 200 € la séance, 10 séances par mois maximum : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
   alternates: { canonical: "/vip" },
 };
 
@@ -20,7 +20,7 @@ const INCLUS = [
 
 export default function VipPage() {
   const whatsappHref = buildWhatsAppLink(
-    "Bonjour Anthony, je souhaite un devis pour un coaching VIP COAI."
+    "Bonjour Anthony, je souhaite un devis pour le Full Présentiel VIP COAI."
   );
 
   return (
@@ -32,7 +32,7 @@ export default function VipPage() {
 
         <div className="mt-12 grid items-start gap-14 lg:grid-cols-[1fr_.82fr] lg:gap-20">
           <div>
-            <SectionLabel>Coaching VIP · sur devis</SectionLabel>
+            <SectionLabel>Full Présentiel VIP · sur devis</SectionLabel>
             <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-6xl">
               Ta transformation ne sera plus laissée au hasard.
             </h1>
@@ -40,6 +40,7 @@ export default function VipPage() {
               Anthony pilote personnellement ta transformation : bilan initial, programme sur
               mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI. Chez toi, dans
               ton entreprise, en club ou à distance — tu sais quoi faire, quand le faire et pourquoi.
+              Créneaux volontairement limités à 10 séances par mois.
             </p>
 
             <div className="mt-8 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-6 py-5">
@@ -72,7 +73,7 @@ export default function VipPage() {
               <span className="pb-1 text-sm text-graphite-500">puis sur devis</span>
             </div>
             <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise.</p>
-            <p className="mt-1 text-sm text-graphite-400">Nombre de nouveaux accompagnements volontairement limité.</p>
+            <p className="mt-1 text-sm text-graphite-400">10 séances par mois maximum, pour un suivi vraiment personnalisé. Nombre de nouveaux accompagnements volontairement limité.</p>
             <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
               Demander mon devis
             </a>

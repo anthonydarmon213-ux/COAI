@@ -15,7 +15,7 @@ import { prisma } from "@/lib/db/client";
 // était jusqu'ici ignoré côté serveur.
 const offresParPlan = () => ({
   PASS_IA: {
-    name: "COAI — Pass IA",
+    name: "COAI — Full IA",
     trialDays: 7,
     MONTHLY: { amount: 1999, interval: "month", count: 1 },
     // 49 € les 3 mois, soit 16,33 €/mois : assez proche du mensuel pour ne
@@ -25,20 +25,17 @@ const offresParPlan = () => ({
     QUARTERLY: { amount: prixTrimestreCentimes(), interval: "month", count: 3 },
     ANNUAL: { amount: 11900, interval: "year", count: 1 },
   },
-  STANDARD: {
-    name: "COAI — Coaching Hybride",
-    trialDays: 7,
-    MONTHLY: { amount: 9900, interval: "month", count: 1 },
-    QUARTERLY: { amount: 9900, interval: "month", count: 1 },
-    ANNUAL: { amount: 9900, interval: "month", count: 1 },
-  },
 }) as const;
 
-// PREMIUM (VIP) a ete retire de la vente en ligne le 02/09/2026 : le
-// coaching VIP se vend desormais a la seance (200 euros puis devis) et se
-// conclut sur WhatsApp. La valeur reste dans l'enum Prisma et dans les
-// libelles pour ne pas casser les comptes qui la portent deja, mais aucun
-// nouveau checkout ne peut plus la creer.
+// PREMIUM (Full Présentiel VIP) a ete retire de la vente en ligne le
+// 02/09/2026 : il se vend desormais a la seance (200 euros puis devis) et se
+// conclut sur WhatsApp. STANDARD (ex-"Coaching Hybride", devenu Full Remote
+// le 04/09/2026 — cf. src/lib/pricing/tiers.ts) suit le meme chemin : sur
+// devis via WhatsApp, jamais de checkout Stripe en ligne (decision confirmee
+// par Anthony, aucun abonne actif sur ce plan au moment du changement). Les
+// deux valeurs restent dans l'enum Prisma et dans les libelles pour ne pas
+// casser les comptes qui les portent deja, mais aucun nouveau checkout ne
+// peut plus les creer.
 
 type Plan = keyof ReturnType<typeof offresParPlan>;
 
@@ -49,17 +46,23 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  // Une demande PREMIUM est refusee plutot que rabattue silencieusement sur
-  // une autre formule : mieux vaut une erreur explicite qu'un client facture
-  // pour un plan qu'il n'a pas choisi.
+  // Une demande PREMIUM ou STANDARD est refusee plutot que rabattue
+  // silencieusement sur une autre formule : mieux vaut une erreur explicite
+  // qu'un client facture pour un plan qu'il n'a pas choisi.
   if (body.plan === "PREMIUM") {
     return NextResponse.json(
-      { error: "Le Coaching VIP ne se souscrit plus en ligne : 200 € la séance, puis sur devis." },
+      { error: "Le Full Présentiel VIP ne se souscrit plus en ligne : 200 € la séance, puis sur devis." },
+      { status: 400 }
+    );
+  }
+  if (body.plan === "STANDARD") {
+    return NextResponse.json(
+      { error: "Le Full Remote ne se souscrit plus en ligne : 400 €/mois, sur devis via WhatsApp." },
       { status: 400 }
     );
   }
 
-  const plan: Plan = body.plan === "PASS_IA" ? "PASS_IA" : "STANDARD";
+  const plan: Plan = "PASS_IA";
   const planConfig = offresParPlan()[plan];
   // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
   // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
@@ -103,7 +106,10 @@ export async function POST(request: Request) {
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
     success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}`,
-    cancel_url: `${appUrl}/pricing?checkout=cancel&selected=${plan}&billing=${billing}#${plan === "PASS_IA" ? "pass-ia" : plan === "STANDARD" ? "coaching-hybride" : "vip"}`,
+    // Seul PASS_IA passe encore par ce checkout (STANDARD et PREMIUM sont
+    // rejetés plus haut, sur devis via WhatsApp) : l'ancre est donc toujours
+    // "pass-ia".
+    cancel_url: `${appUrl}/pricing?checkout=cancel&selected=${plan}&billing=${billing}#pass-ia`,
     // Acceptation des CGV déplacée ici (21/08/2026, audit tunnel demandé par
     // Anthony, point #7 : la case à cocher sur /pricing bloquait chaque
     // bouton avant même la décision, "alourdit la comparaison des offres").

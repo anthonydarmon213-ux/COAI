@@ -22,19 +22,19 @@ type PricingSearchParams = {
 
 function tierId(plan: string) {
   if (plan === "PASS_IA") return "pass-ia";
-  if (plan === "STANDARD") return "coaching-hybride";
-  return "vip";
+  if (plan === "STANDARD") return "full-remote";
+  return "full-presentiel";
 }
 
 const COMPARAISON_RAPIDE = [
-  ["Pass IA", "Je veux avancer en autonomie", "IA 24h/24 · programme adaptatif"],
-  ["Coaching Hybride", "Je veux aussi un regard humain", "Supervision et ajustements du coach"],
-  ["Coaching VIP", "Je veux une attention maximale", "200 € la séance, sans abonnement"],
+  ["Full IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
+  ["Full Remote", "Je veux un coaching 1:1 à distance", "400 €/mois, 15 places max"],
+  ["Full Présentiel VIP", "Je veux une attention maximale", "200 € la séance, 10/mois max"],
 ] as const;
 
 export const metadata: Metadata = {
   title: "Tarifs — Personal Training réimaginé | COAI",
-  description: "Choisis le niveau d'attention dont tu as besoin : Pass IA, Coaching Hybride ou VIP.",
+  description: "Choisis le niveau d'attention dont tu as besoin : Full IA, Full Remote ou Full Présentiel VIP.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -55,7 +55,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
           Ton bilan et ton résultat sont enregistrés. Choisis maintenant la formule qui te correspond.
-          Pass IA et Coaching Hybride incluent 7 jours d&apos;essai ; pour VIP, un échange confirme d&apos;abord ton accompagnement.
+          Full IA inclut 7 jours d&apos;essai ; Full Remote et Full Présentiel VIP se confirment sur devis, via WhatsApp.
         </p>
       </div>
 
@@ -79,7 +79,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
-            <a key={nom} href={`#${nom === "Pass IA" ? "pass-ia" : nom === "Coaching Hybride" ? "coaching-hybride" : "vip"}`} className="rounded-2xl border border-white/[0.08] bg-white/[0.035] px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-400/60">
+            <a key={nom} href={`#${nom === "Full IA" ? "pass-ia" : nom === "Full Remote" ? "full-remote" : "full-presentiel"}`} className="rounded-2xl border border-white/[0.08] bg-white/[0.035] px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-400/60">
               <strong className="block text-base text-white">{nom}</strong>
               <span className="mt-1.5 block text-sm font-semibold text-laiton-300">{besoin}</span>
               <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
@@ -142,21 +142,20 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             {tier.sessions && (
               <div className="space-y-4 rounded-2xl border border-laiton-300/20 bg-laiton-300/[0.05] p-5">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-laiton-300">Coaching VIP</p>
-                  <p className="mt-2 text-sm font-semibold text-white">200 € la séance, puis sur devis</p>
-                  <p className="mt-1 text-xs leading-5 text-graphite-400">À domicile, en entreprise, en club ou à distance.</p>
+                  <p className="text-xs uppercase tracking-widest text-laiton-300">{tier.nom}</p>
+                  <p className="mt-2 text-sm font-semibold text-white">{tier.prix} {tier.suffixe}, puis sur devis</p>
+                  <p className="mt-1 text-xs leading-5 text-graphite-400">{tier.devisTagline}</p>
                 </div>
                 <a
                   className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
-                  href={vipReservationHref("le coaching VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+                  href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
                   target="_blank"
                   rel="noreferrer"
                 >
                   Demander mon devis sur WhatsApp
                 </a>
                 <p className="text-center text-[11px] text-graphite-500">
-                  Séances à l&apos;unité ou suivies, sans abonnement. Facture
-                  déductible pour les entreprises.
+                  {tier.devisFootnote}
                 </p>
               </div>
             )}
@@ -246,16 +245,17 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
-        <p className="mt-1 text-xs text-graphite-400">Pass IA et Coaching Hybride : 7 jours d&apos;essai avant le premier prélèvement. Le Coaching VIP se règle à la séance, sans abonnement.</p>
+        <p className="mt-1 text-xs text-graphite-400">Full IA : 7 jours d&apos;essai avant le premier prélèvement. Full Remote et Full Présentiel VIP se règlent sur devis, via WhatsApp.</p>
       </div>
 
-      {/* Le VIP ne se souscrit pas en ligne : il sort donc de la grille des
-          abonnements et devient une carte a part, conclue sur WhatsApp. */}
+      {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
+          la grille des abonnements et devient une carte a part, conclue sur
+          WhatsApp — comme Full Remote (cf. tier.sessions plus haut). */}
       <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
-              Coaching VIP · sans abonnement
+              Full Présentiel VIP · sans abonnement
             </p>
             <div className="mt-3 flex items-baseline gap-1.5">
               <span className="font-display text-4xl font-semibold text-white">200 €</span>
@@ -263,7 +263,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             </div>
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
               Séances privées avec Anthony, à domicile, en entreprise, en club ou à
-              distance. Les formules suivies et les groupes se chiffrent sur mesure.
+              distance — jusqu&apos;à 10 séances par mois. Les formules suivies et les
+              groupes se chiffrent sur mesure.
             </p>
             <p className="mt-2 text-sm text-laiton-200">
               Facture professionnelle fournie, déductible en frais d&apos;entreprise.
@@ -272,7 +273,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           <div className="shrink-0">
             <a
               className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
-              href={vipReservationHref("le coaching VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+              href={vipReservationHref("le Full Présentiel VIP", "200 € la séance, puis sur devis") ?? "/vip"}
               target="_blank"
               rel="noreferrer"
             >
@@ -286,7 +287,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
-        Abonnements mensuels sans engagement, résiliables à tout moment. Le Coaching VIP n&apos;est pas un abonnement : il se règle à la séance, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
+        Full IA est un abonnement mensuel sans engagement, résiliable à tout moment. Full Remote (abonnement mensuel) et Full Présentiel VIP (à la séance) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
       </p>
     </main>
   );

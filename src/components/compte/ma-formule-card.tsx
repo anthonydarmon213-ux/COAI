@@ -20,8 +20,8 @@ const AUTRES_PAR_FORMULE: Record<ServiceKey | "AUCUNE", ServiceKey[]> = {
 // comparer d'un coup d'œil — le détail complet reste dans ServiceDetailModal.
 const RESUME_COMPARATIF: Record<ServiceKey, string> = {
   IMPULSION: "Coach personnel autonome et adaptatif — 19,99 €/mois",
-  TRANSFORMATION: "IA 24/7 + regard et ajustements humains — 99€/mois",
-  VIP: "Séances privées avec Anthony — à domicile, en entreprise, en club ou à distance, 200 € la séance",
+  TRANSFORMATION: "Coaching individuel 1:1 à distance avec Anthony — 400 €/mois, sur devis",
+  VIP: "Séances privées avec Anthony — à domicile, en entreprise, en club ou à distance, 200 € la séance (10/mois max)",
 };
 
 // Carte "Ta formule" (16/08/2026, demande Anthony) : jusqu'ici rien sur
@@ -55,7 +55,7 @@ export function MaFormuleCard({ formuleActuelle }: { formuleActuelle: ServiceKey
           </>
         ) : (
           <p className="mt-2 text-sm leading-6 text-graphite-300">
-            Choisis ton niveau d&apos;attention : Pass IA, Coaching Hybride ou VIP.
+            Choisis ton niveau d&apos;attention : Full IA, Full Remote ou Full Présentiel VIP.
           </p>
         )}
       </div>

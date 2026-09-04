@@ -125,23 +125,19 @@ export function ServiceDetailModal({
           {tier.sessions ? (
             <>
               <div className="flex items-baseline gap-1.5">
-                <span className="font-display text-4xl font-semibold text-white">200 €</span>
-                <span className="text-sm text-graphite-400">la séance</span>
+                <span className="font-display text-4xl font-semibold text-white">{tier.prix}</span>
+                <span className="text-sm text-graphite-400">{tier.suffixe}</span>
               </div>
-              <p className="text-sm text-graphite-300">
-                À domicile, en entreprise, en club ou à distance — sans abonnement.
-              </p>
+              <p className="text-sm text-graphite-300">{tier.devisTagline}</p>
               <a
-                href={vipReservationHref("le coaching VIP", "200 € la séance, puis sur devis") ?? "/vip"}
+                href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
                 target="_blank"
                 rel="noreferrer"
                 className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
               >
                 Demander mon devis sur WhatsApp
               </a>
-              <p className="text-center text-xs text-graphite-400">
-                Facture professionnelle fournie, déductible en frais d&apos;entreprise.
-              </p>
+              <p className="text-center text-xs text-graphite-400">{tier.devisFootnote}</p>
             </>
           ) : (
             <SubscribeButton

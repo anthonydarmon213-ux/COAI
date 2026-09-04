@@ -26,6 +26,14 @@ export type Tier = {
   // l'impression d'un prix mensuel qui ne sera pas le vrai prélèvement.
   factureAnnuellement?: boolean;
   noteFacturation?: string;
+  // Bloc "sur devis" (04/09/2026, repositionnement 3 offres) : tout tier
+  // avec `sessions` défini sort du checkout en ligne et affiche ce bloc à la
+  // place (sur /pricing et dans la modale service-detail-modal.tsx). Ces
+  // trois champs remplacent l'ancien texte codé en dur ("Coaching VIP"
+  // partout) pour que le même bloc serve n'importe quel tier sur devis.
+  devisTagline?: string;
+  devisWhatsappLabel?: string;
+  devisFootnote?: string;
 };
 
 export const ENTREPRISE = {
@@ -51,16 +59,32 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
   );
 }
 
+// Repositionnement 3 offres (04/09/2026, demande Anthony — "Clarté nouveau
+// positionnement 3 choses : full ia ton prog en autonomie mon whatsapp si
+// besoin, full remote en 1:1 avec moi 400€/mois limité à 15 places, full
+// presentiel vip 200 la séance sur Paris en club limité à 10/mois"). Cible :
+// entrepreneurs 35-65 ans, forme/santé/longévité/perte de gras. V1 = copie
+// uniquement, aucun compteur de places réel (les "15 places"/"10
+// séances/mois" sont des promesses affichées, pas encore appliquées côté
+// serveur — cf. CLAUDE.md pour le suivi de la V2).
+//
+// STANDARD (ex-"Coaching Hybride", 99€/mois) est repris tel quel pour devenir
+// Full Remote plutôt que d'ajouter un 4ème PlanCode : Anthony a confirmé
+// qu'il n'y a aucun abonné actif sur ce plan, donc aucun risque d'afficher un
+// mauvais prix à un abonné existant sur /compte. Comme PREMIUM (Coaching
+// VIP) le 02/09, Full Remote sort du checkout en ligne (cf.
+// api/stripe/checkout/route.ts) et se vend sur devis via WhatsApp — décision
+// confirmée par Anthony (pas de facturation Stripe en V1).
 export const TIERS: Tier[] = [
   {
-    nom: "Pass IA",
-    eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24",
+    nom: "Full IA",
+    eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24 + WHATSAPP",
     prix: "19,99€",
     suffixe: "/mois",
     factureAnnuellement: false,
     noteFacturation: "Sans engagement · 39€ les 3 mois jusqu'au 30 septembre, ou 9,99€/mois en annuel (119€ facturés une fois par an)",
     description:
-      "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie.",
+      "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie — et mon WhatsApp en renfort si tu as besoin d'un coup de pouce.",
     // La page tarifs n'affiche que les quatre premieres : le concret passe
     // donc devant l'abstrait. Un visiteur ignorait qu'il obtient des
     // centaines de contenus deja produits, et ne lisait que des promesses
@@ -69,7 +93,7 @@ export const TIERS: Tier[] = [
       `${NB_RECETTES} recettes avec leurs macros — végétarien, vegan, sans gluten, hyper-protéiné`,
       `${NB_PROGRAMMES_PRETS} programmes prêts à suivre et ${NB_EXERCICES_FILMES} exercices filmés par Anthony`,
       "Une séance recalculée chaque jour selon ton sommeil, ta forme et ton temps",
-      "Coach IA disponible pendant ta séance, 24h/24",
+      "Coach IA disponible 24h/24, et mon WhatsApp perso si jamais tu bloques",
       "Programme ultra-personnalisé selon ton diagnostic",
       "Suivi des séances, mesures et progrès",
     ],
@@ -79,37 +103,41 @@ export const TIERS: Tier[] = [
     founderOffer: true,
   },
   {
-    nom: "Coaching Hybride",
-    eyebrow: "IA + REGARD HUMAIN",
-    prix: "99€",
+    nom: "Full Remote",
+    eyebrow: "COACHING 1:1 AVEC ANTHONY · 15 PLACES MAX",
+    prix: "400 €",
     suffixe: "/mois",
     description:
-      "La rapidité de l'IA et la subtilité d'un coach humain : le bon niveau d'attention pour progresser sans rester seul.",
+      "Un coaching individuel à distance, piloté personnellement par moi : ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
     features: [
-      "Tout l'accompagnement Pass IA",
-      "Programme relu et supervisé par un coach diplômé d'État",
-      "Retour humain sur tes progrès et tes difficultés",
-      "Ajustements en cas de plateau, gêne ou changement d'objectif",
-      "Coach IA 24h/24 entre les échanges humains",
-      "Priorité aux décisions sûres, réalistes et durables",
+      "Suivi individuel 100% avec Anthony, à distance",
+      "Programme construit et ajusté personnellement selon tes retours",
+      "Échanges réguliers sur WhatsApp pour corriger, motiver et adapter",
+      "Coach IA disponible 24h/24 en complément entre nos échanges",
+      "Priorité sur tes créneaux et tes questions",
+      "Places volontairement limitées à 15 pour garder un vrai suivi",
     ],
     plan: "STANDARD",
-    trial: true,
+    limitedSpots: true,
+    sessions: [{ count: 1, label: "Suivi individuel à distance", prix: "400 € / mois" }],
+    devisTagline: "Suivi individuel à distance, 100 % avec moi — 15 places maximum.",
+    devisWhatsappLabel: "le Full Remote (400 €/mois, coaching individuel à distance avec Anthony)",
+    devisFootnote: "Abonnement mensuel sans engagement, résiliable à tout moment. Places limitées à 15 pour garder un vrai suivi individuel.",
   },
   {
-    nom: "Coaching VIP",
-    eyebrow: "SANS ABONNEMENT · PLACES ULTRA LIMITÉES",
+    nom: "Full Présentiel VIP",
+    eyebrow: "SANS ABONNEMENT · 10 SÉANCES/MOIS MAX",
     prix: "200 €",
     suffixe: "la séance",
     description:
-      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau.",
+      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — jusqu'à 10 séances par mois.",
     features: [
       "Séances privées de Personal Training avec Anthony",
       "À domicile, en entreprise, en club ou à distance",
       "Analyse approfondie des objectifs, douleurs et contraintes",
       "Formules suivies et groupes chiffrés sur devis",
       "Facture professionnelle déductible en frais d'entreprise",
-      "Créneaux volontairement ultra limités",
+      "Créneaux volontairement limités à 10 séances par mois",
     ],
     plan: "PREMIUM",
     limitedSpots: true,
@@ -117,6 +145,9 @@ export const TIERS: Tier[] = [
       { count: 1, label: "Séance à l'unité", prix: "200 € la séance" },
       { count: 2, label: "Accompagnement suivi", prix: "sur devis" },
     ],
+    devisTagline: "À domicile, en entreprise, en club ou à distance — 10 séances par mois maximum.",
+    devisWhatsappLabel: "le Full Présentiel VIP",
+    devisFootnote: "Séances à l'unité ou suivies, sans abonnement. Facture déductible pour les entreprises.",
   },
 ];
 

@@ -35,7 +35,7 @@ const FAQ = [
   {
     question: "Est-ce que c'est juste un robot, ou un vrai coach ?",
     reponse:
-      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Coaching Hybride et en VIP, l'humain apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
+      "Les deux. L'IA reste disponible 24h/24 et adapte rapidement le programme. En Full Remote et en Full Présentiel VIP, Anthony lui-même apporte son regard, sa nuance et ses ajustements. Tu choisis le niveau d'attention dont tu as besoin.",
   },
   {
     question: "C'est adapté si je suis débutant ?",
@@ -45,7 +45,7 @@ const FAQ = [
   {
     question: "C'est payant dès le départ ?",
     reponse:
-      "Le diagnostic est offert. Ensuite, Pass IA coûte 19,99€/mois (ou 119€/an) et Coaching Hybride 99€/mois, avec 7 jours d'essai. Le Coaching VIP avec Anthony n'est pas un abonnement : 200 € la séance, puis sur devis.",
+      "Le diagnostic est offert. Ensuite, Full IA coûte 19,99€/mois (ou 119€/an), avec 7 jours d'essai. Full Remote (coaching 1:1 à distance avec Anthony, 400€/mois, 15 places max) et Full Présentiel VIP (200 € la séance, 10/mois max) se règlent sur devis, via WhatsApp.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -54,7 +54,7 @@ const FAQ = [
   {
     question: "Et si mon programme ne me convient pas ?",
     reponse:
-      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Coaching Hybride et en VIP, l'humain peut aussi intervenir pour affiner les décisions importantes.",
+      "Il évolue avec ton temps disponible, ta forme, ton sommeil, tes douleurs et tes progrès. En Full Remote et en Full Présentiel VIP, Anthony peut aussi intervenir pour affiner les décisions importantes.",
   },
   {
     question: "Mes données sont-elles en sécurité ?",
@@ -182,9 +182,9 @@ const STRUCTURED_DATA = {
       areaServed: "FR",
       description: DESCRIPTION,
       offers: [
-        { "@type": "Offer", name: "Pass IA", price: "19.99", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Coaching Hybride", price: "99", priceCurrency: "EUR" },
-        { "@type": "Offer", name: "Coaching VIP", price: "200", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Full IA", price: "19.99", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Full Remote", price: "400", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Full Présentiel VIP", price: "200", priceCurrency: "EUR" },
       ],
     },
     {
@@ -202,8 +202,8 @@ const PARCOURS_COURT = [
   ["01", "Bilan gratuit", "Moins de 5 minutes, sans carte bancaire."],
   ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
   ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
-  ["04", "Choix de la formule", "Pass IA, Coaching Hybride ou VIP."],
-  ["05", "Essai de 7 jours", "Inclus avec Pass IA et Coaching Hybride, avant le premier prélèvement."],
+  ["04", "Choix de la formule", "Full IA, Full Remote ou Full Présentiel VIP."],
+  ["05", "Essai de 7 jours", "Inclus avec Full IA, avant le premier prélèvement."],
   ["06", "Programme activé", "Entraînement, alimentation et récupération coordonnés."],
   ["07", "Première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;
@@ -262,31 +262,35 @@ export default function LandingPage() {
       </section>
 
 
-      {/* Coaching VIP : teaser court + lien vers /vip, qui porte déjà le
-          détail complet (4 modalités, tarif, WhatsApp, formulaire) — évite
-          de doubler cette page sur la home (simplification demandée par
-          Anthony suite au retour de Mickaël, 04/09/2026). */}
+      {/* Teaser court pour les deux offres avec Anthony (Full Remote,
+          Full Présentiel VIP) + lien vers /pricing, qui porte déjà le détail
+          complet des deux (tarifs, WhatsApp, formulaire) — évite de doubler
+          cette page sur la home (simplification demandée par Anthony suite
+          au retour de Mickaël, 04/09/2026 ; mis à jour le même jour pour le
+          repositionnement 3 offres Full IA / Full Remote / Full Présentiel
+          VIP). */}
       <Reveal>
       <section
-        id="coaching-vip"
+        id="coaching-anthony"
         className="mx-auto my-8 flex w-[calc(100%-2rem)] max-w-4xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/25 bg-laiton-300/[0.04] px-6 py-14 text-center sm:px-12"
-        aria-labelledby="coaching-vip-title"
+        aria-labelledby="coaching-anthony-title"
       >
-        <SectionLabel>Coaching VIP</SectionLabel>
+        <SectionLabel>Full Remote · Full Présentiel VIP</SectionLabel>
         <h2
-          id="coaching-vip-title"
+          id="coaching-anthony-title"
           className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
         >
-          Anthony te coache en personne.
+          Anthony te coache lui-même, à distance ou en personne.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
-          Chez toi, en entreprise, en club ou à distance — à partir de 200 € la séance, puis sur devis.
+          Full Remote : coaching 1:1 à distance, 400 €/mois, 15 places max. Full Présentiel VIP :
+          chez toi, en entreprise, en club ou à distance, 200 € la séance, 10/mois max. Les deux sur devis.
         </p>
         <Link
-          href="/vip"
+          href="/pricing"
           className="rounded-full bg-laiton-300 px-7 py-3.5 text-sm font-semibold text-[#0d0d0c] transition hover:bg-laiton-200"
         >
-          Découvrir le Coaching VIP
+          Découvrir les formules
         </Link>
       </section>
       </Reveal>

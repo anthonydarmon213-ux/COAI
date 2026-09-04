@@ -15,9 +15,9 @@ export type BesoinIdentifie = {
 };
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
-  IMPULSION: { label: "Pass IA — 19,99€/mois ou 119€/an", href: "/pricing#impulsion" },
-  TRANSFORMATION: { label: "Coaching Hybride — 99€/mois", href: "/pricing#transformation" },
-  VIP: { label: "Coaching VIP — 200 € la séance", href: "/pricing#vip" },
+  IMPULSION: { label: "Full IA — 19,99€/mois ou 119€/an", href: "/pricing#pass-ia" },
+  TRANSFORMATION: { label: "Full Remote — 400€/mois, sur devis", href: "/pricing#full-remote" },
+  VIP: { label: "Full Présentiel VIP — 200 € la séance", href: "/pricing#full-presentiel" },
 };
 
 function contient(valeur: string | null | undefined, motif: string): boolean {
@@ -92,13 +92,13 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
   if (profile.coachPreference === "VIP_PRESENTIEL") {
     besoins.push({
       besoin: "Tu recherches un coaching privé en présentiel",
-      explication: "L'offre VIP te permet d'être accompagné directement par Anthony avec un suivi très personnalisé.",
+      explication: "Le Full Présentiel VIP te permet d'être accompagné directement par Anthony avec un suivi très personnalisé.",
       service: "VIP",
     });
   } else if (profile.coachPreference === "HYBRIDE") {
     besoins.push({
       besoin: "Tu veux combiner IA et expertise humaine",
-      explication: "Coaching Hybride associe un programme évolutif à la validation et aux ajustements d'un coach diplômé.",
+      explication: "Le Full Remote associe un suivi individuel avec Anthony à distance et le Coach IA entre vos échanges.",
       service: "TRANSFORMATION",
     });
   } else if (profile.coachPreference === "FULL_IA") {

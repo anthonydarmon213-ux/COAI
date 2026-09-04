@@ -192,7 +192,7 @@ export default async function AbonnementPage() {
           </span>
           <Badge tone="warning">Places limitées</Badge>
         </div>
-        <h2 className="text-lg font-semibold text-graphite-50">Coaching VIP avec Anthony Darmon</h2>
+        <h2 className="text-lg font-semibold text-graphite-50">Full Présentiel VIP avec Anthony Darmon</h2>
         <p className="text-sm text-graphite-300">{TIER_BY_SERVICE.VIP.description}</p>
 
         {TIER_BY_SERVICE.VIP.sessions && (
