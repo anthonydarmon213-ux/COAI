@@ -28,6 +28,18 @@ export default function EntreprisePage() {
             <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-white sm:text-6xl">Des équipes en meilleure forme. Une entreprise plus performante.</h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-graphite-300">COAI personnalise l&apos;entraînement, la nutrition et la récupération de chaque collaborateur, tout en donnant à l&apos;entreprise une vision claire de l&apos;engagement — jamais des données de santé individuelles.</p>
 
+            {/* Preuve ajoutee le 04/09/2026 (demande Anthony : « tu peux
+                rajouter des centaines d'entrepreneurs accompagnes »).
+                Formulation volontairement sans chiffre exact ni date de
+                depart — Anthony a choisi de garder « des centaines » plutot
+                que de donner un nombre precis a justifier, et je n'invente
+                pas de date de debut : « 17 ans d'experience » concerne le
+                coaching en general, pas necessairement le meme point de
+                depart que l'accompagnement d'entrepreneurs specifiquement. */}
+            <p className="mt-5 font-mono text-xs uppercase tracking-[0.14em] text-laiton-300">
+              Des centaines d&apos;entrepreneurs et dirigeants accompagnés
+            </p>
+
             <div className="mt-10 rounded-2xl border border-white/[0.09] bg-white/[0.035] p-6 sm:p-7">
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Pour vous, dirigeant(e)</p>
               <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">Commencez dès aujourd&apos;hui, sans attendre le déploiement de l&apos;offre équipe.</h2>
