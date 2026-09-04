@@ -141,6 +141,13 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
               {TIER_BY_SERVICE.VIP.eyebrow}
             </p>
+            {/* Nom de l'offre ajoute le 04/09/2026 : cette carte n'affichait
+                que son sur-titre puis le prix, jamais « VIP Presentiel ».
+                Passable tant qu'elle fermait la page apres les deux autres
+                cartes nommees ; intenable maintenant qu'elle l'ouvre — le
+                visiteur tombait sur 1 200 EUR sans savoir de quelle offre il
+                s'agit. Meme niveau de titre que les deux autres cartes. */}
+            <h2 className="mt-2 text-3xl font-semibold text-white">{TIER_BY_SERVICE.VIP.nom}</h2>
             <div className="mt-3 flex items-baseline gap-1.5">
               <span className="font-display text-4xl font-semibold text-white">{TIER_BY_SERVICE.VIP.prix}</span>
               <span className="text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.suffixe}</span>
