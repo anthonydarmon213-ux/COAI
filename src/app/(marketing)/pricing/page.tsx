@@ -27,10 +27,11 @@ function tierId(plan: string) {
   return "full-presentiel";
 }
 
+// Ordre humain -> IA (04/09/2026, cf. commentaire sur la carte VIP plus bas).
 const COMPARAISON_RAPIDE = [
-  ["Standard IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
-  ["Premium Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
   ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
+  ["Premium Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
+  ["Standard IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
 ] as const;
 
 export const metadata: Metadata = {
@@ -119,8 +120,71 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       <CompteAReboursRentree className="w-full max-w-5xl" />
 
+      {/* Ordre inverse le 04/09/2026 (demande Anthony : « mets l'accent sur
+          l'humain d'abord, et si la personne n'a pas les moyens, guide-la
+          vers l'IA »). La page listait les offres du moins cher au plus cher,
+          donc l'IA en premier : le visiteur voyait l'offre sans coach avant
+          d'avoir vu Anthony. VIP Presentiel ouvre desormais la page, Standard
+          IA ferme la marche comme porte d'entree. */}
+      {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
+          la grille des abonnements et devient une carte a part, conclue sur
+          WhatsApp — comme Full Remote (cf. tier.sessions plus haut). Tarif
+          entreprise (200 €/séance) volontairement absent d'ici (04/09/2026,
+          décision Anthony) : seul le tarif particulier (100 €) est public,
+          l'entreprise reste sur devis via WhatsApp. Prix affiché = total du
+          pack 3 mois, pas le prix/séance (même jour, "on ne vend pas des
+          séances on vend une transformation") — champs repris directement de
+          TIER_BY_SERVICE.VIP pour ne jamais diverger de tiers.ts. */}
+      <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
+              {TIER_BY_SERVICE.VIP.eyebrow}
+            </p>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="font-display text-4xl font-semibold text-white">{TIER_BY_SERVICE.VIP.prix}</span>
+              <span className="text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.suffixe}</span>
+            </div>
+            {TIER_BY_SERVICE.VIP.noteFacturation && (
+              <p className="mt-1 text-xs text-graphite-500">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
+            )}
+            <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
+              Séances privées avec Anthony, à domicile, en entreprise, en club ou à
+              distance — environ 1 séance par semaine. Tarif entreprise et accompagnements
+              suivis sur devis.
+            </p>
+            <p className="mt-2 text-sm text-laiton-200">
+              Facture professionnelle fournie, déductible en frais d&apos;entreprise.
+            </p>
+          </div>
+          <div className="shrink-0 space-y-2">
+            <a
+              className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
+              href={vipReservationHref(TIER_BY_SERVICE.VIP.devisWhatsappLabel ?? TIER_BY_SERVICE.VIP.nom, TIER_BY_SERVICE.VIP.devisPriceLabel ?? `${TIER_BY_SERVICE.VIP.prix} ${TIER_BY_SERVICE.VIP.suffixe}`) ?? "/vip"}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Demander mon devis sur WhatsApp
+            </a>
+            {TIER_BY_SERVICE.VIP.devisSecondaryCta && (
+              <a
+                className="flex items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-7 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
+                href={buildWhatsAppLink(TIER_BY_SERVICE.VIP.devisSecondaryCta.whatsappMessage) ?? "/vip"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {TIER_BY_SERVICE.VIP.devisSecondaryCta.label}
+              </a>
+            )}
+            <p className="text-center text-[11px] text-graphite-500">
+              Réponse directe · places extrêmement limitées
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
-        {TIERS.filter((tier) => tier.plan !== "PREMIUM").map((tier) => (
+        {[...TIERS.filter((tier) => tier.plan !== "PREMIUM")].reverse().map((tier) => (
           <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
@@ -260,62 +324,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         <p className="mt-1 text-xs text-graphite-400">Standard IA : 7 jours d&apos;essai avant le premier prélèvement. Premium Remote et VIP Présentiel se règlent sur devis, via WhatsApp — packs 3 ou 6 mois uniquement, pas de séance isolée en dehors de l&apos;essai.</p>
       </div>
 
-      {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
-          la grille des abonnements et devient une carte a part, conclue sur
-          WhatsApp — comme Full Remote (cf. tier.sessions plus haut). Tarif
-          entreprise (200 €/séance) volontairement absent d'ici (04/09/2026,
-          décision Anthony) : seul le tarif particulier (100 €) est public,
-          l'entreprise reste sur devis via WhatsApp. Prix affiché = total du
-          pack 3 mois, pas le prix/séance (même jour, "on ne vend pas des
-          séances on vend une transformation") — champs repris directement de
-          TIER_BY_SERVICE.VIP pour ne jamais diverger de tiers.ts. */}
-      <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
-              {TIER_BY_SERVICE.VIP.eyebrow}
-            </p>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="font-display text-4xl font-semibold text-white">{TIER_BY_SERVICE.VIP.prix}</span>
-              <span className="text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.suffixe}</span>
-            </div>
-            {TIER_BY_SERVICE.VIP.noteFacturation && (
-              <p className="mt-1 text-xs text-graphite-500">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
-            )}
-            <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
-              Séances privées avec Anthony, à domicile, en entreprise, en club ou à
-              distance — environ 1 séance par semaine. Tarif entreprise et accompagnements
-              suivis sur devis.
-            </p>
-            <p className="mt-2 text-sm text-laiton-200">
-              Facture professionnelle fournie, déductible en frais d&apos;entreprise.
-            </p>
-          </div>
-          <div className="shrink-0 space-y-2">
-            <a
-              className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
-              href={vipReservationHref(TIER_BY_SERVICE.VIP.devisWhatsappLabel ?? TIER_BY_SERVICE.VIP.nom, TIER_BY_SERVICE.VIP.devisPriceLabel ?? `${TIER_BY_SERVICE.VIP.prix} ${TIER_BY_SERVICE.VIP.suffixe}`) ?? "/vip"}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Demander mon devis sur WhatsApp
-            </a>
-            {TIER_BY_SERVICE.VIP.devisSecondaryCta && (
-              <a
-                className="flex items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-7 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
-                href={buildWhatsAppLink(TIER_BY_SERVICE.VIP.devisSecondaryCta.whatsappMessage) ?? "/vip"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {TIER_BY_SERVICE.VIP.devisSecondaryCta.label}
-              </a>
-            )}
-            <p className="text-center text-[11px] text-graphite-500">
-              Réponse directe · places extrêmement limitées
-            </p>
-          </div>
-        </div>
-      </div>
 
       <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
         Standard IA est un abonnement mensuel sans engagement, résiliable à tout moment. Premium Remote et VIP Présentiel (packs de séances engagés 3 ou 6 mois, payés en une fois) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.

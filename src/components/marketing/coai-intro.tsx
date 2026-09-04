@@ -49,11 +49,15 @@ export function CoaiIntro() {
         </p>
 
         <div className="mt-10">
-          <Link href="/diagnostic">
-            <Button className="px-10 py-5 text-sm font-extrabold uppercase tracking-[0.07em] shadow-[0_0_60px_-8px_rgba(201,162,98,.85)] sm:text-base">
-              Faire mon bilan offert →
-            </Button>
-          </Link>
+          {/* coai-cta-glow : halo laiton qui respire autour du bouton
+              (cf. globals.css) — reprend l'effet de charlesdenis.fr. */}
+          <span className="coai-cta-glow">
+            <Link href="/diagnostic">
+              <Button className="px-10 py-5 text-sm font-extrabold uppercase tracking-[0.07em] sm:text-base">
+                Faire mon bilan forme offert →
+              </Button>
+            </Link>
+          </span>
           <p className="mt-4 text-xs text-graphite-500">
             Moins de 5 minutes · résultat immédiat · aucune carte bancaire
           </p>

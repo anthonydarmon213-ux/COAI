@@ -2062,3 +2062,45 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .coai-silhouette-flip { transition: none; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Halo pulsant du bouton principal du hero (04/09/2026, demande        */
+/* Anthony : « je veux un effet comme lui sur le bouton CTA »).         */
+/* charlesdenis.fr fait respirer un halo rouge diffus autour de son     */
+/* bouton — c'est ce qui accroche l'oeil en premier sur sa page.        */
+/* Version COAI : meme respiration, en laiton.                          */
+/*                                                                      */
+/* Le halo est porte par un ::after separe plutot que par le box-shadow */
+/* du bouton : le composant Button utilise deja box-shadow, et animer   */
+/* un box-shadow force le navigateur a repeindre a chaque frame. Un     */
+/* pseudo-element flou anime en opacity/transform reste sur le GPU.     */
+/* isolation:isolate cree un contexte d'empilement local, sinon le      */
+/* z-index:-1 ferait passer le halo derriere le fond de la section.     */
+.coai-cta-glow {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.coai-cta-glow::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: 9999px;
+  background: rgba(201, 162, 98, 0.6);
+  filter: blur(20px);
+  animation: coai-cta-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes coai-cta-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.97); }
+  50% { opacity: 0.95; transform: scale(1.06); }
+}
+
+/* Accessibilite : une animation qui ne s'arrete jamais est desagreable,  */
+/* voire nauseeuse, pour les personnes sensibles au mouvement. Le halo    */
+/* reste, il ne respire plus.                                            */
+@media (prefers-reduced-motion: reduce) {
+  .coai-cta-glow::after { animation: none; opacity: 0.55; }
+}
