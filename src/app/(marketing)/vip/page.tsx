@@ -4,10 +4,11 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { VipApplicationForm } from "@/components/marketing/vip-application-form";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { TIER_BY_SERVICE } from "@/lib/pricing/tiers";
 
 export const metadata: Metadata = {
   title: "Full Présentiel VIP — À domicile, en entreprise, en club ou à distance",
-  description: "Full Présentiel VIP avec Anthony Darmon, 100 € la séance (pack 3 ou 6 mois), tarif entreprise sur devis : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
+  description: "Full Présentiel VIP avec Anthony Darmon, 1 200 € le pack 3 mois minimum (soit 100 €/séance), tarif entreprise sur devis : à domicile, en entreprise, en club ou à distance. Entraînement, nutrition, récupération et suivi COAI quotidien.",
   alternates: { canonical: "/vip" },
 };
 
@@ -68,12 +69,19 @@ export default function VipPage() {
               <p className="mt-3 text-sm text-graphite-400">Anthony Darmon · 17 ans d&apos;expérience terrain</p>
             </div>
 
+            {/* Prix affiché = total du pack 3 mois minimum, pas le prix/séance
+                (04/09/2026, "on ne vend pas des séances on vend une
+                transformation") — repris de TIER_BY_SERVICE.VIP pour ne
+                jamais diverger de tiers.ts. */}
             <div className="mt-10 flex items-end gap-3">
-              <span className="font-display text-4xl font-semibold text-white">100 € la séance</span>
-              <span className="pb-1 text-sm text-graphite-500">pack 3 ou 6 mois</span>
+              <span className="font-display text-4xl font-semibold text-white">{TIER_BY_SERVICE.VIP.prix}</span>
+              <span className="pb-1 text-sm text-graphite-500">{TIER_BY_SERVICE.VIP.suffixe}</span>
             </div>
-            <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise. Tarif entreprise sur devis.</p>
-            <p className="mt-1 text-sm text-graphite-400">Environ 1 séance par semaine, pour un suivi vraiment personnalisé. Nombre de nouveaux accompagnements volontairement limité.</p>
+            {TIER_BY_SERVICE.VIP.noteFacturation && (
+              <p className="mt-1 text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
+            )}
+            <p className="mt-2 text-sm text-laiton-200">Facture professionnelle fournie, déductible en frais d&apos;entreprise.</p>
+            <p className="mt-1 text-sm text-graphite-400">Nombre de nouveaux accompagnements volontairement limité. Pas de séance isolée en dehors de l&apos;essai ci-contre.</p>
             <a href="#candidature" className="mt-6 inline-flex rounded-full bg-laiton-400 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.05em] text-graphite-950 transition hover:bg-laiton-300 lg:hidden">
               Demander mon devis
             </a>
@@ -89,6 +97,19 @@ export default function VipPage() {
                 className="mb-5 flex min-h-14 w-full items-center justify-center rounded-full border border-[#70c989]/40 bg-[#1f7a43] px-6 py-4 text-center text-sm font-extrabold uppercase tracking-[0.04em] text-white shadow-[0_18px_45px_-22px_rgba(37,211,102,.7)] transition hover:-translate-y-0.5 hover:bg-[#176b39]"
               >
                 Échanger directement avec Anthony sur WhatsApp →
+              </a>
+            )}
+            {/* Séance d'essai (04/09/2026) : seule exception à "pas de vente
+                à la séance" — payante, déduite du pack si la personne
+                enchaîne. Repris de TIER_BY_SERVICE.VIP.devisSecondaryCta. */}
+            {TIER_BY_SERVICE.VIP.devisSecondaryCta && (
+              <a
+                href={buildWhatsAppLink(TIER_BY_SERVICE.VIP.devisSecondaryCta.whatsappMessage) ?? "/vip"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-5 flex min-h-14 w-full items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-6 py-4 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
+              >
+                {TIER_BY_SERVICE.VIP.devisSecondaryCta.label}
               </a>
             )}
             <p className="mb-5 text-center text-xs leading-5 text-graphite-400">

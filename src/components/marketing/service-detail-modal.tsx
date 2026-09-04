@@ -129,6 +129,7 @@ export function ServiceDetailModal({
                 <span className="font-display text-4xl font-semibold text-white">{tier.prix}</span>
                 <span className="text-sm text-graphite-400">{tier.suffixe}</span>
               </div>
+              {tier.noteFacturation && <p className="text-xs leading-5 text-graphite-500">{tier.noteFacturation}</p>}
               <p className="text-sm text-graphite-300">{tier.devisTagline}</p>
               <a
                 href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, tier.devisPriceLabel ?? `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}

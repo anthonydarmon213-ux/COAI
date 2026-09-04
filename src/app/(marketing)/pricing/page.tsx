@@ -10,7 +10,7 @@ import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
-import { TIERS, vipReservationHref } from "@/lib/pricing/tiers";
+import { TIERS, TIER_BY_SERVICE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 type PricingSearchParams = {
@@ -29,8 +29,8 @@ function tierId(plan: string) {
 
 const COMPARAISON_RAPIDE = [
   ["Full IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
-  ["Full Remote", "Je veux un coaching 1:1 à distance", "80 €/séance, pack 3 ou 6 mois"],
-  ["Full Présentiel VIP", "Je veux une attention maximale", "100 €/séance, pack 3 ou 6 mois"],
+  ["Full Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
+  ["Full Présentiel VIP", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
 ] as const;
 
 export const metadata: Metadata = {
@@ -257,7 +257,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
-        <p className="mt-1 text-xs text-graphite-400">Full IA : 7 jours d&apos;essai avant le premier prélèvement. Full Remote et Full Présentiel VIP se règlent sur devis, via WhatsApp.</p>
+        <p className="mt-1 text-xs text-graphite-400">Full IA : 7 jours d&apos;essai avant le premier prélèvement. Full Remote et Full Présentiel VIP se règlent sur devis, via WhatsApp — packs 3 ou 6 mois uniquement, pas de séance isolée en dehors de l&apos;essai.</p>
       </div>
 
       {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
@@ -265,17 +265,23 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           WhatsApp — comme Full Remote (cf. tier.sessions plus haut). Tarif
           entreprise (200 €/séance) volontairement absent d'ici (04/09/2026,
           décision Anthony) : seul le tarif particulier (100 €) est public,
-          l'entreprise reste sur devis via WhatsApp. */}
+          l'entreprise reste sur devis via WhatsApp. Prix affiché = total du
+          pack 3 mois, pas le prix/séance (même jour, "on ne vend pas des
+          séances on vend une transformation") — champs repris directement de
+          TIER_BY_SERVICE.VIP pour ne jamais diverger de tiers.ts. */}
       <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
-              Full Présentiel VIP · pack 3 ou 6 mois
+              {TIER_BY_SERVICE.VIP.eyebrow}
             </p>
             <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="font-display text-4xl font-semibold text-white">100 €</span>
-              <span className="text-sm text-graphite-400">la séance, pack 3 ou 6 mois</span>
+              <span className="font-display text-4xl font-semibold text-white">{TIER_BY_SERVICE.VIP.prix}</span>
+              <span className="text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.suffixe}</span>
             </div>
+            {TIER_BY_SERVICE.VIP.noteFacturation && (
+              <p className="mt-1 text-xs text-graphite-500">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
+            )}
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
               Séances privées avec Anthony, à domicile, en entreprise, en club ou à
               distance — environ 1 séance par semaine. Tarif entreprise et formules
@@ -285,16 +291,26 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               Facture professionnelle fournie, déductible en frais d&apos;entreprise.
             </p>
           </div>
-          <div className="shrink-0">
+          <div className="shrink-0 space-y-2">
             <a
               className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
-              href={vipReservationHref("le Full Présentiel VIP", "100 € / séance (pack 3 ou 6 mois)") ?? "/vip"}
+              href={vipReservationHref(TIER_BY_SERVICE.VIP.devisWhatsappLabel ?? TIER_BY_SERVICE.VIP.nom, TIER_BY_SERVICE.VIP.devisPriceLabel ?? `${TIER_BY_SERVICE.VIP.prix} ${TIER_BY_SERVICE.VIP.suffixe}`) ?? "/vip"}
               target="_blank"
               rel="noreferrer"
             >
               Demander mon devis sur WhatsApp
             </a>
-            <p className="mt-2 text-center text-[11px] text-graphite-500">
+            {TIER_BY_SERVICE.VIP.devisSecondaryCta && (
+              <a
+                className="flex items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-7 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
+                href={buildWhatsAppLink(TIER_BY_SERVICE.VIP.devisSecondaryCta.whatsappMessage) ?? "/vip"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {TIER_BY_SERVICE.VIP.devisSecondaryCta.label}
+              </a>
+            )}
+            <p className="text-center text-[11px] text-graphite-500">
               Réponse directe · places limitées
             </p>
           </div>

@@ -40,8 +40,13 @@ const offresParPlan = () => ({
 // Tarifs precises/revus le 04/09/2026 (meme journee) : les deux passent
 // d'un prix fixe a un tarif par seance en pack engage 3 ou 6 mois — Full
 // Remote 80€/seance, Full Presentiel VIP 100€/seance particulier (200€/
-// seance entreprise, jamais affiche publiquement, sur devis uniquement) —
-// cf. src/lib/pricing/tiers.ts pour le detail complet de la decision.
+// seance entreprise, jamais affiche publiquement, sur devis uniquement).
+// Reaffine encore le meme jour ("on ne vend pas des seances on vend une
+// transformation") : le prix mis en avant devient le total du pack 3 mois
+// minimum (960€ Full Remote, 1 200€ VIP), le prix/seance passe en detail —
+// et une seule seance d'essai payante (deduite du pack) reste possible, plus
+// aucune vente a la seance en dehors de ce cas. Cf. src/lib/pricing/tiers.ts
+// pour le detail complet de la decision.
 
 type Plan = keyof ReturnType<typeof offresParPlan>;
 
@@ -57,13 +62,13 @@ export async function POST(request: Request) {
   // qu'un client facture pour un plan qu'il n'a pas choisi.
   if (body.plan === "PREMIUM") {
     return NextResponse.json(
-      { error: "Le Full Présentiel VIP ne se souscrit plus en ligne : 100 €/séance (pack 3 ou 6 mois), sur devis via WhatsApp." },
+      { error: "Le Full Présentiel VIP ne se souscrit plus en ligne : à partir de 1 200 € le pack 3 mois minimum, sur devis via WhatsApp." },
       { status: 400 }
     );
   }
   if (body.plan === "STANDARD") {
     return NextResponse.json(
-      { error: "Le Full Remote ne se souscrit plus en ligne : 80 €/séance (pack 3 ou 6 mois), sur devis via WhatsApp." },
+      { error: "Le Full Remote ne se souscrit plus en ligne : à partir de 960 € le pack 3 mois minimum, sur devis via WhatsApp." },
       { status: 400 }
     );
   }

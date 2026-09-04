@@ -44,10 +44,10 @@ export type Tier = {
   // fixe (pas de "puis sur devis" pour un prix qui ne varie pas) — ce champ
   // permet de le remplacer entièrement quand c'est le cas.
   devisPriceLabel?: string;
-  // Second CTA du bloc "sur devis" (04/09/2026, Full Remote uniquement,
-  // demande Anthony : proposer un appel visio avant de signer, en plus de
-  // la possibilité de souscrire tout de suite). Absent = un seul CTA
-  // ("Demander mon devis sur WhatsApp"), comme pour Full Présentiel VIP.
+  // Second CTA du bloc "sur devis" (04/09/2026, Full Remote uniquement au
+  // départ ; repurposé le même jour pour Full Remote + Full Présentiel VIP
+  // — cf. note "Vendre une transformation, pas des séances" plus bas).
+  // Absent = un seul CTA ("Demander mon devis sur WhatsApp").
   devisSecondaryCta?: { label: string; whatsappMessage: string };
 };
 
@@ -132,6 +132,28 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
 // - `PlanCode` (`STANDARD`/`PREMIUM`) et le fonctionnement "sur devis via
 //   WhatsApp, jamais de Stripe" restent inchangés — seul le mode de calcul
 //   du prix affiché change (par séance × pack, plutôt qu'un forfait unique).
+//
+// "Vendre une transformation, pas des séances" (04/09/2026, même jour,
+// retour Anthony après relecture de la mise en avant du prix/séance
+// ci-dessus — "on ne vend pas des séances on vend une transformation").
+// Reprise du cadrage de Full Remote / Full Présentiel VIP, quelques heures
+// après la version "prix/séance" ci-dessus :
+// - Le gros prix affiché (`prix`/`suffixe`) devient le total du pack 3 mois
+//   (le minimum, ex. "960 €" / "pack 3 mois minimum"), plus l'offre phare —
+//   le prix à la séance et l'option 6 mois passent en détail secondaire
+//   (`noteFacturation`, même usage que pour Pass IA : gros chiffre =
+//   repère principal, petit texte = le détail exact).
+// - Explicitement interdit : vendre du "one-shot" (une séance isolée, sans
+//   engagement). La seule exception est la séance d'essai ci-dessous.
+// - Séance d'essai (nouveau) : une seule séance, payante au tarif normal
+//   (80 €/100 €), pour tester avant de s'engager — déduite du prix du pack
+//   si la personne enchaîne sur 3 ou 6 mois derrière. Remplace le bouton
+//   "réserver un appel visio avant de signer" ajouté plus tôt le même jour
+//   (`devisSecondaryCta`, même champ réutilisé) : Anthony a tranché pour la
+//   séance d'essai plutôt que les deux options, jugeant l'essai plus
+//   concret qu'un simple appel. Ce même schéma (essai payant déductible +
+//   pas de one-shot) s'applique désormais aux deux tiers, alors que le
+//   bouton visio précédent n'existait que sur Full Remote.
 export const TIERS: Tier[] = [
   {
     nom: "Full IA",
@@ -162,10 +184,11 @@ export const TIERS: Tier[] = [
   {
     nom: "Full Remote",
     eyebrow: "COACHING 1:1 AVEC ANTHONY · 15 PLACES MAX",
-    prix: "80 €",
-    suffixe: "/ séance",
+    prix: "960 €",
+    suffixe: "/ pack 3 mois minimum",
+    noteFacturation: "Soit 80 €/séance, environ 1 séance par semaine. Pack 6 mois : 1 920 € (même tarif à la séance).",
     description:
-      "Un coaching individuel à distance, piloté personnellement par moi — 80 € la séance, environ 1 séance par semaine, en pack engagé de 3 ou 6 mois payé en une fois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
+      "Une transformation encadrée personnellement par moi, à distance, sur un engagement minimum de 3 mois (ou 6 pour aller plus loin) — payé en une fois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
     features: [
       "Suivi individuel 100% avec Anthony, à distance",
       "Programme construit et ajusté personnellement selon tes retours",
@@ -177,28 +200,31 @@ export const TIERS: Tier[] = [
     plan: "STANDARD",
     limitedSpots: true,
     sessions: [
-      { count: 3, label: "Pack 3 mois (~12 séances, 1/semaine)", prix: "80 € / séance · 960 € au total" },
-      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "80 € / séance · 1 920 € au total" },
+      { count: 3, label: "Pack 3 mois minimum (~12 séances, 1/semaine)", prix: "960 € au total (soit 80 €/séance)" },
+      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "1 920 € au total (soit 80 €/séance)" },
     ],
-    devisTagline: "Suivi individuel à distance, 100 % avec moi — 80 €/séance, environ 1 séance par semaine, pack 3 ou 6 mois au choix. 15 places maximum.",
+    devisTagline: "Une transformation encadrée par moi à distance — pack 3 mois minimum (960 €) ou 6 mois (1 920 €), payé en une fois. 15 places maximum.",
     devisWhatsappLabel: "le Full Remote",
-    devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel.",
-    devisPriceLabel: "80 € / séance (pack 3 ou 6 mois, payé en une fois)",
-    // Demande Anthony (04/09/2026) : proposer un appel visio avant de
-    // signer pour qui en a besoin, sans bloquer qui veut souscrire tout de
-    // suite — les deux CTA restent visibles, au choix.
+    devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel. Pas de séance isolée en dehors de l'essai.",
+    devisPriceLabel: "960 € pour 3 mois minimum (ou 1 920 € pour 6 mois)",
+    // Séance d'essai (04/09/2026, remplace le bouton "appel visio avant de
+    // signer" ajouté plus tôt le même jour — décision Anthony : "on ne vend
+    // pas des séances on vend une transformation", donc pas de vente à
+    // l'unité en dehors de cette unique séance test, déduite du pack si la
+    // personne enchaîne).
     devisSecondaryCta: {
-      label: "Réserver un appel visio avant de signer",
-      whatsappMessage: "Bonjour Anthony, avant de m'engager sur Full Remote (80 €/séance), je voudrais d'abord un appel visio avec toi.",
+      label: "Réserver ma séance d'essai (80 €, déduite si je continue)",
+      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour Full Remote (80 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
     },
   },
   {
     nom: "Full Présentiel VIP",
     eyebrow: "SÉANCES PRIVÉES AVEC ANTHONY · PACK 3 OU 6 MOIS",
-    prix: "100 €",
-    suffixe: "/ séance",
+    prix: "1 200 €",
+    suffixe: "/ pack 3 mois minimum",
+    noteFacturation: "Soit 100 €/séance, environ 1 séance par semaine. Pack 6 mois : 2 400 € (même tarif à la séance). Tarif entreprise sur devis.",
     description:
-      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — 100 € la séance, environ 1 séance par semaine, en pack engagé de 3 ou 6 mois payé en une fois.",
+      "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — une transformation encadrée en présentiel, sur un engagement minimum de 3 mois (ou 6 mois), payé en une fois.",
     features: [
       "Séances privées de Personal Training avec Anthony",
       "À domicile, en entreprise, en club ou à distance",
@@ -210,16 +236,23 @@ export const TIERS: Tier[] = [
     plan: "PREMIUM",
     limitedSpots: true,
     sessions: [
-      { count: 3, label: "Pack 3 mois (~12 séances, 1/semaine)", prix: "100 € / séance · 1 200 € au total" },
-      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "100 € / séance · 2 400 € au total" },
+      { count: 3, label: "Pack 3 mois minimum (~12 séances, 1/semaine)", prix: "1 200 € au total (soit 100 €/séance)" },
+      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "2 400 € au total (soit 100 €/séance)" },
     ],
     // Tarif entreprise (200 €/séance) volontairement absent de tout texte
     // public (décision Anthony, 04/09/2026) : communiqué uniquement sur
     // devis via WhatsApp, jamais affiché en chiffres sur le site.
-    devisTagline: "À domicile, en entreprise, en club ou à distance — 100 €/séance, environ 1 séance par semaine, pack 3 ou 6 mois. Tarif entreprise sur devis.",
+    devisTagline: "Une transformation encadrée par moi en présentiel — pack 3 mois minimum (1 200 €) ou 6 mois (2 400 €), payé en une fois. Tarif entreprise sur devis.",
     devisWhatsappLabel: "le Full Présentiel VIP",
-    devisFootnote: "Pack payé en une fois à la signature. Tarif entreprise (facture déductible) sur devis.",
-    devisPriceLabel: "100 € / séance (pack 3 ou 6 mois, payé en une fois)",
+    devisFootnote: "Pack payé en une fois à la signature. Tarif entreprise (facture déductible) sur devis. Pas de séance isolée en dehors de l'essai.",
+    devisPriceLabel: "1 200 € pour 3 mois minimum (ou 2 400 € pour 6 mois)",
+    // Séance d'essai (04/09/2026) : même logique que Full Remote ci-dessus —
+    // une seule séance test, payante, déduite du pack si la personne
+    // enchaîne. Pas de vente à la séance en dehors de ce cas.
+    devisSecondaryCta: {
+      label: "Réserver ma séance d'essai (100 €, déduite si je continue)",
+      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour Full Présentiel VIP (100 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
+    },
   },
 ];
 

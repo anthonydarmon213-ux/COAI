@@ -147,6 +147,43 @@ inchangés ; `Tier.sessions[].count` élargi de `1|2|3|4` à `1|2|3|4|6` (champ
 jamais affiché, seulement `.label`/`.prix` le sont côté UI — vérifié dans
 `compte/abonnement/page.tsx`, seul endroit qui itère sur `sessions`).
 
+**"On ne vend pas des séances, on vend une transformation" (04/09/2026,
+quelques heures après le repositionnement ci-dessus, nouveau retour
+d'Anthony)** : deuxième ajustement le même jour sur Full Remote et Full
+Présentiel VIP, décidé via 2 questions de clarification (le prix mis en
+avant, et le sort du bouton "appel visio").
+- **Prix mis en avant = total du pack 3 mois minimum** (960 € Full Remote,
+  1 200 € VIP particulier), plus le prix/séance affiché en gros — le
+  prix/séance (80 €/100 €) et l'option 6 mois passent en détail secondaire
+  (`Tier.noteFacturation`, même champ/usage que pour Pass IA). Avant cet
+  ajustement, `prix`/`suffixe` affichaient encore "80 €/séance" — resté en
+  place moins d'une heure.
+- **Interdiction explicite de vendre du "one-shot"** (une séance isolée
+  sans engagement) — seule exception : une **séance d'essai**, payante au
+  tarif normal (80 €/100 €), **déduite du prix du pack** si la personne
+  enchaîne sur 3 ou 6 mois. S'applique aux deux tiers (avant, seul Full
+  Remote avait un 2ème CTA).
+- Le bouton "réserver un appel visio avant de signer" (ajouté plus tôt le
+  même jour, Full Remote uniquement) est **remplacé** par "Réserver ma
+  séance d'essai (déduite si je continue)" — Anthony a tranché pour l'essai
+  plutôt que les deux options, jugé plus concret. Même champ de données
+  réutilisé (`Tier.devisSecondaryCta`), désormais renseigné aussi sur Full
+  Présentiel VIP (qui n'avait aucun 2ème CTA avant).
+
+Implémentation : `tiers.ts` (les deux tiers), répercuté sur `/pricing`
+(comparatif rapide + carte standalone VIP, désormais lue directement depuis
+`TIER_BY_SERVICE.VIP` au lieu d'un texte codé en dur — évite que cette carte
+diverge de `tiers.ts` à la prochaine évolution tarifaire), `/vip` (idem, lu
+depuis `TIER_BY_SERVICE.VIP`, + bouton essai ajouté dans la sidebar sticky),
+`service-detail-modal.tsx` (ajout de l'affichage de `noteFacturation` dans
+la branche `tier.sessions`, absent jusqu'ici), home (FAQ, structured data,
+teaser), `ma-formule-card.tsx`, `besoins-identifies.ts`, messages d'erreur
+`checkout/route.ts`. Non touché intentionnellement : `vip-application-form.tsx`
+a un champ "niveau d'investissement" (2 500 à 4 000 € / 4 000 à 7 000 € /
+7 000 €+) nettement au-dessus des nouveaux totaux de pack (960-2 400 €) —
+incohérence pré-existante repérée en passant, pas dans le périmètre demandé
+par Anthony aujourd'hui, à clarifier avec lui séparément si besoin.
+
 ## Simplification de la home (04/09/2026)
 
 Anthony a reçu un retour d'un proche (Mickaël, capture WhatsApp) : la home et
