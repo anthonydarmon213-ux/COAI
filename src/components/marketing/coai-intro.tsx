@@ -1,160 +1,119 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const BENEFICES = [
-  "Le coach quotidien « Aujourd'hui » : tu sais quoi faire, sans chercher",
-  "Une IA explicable — tu sais toujours pourquoi ta séance a changé",
-  "Le Coach IA disponible pendant ta séance, dans le contexte exact de ton exercice",
-  "Validation humaine selon ton accompagnement : l'humain garde le dernier mot quand ça compte",
-];
-
+// Hero refondu le 04/09/2026 (demande Anthony : « je veux qu'on change notre
+// landing pour faire comme charlesdenis.fr — moins de blabla, simple,
+// efficace, mets ma photo sous le hero comme lui »).
+//
+// Ancien hero : photo en fond + carte sombre par-dessus contenant l'accroche,
+// une phrase de positionnement, un paragraphe de 3 lignes, 4 bénéfices à
+// puces, 2 boutons, 4 preuves chiffrées et une ligne clubs. Soit ~12 blocs de
+// texte avant le premier scroll — le visiteur devait lire pour comprendre.
+//
+// Nouveau hero, structure charlesdenis.fr : sur-titre de ciblage → accroche
+// géante centrée → UNE phrase de méthode → UN bouton → preuve → photo réelle
+// juste en dessous. 5 éléments, lisibles en 3 secondes.
+//
+// Ce qui a été retiré du hero (et non supprimé du site) : les 4 bénéfices
+// produit et le paragraphe explicatif sont déjà racontés plus bas sur la home
+// (section « Simple du début à la première séance » + piliers visuels), donc
+// les garder ici faisait lire deux fois la même chose.
+//
+// Ce qui a été gardé volontairement : uniquement des preuves vérifiables
+// (diplôme, années d'exercice, abonnés, clubs nommés). charlesdenis.fr affiche
+// une note « 5.0 · 92 avis » — COAI n'a pas encore de recueil d'avis, donc
+// aucune note n'est affichée : un chiffre inventé se verrait et se paierait.
 export function CoaiIntro() {
   return (
-    <section className="coai-future-hero coai-landing-hero relative min-h-screen overflow-hidden px-6 pb-16 pt-28 sm:px-10 sm:pt-36">
-      {/* Photo réelle d'Anthony en séance TRX (04/09/2026) — remplace le
-          visuel généré par IA (couple avec un téléphone) suite au retour
-          d'un proche d'Anthony sur coai.fr : les visuels IA donnaient moins
-          confiance, mieux vaut de vraies photos. La photo est en portrait
-          et le hero très large en desktop : object-cover zoome fortement
-          pour couvrir la largeur, donc object-top (0%) ou object-center
-          (50%) coupaient le visage (l'un montrait le plafond, l'autre
-          l'épaule). object-[center_30%] a été choisi après avoir simulé
-          le recadrage réel sur desktop (1600×800) et mobile (420×700) :
-          seul ce réglage garde le visage souriant et la poignée TRX
-          visibles sur desktop, sans rien changer sur mobile (l'image y
-          tient déjà entièrement en hauteur). */}
-      <Image
-        src="/anthony-trx-reel.jpg"
-        alt=""
-        fill
-        priority
-        quality={95}
-        sizes="100vw"
-        className="coai-palace-image object-cover object-[center_30%]"
+    <section className="coai-future-hero coai-landing-hero relative overflow-hidden px-6 pb-0 pt-28 sm:px-10 sm:pt-36">
+      {/* Halo laiton derrière l'accroche — remplace la photo de fond, qui
+          descend maintenant sous le hero. */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-0 h-[620px] w-[1100px] max-w-[160vw] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(201,162,98,.16),transparent_70%)] blur-2xl"
         aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,9,.12)_0%,rgba(8,9,9,.08)_43%,rgba(8,9,9,.48)_67%,rgba(8,9,9,.78)_100%)]" aria-hidden="true" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,9,9,.22)_0%,transparent_48%,rgba(8,9,9,.72)_100%)]" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-end justify-end md:min-h-[650px] md:items-center">
-        {/* Carte resserrée sur mobile (w-[84%] au lieu de w-full) — demande
-            Anthony du 04/09/2026 : en pleine largeur, la carte cachait
-            quasiment toute la photo réelle d'Anthony en TRX derrière elle
-            (juste un filet visible sur le bord). À partir de sm: (tablette
-            et plus), la mise en page a assez d'espace horizontal pour que
-            w-full ne pose plus ce problème, donc inchangé. */}
-        <div className="w-[84%] max-w-xl animate-reveal rounded-[2rem] border border-laiton-300/20 bg-[#0b0b0a] p-5 text-left shadow-[0_35px_110px_rgba(0,0,0,.58)] sm:w-full sm:p-8 lg:p-10">
-          <div className="mb-7 inline-flex max-w-full items-start gap-2 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2 sm:rounded-full">
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
-            {/* "Coaching santé et longévité" ajouté le 04/09/2026 (demande
-                Anthony, inspiration enseigne "bangji — Longevity Skincare") :
-                premier texte lu par un visiteur, ajout additif devant la
-                preuve d'expérience existante, sans rien retirer.
-                Formulation précisée le même jour ("santé et longévité"
-                plutôt que "longévité" seul, retour direct d'Anthony). */}
-            <span className="text-[10px] font-semibold uppercase leading-4 tracking-[0.14em] text-laiton-200 sm:text-[11px] sm:tracking-[0.18em]">
-              Coaching santé et longévité nourri par 17 ans d’expérience · des milliers de personnes accompagnées
-            </span>
-          </div>
+      <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+        <p className="text-[11px] font-bold uppercase leading-4 tracking-[0.22em] text-laiton-300 sm:text-xs">
+          Coaching santé et longévité pour dirigeants
+        </p>
 
-          {/* Recentré sur les dirigeants (21/08/2026, audit tunnel demandé
-              par Anthony, points #1/#2 : "la page parle à presque tout le
-              monde"... "une promesse ciblée convertit généralement mieux").
-              Reprend le ciblage déjà défini dans le dossier de
-              positionnement (35-65 ans, agenda instable, charge mentale) —
-              jusqu'ici jamais porté par le titre principal de la home. Les
-              pages SEO généralistes restent inchangées, seule l'entrée
-              principale change de cible. */}
-          <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[.98] tracking-[-0.055em] text-white sm:text-5xl lg:text-6xl">
-            Retrouve ton énergie et ta forme,
-            <span className="mt-2 block text-laiton-200">malgré un agenda chargé.</span>
-          </h1>
+        <h1 className="mt-6 font-display text-[2.6rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
+          Retrouve ton énergie et ta forme,
+          <span className="mt-2 block text-graphite-400">malgré un agenda chargé.</span>
+        </h1>
 
-          <p className="mt-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-laiton-200">
-            <span className="h-px w-8 bg-laiton-300/60" aria-hidden="true" />
-            L&apos;IA génère. Ton coach valide.
+        <p className="mt-8 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
+          La méthode d&apos;un coach diplômé d&apos;État, 17 ans auprès de dirigeants — amplifiée
+          par l&apos;IA. L&apos;IA génère, ton coach valide.
+        </p>
+
+        <div className="mt-10">
+          <Link href="/diagnostic">
+            <Button className="px-10 py-5 text-sm font-extrabold uppercase tracking-[0.07em] shadow-[0_0_60px_-8px_rgba(201,162,98,.85)] sm:text-base">
+              Faire mon bilan offert →
+            </Button>
+          </Link>
+          <p className="mt-4 text-xs text-graphite-500">
+            Moins de 5 minutes · résultat immédiat · aucune carte bancaire
           </p>
+        </div>
 
-          <p className="mt-7 max-w-xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-            COAI construit chaque jour la séance la plus utile selon ton temps disponible, ta
-            forme réelle et tes contraintes — pas un programme figé que tu dois faire tenir dans
-            ton emploi du temps.
-          </p>
+        {/* Preuve juste sous le bouton, à l'emplacement où charlesdenis.fr
+            place ses étoiles : uniquement des faits contrôlables. */}
+        <ul
+          className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
+          aria-label="Ce qui garantit le sérieux de COAI"
+        >
+          {[
+            { chiffre: "17 ans", texte: "auprès de dirigeants" },
+            { chiffre: "DE", texte: "coach diplômé d’État" },
+            { chiffre: "24 ans", texte: "l’âge COAI d’Anthony, à plus de 40 ans" },
+            { chiffre: "3 100+", texte: "abonnés Instagram" },
+          ].map((preuve) => (
+            <li key={preuve.chiffre} className="flex items-baseline gap-2">
+              <span className="font-display text-lg font-bold tracking-[-0.03em] text-laiton-300">
+                {preuve.chiffre}
+              </span>
+              <span className="text-xs leading-4 text-graphite-400">{preuve.texte}</span>
+            </li>
+          ))}
+        </ul>
 
-          <ul className="mt-7 space-y-3" aria-label="Ce que comprend le diagnostic">
-            {BENEFICES.map((benefice) => (
-              <li key={benefice} className="flex items-start gap-3 text-sm text-graphite-200 sm:text-base">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-laiton-300/35 text-[11px] text-laiton-200">✓</span>
-                <span>{benefice}</span>
-              </li>
-            ))}
-          </ul>
+        <p className="mt-4 text-xs leading-5 text-graphite-500">
+          Intervient dans les clubs premium parisiens — La Montgolfière Club et RITM Saint-Germain.
+        </p>
+      </div>
 
-          <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            <Link href="/diagnostic">
-              <Button className="px-8 py-4 text-sm font-bold uppercase tracking-[0.055em] shadow-[0_22px_65px_-18px_rgba(201,162,98,.75)] sm:text-base">
-                Faire mon bilan initial offert
-              </Button>
-            </Link>
-            <Link href="#comment-ca-marche" className="px-2 py-3 text-sm font-medium text-graphite-300 transition hover:text-white">
-              Voir les étapes →
-            </Link>
-          </div>
-          <p className="mt-3 text-xs text-graphite-500">Bilan initial en moins de 5 minutes · Score COAI personnalisé · aucune carte bancaire</p>
-
-          {/* Preuve au niveau du premier appel a l'action (02/09/2026) : la
-              promesse reposait sur "des milliers de personnes accompagnees",
-              invérifiable et donc sans valeur.
-              Uniquement des faits contrôlables — diplôme, années d'exercice,
-              audience publique, et l'âge COAI d'Anthony lui-même. Aucun
-              témoignage n'est affiché tant qu'il n'y a pas de client à citer :
-              en inventer se verrait, et se paierait cher.
-              La clientèle est décrite par catégorie, jamais nommée ni rendue
-              identifiable : citer un client demande son accord écrit, et une
-              référence prestigieuse mais anonyme ne se vérifie pas — donc ne
-              convainc pas. */}
-          <ul
-            className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/[0.08] pt-5"
-            aria-label="Ce qui garantit le sérieux de COAI"
-          >
-            {[
-              { chiffre: "17 ans", texte: "auprès de dirigeants, d'entrepreneurs et de familles internationales" },
-              { chiffre: "DE", texte: "coach diplômé d'État" },
-              { chiffre: "24 ans", texte: "l'âge COAI d'Anthony, à plus de 40 ans" },
-              { chiffre: "3 100+", texte: "abonnés sur Instagram" },
-            ].map((preuve) => (
-              <li key={preuve.chiffre} className="flex items-baseline gap-2">
-                <span className="font-display text-lg font-semibold tracking-[-0.03em] text-laiton-300">
-                  {preuve.chiffre}
-                </span>
-                <span className="text-xs leading-4 text-graphite-400">{preuve.texte}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* Les clubs sont des etablissements, pas des clients : les nommer
-              ne demande pas d'accord individuel, et c'est verifiable — donc
-              utile, contrairement a une reference anonyme. */}
-          <p className="mt-4 text-xs leading-5 text-graphite-400">
-            Intervient dans les clubs premium parisiens —{" "}
-            <span className="text-graphite-300">La Montgolfière Club</span> et{" "}
-            <span className="text-graphite-300">RITM Saint-Germain</span>.
+      {/* Photo réelle d'Anthony, sous l'accroche (structure charlesdenis.fr).
+          Elle était jusqu'ici en fond derrière une carte opaque : sur mobile
+          on n'en voyait qu'un filet. En portrait plein cadre ici, elle est
+          enfin lisible, et c'est elle qui porte la confiance — un visage réel
+          plutôt qu'un visuel généré. */}
+      <div className="relative z-10 mx-auto mt-16 w-full max-w-lg sm:mt-20">
+        <div className="relative overflow-hidden rounded-t-[2.5rem] border-x border-t border-laiton-300/20 shadow-[0_-30px_120px_-40px_rgba(201,162,98,.45)]">
+          <Image
+            src="/anthony-trx-reel.jpg"
+            alt="Anthony Darmon, coach sportif diplômé d’État, en séance TRX"
+            width={1400}
+            height={2096}
+            priority
+            quality={95}
+            sizes="(max-width: 640px) 100vw, 512px"
+            className="h-auto w-full object-cover"
+          />
+          {/* Fondu vers le fond de page pour que la photo se termine sans
+              bord net, et que la section suivante enchaîne naturellement. */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,#080909)]"
+            aria-hidden="true"
+          />
+          <p className="absolute inset-x-0 bottom-6 text-center font-display text-sm font-bold uppercase tracking-[0.18em] text-white/90">
+            Anthony Darmon
           </p>
         </div>
       </div>
-
-      {/* Mini-résumé "01 Bilan offert / 02 Résultat personnalisé / 03
-          Première séance" retiré le 04/09/2026 (demande Anthony : "enlève
-          les doublons, plus de simplicité, efficacité, clarté") — il
-          racontait exactement le même parcours que le bloc détaillé en 7
-          étapes plus bas sur la page (section #comment-ca-marche,
-          "SIMPLE DU DÉBUT À LA PREMIÈRE SÉANCE"), juste après. Un visiteur
-          lisait deux fois la même histoire à quelques secondes d'écart. Le
-          bloc 7 étapes est gardé car plus complet (va jusqu'à la première
-          séance activée, pas seulement le bilan). */}
     </section>
   );
 }
