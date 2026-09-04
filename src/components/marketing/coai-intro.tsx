@@ -43,12 +43,14 @@ export function CoaiIntro() {
         <div className="w-full max-w-xl animate-reveal rounded-[2rem] border border-laiton-300/20 bg-[#0b0b0a] p-6 text-left shadow-[0_35px_110px_rgba(0,0,0,.58)] sm:p-8 lg:p-10">
           <div className="mb-7 inline-flex max-w-full items-start gap-2 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-4 py-2 sm:rounded-full">
             <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-laiton-300 shadow-[0_0_14px_rgba(221,193,145,.85)]" />
-            {/* "Coaching longévité" ajouté le 04/09/2026 (demande Anthony,
-                inspiration enseigne "bangji — Longevity Skincare") : premier
-                texte lu par un visiteur, ajout additif devant la preuve
-                d'expérience existante, sans rien retirer. */}
+            {/* "Coaching santé et longévité" ajouté le 04/09/2026 (demande
+                Anthony, inspiration enseigne "bangji — Longevity Skincare") :
+                premier texte lu par un visiteur, ajout additif devant la
+                preuve d'expérience existante, sans rien retirer.
+                Formulation précisée le même jour ("santé et longévité"
+                plutôt que "longévité" seul, retour direct d'Anthony). */}
             <span className="text-[10px] font-semibold uppercase leading-4 tracking-[0.14em] text-laiton-200 sm:text-[11px] sm:tracking-[0.18em]">
-              Coaching longévité nourri par 17 ans d’expérience · des milliers de personnes accompagnées
+              Coaching santé et longévité nourri par 17 ans d’expérience · des milliers de personnes accompagnées
             </span>
           </div>
 
