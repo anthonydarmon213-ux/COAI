@@ -39,14 +39,13 @@ export function CoaiIntro() {
           Coaching santé et longévité pour dirigeants
         </p>
 
-        <h1 className="mt-6 font-display text-[2.6rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
+        <h1 className="mt-6 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
           Retrouve ton énergie et ta forme,
           <span className="mt-2 block text-graphite-400">malgré un agenda chargé.</span>
         </h1>
 
         <p className="mt-8 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-          La méthode d&apos;un coach diplômé d&apos;État, 17 ans auprès de dirigeants — amplifiée
-          par l&apos;IA. L&apos;IA génère, ton coach valide.
+          La méthode d&apos;un coach diplômé d&apos;État, 17 ans auprès de dirigeants.
         </p>
 
         <div className="mt-10">
@@ -57,6 +56,24 @@ export function CoaiIntro() {
           </Link>
           <p className="mt-4 text-xs text-graphite-500">
             Moins de 5 minutes · résultat immédiat · aucune carte bancaire
+          </p>
+
+          {/* Repositionnement 04/09/2026 (demande Anthony : « mets l'accent
+              sur l'humain d'abord, et si la personne n'a pas les moyens,
+              guide-la vers l'IA »). L'accroche et le bouton principal
+              vendent donc le coach humain ; l'offre IA n'est plus presentee
+              comme LE produit mais comme la porte d'entree pour qui n'a pas
+              encore le budget d'un accompagnement humain. Volontairement en
+              petit et sous le bouton : c'est un repli, pas la promesse. */}
+          <p className="mt-6 text-sm leading-6 text-graphite-400">
+            Pas encore le budget d&apos;un accompagnement humain ?{" "}
+            <Link
+              href="/pricing"
+              className="font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4 transition hover:text-laiton-100"
+            >
+              Commence avec Standard IA à 19,99 €/mois
+            </Link>
+            .
           </p>
         </div>
 
@@ -92,16 +109,20 @@ export function CoaiIntro() {
           enfin lisible, et c'est elle qui porte la confiance — un visage réel
           plutôt qu'un visuel généré. */}
       <div className="relative z-10 mx-auto mt-16 w-full max-w-lg sm:mt-20">
-        <div className="relative overflow-hidden rounded-t-[2.5rem] border-x border-t border-laiton-300/20 shadow-[0_-30px_120px_-40px_rgba(201,162,98,.45)]">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] border-x border-t border-laiton-300/20 shadow-[0_-30px_120px_-40px_rgba(201,162,98,.45)]">
+          {/* Recadrage : la photo source est un portrait haut dont le tiers
+              supérieur est le plafond et les sangles TRX. En plein cadre, il
+              fallait scroller longtemps avant d'arriver au visage. Le format
+              4/5 avec object-[center_35%] cadre directement sur le visage
+              souriant, sangle TRX comprise. */}
           <Image
             src="/anthony-trx-reel.jpg"
             alt="Anthony Darmon, coach sportif diplômé d’État, en séance TRX"
-            width={1400}
-            height={2096}
+            fill
             priority
             quality={95}
             sizes="(max-width: 640px) 100vw, 512px"
-            className="h-auto w-full object-cover"
+            className="object-cover object-[center_35%]"
           />
           {/* Fondu vers le fond de page pour que la photo se termine sans
               bord net, et que la section suivante enchaîne naturellement. */}
