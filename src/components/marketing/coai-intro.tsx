@@ -44,8 +44,16 @@ export function CoaiIntro() {
           <span className="mt-2 block text-graphite-400">malgré un agenda chargé.</span>
         </h1>
 
+        {/* Reformule le 04/09/2026 (Anthony : « la methode d'un coach
+            diplome d'Etat... tu peux reformuler, ce n'est pas top »).
+            L'ancienne phrase enchainait deux informations par une simple
+            virgule (« un coach diplome d'Etat, 17 ans aupres de dirigeants »),
+            ce qui se lisait comme une liste plutot qu'une phrase. Le "avec"
+            relie proprement le diplome a l'experience, et le prenom cree un
+            lien direct avec la photo d'Anthony juste en dessous. */}
         <p className="mt-8 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-          La méthode d&apos;un coach diplômé d&apos;État, 17 ans auprès de dirigeants.
+          La méthode d&apos;Anthony Darmon, coach diplômé d&apos;État avec 17 ans d&apos;expérience
+          auprès de dirigeants.
         </p>
 
         <div className="mt-10">
@@ -58,36 +66,15 @@ export function CoaiIntro() {
               </Button>
             </Link>
           </span>
-          <p className="mt-4 text-xs text-graphite-500">
-            Moins de 5 minutes · sans carte bancaire
-          </p>
+          {/* Ligne de reassurance retiree le 04/09/2026 (Anthony : « enleve »). */}
 
-          {/* Repositionnement 04/09/2026 (demande Anthony : « mets l'accent
-              sur l'humain d'abord, et si la personne n'a pas les moyens,
-              guide-la vers l'IA »). L'accroche et le bouton principal
-              vendent donc le coach humain ; l'offre IA n'est plus presentee
-              comme LE produit mais comme la porte d'entree pour qui n'a pas
-              encore le budget d'un accompagnement humain. Volontairement en
-              petit et sous le bouton : c'est un repli, pas la promesse. */}
-          {/* Prix retire du hero le 04/09/2026 (demande Anthony : « je ne
-              veux pas qu'on mette tout de suite les prix sur la landing, le
-              prospect est trop froid, il faut le chauffer et l'eduquer
-              d'abord », « on lui propose les tarifs apres le bilan et apres
-              qu'il a vu l'interface »). La ligne annoncait 19,99 EUR/mois des
-              le premier ecran : un chiffre lu avant d'avoir compris le
-              produit ne sert qu'a faire partir ceux qui ne sont pas encore
-              convaincus. Le repli vers l'offre IA reste, il envoie vers le
-              bilan — le prix arrive plus loin dans le parcours. */}
-          <p className="mt-6 text-sm leading-6 text-graphite-400">
-            Pas encore le budget d&apos;un accompagnement humain ?{" "}
-            <Link
-              href="/diagnostic"
-              className="font-semibold text-laiton-200 underline decoration-laiton-300/40 underline-offset-4 transition hover:text-laiton-100"
-            >
-              Commence par le bilan, l&apos;application fait le reste
-            </Link>
-            .
-          </p>
+          {/* Ligne « Pas encore le budget... » retiree le 04/09/2026
+              (Anthony : « enleve »). Le bouton principal mene deja au bilan
+              ("/diagnostic") juste au-dessus : cette seconde ligne repetait
+              la meme destination avec un pretexte differe, ce qui affaiblissait
+              le bouton plutot que d'ajouter une vraie option. Le repositionnement
+              humain-d'abord du meme jour reste intact — c'etait seulement la
+              formulation en trop, pas l'intention. */}
         </div>
 
         {/* Nettoyage 04/09/2026 (Anthony : « pas de doublon ! », « enleve les
@@ -102,10 +89,12 @@ export function CoaiIntro() {
             - les quatre preuves + la ligne clubs + la ligne de reassurance
               faisaient cinq lignes de petit texte empilees sous le bouton.
               charlesdenis.fr n'en a qu'une (ses etoiles). Tout est ramene a
-              une seule ligne. */}
-        <p className="mt-8 text-xs leading-5 text-graphite-400 sm:text-sm">
-          Intervient à La Montgolfière Club et RITM Saint-Germain · 3 100+ abonnés
-        </p>
+              une seule ligne.
+            Deplacee une seconde fois le meme jour (Anthony : « ca ne va pas,
+            intervient a la Montgol a cet endroit-la ») : la phrase n'avait
+            pas de sujet et flottait, isolee, juste sous un lien sans rapport.
+            Elle rejoint la legende de la photo plus bas, ou « Anthony
+            Darmon » est ecrit juste au-dessus — le sujet devient evident. */}
       </div>
 
       {/* Photo réelle d'Anthony, sous l'accroche (structure charlesdenis.fr).
@@ -144,6 +133,10 @@ export function CoaiIntro() {
             </p>
           </div>
         </div>
+        <p className="mt-5 text-center text-xs leading-5 text-graphite-400 sm:text-sm">
+          Anthony intervient à La Montgolfière Club et RITM Saint-Germain · 3 100+ abonnés
+          Instagram
+        </p>
       </div>
     </section>
   );
