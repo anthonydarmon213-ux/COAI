@@ -49,14 +49,30 @@ lui en séance TRX (garage/studio maison). Enregistrée en
 `public/anthony-trx-reel.jpg` (redimensionnée 1400px de large, JPEG
 qualité 85, orientation EXIF appliquée — 2,7 Mo → 289 Ko), référencée dans
 `src/components/marketing/coai-intro.tsx` à la place de l'ancienne image.
-Recadrage en `object-top` plutôt que `object-center` : la photo est en
-portrait (2832×4240) et le hero est très large en desktop — `object-cover`
-zoome fortement pour couvrir la largeur, un recadrage centré aurait coupé
-le visage. `object-top` garde le visage et la poignée TRX dans le cadre.
+Recadrage en `object-[center_30%]` : la photo est en portrait (2832×4240)
+et le hero est très large en desktop — `object-cover` zoome fortement
+pour couvrir la largeur. `object-top` (0%) essayé en premier, mais coupait
+quasi tout le visage (ne restaient que le plafond et le haut du crâne) ;
+`object-center` (50%) coupait le visage de l'autre côté (trop bas, montrait
+surtout l'épaule). 30% a été choisi après simulation du recadrage réel en
+Python (fenêtre desktop 1600×800 et mobile 420×700) — c'est le seul réglage
+qui garde le visage souriant et la poignée TRX visibles sur desktop, sans
+rien changer sur mobile (l'image y tient déjà entièrement en hauteur).
 
 `coai-diagnostic-clean.png` n'est plus référencé nulle part dans `src/`
 mais n'a pas été supprimé du dossier `public/` (pas demandé, pas
 strictement nécessaire).
+
+Anthony a ensuite demandé de changer le fond (mur gris) pour quelque chose
+de plus premium façon `anthony-trx-studio-premium.jpg` (l'ancien visuel
+studio, lui-même généré par IA, jamais utilisé sur la home actuelle).
+Refusé/déconseillé : pas d'outil de découpe/recomposition de fond fiable
+disponible (un copier-coller basique aurait l'air truqué), et surtout
+recomposer un fond IA derrière une vraie photo réintroduirait exactement
+ce que ce chantier cherche à éliminer. Anthony a choisi de garder le fond
+réel tel quel. Si un fond studio premium est vraiment souhaité, il faudra
+une vraie séance photo (ex. à La Montgolfière ou au RITM Saint-Germain,
+déjà cités dans le hero) — pas une simulation.
 
 Même branche `claude/simplifier-home-menu`, même limitation de
 vérification (pas de `next build` réel dans ce sandbox).
