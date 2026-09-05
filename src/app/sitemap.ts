@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/bilan-forme-gratuit", priority: 0.8, changeFrequency: "monthly" },
     { path: "/coach-sportif-ia", priority: 0.8, changeFrequency: "monthly" },
     { path: "/coach-sante-dirigeant", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/perdre-ventre-dirigeant", priority: 0.8, changeFrequency: "monthly" },
     { path: "/programme-sport-entrepreneur", priority: 0.8, changeFrequency: "monthly" },
     { path: "/ameliorer-energie-au-travail", priority: 0.8, changeFrequency: "monthly" },
     { path: "/challenge-30-jours", priority: 0.8, changeFrequency: "monthly" },
