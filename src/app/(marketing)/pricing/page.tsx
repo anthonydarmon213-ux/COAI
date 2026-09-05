@@ -154,7 +154,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             )}
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
               Séances privées avec Anthony, à domicile, en entreprise ou en club —
-              environ 1 séance par semaine. (Un suivi individuel à distance ? C'est Premium Remote.)
+              environ 1 séance par semaine. (Un suivi individuel à distance ? C&apos;est Premium Remote.)
             </p>
             {/* Les deux tarifs sont affiches cote a cote depuis le 04/09/2026
                 (demande Anthony) : le prix entreprise etait jusque-la garde
