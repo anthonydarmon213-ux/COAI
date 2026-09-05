@@ -133,9 +133,18 @@ export function CoaiIntro() {
             </p>
           </div>
         </div>
+        {/* "3 100+ abonnes Instagram" remplace le 04/09/2026 (demande
+            Anthony : « enleve 3100 abonnes insta et remplace par des
+            centaines d'entrepreneurs accompagnes ») : un compteur de
+            followers ne dit rien de la valeur du coaching, alors que le
+            volume de clients accompagnes est la preuve directement liee a ce
+            que la page vend. Meme formulation sans chiffre exact que sur
+            /entreprise (choix Anthony du meme jour), pour rester coherent
+            entre les deux pages plutot que de risquer deux chiffres
+            differents. */}
         <p className="mt-5 text-center text-xs leading-5 text-graphite-400 sm:text-sm">
-          Anthony intervient à La Montgolfière Club et RITM Saint-Germain · 3 100+ abonnés
-          Instagram
+          Anthony intervient à La Montgolfière Club et RITM Saint-Germain · des centaines
+          d&apos;entrepreneurs accompagnés
         </p>
       </div>
     </section>
