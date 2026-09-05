@@ -42,7 +42,7 @@ export default function VipPage() {
               mesure, rendez-vous privés, ajustements et suivi quotidien avec COAI. Chez toi, dans
               ton entreprise ou en club — tu sais quoi faire, quand le faire et pourquoi. Environ 1 séance
               par semaine, en pack engagé de 3 ou 6 mois. (Tu cherches un suivi individuel à distance ?
-              C'est Premium Remote.)
+              C&apos;est Premium Remote.)
             </p>
 
             <div className="mt-8 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.07] px-6 py-5">
