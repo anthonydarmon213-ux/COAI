@@ -38,12 +38,12 @@ export async function POST() {
   }
 
   // Génération bloquée tant que rien n'est débloqué (13/08/2026, nouveau
-  // modèle d'abonnement) : la génération est disponible avec une formule
-  // Pass IA, Coaching Hybride ou VIP active.
+  // modèle d'abonnement) : la génération est disponible avec un
+  // accompagnement Standard IA, Premium Remote ou VIP Présentiel actif.
   // L'inscription elle-même est gratuite et ne suffit plus.
   if (!hasProgrammeAccess(user, user.subscription)) {
     return NextResponse.json(
-      { error: "Choisis ton accompagnement Pass IA, Coaching Hybride ou VIP pour générer et faire évoluer ton programme." },
+      { error: "Choisis ton accompagnement Standard IA, Premium Remote ou VIP Présentiel pour générer et faire évoluer ton programme." },
       { status: 403 }
     );
   }

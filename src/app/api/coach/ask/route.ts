@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     if (reserved.count === 0) {
       return NextResponse.json(
         {
-          error: `Limite de ${COACH_QUOTA_LIMIT} questions/mois atteinte — passe à Coaching Hybride pour un accès illimité.`,
+          error: `Limite de ${COACH_QUOTA_LIMIT} questions/mois atteinte — passe à Premium Remote pour un accès illimité.`,
           quotaRemaining: 0,
         },
         { status: 429 }

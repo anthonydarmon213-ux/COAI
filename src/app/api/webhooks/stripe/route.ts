@@ -7,10 +7,14 @@ import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
 
+// Noms affiches uniquement dans la notification interne "Nouvelle
+// inscription COAI" envoyee a Anthony — corriges le 04/09/2026 pour
+// suivre le renommage Standard IA / Premium Remote / VIP Presentiel et le
+// passage en pack 3/6 mois de ces deux dernieres offres.
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  PASS_IA: "Pass IA — 19,99€/mois",
-  STANDARD: "Coaching Hybride — 99€/mois",
-  PREMIUM: "Coaching VIP — 200 € la séance",
+  PASS_IA: "Standard IA — 19,99€/mois",
+  STANDARD: "Premium Remote — 960€/pack 3 mois minimum",
+  PREMIUM: "VIP Présentiel — 1 200€/pack 3 mois minimum",
 };
 
 const PROGRAMME_PAR_SLUG = new Map(PROGRAMMES_PRETS.map((programme) => [programme.slug, programme]));

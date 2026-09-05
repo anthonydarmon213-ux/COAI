@@ -93,7 +93,7 @@ export async function POST(request: Request) {
         "",
         "Voici ce que tu recevras en priorité :",
         "• Des conseils pratiques entraînement, nutrition et récupération, directement appliquables.",
-        "• Des explications claires sur nos offres : Pass IA, Coaching Hybride, VIP.",
+        "• Des explications claires sur nos offres : Standard IA, Premium Remote, VIP Présentiel.",
         "• Des exemples de services : plans, progressions, routines de récupération.",
         "",
         `Ton lien de ressources : ${appUrl}/bilan-forme-gratuit`,

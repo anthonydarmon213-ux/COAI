@@ -210,9 +210,9 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
 
     const extrait = (seanceAvecDouleur.ressenti || seanceAvecDouleur.notes || "").slice(0, 200);
     await sendAdminNotification(
-      "Douleur signalée — palier Pass IA",
+      "Douleur signalée — palier Standard IA",
       `${user.prenom ? user.prenom : "Un abonné"} (${user.email}) a mentionné une gêne/douleur dans une séance ` +
-        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier Pass IA, pas de relecture humaine) : « ${extrait} »`
+        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier Standard IA, pas de relecture humaine) : « ${extrait} »`
     );
 
     if (envoyeUtilisateur) {
@@ -268,7 +268,7 @@ async function alerterMotivationEnBaisse(appUrl: string): Promise<number> {
 
     const lienWhatsApp = buildWhatsAppContactLink(user.phoneWhatsapp, user.prenom, [flag]);
     await sendAdminNotification(
-      "Motivation en baisse — Coaching Hybride",
+      "Motivation en baisse — Premium Remote",
       `${user.prenom ? user.prenom : "Un abonné"} montre un signal de motivation en baisse : ${flag.detail}.\n\n` +
         (lienWhatsApp
           ? `Message WhatsApp prêt à envoyer : ${lienWhatsApp}`
@@ -472,7 +472,14 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
 
   let relancesCheckout = 0;
   for (const user of candidats) {
-    const plan = user.checkoutPlan === "STANDARD" ? "Coaching Hybride" : "Pass IA";
+    // checkoutPlan === "STANDARD" ne peut plus etre ecrit pour un nouvel
+    // abandon (src/app/api/stripe/checkout/route.ts rejette STANDARD et
+    // PREMIUM en 400 avant meme d'ecrire checkoutPlan, depuis que ces deux
+    // offres sont passees en pack sur devis) — corrige quand meme par
+    // prudence pour une donnee historique deja en base : "Coaching Hybride"
+    // et "99 €/mois" etaient a la fois l'ancien nom ET un tarif qui n'existe
+    // plus (pack 3 mois minimum, sur devis, pas d'abonnement mensuel).
+    const plan = user.checkoutPlan === "STANDARD" ? "Premium Remote" : "Standard IA";
     // Le prix cité doit suivre le rythme de facturation réellement choisi
     // au checkout (23/08/2026) : Pass IA propose désormais les deux, et
     // l'e-mail affichait encore "49 €/an", un tarif qui n'existe plus
@@ -480,7 +487,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
     // un prix faux est pire que pas d'e-mail du tout.
     const prix =
       user.checkoutPlan === "STANDARD"
-        ? "99 €/mois"
+        ? "pack 3 mois minimum, sur devis"
         : user.checkoutBillingInterval === "ANNUAL"
           ? "119 €/an"
           : "19,99 €/mois";

@@ -38,7 +38,7 @@ const ETAPES: Etape[] = [
       `ton profil est codé à partir de plus de 17 ans d'expérience terrain d'Anthony Darmon, coach diplômé d'État ` +
       `— chaque règle de personnalisation vient d'un vrai coaching, pas d'un texte générique trouvé en ligne.\n\n` +
       `Ton espace personnalisé te permet de découvrir un Personal Trainer IA disponible 24h/24. Si tu veux ensuite un regard humain, ` +
-      `Coaching Hybride ajoute la validation et les ajustements d'un coach diplômé : l'IA personnalise, l'humain affine.\n\n` +
+      `Premium Remote ajoute la validation et les ajustements d'un coach diplômé : l'IA personnalise, l'humain affine.\n\n` +
       `Créer mon espace personnalisé : ${appUrl}/sign-up\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),
@@ -51,8 +51,8 @@ const ETAPES: Etape[] = [
       `Bonjour,\n\n` +
       `Un programme figé devient vite inutile. Dans ton espace personnalisé, le Défi COAI te propose ` +
       `une action utile par jour pendant 7 jours pour découvrir comment COAI apprend de toi.\n\n` +
-      `Tu peux commencer avec Pass IA pendant 7 jours, puis continuer pour 19,99€/mois (ou 119€/an), sans engagement. ` +
-      `Si tu veux aussi le regard d'un coach humain, Coaching Hybride est à 99€/mois.\n\n` +
+      `Tu peux commencer avec Standard IA pendant 7 jours, puis continuer pour 19,99€/mois (ou 119€/an), sans engagement. ` +
+      `Si tu veux aussi le regard d'un coach humain, Premium Remote est proposé en pack de 3 mois minimum, sur devis.\n\n` +
       `Créer mon espace personnalisé : ${appUrl}/sign-up\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),
@@ -63,14 +63,14 @@ const ETAPES: Etape[] = [
     sujet: "Prêt à passer de ton diagnostic à l'action ?",
     corps: (appUrl, unsubscribe) => {
       const whatsapp = buildWhatsAppLink(
-        "Bonjour Anthony, j'ai fait le diagnostic COAI et j'aimerais échanger sur Coaching Hybride ou VIP."
+        "Bonjour Anthony, j'ai fait le diagnostic COAI et j'aimerais échanger sur Premium Remote ou VIP Présentiel."
       );
       return (
         `Bonjour,\n\n` +
         `Ton diagnostic a identifié le point de départ. Ton espace personnalisé te permet maintenant ` +
-        `de passer à l'action ; si tu veux ton programme adaptatif complet, Pass IA démarre par 7 jours d'essai puis 19,99 €/mois (ou 119 €/an).\n\n` +
+        `de passer à l'action ; si tu veux ton programme adaptatif complet, Standard IA démarre par 7 jours d'essai puis 19,99 €/mois (ou 119 €/an).\n\n` +
         `Commencer mes 7 jours d'essai : ${appUrl}/pricing\n\n` +
-        (whatsapp ? `Tu préfères un accompagnement VIP ? Écris directement à Anthony : ${whatsapp}\n\n` : "") +
+        (whatsapp ? `Tu préfères un accompagnement avec Anthony (Premium Remote ou VIP Présentiel) ? Écris-lui directement : ${whatsapp}\n\n` : "") +
         `À bientôt,\nL'équipe COAI` +
         (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : "")
       );
