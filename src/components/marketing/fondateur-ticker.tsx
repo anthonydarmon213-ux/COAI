@@ -34,7 +34,7 @@ export function FondateurTicker() {
 
   // Le nombre restant est volontairement tu : l'afficher revenait à
   // annoncer le nombre de places vides.
-  const message = `🔒 Prix Pass IA bloqué à vie · Le tarif auquel tu souscris reste le tien, même quand il augmentera pour les nouveaux membres`;
+  const message = `🔒 Prix Standard IA bloqué à vie · Le tarif auquel tu souscris reste le tien, même quand il augmentera pour les nouveaux membres`;
 
   return (
     <div

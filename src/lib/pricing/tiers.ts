@@ -161,7 +161,7 @@ export const TIERS: Tier[] = [
     prix: "19,99€",
     suffixe: "/mois",
     factureAnnuellement: false,
-    noteFacturation: "Sans engagement · 39€ les 3 mois jusqu'au 30 septembre, ou 9,99€/mois en annuel (119€ facturés une fois par an)",
+    noteFacturation: "Sans engagement · ou 119€ facturés une fois par an (soit 9,92€/mois en équivalent annuel).",
     description:
       "L'expérience Personal Training réimaginée pour avancer en autonomie, avec un programme qui s'adapte à ta vraie vie — et mon WhatsApp en renfort si tu as besoin d'un coup de pouce.",
     // La page tarifs n'affiche que les quatre premieres : le concret passe
@@ -227,7 +227,7 @@ export const TIERS: Tier[] = [
       "Pour les objectifs précis, les contraintes particulières et ceux qui veulent être suivis comme un sportif de haut niveau — une expérience de transformation physique encadrée en présentiel, sur un engagement minimum de 3 mois (ou 6 mois), payé en une fois.",
     features: [
       "Séances privées de Personal Training avec Anthony",
-      "À domicile, en entreprise, en club ou à distance",
+      "À domicile, en entreprise ou en club",
       "Analyse approfondie des objectifs, douleurs et contraintes",
       "Tarif entreprise : 200 € HT/séance + TVA 20 % (240 € TTC), sur devis",
       "Facture professionnelle déductible en frais d'entreprise",

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
 import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
-import { FIN_OFFRE_TRIMESTRE_LIBELLE, offreTrimestreActive, prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
+import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
@@ -153,8 +153,8 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               <p className="mt-1 text-xs text-graphite-500">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
             )}
             <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
-              Séances privées avec Anthony, à domicile, en entreprise, en club ou à
-              distance — environ 1 séance par semaine.
+              Séances privées avec Anthony, à domicile, en entreprise ou en club —
+              environ 1 séance par semaine. (Un suivi individuel à distance ? C'est Premium Remote.)
             </p>
             {/* Les deux tarifs sont affiches cote a cote depuis le 04/09/2026
                 (demande Anthony) : le prix entreprise etait jusque-la garde
@@ -299,12 +299,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                           label={`Choisir 3 mois · ${prixTrimestreCentimes() / 100}€`}
                           className="w-full border border-white/15 bg-white/[0.035] text-white"
                         />
-                        {offreTrimestreActive() && (
-                          <p className="text-center text-[11px] font-semibold text-laiton-200">
-                            Offre de rentrée — 39€ au lieu de 49€ jusqu&apos;au{" "}
-                            {FIN_OFFRE_TRIMESTRE_LIBELLE}.
-                          </p>
-                        )}
                       </>
                     )}
                   </>

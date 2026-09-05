@@ -44,7 +44,7 @@ export default function EntreprisePage() {
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Pour vous, dirigeant(e)</p>
               <h2 className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">Commencez dès aujourd&apos;hui, sans attendre le déploiement de l&apos;offre équipe.</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">
-                Avant de penser à vos équipes, prenez soin de vous : l&apos;abonnement individuel COAI est accessible
+                Avant de penser à vos équipes, prenez soin de vous : Standard IA est accessible
                 immédiatement, en libre-service, avec le même diagnostic et le même moteur d&apos;adaptation que le
                 dispositif entreprise.
               </p>

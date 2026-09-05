@@ -48,7 +48,7 @@ export function CompteAReboursRentree({ className = "" }: { className?: string }
         Offre de rentrée
       </p>
       <p className="mt-2 text-sm leading-6 text-white">
-        Bloque ton Pass IA à <strong>19,99&nbsp;€/mois</strong> à vie.
+        Bloque ton tarif Standard IA à <strong>19,99&nbsp;€/mois</strong> à vie.
         <span className="text-graphite-300">
           {" "}Le tarif passera à {PRIX_APRES_OFFRE} pour les nouveaux membres.
         </span>

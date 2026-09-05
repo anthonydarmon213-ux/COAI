@@ -62,7 +62,7 @@ export function CoaiIntro() {
           <span className="coai-cta-glow">
             <Link href="/diagnostic">
               <Button className="px-10 py-5 text-sm font-extrabold uppercase tracking-[0.07em] sm:text-base">
-                Faire mon bilan forme offert →
+                Faire mon bilan gratuit →
               </Button>
             </Link>
           </span>

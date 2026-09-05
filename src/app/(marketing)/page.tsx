@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
-import { NB_EXERCICES_FILMES, NB_RECETTES } from "@/lib/catalogue-chiffres";
+import { NB_EXERCICES_FILMES, NB_PROGRAMMES_PRETS, NB_RECETTES } from "@/lib/catalogue-chiffres";
 import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -58,7 +58,7 @@ const FAQ = [
       // gratuit, comment on paie, et renvoie vers la page tarifs pour qui
       // veut les chiffres tout de suite. Masquer un prix a quelqu'un qui le
       // demande le ferait fuir plus surement que le prix lui-meme.
-      "Non. Le bilan est offert, sans carte bancaire, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — l'offre IA par abonnement mensuel sans engagement, les deux accompagnements avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp, avec une séance d'essai possible avant de t'engager. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
+      "Non. Le bilan est offert, sans carte bancaire, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — Standard IA par abonnement mensuel sans engagement, les deux accompagnements avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp, avec une séance d'essai possible avant de t'engager. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -144,7 +144,7 @@ function PiliersVisuelsSection() {
                   href="/diagnostic"
                   className="inline-flex min-h-14 items-center justify-center rounded-full bg-laiton-400 px-6 text-center text-sm font-semibold text-graphite-950 shadow-[0_16px_45px_-18px_rgba(212,175,55,.8)] transition hover:-translate-y-0.5 hover:bg-laiton-300"
                 >
-                  Faire mon bilan initial offert →
+                  Faire mon bilan gratuit →
                 </Link>
               ) : null}
             </div>
@@ -152,12 +152,12 @@ function PiliersVisuelsSection() {
         </div>
         <div className="mx-auto max-w-3xl border-t border-white/[0.08] pt-10 text-center">
           <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.025em] text-white sm:text-3xl">
-            Ton entraînement, ta nutrition et ta récupération,
-            <span className="text-laiton-300"> personnalisés par l&apos;IA et validés par un coach diplômé d&apos;État.</span>
+            Un programme conçu avec la méthode d&apos;Anthony,
+            <span className="text-laiton-300"> personnalisé par COAI.</span>
           </p>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
-            Parce que deux coachs valent mieux qu&apos;un, COAI réunit l&apos;intelligence artificielle
-            et l&apos;expertise humaine avec une seule mission : te proposer le meilleur accompagnement.
+            Suivi individuel avec Anthony inclus en Premium Remote et VIP Présentiel : il relit,
+            ajuste et valide les décisions importantes de ton programme.
           </p>
         </div>
       </section>
@@ -211,14 +211,16 @@ const STRUCTURED_DATA = {
   ],
 };
 
+// Réduit de 7 à 3 étapes le 04/09/2026 (retour audit externe relayé par
+// Anthony : "sept étapes produisent l'effet inverse" de la simplicité
+// recherchée). Les détails retirés (compte gratuit, essai de 7 jours,
+// activation du programme) ne sont pas perdus : ils restent expliqués au
+// bon moment, dans le quiz lui-même et sur /pricing, pas listés d'avance
+// ici où ils ne font qu'allonger le parcours avant même de commencer.
 const PARCOURS_COURT = [
-  ["01", "Bilan gratuit", "Moins de 5 minutes, sans carte bancaire."],
-  ["02", "Résultat personnalisé", "Ton profil, tes priorités et ton point de départ."],
-  ["03", "Compte gratuit", "Tu sauvegardes ton résultat avant de choisir."],
-  ["04", "Choix de l'accompagnement", "Standard IA, Premium Remote ou VIP Présentiel."],
-  ["05", "Essai de 7 jours", "Inclus avec Standard IA, avant le premier prélèvement."],
-  ["06", "Programme activé", "Entraînement, alimentation et récupération coordonnés."],
-  ["07", "Première séance", "COAI te guide immédiatement, étape par étape."],
+  ["01", "Fais ton bilan gratuit", "Découvre ton Âge COAI et ton score en moins de 5 minutes, sans carte bancaire."],
+  ["02", "Choisis ton accompagnement", "Ton programme personnalisé, puis Standard IA, Premium Remote ou VIP Présentiel."],
+  ["03", "Commence ta première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;
 
 export default function LandingPage() {
@@ -247,7 +249,7 @@ export default function LandingPage() {
             Ton bilan et ton résultat restent gratuits. Tu crées ensuite ton compte, choisis ton accompagnement et testes COAI pendant 7 jours.
           </p>
         </div>
-        <ol className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-10 grid gap-3 md:grid-cols-3">
           {PARCOURS_COURT.map(([numero, titre, texte], index) => (
             <li key={numero} className={`rounded-3xl border px-5 py-6 ${index === PARCOURS_COURT.length - 1 ? "border-laiton-300/45 bg-laiton-300/[0.08]" : "border-white/[0.08] bg-white/[0.03]"}`}>
               <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-300">ÉTAPE {numero}</span>
@@ -257,8 +259,11 @@ export default function LandingPage() {
           ))}
         </ol>
         <div className="mt-9 text-center">
-          <Link href="/diagnostic"><Button>Commencer mon bilan gratuit</Button></Link>
+          <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>
           <p className="mt-3 text-xs text-graphite-500">Aucune carte bancaire · résultat immédiat · sans engagement</p>
+          <Link href="/pricing" className="mt-4 inline-block text-sm font-semibold text-laiton-300 underline underline-offset-4 transition hover:text-laiton-200">
+            Voir les accompagnements →
+          </Link>
         </div>
       </section>
 
@@ -306,13 +311,13 @@ export default function LandingPage() {
           id="coaching-anthony-title"
           className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"
         >
-          Anthony te coache lui-même, à distance ou en personne.
+          Anthony te coache lui-même, à distance ou en présentiel.
         </h2>
         <p className="max-w-xl text-base leading-7 text-graphite-300 sm:text-lg">
           Deux accompagnements pour une vraie transformation physique. Premium Remote : coaching
-          1:1 à distance, 15 places maximum. VIP Présentiel : chez toi, en entreprise, en club ou
-          à distance, places extrêmement limitées. Les deux sur devis, avec une séance d&apos;essai
-          possible avant de t&apos;engager.
+          1:1 à distance, 15 places maximum. VIP Présentiel : chez toi, en entreprise ou en club,
+          places extrêmement limitées. Les deux sur devis, avec une séance d&apos;essai possible
+          avant de t&apos;engager.
         </p>
         {/* Deux boutons, sur le modele de charlesdenis.fr (demande Anthony
             du 04/09/2026 : « on lui propose aussi 1 seance d'essai et/ou un
@@ -330,7 +335,7 @@ export default function LandingPage() {
               href="/diagnostic"
               className="inline-flex rounded-full bg-laiton-300 px-8 py-4 text-sm font-bold uppercase tracking-[0.05em] text-[#0d0d0c] transition hover:bg-laiton-200"
             >
-              Faire mon bilan forme offert →
+              Faire mon bilan gratuit →
             </Link>
           </span>
           {/* Depuis le 04/09/2026 ce bouton mene a un formulaire de demande
@@ -398,7 +403,7 @@ export default function LandingPage() {
         <div className="mx-auto mt-12 grid max-w-5xl gap-px overflow-hidden rounded-[1.6rem] border border-white/[0.09] bg-white/[0.09] sm:grid-cols-2 lg:grid-cols-4">
           {[
             { chiffre: String(NB_RECETTES), titre: "recettes", texte: "Avec leurs macros. Végétarien, vegan, sans gluten, hyper-protéiné." },
-            { chiffre: "13", titre: "programmes prêts", texte: "Dont 5 protocoles de récupération : sommeil, respiration, foam roller." },
+            { chiffre: String(NB_PROGRAMMES_PRETS), titre: "programmes prêts", texte: "Dont 5 protocoles de récupération : sommeil, respiration, foam roller." },
             { chiffre: String(NB_EXERCICES_FILMES), titre: "exercices filmés", texte: "Démontrés par Anthony, pas des animations génériques." },
             { chiffre: "1", titre: "séance par jour", texte: "Recalculée selon ton sommeil, ta forme et ton temps." },
             { chiffre: "Rep", titre: "carnet de séances", texte: "Chaque série, chaque charge, ton tonnage et tes records." },
@@ -420,7 +425,7 @@ export default function LandingPage() {
         </p>
         <div className="mt-8 flex justify-center">
           <Link href="/diagnostic">
-            <Button>Faire mon bilan offert</Button>
+            <Button>Faire mon bilan gratuit</Button>
           </Link>
         </div>
       </section>
