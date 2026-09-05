@@ -13,7 +13,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
   const user = await getCurrentUser();
 
   return (
-    <div className="relative">
+    <div className="coai-site-shell relative">
       <UtmCapture />
       <header className="coai-public-header fixed inset-x-0 top-0 z-50 border-b shadow-[0_12px_35px_rgba(0,0,0,.18)] backdrop-blur-xl">
         <SiteNav connecte={!!user} />

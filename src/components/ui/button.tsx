@@ -5,9 +5,9 @@ type Size = "default" | "compact";
 
 // Primaire brass / secondaire steel outline (spec design system v2).
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-laiton-400 text-graphite-950 shadow-[0_12px_38px_-14px_rgba(201,162,98,0.75)] hover:bg-laiton-300",
-  secondary: "border border-white/15 bg-white/[0.03] text-graphite-50 hover:border-laiton-400/40 hover:bg-white/[0.07]",
-  ghost: "bg-transparent text-graphite-200 hover:text-laiton-400",
+  primary: "border border-laiton-300/40 bg-[linear-gradient(115deg,#F0DCA0,#D4AF37)] text-graphite-950 shadow-[0_14px_42px_-16px_rgba(212,175,55,0.8)] hover:brightness-110",
+  secondary: "border border-cyan-300/25 bg-cyan-300/[0.055] text-graphite-50 shadow-[inset_0_1px_0_rgba(255,255,255,.06)] hover:border-cyan-300/55 hover:bg-cyan-300/[0.1]",
+  ghost: "bg-transparent text-graphite-200 hover:text-cyan-300",
 };
 
 // "compact" : pour les CTA dans des cartes étroites (ex: teaser "Nos

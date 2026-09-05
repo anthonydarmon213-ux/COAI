@@ -15,8 +15,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <AppNav />
       <main className="coai-app-main relative min-w-0 flex-1 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-          <div className="animate-pulse-glow absolute -right-40 -top-48 h-[32rem] w-[32rem] rounded-full bg-laiton-400/[0.07] blur-3xl" />
-          <div className="absolute -bottom-56 -left-40 h-[30rem] w-[30rem] rounded-full bg-[#4a9fc9]/[0.05] blur-3xl" />
+          <div className="animate-pulse-glow absolute -right-40 -top-48 h-[32rem] w-[32rem] rounded-full bg-cyan-300/[0.11] blur-3xl" />
+          <div className="absolute -bottom-56 -left-40 h-[30rem] w-[30rem] rounded-full bg-laiton-400/[0.07] blur-3xl" />
           <div className="coai-future-ring animate-spin-slow absolute left-1/2 top-1/3 h-[48rem] w-[48rem] -translate-x-1/2 opacity-40" />
         </div>
         <div className="relative mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 sm:py-12 lg:px-12">{children}</div>

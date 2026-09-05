@@ -51,7 +51,7 @@ const config: Config = {
         // Accent secondaire : cyan néon de la charte, en remplacement du
         // bleu-acier #5B8296. Utilisé sur 27 emplacements existants, qui
         // basculent donc automatiquement.
-        acier: "#00F0FF",
+        acier: "#38BDF8",
         // Tokens du design system v2 (spécification "Design System — Lab Coach").
         // Additifs : graphite/laiton restent la base déjà en place, brass/steel
         // sont les nouveaux accents (bouton primaire/secondaire), ink/paper/
@@ -64,7 +64,7 @@ const config: Config = {
         // explicite. Ces deux teintes servent les surfaces techniques :
         // jauges biométriques, cartographie musculaire, métriques live.
         or: "#D4AF37",
-        cyan: "#00F0FF",
+        cyan: "#38BDF8",
         // Fond profond de la charte, très proche du graphite-950 existant
         // (#0d0e10) : conservé distinct pour les écrans immersifs
         // (lecteur de séance) sans toucher au fond global de l'app.

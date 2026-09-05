@@ -16,7 +16,7 @@ export function LeadCtaLink({ placement, children, className }: LeadCtaLinkProps
     <Link
       href="/diagnostic"
       onClick={() => trackFunnelEvent("landing_cta_clicked", { placement })}
-      className={`inline-flex min-h-12 items-center justify-center rounded-full bg-laiton-400 px-6 py-3 text-sm font-bold uppercase tracking-[0.055em] text-graphite-950 transition hover:bg-laiton-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${className ?? ""}`}
+      className={`inline-flex min-h-12 items-center justify-center rounded-full border border-laiton-200/45 bg-[linear-gradient(115deg,#F0DCA0,#D4AF37)] px-6 py-3 text-sm font-bold uppercase tracking-[0.055em] text-graphite-950 shadow-[0_16px_44px_-18px_rgba(212,175,55,.8)] transition hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${className ?? ""}`}
     >
       {children}
     </Link>

@@ -5,17 +5,29 @@
 body {
   @apply bg-graphite-950 text-graphite-50 antialiased;
   background:
-    radial-gradient(circle at 50% -20%, rgba(201, 162, 98, 0.1), transparent 38rem),
-    #090a0b;
+    radial-gradient(circle at 88% -8%, rgba(56, 189, 248, .12), transparent 35rem),
+    radial-gradient(circle at 8% 24%, rgba(212, 175, 55, .09), transparent 32rem),
+    linear-gradient(155deg, #08090b 0%, #0b1015 52%, #090a0d 100%);
+}
+
+::selection { background: rgba(56, 189, 248, .28); color: #fff; }
+
+.coai-site-shell {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(56,189,248,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,.018) 1px, transparent 1px);
+  background-size: 52px 52px;
 }
 
 /* En-tête marketing : voile fumé suffisamment dense pour rester lisible
    au-dessus des pages sombres comme des pages ivoire du diagnostic. */
 .coai-public-header {
-  border-color: rgba(221, 193, 145, 0.16);
+  border-color: rgba(56, 189, 248, 0.14);
   background:
-    linear-gradient(90deg, rgba(17, 16, 14, 0.94), rgba(29, 27, 23, 0.9) 52%, rgba(14, 17, 18, 0.94));
-  box-shadow: 0 16px 42px rgba(29, 24, 17, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.035);
+    radial-gradient(circle at 76% -100%, rgba(56,189,248,.16), transparent 22rem),
+    linear-gradient(90deg, rgba(10, 12, 15, 0.95), rgba(13, 19, 25, 0.92) 52%, rgba(10, 12, 15, 0.95));
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.3), inset 0 -1px 0 rgba(212,175,55,.08);
 }
 
 /* Diagnostic — luxe technologique lumineux. Une page ivoire et champagne,
@@ -508,15 +520,15 @@ body {
   color: #fffdf8;
   font-family: var(--font-display), system-ui, sans-serif;
   background:
-    radial-gradient(circle at 24% 0%, rgba(214,177,110,.14), transparent 28rem),
-    radial-gradient(circle at 94% 72%, rgba(87,145,172,.12), transparent 34rem),
-    #0d0e10;
+    radial-gradient(circle at 92% 2%, rgba(56,189,248,.15), transparent 30rem),
+    radial-gradient(circle at 18% 86%, rgba(212,175,55,.1), transparent 32rem),
+    linear-gradient(150deg,#090b0e,#0d141a 58%,#0b0d10);
 }
 
 .coai-app-nav {
-  border-color: rgba(255,255,255,.08);
-  background: rgba(13,14,16,.86);
-  box-shadow: 16px 0 45px -38px rgba(0,0,0,.6);
+  border-color: rgba(56,189,248,.13);
+  background: linear-gradient(180deg,rgba(12,17,22,.94),rgba(9,11,14,.9));
+  box-shadow: 16px 0 55px -38px rgba(14,116,144,.48), inset -1px 0 rgba(212,175,55,.04);
 }
 
 .coai-app-nav a:hover,
@@ -790,9 +802,9 @@ body {
 .coai-landing-lux {
   color: #fffdf8;
   background:
-    radial-gradient(circle at 8% 26%, rgba(220,184,116,.13), transparent 32rem),
-    radial-gradient(circle at 96% 62%, rgba(89,145,169,.1), transparent 36rem),
-    #0d0e10;
+    radial-gradient(circle at 8% 26%, rgba(212,175,55,.11), transparent 32rem),
+    radial-gradient(circle at 96% 42%, rgba(56,189,248,.13), transparent 36rem),
+    linear-gradient(160deg,#0b0d10,#0d1319 52%,#0b0d10);
 }
 
 .coai-landing-lux .coai-landing-hero-image {
