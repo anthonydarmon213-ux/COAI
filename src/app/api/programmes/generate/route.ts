@@ -172,6 +172,35 @@ export async function POST() {
   // des appels IA.
   const socle = socles && Object.values(socles).every((v) => v !== null);
 
+  // Réserve le quota AVANT le premier appel payant. Le précédent débit
+  // après génération permettait à plusieurs requêtes concurrentes de
+  // passer toutes le contrôle avec le même compteur.
+  let quotaReserve = false;
+  if (!socle) {
+    if (quota.expire) {
+      await prisma.user.updateMany({
+        where: { id: user.id, generationsResetAt: user.generationsResetAt },
+        data: { generationsUsed: 0, generationsResetAt: new Date() },
+      });
+    }
+
+    const reservation = await prisma.user.updateMany({
+      where: { id: user.id, generationsUsed: { lt: quota.limite } },
+      data: { generationsUsed: { increment: 1 } },
+    });
+    if (reservation.count === 0) {
+      return NextResponse.json(
+        {
+          error: `Tu as utilisé tes ${quota.limite} régénérations de programme ce mois-ci. Ton programme actuel reste disponible et continue de s'adapter.`,
+          quotaEpuise: true,
+          retryable: false,
+        },
+        { status: 429 }
+      );
+    }
+    quotaReserve = true;
+  }
+
   const resultats = await Promise.allSettled(
     piliers.map(async (pilier) => {
       const contenuSocle = socles?.[pilier] ?? null;
@@ -194,6 +223,14 @@ export async function POST() {
 
   const echecs = resultats.filter((r): r is PromiseRejectedResult => r.status === "rejected");
   if (echecs.length === piliers.length) {
+    // Aucun résultat livré : restitue la réservation, l'utilisateur ne doit
+    // pas payer le coût fonctionnel d'une panne fournisseur.
+    if (quotaReserve) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { generationsUsed: { decrement: 1 } },
+      }).catch(() => undefined);
+    }
     // Message générique côté utilisateur (23/08/2026) — l'API renvoyait
     // jusqu'ici l'erreur brute du fournisseur IA, que le bouton affichait
     // telle quelle : un abonné a vu le détail d'un problème de facturation
@@ -229,23 +266,6 @@ export async function POST() {
   const programmes = resultats
     .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof prisma.programmeGenerated.create>>> => r.status === "fulfilled")
     .map((r) => r.value);
-
-  // Décompté seulement en cas de succès : une génération qui échoue ne doit
-  // pas consommer le quota de l'utilisateur, il n'a rien obtenu.
-  // La fenêtre glissante démarre à la première génération de la période et
-  // n'est pas repoussée par les suivantes — sinon le quota ne se
-  // réinitialiserait jamais pour quelqu'un qui régénère régulièrement.
-  // Un socle servi n'a déclenché aucun appel IA : il ne consomme pas de
-  // quota. Plafonner un accès gratuit n'aurait aucun sens.
-  if (programmes.length > 0 && !socle) {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        generationsUsed: quota.expire ? 1 : { increment: 1 },
-        ...(quota.expire ? { generationsResetAt: new Date() } : {}),
-      },
-    });
-  }
 
   if (programmes.length > 0 && statutInitial === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";

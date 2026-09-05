@@ -92,10 +92,26 @@ export async function POST(request: Request) {
   });
   if (!user) return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
 
+  // Une souscription Stripe existante doit être régularisée ou résiliée,
+  // jamais doublée par un second Checkout. CANCELED est le seul état qui
+  // autorise explicitement une nouvelle souscription.
+  if (user.subscription?.stripeSubscriptionId && user.subscription.status !== "CANCELED") {
+    return NextResponse.json(
+      { error: "Un abonnement existe déjà pour ce compte. Gère-le depuis ton espace abonnement." },
+      { status: 409 }
+    );
+  }
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (!appUrl) return NextResponse.json({ error: "Configuration Stripe manquante" }, { status: 500 });
 
   const metadata = { plan, billing };
+  // Un essai est accordé une seule fois par compte. La ligne Subscription
+  // est conservée après résiliation, et son trialEnd sert de preuve durable.
+  const trialDays = user.subscription?.trialEnd ? 0 : offer.trialDays;
+  // Même clé pendant dix minutes : un double clic ou deux requêtes
+  // concurrentes ne peuvent pas créer deux sessions/souscriptions.
+  const idempotencyBucket = Math.floor(Date.now() / (10 * 60 * 1000));
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{
@@ -133,9 +149,11 @@ export async function POST(request: Request) {
     consent_collection: { terms_of_service: "required" },
     subscription_data: {
       metadata,
-      ...(offer.trialDays ? { trial_period_days: offer.trialDays } : {}),
+      ...(trialDays ? { trial_period_days: trialDays } : {}),
     },
-    ...(offer.trialDays ? { payment_method_collection: "always" as const } : {}),
+    ...(trialDays ? { payment_method_collection: "always" as const } : {}),
+  }, {
+    idempotencyKey: `subscription-checkout:${user.id}:${plan}:${billing}:${idempotencyBucket}`,
   });
 
   await prisma.user.update({

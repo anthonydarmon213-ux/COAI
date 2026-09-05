@@ -2,7 +2,9 @@ import type { Subscription } from "@prisma/client";
 
 export type EffectivePlan = "PASS_IA" | "STANDARD" | "PREMIUM";
 
-const ACTIVE_STATUSES = new Set(["ACTIVE", "PAST_DUE"]);
+// Un paiement en retard n'ouvre plus les fonctions coûteuses : Stripe peut
+// réactiver l'accès automatiquement dès que le webhook repasse à ACTIVE.
+const ACTIVE_STATUSES = new Set(["ACTIVE"]);
 
 /** Un accès facturé (ou en période d'essai) donne accès aux fonctions IA coûteuses. */
 export function hasPaidSubscription(subscription?: Subscription | null): boolean {
@@ -35,7 +37,7 @@ export function isInTrial(subscription?: Subscription | null): boolean {
 }
 
 // Autorise la génération de programme dès qu'il existe un abonnement
-// Stripe réel, actif (ou en retard de paiement, encore toléré) — y compris
+// Stripe réel et actif — y compris
 // pendant l'essai offert (11/08/2026 : l'essai doit donner un accès réel,
 // immédiat, pas un accès différé à la fin des 7 jours). Contrairement à
 // getEffectivePlan (qui retombe volontairement sur "PASS_IA" en l'absence

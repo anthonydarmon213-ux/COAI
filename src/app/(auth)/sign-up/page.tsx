@@ -52,7 +52,9 @@ export default function SignUpPage() {
     planParam === "PASS_IA" || planParam === "STANDARD" || planParam === "PREMIUM"
       ? planParam
       : null;
-  const requestedBilling: IntendedBilling = searchParams.get("billing") === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+  const billingParam = searchParams.get("billing");
+  const requestedBilling: IntendedBilling =
+    billingParam === "ANNUAL" ? "ANNUAL" : billingParam === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
   const arriveDepuisInstagram = searchParams.get("source") === "instagram";
   const requestedReturn = sanitizeReturnTo(searchParams.get("redirect_to"));
   const destinationApresInscription = requestedPlan
