@@ -13,8 +13,8 @@ import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
 // passage en pack 3/6 mois de ces deux dernieres offres.
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
   PASS_IA: "Standard IA — 19,99€/mois",
-  STANDARD: "Premium Remote — 960€/pack 3 mois minimum",
-  PREMIUM: "VIP Présentiel — 1 200€/pack 3 mois minimum",
+  STANDARD: "Premium Remote — 960€, accompagnement 3 mois minimum",
+  PREMIUM: "VIP Présentiel — 1 200€, accompagnement 3 mois minimum",
 };
 
 const PROGRAMME_PAR_SLUG = new Map(PROGRAMMES_PRETS.map((programme) => [programme.slug, programme]));

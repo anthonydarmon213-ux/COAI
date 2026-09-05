@@ -50,7 +50,7 @@ const FAQ_ITEMS = [
   {
     question: "Le plan nutrition est-il relu par un professionnel ?",
     reponse:
-      "Avec Standard IA (19,99€/mois ou 119€/an), ton plan évolue grâce au Personal Trainer IA disponible 24h/24. Premium Remote ajoute le regard et les ajustements d'un coach humain, en pack de 3 mois minimum sur devis.",
+      "Avec Standard IA (19,99€/mois ou 119€/an), ton plan évolue grâce au Personal Trainer IA disponible 24h/24. Premium Remote ajoute le regard et les ajustements d'un coach humain, dans le cadre d'un accompagnement sur devis (engagement minimum 3 mois).",
   },
   {
     question: "Est-ce lié à mon programme d'entraînement ?",

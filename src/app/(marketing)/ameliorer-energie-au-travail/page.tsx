@@ -50,7 +50,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Le bilan initial est gratuit. Standard IA coûte ensuite 19,99€/mois (ou 119€/an) avec 7 jours d'essai, sans engagement. Pour le regard d'un coach diplômé d'État, Premium Remote est proposé en pack de 3 mois minimum, sur devis.",
+      "Le bilan initial est gratuit. Standard IA coûte ensuite 19,99€/mois (ou 119€/an) avec 7 jours d'essai, sans engagement. Pour le regard d'un coach diplômé d'État, Premium Remote est un accompagnement individuel avec Anthony, sur devis (engagement minimum 3 mois, payé en une fois).",
   },
 ];
 

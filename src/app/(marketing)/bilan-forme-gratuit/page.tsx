@@ -54,7 +54,7 @@ const FAQ_ITEMS = [
   {
     question: "Et si je veux un accompagnement ensuite ?",
     reponse:
-      "Standard IA coûte 19,99€/mois (ou 119€/an) avec 7 jours d'essai et un coach IA disponible 24h/24, sans engagement. Premium Remote ajoute le regard d'un coach diplômé d'État, en pack de 3 mois minimum sur devis.",
+      "Standard IA coûte 19,99€/mois (ou 119€/an) avec 7 jours d'essai et un coach IA disponible 24h/24, sans engagement. Premium Remote ajoute le regard d'un coach diplômé d'État, dans le cadre d'un accompagnement sur devis (engagement minimum 3 mois).",
   },
 ];
 

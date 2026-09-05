@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     if (questionsUtilisees >= QUOTA_LIMITE) {
       const reply =
-        "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre Standard IA. Passe à Premium Remote (960€/pack 3 mois minimum, sur devis) pour un accès illimité au coach IA et le regard d'un coach humain.";
+        "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre Standard IA. Passe à Premium Remote — un accompagnement individuel avec Anthony, 960€ pour un engagement de 3 mois minimum, sur devis — pour un accès illimité au coach IA et le regard d'un coach humain.";
       await prisma.whatsAppEvent.create({
         data: { userId: user.id, direction: "OUTBOUND", payload: { reply } as Prisma.InputJsonValue },
       });

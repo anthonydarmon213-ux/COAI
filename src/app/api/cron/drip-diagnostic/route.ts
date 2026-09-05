@@ -52,7 +52,7 @@ const ETAPES: Etape[] = [
       `Un programme figé devient vite inutile. Dans ton espace personnalisé, le Défi COAI te propose ` +
       `une action utile par jour pendant 7 jours pour découvrir comment COAI apprend de toi.\n\n` +
       `Tu peux commencer avec Standard IA pendant 7 jours, puis continuer pour 19,99€/mois (ou 119€/an), sans engagement. ` +
-      `Si tu veux aussi le regard d'un coach humain, Premium Remote est proposé en pack de 3 mois minimum, sur devis.\n\n` +
+      `Si tu veux aussi le regard d'un coach humain, Premium Remote est un accompagnement individuel avec moi, sur devis (engagement minimum 3 mois).\n\n` +
       `Créer mon espace personnalisé : ${appUrl}/sign-up\n\n` +
       `À bientôt,\nL'équipe COAI` +
       (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : ""),

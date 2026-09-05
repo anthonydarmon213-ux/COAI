@@ -388,8 +388,8 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Ton profil est prêt : il ne te reste qu'à choisir l'accompagnement qui correspond au niveau de suivi que tu veux.\n\n` +
         `Choisis ton accompagnement : ${appUrl}/pricing\n\n` +
         `Standard IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
-        `Premium Remote : 960 € le pack 3 mois minimum (soit 80 €/séance), coaching 1:1 à distance avec Anthony, sur devis via WhatsApp.\n` +
-        `VIP Présentiel : 1 200 € le pack 3 mois minimum (soit 100 €/séance), à domicile, en entreprise, en club ou à distance, sur devis via WhatsApp.\n\n` +
+        `Premium Remote : accompagnement individuel à distance avec Anthony, 960 € pour un engagement de 3 mois minimum (soit 80 €/séance), sur devis via WhatsApp.\n` +
+        `VIP Présentiel : accompagnement individuel en présentiel avec Anthony, 1 200 € pour un engagement de 3 mois minimum (soit 100 €/séance), à domicile, en entreprise, en club ou à distance, sur devis via WhatsApp.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;
@@ -487,7 +487,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
     // un prix faux est pire que pas d'e-mail du tout.
     const prix =
       user.checkoutPlan === "STANDARD"
-        ? "pack 3 mois minimum, sur devis"
+        ? "accompagnement 3 mois minimum, sur devis"
         : user.checkoutBillingInterval === "ANNUAL"
           ? "119 €/an"
           : "19,99 €/mois";
