@@ -4,12 +4,10 @@ import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
 import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
-import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { TIERS, TIER_BY_SERVICE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
@@ -55,11 +53,10 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       <div className="max-w-4xl text-center">
         <SectionLabel>Choisis ton accompagnement</SectionLabel>
         <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
-          Choisis ton niveau d&apos;accompagnement.
+          Trois niveaux. Un même objectif&nbsp;: <span className="bg-gradient-to-r from-cyan-200 to-laiton-200 bg-clip-text text-transparent">ta meilleure forme.</span>
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
-          Ton bilan et ton résultat sont enregistrés. Choisis maintenant l&apos;accompagnement qui te correspond.
-          Standard IA inclut 7 jours d&apos;essai ; Premium Remote et VIP Présentiel se confirment sur devis, via WhatsApp.
+          Commence en autonomie avec COAI ou ajoute le suivi personnel d&apos;Anthony. Chaque formule associe entraînement, nutrition et récupération à ton agenda réel.
         </p>
       </div>
 
@@ -83,7 +80,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
-            <a key={nom} href={`#${nom === "Standard IA" ? "pass-ia" : nom === "Premium Remote" ? "full-remote" : "full-presentiel"}`} className="rounded-2xl border border-white/[0.08] bg-white/[0.035] px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-400/60">
+            <a key={nom} href={`#${nom === "Standard IA" ? "pass-ia" : nom === "Premium Remote" ? "full-remote" : "full-presentiel"}`} className={`rounded-2xl border px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 ${nom === "Standard IA" ? "border-cyan-300/30 bg-cyan-300/[0.07] hover:border-cyan-300/55 focus-visible:ring-cyan-300/50" : "border-white/[0.08] bg-white/[0.035] hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:ring-laiton-400/60"}`}>
               <strong className="block text-base text-white">{nom}</strong>
               <span className="mt-1.5 block text-sm font-semibold text-laiton-300">{besoin}</span>
               <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
@@ -94,7 +91,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
 
       <section
         id="pass-ia"
-        className="relative w-full max-w-5xl scroll-mt-24 overflow-hidden rounded-[2rem] border border-laiton-300/35 bg-[radial-gradient(circle_at_80%_10%,rgba(66,214,222,0.16),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(214,170,96,0.18),transparent_38%),rgba(255,255,255,0.035)] px-6 py-8 shadow-[0_32px_120px_-55px_rgba(66,214,222,0.75)] sm:px-10 sm:py-10"
+        className="relative w-full max-w-5xl scroll-mt-24 overflow-hidden rounded-[2rem] border border-cyan-300/35 bg-[radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(212,175,55,0.14),transparent_38%),rgba(255,255,255,0.035)] px-6 py-8 shadow-[0_32px_120px_-55px_rgba(56,189,248,0.7)] sm:px-10 sm:py-10"
         aria-labelledby="standard-ia-title"
       >
         <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border border-cyan-200/20 bg-cyan-300/[0.06] blur-[1px]" />
@@ -389,10 +386,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           prix du Pass IA, donc l'offre sans coach etait la premiere chose
           lue, avant meme d'avoir vu Anthony. Les deux promos Standard IA
           sont maintenant regroupees apres les trois offres. */}
-      <FondateurTicker />
-
-      <CompteAReboursRentree className="w-full max-w-5xl" />
-
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
         <p className="mt-1 text-xs text-graphite-400">Standard IA : 7 jours d&apos;essai avant le premier prélèvement. Premium Remote et VIP Présentiel se règlent sur devis, via WhatsApp — packs 3 ou 6 mois uniquement, pas de séance isolée en dehors de l&apos;essai.</p>

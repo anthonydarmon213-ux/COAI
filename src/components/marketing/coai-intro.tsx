@@ -28,19 +28,21 @@ export function CoaiIntro() {
     <section className="coai-future-hero coai-landing-hero relative overflow-hidden px-6 pb-0 pt-28 sm:px-10 sm:pt-36">
       {/* Halo laiton derrière l'accroche — remplace la photo de fond, qui
           descend maintenant sous le hero. */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-0 h-[620px] w-[1100px] max-w-[160vw] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(201,162,98,.16),transparent_70%)] blur-2xl"
-        aria-hidden="true"
-      />
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute left-1/2 top-0 h-[620px] w-[1100px] max-w-[160vw] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(56,189,248,.15),rgba(212,175,55,.08)_42%,transparent_72%)] blur-2xl" />
+        <div className="absolute left-1/2 top-20 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full border border-cyan-300/[0.09] shadow-[0_0_100px_rgba(56,189,248,.06)]" />
+        <div className="absolute left-1/2 top-28 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full border border-dashed border-laiton-300/[0.12]" />
+      </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center">
-        <p className="text-[11px] font-bold uppercase leading-4 tracking-[0.22em] text-laiton-300 sm:text-xs">
+        <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.055] px-4 py-2 text-[11px] font-bold uppercase leading-4 tracking-[0.2em] text-cyan-200 sm:text-xs">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(56,189,248,.9)]" />
           Pour dirigeants &amp; entrepreneurs de 35 à 65 ans
         </p>
 
         <h1 className="mt-6 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
           Retrouve un corps fort et ton énergie,
-          <span className="mt-2 block text-graphite-400">sans sacrifier ton agenda.</span>
+          <span className="mt-2 block bg-gradient-to-r from-cyan-200 via-white to-laiton-200 bg-clip-text text-transparent">sans sacrifier ton agenda.</span>
         </h1>
 
         {/* Reformule le 04/09/2026 (Anthony : « la methode d'un coach
@@ -100,7 +102,7 @@ export function CoaiIntro() {
           enfin lisible, et c'est elle qui porte la confiance — un visage réel
           plutôt qu'un visuel généré. */}
       <div className="relative z-10 mx-auto mt-16 w-full max-w-lg sm:mt-20">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] border-x border-t border-laiton-300/20 shadow-[0_-30px_120px_-40px_rgba(201,162,98,.45)]">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] border-x border-t border-cyan-300/20 shadow-[0_-30px_120px_-40px_rgba(56,189,248,.34)]">
           {/* Recadrage : la photo source est un portrait haut dont le tiers
               supérieur est le plafond et les sangles TRX. En plein cadre, il
               fallait scroller longtemps avant d'arriver au visage. Le format

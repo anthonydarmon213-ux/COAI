@@ -36,7 +36,7 @@ const ONGLETS: {
   teinte: string;
   sous?: SousLien[];
 }[] = [
-  { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard", teinte: "201,162,98" },
+  { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard", teinte: "56,189,248" },
   // Le carnet de séances (RepCount) est promu en entrée principale
   // (01/09/2026, demande Anthony : « en priorité et en avant »). Il était
   // enterré comme 1er sous-lien de Progression, invisible tant que l'onglet

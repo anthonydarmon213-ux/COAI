@@ -201,6 +201,10 @@ export default async function DashboardPage() {
 
       {/* BLOC 1 — Hero + Readiness du jour */}
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-6 px-6 py-7 sm:px-8 sm:py-9">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(56,189,248,.9)]" />
+          COAI Live · ton plan du jour
+        </div>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-5">
             <DashboardAvatar resultat={ageCoai} />
@@ -228,7 +232,7 @@ export default async function DashboardPage() {
 
       {/* BLOC 2 — L'action principale du jour, seule décision à prendre */}
       <div className="relative">
-        <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-laiton-400/[0.12] blur-2xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-[radial-gradient(circle_at_75%_20%,rgba(56,189,248,.16),rgba(212,175,55,.08),transparent_70%)] blur-2xl" />
         <div className="relative flex flex-col gap-5">
           {!completion.essentielComplet ? (
             <section className="coai-glass p-6">
@@ -295,7 +299,7 @@ export default async function DashboardPage() {
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link
           href="/programme"
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-laiton-400/35 bg-white/[0.04] px-6 py-3 text-sm font-bold text-graphite-50 transition hover:-translate-y-0.5 hover:bg-white/[0.08]"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-300/[0.06] px-6 py-3 text-sm font-bold text-graphite-50 transition hover:-translate-y-0.5 hover:bg-cyan-300/[0.12]"
         >
           Voir mon programme complet →
         </Link>

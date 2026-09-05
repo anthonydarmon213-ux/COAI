@@ -3,13 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/section-label";
 import { NB_EXERCICES_FILMES, NB_PROGRAMMES_PRETS, NB_RECETTES } from "@/lib/catalogue-chiffres";
-import { CompteAReboursRentree } from "@/components/marketing/compte-a-rebours-rentree";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { Reveal } from "@/components/marketing/reveal";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { MobileLeadBar } from "@/components/marketing/lead-cta";
 
 const TITLE = "COAI — Coaching adaptatif pour dirigeants et entrepreneurs";
@@ -225,12 +223,6 @@ const PARCOURS_COURT = [
 ] as const;
 
 export default function LandingPage() {
-  // Messages pre-remplis : la personne n'a plus qu'a envoyer, et Anthony sait
-  // d'ou vient la demande sans avoir a la questionner.
-  const seanceEssaiHref = buildWhatsAppLink(
-    "Bonjour Anthony, j’aimerais tester une séance d’essai avec vous avant de choisir un accompagnement."
-  );
-
   return (
     <main className="coai-color-surface bg-lab-grid flex flex-col after:hidden">
       <script
@@ -253,7 +245,7 @@ export default function LandingPage() {
         </div>
         <ol className="mt-10 grid gap-3 md:grid-cols-3">
           {PARCOURS_COURT.map(([numero, titre, texte], index) => (
-            <li key={numero} className={`rounded-3xl border px-5 py-6 ${index === PARCOURS_COURT.length - 1 ? "border-laiton-300/45 bg-laiton-300/[0.08]" : "border-white/[0.08] bg-white/[0.03]"}`}>
+            <li key={numero} className={`rounded-3xl border px-5 py-6 backdrop-blur-sm ${index === PARCOURS_COURT.length - 1 ? "border-laiton-300/45 bg-laiton-300/[0.08]" : "border-cyan-300/[0.14] bg-[linear-gradient(145deg,rgba(255,255,255,.04),rgba(56,189,248,.035))]"}`}>
               <span className="font-mono text-[10px] tracking-[0.2em] text-cyan-300">ÉTAPE {numero}</span>
               <h3 className="mt-3 text-lg font-semibold text-white">{titre}</h3>
               <p className="mt-2 text-sm leading-6 text-graphite-400">{texte}</p>
@@ -305,7 +297,7 @@ export default function LandingPage() {
       <Reveal>
       <section
         id="coaching-anthony"
-        className="mx-auto my-8 flex w-[calc(100%-2rem)] max-w-4xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/25 bg-laiton-300/[0.04] px-6 py-14 text-center sm:px-12"
+        className="mx-auto my-8 flex w-[calc(100%-2rem)] max-w-4xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-cyan-300/20 bg-[radial-gradient(circle_at_85%_0%,rgba(56,189,248,.13),transparent_24rem),radial-gradient(circle_at_10%_100%,rgba(212,175,55,.1),transparent_22rem),rgba(255,255,255,.025)] px-6 py-14 text-center shadow-[0_32px_100px_-65px_rgba(56,189,248,.75)] sm:px-12"
         aria-labelledby="coaching-anthony-title"
       >
         <SectionLabel>Premium Remote · VIP Présentiel</SectionLabel>
@@ -380,10 +372,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="mx-auto w-[calc(100%-2rem)] max-w-2xl">
-        <CompteAReboursRentree />
-      </div>
-
       {/* Ce que contient l'abonnement, en chiffres verifiables. La page
           expliquait comment COAI fonctionne sans jamais dire ce qu'on y
           trouve : un visiteur ignorait qu'il achete des centaines de
@@ -413,7 +401,7 @@ export default function LandingPage() {
             { chiffre: "24/7", titre: "coach IA", texte: "Disponible pendant la séance, dans le contexte de ton exercice." },
             { chiffre: "1-1", titre: "coach humain", texte: "Anthony relit et ajuste ton programme, selon ton accompagnement." },
           ].map((bloc) => (
-            <div key={bloc.titre} className="bg-[#0d0d0c]/95 p-6 text-left">
+            <div key={bloc.titre} className="bg-[linear-gradient(145deg,rgba(10,14,18,.98),rgba(12,24,32,.94))] p-6 text-left">
               <p className="font-display text-3xl font-semibold tracking-[-0.04em] text-laiton-300">{bloc.chiffre}</p>
               <p className="mt-1 text-sm font-semibold text-white">{bloc.titre}</p>
               <p className="mt-2 text-sm leading-6 text-graphite-400">{bloc.texte}</p>

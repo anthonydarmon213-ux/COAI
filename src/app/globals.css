@@ -37,8 +37,8 @@ body {
   isolation: isolate;
   overflow: hidden;
   background:
-    radial-gradient(circle at 12% 5%, rgba(216, 181, 119, 0.16), transparent 25rem),
-    radial-gradient(circle at 88% 18%, rgba(109, 154, 176, 0.14), transparent 28rem),
+    radial-gradient(circle at 12% 5%, rgba(212, 175, 55, 0.12), transparent 25rem),
+    radial-gradient(circle at 88% 18%, rgba(56, 189, 248, 0.18), transparent 28rem),
     linear-gradient(145deg, #0d0e10 0%, #111316 48%, #0d1315 100%);
 }
 
@@ -99,10 +99,10 @@ body {
 .coai-diagnostic-card {
   position: relative;
   color: #fffdf8;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(56, 189, 248, 0.16);
   border-radius: 2rem;
-  background: radial-gradient(circle at 85% 0%, rgba(196,154,82,.1), transparent 24rem), #111518;
-  box-shadow: 0 30px 90px -46px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255,255,255,.05);
+  background: radial-gradient(circle at 88% 0%, rgba(56,189,248,.105), transparent 24rem), radial-gradient(circle at 0% 100%, rgba(212,175,55,.07), transparent 20rem), #101519;
+  box-shadow: 0 30px 90px -46px rgba(14,116,144,.55), inset 0 1px 0 rgba(255,255,255,.06);
   backdrop-filter: blur(24px);
 }
 
@@ -127,12 +127,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: .65rem;
-  border: 1px solid rgba(221, 193, 145, .18);
+  border: 1px solid rgba(56, 189, 248, .24);
   border-radius: 999px;
   background: linear-gradient(110deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
   box-shadow: 0 10px 30px -20px rgba(0, 0, 0, .8), inset 0 1px 0 rgba(255,255,255,.06);
   padding: .55rem .85rem;
-  color: #ddc191;
+  color: #bae6fd;
   font-family: var(--font-sans), sans-serif;
   font-size: .78rem;
   font-weight: 650;
@@ -143,8 +143,8 @@ body {
   width: .45rem;
   height: .45rem;
   border-radius: 999px;
-  background: #c9a262;
-  box-shadow: 0 0 0 4px rgba(201, 162, 98, .18);
+  background: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, .16), 0 0 16px rgba(56,189,248,.65);
 }
 
 .coai-diagnostic-kicker-separator {
@@ -164,8 +164,8 @@ body {
 
 .coai-progress-value {
   position: relative;
-  background: linear-gradient(90deg, #8e662d, #d7af6e 65%, #f0d89f);
-  box-shadow: 0 0 13px rgba(183,137,67,.48);
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8 54%, #d4af37);
+  box-shadow: 0 0 15px rgba(56,189,248,.5);
 }
 
 .coai-progress-value::after {
@@ -206,14 +206,14 @@ body {
 }
 
 .coai-diagnostic-option[aria-pressed="true"] .coai-diagnostic-option-mark {
-  border-color: #a77a37;
-  background: linear-gradient(145deg, #c49a57, #8f672b);
+  border-color: #38bdf8;
+  background: linear-gradient(145deg, #38bdf8, #0e7490);
   transform: scale(1.04);
 }
 
 .coai-diagnostic-option[aria-pressed="true"] {
   transform: translateY(-1px) scale(1.008);
-  box-shadow: 0 14px 30px -22px rgba(0,0,0,.6), inset 3px 0 0 #b78943, inset 0 1px 0 rgba(255,255,255,.1);
+  box-shadow: 0 14px 34px -22px rgba(14,116,144,.8), inset 3px 0 0 #38bdf8, inset 0 1px 0 rgba(255,255,255,.1);
   animation: coai-choice-confirm .28s ease-out;
 }
 
@@ -953,12 +953,13 @@ body:has(main.coai-vip-page) .coai-marketing-footer .text-graphite-500 { color: 
 .coai-dashboard-hero {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.09);
+  border: 1px solid rgba(56,189,248,.18);
   border-radius: 1.75rem;
   background:
-    radial-gradient(circle at 88% 10%, rgba(91,143,166,.16), transparent 18rem),
-    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-  box-shadow: 0 30px 70px -52px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
+    radial-gradient(circle at 88% 10%, rgba(56,189,248,.18), transparent 18rem),
+    radial-gradient(circle at 5% 100%, rgba(212,175,55,.08), transparent 20rem),
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(56,189,248,.025));
+  box-shadow: 0 30px 80px -52px rgba(14,116,144,.72), inset 0 1px 0 rgba(255,255,255,.065);
 }
 
 .coai-dashboard-hero::after {
@@ -1725,13 +1726,14 @@ html {
    repli, une carte deviendrait illisible sur un navigateur sans support.
 --------------------------------------------------------------------------- */
 .coai-glass {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(255,255,255,.05), rgba(56,189,248,.025));
+  border: 1px solid rgba(56, 189, 248, 0.14);
   border-radius: 1rem;
+  box-shadow: inset 0 1px rgba(255,255,255,.055), 0 24px 70px -50px rgba(14,116,144,.45);
 }
 @supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
   .coai-glass {
-    background: rgba(255, 255, 255, 0.04);
+    background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(56,189,248,.025));
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }
