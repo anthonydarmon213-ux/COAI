@@ -74,7 +74,7 @@ export default async function EvolutionPage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="animate-reveal flex flex-col gap-3 border-b border-acier/25 pb-7">
+      <div className="coai-app-page-header animate-reveal flex flex-col gap-3">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Ton évolution</span>

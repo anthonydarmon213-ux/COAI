@@ -23,6 +23,7 @@ import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
+import type { CSSProperties } from "react";
 
 // Traverse le JSON d'un programme généré (structure non garantie — contenu
 // IA, différente par pilier) pour en extraire tous les "photoQuery" que
@@ -70,6 +71,18 @@ const TYPE_MEDIA: Partial<Record<Pilier, "exercice" | "repas">> = {
 };
 
 const PILIERS: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
+
+const PILIER_ACCENT: Record<Pilier, string> = {
+  ENTRAINEMENT: "56 189 248",
+  NUTRITION: "52 211 153",
+  RECUPERATION: "167 139 250",
+};
+
+const PILIER_HREF: Record<Pilier, string> = {
+  ENTRAINEMENT: "/programme/entrainement",
+  NUTRITION: "/programme/alimentation",
+  RECUPERATION: "/programme/recuperation",
+};
 
 const PDF_SLUG: Record<Pilier, string> = {
   ENTRAINEMENT: "entrainement",
@@ -168,7 +181,10 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   });
 
   return (
-    <div className="coai-programme-page flex flex-col gap-8">
+    <div
+      className="coai-programme-page flex flex-col gap-8"
+      style={{ "--coai-pillar": PILIER_ACCENT[pilierActif] } as CSSProperties}
+    >
       {derniers[0] && derniers[0].version === 1 && <TrackConversion name="first_programme_viewed" />}
 
       <div className="coai-programme-hero animate-reveal overflow-hidden px-5 py-6 sm:px-8 sm:py-9">
@@ -192,20 +208,34 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
             <div className="flex flex-wrap gap-2">
               <a
                 href="/api/programmes/fiche-complete"
-                className="inline-flex min-h-11 items-center rounded-full border border-laiton-400/40 bg-laiton-400/10 px-5 text-sm font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+                className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-semibold transition"
               >
                 Télécharger ma fiche (PDF)
               </a>
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/[0.09] to-laiton-400/[0.07] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <nav aria-label="Choisir un pilier" className="coai-pillar-switcher">
+            {PILIERS.map((pilier) => (
+              <Link
+                key={pilier}
+                href={PILIER_HREF[pilier]}
+                aria-current={pilier === pilierActif ? "page" : undefined}
+                className={pilier === pilierActif ? "is-active" : undefined}
+              >
+                <span>{LABELS[pilier]}</span>
+                <small>{etapes[PILIERS.indexOf(pilier)]?.sousTitre}</small>
+              </Link>
+            ))}
+          </nav>
+
+          <div className="coai-pillar-daily flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">À faire en premier · 45 secondes</p>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">À faire en premier · 45 secondes</p>
               <h2 className="mt-1.5 text-lg font-semibold text-white">Comment te sens-tu aujourd&apos;hui ?</h2>
               <p className="mt-1 text-xs leading-5 text-graphite-300">Forme, sommeil, douleur, temps et matériel : COAI prépare la bonne séance sans recréer tout ton programme.</p>
             </div>
-            <Link href="/dashboard#check-in-du-jour" className="inline-flex shrink-0 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-bold text-graphite-950 transition hover:bg-cyan-50">
+            <Link href="/dashboard#check-in-du-jour" className="coai-pillar-primary inline-flex shrink-0 items-center justify-center rounded-full px-5 py-3 text-sm font-bold transition">
               Faire mon bilan →
             </Link>
           </div>

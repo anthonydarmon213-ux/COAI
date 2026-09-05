@@ -25,7 +25,7 @@ export default async function RecettesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="animate-reveal flex flex-col gap-3">
+      <div className="coai-app-page-header animate-reveal flex flex-col gap-3">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Bibliothèque</span>

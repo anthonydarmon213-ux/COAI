@@ -78,11 +78,19 @@ export function RepasForm() {
   }
 
   return (
-    <Card>
+    <Card className="coai-action-card">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Field label="Date">
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </Field>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-semibold text-white">Ton bilan du jour</p>
+            <p className="mt-1 text-sm text-graphite-300">Un choix suffit. Les détails restent facultatifs.</p>
+          </div>
+          <div className="w-full sm:w-44">
+            <Field label="Date">
+              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </Field>
+          </div>
+        </div>
         <Field label="Comment s'est passée ta journée nutrition ?">
           <div className="flex flex-wrap gap-2">
             {STATUTS.map((s) => (
@@ -102,38 +110,23 @@ export function RepasForm() {
             ))}
           </div>
         </Field>
-        <Field label="Ce que tu as mangé (optionnel)">
-          <Input
-            type="text"
-            placeholder="ex: poulet, riz et brocolis"
-            value={libelle}
-            onChange={(e) => setLibelle(e.target.value)}
-            maxLength={120}
-          />
-        </Field>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          <Field label="Calories">
-            <Input type="number" min="0" inputMode="numeric" placeholder="kcal" value={calories} onChange={(e) => setCalories(e.target.value)} />
-          </Field>
-          <Field label="Protéines">
-            <Input type="number" min="0" inputMode="numeric" placeholder="g" value={proteines} onChange={(e) => setProteines(e.target.value)} />
-          </Field>
-          <Field label="Glucides">
-            <Input type="number" min="0" inputMode="numeric" placeholder="g" value={glucides} onChange={(e) => setGlucides(e.target.value)} />
-          </Field>
-          <Field label="Lipides">
-            <Input type="number" min="0" inputMode="numeric" placeholder="g" value={lipides} onChange={(e) => setLipides(e.target.value)} />
-          </Field>
-        </div>
-        <Field label="Note (optionnel)">
-          <Textarea
-            placeholder="ex: repas de famille le midi, sinon suivi le plan"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-        </Field>
+        <details className="coai-advanced-fields">
+          <summary>Ajouter les aliments, macros ou une note</summary>
+          <div className="mt-4 flex flex-col gap-4">
+            <Field label="Ce que tu as mangé">
+              <Input type="text" placeholder="ex : poulet, riz et brocolis" value={libelle} onChange={(e) => setLibelle(e.target.value)} maxLength={120} />
+            </Field>
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <Field label="Calories"><Input type="number" min="0" inputMode="numeric" placeholder="kcal" value={calories} onChange={(e) => setCalories(e.target.value)} /></Field>
+              <Field label="Protéines"><Input type="number" min="0" inputMode="numeric" placeholder="g" value={proteines} onChange={(e) => setProteines(e.target.value)} /></Field>
+              <Field label="Glucides"><Input type="number" min="0" inputMode="numeric" placeholder="g" value={glucides} onChange={(e) => setGlucides(e.target.value)} /></Field>
+              <Field label="Lipides"><Input type="number" min="0" inputMode="numeric" placeholder="g" value={lipides} onChange={(e) => setLipides(e.target.value)} /></Field>
+            </div>
+            <Field label="Note"><Textarea placeholder="ex : repas de famille le midi, sinon suivi le plan" value={notes} onChange={(e) => setNotes(e.target.value)} /></Field>
+          </div>
+        </details>
         {error && <p className="text-sm text-red-400">{error}</p>}
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} className="sm:self-start">
           {loading ? "Ajout…" : "Ajouter mon bilan"}
         </Button>
       </form>

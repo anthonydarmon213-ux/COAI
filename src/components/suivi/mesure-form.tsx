@@ -72,68 +72,55 @@ export function MesureForm() {
   }
 
   return (
-    <Card>
+    <Card className="coai-action-card">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Field label="Date">
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </Field>
-        <Field label="Poids (kg)">
-          <Input
-            type="number"
-            step="0.1"
-            value={poidsKg}
-            onChange={(e) => setPoidsKg(e.target.value)}
-          />
-        </Field>
-        <Field label="Tour de taille (cm)">
-          <Input
-            type="number"
-            step="0.1"
-            value={tourTailleCm}
-            onChange={(e) => setTourTailleCm(e.target.value)}
-          />
-        </Field>
+        <div>
+          <SectionLabel>Mise à jour rapide</SectionLabel>
+          <p className="mt-2 text-sm leading-6 text-graphite-300">Le poids et le tour de taille suffisent pour suivre la tendance.</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Field label="Date">
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </Field>
+          <Field label="Poids (kg)">
+            <Input type="number" step="0.1" inputMode="decimal" value={poidsKg} onChange={(e) => setPoidsKg(e.target.value)} />
+          </Field>
+          <Field label="Tour de taille (cm)">
+            <Input type="number" step="0.1" inputMode="decimal" value={tourTailleCm} onChange={(e) => setTourTailleCm(e.target.value)} />
+          </Field>
+        </div>
 
-        <SectionLabel>Composition corporelle (type InBody, optionnel)</SectionLabel>
-        <Field label="Masse grasse (%)">
-          <Input
-            type="number"
-            step="0.1"
-            value={masseGrassePourcent}
-            onChange={(e) => setMasseGrassePourcent(e.target.value)}
-          />
-        </Field>
-        <Field label="Masse musculaire (kg)">
-          <Input
-            type="number"
-            step="0.1"
-            value={masseMusculaireKg}
-            onChange={(e) => setMasseMusculaireKg(e.target.value)}
-          />
-        </Field>
-        <Field label="Fréquence cardiaque de repos (bpm)">
-          <Input
-            type="number"
-            value={frequenceCardiaqueReposBpm}
-            onChange={(e) => setFrequenceCardiaqueReposBpm(e.target.value)}
-          />
-        </Field>
-
-        <Field label="Photo de progression (optionnel)">
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={(e) => {
-              const selected = e.target.files?.[0] ?? null;
-              setPhoto(selected);
-              setPhotoInfo(selected ? "La photo sera optimisée automatiquement avant l’envoi." : null);
-            }}
-            className="text-sm text-graphite-300 file:mr-3 file:rounded-md file:border-0 file:bg-laiton-500 file:px-3 file:py-1.5 file:text-graphite-950 file:transition hover:file:bg-laiton-400"
-          />
-        </Field>
-        {photoInfo && <p className="-mt-2 text-xs text-graphite-400">{photoInfo}</p>}
+        <details className="coai-advanced-fields">
+          <summary>Ajouter une analyse complète ou une photo</summary>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <Field label="Masse grasse (%)">
+              <Input type="number" step="0.1" inputMode="decimal" value={masseGrassePourcent} onChange={(e) => setMasseGrassePourcent(e.target.value)} />
+            </Field>
+            <Field label="Masse musculaire (kg)">
+              <Input type="number" step="0.1" inputMode="decimal" value={masseMusculaireKg} onChange={(e) => setMasseMusculaireKg(e.target.value)} />
+            </Field>
+            <Field label="Fréquence cardiaque au repos">
+              <Input type="number" inputMode="numeric" placeholder="bpm" value={frequenceCardiaqueReposBpm} onChange={(e) => setFrequenceCardiaqueReposBpm(e.target.value)} />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field label="Photo de progression">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => {
+                  const selected = e.target.files?.[0] ?? null;
+                  setPhoto(selected);
+                  setPhotoInfo(selected ? "La photo sera optimisée automatiquement avant l’envoi." : null);
+                }}
+                className="text-sm text-graphite-300 file:mr-3 file:rounded-full file:border-0 file:bg-cyan-300 file:px-4 file:py-2 file:font-semibold file:text-graphite-950 file:transition hover:file:bg-cyan-200"
+              />
+            </Field>
+            {photoInfo && <p className="mt-2 text-xs text-graphite-400">{photoInfo}</p>}
+          </div>
+        </details>
         {error && <p className="text-sm text-red-400">{error}</p>}
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} className="sm:self-start">
           {loading ? "Ajout…" : "Ajouter la mesure"}
         </Button>
       </form>

@@ -55,14 +55,14 @@ export default async function AlimentationSuiviPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="animate-reveal flex flex-col gap-3">
+      <div className="coai-app-page-header animate-reveal flex flex-col gap-3">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Suivi</span>
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Journal nutrition.</h1>
         <p className="text-sm text-graphite-400">
-          Un bilan rapide par jour, pas un journal alimentaire complet à remplir à chaque repas.
+          Un bilan rapide par jour. COAI observe la régularité sans te demander de peser chaque aliment.
         </p>
       </div>
       <CompteurCalories repasDuJour={repasDuJour} objectifs={objectifs} />
@@ -71,14 +71,14 @@ export default async function AlimentationSuiviPage() {
         {repasLogs.map((r) => {
           const { label, tone } = STATUT_LABELS[r.statut];
           return (
-            <Card key={r.id} className="flex items-center gap-3 p-3 text-sm">
+            <Card key={r.id} className="coai-history-row flex flex-wrap items-center gap-3 p-3 text-sm">
               <span className="font-mono text-laiton-400">{r.date.toISOString().slice(0, 10)}</span>
               <Badge tone={tone}>{label}</Badge>
               {r.notes && <span className="text-graphite-300">{r.notes}</span>}
             </Card>
           );
         })}
-        {repasLogs.length === 0 && <p className="text-graphite-400">Aucun bilan pour l&apos;instant.</p>}
+        {repasLogs.length === 0 && <div className="coai-empty-state">Ton premier bilan nutrition apparaîtra ici.</div>}
       </div>
     </div>
   );

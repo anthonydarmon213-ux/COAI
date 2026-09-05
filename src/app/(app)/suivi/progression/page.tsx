@@ -142,12 +142,15 @@ export default async function ProgressionPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="animate-reveal flex flex-col gap-3">
+      <div className="coai-app-page-header animate-reveal flex flex-col gap-3">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Suivi</span>
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Progression.</h1>
+        <p className="max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
+          Tes tendances utiles, tes records et les signaux que COAI utilise pour faire évoluer ton coaching.
+        </p>
       </div>
 
       <SyntheseCorporelle

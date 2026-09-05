@@ -43,12 +43,15 @@ export default async function SeancesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="animate-reveal flex flex-col gap-3">
+      <div className="coai-app-page-header animate-reveal flex flex-col gap-3">
         <div className="coai-diagnostic-kicker self-start">
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Suivi</span>
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Journal de séances.</h1>
+        <p className="max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
+          Enregistre l’essentiel après ta séance. COAI transforme ensuite tes retours en ajustements utiles.
+        </p>
       </div>
       <SeanceForm exercicesConnus={EXERCICES.filter((e) => exerciceAvecMediasCoai(e.nom)).map((e) => e.nom).sort((a, b) => a.localeCompare(b))} />
       <div className="flex flex-col gap-3">
@@ -59,7 +62,7 @@ export default async function SeancesPage() {
           const tonnageTotal = exercices.reduce((sum, ex) => sum + tonnageExercice(ex), 0);
 
           return (
-            <Card key={s.id} className="flex flex-col gap-3 p-4">
+            <Card key={s.id} className="coai-history-row flex flex-col gap-3 p-4">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-sm font-semibold text-laiton-400">
                   {s.date.toISOString().slice(0, 10)}
@@ -135,7 +138,7 @@ export default async function SeancesPage() {
             </Card>
           );
         })}
-        {seances.length === 0 && <p className="text-graphite-400">Aucune séance loguée.</p>}
+        {seances.length === 0 && <div className="coai-empty-state">Ta première séance terminée apparaîtra ici.</div>}
       </div>
     </div>
   );
