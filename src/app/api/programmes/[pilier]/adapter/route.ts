@@ -56,7 +56,7 @@ export async function POST(request: Request, { params }: { params: { pilier: str
   }
 
   const programmeExistant = await prisma.programmeGenerated.findFirst({
-    where: { userId: user.id, pilier },
+    where: { userId: user.id, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
   });
   if (!programmeExistant) {
     return NextResponse.json(

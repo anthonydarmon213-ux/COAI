@@ -31,21 +31,20 @@ export async function GET(request: Request, { params }: { params: { pilier: stri
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  // Même logique de sélection du programme affiché que PilierPage : le
-  // dernier programme validé prime, sinon le dernier en attente/généré IA.
+  // Un programme en attente de validation humaine ne doit jamais être
+  // exporté. Le dernier programme validé prime, sinon un programme IA
+  // explicitement publiable peut être utilisé.
   const [valide, dernier] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier, statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
     }),
     prisma.programmeGenerated.findFirst({
-      where: { userId: user.id, pilier },
+      where: { userId: user.id, pilier, statut: "GENERE_IA" },
       orderBy: { generatedAt: "desc" },
     }),
   ]);
-  const enAttente = dernier && dernier.statut === "EN_ATTENTE";
-  const genereIA = dernier && dernier.statut === "GENERE_IA";
-  const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
+  const affiche = valide ?? dernier;
 
   if (!affiche) {
     return NextResponse.json({ error: "Aucun programme généré" }, { status: 404 });

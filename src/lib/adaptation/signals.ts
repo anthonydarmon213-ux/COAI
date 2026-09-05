@@ -48,7 +48,10 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
       prisma.weeklyCheckin.findFirst({ where: { userId }, orderBy: { semaineDebut: "desc" } }),
       prisma.mesure.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 2 }),
       prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 20 }),
-      prisma.programmeGenerated.findFirst({ where: { userId, pilier }, orderBy: { generatedAt: "desc" } }),
+      prisma.programmeGenerated.findFirst({
+        where: { userId, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
+        orderBy: { generatedAt: "desc" },
+      }),
       prisma.repasLog.findMany({ where: { userId, date: { gte: depuis } } }),
     ]);
 

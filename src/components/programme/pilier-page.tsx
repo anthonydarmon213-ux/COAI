@@ -126,9 +126,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
   // que l'IA génère elle-même dans le contenu (cf. extractPhotoQueries).
   const contenusAffiches = PILIERS.map((_, index) =>
     valides[index]?.contenu ??
-    (derniers[index]?.statut === "EN_ATTENTE" || derniers[index]?.statut === "GENERE_IA"
-      ? derniers[index]?.contenu
-      : null)
+    (derniers[index]?.statut === "GENERE_IA" ? derniers[index]?.contenu : null)
   );
   const photosParPilier = await Promise.all(
     contenusAffiches.map((contenu, index) =>
@@ -276,7 +274,21 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
         const dernier = derniers[i];
         const enAttente = dernier && dernier.statut === "EN_ATTENTE";
         const genereIA = dernier && dernier.statut === "GENERE_IA";
-        const affiche: ProgrammeGenerated | null = valide ? valide : enAttente || genereIA ? dernier : null;
+        const affiche: ProgrammeGenerated | null = valide ? valide : genereIA ? dernier : null;
+
+        if (!affiche && enAttente) {
+          return (
+            <section id={`pilier-${pilier.toLowerCase()}`} key={pilier} className="scroll-mt-6">
+              <Card className="flex flex-col gap-3 p-6 text-center">
+                <Badge tone="warning">À valider par le coach</Badge>
+                <h2 className="text-2xl font-semibold text-white">Anthony relit ton programme.</h2>
+                <p className="text-sm leading-6 text-graphite-300">
+                  Son contenu reste privé jusqu&apos;à sa validation.
+                </p>
+              </Card>
+            </section>
+          );
+        }
 
         if (!affiche && (!peutGenerer || !aUnContenu)) return null;
 
@@ -300,7 +312,6 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                   {valide && (
                     <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
                   )}
-                  {!valide && enAttente && <Badge tone="warning">À valider par le coach</Badge>}
                   {!valide && genereIA && estSocleCoai(affiche?.contenu) && (
                     <Badge tone="success">Programme COAI · conçu par Anthony Darmon</Badge>
                   )}
@@ -327,13 +338,6 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
                       </Link>
                     </>
                   )}
-                </p>
-              )}
-
-              {enAttente && (
-                <p className="text-sm text-laiton-400">
-                  Aperçu ci-dessous — Anthony n&apos;a pas encore relu/validé ce programme, les
-                  détails peuvent encore être ajustés.
                 </p>
               )}
 

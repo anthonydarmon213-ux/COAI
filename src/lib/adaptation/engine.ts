@@ -205,7 +205,7 @@ export async function proposerAdaptation(
   const [signaux, programmeActuel] = await Promise.all([
     collecterSignaux(user.id, pilier),
     prisma.programmeGenerated.findFirst({
-      where: { userId: user.id, pilier },
+      where: { userId: user.id, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
       orderBy: { generatedAt: "desc" },
     }),
   ]);
@@ -384,7 +384,7 @@ export async function reprendreProgrammeHabituel(
   pilier: Pilier
 ): Promise<{ nouvelleVersion: number } | null> {
   const dernierProgramme = await prisma.programmeGenerated.findFirst({
-    where: { userId, pilier },
+    where: { userId, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
     orderBy: { generatedAt: "desc" },
   });
   if (!dernierProgramme || !dernierProgramme.temporaire) return null;

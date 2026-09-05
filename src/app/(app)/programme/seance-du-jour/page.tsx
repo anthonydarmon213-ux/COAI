@@ -32,7 +32,7 @@ export default async function SeanceDuJourPage() {
   if (!user) return null;
 
   const programme = await prisma.programmeGenerated.findFirst({
-    where: { userId: user.id, pilier: "ENTRAINEMENT" },
+    where: { userId: user.id, pilier: "ENTRAINEMENT", statut: { in: ["VALIDE", "GENERE_IA"] } },
     orderBy: { generatedAt: "desc" },
     select: { contenu: true },
   });

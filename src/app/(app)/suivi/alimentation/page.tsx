@@ -31,7 +31,7 @@ export default async function AlimentationSuiviPage() {
       select: { calories: true, proteines: true, glucides: true, lipides: true },
     }),
     prisma.programmeGenerated.findFirst({
-      where: { userId: user.id, pilier: "NUTRITION" },
+      where: { userId: user.id, pilier: "NUTRITION", statut: { in: ["VALIDE", "GENERE_IA"] } },
       orderBy: { generatedAt: "desc" },
       select: { contenu: true },
     }),

@@ -33,21 +33,19 @@ export async function GET(request: Request) {
   const entrees: PilierPdfEntree[] = [];
 
   for (const pilier of ORDRE) {
-    // Même sélection que les routes par pilier : le dernier programme validé
-    // prime, sinon le dernier en attente ou généré par l'IA.
+    // Un programme en attente de validation humaine ne doit jamais être
+    // exporté. Le dernier validé prime, sinon un programme IA publiable.
     const [valide, dernier] = await Promise.all([
       prisma.programmeGenerated.findFirst({
         where: { userId: user.id, pilier, statut: "VALIDE" },
         orderBy: { generatedAt: "desc" },
       }),
       prisma.programmeGenerated.findFirst({
-        where: { userId: user.id, pilier },
+        where: { userId: user.id, pilier, statut: "GENERE_IA" },
         orderBy: { generatedAt: "desc" },
       }),
     ]);
-    const enAttente = dernier && dernier.statut === "EN_ATTENTE";
-    const genereIA = dernier && dernier.statut === "GENERE_IA";
-    const affiche = valide ? valide : enAttente || genereIA ? dernier : null;
+    const affiche = valide ?? dernier;
     if (!affiche) continue;
 
     const exerciseImages: Record<string, string> = {};

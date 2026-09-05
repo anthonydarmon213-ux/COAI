@@ -27,7 +27,7 @@ async function activeTrainingProgramme(userId: string) {
       orderBy: { generatedAt: "desc" },
     }),
     prisma.programmeGenerated.findFirst({
-      where: { userId, pilier: "ENTRAINEMENT" },
+      where: { userId, pilier: "ENTRAINEMENT", statut: "GENERE_IA" },
       orderBy: { generatedAt: "desc" },
     }),
   ]);

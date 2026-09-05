@@ -21,7 +21,7 @@ export async function GET() {
   const programmes = await Promise.all(
     piliers.map((pilier) =>
       prisma.programmeGenerated.findFirst({
-        where: { userId: user.id, pilier },
+        where: { userId: user.id, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
         orderBy: { generatedAt: "desc" },
       })
     )
