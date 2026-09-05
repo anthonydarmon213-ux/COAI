@@ -1,6 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { LeadCtaLink } from "@/components/marketing/lead-cta";
 
 // Hero refondu le 04/09/2026 (demande Anthony : « je veux qu'on change notre
 // landing pour faire comme charlesdenis.fr — moins de blabla, simple,
@@ -36,12 +35,12 @@ export function CoaiIntro() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center">
         <p className="text-[11px] font-bold uppercase leading-4 tracking-[0.22em] text-laiton-300 sm:text-xs">
-          Coaching santé et longévité
+          Pour dirigeants &amp; entrepreneurs de 35 à 65 ans
         </p>
 
         <h1 className="mt-6 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
-          Retrouve ton énergie et ta forme,
-          <span className="mt-2 block text-graphite-400">malgré un agenda chargé.</span>
+          Retrouve un corps fort et ton énergie,
+          <span className="mt-2 block text-graphite-400">sans sacrifier ton agenda.</span>
         </h1>
 
         {/* Reformule le 04/09/2026 (Anthony : « la methode d'un coach
@@ -52,19 +51,17 @@ export function CoaiIntro() {
             relie proprement le diplome a l'experience, et le prenom cree un
             lien direct avec la photo d'Anthony juste en dessous. */}
         <p className="mt-8 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-          La méthode d&apos;Anthony Darmon, coach diplômé d&apos;État avec 17 ans d&apos;expérience
-          auprès de dirigeants.
+          La Méthode COAI Adapt transforme ton bilan en plan quotidien qui évolue avec
+          ton sommeil, ton énergie, tes déplacements et tes progrès.
         </p>
 
         <div className="mt-10">
           {/* coai-cta-glow : halo laiton qui respire autour du bouton
               (cf. globals.css) — reprend l'effet de charlesdenis.fr. */}
           <span className="coai-cta-glow">
-            <Link href="/diagnostic">
-              <Button className="px-10 py-5 text-sm font-extrabold uppercase tracking-[0.07em] sm:text-base">
-                Faire mon bilan gratuit →
-              </Button>
-            </Link>
+            <LeadCtaLink placement="hero" className="px-10 py-5 text-sm font-extrabold sm:text-base">
+              Découvrir mon Âge COAI →
+            </LeadCtaLink>
           </span>
           {/* Ligne de reassurance retiree le 04/09/2026 (Anthony : « enleve »). */}
 

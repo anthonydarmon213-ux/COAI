@@ -10,8 +10,9 @@ import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { Reveal } from "@/components/marketing/reveal";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { MobileLeadBar } from "@/components/marketing/lead-cta";
 
-const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
+const TITLE = "COAI — Coaching adaptatif pour dirigeants et entrepreneurs";
 // "Santé et longévité" ajouté le 04/09/2026 (demande Anthony, inspiration
 // enseigne "bangji — Longevity Skincare") : le thème existait déjà dans le
 // positionnement (âge métabolique, -15 ans visés) mais n'apparaissait pas
@@ -20,7 +21,7 @@ const TITLE = "COAI — Ton Personal Trainer, toujours avec toi";
 // précisée le même jour ("Santé et longévité" plutôt que "longévité" seul,
 // retour direct d'Anthony).
 const DESCRIPTION =
-  "Coaching santé et longévité, Personal Training réimaginé. Une expérience de coaching personnalisée, disponible 24h/24, avec la rapidité de l’IA et la précision d’un coach humain.";
+  "La Méthode COAI Adapt transforme ton bilan en coaching quotidien qui évolue avec ton agenda, ton énergie et tes progrès. Bilan offert en moins de 5 minutes.";
 
 // 11/08/2026 : sans ce bloc openGraph/twitter dédié, chaque page publique
 // affichait le titre/description génériques du layout racine ("COAI — HI ×
@@ -238,6 +239,7 @@ export default function LandingPage() {
       />
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
+      <MobileLeadBar />
 
       <section id="comment-ca-marche" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-20 sm:py-24">
         <div className="mx-auto max-w-3xl text-center">
