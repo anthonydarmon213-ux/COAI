@@ -1,8 +1,7 @@
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
 
-// Bucket privé Supabase Storage — à créer manuellement dans le dashboard
-// (Storage → New bucket → "progress-photos", Public: OFF).
-export const PROGRESS_PHOTOS_BUCKET = "progress-photos";
+// Nom exact du bucket privé existant dans Supabase.
+export const PROGRESS_PHOTOS_BUCKET = "progress photos";
 
 const SIGNED_URL_TTL_SECONDS = 3600;
 
@@ -22,7 +21,12 @@ export async function uploadProgressPhoto(
   return { path };
 }
 
-export async function getSignedProgressPhotoUrl(path: string): Promise<string | null> {
+export function isOwnedProgressPhotoPath(userId: string, path: string): boolean {
+  return path.startsWith(`${userId}/`) && !path.includes("..") && !path.includes("\\");
+}
+
+export async function getSignedProgressPhotoUrl(userId: string, path: string): Promise<string | null> {
+  if (!isOwnedProgressPhotoPath(userId, path)) return null;
   const admin = createSupabaseAdminClient();
   const { data, error } = await admin.storage
     .from(PROGRESS_PHOTOS_BUCKET)

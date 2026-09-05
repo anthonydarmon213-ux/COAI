@@ -27,11 +27,10 @@ function tierId(plan: string) {
   return "full-presentiel";
 }
 
-// Ordre humain -> IA (04/09/2026, cf. commentaire sur la carte VIP plus bas).
 const COMPARAISON_RAPIDE = [
+  ["Standard IA", "Je veux avancer dès maintenant", "7 jours offerts · dès 9,92 €/mois"],
   ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
   ["Premium Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
-  ["Standard IA", "Je veux avancer en autonomie", "IA 24h/24 · WhatsApp si besoin"],
 ] as const;
 
 export const metadata: Metadata = {
@@ -42,7 +41,11 @@ export const metadata: Metadata = {
 
 export default function PricingPage({ searchParams }: { searchParams?: PricingSearchParams }) {
   const selectedPlan = searchParams?.selected;
-  const selectedBilling = searchParams?.billing === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+  const selectedBilling = searchParams?.billing === "ANNUAL"
+    ? "ANNUAL"
+    : searchParams?.billing === "QUARTERLY"
+      ? "QUARTERLY"
+      : "MONTHLY";
   const arriveApresCreation = searchParams?.from === "signup";
 
   return (
@@ -89,6 +92,54 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </div>
       </section>
 
+      <section
+        id="pass-ia"
+        className="relative w-full max-w-5xl scroll-mt-24 overflow-hidden rounded-[2rem] border border-laiton-300/35 bg-[radial-gradient(circle_at_80%_10%,rgba(66,214,222,0.16),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(214,170,96,0.18),transparent_38%),rgba(255,255,255,0.035)] px-6 py-8 shadow-[0_32px_120px_-55px_rgba(66,214,222,0.75)] sm:px-10 sm:py-10"
+        aria-labelledby="standard-ia-title"
+      >
+        <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border border-cyan-200/20 bg-cyan-300/[0.06] blur-[1px]" />
+        <div className="relative grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-200/[0.08] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-100">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300" />
+                Coaching adaptatif actif 24h/24
+              </span>
+              <Badge tone="warning">Recommandé</Badge>
+            </div>
+            <h2 id="standard-ia-title" className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+              Ton coach personnel.<br /><span className="text-laiton-300">Chaque jour.</span>
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-7 text-graphite-300">
+              COAI transforme ton bilan en programme, puis ajuste ta séance selon ton énergie,
+              ton sommeil, tes douleurs et le temps dont tu disposes réellement.
+            </p>
+            <div className="mt-6 grid max-w-xl gap-3 sm:grid-cols-3">
+              {["Programme immédiat", "Séance adaptée chaque jour", "Coach IA dans ta poche"].map((item) => (
+                <div key={item} className="rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3 text-sm font-medium text-white">
+                  <span className="mr-2 text-cyan-300">◆</span>{item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.1] bg-black/30 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl sm:p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Standard IA · 7 jours offerts</p>
+            <div className="mt-3 flex items-end gap-2">
+              <strong className="text-5xl tracking-[-0.06em] text-white">19,99€</strong>
+              <span className="pb-1 text-sm text-graphite-400">/mois</span>
+            </div>
+            <p className="mt-2 text-xs text-graphite-400">Sans engagement · annulation en 1 clic</p>
+            <div className="mt-6 space-y-2.5">
+              <SubscribeButton plan="PASS_IA" billing="MONTHLY" label="Démarrer mes 7 jours offerts" className="coai-rainbow-cta w-full border-0 text-[#111216]" />
+              <SubscribeButton plan="PASS_IA" billing="QUARTERLY" label={`3 mois · ${prixTrimestreCentimes() / 100}€`} className="w-full border border-cyan-300/25 bg-cyan-300/[0.07] text-cyan-100" />
+              <SubscribeButton plan="PASS_IA" billing="ANNUAL" label="Annuel · 119€ (meilleure valeur)" className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200" />
+            </div>
+            <p className="mt-4 text-center text-[11px] text-graphite-400">🔒 Paiement sécurisé · aucun prélèvement avant la fin de l’essai</p>
+          </div>
+        </div>
+      </section>
+
       {/* Deux cartes principales (22/08/2026, demande Anthony) — VIP sort
           de la grille et devient un lien d'upsell sous les cartes : à trois
           colonnes, le VIP écrasait visuellement les deux offres réellement
@@ -100,23 +151,6 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           l'entree libre, mais quiconque arrivait ici par le menu ou par un
           lien externe ne voyait que des boutons payants : la page ressemblait
           a un mur alors que l'application est ouverte sans carte bancaire. */}
-      <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
-        <p className="text-sm font-semibold text-white">
-          Tu peux entrer dans l&apos;application sans payer.
-        </p>
-        <p className="mx-auto mt-1 max-w-2xl text-xs leading-5 text-graphite-300">
-          Dix fonctions sont gratuites, sans carte bancaire : suivi de tes séances,
-          RepCount, records, mesures, bibliothèque d&apos;exercices et recettes. Tu
-          choisiras un accompagnement seulement si tu veux aller plus loin.
-        </p>
-        <Link
-          href="/dashboard"
-          className="mt-3 inline-flex rounded-full border border-cyan-300/40 bg-cyan-300/10 px-6 py-2.5 text-sm font-bold text-cyan-100"
-        >
-          Entrer dans l&apos;application →
-        </Link>
-      </div>
-
       {/* Ordre inverse le 04/09/2026 (demande Anthony : « mets l'accent sur
           l'humain d'abord, et si la personne n'a pas les moyens, guide-la
           vers l'IA »). La page listait les offres du moins cher au plus cher,
@@ -203,7 +237,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
-        {[...TIERS.filter((tier) => tier.plan !== "PREMIUM")].reverse().map((tier) => (
+        {TIERS.filter((tier) => tier.plan === "STANDARD").map((tier) => (
           <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
@@ -330,6 +364,16 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             )}
           </Card>
         ))}
+      </div>
+
+      <div className="w-full max-w-5xl rounded-2xl border border-white/[0.08] bg-white/[0.025] px-5 py-4 text-center">
+        <p className="text-sm font-semibold text-white">Tu préfères explorer avant de choisir ?</p>
+        <p className="mx-auto mt-1 max-w-2xl text-xs leading-5 text-graphite-400">
+          Entre gratuitement dans COAI pour découvrir le carnet, les mesures, les exercices et les recettes — sans carte bancaire.
+        </p>
+        <Link href="/dashboard" className="mt-3 inline-flex text-sm font-semibold text-graphite-200 underline decoration-white/25 underline-offset-4">
+          Explorer l&apos;application gratuitement →
+        </Link>
       </div>
 
       {/* Compte a rebours descendu ici le 04/09/2026 : place en haut de

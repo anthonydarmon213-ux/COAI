@@ -20,6 +20,6 @@ export async function POST(request: Request) {
   if ("error" in uploaded) return NextResponse.json({ error: uploaded.error }, { status: 500 });
 
   await prisma.user.update({ where: { id: user.id }, data: { avatarPath: uploaded.path } });
-  const url = await getSignedProgressPhotoUrl(uploaded.path);
+  const url = await getSignedProgressPhotoUrl(user.supabaseAuthId, uploaded.path);
   return NextResponse.json({ url }, { status: 201 });
 }

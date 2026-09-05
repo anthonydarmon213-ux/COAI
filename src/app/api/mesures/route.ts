@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { isOwnedProgressPhotoPath } from "@/lib/storage/progress-photos";
 
 const bodySchema = z.object({
   date: z.coerce.date(),
@@ -42,6 +43,10 @@ export async function POST(request: Request) {
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!user) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+  }
+
+  if (parsed.data.photoPath && !isOwnedProgressPhotoPath(authUser.id, parsed.data.photoPath)) {
+    return NextResponse.json({ error: "Chemin de photo invalide" }, { status: 400 });
   }
 
   const mesure = await prisma.mesure.create({

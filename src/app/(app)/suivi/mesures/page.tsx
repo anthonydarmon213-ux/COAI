@@ -16,7 +16,7 @@ export default async function MesuresPage() {
   });
 
   const photoUrls = await Promise.all(
-    mesures.map((m) => (m.photoPath ? getSignedProgressPhotoUrl(m.photoPath) : null))
+    mesures.map((m) => (m.photoPath ? getSignedProgressPhotoUrl(user.supabaseAuthId, m.photoPath) : null))
   );
 
   const tailleCm = user.profile?.tailleCm;
