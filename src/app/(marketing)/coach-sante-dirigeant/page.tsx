@@ -32,7 +32,7 @@ const AVANTAGES = [
   {
     titre: "Un regard humain quand ça compte",
     description:
-      "Sur le palier Coaching Hybride, un coach diplômé d'État relit et valide ton programme avant qu'il ne devienne définitif.",
+      "Sur le palier Premium Remote, un coach diplômé d'État relit et valide ton programme avant qu'il ne devienne définitif.",
   },
 ];
 
@@ -55,7 +55,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Pass IA coûte 19,99€/mois (ou 119€/an) avec 7 jours d'essai et un coach IA disponible 24h/24. Coaching Hybride coûte 99€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain. Les deux sont sans engagement.",
+      "Standard IA coûte 19,99€/mois (ou 119€/an) avec 7 jours d'essai et un coach IA disponible 24h/24, sans engagement. Premium Remote ajoute le regard d'un coach humain, en pack de 3 mois minimum sur devis.",
   },
 ];
 

@@ -56,7 +56,7 @@ const FAQ_ITEMS = [
   {
     question: "Est-ce payant dès le départ ?",
     reponse:
-      "Non — le diagnostic est offert. Tu choisis ensuite Pass IA (19,99€/mois ou 119€/an, 7 jours d'essai) ou Coaching Hybride (99€/mois, 7 jours d'essai, avec le regard d'un coach humain).",
+      "Non — le diagnostic est offert. Tu choisis ensuite Standard IA (19,99€/mois ou 119€/an, 7 jours d'essai) ou un accompagnement avec Anthony — Premium Remote ou VIP Présentiel, en pack de 3 mois minimum sur devis.",
   },
 ];
 

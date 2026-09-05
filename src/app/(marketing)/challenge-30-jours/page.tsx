@@ -75,7 +75,7 @@ export default function Challenge30JoursPage() {
         <p className="mt-2 text-base leading-7 text-graphite-200">
           Termine le challenge, puis fais ton bilan de forme COAI gratuit pour repartir avec un
           score personnalisé et un programme construit sur mesure — et si tu veux aller plus loin,
-          rejoins les 100 premiers membres fondateurs COAI (tarif Pass IA bloqué à vie).
+          rejoins les 100 premiers membres fondateurs COAI (tarif Standard IA bloqué à vie).
         </p>
       </div>
 

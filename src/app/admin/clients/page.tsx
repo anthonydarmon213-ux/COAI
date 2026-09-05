@@ -58,7 +58,7 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
         <AdminNav current="/admin/clients" />
         <div className="border-b border-acier/25 pb-7">
           <SectionLabel>Portefeuille coach</SectionLabel>
-          <h1 className="mt-2 text-2xl font-semibold text-graphite-50">Clients Coaching Hybride</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-graphite-50">Clients Premium Remote</h1>
           <p className="mt-1 text-sm text-graphite-400">
             {enriched.length} client{enriched.length > 1 ? "s" : ""}, dont {alertCount} avec un signal à vérifier.
           </p>

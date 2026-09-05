@@ -271,7 +271,7 @@ export async function POST(request: Request) {
           data: { programmeUnlockedAt: new Date() },
         });
         await sendAdminNotification(
-          "Programme Pass IA débloqué",
+          "Programme Standard IA débloqué",
           `${user.prenom ? user.prenom : "Un utilisateur"} (${user.email}) vient de débloquer la génération de son programme (19€, paiement unique).`
         );
       }

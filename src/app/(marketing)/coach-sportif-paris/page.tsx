@@ -95,15 +95,16 @@ export default function CoachSportifParisPage() {
         <Card className="flex flex-col gap-3 text-center">
           <h2 className="text-lg font-semibold text-white">Séances individuelles à Paris</h2>
           <p className="text-sm leading-6 text-graphite-300">
-            200€ en présentiel (Paris centre, 1h) ou 100€ en visioconférence — réservation
-            flexible, sans engagement.
+            100 à 200€/séance selon la formule (Premium Remote à distance, VIP Présentiel à Paris centre) —
+            engagement en pack de 3 mois minimum, sur devis.
           </p>
         </Card>
         <Card className="flex flex-col gap-3 text-center">
           <h2 className="text-lg font-semibold text-white">Accompagnement COAI à distance</h2>
           <p className="text-sm leading-6 text-graphite-300">
-            Personal Trainer IA avec Pass IA à 19,99€/mois (ou 119€/an), ou avec le regard et les ajustements
-            d&apos;un coach humain avec Coaching Hybride à 99€/mois — accessible depuis n&apos;importe où.
+            Personal Trainer IA avec Standard IA à 19,99€/mois (ou 119€/an), ou avec le regard et les ajustements
+            d&apos;un coach humain avec Premium Remote, en pack de 3 mois minimum sur devis — accessible
+            depuis n&apos;importe où.
           </p>
         </Card>
       </div>

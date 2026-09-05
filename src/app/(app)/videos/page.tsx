@@ -46,7 +46,7 @@ export default async function VideosPage() {
         <Card className="flex flex-col items-start gap-3">
           <Badge tone="warning">Réservé aux membres COAI</Badge>
           <p className="text-sm text-graphite-300">
-            Active un Pass IA, Coaching Hybride ou VIP pour accéder aux cours exclusifs d&apos;Anthony.
+            Active un Standard IA, Premium Remote ou VIP Présentiel pour accéder aux cours exclusifs d&apos;Anthony.
           </p>
           <Link href="/pricing">
             <Button>Voir les offres</Button>

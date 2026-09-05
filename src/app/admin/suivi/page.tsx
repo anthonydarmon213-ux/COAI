@@ -15,7 +15,7 @@ export default async function AdminSuiviPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  // Périmètre Coaching Hybride uniquement — Pass IA n'a aucun suivi humain
+  // Périmètre Premium Remote uniquement — Standard IA n'a aucun suivi humain
   // (positionnement du palier), pas de raison de le faire remonter ici.
   const abonnesTransformation = await prisma.user.findMany({
     where: { subscription: { plan: "STANDARD", status: { in: ["ACTIVE", "PAST_DUE"] } } },
@@ -35,7 +35,7 @@ export default async function AdminSuiviPage() {
         <AdminNav current="/admin/suivi" />
         <div className="flex flex-col gap-1 border-b border-acier/25 pb-7">
           <SectionLabel>Espace coach</SectionLabel>
-          <h1 className="text-2xl font-semibold text-graphite-50">Suivi à risque — Coaching Hybride</h1>
+          <h1 className="text-2xl font-semibold text-graphite-50">Suivi à risque — Premium Remote</h1>
           <p className="text-sm text-graphite-400">
             {aSuivre.length} abonné{aSuivre.length > 1 ? "s" : ""} sur {abonnesTransformation.length} avec un
             signal à vérifier — inactivité, gêne mentionnée dans une séance, ou pas de mesure récente.

@@ -28,7 +28,7 @@ const AVANTAGES = [
   {
     titre: "Un vrai coach dans la boucle",
     description:
-      "Sur le palier Coaching Hybride, chaque programme généré par IA est relu et validé par un coach diplômé d'État avant de t'être présenté.",
+      "Sur le palier Premium Remote, chaque programme généré par IA est relu et validé par un coach diplômé d'État avant de t'être présenté.",
   },
   {
     titre: "Disponible quand tu en as besoin",
@@ -51,7 +51,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien ça coûte ?",
     reponse:
-      "Pass IA coûte 19,99€/mois (ou 119€/an) avec 7 jours d'essai et un Personal Trainer IA disponible 24h/24. Coaching Hybride coûte 99€/mois avec 7 jours d'essai et ajoute le regard d'un coach humain. Les deux sont sans engagement.",
+      "Standard IA coûte 19,99€/mois (ou 119€/an) avec 7 jours d'essai et un Personal Trainer IA disponible 24h/24, sans engagement. Premium Remote ajoute le regard d'un coach humain, en pack de 3 mois minimum sur devis.",
   },
   {
     question: "Je peux poser des questions à un coach entre deux programmes ?",

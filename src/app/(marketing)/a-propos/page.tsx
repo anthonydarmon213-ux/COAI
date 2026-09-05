@@ -36,8 +36,8 @@ export default function AProposPage() {
             COAI est né de cette tension. Donner à chacun un programme d&apos;entraînement, de
             nutrition et de récupération aussi précis qu&apos;une consultation privée — généré en
             quelques secondes par l&apos;IA, à partir d&apos;un vrai profil, pas d&apos;un modèle
-            générique. Sur Coaching Hybride, il n&apos;est jamais livré sans qu&apos;Anthony, ou un
-            coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé ; sur Pass IA, il
+            générique. Sur Premium Remote et VIP Présentiel, il n&apos;est jamais livré sans qu&apos;Anthony, ou un
+            coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé ; sur Standard IA, il
             reste généré par l&apos;IA seule, sans relecture.
           </p>
           <p>

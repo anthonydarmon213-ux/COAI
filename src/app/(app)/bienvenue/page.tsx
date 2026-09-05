@@ -148,7 +148,7 @@ export default async function BienvenuePage({
         <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-2">
           {[
             { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de ton futur programme." },
-            { titre: "Ton programme", texte: "Pass IA, Coaching Hybride ou VIP : le niveau d'attention qui te correspond." },
+            { titre: "Ton programme", texte: "Standard IA, Premium Remote ou VIP Présentiel : le niveau d'attention qui te correspond." },
             { titre: "Ton Coach IA", texte: "Pose tes questions, 24h/24, dans l'esprit de la méthode d'Anthony." },
             { titre: "Ton suivi", texte: "Séances, mesures, progression — tout au même endroit." },
           ].map((etape, i) => (
@@ -201,7 +201,12 @@ export default async function BienvenuePage({
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).
   const enEssai = plan !== "PREMIUM" && searchParams.essai !== "0";
-  const valeurMensuelle = plan === "PREMIUM" ? 199 : plan === "STANDARD" ? 99 : 19.99;
+    // Valeurs de pack pour STANDARD/PREMIUM (04/09/2026, repositionnement 3 offres) — ce
+  // chemin (plan=STANDARD/PREMIUM) est en pratique mort depuis que checkout/route.ts
+  // refuse ces deux plans en amont (sur devis WhatsApp uniquement), mais corrigé quand
+  // même par précaution pour ne jamais faire remonter un faux montant a Meta si un
+  // enregistrement historique passait encore par ici.
+  const valeurMensuelle = plan === "PREMIUM" ? 1200 : plan === "STANDARD" ? 960 : 19.99;
   const metaEventAchat = enEssai ? "StartTrial" : "Subscribe";
 
   return (
