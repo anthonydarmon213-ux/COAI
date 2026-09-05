@@ -262,6 +262,8 @@ type Step =
   | "sommeil"
   | "sante"
   | "coach"
+  | "localisation"
+  | "budget"
   | "email"
   | "respire1"
   | "respire2"
@@ -340,6 +342,8 @@ const QUESTION_STEPS: Step[] = [
   // Alimente `coachPreference`, déjà lu par recommanderFormule() et
   // detecterBesoins() (jusqu'ici jamais réellement capturé côté quiz).
   "coach",
+  "localisation",
+  "budget",
   "equipement",
   "lieu",
   "duree",
@@ -683,6 +687,11 @@ export function DiagnosticQuiz({
   // Anthony) — n'assigne aucun coach réel, sert juste à orienter la formule
   // mise en avant sur l'écran résultat.
   const [coachPreference, setCoachPreference] = useState<"FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL" | null>(null);
+  // Filtres localisation/budget (04/09/2026, demande Anthony) — posés après
+  // "coach", cf. recommanderFormule() dans mini-diagnostic.ts pour la
+  // logique de recadrage.
+  const [localisation, setLocalisation] = useState<"PARIS" | "AILLEURS" | null>(null);
+  const [budget, setBudget] = useState<"ACCOMPAGNEMENT_HUMAIN" | "COMMENCER_IA" | null>(null);
   // Événement émotionnel déclencheur (19/08/2026, demande Anthony — façon
   // MyFitCoach) : utilisé uniquement pour la projection affichée sur
   // l'écran de résultat, jamais persisté sur Profile.
@@ -885,6 +894,8 @@ export function DiagnosticQuiz({
       santeAutreTexte,
       antecedentsMedicaux,
       coachPreference,
+      localisation,
+      budget,
       email,
       telephone,
     });
@@ -944,6 +955,8 @@ export function DiagnosticQuiz({
     santeAutreTexte,
     antecedentsMedicaux,
     coachPreference,
+    localisation,
+    budget,
     email,
     telephone,
   ]);
@@ -1011,6 +1024,12 @@ export function DiagnosticQuiz({
       saved.coachPreference === "VIP_PRESENTIEL"
     ) {
       setCoachPreference(saved.coachPreference);
+    }
+    if (saved.localisation === "PARIS" || saved.localisation === "AILLEURS") {
+      setLocalisation(saved.localisation);
+    }
+    if (saved.budget === "ACCOMPAGNEMENT_HUMAIN" || saved.budget === "COMMENCER_IA") {
+      setBudget(saved.budget);
     }
     if (typeof saved.email === "string") setEmail(saved.email);
     if (typeof saved.telephone === "string") setTelephone(saved.telephone);
@@ -1087,6 +1106,8 @@ export function DiagnosticQuiz({
     if (step === "niveau") return Boolean(niveau);
     if (step === "objectif") return objectifsPrincipaux.length > 0 || Boolean(objectif);
     if (step === "coach") return Boolean(coachPreference);
+    if (step === "localisation") return Boolean(localisation);
+    if (step === "budget") return Boolean(budget);
     if (step === "accompagnement") return true;
     if (step === "echeance") return Boolean(echeance);
     if (step === "declencheur") return declencheur.length > 0;
@@ -1148,6 +1169,8 @@ export function DiagnosticQuiz({
         qualiteSommeil,
         sante: resolveAutre(sante, santeAutreTexte),
         coachPreference,
+        localisation,
+        budget,
       }),
     [
       persona,
@@ -1166,6 +1189,8 @@ export function DiagnosticQuiz({
       sante,
       santeAutreTexte,
       coachPreference,
+      localisation,
+      budget,
     ]
   );
 
@@ -1417,6 +1442,8 @@ export function DiagnosticQuiz({
             qualiteSommeil,
             sante: resolveAutre(sante, santeAutreTexte),
             coachPreference,
+            localisation,
+            budget,
           },
         }),
       });
@@ -1616,6 +1643,57 @@ export function DiagnosticQuiz({
                   hint="VIP Présentiel — à domicile, en club ou en entreprise"
                   active={coachPreference === "VIP_PRESENTIEL"}
                   onClick={() => chooseSingle(setCoachPreference, "VIP_PRESENTIEL")}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Filtre localisation (04/09/2026, demande Anthony) : posé juste
+              après la préférence de coach, pour recadrer un choix "présentiel
+              à Paris" qui ne serait pas faisable — cf. recommanderFormule()
+              dans mini-diagnostic.ts. Jamais de prix affiché ici. */}
+          {step === "localisation" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">Es-tu à Paris ou à proximité ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Ça détermine si un accompagnement en présentiel avec moi est possible.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <ChoixVisuel
+                  label="Oui, à Paris ou en Île-de-France"
+                  active={localisation === "PARIS"}
+                  onClick={() => chooseSingle(setLocalisation, "PARIS")}
+                />
+                <ChoixVisuel
+                  label="Non, ailleurs"
+                  active={localisation === "AILLEURS"}
+                  onClick={() => chooseSingle(setLocalisation, "AILLEURS")}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Filtre budget (04/09/2026, demande Anthony) : pas de prix
+              affiché, juste une question qualitative — le montant exact
+              n'a rien à faire ici (cf. règle "pas de prix sur le diag").
+              Sert uniquement à recadrer vers Standard IA si la personne
+              n'a pas le budget pour un accompagnement humain. */}
+          {step === "budget" && (
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-white">As-tu le budget pour un accompagnement humain avec moi ?</h2>
+                <p className="mt-1.5 text-sm text-graphite-400">Réponds honnêtement — les deux options te donnent un vrai programme.</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <ChoixVisuel
+                  label="Oui, je peux investir dans un accompagnement avec un coach"
+                  active={budget === "ACCOMPAGNEMENT_HUMAIN"}
+                  onClick={() => chooseSingle(setBudget, "ACCOMPAGNEMENT_HUMAIN")}
+                />
+                <ChoixVisuel
+                  label="Pas pour l'instant, je préfère commencer avec l'IA"
+                  active={budget === "COMMENCER_IA"}
+                  onClick={() => chooseSingle(setBudget, "COMMENCER_IA")}
                 />
               </div>
             </div>

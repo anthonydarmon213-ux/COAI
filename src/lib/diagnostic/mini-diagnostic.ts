@@ -30,6 +30,16 @@ export type ReponsesDiagnostic = {
   // — utilisé uniquement pour la recommandation de formule ci-dessous,
   // jamais pour affecter un coach humain réel.
   coachPreference?: "FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL" | null;
+  // Localisation et budget (04/09/2026, demande Anthony : "il faut orienter
+  // la personne sur l'accompagnement le mieux adapté — si elle n'habite
+  // pas Paris pas de présentiel VIP, orienté vers le remote ; si elle n'a
+  // pas le budget, l'offre IA... le diag filtre oriente en plus de faire
+  // le bilan forme"). Posées après l'étape "coach" : la personne dit
+  // d'abord ce qu'elle voudrait dans l'idéal, puis ces deux réponses
+  // servent à recadrer vers ce qui est réellement faisable — cf.
+  // recommanderFormule() ci-dessous.
+  localisation?: "PARIS" | "AILLEURS" | null;
+  budget?: "ACCOMPAGNEMENT_HUMAIN" | "COMMENCER_IA" | null;
 };
 
 const EXEMPLES_DEFAUT = ["pompes", "squats au poids du corps", "gainage"];
@@ -356,50 +366,80 @@ function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
 //    souvent un plateau mieux qu'un simple nouveau programme.
 // 6. Par défaut : Pass IA, le point de départ recommandé.
 function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnostic["recommandation"] {
+  // Filtre budget (04/09/2026) : priorité absolue sur tout le reste,
+  // coachPreference inclus. Recommander un accompagnement humain à
+  // quelqu'un qui vient de dire ne pas en avoir les moyens serait
+  // contre-productif — retour direct, sans même évaluer le reste du
+  // profil.
+  if (r.budget === "COMMENCER_IA") {
+    return {
+      service: "IMPULSION",
+      label: "Standard IA",
+      raison: "Tu préfères commencer sans engagement financier : Standard IA te donne un programme complet et un Personal Trainer IA disponible 24h/24, avec mon WhatsApp en renfort si besoin.",
+    };
+  }
+
   const persona = r.persona ?? [];
   const avanceExigeant = r.niveau === "Avancé" && /force|performance/i.test(r.objectif ?? "");
   const plateau = persona.includes("Même programme depuis des années, sans résultat");
 
-  if (r.coachPreference === "VIP_PRESENTIEL") {
+  const brute: MiniDiagnostic["recommandation"] = (() => {
+    if (r.coachPreference === "VIP_PRESENTIEL") {
+      return {
+        service: "VIP",
+        label: "VIP Présentiel",
+        raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, à domicile, en entreprise, en club ou à distance.",
+      };
+    }
+    if (sante.length > 0) {
+      return {
+        service: "TRANSFORMATION",
+        label: "Premium Remote",
+        raison: "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant.",
+      };
+    }
+    if (r.coachPreference === "HYBRIDE") {
+      return {
+        service: "TRANSFORMATION",
+        label: "Premium Remote",
+        raison: "Tu as choisi de combiner la disponibilité de l'IA et le regard d'un coach humain.",
+      };
+    }
+    if (avanceExigeant) {
+      return {
+        service: "VIP",
+        label: "VIP Présentiel",
+        raison: "Ton niveau et ton objectif de performance justifient un accompagnement 1-to-1, pas juste un programme à suivre seul.",
+      };
+    }
+    if (plateau) {
+      return {
+        service: "TRANSFORMATION",
+        label: "Premium Remote",
+        raison: "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
+      };
+    }
     return {
-      service: "VIP",
-      label: "VIP Présentiel",
-      raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, à domicile, en entreprise, en club ou à distance.",
+      service: "IMPULSION",
+      label: "Standard IA",
+      raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
     };
-  }
-  if (sante.length > 0) {
+  })();
+
+  // Filtre localisation (04/09/2026) : le VIP Présentiel suppose de vraies
+  // séances avec Anthony (domicile, club, entreprise) donc n'a de sens qu'à
+  // Paris/proche, quelle que soit la raison qui a mené à cette
+  // recommandation (préférence explicite ou niveau avancé) — ailleurs,
+  // Premium Remote donne le même accompagnement individuel, à distance.
+  if (brute.label === "VIP Présentiel" && r.localisation === "AILLEURS") {
     return {
       service: "TRANSFORMATION",
       label: "Premium Remote",
-      raison: "Vu la contrainte que tu as signalée, un coach diplômé d'État qui valide et suit ton programme nous semble plus rassurant.",
+      raison: "Le VIP Présentiel se fait uniquement à Paris et ses environs. Depuis chez toi, Premium Remote te donne le même accompagnement individuel avec moi, à distance.",
     };
   }
-  if (r.coachPreference === "HYBRIDE") {
-    return {
-      service: "TRANSFORMATION",
-      label: "Premium Remote",
-      raison: "Tu as choisi de combiner la disponibilité de l'IA et le regard d'un coach humain.",
-    };
-  }
-  if (avanceExigeant) {
-    return {
-      service: "VIP",
-      label: "VIP Présentiel",
-      raison: "Ton niveau et ton objectif de performance justifient un accompagnement 1-to-1, pas juste un programme à suivre seul.",
-    };
-  }
-  if (plateau) {
-    return {
-      service: "TRANSFORMATION",
-      label: "Premium Remote",
-      raison: "Casser un plateau qui dure demande souvent un vrai suivi humain, pas juste un nouveau programme.",
-    };
-  }
-  return {
-    service: "IMPULSION",
-    label: "Standard IA",
-    raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
-  };
+
+  return brute;
 }
 
 export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | null {
