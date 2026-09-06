@@ -65,8 +65,8 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
   ) {
     besoins.push({
       besoin: "Tu cherches à optimiser en profondeur, pas à découvrir",
-      explication: "Un accompagnement 1-to-1 pour aller chercher les derniers pourcents.",
-      service: "VIP",
+      explication: "Un suivi individuel à distance pour ajuster finement charge, récupération et progression.",
+      service: "TRANSFORMATION",
     });
   }
 
@@ -110,6 +110,30 @@ export function detecterBesoins(profile: ProfilSignaux | null | undefined): Beso
   }
 
   return besoins;
+}
+
+// Source de vérité du service mis en avant après l'inscription. L'ordre des
+// cartes de besoins ne doit pas décider arbitrairement de la recommandation :
+// on reprend ici la même hiérarchie que le bilan public. Le VIP n'est proposé
+// automatiquement qu'à une personne qui l'a explicitement demandé ; un profil
+// avancé/performance est orienté vers Premium Remote par défaut.
+export function recommanderServiceDepuisProfil(profile: ProfilSignaux | null | undefined): ServiceRecommande {
+  if (!profile) return "IMPULSION";
+
+  if (profile.coachPreference === "VIP_PRESENTIEL") return "VIP";
+  if (Boolean(profile.contraintesSante?.trim())) return "TRANSFORMATION";
+  if (profile.coachPreference === "HYBRIDE") return "TRANSFORMATION";
+  if (
+    profile.niveau === "Avancé" &&
+    (contient(profile.objectifs, "force") || contient(profile.objectifs, "performances"))
+  ) {
+    return "TRANSFORMATION";
+  }
+  if (contient(profile.persona, "Même programme depuis des années")) return "TRANSFORMATION";
+  if (profile.frequenceEntrainement === "6 fois ou plus par semaine") return "TRANSFORMATION";
+  if (profile.coachPreference === "FULL_IA") return "IMPULSION";
+
+  return "IMPULSION";
 }
 
 // Retire les besoins pointant vers un service déjà actif — inutile de

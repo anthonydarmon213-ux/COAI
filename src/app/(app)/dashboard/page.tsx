@@ -8,7 +8,7 @@ import { computeProfilCompletion } from "@/lib/profil/completion";
 import { hasProgrammeAccess, hasPaidSubscription } from "@/lib/subscription/plan";
 import { OffresCard } from "@/components/dashboard/offres-card";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
-import { detecterBesoins, filtrerBesoinsPertinents } from "@/lib/dashboard/besoins-identifies";
+import { recommanderServiceDepuisProfil } from "@/lib/dashboard/besoins-identifies";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
 import { calculerAgeCoai } from "@/lib/insight/age-coai";
@@ -96,9 +96,8 @@ export default async function DashboardPage() {
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
   const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
-  const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
   const hasAccess = hasProgrammeAccess(user, user.subscription);
-  const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
+  const serviceRecommande = recommanderServiceDepuisProfil(user.profile);
   const insight = !programme && !hasAccess ? await getCoaiInsight(user.id) : null;
 
   type SetD = { reps?: number; charge?: number };
