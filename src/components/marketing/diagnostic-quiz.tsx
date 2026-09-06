@@ -333,17 +333,11 @@ const QUESTION_STEPS: Step[] = [
   "quotidien",
   "niveau",
   "objectif",
-  // Rétablie le 04/09/2026 (Anthony, repositionnement 3 offres) : après
-  // avoir retiré cette question le 01/09 pour raccourcir le bilan, Anthony
-  // demande explicitement d'orienter la personne vers l'accompagnement
-  // qu'elle désire (Full IA / Full Remote / Full Présentiel VIP) dès le
-  // bilan plutôt que seulement via la recommandation calculée après coup —
-  // assumé comme une étape de plus, contrairement à la logique du 01/09.
-  // Alimente `coachPreference`, déjà lu par recommanderFormule() et
-  // detecterBesoins() (jusqu'ici jamais réellement capturé côté quiz).
-  "coach",
-  "localisation",
-  "budget",
+  // La qualification commerciale (type de coaching, localisation, budget)
+  // vient après la valeur délivrée. La poser avant le résultat ajoutait
+  // trois écrans de friction et donnait l'impression que le bilan servait
+  // surtout à vendre. Les états/rendus restent disponibles pour une future
+  // qualification post-résultat, sans ralentir le bilan forme offert.
   "equipement",
   "lieu",
   "duree",
@@ -1120,7 +1114,9 @@ export function DiagnosticQuiz({
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
-    if (step === "email") return isValidEmail(email) && isValidTelephone(telephone) && consentEmail;
+    if (step === "email") {
+      return isValidEmail(email) && (!telephone.trim() || isValidTelephone(telephone)) && consentEmail;
+    }
     return true;
     // persona / mobiliteRepere / cardioRepere / forceRepere / mouvementRepere
     // retirés (22/08/2026) : les étapes qui les utilisaient ont été
@@ -2091,7 +2087,7 @@ export function DiagnosticQuiz({
               <div>
                 <h2 className="font-display text-xl font-semibold text-white">Dernière étape.</h2>
                 <p className="mt-1.5 text-sm text-graphite-400">
-                  Ton email pour voir ton diagnostic et le retrouver plus tard.
+                  Ton email pour voir ton bilan et le retrouver plus tard.
                 </p>
               </div>
               <Input
@@ -2112,8 +2108,7 @@ export function DiagnosticQuiz({
                   inputMode="tel"
                 />
                 <p className="mt-1.5 text-xs text-graphite-500">
-                  Ton numéro (ex. 06 12 34 56 78) — le format français est accepté. Pour recevoir un conseil personnalisé ou être
-                  recontacté sur WhatsApp. Jamais partagé.
+                  Facultatif — laisse ton numéro uniquement si tu souhaites recevoir un conseil personnalisé ou être recontacté sur WhatsApp.
                 </p>
               </div>
               <label className="flex items-start gap-2 text-xs leading-5 text-graphite-400">
