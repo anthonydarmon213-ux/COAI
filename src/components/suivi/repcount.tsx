@@ -22,6 +22,54 @@ function totalRepetitions(perf: PerfExercice): number {
   return perf.sets.reduce((total, serie) => total + serie.reps, 0);
 }
 
+function prochainCap({
+  nombreSeances,
+  derniereValeur,
+  record,
+  progression,
+  unite,
+}: {
+  nombreSeances: number;
+  derniereValeur: number;
+  record: number;
+  progression: number | null;
+  unite: string;
+}) {
+  if (nombreSeances === 1) {
+    return {
+      titre: "Ta référence est posée",
+      texte: "Deux nouvelles séances permettront à COAI de confirmer une vraie tendance.",
+      progression: 1 / 3,
+    };
+  }
+  if (nombreSeances === 2) {
+    return {
+      titre: "La tendance se dessine",
+      texte: "Encore une séance suivie pour obtenir un repère plus fiable.",
+      progression: 2 / 3,
+    };
+  }
+  if (derniereValeur < record) {
+    return {
+      titre: `Prochain cap · retrouver ${record} ${unite}`,
+      texte: "Vise d’abord une exécution propre et sans douleur. Le record attendra si la forme du jour ne suit pas.",
+      progression: Math.max(0.15, derniereValeur / Math.max(record, 1)),
+    };
+  }
+  if (progression !== null && progression > 0) {
+    return {
+      titre: "Nouveau cap validé",
+      texte: "Confirme ce niveau une deuxième séance avec une exécution propre avant de monter davantage.",
+      progression: 1,
+    };
+  }
+  return {
+    titre: "Ton record est stabilisé",
+    texte: "Cherche une répétition plus fluide ou plus propre avant d’augmenter la difficulté.",
+    progression: 1,
+  };
+}
+
 function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
   const chronologie = historique.slice(0, 10).reverse();
   const suitLaCharge = chronologie.some((perf) => meilleureCharge(perf) > 0);
@@ -55,6 +103,13 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
   const record = Math.max(...valeurs);
   const estRecord = derniere.valeur >= record;
   const unite = suitLaCharge ? "kg" : "reps";
+  const cap = prochainCap({
+    nombreSeances: chronologie.length,
+    derniereValeur: derniere.valeur,
+    record,
+    progression,
+    unite,
+  });
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-[#06131b] p-4 shadow-[0_0_45px_rgba(34,211,238,0.08)]">
@@ -189,6 +244,26 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
             {progression !== null && <span className="ml-1 text-xs text-graphite-400">{unite}</span>}
           </p>
           <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-graphite-500">Vs avant</p>
+        </div>
+      </div>
+
+      <div className="relative mt-4 overflow-hidden rounded-xl border border-white/10 bg-black/25 p-3.5">
+        <div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-300/[0.09] to-transparent transition-[width] duration-700 motion-reduce:transition-none"
+          style={{ width: `${Math.min(100, Math.round(cap.progression * 100))}%` }}
+          aria-hidden="true"
+        />
+        <div className="relative flex items-start gap-3">
+          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-300/10 text-xs text-cyan-200 shadow-[0_0_18px_rgba(34,211,238,0.16)]">
+            ◉
+          </span>
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-cyan-200">
+              Coach RepCount
+            </p>
+            <p className="mt-1 text-sm font-semibold text-white">{cap.titre}</p>
+            <p className="mt-1 text-xs leading-5 text-graphite-300">{cap.texte}</p>
+          </div>
         </div>
       </div>
     </section>
