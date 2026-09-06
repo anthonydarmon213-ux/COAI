@@ -109,6 +109,11 @@ export async function POST(request: Request) {
   // Un essai est accordé une seule fois par compte. La ligne Subscription
   // est conservée après résiliation, et son trialEnd sert de preuve durable.
   const trialDays = user.subscription?.trialEnd ? 0 : offer.trialDays;
+  const descriptionProduit = billing === "ANNUAL"
+    ? "Personal Training réimaginé — 119€ facturés une fois par an, résiliable avant le prochain renouvellement."
+    : billing === "QUARTERLY"
+      ? `Personal Training réimaginé — ${(offer.amount / 100).toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}€ facturés tous les 3 mois, résiliable avant le prochain renouvellement.`
+      : "Personal Training réimaginé — 19,99€ par mois, sans engagement, résiliable à tout moment.";
   // Même clé pendant dix minutes : un double clic ou deux requêtes
   // concurrentes ne peuvent pas créer deux sessions/souscriptions.
   const idempotencyBucket = Math.floor(Date.now() / (10 * 60 * 1000));
@@ -121,9 +126,7 @@ export async function POST(request: Request) {
         recurring: { interval: offer.interval, interval_count: offer.count },
         product_data: {
           name: offer.name,
-          description: offer.interval === "year"
-            ? "Personal Training réimaginé — 119€ facturés une fois par an, résiliable à tout moment."
-            : "Personal Training réimaginé — accompagnement mensuel sans engagement, résiliable à tout moment.",
+          description: descriptionProduit,
         },
       },
       quantity: 1,
@@ -132,7 +135,7 @@ export async function POST(request: Request) {
       ? { customer: user.subscription.stripeCustomerId }
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
-    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}`,
+    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}&essai=${trialDays ? "1" : "0"}`,
     // Seul PASS_IA passe encore par ce checkout (STANDARD et PREMIUM sont
     // rejetés plus haut, sur devis via WhatsApp) : l'ancre est donc toujours
     // "pass-ia".
