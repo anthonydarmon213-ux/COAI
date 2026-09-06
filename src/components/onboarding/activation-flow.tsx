@@ -23,8 +23,8 @@ import { ProfilCompletion } from "@/components/compte/profil-completion";
 // profils réellement incomplets (abonnement direct sans diagnostic, ou
 // diagnostic abandonné avant les questions essentielles) voient l'écran
 // "COAI te connaît à X%" plutôt qu'une génération automatique.
-const RETRIES_GENERATION = 3;
-const DELAI_RETRY_MS = 1800;
+const RETRIES_GENERATION = 6;
+const DELAI_RETRY_MS = 2000;
 
 type Etat =
   | "verification"
@@ -191,13 +191,16 @@ export function ActivationFlow({
   if (etat === "debloquer") {
     return (
       <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
-        <SectionLabel>Ton profil est prêt</SectionLabel>
+        <SectionLabel>Activation en cours</SectionLabel>
         <p className="max-w-md text-sm leading-6 text-graphite-300">
-          Choisis le niveau d&apos;attention qui te correspond : Pass IA à 19,99€/mois,
-          Coaching Hybride à 99€/mois, ou le Coaching VIP à 200 € la séance.
+          Ton retour de paiement est bien arrivé, mais Stripe n&apos;a pas encore fini de synchroniser ton accès.
+          Cela prend généralement quelques secondes : ne relance pas de paiement.
         </p>
-        <Link href="/pricing">
-          <Button className="px-8 py-3">Choisir mon accompagnement</Button>
+        <Button type="button" className="px-8 py-3" onClick={() => window.location.reload()}>
+          Vérifier mon accès
+        </Button>
+        <Link href="/dashboard" className="text-xs text-graphite-500 underline hover:text-laiton-300">
+          Entrer dans mon espace en attendant
         </Link>
       </div>
     );

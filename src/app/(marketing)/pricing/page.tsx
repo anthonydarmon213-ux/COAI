@@ -45,6 +45,12 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       ? "QUARTERLY"
       : "MONTHLY";
   const arriveApresCreation = searchParams?.from === "signup";
+  const repriseStandard = arriveApresCreation && selectedPlan === "PASS_IA";
+  const reprisePrix = selectedBilling === "ANNUAL"
+    ? "119 € / an"
+    : selectedBilling === "QUARTERLY"
+      ? `${prixTrimestreCentimes() / 100} € / 3 mois`
+      : "19,99 € / mois";
 
   return (
     <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-8 px-6 pb-20 pt-16 sm:pt-20">
@@ -61,9 +67,36 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
       </div>
 
       {arriveApresCreation && (
-        <Card className="w-full max-w-4xl border-emerald-400/25 bg-emerald-400/[0.06] px-6 py-5 text-center">
-          <p className="font-semibold text-white">✓ Ton compte gratuit est prêt.</p>
-          <p className="mt-1 text-sm text-graphite-300">Aucun paiement n&apos;a encore été effectué.</p>
+        <Card className={`w-full max-w-4xl px-6 py-5 ${repriseStandard ? "border-cyan-300/30 bg-cyan-300/[0.06]" : "border-emerald-400/25 bg-emerald-400/[0.06]"}`}>
+          {repriseStandard ? (
+            <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div>
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200">
+                  Ton compte est prêt · ton choix est conservé
+                </p>
+                <h2 className="mt-2 font-display text-2xl font-semibold text-white">Standard IA · {reprisePrix}</h2>
+                <p className="mt-1 text-sm leading-6 text-graphite-300">
+                  Confirme tes 7 jours d&apos;essai. Aucun prélèvement avant leur fin.
+                </p>
+              </div>
+              <div className="min-w-64">
+                <SubscribeButton
+                  plan="PASS_IA"
+                  billing={selectedBilling}
+                  label="Confirmer mes 7 jours offerts →"
+                  className="coai-rainbow-cta w-full border-0 text-[#111216]"
+                />
+                <a href="#pass-ia" className="mt-2 block text-center text-xs text-graphite-400 underline decoration-white/20 underline-offset-4 hover:text-white">
+                  Modifier mon choix
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="font-semibold text-white">✓ Ton compte gratuit est prêt.</p>
+              <p className="mt-1 text-sm text-graphite-300">Aucun paiement n&apos;a encore été effectué.</p>
+            </div>
+          )}
         </Card>
       )}
 
