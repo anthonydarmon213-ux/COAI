@@ -207,7 +207,7 @@ function construireProfilParagraphe(r: ReponsesDiagnostic, profil: ProfilStructu
 // "le plus simple et efficace" ; le niveau influence déjà le programme via
 // SERIES_PAR_NIVEAU, pas la peine de dupliquer la nuance ici).
 export const RESULTATS_TIMELINE =
-  "Avec un programme adapté et un vrai suivi, les premiers effets se font généralement sentir dès 6 semaines, et l'atteinte de ton objectif sous 3 mois.";
+  "Avec un programme adapté et un suivi régulier, les premiers progrès se ressentent souvent en quelques semaines. Un changement durable se construit généralement sur 3 mois ou davantage, selon ton point de départ et ton objectif.";
 
 const STRUCTURE_PERSONAS = [
   "Je ne sais pas quoi faire à la salle",
@@ -251,7 +251,7 @@ function calculerPointsATravailler(r: ReponsesDiagnostic, sante: string[]): stri
 function calculerPointsResolus(r: ReponsesDiagnostic, sante: string[]): string[] {
   const points: string[] = [];
   if (sante.length > 0) {
-    points.push("Un programme qui respecte cette contrainte, contrôlé par un vrai coach avant d'être appliqué.");
+    points.push("Un programme qui tient compte de cette contrainte, avec des garde-fous clairs et l'avis d'un professionnel de santé recommandé en cas de douleur.");
   }
   if ((r.persona ?? []).some((p) => STRUCTURE_PERSONAS.includes(p))) {
     points.push("Un plan structuré, séance par séance, adapté à ton niveau et à ton matériel.");
@@ -377,7 +377,7 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
     return {
       service: "IMPULSION",
       label: "Standard IA",
-      raison: "Tu préfères commencer sans engagement financier : Standard IA te donne un programme complet et un Personal Trainer IA disponible 24h/24, avec mon WhatsApp en renfort si besoin.",
+      raison: "Tu préfères commencer avec un budget maîtrisé : Standard IA te donne 7 jours d'essai, puis un programme complet et un Personal Trainer IA disponible 24h/24, avec mon WhatsApp en renfort si besoin.",
     };
   }
 
@@ -458,7 +458,7 @@ export function buildMiniDiagnostic(r: ReponsesDiagnostic): MiniDiagnostic | nul
   return {
     titre: `Profil ${niveau.toLowerCase()} — objectif ${objectif.toLowerCase()}`,
     accroche: accrochePour(persona),
-    alerte: sante.length > 0 ? `Signalé : ${sante.join(", ")} — le vrai programme évite les mouvements à risque pour ces zones.` : null,
+    alerte: sante.length > 0 ? `Signalé : ${sante.join(", ")} — ton programme doit être adapté à cette contrainte. En cas de douleur, demande l'avis d'un professionnel de santé avant de poursuivre.` : null,
     pointsATravailler: calculerPointsATravailler(r, sante),
     pointsResolus: calculerPointsResolus(r, sante),
     split: SPLIT_PAR_FREQUENCE[frequence] ?? null,
