@@ -98,6 +98,10 @@ export default async function DashboardPage() {
   const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
   const hasAccess = hasProgrammeAccess(user, user.subscription);
   const serviceRecommande = recommanderServiceDepuisProfil(user.profile);
+  // Un ancien déblocage à vie conserve son programme, mais ne doit jamais
+  // se voir revendre Standard IA. S'il souhaite davantage d'accompagnement,
+  // Premium Remote est le premier niveau supplémentaire cohérent.
+  const serviceAProposer = hasAccess && serviceRecommande === "IMPULSION" ? "TRANSFORMATION" : serviceRecommande;
   const insight = !programme && !hasAccess ? await getCoaiInsight(user.id) : null;
 
   type SetD = { reps?: number; charge?: number };
@@ -281,7 +285,7 @@ export default async function DashboardPage() {
           (01/09/2026) : l'inscription renvoyait auparavant vers /pricing,
           soit un prix avant même la première séance. Masquée dès qu'un
           abonnement est actif — inutile de vendre à qui a déjà acheté. */}
-      {!hasPaidSubscription(user.subscription) && <OffresCard serviceRecommande={serviceRecommande} />}
+      {!hasPaidSubscription(user.subscription) && <OffresCard serviceRecommande={serviceAProposer} />}
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link
