@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
 import { hasSuiviAccess } from "@/lib/subscription/plan";
-import { ParrainageCard } from "@/components/compte/parrainage-card";
 
 // Écran d'accueil post-paiement (10/08/2026) : repensé façon "salon
 // d'embarquement" plutôt qu'un simple accusé de réception transactionnel.
@@ -86,17 +85,18 @@ export default async function BienvenuePage({
             Bienvenue{prenom ? `, ${prenom}` : ""}.
           </h1>
           <p className="max-w-md text-sm leading-6 text-graphite-400">
-            Ton espace personnel est prêt. On te guide, étape par étape.
+            Ton bilan devient maintenant un plan d&apos;action simple, adapté à ton quotidien.
           </p>
         </div>
 
-        <Link
-          href="/dashboard"
-          className="coai-rainbow-cta animate-reveal inline-flex min-h-14 w-full max-w-md items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-20px_rgba(102,126,255,.75)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_65px_-18px_rgba(228,92,150,.65)]"
-          style={{ animationDelay: "100ms" }}
-        >
-          Entrer dans mon espace&nbsp; →
-        </Link>
+        {/* Le CTA est rendu par ActivationFlow seulement après la sauvegarde
+            effective du bilan. Une seule action principale, sans risque que
+            l'utilisateur arrive sur le dashboard avant son profil. */}
+        <ActivationFlow
+          coachValidationRequise={coachValidationRequise}
+          profilInitial={user.profile ?? null}
+          declencherGenerationAuto={false}
+        />
 
         {/* Carte d'embarquement, version accès libre (16/08/2026, demande
             Anthony — un "effet whaou", pris en main dès l'arrivée, comme dans
@@ -145,12 +145,11 @@ export default async function BienvenuePage({
           </div>
         </div>
 
-        <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-2">
+        <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-3">
           {[
-            { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de ton futur programme." },
-            { titre: "Ton programme", texte: "Standard IA, Premium Remote ou VIP Présentiel : le niveau d'attention qui te correspond." },
-            { titre: "Ton Coach IA", texte: "Pose tes questions, 24h/24, dans l'esprit de la méthode d'Anthony." },
-            { titre: "Ton suivi", texte: "Séances, mesures, progression — tout au même endroit." },
+            { titre: "Aujourd'hui", texte: "COAI te montre une seule priorité utile." },
+            { titre: "Chaque séance", texte: "Ton plan s'adapte à ta forme et à tes contraintes." },
+            { titre: "Dans le temps", texte: "Tes résultats rendent les prochaines décisions plus précises." },
           ].map((etape, i) => (
             <div
               key={etape.titre}
@@ -168,25 +167,6 @@ export default async function BienvenuePage({
           ))}
         </div>
 
-        {/* Le diagnostic reste appliqué au profil en silence si des réponses
-            attendent en localStorage — mais plus aucune tentative de
-            génération/paiement ne s'affiche automatiquement ici (cf. prop
-            declencherGenerationAuto). */}
-        <ActivationFlow
-          coachValidationRequise={coachValidationRequise}
-          profilInitial={user.profile ?? null}
-          declencherGenerationAuto={false}
-        />
-
-        {/* Partage du lien de parrainage remonté ici (14/08/2026, test
-            acquisition) : jusque-là visible uniquement sur compte/abonnement,
-            donc jamais vu par quelqu'un qui explore encore gratuitement.
-            Réutilise ParrainageCard tel quel (même carte, même API) —
-            l'enthousiasme de l'inscription est le moment le plus favorable
-            pour proposer de partager, avant même un premier paiement. */}
-        <div className="w-full max-w-md text-left">
-          <ParrainageCard />
-        </div>
       </div>
     );
   }
