@@ -74,7 +74,7 @@ export default async function AdminBusinessPage() {
         email: true,
         createdAt: true,
         subscription: { select: { status: true, trialEnd: true } },
-        _count: { select: { seances: true } },
+        _count: { select: { seances: true, testsMaxi: true } },
       },
     }),
   ]);
@@ -131,12 +131,31 @@ export default async function AdminBusinessPage() {
   ).length;
   const conversionParrainage = filleuls.length > 0 ? (filleulsConvertis / filleuls.length) * 100 : 0;
   const emailsLeads = new Set(diagnosticLeads30d.map((lead) => lead.email.toLowerCase()));
-  const inscritsDepuisDiagnostic = usersAvecAbonnement.filter((user) => emailsLeads.has(user.email.toLowerCase()));
-  const actifsDepuisDiagnostic = inscritsDepuisDiagnostic.filter((user) => user._count.seances > 0);
-  const essaisDepuisDiagnostic = inscritsDepuisDiagnostic.filter((user) => user.subscription?.status === "ACTIVE");
-  const payantsDepuisDiagnostic = essaisDepuisDiagnostic.filter(
-    (user) => !user.subscription?.trialEnd || user.subscription.trialEnd <= maintenant
+  const premierLeadParEmail = new Map<string, (typeof diagnosticLeads30d)[number]>();
+  for (const lead of diagnosticLeads30d) {
+    const emailNormalise = lead.email.toLowerCase();
+    if (!premierLeadParEmail.has(emailNormalise)) premierLeadParEmail.set(emailNormalise, lead);
+  }
+  // Une simple égalité d'e-mail ne suffit pas : un compte créé avant le
+  // diagnostic n'est pas une conversion produite par ce diagnostic.
+  const inscritsDepuisDiagnostic = usersAvecAbonnement.filter((user) => {
+    const lead = premierLeadParEmail.get(user.email.toLowerCase());
+    return Boolean(lead && user.createdAt >= lead.createdAt);
+  });
+  // RepCount est volontairement la première valeur gratuite du produit. Ne
+  // compter que les séances rendait invisibles les utilisateurs qui avaient
+  // déjà enregistré une charge et obtenu leur courbe de progression.
+  const actifsDepuisDiagnostic = inscritsDepuisDiagnostic.filter(
+    (user) => user._count.seances > 0 || user._count.testsMaxi > 0
   );
+  const essaisDepuisDiagnostic = inscritsDepuisDiagnostic.filter(
+    (user) =>
+      user.subscription?.status === "ACTIVE" &&
+      Boolean(user.subscription.trialEnd && user.subscription.trialEnd > maintenant)
+  );
+  const payantsDepuisDiagnostic = inscritsDepuisDiagnostic.filter(
+    (user) => !user.subscription?.trialEnd || user.subscription.trialEnd <= maintenant
+  ).filter((user) => user.subscription?.status === "ACTIVE");
   const leadsUniques = emailsLeads.size;
   const tauxLeadInscription = leadsUniques > 0 ? (inscritsDepuisDiagnostic.length / leadsUniques) * 100 : 0;
   const tauxInscriptionActivation = inscritsDepuisDiagnostic.length > 0
@@ -148,11 +167,6 @@ export default async function AdminBusinessPage() {
     diagnosticLeads30d.filter((lead) => lead.conversionReminderSentAt).map((lead) => lead.email.toLowerCase())
   ).size;
   const utilisateurParEmail = new Map(usersAvecAbonnement.map((user) => [user.email.toLowerCase(), user]));
-  const premierLeadParEmail = new Map<string, (typeof diagnosticLeads30d)[number]>();
-  for (const lead of diagnosticLeads30d) {
-    const emailNormalise = lead.email.toLowerCase();
-    if (!premierLeadParEmail.has(emailNormalise)) premierLeadParEmail.set(emailNormalise, lead);
-  }
   const campagnes = new Map<string, { source: string; campagne: string; diagnostics: number; comptes: number; actifs: number; essais: number; payants: number }>();
   for (const [emailNormalise, lead] of premierLeadParEmail) {
     const source = lead.utmSource?.trim() || "direct";
@@ -160,13 +174,21 @@ export default async function AdminBusinessPage() {
     const key = `${source}\u0000${campagne}`;
     const ligne = campagnes.get(key) ?? { source, campagne, diagnostics: 0, comptes: 0, actifs: 0, essais: 0, payants: 0 };
     ligne.diagnostics++;
-    const user = utilisateurParEmail.get(emailNormalise);
+    const candidat = utilisateurParEmail.get(emailNormalise);
+    const user = candidat && candidat.createdAt >= lead.createdAt ? candidat : undefined;
     if (user) ligne.comptes++;
-    if (user && user._count.seances > 0) ligne.actifs++;
-    if (user?.subscription?.status === "ACTIVE") {
+    if (user && (user._count.seances > 0 || user._count.testsMaxi > 0)) ligne.actifs++;
+    if (
+      user?.subscription?.status === "ACTIVE" &&
+      user.subscription.trialEnd &&
+      user.subscription.trialEnd > maintenant
+    ) {
       ligne.essais++;
-      if (!user.subscription.trialEnd || user.subscription.trialEnd <= maintenant) ligne.payants++;
     }
+    if (
+      user?.subscription?.status === "ACTIVE" &&
+      (!user.subscription.trialEnd || user.subscription.trialEnd <= maintenant)
+    ) ligne.payants++;
     campagnes.set(key, ligne);
   }
   const campagnesTriees = [...campagnes.values()].sort((a, b) => b.diagnostics - a.diagnostics || b.payants - a.payants);
