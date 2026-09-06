@@ -2354,6 +2354,24 @@ export function DiagnosticQuiz({
                 )}
               </div>
 
+              {/* Le bilan débouche immédiatement sur une décision claire :
+                  une seule formule, expliquée à partir des réponses. Les
+                  détails pédagogiques restent disponibles plus bas, mais ne
+                  repoussent plus l'action principale sous plusieurs écrans. */}
+              <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
+
+              {!connecte && (
+                <div className="flex w-full flex-col items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.025] px-5 py-5 text-center sm:flex-row sm:text-left">
+                  <div>
+                    <p className="text-sm font-semibold text-white">Tu veux d&apos;abord conserver ton bilan ?</p>
+                    <p className="mt-1 text-xs leading-5 text-graphite-400">Crée ton espace gratuit pour retrouver ton résultat et explorer COAI, sans carte bancaire.</p>
+                  </div>
+                  <Link href={signUpHref()} onClick={handleCreerCompte} className="shrink-0">
+                    <Button variant="secondary" className="px-6">Conserver mon bilan</Button>
+                  </Link>
+                </div>
+              )}
+
               {projection && <ProjectionEmotionnelleCard projection={projection} />}
 
               <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
@@ -2432,37 +2450,6 @@ export function DiagnosticQuiz({
                   </div>
                   <p className="mt-4 text-[11px] leading-5 text-graphite-500">
                     Indicateur de coaching calculé à partir de tes réponses. Il ne constitue pas une mesure médicale.
-                  </p>
-                </div>
-              )}
-
-              {/* Recommandation de formule remontée juste après le bloc problème/solution
-                  (19/08/2026, audit conversion demandé par Anthony) : elle vivait jusqu'ici
-                  tout en bas de l'écran, après ~6 sections éducatives supplémentaires — le
-                  point de conversion le plus important de la page était le plus enterré. */}
-              {connecte ? (
-                <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
-              ) : (
-                <div className="w-full rounded-[1.6rem] border border-laiton-400/35 bg-laiton-400/[0.07] px-6 py-7 text-center">
-                  <SectionLabel>Conserve ton résultat</SectionLabel>
-                  <h3 className="mt-3 font-display text-2xl font-semibold text-white">
-                    Entre dans ton espace COAI.
-                  </h3>
-                  {/* La formulation precedente annoncait le choix d'une formule
-                      comme etape suivante, alors que l'inscription mene
-                      directement au tableau de bord : elle promettait une
-                      friction qui n'existe pas et faisait fuir avant l'essai. */}
-                  <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-graphite-300">
-                    Ton diagnostic est enregistré et tu arrives directement dans
-                    l&apos;application. Dix fonctions sont gratuites, sans carte bancaire :
-                    suivi de tes séances, records, mesures, bibliothèque d&apos;exercices,
-                    recettes. Tu ne choisiras une formule que si tu veux aller plus loin.
-                  </p>
-                  <Link href={signUpHref()} onClick={handleCreerCompte} className="mt-5 inline-flex">
-                    <Button className="px-8 py-4">Entrer dans l&apos;application →</Button>
-                  </Link>
-                  <p className="mt-3 text-xs text-graphite-400">
-                    Gratuit, sans engagement, sans paiement automatique.
                   </p>
                 </div>
               )}
@@ -2632,8 +2619,8 @@ export function DiagnosticQuiz({
                   </div>
                   <h3 className="max-w-xl font-display text-3xl font-bold leading-tight text-white sm:text-4xl">Garde ton résultat et poursuis gratuitement.</h3>
                   <p className="max-w-xl text-sm leading-6 text-graphite-300">
-                    Crée ton compte sans carte bancaire. Tu choisiras ensuite ton accompagnement, puis tu
-                    pourras démarrer les 7 jours d&apos;essai si tu le souhaites.
+                    Crée ton compte sans carte bancaire. Ton bilan et l&apos;accompagnement recommandé restent
+                    enregistrés pour que tu puisses reprendre exactement ici.
                   </p>
                   <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-laiton-300">Clique ci-dessous pour continuer</span>
                   <Link href={signUpHref()} onClick={handleCreerCompte} className="w-full max-w-md">

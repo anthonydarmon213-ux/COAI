@@ -361,7 +361,9 @@ function calculerIndiceCoai(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
 //    face à une contrainte physique réelle.
 // 3. Choix explicite "hybride" à l'étape coach.
 // 4. Niveau avancé + objectif de force/performance — optimisation fine,
-//    VIP même si "full IA" avait été coché par défaut.
+//    Premium Remote par défaut. Le VIP n'est recommandé que lorsque la
+//    personne a explicitement demandé du présentiel à Paris : le bilan
+//    public raccourci ne demande plus sa localisation avant le résultat.
 // 5. Plateau de progression qui dure (persona) — un suivi humain casse
 //    souvent un plateau mieux qu'un simple nouveau programme.
 // 6. Par défaut : Pass IA, le point de départ recommandé.
@@ -407,9 +409,9 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
     }
     if (avanceExigeant) {
       return {
-        service: "VIP",
-        label: "VIP Présentiel",
-        raison: "Ton niveau et ton objectif de performance justifient un accompagnement 1-to-1, pas juste un programme à suivre seul.",
+        service: "TRANSFORMATION",
+        label: "Premium Remote",
+        raison: "Ton niveau et ton objectif de performance demandent des ajustements fins. Premium Remote ajoute le suivi individuel d'Anthony à la disponibilité de COAI.",
       };
     }
     if (plateau) {
