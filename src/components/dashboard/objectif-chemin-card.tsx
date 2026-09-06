@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Apple, Dumbbell, MoonStar, Repeat2, type LucideIcon } from "lucide-react";
 import { objectifSocle, type ObjectifSocle } from "@/lib/programmes-socles/cle";
 import type { CompletionProfil } from "@/lib/profil/completion";
 
@@ -50,6 +51,8 @@ export function ObjectifCheminCard({
   objectifs,
   completion,
   hasProgramme,
+  hasNutrition,
+  hasRecovery,
   hasAccess,
   premiereSeanceFaite,
   seancesDuMois,
@@ -57,6 +60,8 @@ export function ObjectifCheminCard({
   objectifs?: string | null;
   completion: CompletionProfil;
   hasProgramme: boolean;
+  hasNutrition: boolean;
+  hasRecovery: boolean;
   hasAccess: boolean;
   premiereSeanceFaite: boolean;
   seancesDuMois: number;
@@ -103,6 +108,48 @@ export function ObjectifCheminCard({
   ];
   const etapesFaites = etapes.filter((etape) => etape.faite).length;
   const prochaineEtape = etapes.findIndex((etape) => !etape.faite);
+  const piliers: {
+    titre: string;
+    detail: string;
+    actif: boolean;
+    href: string;
+    Icone: LucideIcon;
+    couleur: "cyan" | "gold" | "violet" | "green";
+  }[] = [
+    {
+      titre: "Entraînement",
+      detail: hasProgramme ? "Plan actif" : "À construire",
+      actif: hasProgramme,
+      href: "/programme/entrainement",
+      Icone: Dumbbell,
+      couleur: "cyan",
+    },
+    {
+      titre: "Alimentation",
+      detail: hasNutrition ? "Repères actifs" : "À activer",
+      actif: hasNutrition,
+      href: "/programme/alimentation",
+      Icone: Apple,
+      couleur: "gold",
+    },
+    {
+      titre: "Récupération",
+      detail: hasRecovery ? "Protocole actif" : "À activer",
+      actif: hasRecovery,
+      href: "/programme/recuperation",
+      Icone: MoonStar,
+      couleur: "violet",
+    },
+    {
+      titre: "Régularité",
+      detail: `${seancesDuMois}/4 séances ce mois`,
+      actif: seancesDuMois >= 4,
+      href: "/suivi/seances",
+      Icone: Repeat2,
+      couleur: "green",
+    },
+  ];
+  const prochaine = etapes[prochaineEtape] ?? etapes.at(-1)!;
 
   return (
     <section
@@ -136,54 +183,47 @@ export function ObjectifCheminCard({
         </Link>
       </div>
 
-      <div className="mt-7 grid gap-2 sm:grid-cols-2 xl:grid-cols-4" aria-label="Chemin vers ton objectif">
-        {etapes.map((etape, index) => {
-          const estProchaine = index === prochaineEtape;
-          return (
-          <Link
-            key={etape.numero}
-            href={etape.href}
-            className={`group relative rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
-              etape.faite
-                ? "border-emerald-300/25 bg-emerald-300/[0.06]"
-                : estProchaine
-                  ? "border-laiton-300/45 bg-laiton-400/[0.1] shadow-[0_18px_45px_-32px_rgba(201,162,98,.9)]"
-                  : "border-white/[0.08] bg-black/[0.08] opacity-60 hover:border-white/15 hover:opacity-80"
-            }`}
-          >
-            {estProchaine && (
-              <span className="mb-3 inline-flex rounded-full bg-laiton-300 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#111216]">
-                Prochaine étape
-              </span>
-            )}
-            <div className="flex items-start justify-between gap-3">
-              <span
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold ${
-                  etape.faite
-                    ? "border-emerald-300/40 bg-emerald-300/15 text-emerald-200"
-                    : "border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
-                }`}
-              >
-                {etape.faite ? "✓" : etape.numero}
-              </span>
-              <span className="text-xs text-graphite-500 transition group-hover:text-laiton-200">{etape.action} ↗</span>
-            </div>
-            <h3 className="mt-4 text-sm font-bold text-white">{etape.titre}</h3>
-            <p className="mt-1 text-xs leading-5 text-graphite-400">{etape.detail}</p>
-          </Link>
-          );
-        })}
+      <div className="coai-trajectory-map mt-7" aria-label="Les quatre piliers de ton objectif">
+        <div className="coai-trajectory-lines" aria-hidden="true">
+          <span /><span /><span /><span />
+        </div>
+        <div className="coai-trajectory-core">
+          <span className="coai-trajectory-core-orbit" aria-hidden="true" />
+          <small>Ton cap</small>
+          <strong>{info.label}</strong>
+          <span>{etapesFaites}/{etapes.length} étapes</span>
+        </div>
+        <div className="coai-trajectory-pillars">
+          {piliers.map(({ titre, detail, actif, href, Icone, couleur }) => (
+            <Link key={titre} href={href} className={`coai-trajectory-pillar coai-trajectory-${couleur}`}>
+              <span className="coai-trajectory-pillar-icon"><Icone size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+              <div>
+                <strong>{titre}</strong>
+                <small>{detail}</small>
+              </div>
+              <i className={actif ? "is-active" : ""} aria-label={actif ? "Actif" : "À activer"} />
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-white/[0.08]" aria-hidden="true">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-laiton-500 via-laiton-300 to-emerald-300 transition-all"
-          style={{ width: `${Math.max(8, (etapesFaites / etapes.length) * 100)}%` }}
-        />
+      <div className="mt-6 grid grid-cols-4 gap-1" aria-label="Marches vers ton objectif">
+        {etapes.map((etape, index) => (
+          <div key={etape.numero} className={`coai-path-step ${etape.faite ? "is-done" : index === prochaineEtape ? "is-next" : ""}`}>
+            <span>{etape.faite ? "✓" : etape.numero}</span>
+            <small>{index === 0 ? "Profil" : index === 1 ? "Plan" : index === 2 ? "Séance" : "Adaptation"}</small>
+          </div>
+        ))}
       </div>
-      <p className="mt-2 text-[11px] text-graphite-500">
-        {etapesFaites === etapes.length ? "Ton chemin est lancé : COAI ajuste maintenant le plan avec tes retours." : "Une seule prochaine étape à la fois, jusqu'à ton objectif."}
-      </p>
+
+      <Link href={prochaine.href} className="coai-next-mission mt-4 flex items-center justify-between gap-4 rounded-2xl px-4 py-3.5 transition hover:-translate-y-0.5">
+        <div>
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-200">Prochaine marche</p>
+          <p className="mt-1 text-sm font-semibold text-white">{prochaine.titre}</p>
+          <p className="mt-0.5 text-xs text-graphite-400">{prochaine.detail}</p>
+        </div>
+        <span className="shrink-0 text-sm font-bold text-laiton-100">{prochaine.action} →</span>
+      </Link>
     </section>
   );
 }

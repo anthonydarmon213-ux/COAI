@@ -44,7 +44,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, diesRecents, programmeNutrition, seancesDuMoisCount] = await Promise.all([
+  const [validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -62,6 +62,11 @@ export default async function DashboardPage() {
       where: { userId: user.id, pilier: "NUTRITION", statut: { in: ["VALIDE", "GENERE_IA"] } },
       orderBy: { generatedAt: "desc" },
       select: { contenu: true },
+    }),
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "RECUPERATION", statut: { in: ["VALIDE", "GENERE_IA"] } },
+      orderBy: { generatedAt: "desc" },
+      select: { id: true },
     }),
     prisma.seanceLog.count({
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) } },
@@ -257,6 +262,8 @@ export default async function DashboardPage() {
         objectifs={user.profile?.objectifs}
         completion={completion}
         hasProgramme={Boolean(programme)}
+        hasNutrition={Boolean(programmeNutrition)}
+        hasRecovery={Boolean(programmeRecuperation)}
         hasAccess={hasAccess}
         premiereSeanceFaite={seancesDuMoisCount > 0}
         seancesDuMois={seancesDuMoisCount}
