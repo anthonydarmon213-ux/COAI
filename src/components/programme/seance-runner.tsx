@@ -560,6 +560,7 @@ export function SeanceRunner({
       )}
       {termine ? (
         <SeanceBilan
+          nomSeance={nomSeance}
           exercices={bilan}
           dureeSecondes={chronoGlobal}
           tonnagePrecedent={tonnagePrecedent}

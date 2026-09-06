@@ -51,12 +51,14 @@ function Tuile({ icone: Icone, valeur, libelle }: { icone: typeof Flame; valeur:
 }
 
 export function SeanceBilan({
+  nomSeance,
   exercices,
   dureeSecondes,
   tonnagePrecedent,
   onFermer,
   chronoFormate,
 }: {
+  nomSeance: string;
   exercices: BilanExercice[];
   dureeSecondes: number;
   tonnagePrecedent: number | null;
@@ -127,6 +129,7 @@ export function SeanceBilan({
       )}
 
       <SeanceShareButton
+        nomSeance={nomSeance}
         exercices={exercices}
         chronoFormate={chronoFormate}
         ecartPourcent={ecart}
