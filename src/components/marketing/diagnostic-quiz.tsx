@@ -23,6 +23,7 @@ import { FondateurTicker } from "@/components/marketing/fondateur-ticker";
 import { ProjectionEmotionnelleCard } from "@/components/marketing/projection-emotionnelle-card";
 import { construireProjection, EVENEMENTS_DECLENCHEURS } from "@/lib/diagnostic/projection-emotionnelle";
 import { Gauge } from "@/components/ui/gauge";
+import { FonctionsDiagnosticCard } from "@/components/marketing/fonctions-diagnostic-card";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -2354,10 +2355,15 @@ export function DiagnosticQuiz({
                 )}
               </div>
 
-              {/* Le bilan débouche immédiatement sur une décision claire :
-                  une seule formule, expliquée à partir des réponses. Les
-                  détails pédagogiques restent disponibles plus bas, mais ne
-                  repoussent plus l'action principale sous plusieurs écrans. */}
+              <FonctionsDiagnosticCard
+                objectif={diagnostic.profil.objectif}
+                rythme={diagnostic.profil.rythme}
+                environnement={diagnostic.profil.environnement}
+                avecContrainte={Boolean(diagnostic.alerte)}
+              />
+
+              {/* Après avoir montré le fonctionnement concret, le bilan
+                  débouche sur une seule formule expliquée par les réponses. */}
               <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
 
               {!connecte && (
