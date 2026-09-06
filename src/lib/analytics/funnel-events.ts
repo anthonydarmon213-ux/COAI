@@ -28,6 +28,7 @@ export type FunnelEventName =
   | "instagram_checkout_help_viewed"
   | "instagram_safari_link_copied"
   | "checkout_completed"
+  | "first_repcount_saved"
   | "first_programme_viewed"
   | "first_workout_started"
   | "progress_shared"

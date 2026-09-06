@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   comparerAvantApres,
   historiquePourExercice,
   type PerfExercice,
   type SetSaisi,
 } from "@/lib/suivi/historique-exercice";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
 const REPOS_DEFAUT = 90;
 
@@ -273,9 +275,11 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
 export function RepCount({
   exercices,
   exerciceInitial = "",
+  hasAccess = false,
 }: {
   exercices: string[];
   exerciceInitial?: string;
+  hasAccess?: boolean;
 }) {
   const [nom, setNom] = useState(exerciceInitial);
   const [reps, setReps] = useState(10);
@@ -339,6 +343,7 @@ export function RepCount({
   const enregistrer = useCallback(async () => {
     if (!nom.trim() || sets.length === 0) return;
     setErreur(null);
+    const premierRepere = seances.length === 0;
     const r = await fetch("/api/seances", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -358,8 +363,9 @@ export function RepCount({
     }
     setSets([]);
     setEnregistre(true);
+    if (premierRepere) trackFunnelEvent("first_repcount_saved");
     void charger();
-  }, [nom, sets, charger]);
+  }, [nom, sets, seances.length, charger]);
 
   const Stepper = ({
     label,
@@ -522,6 +528,19 @@ export function RepCount({
           <p className="mt-1 text-xs text-graphite-300">
             Ta courbe est à jour. Reviens à la prochaine séance pour battre ton repère.
           </p>
+          {!hasAccess && (
+            <div className="mt-3 border-t border-emerald-200/15 pt-3">
+              <p className="text-xs leading-5 text-graphite-200">
+                RepCount mesure tes progrès. L&apos;accompagnement COAI ajoute le programme qui te dit quoi faire pour les provoquer.
+              </p>
+              <Link
+                href="/pricing?source=repcount"
+                className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/10 px-5 text-sm font-bold text-laiton-100 transition hover:bg-laiton-300/15"
+              >
+                Découvrir mon accompagnement →
+              </Link>
+            </div>
+          )}
         </div>
       )}
 

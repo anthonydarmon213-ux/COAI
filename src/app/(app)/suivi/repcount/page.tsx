@@ -1,6 +1,8 @@
 import { RepCount } from "@/components/suivi/repcount";
 import { EXERCICES } from "@/lib/exercices/catalogue";
 import { SectionLabel } from "@/components/ui/section-label";
+import { getCurrentAppUser } from "@/lib/auth/server";
+import { hasProgrammeAccess } from "@/lib/subscription/plan";
 
 export const metadata = {
   title: "RepCount | COAI",
@@ -13,7 +15,7 @@ export const metadata = {
 // libre. Les données sont écrites dans SeanceLog via /api/seances, au même
 // format que le lecteur — elles alimentent donc les graphiques de
 // progression et le volume par muscle sans traitement supplémentaire.
-export default function RepCountPage({
+export default async function RepCountPage({
   searchParams,
 }: {
   searchParams?: { exercice?: string | string[] };
@@ -30,6 +32,8 @@ export default function RepCountPage({
   const exerciceInitial = Array.isArray(searchParams?.exercice)
     ? searchParams.exercice[0] ?? ""
     : searchParams?.exercice ?? "";
+  const user = await getCurrentAppUser();
+  const hasAccess = Boolean(user && hasProgrammeAccess(user, user.subscription));
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-col gap-6">
@@ -49,7 +53,11 @@ export default function RepCountPage({
         </p>
       </header>
 
-      <RepCount exercices={EXERCICES.map((e) => e.nom)} exerciceInitial={exerciceInitial} />
+      <RepCount
+        exercices={EXERCICES.map((e) => e.nom)}
+        exerciceInitial={exerciceInitial}
+        hasAccess={hasAccess}
+      />
     </main>
   );
 }
