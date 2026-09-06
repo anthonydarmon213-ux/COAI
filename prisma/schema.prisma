@@ -525,12 +525,19 @@ enum NiveauDouleur {
   IMPORTANTE
 }
 
+enum SeanceSource {
+  LIBRE
+  REPCOUNT
+  PROGRAMME
+}
+
 model SeanceLog {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   date      DateTime
   exercices Json
+  source    SeanceSource @default(LIBRE)
   ressenti  String?
   notes     String?
   createdAt DateTime @default(now())
@@ -549,6 +556,7 @@ model SeanceLog {
   // l'ont renseignée.
   dureeMinutes Int?
 
+  @@index([userId, source])
   @@map("seances_log")
 }
 

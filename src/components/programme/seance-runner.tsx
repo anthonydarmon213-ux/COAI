@@ -453,6 +453,7 @@ export function SeanceRunner({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: finRef.current,
+          source: "PROGRAMME",
           exercices: [...parExercice.values()],
           dureeMinutes,
           notes: `Séance guidée : ${nomSeance}`,

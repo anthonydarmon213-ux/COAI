@@ -419,13 +419,13 @@ export function RepCount({
     if (!nom.trim() || sets.length === 0 || enregistrementEnCours) return;
     setErreur(null);
     setEnregistrementEnCours(true);
-    const premierRepere = seances.length === 0;
     try {
       const r = await fetch("/api/seances", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: new Date().toISOString(),
+          source: "REPCOUNT",
           exercices: [
             {
               nom: nom.trim(),
@@ -437,14 +437,16 @@ export function RepCount({
       if (!r.ok) throw new Error("enregistrement_refuse");
       setSets([]);
       setEnregistre(true);
-      if (premierRepere) trackFunnelEvent("first_repcount_saved");
+      if (r.headers.get("X-COAI-First-Source") === "1") {
+        trackFunnelEvent("first_repcount_saved");
+      }
       void charger();
     } catch {
       setErreur("L'enregistrement a échoué. Réessaie.");
     } finally {
       setEnregistrementEnCours(false);
     }
-  }, [nom, sets, seances.length, charger, enregistrementEnCours]);
+  }, [nom, sets, charger, enregistrementEnCours]);
 
   const Stepper = ({
     label,

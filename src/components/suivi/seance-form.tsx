@@ -126,6 +126,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
+          source: "LIBRE",
           exercices: payload,
           notes: commentaire || undefined,
           difficulte: difficulte ?? undefined,

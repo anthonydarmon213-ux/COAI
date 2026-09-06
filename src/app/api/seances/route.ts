@@ -33,6 +33,7 @@ const bodySchema = z.object({
   douleur: z.enum(["AUCUNE", "LEGERE", "IMPORTANTE"]).optional(),
   douleurZone: z.string().max(200).optional(),
   dureeMinutes: z.number().int().min(0).max(600).optional(),
+  source: z.enum(["LIBRE", "REPCOUNT", "PROGRAMME"]).optional(),
 });
 
 export async function GET() {
@@ -65,6 +66,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
+  const source = parsed.data.source ?? "LIBRE";
   // Une nouvelle tentative après une coupure réseau réutilise exactement la
   // même date ISO. Si la première écriture avait réussi mais que sa réponse
   // s'était perdue, on renvoie la séance existante au lieu de créer un
@@ -73,16 +75,23 @@ export async function POST(request: Request) {
     where: { userId: user.id, date: parsed.data.date },
   });
   if (dejaEnregistree) {
-    return NextResponse.json(dejaEnregistree, { status: 200 });
+    const nbDeCetteSource = await prisma.seanceLog.count({ where: { userId: user.id, source } });
+    return NextResponse.json(dejaEnregistree, {
+      status: 200,
+      headers: {
+        "X-COAI-First-Source": dejaEnregistree.source === source && nbDeCetteSource === 1 ? "1" : "0",
+      },
+    });
   }
 
-  const seancesExistantes = await prisma.seanceLog.count({ where: { userId: user.id } });
+  const entreesDeCetteSource = await prisma.seanceLog.count({ where: { userId: user.id, source } });
 
   const seance = await prisma.seanceLog.create({
     data: {
       userId: user.id,
       date: parsed.data.date,
       exercices: parsed.data.exercices,
+      source,
       ressenti: parsed.data.ressenti,
       notes: parsed.data.notes,
       difficulte: parsed.data.difficulte,
@@ -93,16 +102,18 @@ export async function POST(request: Request) {
     },
   });
 
-  // Funnel (Phase 5B, 11/08/2026) : "first_workout_started" — COAI n'a pas
-  // de suivi live d'une séance en cours, le log après-coup est le seul
-  // signal disponible ; approximé par le tout premier SeanceLog du compte.
-  if (seancesExistantes === 0) {
-    trackServerEvent("first_workout_started", user.id);
-  }
-  trackServerEvent("workout_completed", user.id);
-  if (parsed.data.difficulte != null || parsed.data.energie != null || parsed.data.douleur) {
-    trackServerEvent("workout_checkin_completed", user.id);
+  if (source === "PROGRAMME") {
+    if (entreesDeCetteSource === 0) trackServerEvent("first_workout_started", user.id);
+    trackServerEvent("workout_completed", user.id);
+    if (parsed.data.difficulte != null || parsed.data.energie != null || parsed.data.douleur) {
+      trackServerEvent("workout_checkin_completed", user.id);
+    }
+  } else if (source === "REPCOUNT") {
+    trackServerEvent("repcount_saved", user.id, { first: entreesDeCetteSource === 0 });
   }
 
-  return NextResponse.json(seance, { status: 201 });
+  return NextResponse.json(seance, {
+    status: 201,
+    headers: { "X-COAI-First-Source": entreesDeCetteSource === 0 ? "1" : "0" },
+  });
 }

@@ -23,6 +23,7 @@ export type ProductEventName =
   | "neat_recommendation_shown"
   | "neat_goal_accepted"
   | "first_workout_started"
+  | "repcount_saved"
   | "diagnostic_email_sent"
   | "muscle_recovery_logged";
 

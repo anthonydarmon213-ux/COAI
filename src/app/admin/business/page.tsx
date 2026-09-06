@@ -43,7 +43,7 @@ export default async function AdminBusinessPage() {
   const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
-      select: { plan: true, billingInterval: true, amountCents: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, createdAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: true } } } } },
+      select: { plan: true, billingInterval: true, amountCents: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, createdAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: { where: { source: "PROGRAMME" } } } } } } },
     }),
     prisma.programmeGenerated.count(),
     prisma.seanceLog.count(),
