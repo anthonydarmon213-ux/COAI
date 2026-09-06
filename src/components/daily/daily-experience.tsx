@@ -177,6 +177,8 @@ export function DailyExperience({
   const totalSteps = exercises.length + (activeSession.echauffement ? 1 : 0) + (activeSession.retourAuCalme ? 1 : 0);
   const progress = totalSteps > 0 ? Math.round((completedSteps.size / totalSteps) * 100) : 0;
   const focusedExercise = activeExercise == null ? null : exercises[activeExercise];
+  const missingCheckinAnswers = [!energy, !sleep, pain === null, equipementDuJour.length === 0].filter(Boolean).length;
+  const checkinReady = missingCheckinAnswers === 0;
 
   function toggleStep(key: string) {
     setCompletedSteps((current) => {
@@ -221,7 +223,7 @@ export function DailyExperience({
   }
 
   async function submitCheckin() {
-    if (!sleep || !energy || pain === null || equipementDuJour.length === 0) return setError("Réponds aux cinq repères essentiels pour adapter ta séance.");
+    if (!checkinReady) return setError("Complète les repères essentiels pour adapter ta séance.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
     await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food: food || undefined, pain, painArea: pain ? painArea : undefined, availableMinutes, equipementDuJour: equipementDuJour.join(", ") });
   }
@@ -253,7 +255,7 @@ export function DailyExperience({
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-300">Ton coach est prêt · Bilan du jour</p>
               <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Comment te sens-tu aujourd’hui ?</h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">5 repères, 30 secondes. COAI ajuste gratuitement la durée, le volume, le matériel et les précautions de ta séance.</p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">30 secondes. Ta forme, ton sommeil et tes contraintes suffisent à adapter la séance.</p>
             </div>
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-laiton-400/30 bg-white/[0.06] text-xl text-laiton-300">◎</span>
           </div>
@@ -272,7 +274,20 @@ export function DailyExperience({
             </div>
           </details>
           {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
-          <Button onClick={submitCheckin} disabled={loading} className="mt-6 w-full rounded-full bg-white py-6 text-base font-bold text-graphite-950 hover:bg-white/90 sm:w-auto sm:px-8">{loading ? "Ton coach prépare ta séance…" : "Préparer ma séance du jour →"}</Button>
+          <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <Button onClick={submitCheckin} disabled={loading || !checkinReady} className="w-full rounded-full bg-white py-6 text-base font-bold text-graphite-950 hover:bg-white/90 sm:w-auto sm:px-8">
+              {loading
+                ? "Ton coach prépare ta séance…"
+                : checkinReady
+                  ? "Adapter ma séance →"
+                  : `${missingCheckinAnswers} réponse${missingCheckinAnswers > 1 ? "s" : ""} restante${missingCheckinAnswers > 1 ? "s" : ""}`}
+            </Button>
+            {!checkinReady && (
+              <p className="text-center text-xs leading-5 text-graphite-400 sm:text-left" aria-live="polite">
+                Sélectionne les repères manquants ci-dessus.
+              </p>
+            )}
+          </div>
         </section>
       )}
 

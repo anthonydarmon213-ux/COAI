@@ -21,16 +21,6 @@ import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
 import { ObjectifsCheminCard } from "@/components/dashboard/objectifs-chemin-card";
 
-const MANTRAS = [
-  "La régularité transforme ce que la motivation commence.",
-  "Aujourd’hui, cherche le mouvement juste — pas le mouvement parfait.",
-  "Une séance adaptée vaut mieux qu’une séance abandonnée.",
-  "La récupération n’interrompt pas la progression. Elle la construit.",
-  "Ton prochain niveau se construit dans les détails d’aujourd’hui.",
-  "Avance avec intention. Le résultat suivra la répétition.",
-  "Écoute ton corps, respecte le plan, célèbre le progrès.",
-];
-
 function nomSeanceCourt(nom: string) {
   const normalise = nom.toLowerCase();
   if (normalise.includes("full body") || normalise.includes("corps entier")) {
@@ -106,7 +96,6 @@ export default async function DashboardPage() {
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
   const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
-  const mantra = MANTRAS[Math.floor(date.getTime() / 86_400_000) % MANTRAS.length];
   const besoins = filtrerBesoinsPertinents(detecterBesoins(user.profile), user, user.subscription);
   const hasAccess = hasProgrammeAccess(user, user.subscription);
   const serviceRecommande = besoins[0]?.service ?? "IMPULSION";
@@ -213,24 +202,15 @@ export default async function DashboardPage() {
                 {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
               </h1>
               <p className="mt-2 max-w-xl text-base leading-7 text-graphite-300">{objective}</p>
-              <p className="mt-3 max-w-xl border-l border-laiton-400/55 pl-4 font-editorial text-base italic leading-6 text-laiton-100/90">
-                « {mantra} »
-              </p>
             </div>
           </div>
           <ReadinessCard readiness={readiness} compact />
         </div>
       </header>
 
-      {/* Objectifs & Chemin recommandé */}
-      <ObjectifsCheminCard
-        profile={user.profile}
-        stats={dashboardStats}
-        hasProgramme={Boolean(programme)}
-        hasNutrition={hasNutrition}
-      />
-
-      {/* BLOC 2 — L'action principale du jour, seule décision à prendre */}
+      {/* BLOC 2 — L'action principale vient immédiatement après l'accueil.
+          Le chemin de progression reste utile, mais ne doit jamais repousser
+          la séance sous plusieurs écrans. */}
       <div className="relative">
         <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-[radial-gradient(circle_at_75%_20%,rgba(56,189,248,.16),rgba(212,175,55,.08),transparent_70%)] blur-2xl" />
         <div className="relative flex flex-col gap-5">
@@ -281,6 +261,14 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Progression secondaire : visible après l'action du jour, pas avant. */}
+      <ObjectifsCheminCard
+        profile={user.profile}
+        stats={dashboardStats}
+        hasProgramme={Boolean(programme)}
+        hasNutrition={hasNutrition}
+      />
 
       {/* BLOC 3 — Bilan rapide : macros à gauche, pause active à droite */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
