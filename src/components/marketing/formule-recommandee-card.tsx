@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { ServiceDetailModal } from "@/components/marketing/service-detail-modal";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIER_BY_SERVICE, type ServiceKey } from "@/lib/pricing/tiers";
@@ -60,14 +61,34 @@ export function FormuleRecommandeeCard({
           </div>
           {tier.trial && <p className="mt-2 text-sm font-semibold text-laiton-200">7 jours d&apos;essai</p>}
           {tier.limitedSpots && <p className="mt-2 text-xs font-semibold text-amber-200">Places volontairement limitées</p>}
-          <Button
+          {tier.sessions ? (
+            <Button
+              onClick={() => setOuvert(true)}
+              className="coai-rainbow-cta mt-5 w-full border-0 px-5 py-3 text-sm font-extrabold text-[#111216] shadow-[0_20px_55px_-18px_rgba(201,162,98,.8)]"
+            >
+              {ctaLabel} →
+            </Button>
+          ) : (
+            <div className="mt-5">
+              <SubscribeButton
+                plan={tier.plan}
+                label={`${ctaLabel} →`}
+                className="coai-rainbow-cta w-full border-0 px-5 py-3 text-sm font-extrabold text-[#111216] shadow-[0_20px_55px_-18px_rgba(201,162,98,.8)]"
+              />
+              <p className="mt-2 text-center text-[11px] leading-4 text-graphite-500">
+                Sans engagement · aucun prélèvement avant la fin de l&apos;essai
+              </p>
+            </div>
+          )}
+          <button
+            type="button"
             onClick={() => setOuvert(true)}
-            className="coai-rainbow-cta mt-5 w-full border-0 px-5 py-3 text-sm font-extrabold text-[#111216] shadow-[0_20px_55px_-18px_rgba(201,162,98,.8)]"
+            className="mt-3 text-center text-xs text-graphite-400 underline decoration-white/20 underline-offset-4 transition hover:text-white"
           >
-            {ctaLabel} →
-          </Button>
-          <Link href="/pricing" className="mt-3 text-center text-xs text-graphite-400 underline decoration-white/20 underline-offset-4 transition hover:text-white">
-            Voir les autres options
+            Voir le détail de cette formule
+          </button>
+          <Link href="/pricing" className="mt-2 text-center text-xs text-graphite-500 underline decoration-white/10 underline-offset-4 transition hover:text-white">
+            Comparer les 3 accompagnements
           </Link>
         </div>
       </div>
