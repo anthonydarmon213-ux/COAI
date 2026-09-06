@@ -19,7 +19,7 @@ import { calculerReadiness } from "@/lib/insight/readiness";
 import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/aujourdhui-guide-card";
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
-import { ObjectifsCheminCard } from "@/components/dashboard/objectifs-chemin-card";
+import { ObjectifCheminCard } from "@/components/dashboard/objectif-chemin-card";
 
 function nomSeanceCourt(nom: string) {
   const normalise = nom.toLowerCase();
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, diesRecents, programmeNutrition, seanceLogs] = await Promise.all([
+  const [validated, latest, daily, diesRecents, programmeNutrition, seancesDuMoisCount] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -62,10 +62,8 @@ export default async function DashboardPage() {
       orderBy: { generatedAt: "desc" },
       select: { contenu: true },
     }),
-    prisma.seanceLog.findMany({
+    prisma.seanceLog.count({
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) } },
-      orderBy: { date: "desc" },
-      select: { date: true, exercices: true },
     }),
   ]);
 
@@ -103,25 +101,6 @@ export default async function DashboardPage() {
   // Premium Remote est le premier niveau supplémentaire cohérent.
   const serviceAProposer = hasAccess && serviceRecommande === "IMPULSION" ? "TRANSFORMATION" : serviceRecommande;
   const insight = !programme && !hasAccess ? await getCoaiInsight(user.id) : null;
-
-  type SetD = { reps?: number; charge?: number };
-  type ExD = { nom?: string; chargeKg?: number; series?: number; repetitions?: number; sets?: SetD[] };
-  const seancesDuMoisCount = seanceLogs.length;
-  let tonnageTotal = 0;
-  for (const s of seanceLogs) {
-    const exs = Array.isArray(s.exercices) ? (s.exercices as ExD[]) : [];
-    for (const ex of exs) {
-      if (ex.sets && ex.sets.length > 0) {
-        tonnageTotal += ex.sets.reduce((acc, set) => acc + (set.reps ?? 0) * (set.charge ?? 0), 0);
-      } else if (typeof ex.chargeKg === "number") {
-        tonnageTotal += (ex.series ?? 1) * (ex.repetitions ?? 1) * ex.chargeKg;
-      }
-    }
-  }
-  const tonnageMoyen = seancesDuMoisCount > 0 ? tonnageTotal / seancesDuMoisCount : 0;
-  const uniqueDays = new Set(seanceLogs.map((s) => s.date.toISOString().slice(0, 10)));
-  const dashboardStats = { seancesDuMois: seancesDuMoisCount, tonnageMoyen, streakJours: uniqueDays.size };
-  const hasNutrition = Boolean(programmeNutrition);
 
   // Une seule direction claire à chaque connexion (19/08/2026, demande
   // Anthony : "être pédagogue... indiquer ce que doit faire la personne").
@@ -266,11 +245,13 @@ export default async function DashboardPage() {
       </div>
 
       {/* Progression secondaire : visible après l'action du jour, pas avant. */}
-      <ObjectifsCheminCard
-        profile={user.profile}
-        stats={dashboardStats}
+      <ObjectifCheminCard
+        objectifs={user.profile?.objectifs}
+        completion={completion}
         hasProgramme={Boolean(programme)}
-        hasNutrition={hasNutrition}
+        hasAccess={hasAccess}
+        premiereSeanceFaite={seancesDuMoisCount > 0}
+        seancesDuMois={seancesDuMoisCount}
       />
 
       {/* BLOC 3 — Bilan rapide : macros à gauche, pause active à droite */}

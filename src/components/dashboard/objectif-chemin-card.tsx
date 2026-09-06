@@ -50,12 +50,16 @@ export function ObjectifCheminCard({
   objectifs,
   completion,
   hasProgramme,
+  hasAccess,
   premiereSeanceFaite,
+  seancesDuMois,
 }: {
   objectifs?: string | null;
   completion: CompletionProfil;
   hasProgramme: boolean;
+  hasAccess: boolean;
   premiereSeanceFaite: boolean;
+  seancesDuMois: number;
 }) {
   const objectifLibre = texteCourt(objectifs);
   const info = objectifLibre ? OBJECTIF_INFO[objectifSocle(objectifs)] : OBJECTIF_NON_RENSEIGNE;
@@ -71,10 +75,14 @@ export function ObjectifCheminCard({
     {
       numero: 2,
       titre: "Ton programme adapté",
-      detail: hasProgramme ? "Programme actif dans ton espace" : "Choisis ton accompagnement pour le débloquer",
+      detail: hasProgramme
+        ? "Programme actif dans ton espace"
+        : hasAccess
+          ? "Ton accès est prêt : génère maintenant ton programme"
+          : "Choisis ton accompagnement pour le débloquer",
       faite: hasProgramme,
-      href: hasProgramme ? "/programme" : "/pricing",
-      action: hasProgramme ? "Ouvrir" : "Choisir",
+      href: hasProgramme ? "/programme" : hasAccess ? "#programme-a-generer" : "/pricing",
+      action: hasProgramme ? "Ouvrir" : hasAccess ? "Générer" : "Choisir",
     },
     {
       numero: 3,
@@ -86,14 +94,15 @@ export function ObjectifCheminCard({
     },
     {
       numero: 4,
-      titre: "Ajuster jusqu’au résultat",
-      detail: "Check-in, charges et mesures pour faire évoluer le plan",
-      faite: false,
-      href: "/suivi/progression",
-      action: "Voir le suivi",
+      titre: "Installer ta régularité",
+      detail: seancesDuMois >= 4 ? "Ton rythme est lancé : continue à nourrir le suivi" : `${seancesDuMois}/4 séances réalisées ce mois`,
+      faite: seancesDuMois >= 4,
+      href: "/suivi/seances",
+      action: seancesDuMois >= 4 ? "Continuer" : "Avancer",
     },
   ];
   const etapesFaites = etapes.filter((etape) => etape.faite).length;
+  const prochaineEtape = etapes.findIndex((etape) => !etape.faite);
 
   return (
     <section
@@ -128,16 +137,25 @@ export function ObjectifCheminCard({
       </div>
 
       <div className="mt-7 grid gap-2 sm:grid-cols-2 xl:grid-cols-4" aria-label="Chemin vers ton objectif">
-        {etapes.map((etape) => (
+        {etapes.map((etape, index) => {
+          const estProchaine = index === prochaineEtape;
+          return (
           <Link
             key={etape.numero}
             href={etape.href}
             className={`group relative rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
               etape.faite
                 ? "border-emerald-300/25 bg-emerald-300/[0.06]"
-                : "border-white/[0.1] bg-black/[0.12] hover:border-laiton-400/35"
+                : estProchaine
+                  ? "border-laiton-300/45 bg-laiton-400/[0.1] shadow-[0_18px_45px_-32px_rgba(201,162,98,.9)]"
+                  : "border-white/[0.08] bg-black/[0.08] opacity-60 hover:border-white/15 hover:opacity-80"
             }`}
           >
+            {estProchaine && (
+              <span className="mb-3 inline-flex rounded-full bg-laiton-300 px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-[#111216]">
+                Prochaine étape
+              </span>
+            )}
             <div className="flex items-start justify-between gap-3">
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold ${
@@ -153,7 +171,8 @@ export function ObjectifCheminCard({
             <h3 className="mt-4 text-sm font-bold text-white">{etape.titre}</h3>
             <p className="mt-1 text-xs leading-5 text-graphite-400">{etape.detail}</p>
           </Link>
-        ))}
+          );
+        })}
       </div>
 
       <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-white/[0.08]" aria-hidden="true">
@@ -163,7 +182,7 @@ export function ObjectifCheminCard({
         />
       </div>
       <p className="mt-2 text-[11px] text-graphite-500">
-        {etapesFaites === etapes.length ? "Ton chemin est lancé : continue à nourrir ton suivi." : "Chaque étape validée rend le prochain ajustement plus précis."}
+        {etapesFaites === etapes.length ? "Ton chemin est lancé : COAI ajuste maintenant le plan avec tes retours." : "Une seule prochaine étape à la fois, jusqu'à ton objectif."}
       </p>
     </section>
   );
