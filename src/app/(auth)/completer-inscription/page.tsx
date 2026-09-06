@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/client";
 import { CompleterInscriptionForm } from "@/components/auth/completer-inscription-form";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
 
 // Étape obligatoire après une première authentification réussie — Google
 // OAuth, ou email/mot de passe une fois le lien de confirmation cliqué
@@ -14,15 +15,20 @@ import { SectionLabel } from "@/components/ui/section-label";
 // le point d'entrée. Nouveau modèle d'accès libre (13/08/2026) : plus de
 // plan à connaître ici, l'inscription est gratuite quel que soit le point
 // d'entrée.
-export default async function CompleterInscriptionPage() {
+export default async function CompleterInscriptionPage({
+  searchParams,
+}: {
+  searchParams: { redirect_to?: string };
+}) {
   const authUser = await getCurrentUser();
   if (!authUser || !authUser.email) {
     redirect("/sign-in");
   }
 
+  const returnTo = sanitizeReturnTo(searchParams.redirect_to);
   const existing = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (existing) {
-    redirect("/dashboard");
+    redirect(returnTo ?? "/dashboard");
   }
 
   const prenomSuggere =
@@ -40,7 +46,7 @@ export default async function CompleterInscriptionPage() {
           </h1>
           <p className="text-sm text-graphite-400">{authUser.email}</p>
         </div>
-        <CompleterInscriptionForm prenomSuggere={prenomSuggere} />
+        <CompleterInscriptionForm prenomSuggere={prenomSuggere} returnTo={returnTo} />
       </Card>
     </main>
   );

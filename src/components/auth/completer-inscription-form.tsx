@@ -18,7 +18,13 @@ import Link from "next/link";
 // La création du compte reste une étape réellement gratuite. Même si une
 // offre a été repérée avant l'inscription, Stripe ne s'ouvre jamais sans une
 // confirmation explicite sur l'écran des formules.
-export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: string }) {
+export function CompleterInscriptionForm({
+  prenomSuggere,
+  returnTo,
+}: {
+  prenomSuggere: string;
+  returnTo?: string | null;
+}) {
   const [prenom, setPrenom] = useState(prenomSuggere);
   const [consentRgpd, setConsentRgpd] = useState(false);
   const [consentSante, setConsentSante] = useState(false);
@@ -79,7 +85,7 @@ export function CompleterInscriptionForm({ prenomSuggere }: { prenomSuggere: str
         window.location.href = `/pricing?${params.toString()}`;
         return;
       }
-      window.location.href = "/dashboard?from=signup";
+      window.location.href = returnTo ?? "/dashboard?from=signup";
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");

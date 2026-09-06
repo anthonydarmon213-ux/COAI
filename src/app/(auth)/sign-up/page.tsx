@@ -59,7 +59,7 @@ export default function SignUpPage() {
   const requestedReturn = sanitizeReturnTo(searchParams.get("redirect_to"));
   const destinationApresInscription = requestedPlan
     ? `/pricing?from=signin&selected=${requestedPlan}&billing=${requestedBilling}`
-    : requestedReturn ?? "/pricing?from=signin";
+    : requestedReturn ?? "/bienvenue";
 
   useEffect(() => {
     const ref = searchParams.get("ref");
