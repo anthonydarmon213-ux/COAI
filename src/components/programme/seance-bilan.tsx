@@ -58,6 +58,9 @@ export function SeanceBilan({
   tonnagePrecedent,
   onFermer,
   chronoFormate,
+  sauvegardeErreur = false,
+  enregistrementEnCours = false,
+  onReessayer,
 }: {
   nomSeance: string;
   exercices: BilanExercice[];
@@ -65,6 +68,9 @@ export function SeanceBilan({
   tonnagePrecedent: number | null;
   onFermer: () => void;
   chronoFormate: string;
+  sauvegardeErreur?: boolean;
+  enregistrementEnCours?: boolean;
+  onReessayer?: () => void;
 }) {
   const tonnage = exercices.reduce(
     (t, e) => t + e.sets.reduce((s, x) => s + x.reps * x.charge, 0), 0);
@@ -79,6 +85,25 @@ export function SeanceBilan({
   return (
     <div className="coai-bilan flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-6 py-10 text-center">
       <div className="coai-bilan-anneau" aria-hidden="true" />
+
+      {sauvegardeErreur && (
+        <div className="w-full max-w-sm rounded-2xl border border-amber-300/30 bg-amber-300/[0.08] p-4 text-left" role="alert">
+          <p className="text-sm font-semibold text-amber-100">Ta séance reste sauvegardée sur cet appareil.</p>
+          <p className="mt-1 text-xs leading-5 text-graphite-300">
+            COAI n&apos;a pas encore confirmé l&apos;enregistrement en ligne. Tu peux réessayer sans perdre tes séries.
+          </p>
+          {onReessayer && (
+            <button
+              type="button"
+              onClick={onReessayer}
+              disabled={enregistrementEnCours}
+              className="mt-3 w-full rounded-full border border-amber-200/35 bg-amber-200/10 px-4 py-2.5 text-xs font-bold text-amber-100 disabled:cursor-wait disabled:opacity-60"
+            >
+              {enregistrementEnCours ? "Nouvelle tentative…" : "Réessayer l'enregistrement"}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="relative">
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-laiton-300">

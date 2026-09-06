@@ -330,10 +330,12 @@ export function SeanceRunner({
   const [bilan, setBilan] = useState<BilanExercice[]>([]);
   const [tonnagePrecedent, setTonnagePrecedent] = useState<number | null>(null);
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [erreurSauvegarde, setErreurSauvegarde] = useState(false);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
   const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
   const debutRef = useRef(sauvegarde?.debut ?? Date.now());
+  const finRef = useRef<string | null>(null);
 
   // Sauvegarde continue tant que la séance n'est pas terminée. Écrire à
   // chaque frappe serait inutilement coûteux, mais index et séries changent
@@ -403,7 +405,10 @@ export function SeanceRunner({
   }, [step, secondesRestantes, bip]);
 
   async function terminerSeance() {
+    if (envoiEnCours) return;
     setEnvoiEnCours(true);
+    setErreurSauvegarde(false);
+    finRef.current ??= new Date().toISOString();
     const dureeMinutes = Math.max(1, Math.round((Date.now() - debutRef.current) / 60000));
     type SetDetail = { set: number; reps: number; charge: number };
     const parExercice = new Map<string, { nom: string; series: number; chargeKg?: number; sets: SetDetail[] }>();
@@ -443,25 +448,26 @@ export function SeanceRunner({
     } catch { /* comparaison facultative */ }
 
     try {
-      await fetch("/api/seances", {
+      const reponse = await fetch("/api/seances", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: new Date().toISOString(),
+          date: finRef.current,
           exercices: [...parExercice.values()],
           dureeMinutes,
           notes: `Séance guidée : ${nomSeance}`,
         }),
       });
-    } catch {
-      // Best-effort : la séance reste "terminée" pour l'utilisateur même si
-      // le log échoue (réseau, etc.) — jamais bloquer sur ça après l'effort
-      // réel qu'il vient de fournir.
-    } finally {
-      // La séance est enregistrée côté serveur : la sauvegarde locale n'a
-      // plus lieu d'être, et la laisser proposerait de « reprendre » une
-      // séance déjà terminée.
+      if (!reponse.ok) throw new Error("sauvegarde_seance_refusee");
+      // La séance est confirmée côté serveur : la reprise locale peut
+      // maintenant être supprimée sans risque de perdre l'effort saisi.
       effacerSauvegarde();
+    } catch {
+      // Le bilan reste visible, mais la reprise locale est conservée et une
+      // nouvelle tentative est proposée. Jamais annoncer une sauvegarde
+      // acquise ni effacer les séries tant que le serveur ne les a pas reçues.
+      setErreurSauvegarde(true);
+    } finally {
       setEnvoiEnCours(false);
       setTermine(true);
     }
@@ -566,6 +572,9 @@ export function SeanceRunner({
           tonnagePrecedent={tonnagePrecedent}
           chronoFormate={formatChrono(chronoGlobal)}
           onFermer={onClose}
+          sauvegardeErreur={erreurSauvegarde}
+          enregistrementEnCours={envoiEnCours}
+          onReessayer={terminerSeance}
         />
       ) : (
         <>

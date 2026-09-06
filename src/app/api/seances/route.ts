@@ -65,6 +65,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
   }
 
+  // Une nouvelle tentative après une coupure réseau réutilise exactement la
+  // même date ISO. Si la première écriture avait réussi mais que sa réponse
+  // s'était perdue, on renvoie la séance existante au lieu de créer un
+  // doublon dans l'historique et les statistiques.
+  const dejaEnregistree = await prisma.seanceLog.findFirst({
+    where: { userId: user.id, date: parsed.data.date },
+  });
+  if (dejaEnregistree) {
+    return NextResponse.json(dejaEnregistree, { status: 200 });
+  }
+
   const seancesExistantes = await prisma.seanceLog.count({ where: { userId: user.id } });
 
   const seance = await prisma.seanceLog.create({
