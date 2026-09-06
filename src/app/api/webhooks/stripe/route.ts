@@ -392,7 +392,7 @@ export async function POST(request: Request) {
             `Bonjour${contact.prenom ? ` ${contact.prenom}` : ""},\n\n` +
               `Le paiement de ${(invoice.amount_due / 100).toFixed(2)} ${invoice.currency.toUpperCase()} n'a pas abouti. ` +
               `Tu peux vérifier ou mettre à jour ton moyen de paiement ici : ${appUrl}/compte/abonnement\n\n` +
-              `Ton espace reste accessible pendant la tentative de régularisation.\n\n` +
+              `Certaines fonctions payantes peuvent être temporairement limitées jusqu'à la régularisation.\n\n` +
               `Besoin d'aide ? Réponds simplement à cet email.\n\nL'équipe COAI`
           );
         }

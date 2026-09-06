@@ -17,13 +17,13 @@ export async function getRevenueMetrics(): Promise<RevenueMetrics> {
   const recoveryLookback = new Date(since.getTime() - 14 * 24 * 60 * 60 * 1000);
   const [paid, failed, customers, endedTrials, recentPaidEvents, failedEvents] = await Promise.all([
     prisma.billingEvent.aggregate({
-      where: { kind: "PAID", occurredAt: { gte: since }, currency: "EUR" },
+      where: { kind: "PAID", amountCents: { gt: 0 }, occurredAt: { gte: since }, currency: "EUR" },
       _count: { _all: true },
       _sum: { amountCents: true },
     }),
     prisma.billingEvent.count({ where: { kind: "FAILED", occurredAt: { gte: since } } }),
     prisma.billingEvent.findMany({
-      where: { kind: "PAID", occurredAt: { gte: since } },
+      where: { kind: "PAID", amountCents: { gt: 0 }, occurredAt: { gte: since } },
       select: { stripeCustomerId: true },
       distinct: ["stripeCustomerId"],
     }),
@@ -32,7 +32,7 @@ export async function getRevenueMetrics(): Promise<RevenueMetrics> {
       select: { stripeCustomerId: true, trialEnd: true },
     }),
     prisma.billingEvent.findMany({
-      where: { kind: "PAID", occurredAt: { gte: since } },
+      where: { kind: "PAID", amountCents: { gt: 0 }, occurredAt: { gte: since } },
       select: { stripeCustomerId: true, occurredAt: true },
     }),
     prisma.billingEvent.findMany({
@@ -51,7 +51,7 @@ export async function getRevenueMetrics(): Promise<RevenueMetrics> {
   );
   const recoveredIds = new Set(recoveredEvents.map((event) => `${event.stripeCustomerId}-${event.occurredAt.toISOString()}`));
   const paidAmounts = await prisma.billingEvent.findMany({
-    where: { kind: "PAID", occurredAt: { gte: since }, currency: "EUR" },
+    where: { kind: "PAID", amountCents: { gt: 0 }, occurredAt: { gte: since }, currency: "EUR" },
     select: { stripeCustomerId: true, occurredAt: true, amountCents: true },
   });
 
