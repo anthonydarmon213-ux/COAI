@@ -14,7 +14,9 @@ import { getAIEconomics } from "@/lib/admin/ai-economics";
 import { getRevenueMetrics } from "@/lib/admin/revenue-metrics";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
-const PRIX_IMPULSION = 19;
+const PRIX_IMPULSION = 19.99;
+// Tarifs mensuels historiques uniquement : les nouvelles ventes Remote et
+// VIP sont désormais des packs sur devis, hors checkout d'abonnement.
 const PRIX_STANDARD = 49;
 const PRIX_PREMIUM = 199;
 const NB_SEMAINES = 12;
@@ -206,8 +208,8 @@ export default async function AdminBusinessPage() {
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} Standard IA · ${nbStandard} Premium Remote · ${essaisActifs.length} essai(s)`} highlight />
-          <StatCard label="MRR" value={eur.format(mrr)} sublabel="Revenu mensuel récurrent" highlight />
-          <StatCard label="ARR projeté" value={eur.format(arr)} sublabel="MRR × 12" />
+          <StatCard label="MRR" value={eurCents.format(mrr)} sublabel="Revenu mensuel récurrent" highlight />
+          <StatCard label="ARR projeté" value={eurCents.format(arr)} sublabel="MRR × 12" />
           <StatCard
             label="Taux de conversion"
             value={`${tauxConversion.toFixed(1)}%`}
