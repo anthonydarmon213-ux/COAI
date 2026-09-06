@@ -281,7 +281,7 @@ export default async function DashboardPage() {
           (01/09/2026) : l'inscription renvoyait auparavant vers /pricing,
           soit un prix avant même la première séance. Masquée dès qu'un
           abonnement est actif — inutile de vendre à qui a déjà acheté. */}
-      {!hasPaidSubscription(user.subscription) && <OffresCard />}
+      {!hasPaidSubscription(user.subscription) && <OffresCard serviceRecommande={serviceRecommande} />}
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link
