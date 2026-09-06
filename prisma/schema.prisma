@@ -303,6 +303,10 @@ model Subscription {
   status                        SubscriptionStatus @default(INCOMPLETE)
   plan                          SubscriptionPlan   @default(STANDARD)
   billingInterval               BillingInterval    @default(MONTHLY)
+  // Montant récurrent réellement porté par la ligne Stripe. Nécessaire pour
+  // calculer le MRR sans supposer un tarif catalogue qui a pu évoluer.
+  amountCents                   Int?
+  currency                      String?
   currentPeriodEnd              DateTime?
   // Fin de la période d'essai Stripe (7 jours). Null
   // hors essai — status reste "ACTIVE" pendant l'essai (trialing y est

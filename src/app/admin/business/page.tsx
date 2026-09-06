@@ -12,6 +12,7 @@ import { getCapacitySnapshot } from "@/lib/admin/capacity";
 import { AIEconomicsPanel } from "@/components/admin/ai-economics-panel";
 import { getAIEconomics } from "@/lib/admin/ai-economics";
 import { getRevenueMetrics } from "@/lib/admin/revenue-metrics";
+import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
 const PRIX_IMPULSION = 19.99;
@@ -42,7 +43,7 @@ export default async function AdminBusinessPage() {
   const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
-      select: { plan: true, billingInterval: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: true } } } } },
+      select: { plan: true, billingInterval: true, amountCents: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, createdAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: true } } } } },
     }),
     prisma.programmeGenerated.count(),
     prisma.seanceLog.count(),
@@ -115,12 +116,23 @@ export default async function AdminBusinessPage() {
     AUTRE: "Autre",
   };
 
-  // MRR conservateur : exclut les essais non encore facturés et inclut bien
-  // Standard IA, qui était auparavant oubliée du calcul.
+  // MRR fondé sur le montant réellement enregistré par Stripe. Le repli ne
+  // sert qu'aux abonnements historiques créés avant l'ajout de amountCents.
   const mrr = abonnesPayants.reduce((total, subscription) => {
-    const monthlyPrice = subscription.plan === "PASS_IA" ? PRIX_IMPULSION : subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM;
-    const annualPrice = monthlyPrice * 12;
-    return total + (subscription.billingInterval === "ANNUAL" ? annualPrice / 12 : monthlyPrice);
+    const fallbackCents = subscription.plan === "PASS_IA"
+      ? subscription.billingInterval === "ANNUAL"
+        ? 11900
+        : subscription.billingInterval === "QUARTERLY"
+          ? prixTrimestreCentimes(subscription.createdAt)
+          : Math.round(PRIX_IMPULSION * 100)
+      : Math.round((subscription.plan === "STANDARD" ? PRIX_STANDARD : PRIX_PREMIUM) * 100);
+    const montant = (subscription.amountCents ?? fallbackCents) / 100;
+    const diviseur = subscription.billingInterval === "ANNUAL"
+      ? 12
+      : subscription.billingInterval === "QUARTERLY"
+        ? 3
+        : 1;
+    return total + montant / diviseur;
   }, 0);
   const arr = mrr * 12;
   const tauxConversion = totalUsers > 0 ? (abonnesPayants.length / totalUsers) * 100 : 0;

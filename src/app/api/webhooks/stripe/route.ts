@@ -156,11 +156,14 @@ function getCurrentPeriodEnd(subscription: Stripe.Subscription): Date | null {
 async function upsertFromSubscription(subscription: Stripe.Subscription, userId?: string) {
   const customerId =
     typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
+  const price = subscription.items.data[0]?.price;
   const data = {
     stripeSubscriptionId: subscription.id,
     status: mapStripeStatus(subscription.status),
     plan: mapStripePlan(subscription),
     billingInterval: mapBillingInterval(subscription),
+    amountCents: price?.unit_amount ?? null,
+    currency: price?.currency?.toUpperCase() ?? null,
     currentPeriodEnd: getCurrentPeriodEnd(subscription),
     trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
