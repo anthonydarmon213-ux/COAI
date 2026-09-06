@@ -135,7 +135,7 @@ export async function POST(request: Request) {
       ? { customer: user.subscription.stripeCustomerId }
       : { customer_email: authUser.email }),
     client_reference_id: user.id,
-    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}&essai=${trialDays ? "1" : "0"}`,
+    success_url: `${appUrl}/bienvenue?plan=${plan}&billing=${billing}&essai=${trialDays ? "1" : "0"}&session_id={CHECKOUT_SESSION_ID}`,
     // Seul PASS_IA passe encore par ce checkout (STANDARD et PREMIUM sont
     // rejetés plus haut, sur devis via WhatsApp) : l'ancre est donc toujours
     // "pass-ia".

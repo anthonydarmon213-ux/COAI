@@ -4,7 +4,9 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
-import { hasSuiviAccess } from "@/lib/subscription/plan";
+import { hasPaidSubscription, hasSuiviAccess } from "@/lib/subscription/plan";
+import { stripe } from "@/lib/stripe/client";
+import type Stripe from "stripe";
 
 // Écran d'accueil post-paiement (10/08/2026) : repensé façon "salon
 // d'embarquement" plutôt qu'un simple accusé de réception transactionnel.
@@ -62,17 +64,39 @@ const CONTENU_PAR_PLAN: Record<
 export default async function BienvenuePage({
   searchParams,
 }: {
-  searchParams: { plan?: string; essai?: string; unlock?: string };
+  searchParams: { plan?: string; billing?: string; essai?: string; unlock?: string; session_id?: string };
 }) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
   const coachValidationRequise = hasSuiviAccess(user.subscription);
 
-  // Un vrai paiement vient de se terminer seulement si l'un de ces
-  // paramètres, posés uniquement par les routes Stripe elles-mêmes
-  // (success_url), est présent — jamais déduit d'une simple intention.
-  const achatConfirme = Boolean(searchParams.plan) || searchParams.unlock === "programme";
+  // Les paramètres visibles dans l'URL sont modifiables par n'importe qui.
+  // La session Stripe est donc relue côté serveur et doit appartenir au
+  // compte connecté avant d'afficher une confirmation ou d'envoyer une
+  // conversion à GA4/Meta.
+  let sessionVerifiee: Stripe.Checkout.Session | null = null;
+  if (searchParams.session_id?.startsWith("cs_")) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(searchParams.session_id, {
+        expand: ["subscription"],
+      });
+      if (
+        session.status === "complete" &&
+        session.mode === "subscription" &&
+        session.client_reference_id === user.id
+      ) {
+        sessionVerifiee = session;
+      }
+    } catch (error) {
+      console.error("Impossible de vérifier la session Stripe de bienvenue", error);
+    }
+  }
+  // Compatibilité avec les retours créés avant l'ajout de session_id : un
+  // paramètre seul ne suffit jamais, il faut aussi un abonnement actif déjà
+  // synchronisé par le webhook.
+  const achatConfirme = Boolean(sessionVerifiee) ||
+    (Boolean(searchParams.plan) && hasPaidSubscription(user.subscription));
 
   const prenom = user.prenom ?? "";
 
@@ -171,8 +195,17 @@ export default async function BienvenuePage({
     );
   }
 
+  const stripeSubscription = sessionVerifiee?.subscription &&
+    typeof sessionVerifiee.subscription !== "string"
+    ? sessionVerifiee.subscription
+    : null;
+  const planMetadata = stripeSubscription?.metadata?.plan;
   const plan: "PASS_IA" | "STANDARD" | "PREMIUM" =
-    searchParams.plan === "PREMIUM" ? "PREMIUM" : searchParams.plan === "STANDARD" ? "STANDARD" : "PASS_IA";
+    planMetadata === "PREMIUM" || (!sessionVerifiee && searchParams.plan === "PREMIUM")
+      ? "PREMIUM"
+      : planMetadata === "STANDARD" || (!sessionVerifiee && searchParams.plan === "STANDARD")
+        ? "STANDARD"
+        : "PASS_IA";
   const { formule, sousTitre, etapes } = CONTENU_PAR_PLAN[plan];
   const date = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -180,24 +213,37 @@ export default async function BienvenuePage({
   // calcul que les abonnements (plan="PASS_IA" par défaut → "Subscribe")
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).
-  const enEssai = plan !== "PREMIUM" && searchParams.essai !== "0";
+  const enEssai = stripeSubscription
+    ? Boolean(stripeSubscription.trial_end && stripeSubscription.trial_end * 1000 > Date.now())
+    : Boolean(user.subscription?.trialEnd && user.subscription.trialEnd > new Date());
     // Valeurs de pack pour STANDARD/PREMIUM (04/09/2026, repositionnement 3 offres) — ce
   // chemin (plan=STANDARD/PREMIUM) est en pratique mort depuis que checkout/route.ts
   // refuse ces deux plans en amont (sur devis WhatsApp uniquement), mais corrigé quand
   // même par précaution pour ne jamais faire remonter un faux montant a Meta si un
   // enregistrement historique passait encore par ici.
-  const valeurMensuelle = plan === "PREMIUM" ? 1200 : plan === "STANDARD" ? 960 : 19.99;
+  const valeurFacturee = stripeSubscription?.items.data[0]?.price.unit_amount;
+  const recurring = stripeSubscription?.items.data[0]?.price.recurring;
+  const billingVerifie = recurring?.interval === "year"
+    ? "ANNUAL"
+    : recurring?.interval === "month" && recurring.interval_count === 3
+      ? "QUARTERLY"
+      : recurring ? "MONTHLY" : searchParams.billing;
+  const valeurConversion = valeurFacturee !== null && valeurFacturee !== undefined
+    ? valeurFacturee / 100
+    : plan === "PREMIUM" ? 1200 : plan === "STANDARD" ? 960 : 19.99;
   const metaEventAchat = enEssai ? "StartTrial" : "Subscribe";
+  const conversionKey = sessionVerifiee?.id ?? user.subscription?.stripeSubscriptionId ?? undefined;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
       <TrackConversion
         name="subscription_started"
-        params={{ plan }}
+        params={{ plan, billing: billingVerifie }}
         metaEvent={metaEventAchat}
-        metaParams={{ value: valeurMensuelle, currency: "EUR" }}
+        metaParams={{ value: valeurConversion, currency: "EUR" }}
+        onceKey={conversionKey}
       />
-      <TrackConversion name="checkout_completed" params={{ plan }} />
+      <TrackConversion name="checkout_completed" params={{ plan }} onceKey={conversionKey} />
 
       <div className="flex flex-col items-center gap-3">
         <SectionLabel>{enEssai ? "Essai activé" : "Accès confirmé"}</SectionLabel>

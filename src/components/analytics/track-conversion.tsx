@@ -16,15 +16,20 @@ export function TrackConversion({
   params,
   metaEvent,
   metaParams,
+  onceKey,
 }: {
   name: string;
   params?: Record<string, unknown>;
   metaEvent?: string;
   metaParams?: Record<string, unknown>;
+  onceKey?: string;
 }) {
   useEffect(() => {
+    const storageKey = onceKey ? `coai_conversion_${name}_${onceKey}` : null;
+    if (storageKey && window.localStorage.getItem(storageKey)) return;
     trackEvent(name, params);
     if (metaEvent) trackMetaEvent(metaEvent, metaParams);
+    if (storageKey) window.localStorage.setItem(storageKey, "1");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
