@@ -362,6 +362,7 @@ export function RepCount({
   const [seances, setSeances] = useState<{ date: string; exercices: unknown }[]>([]);
   const [repos, setRepos] = useState<number | null>(null);
   const [enregistre, setEnregistre] = useState(false);
+  const [enregistrementEnCours, setEnregistrementEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
   const prefillRef = useRef<string | null>(null);
@@ -415,31 +416,35 @@ export function RepCount({
   }, [reps, charge]);
 
   const enregistrer = useCallback(async () => {
-    if (!nom.trim() || sets.length === 0) return;
+    if (!nom.trim() || sets.length === 0 || enregistrementEnCours) return;
     setErreur(null);
+    setEnregistrementEnCours(true);
     const premierRepere = seances.length === 0;
-    const r = await fetch("/api/seances", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        date: new Date().toISOString(),
-        exercices: [
-          {
-            nom: nom.trim(),
-            sets: sets.map((s, i) => ({ set: i + 1, reps: s.reps, charge: s.charge })),
-          },
-        ],
-      }),
-    });
-    if (!r.ok) {
+    try {
+      const r = await fetch("/api/seances", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: new Date().toISOString(),
+          exercices: [
+            {
+              nom: nom.trim(),
+              sets: sets.map((s, i) => ({ set: i + 1, reps: s.reps, charge: s.charge })),
+            },
+          ],
+        }),
+      });
+      if (!r.ok) throw new Error("enregistrement_refuse");
+      setSets([]);
+      setEnregistre(true);
+      if (premierRepere) trackFunnelEvent("first_repcount_saved");
+      void charger();
+    } catch {
       setErreur("L'enregistrement a échoué. Réessaie.");
-      return;
+    } finally {
+      setEnregistrementEnCours(false);
     }
-    setSets([]);
-    setEnregistre(true);
-    if (premierRepere) trackFunnelEvent("first_repcount_saved");
-    void charger();
-  }, [nom, sets, seances.length, charger]);
+  }, [nom, sets, seances.length, charger, enregistrementEnCours]);
 
   const Stepper = ({
     label,
@@ -447,12 +452,14 @@ export function RepCount({
     setValeur,
     pas,
     unite,
+    minimum = 0,
   }: {
     label: string;
     valeur: number;
     setValeur: (v: number) => void;
     pas: number;
     unite: string;
+    minimum?: number;
   }) => (
     <div className="flex-1">
       <p className="text-center font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-400">
@@ -461,7 +468,7 @@ export function RepCount({
       <div className="mt-1.5 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => setValeur(Math.max(0, +(valeur - pas).toFixed(1)))}
+          onClick={() => setValeur(Math.max(minimum, +(valeur - pas).toFixed(1)))}
           aria-label={`Diminuer ${label}`}
           className="h-12 w-12 shrink-0 rounded-xl border border-white/12 bg-white/[0.04] text-xl font-bold text-white active:bg-white/10"
         >
@@ -534,7 +541,7 @@ export function RepCount({
       {historique.length > 0 && <CourbeProgression historique={historique} />}
 
       <div className="flex gap-3">
-        <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" />
+        <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} />
         <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
       </div>
 
@@ -592,9 +599,10 @@ export function RepCount({
           <button
             type="button"
             onClick={enregistrer}
-            className="mt-4 w-full rounded-full border border-laiton-300/40 bg-laiton-300/10 py-3 text-sm font-bold text-laiton-200"
+            disabled={enregistrementEnCours}
+            className="mt-4 w-full rounded-full border border-laiton-300/40 bg-laiton-300/10 py-3 text-sm font-bold text-laiton-200 disabled:cursor-wait disabled:opacity-60"
           >
-            Enregistrer l&apos;exercice
+            {enregistrementEnCours ? "Enregistrement…" : "Enregistrer l'exercice"}
           </button>
         </div>
       )}
