@@ -794,6 +794,12 @@ export function DiagnosticQuiz({
 
   function chooseSingle<T>(setter: (value: T) => void, value: T) {
     setter(value);
+    // Les écrans à choix unique n'ont rien d'autre à valider : un second
+    // clic sur « Continuer » doublait le nombre de gestes sans améliorer la
+    // qualité du bilan. Le court délai laisse apparaître la sélection avant
+    // la transition. Les choix multiples, la santé, la morphologie et
+    // l'email conservent volontairement leur validation explicite.
+    window.setTimeout(goNext, 220);
   }
   function goBack() {
     const i = STEP_ORDER.indexOf(step);
@@ -2098,23 +2104,27 @@ export function DiagnosticQuiz({
                   Ton email pour voir ton bilan et le retrouver plus tard.
                 </p>
               </div>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="toi@exemple.fr"
-                autoComplete="email"
-              />
-              <div>
+              <Field label="Email">
                 <Input
-                  type="tel"
-                  value={telephone}
-                  onChange={(e) => setTelephone(e.target.value)}
-                  onBlur={() => setTelephone(normalizeTelephone(telephone))}
-                  placeholder="06 12 34 56 78"
-                  autoComplete="tel"
-                  inputMode="tel"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="toi@exemple.fr"
+                  autoComplete="email"
                 />
+              </Field>
+              <div>
+                <Field label="Téléphone / WhatsApp (facultatif)">
+                  <Input
+                    type="tel"
+                    value={telephone}
+                    onChange={(e) => setTelephone(e.target.value)}
+                    onBlur={() => setTelephone(normalizeTelephone(telephone))}
+                    placeholder="06 12 34 56 78"
+                    autoComplete="tel"
+                    inputMode="tel"
+                  />
+                </Field>
                 <p className="mt-1.5 text-xs text-graphite-500">
                   Facultatif — laisse ton numéro uniquement si tu souhaites recevoir un conseil personnalisé ou être recontacté sur WhatsApp.
                 </p>
