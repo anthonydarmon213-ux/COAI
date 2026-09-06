@@ -68,7 +68,12 @@ export default async function AdminBusinessPage() {
       orderBy: { createdAt: "asc" },
     }),
     prisma.user.findMany({
-      select: { email: true, createdAt: true, subscription: { select: { status: true, trialEnd: true } } },
+      select: {
+        email: true,
+        createdAt: true,
+        subscription: { select: { status: true, trialEnd: true } },
+        _count: { select: { seances: true } },
+      },
     }),
   ]);
 
@@ -124,12 +129,16 @@ export default async function AdminBusinessPage() {
   const conversionParrainage = filleuls.length > 0 ? (filleulsConvertis / filleuls.length) * 100 : 0;
   const emailsLeads = new Set(diagnosticLeads30d.map((lead) => lead.email.toLowerCase()));
   const inscritsDepuisDiagnostic = usersAvecAbonnement.filter((user) => emailsLeads.has(user.email.toLowerCase()));
+  const actifsDepuisDiagnostic = inscritsDepuisDiagnostic.filter((user) => user._count.seances > 0);
   const essaisDepuisDiagnostic = inscritsDepuisDiagnostic.filter((user) => user.subscription?.status === "ACTIVE");
   const payantsDepuisDiagnostic = essaisDepuisDiagnostic.filter(
     (user) => !user.subscription?.trialEnd || user.subscription.trialEnd <= maintenant
   );
   const leadsUniques = emailsLeads.size;
   const tauxLeadInscription = leadsUniques > 0 ? (inscritsDepuisDiagnostic.length / leadsUniques) * 100 : 0;
+  const tauxInscriptionActivation = inscritsDepuisDiagnostic.length > 0
+    ? (actifsDepuisDiagnostic.length / inscritsDepuisDiagnostic.length) * 100
+    : 0;
   const tauxInscriptionEssai = inscritsDepuisDiagnostic.length > 0 ? (essaisDepuisDiagnostic.length / inscritsDepuisDiagnostic.length) * 100 : 0;
   const tauxLeadPayant = leadsUniques > 0 ? (payantsDepuisDiagnostic.length / leadsUniques) * 100 : 0;
   const relancesDiagnosticEnvoyees = new Set(
@@ -141,15 +150,16 @@ export default async function AdminBusinessPage() {
     const emailNormalise = lead.email.toLowerCase();
     if (!premierLeadParEmail.has(emailNormalise)) premierLeadParEmail.set(emailNormalise, lead);
   }
-  const campagnes = new Map<string, { source: string; campagne: string; diagnostics: number; comptes: number; essais: number; payants: number }>();
+  const campagnes = new Map<string, { source: string; campagne: string; diagnostics: number; comptes: number; actifs: number; essais: number; payants: number }>();
   for (const [emailNormalise, lead] of premierLeadParEmail) {
     const source = lead.utmSource?.trim() || "direct";
     const campagne = lead.utmCampaign?.trim() || "sans campagne";
     const key = `${source}\u0000${campagne}`;
-    const ligne = campagnes.get(key) ?? { source, campagne, diagnostics: 0, comptes: 0, essais: 0, payants: 0 };
+    const ligne = campagnes.get(key) ?? { source, campagne, diagnostics: 0, comptes: 0, actifs: 0, essais: 0, payants: 0 };
     ligne.diagnostics++;
     const user = utilisateurParEmail.get(emailNormalise);
     if (user) ligne.comptes++;
+    if (user && user._count.seances > 0) ligne.actifs++;
     if (user?.subscription?.status === "ACTIVE") {
       ligne.essais++;
       if (!user.subscription.trialEnd || user.subscription.trialEnd <= maintenant) ligne.payants++;
@@ -253,12 +263,13 @@ export default async function AdminBusinessPage() {
           <div>
             <SectionLabel>Tunnel revenus · 30 jours</SectionLabel>
             <p className="mt-2 text-xs text-graphite-500">
-              Mesure interne par email : diagnostic terminé → compte → essai actif → premier paiement.
+              Mesure interne agrégée : diagnostic → compte → premier repère ou séance → essai → paiement.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
             <StatCard label="Diagnostics" value={String(leadsUniques)} sublabel="Prospects uniques" highlight />
             <StatCard label="Comptes créés" value={String(inscritsDepuisDiagnostic.length)} sublabel={`${tauxLeadInscription.toFixed(1)} % des diagnostics`} />
+            <StatCard label="Première valeur" value={String(actifsDepuisDiagnostic.length)} sublabel={`${tauxInscriptionActivation.toFixed(1)} % des comptes`} highlight />
             <StatCard label="Essais actifs" value={String(essaisDepuisDiagnostic.length)} sublabel={`${tauxInscriptionEssai.toFixed(1)} % des comptes`} />
             <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
           </div>
@@ -300,16 +311,17 @@ export default async function AdminBusinessPage() {
           <Card className="overflow-x-auto p-0">
             <table className="w-full min-w-[680px] text-left text-sm">
               <thead className="border-b border-white/[0.08] text-xs text-graphite-500">
-                <tr><th className="px-4 py-3">Source / campagne</th><th className="px-3 py-3">Diagnostics</th><th className="px-3 py-3">Comptes</th><th className="px-3 py-3">Essais</th><th className="px-3 py-3">Payants</th><th className="px-4 py-3">Conv.</th></tr>
+                <tr><th className="px-4 py-3">Source / campagne</th><th className="px-3 py-3">Diagnostics</th><th className="px-3 py-3">Comptes</th><th className="px-3 py-3">Actifs</th><th className="px-3 py-3">Essais</th><th className="px-3 py-3">Payants</th><th className="px-4 py-3">Conv.</th></tr>
               </thead>
               <tbody className="divide-y divide-white/[0.06]">
                 {campagnesTriees.length === 0 ? (
-                  <tr><td colSpan={6} className="px-4 py-6 text-center text-graphite-500">Aucune campagne attribuée sur cette période.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-6 text-center text-graphite-500">Aucune campagne attribuée sur cette période.</td></tr>
                 ) : campagnesTriees.map((campagne) => (
                   <tr key={`${campagne.source}-${campagne.campagne}`}>
                     <td className="px-4 py-3"><span className="font-medium text-white">{campagne.source}</span><span className="block text-xs text-graphite-500">{campagne.campagne}</span></td>
                     <td className="px-3 py-3 text-graphite-200">{campagne.diagnostics}</td>
                     <td className="px-3 py-3 text-graphite-200">{campagne.comptes}</td>
+                    <td className="px-3 py-3 font-semibold text-cyan-200">{campagne.actifs}</td>
                     <td className="px-3 py-3 text-graphite-200">{campagne.essais}</td>
                     <td className="px-3 py-3 font-semibold text-laiton-300">{campagne.payants}</td>
                     <td className="px-4 py-3 text-graphite-200">{campagne.diagnostics > 0 ? `${((campagne.payants / campagne.diagnostics) * 100).toFixed(1)} %` : "0 %"}</td>
