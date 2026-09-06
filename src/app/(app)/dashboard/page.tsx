@@ -20,6 +20,7 @@ import { AujourdhuiGuideCard, type MissionDuJour } from "@/components/dashboard/
 import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
 import { ObjectifCheminCard } from "@/components/dashboard/objectif-chemin-card";
+import { DashboardCommandRail } from "@/components/dashboard/dashboard-command-rail";
 
 function nomSeanceCourt(nom: string) {
   const normalise = nom.toLowerCase();
@@ -190,6 +191,11 @@ export default async function DashboardPage() {
           </div>
           <ReadinessCard readiness={readiness} compact />
         </div>
+        <DashboardCommandRail
+          profil={completion.pourcentage}
+          readiness={readiness.disponible ? readiness.score : null}
+          seances={seancesDuMoisCount}
+        />
       </header>
 
       {/* BLOC 2 — L'action principale vient immédiatement après l'accueil.

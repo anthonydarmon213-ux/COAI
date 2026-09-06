@@ -24,6 +24,7 @@ import { ProjectionEmotionnelleCard } from "@/components/marketing/projection-em
 import { construireProjection, EVENEMENTS_DECLENCHEURS } from "@/lib/diagnostic/projection-emotionnelle";
 import { Gauge } from "@/components/ui/gauge";
 import { FonctionsDiagnosticCard } from "@/components/marketing/fonctions-diagnostic-card";
+import { DiagnosticScanPortal } from "@/components/marketing/diagnostic-scan-portal";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -1524,6 +1525,7 @@ export function DiagnosticQuiz({
                   </>
                 )}
               </p>
+              {!resumable && <DiagnosticScanPortal />}
               {!resumable && (
                 <p className="max-w-lg rounded-xl border border-laiton-400/20 bg-laiton-400/[0.07] px-4 py-3 text-sm leading-6 text-laiton-100">
                   Ce ne sont pas les kilos qui décident de ta longévité, mais ce que tu fais chaque jour.
@@ -1552,8 +1554,8 @@ export function DiagnosticQuiz({
                   </button>
                 </div>
               ) : (
-                <Button onClick={startDiagnostic} className="mt-2 whitespace-nowrap px-5 py-3.5 text-[0.78rem] min-[390px]:px-8 min-[390px]:text-sm">
-                  Découvrir mon Âge COAI
+                <Button onClick={startDiagnostic} className="coai-scan-launch mt-2 whitespace-nowrap px-5 py-3.5 text-[0.78rem] min-[390px]:px-8 min-[390px]:text-sm">
+                  Lancer mon scan COAI
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
