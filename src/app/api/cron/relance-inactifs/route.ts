@@ -5,6 +5,7 @@ import { sendEmail, sendAdminNotification } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
+import { stripe } from "@/lib/stripe/client";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
 // Coaching Hybride/Premium le 11/08/2026). À l'origine réservé au palier
@@ -39,6 +40,50 @@ const RELANCE_PREMIERE_VALEUR_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_CHECKOUT_APRES_MS = 2 * 60 * 60 * 1000;
 const RELANCE_CHECKOUT_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_PAIEMENT_APRES_MS = 48 * 60 * 60 * 1000;
+
+function formatPrixStripe(
+  montantCentimes: number,
+  devise: string,
+  intervalle: "MONTHLY" | "QUARTERLY" | "ANNUAL"
+): string {
+  const montant = new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: devise.toUpperCase(),
+    minimumFractionDigits: montantCentimes % 100 === 0 ? 0 : 2,
+  }).format(montantCentimes / 100);
+  if (intervalle === "ANNUAL") return `${montant}/an`;
+  if (intervalle === "QUARTERLY") return `${montant} tous les 3 mois`;
+  return `${montant}/mois`;
+}
+
+// Le tarif trimestriel peut varier selon la date de souscription. Le lire
+// depuis l'abonnement Stripe évite qu'une relance envoyée après la fin d'une
+// offre annonce le nouveau tarif à quelqu'un qui a verrouillé l'ancien.
+async function lirePrixPremierPrelevement(subscription: {
+  stripeSubscriptionId: string | null;
+  plan: SubscriptionPlan;
+  billingInterval: "MONTHLY" | "QUARTERLY" | "ANNUAL";
+}): Promise<string> {
+  if (subscription.stripeSubscriptionId) {
+    try {
+      const stripeSubscription = await stripe.subscriptions.retrieve(
+        subscription.stripeSubscriptionId
+      );
+      const price = stripeSubscription.items.data[0]?.price;
+      if (price?.unit_amount !== null && price?.unit_amount !== undefined && price.currency) {
+        return formatPrixStripe(price.unit_amount, price.currency, subscription.billingInterval);
+      }
+    } catch (error) {
+      console.error("Impossible de lire le tarif Stripe pour le rappel d'essai", error);
+    }
+  }
+
+  // En cas d'indisponibilité Stripe, ne jamais inventer un montant : le
+  // client retrouve le tarif exact dans son portail d'abonnement.
+  return subscription.plan === "STANDARD"
+    ? "au tarif convenu lors de ton inscription"
+    : "au tarif choisi lors de ton inscription";
+}
 
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Coaching Hybride) — gardés synchronisés à la main, les deux vivent dans des
@@ -305,18 +350,7 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
   let rappels = 0;
   for (const subscription of candidats) {
     if (!subscription.trialEnd) continue;
-    // Ces montants annonçaient 49 €/mois pour le Pass IA facturé 19,99 €, et
-    // multipliaient par douze pour l'annuel — soit 588 € au lieu de 119 €.
-    // Un tarif faux, juste avant le premier prélèvement. Les valeurs sont
-    // désormais celles réellement facturées par OFFER_BY_PLAN.
-    const prix =
-      subscription.plan === "STANDARD"
-        ? "99 €/mois"
-        : subscription.billingInterval === "ANNUAL"
-          ? "119 €/an"
-          : subscription.billingInterval === "QUARTERLY"
-            ? "49 € tous les 3 mois"
-            : "19,99 €/mois";
+    const prix = await lirePrixPremierPrelevement(subscription);
     const date = subscription.trialEnd.toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "long",
@@ -324,11 +358,14 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
       timeZone: "Europe/Paris",
     });
     const nom = subscription.user.prenom ? ` ${subscription.user.prenom}` : "";
+    const engagement = subscription.billingInterval === "MONTHLY"
+      ? "sans engagement"
+      : "renouvelé automatiquement à cette échéance";
     const envoye = await sendEmail(
       subscription.user.email,
       "Ton essai COAI se termine bientôt",
       `Bonjour${nom},\n\n` +
-        `Ton essai COAI se termine le ${date}. Ton abonnement passera ensuite à ${prix}, sans engagement.\n\n` +
+        `Ton essai COAI se termine le ${date}. Ton abonnement passera ensuite à ${prix}, ${engagement}.\n\n` +
         `Profite des derniers jours pour ouvrir ta séance du jour et tester ton accompagnement : ${appUrl}/aujourdhui\n\n` +
         `Tu peux consulter ou gérer ton abonnement à tout moment ici : ${appUrl}/compte/abonnement\n\n` +
         `À bientôt,\nL'équipe COAI`
@@ -525,7 +562,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
       email: true,
       prenom: true,
       checkoutPlan: true,
-      checkoutBillingInterval: true,
+      subscription: { select: { trialEnd: true } },
     },
   });
 
@@ -539,25 +576,17 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
     // et "99 €/mois" etaient a la fois l'ancien nom ET un tarif qui n'existe
     // plus (pack 3 mois minimum, sur devis, pas d'abonnement mensuel).
     const plan = user.checkoutPlan === "STANDARD" ? "Premium Remote" : "Standard IA";
-    // Le prix cité doit suivre le rythme de facturation réellement choisi
-    // au checkout (23/08/2026) : Pass IA propose désormais les deux, et
-    // l'e-mail affichait encore "49 €/an", un tarif qui n'existe plus
-    // depuis le repositionnement du 22/08. Un e-mail de relance qui cite
-    // un prix faux est pire que pas d'e-mail du tout.
-    const prix =
-      user.checkoutPlan === "STANDARD"
-        ? "accompagnement 3 mois minimum, sur devis"
-        : user.checkoutBillingInterval === "ANNUAL"
-          ? "119 €/an"
-          : "19,99 €/mois";
     const nom = user.prenom ? ` ${user.prenom}` : "";
+    const reprise = user.subscription?.trialEnd
+      ? "Tu peux reprendre ton inscription ici"
+      : "Tu peux reprendre ton inscription et profiter de tes 7 jours d'essai ici";
     const envoye = await sendEmail(
       user.email,
       "Tu peux reprendre ton inscription COAI",
       `Bonjour${nom},\n\n` +
-        `Ton inscription à l'accompagnement ${plan} (${prix}) n'a pas été finalisée. ` +
+        `Ton inscription à l'accompagnement ${plan} n'a pas été finalisée. ` +
         `Aucun paiement n'a été enregistré.\n\n` +
-        `Tu peux reprendre quand tu veux et profiter de tes 7 jours d'essai : ${appUrl}/pricing\n\n` +
+        `${reprise} : ${appUrl}/pricing\n\n` +
         `Si tu as rencontré un problème, réponds simplement à cet email.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
