@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/client";
 import { sendEmail, sendAdminNotification } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
+import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
 // Coaching Hybride/Premium le 11/08/2026). À l'origine réservé au palier
@@ -34,6 +35,7 @@ const RAPPEL_ESSAI_AVANT_MS = 72 * 60 * 60 * 1000;
 const RELANCE_DIAGNOSTIC_APRES_MS = 24 * 60 * 60 * 1000;
 const RELANCE_DIAGNOSTIC_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_ACTIVATION_APRES_MS = 24 * 60 * 60 * 1000;
+const RELANCE_PREMIERE_VALEUR_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_CHECKOUT_APRES_MS = 2 * 60 * 60 * 1000;
 const RELANCE_CHECKOUT_FENETRE_MS = 7 * JOUR_MS;
 const RELANCE_PAIEMENT_APRES_MS = 48 * 60 * 60 * 1000;
@@ -444,6 +446,63 @@ async function relancerEssaisNonActives(appUrl: string): Promise<number> {
   return relancesActivation;
 }
 
+// Première victoire avant la vente : relance une seule fois les comptes
+// gratuits issus d'un diagnostic consenti qui n'ont encore enregistré ni
+// série RepCount ni séance. Les abonnés ont leur propre onboarding juste
+// au-dessus ; les comptes sans consentement marketing ne sont jamais ciblés.
+async function relancerComptesSansPremierRepere(appUrl: string): Promise<number> {
+  const maintenant = Date.now();
+  const leadsConsentis = await prisma.diagnosticLead.findMany({
+    where: {
+      resultEmailSentAt: { not: null },
+      optedOutAt: null,
+      createdAt: { gte: new Date(maintenant - RELANCE_PREMIERE_VALEUR_FENETRE_MS) },
+    },
+    select: { email: true },
+  });
+  const emails = [...new Set(leadsConsentis.map((lead) => lead.email.toLowerCase()))];
+  if (emails.length === 0) return 0;
+
+  const candidats = await prisma.user.findMany({
+    where: {
+      email: { in: emails },
+      createdAt: {
+        gte: new Date(maintenant - RELANCE_PREMIERE_VALEUR_FENETRE_MS),
+        lte: new Date(maintenant - RELANCE_ACTIVATION_APRES_MS),
+      },
+      firstValueReminderSentAt: null,
+      programmeUnlockedAt: null,
+      subscription: null,
+      seances: { none: {} },
+    },
+    select: { id: true, email: true, prenom: true },
+  });
+
+  let relancesPremiereValeur = 0;
+  for (const user of candidats) {
+    const nom = user.prenom ? ` ${user.prenom}` : "";
+    const unsubscribe = buildUnsubscribeLink(appUrl, user.email);
+    const envoye = await sendEmail(
+      user.email,
+      "Ton premier repère COAI prend moins d'une minute",
+      `Bonjour${nom},\n\n` +
+        `Ton bilan est bien enregistré. Pour voir COAI travailler avec une donnée réelle, choisis simplement un exercice et note une série : ta première courbe de progression apparaîtra.\n\n` +
+        `Poser mon premier repère gratuitement : ${appUrl}/suivi/repcount\n\n` +
+        `Aucune carte bancaire n'est demandée. Tu choisiras un accompagnement seulement après avoir essayé.\n\n` +
+        `À bientôt,\nL'équipe COAI` +
+        (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : "")
+    );
+    if (!envoye) continue;
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { firstValueReminderSentAt: new Date() },
+    });
+    relancesPremiereValeur++;
+  }
+  return relancesPremiereValeur;
+}
+
 // Récupère une intention de Checkout restée sans abonnement actif. Une seule
 // relance par session commencée ; un nouveau Checkout réarme proprement le
 // rappel en remettant checkoutReminderSentAt à null.
@@ -556,16 +615,17 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
 
-  const [relances, alertesDouleur, alertesMotivation, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement] = await Promise.all([
+  const [relances, alertesDouleur, alertesMotivation, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesPremiereValeur, relancesCheckout, relancesPaiement] = await Promise.all([
     relancerInactifs(appUrl),
     alerterDouleurImpulsion(appUrl),
     alerterMotivationEnBaisse(appUrl),
     rappelerFinEssai(appUrl),
     relancerDiagnosticsNonConvertis(appUrl),
     relancerEssaisNonActives(appUrl),
+    relancerComptesSansPremierRepere(appUrl),
     relancerCheckoutsAbandonnes(appUrl),
     relancerPaiementsEnRetard(appUrl),
   ]);
 
-  return NextResponse.json({ relances, alertesDouleur, alertesMotivation, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesCheckout, relancesPaiement });
+  return NextResponse.json({ relances, alertesDouleur, alertesMotivation, rappelsFinEssai, relancesDiagnostic, relancesActivation, relancesPremiereValeur, relancesCheckout, relancesPaiement });
 }

@@ -69,6 +69,11 @@ model User {
   // /api/cron/relance-inactifs.
   derniereRelanceInactiviteEnvoyeeAt DateTime?
 
+  // Relance d'activation unique pour un compte gratuit issu du diagnostic
+  // qui n'a encore enregistré aucun repère après 24 h. Distincte des
+  // relances d'essai payant et bloquée dès la première séance.
+  firstValueReminderSentAt DateTime?
+
   // Bilan mensuel automatique (11/08/2026) — récap des séances loggées et
   // de la progression (poids, force) envoyé par email à chaque abonné payant
   // actif, environ tous les 30 jours (calculé depuis cette date, pas un jour
@@ -134,6 +139,7 @@ model User {
   coachNotesAuthored       CoachNote[]              @relation("CoachNoteAuthor")
 
   @@index([checkoutStartedAt, checkoutReminderSentAt])
+  @@index([firstValueReminderSentAt, createdAt])
   @@map("users")
 }
 

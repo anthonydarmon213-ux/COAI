@@ -96,10 +96,11 @@ export default async function AdminBusinessPage() {
   const tauxActivationProgramme = essaisActifs.length > 0 ? (essaisAvecProgramme / essaisActifs.length) * 100 : 0;
   const tauxActivationSeance = essaisActifs.length > 0 ? (essaisAvecSeance / essaisActifs.length) * 100 : 0;
   const relancesActivationEnvoyees = subscriptions.filter((subscription) => subscription.trialActivationReminderSentAt).length;
-  const [checkoutsCommences30d, relancesCheckout30d, relancesPaiement30d] = await Promise.all([
+  const [checkoutsCommences30d, relancesCheckout30d, relancesPaiement30d, relancesPremiereValeur30d] = await Promise.all([
     prisma.user.count({ where: { checkoutStartedAt: { gte: ilYA30Jours } } }),
     prisma.user.count({ where: { checkoutReminderSentAt: { gte: ilYA30Jours } } }),
     prisma.subscription.count({ where: { paymentRecoveryReminderSentAt: { gte: ilYA30Jours } } }),
+    prisma.user.count({ where: { firstValueReminderSentAt: { gte: ilYA30Jours } } }),
   ]);
   const churnFeedbackCount = churnReasons.reduce((total, item) => total + item._count._all, 0);
   const topChurnReason = churnReasons[0]?.reason ?? "Aucun retour";
@@ -273,7 +274,9 @@ export default async function AdminBusinessPage() {
             <StatCard label="Essais actifs" value={String(essaisDepuisDiagnostic.length)} sublabel={`${tauxInscriptionEssai.toFixed(1)} % des comptes`} />
             <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
           </div>
-          <p className="text-xs text-graphite-500">{relancesDiagnosticEnvoyees} relance{relancesDiagnosticEnvoyees > 1 ? "s" : ""} diagnostic envoyée{relancesDiagnosticEnvoyees > 1 ? "s" : ""} sur la période.</p>
+          <p className="text-xs text-graphite-500">
+            {relancesDiagnosticEnvoyees} relance{relancesDiagnosticEnvoyees > 1 ? "s" : ""} avant inscription · {relancesPremiereValeur30d} relance{relancesPremiereValeur30d > 1 ? "s" : ""} vers le premier repère.
+          </p>
         </section>
 
         <section className="flex flex-col gap-3">
