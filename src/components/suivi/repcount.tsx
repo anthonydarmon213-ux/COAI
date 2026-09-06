@@ -14,6 +14,187 @@ function formatDate(d: Date) {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
+function meilleureCharge(perf: PerfExercice): number {
+  return Math.max(0, ...perf.sets.map((serie) => serie.charge));
+}
+
+function totalRepetitions(perf: PerfExercice): number {
+  return perf.sets.reduce((total, serie) => total + serie.reps, 0);
+}
+
+function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
+  const chronologie = historique.slice(0, 10).reverse();
+  const suitLaCharge = chronologie.some((perf) => meilleureCharge(perf) > 0);
+  const valeurs = chronologie.map((perf) =>
+    suitLaCharge ? meilleureCharge(perf) : totalRepetitions(perf)
+  );
+  const minimum = Math.min(...valeurs);
+  const maximum = Math.max(...valeurs);
+  const amplitude = Math.max(maximum - minimum, 1);
+  const largeur = 640;
+  const hauteur = 230;
+  const margeX = 34;
+  const haut = 30;
+  const bas = 184;
+  const points = valeurs.map((valeur, index) => ({
+    x:
+      chronologie.length === 1
+        ? largeur / 2
+        : margeX + (index / (chronologie.length - 1)) * (largeur - margeX * 2),
+    y: bas - ((valeur - minimum) / amplitude) * (bas - haut),
+    valeur,
+  }));
+  const premierPoint = points[0]!;
+  const derniere = points.at(-1)!;
+  const premierePerf = chronologie[0]!;
+  const dernierePerf = chronologie.at(-1)!;
+  const trace = points.map((point) => `${point.x},${point.y}`).join(" ");
+  const zone = `${premierPoint.x},${bas} ${trace} ${derniere.x},${bas}`;
+  const valeurPrecedente = valeurs.at(-2) ?? null;
+  const progression = valeurPrecedente === null ? null : derniere.valeur - valeurPrecedente;
+  const record = Math.max(...valeurs);
+  const estRecord = derniere.valeur >= record;
+  const unite = suitLaCharge ? "kg" : "reps";
+
+  return (
+    <section className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-[#06131b] p-4 shadow-[0_0_45px_rgba(34,211,238,0.08)]">
+      <div className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-laiton-300/10 blur-3xl" />
+
+      <div className="relative flex items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-200">
+            Progression RepCount
+          </p>
+          <p className="mt-1 text-sm text-graphite-300">
+            {suitLaCharge ? "Meilleure charge par séance" : "Répétitions par séance"}
+          </p>
+        </div>
+        {estRecord && chronologie.length > 1 && (
+          <span className="rounded-full border border-laiton-300/40 bg-laiton-300/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-laiton-200 shadow-[0_0_20px_rgba(217,180,94,0.18)]">
+            Record
+          </span>
+        )}
+      </div>
+
+      <div className="relative mt-3" aria-label={`Évolution sur ${chronologie.length} séances`}>
+        <svg viewBox={`0 0 ${largeur} ${hauteur}`} className="h-auto w-full" role="img">
+          <title>
+            {suitLaCharge ? "Courbe des meilleures charges" : "Courbe des répétitions"}
+          </title>
+          <defs>
+            <linearGradient id="repcount-line" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#42c8ff" />
+              <stop offset="70%" stopColor="#77e6ff" />
+              <stop offset="100%" stopColor="#e4bd62" />
+            </linearGradient>
+            <linearGradient id="repcount-area" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#42c8ff" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#42c8ff" stopOpacity="0" />
+            </linearGradient>
+            <filter id="repcount-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="7" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {[haut, (haut + bas) / 2, bas].map((y) => (
+            <line
+              key={y}
+              x1={margeX}
+              y1={y}
+              x2={largeur - margeX}
+              y2={y}
+              stroke="rgba(255,255,255,0.09)"
+              strokeDasharray="5 8"
+            />
+          ))}
+          {points.length > 1 && <polygon points={zone} fill="url(#repcount-area)" />}
+          {points.length > 1 && (
+            <polyline
+              points={trace}
+              fill="none"
+              stroke="url(#repcount-line)"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              filter="url(#repcount-glow)"
+            />
+          )}
+          {points.map((point, index) => {
+            const dernierPoint = index === points.length - 1;
+            return (
+              <g key={`${point.x}-${chronologie[index]!.date.toISOString()}`}>
+                {dernierPoint && (
+                  <circle cx={point.x} cy={point.y} r="17" fill="#e4bd62" opacity="0.16">
+                    <animate attributeName="r" values="12;21;12" dur="2.4s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.24;0.04;0.24" dur="2.4s" repeatCount="indefinite" />
+                  </circle>
+                )}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={dernierPoint ? 7 : 4.5}
+                  fill={dernierPoint ? "#f1cf78" : "#7de7ff"}
+                  stroke="#06131b"
+                  strokeWidth="3"
+                />
+                {(dernierPoint || chronologie.length <= 4) && (
+                  <text
+                    x={point.x}
+                    y={Math.max(point.y - 16, 15)}
+                    textAnchor="middle"
+                    fill={dernierPoint ? "#f1cf78" : "#b9f1ff"}
+                    fontSize="16"
+                    fontWeight="700"
+                  >
+                    {point.valeur} {unite}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+          <text x={margeX} y="218" fill="rgba(255,255,255,.42)" fontSize="14">
+            {formatDate(premierePerf.date)}
+          </text>
+          <text x={largeur - margeX} y="218" textAnchor="end" fill="rgba(255,255,255,.62)" fontSize="14">
+            {formatDate(dernierePerf.date)}
+          </text>
+        </svg>
+      </div>
+
+      <div className="relative grid grid-cols-3 gap-2 border-t border-white/10 pt-3 text-center">
+        <div>
+          <p className="font-display text-lg font-semibold tabular-nums text-white">
+            {derniere.valeur} <span className="text-xs text-graphite-400">{unite}</span>
+          </p>
+          <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-graphite-500">Dernière</p>
+        </div>
+        <div className="border-x border-white/10">
+          <p className="font-display text-lg font-semibold tabular-nums text-laiton-200">
+            {record} <span className="text-xs text-graphite-400">{unite}</span>
+          </p>
+          <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-graphite-500">Record</p>
+        </div>
+        <div>
+          <p
+            className={`font-display text-lg font-semibold tabular-nums ${
+              progression !== null && progression > 0 ? "text-emerald-300" : "text-white"
+            }`}
+          >
+            {progression === null ? "—" : `${progression > 0 ? "+" : ""}${progression}`}
+            {progression !== null && <span className="ml-1 text-xs text-graphite-400">{unite}</span>}
+          </p>
+          <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-graphite-500">Vs avant</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function RepCount({ exercices }: { exercices: string[] }) {
   const [nom, setNom] = useState("");
   const [reps, setReps] = useState(10);
@@ -173,6 +354,8 @@ export function RepCount({ exercices }: { exercices: string[] }) {
         </div>
       )}
 
+      {historique.length > 0 && <CourbeProgression historique={historique} />}
+
       <div className="flex gap-3">
         <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" />
         <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
@@ -237,9 +420,12 @@ export function RepCount({ exercices }: { exercices: string[] }) {
 
       {erreur && <p className="text-sm text-rose-300">{erreur}</p>}
       {enregistre && (
-        <p className="text-sm text-emerald-300">
-          Enregistré. Ça alimente ta progression et ton volume par muscle.
-        </p>
+        <div className="rounded-xl border border-emerald-300/25 bg-emerald-300/[0.06] px-4 py-3" role="status">
+          <p className="text-sm font-semibold text-emerald-300">Séance enregistrée ✓</p>
+          <p className="mt-1 text-xs text-graphite-300">
+            Ta courbe est à jour. Reviens à la prochaine séance pour battre ton repère.
+          </p>
+        </div>
       )}
 
       {historique.length > 1 && (
