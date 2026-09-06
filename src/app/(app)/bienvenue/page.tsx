@@ -147,9 +147,9 @@ export default async function BienvenuePage({
 
         <div className="grid w-full grid-cols-1 gap-3 text-left sm:grid-cols-3">
           {[
-            { titre: "Aujourd'hui", texte: "COAI te montre une seule priorité utile." },
-            { titre: "Chaque séance", texte: "Ton plan s'adapte à ta forme et à tes contraintes." },
-            { titre: "Dans le temps", texte: "Tes résultats rendent les prochaines décisions plus précises." },
+            { titre: "Commence gratuitement", texte: "Pose ton premier repère avec RepCount, sans carte bancaire." },
+            { titre: "Vois ta progression", texte: "Tes séries, charges et records construisent une courbe lisible." },
+            { titre: "Choisis ensuite", texte: "Débloque le niveau d'accompagnement adapté quand tu as vu la valeur." },
           ].map((etape, i) => (
             <div
               key={etape.titre}

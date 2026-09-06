@@ -131,8 +131,10 @@ export default async function DashboardPage() {
           }
         : {
             kicker: "Ta mission du jour",
-            title: "Choisis ton accompagnement pour démarrer.",
-            description: "Découvre d'abord ce que COAI a compris de ton profil, puis choisis l'expérience qui te correspond.",
+            title: "Pose ton premier repère gratuitement.",
+            description: "Choisis un exercice, note une série et découvre comment COAI construit ta courbe de progression. Aucun abonnement nécessaire pour essayer.",
+            href: "/suivi/repcount",
+            cta: "Tester RepCount gratuitement →",
           }
       : sourceSession
         ? !daily?.sleep

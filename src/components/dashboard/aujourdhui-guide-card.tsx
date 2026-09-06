@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ServiceDetailModal } from "@/components/marketing/service-detail-modal";
 import type { CoaiInsight } from "@/lib/insight/coai-insight";
 import type { ServiceRecommande } from "@/lib/dashboard/besoins-identifies";
+import { trackEvent } from "@/lib/analytics";
 
 const TON_ACCENT: Record<CoaiInsight["ton"], string> = {
   neutral: "border-white/[0.08]",
@@ -56,7 +57,11 @@ export function AujourdhuiGuideCard({
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">{mission.description}</p>
           {mission.href && (
-            <Link href={mission.href} className="coai-rainbow-cta mt-5 inline-flex rounded-xl px-6 py-3 text-sm font-extrabold text-white">
+            <Link
+              href={mission.href}
+              onClick={() => trackEvent("dashboard_mission_started", { destination: mission.href, has_access: hasAccess })}
+              className="coai-rainbow-cta mt-5 inline-flex rounded-xl px-6 py-3 text-sm font-extrabold text-white"
+            >
               {mission.cta ?? "Continuer →"}
             </Link>
           )}
@@ -70,7 +75,8 @@ export function AujourdhuiGuideCard({
       {!hasAccess && (
         <div className="mt-6 flex flex-col items-start gap-3 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-lg text-sm leading-6 text-graphite-300">
-            Débloque le suivi complet — programme généré, adaptations continues, et un coach humain si tu en as besoin — pour transformer cette photo du jour en vraie progression.
+            Commence par tester le carnet gratuitement. Débloque ensuite le programme généré,
+            les adaptations continues et, si tu en as besoin, le regard d&apos;un coach humain.
           </p>
           <Button className="coai-rainbow-cta shrink-0 border-0 text-[#111216]" onClick={() => setModalOuvert(true)}>
             Débloquer mon accompagnement →
