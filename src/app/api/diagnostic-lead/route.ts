@@ -17,8 +17,8 @@ const FENETRE_ANTI_DOUBLON_MS = 5 * 60 * 1000;
 // de loin le plus fréquent, et le seul qui ne nécessite pas de requête
 // supplémentaire.
 async function resoudreCta(email: string): Promise<{ label: string; href: string }> {
-  const user = await prisma.user.findUnique({
-    where: { email },
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
     select: { id: true },
   });
   if (!user) return { label: "Voir mes accompagnements", href: "/pricing" };
@@ -56,9 +56,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
+  const emailNormalise = parsed.data.email.trim().toLowerCase();
   const lead = await prisma.diagnosticLead.create({
     data: {
-      email: parsed.data.email,
+      email: emailNormalise,
       telephone: parsed.data.telephone,
       reponses: parsed.data.reponses as Prisma.InputJsonValue,
       utmSource: parsed.data.utmSource,
@@ -94,8 +95,14 @@ export async function POST(request: Request) {
   const activiteQuotidienne = typeof reponsesLead.activiteQuotidienne === "string" ? reponsesLead.activiteQuotidienne : "Non renseignée";
   const objectifSecondaire = typeof reponsesLead.objectifSecondaire === "string" ? reponsesLead.objectifSecondaire : "Non renseigné";
   const importanceObjectif = typeof reponsesLead.importanceObjectif === "string" ? reponsesLead.importanceObjectif : "Non renseignée";
-  const freinPrincipalLibre = typeof reponsesLead.freinPrincipalLibre === "string" ? reponsesLead.freinPrincipalLibre : "Non renseigné";
-  const attentesCoai = typeof reponsesLead.attentesCoai === "string" ? reponsesLead.attentesCoai : "Non renseignées";
+  const joindreReponse = (value: unknown, fallback: string) =>
+    typeof value === "string"
+      ? value
+      : Array.isArray(value)
+        ? value.filter((item): item is string => typeof item === "string").join(" · ") || fallback
+        : fallback;
+  const freinPrincipalLibre = joindreReponse(reponsesLead.freinsPrincipaux, "Non renseigné");
+  const attentesCoai = joindreReponse(reponsesLead.attentesCoai, "Non renseignées");
   const niveauLead = typeof reponsesLead.niveau === "string" ? reponsesLead.niveau : "Non renseigné";
   const echeanceLead = typeof reponsesLead.echeance === "string" ? reponsesLead.echeance : "Non renseignée";
   const evaluationLead = [
@@ -114,7 +121,7 @@ export async function POST(request: Request) {
     : "Standard IA — Personal Trainer IA 24/7";
 
   const notifText = [
-    `${parsed.data.email} vient de terminer le diagnostic gratuit sur coai.fr.`,
+    `${emailNormalise} vient de terminer le diagnostic gratuit sur coai.fr.`,
     parsed.data.telephone ? `Téléphone : ${parsed.data.telephone}` : "Téléphone : non renseigné",
     diagnostic ? `Score COAI : ${diagnostic.indiceCoai.score}/100 — ${diagnostic.indiceCoai.niveau}` : null,
     `Objectif : ${objectifLead}`,
@@ -132,7 +139,7 @@ export async function POST(request: Request) {
     `Solutions : ${diagnostic?.pointsResolus.join(" · ") || "Diagnostic COAI"}`,
     `Offre recommandée : ${offreRecommandee}`,
     parsed.data.telephone
-      ? `WhatsApp : ${buildWhatsAppLinkVersLead(parsed.data.telephone, parsed.data.email)}`
+      ? `WhatsApp : ${buildWhatsAppLinkVersLead(parsed.data.telephone, emailNormalise)}`
       : null,
   ]
     .filter(Boolean)
@@ -143,7 +150,7 @@ export async function POST(request: Request) {
     // HubSpot. La base COAI reste la source de vérité et conserve le lead si
     // le CRM est momentanément indisponible ou pas encore configuré.
     synchroniserLeadHubSpot({
-      email: parsed.data.email,
+      email: emailNormalise,
       telephone: parsed.data.telephone,
     }).catch((err) => console.error("[diagnostic-lead] synchronisation HubSpot :", err)),
 
@@ -159,7 +166,7 @@ export async function POST(request: Request) {
       notifText,
       diagnostic
         ? buildNouveauLeadEmailHtml({
-            email: parsed.data.email,
+            email: emailNormalise,
             telephone: parsed.data.telephone ?? null,
             score: diagnostic.indiceCoai.score,
             niveauScore: diagnostic.indiceCoai.niveau,
@@ -193,7 +200,7 @@ export async function POST(request: Request) {
 
         const recent = await prisma.diagnosticLead.findFirst({
           where: {
-            email: parsed.data.email,
+            email: emailNormalise,
             id: { not: lead.id },
             resultEmailSentAt: { not: null, gte: new Date(Date.now() - FENETRE_ANTI_DOUBLON_MS) },
           },
@@ -201,9 +208,9 @@ export async function POST(request: Request) {
         });
         if (recent) return;
 
-        const cta = await resoudreCta(parsed.data.email);
+        const cta = await resoudreCta(emailNormalise);
         const envoye = await sendEmail(
-          parsed.data.email,
+          emailNormalise,
           "Ton diagnostic COAI",
           miniDiagnosticEnTexte(diagnostic, appUrl, cta)
         );
@@ -212,7 +219,7 @@ export async function POST(request: Request) {
             where: { id: lead.id },
             data: { resultEmailSentAt: new Date() },
           });
-          trackServerEvent("diagnostic_email_sent", null, { email: parsed.data.email });
+          trackServerEvent("diagnostic_email_sent", null, { email: emailNormalise });
         }
       } catch (err) {
         console.error("[diagnostic-lead] envoi email résultat :", err);

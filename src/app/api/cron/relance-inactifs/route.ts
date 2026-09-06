@@ -404,7 +404,7 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
   if (emails.length === 0) return 0;
 
   const comptesExistants = await prisma.user.findMany({
-    where: { email: { in: emails } },
+    where: { email: { in: emails, mode: "insensitive" } },
     select: { email: true },
   });
   const dejaInscrits = new Set(comptesExistants.map((user) => user.email.toLowerCase()));
