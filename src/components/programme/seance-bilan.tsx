@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Flame, Repeat, Timer, TrendingUp } from "lucide-react";
+import Link from "next/link";
 import { SeanceShareButton } from "@/components/programme/seance-share-button";
 
 // Écran de fin de séance (01/09/2026, demande Anthony — « marquer les
@@ -117,14 +118,22 @@ export function SeanceBilan({
           {exercices.map((e) => {
             const t = e.sets.reduce((s, x) => s + x.reps * x.charge, 0);
             return (
-              <div key={e.nom} className="flex items-baseline justify-between gap-3 py-1.5 text-xs">
+              <Link
+                key={e.nom}
+                href={{ pathname: "/suivi/repcount", query: { exercice: e.nom } }}
+                className="group flex items-baseline justify-between gap-3 rounded-lg px-1 py-1.5 text-xs transition hover:bg-white/[0.04]"
+              >
                 <span className="min-w-0 truncate text-graphite-200">{e.nom}</span>
-                <span className="flex-none font-mono tabular-nums text-graphite-400">
+                <span className="flex-none font-mono tabular-nums text-graphite-400 transition group-hover:text-cyan-200">
                   {e.series} × {t > 0 ? `${t.toLocaleString("fr-FR")} kg` : "—"}
+                  <span className="ml-1.5" aria-hidden="true">↗</span>
                 </span>
-              </div>
+              </Link>
             );
           })}
+          <p className="mt-2 border-t border-white/10 pt-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-cyan-200">
+            Touche un exercice pour voir sa courbe
+          </p>
         </div>
       )}
 

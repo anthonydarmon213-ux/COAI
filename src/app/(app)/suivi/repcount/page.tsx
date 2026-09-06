@@ -13,7 +13,11 @@ export const metadata = {
 // libre. Les données sont écrites dans SeanceLog via /api/seances, au même
 // format que le lecteur — elles alimentent donc les graphiques de
 // progression et le volume par muscle sans traitement supplémentaire.
-export default function RepCountPage() {
+export default function RepCountPage({
+  searchParams,
+}: {
+  searchParams?: { exercice?: string | string[] };
+}) {
   // Date rendue sur le serveur, forcee sur Europe/Paris : l'hebergeur tourne
   // en UTC et afficherait la veille en soiree. C'est bien ce jour-la que les
   // series seront enregistrees.
@@ -23,6 +27,9 @@ export default function RepCountPage() {
     month: "long",
     timeZone: "Europe/Paris",
   });
+  const exerciceInitial = Array.isArray(searchParams?.exercice)
+    ? searchParams.exercice[0] ?? ""
+    : searchParams?.exercice ?? "";
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-col gap-6">
@@ -42,7 +49,7 @@ export default function RepCountPage() {
         </p>
       </header>
 
-      <RepCount exercices={EXERCICES.map((e) => e.nom)} />
+      <RepCount exercices={EXERCICES.map((e) => e.nom)} exerciceInitial={exerciceInitial} />
     </main>
   );
 }

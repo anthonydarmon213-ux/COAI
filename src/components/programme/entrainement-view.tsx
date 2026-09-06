@@ -52,12 +52,12 @@ export function EntrainementView({
           un clic, sans avoir à deviner quel jour ouvrir dans l'accordéon. */}
       <SeanceDuJourHero contenu={data} photosParExercice={photosParExercice} dureeProfil={dureeProfil} />
       <Link
-        href="/suivi/progression#charges"
+        href="/suivi/repcount"
         className="group flex items-center justify-between gap-4 rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/[0.08] to-laiton-400/[0.07] p-4 transition hover:border-cyan-300/40"
       >
         <span>
           <span className="font-mono text-[9px] font-bold uppercase tracking-[0.17em] text-cyan-200">Progression des charges</span>
-          <strong className="mt-1 block text-sm text-white">Chaque charge saisie pendant ta séance alimente automatiquement ta courbe.</strong>
+          <strong className="mt-1 block text-sm text-white">Note une série ou retrouve automatiquement les courbes alimentées pendant tes séances.</strong>
         </span>
         <span className="shrink-0 text-xl text-cyan-200 transition group-hover:translate-x-1">↗</span>
       </Link>

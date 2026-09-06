@@ -195,8 +195,14 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
   );
 }
 
-export function RepCount({ exercices }: { exercices: string[] }) {
-  const [nom, setNom] = useState("");
+export function RepCount({
+  exercices,
+  exerciceInitial = "",
+}: {
+  exercices: string[];
+  exerciceInitial?: string;
+}) {
+  const [nom, setNom] = useState(exerciceInitial);
   const [reps, setReps] = useState(10);
   const [charge, setCharge] = useState(20);
   const [sets, setSets] = useState<SetSaisi[]>([]);
@@ -205,6 +211,7 @@ export function RepCount({ exercices }: { exercices: string[] }) {
   const [enregistre, setEnregistre] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
+  const prefillRef = useRef<string | null>(null);
 
   const charger = useCallback(async () => {
     const r = await fetch("/api/seances");
@@ -233,6 +240,18 @@ export function RepCount({ exercices }: { exercices: string[] }) {
     [seances, nom]
   );
   const comparaison = useMemo(() => comparerAvantApres(historique), [historique]);
+
+  // À l'ouverture depuis un bilan de séance, reprend automatiquement la
+  // meilleure série connue. L'utilisateur retrouve son repère sans le
+  // mémoriser ni le recopier, mais garde la main sur les deux steppers.
+  useEffect(() => {
+    const cle = nom.trim().toLocaleLowerCase("fr-FR");
+    const derniereSerie = comparaison.precedente?.meilleureSerie;
+    if (!cle || !derniereSerie || prefillRef.current === cle || sets.length > 0) return;
+    setReps(derniereSerie.reps);
+    setCharge(derniereSerie.charge);
+    prefillRef.current = cle;
+  }, [comparaison.precedente, nom, sets.length]);
 
   const volumeCourant = sets.reduce((t, s) => t + s.reps * s.charge, 0);
 
@@ -350,6 +369,9 @@ export function RepCount({ exercices }: { exercices: string[] }) {
                 {Math.round(comparaison.deltaVolume)} kg vs la semaine passée
               </span>
             )}
+          </p>
+          <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.13em] text-laiton-200/80">
+            Repère repris automatiquement ↓
           </p>
         </div>
       )}
