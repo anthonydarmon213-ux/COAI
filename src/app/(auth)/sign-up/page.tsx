@@ -165,13 +165,13 @@ export default function SignUpPage() {
             <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
               {arriveDepuisInstagram
                 ? "Instagram utilise une connexion séparée de Safari. Ton offre est conservée : crée ton accès ou connecte-toi, puis tu reviendras la confirmer avant Stripe."
-                : "Ton résultat personnalisé est conservé. Si tu viens du bilan express, tu accèdes d'abord au programme Mobilité totale offert."}
+                : "Ton résultat personnalisé est conservé. Tu entres d'abord dans ton espace et poses ton premier repère RepCount, sans carte bancaire."}
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {(arriveDepuisInstagram
               ? ["Ton offre conservée", "Connexion sécurisée", "Aucun débit aujourd'hui"]
-              : ["Ton résultat conservé", "Mobilité offerte", "Aucun paiement automatique"]
+              : ["Ton résultat conservé", "Premier repère RepCount", "Aucun paiement automatique"]
             ).map((item) => (
               <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
             ))}

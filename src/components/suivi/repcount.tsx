@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { Activity } from "lucide-react";
 import {
   comparerAvantApres,
   historiquePourExercice,
@@ -22,6 +23,79 @@ function meilleureCharge(perf: PerfExercice): number {
 
 function totalRepetitions(perf: PerfExercice): number {
   return perf.sets.reduce((total, serie) => total + serie.reps, 0);
+}
+
+function JumeauSeance({
+  sets,
+  reference,
+}: {
+  sets: SetSaisi[];
+  reference: PerfExercice;
+}) {
+  const suitLaCharge =
+    reference.sets.some((serie) => serie.charge > 0) || sets.some((serie) => serie.charge > 0);
+  const valeurActuelle = suitLaCharge
+    ? sets.reduce((total, serie) => total + serie.reps * serie.charge, 0)
+    : sets.reduce((total, serie) => total + serie.reps, 0);
+  const valeurReference = suitLaCharge ? reference.volume : totalRepetitions(reference);
+  const ratio = valeurReference > 0 ? valeurActuelle / valeurReference : 0;
+  const pourcentage = Math.max(0, Math.round(ratio * 100));
+  const progressionVisuelle = Math.min(100, pourcentage);
+  const unite = suitLaCharge ? "kg de volume" : "répétitions";
+  const lecture =
+    ratio < 0.5
+      ? "Ta séance prend forme."
+      : ratio < 0.9
+        ? "Tu retrouves progressivement ta dernière référence."
+        : ratio <= 1.1
+          ? "Ton volume est comparable à ta dernière séance."
+          : "Ton volume actuel est supérieur à ta dernière séance.";
+
+  return (
+    <section className="relative overflow-hidden rounded-2xl border border-violet-300/25 bg-[radial-gradient(circle_at_100%_0%,rgba(56,189,248,.17),transparent_18rem),radial-gradient(circle_at_0%_100%,rgba(139,92,246,.14),transparent_20rem),#090d18] p-4 shadow-[0_22px_60px_-35px_rgba(56,189,248,.65)]">
+      <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent" />
+      <div className="relative flex items-center gap-4">
+        <div
+          className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full p-[2px] shadow-[0_0_34px_rgba(34,211,238,.12)]"
+          style={{
+            background: `conic-gradient(#67e8f9 ${progressionVisuelle * 3.6}deg, rgba(255,255,255,.08) 0deg)`,
+          }}
+          role="img"
+          aria-label={`${pourcentage}% du volume de la dernière séance`}
+        >
+          <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/[0.06] bg-[#090d18]">
+            <Activity size={17} className="text-cyan-200" aria-hidden="true" />
+            <strong className="mt-1 font-display text-2xl font-semibold tabular-nums text-white">
+              {pourcentage}%
+            </strong>
+            <span className="font-mono text-[7px] uppercase tracking-[0.13em] text-graphite-500">référence</span>
+          </div>
+          <span className="pointer-events-none absolute inset-[-7px] animate-pulse rounded-full border border-dashed border-cyan-200/15 motion-reduce:animate-none" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.17em] text-cyan-200">
+            COAI Live Twin
+          </p>
+          <h3 className="mt-1 font-display text-xl font-semibold text-white">Ta séance, en direct.</h3>
+          <p className="mt-1 text-xs leading-5 text-graphite-300">{lecture}</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-white/[0.08] bg-white/[0.035] px-2.5 py-2">
+              <p className="font-display text-base font-semibold tabular-nums text-white">{Math.round(valeurActuelle)}</p>
+              <p className="text-[9px] text-graphite-500">{unite} maintenant</p>
+            </div>
+            <div className="rounded-lg border border-white/[0.08] bg-white/[0.035] px-2.5 py-2">
+              <p className="font-display text-base font-semibold tabular-nums text-laiton-200">{Math.round(valeurReference)}</p>
+              <p className="text-[9px] text-graphite-500">dernière séance</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p className="relative mt-3 border-t border-white/[0.07] pt-2.5 text-center text-[10px] leading-4 text-graphite-500">
+        Comparaison personnelle en direct · ce repère n&apos;est pas un objectif à dépasser
+      </p>
+    </section>
+  );
 }
 
 function prochainCap({
@@ -487,6 +561,10 @@ export function RepCount({
             Passer
           </button>
         </div>
+      )}
+
+      {sets.length > 0 && comparaison.precedente && (
+        <JumeauSeance sets={sets} reference={comparaison.precedente} />
       )}
 
       {sets.length > 0 && (

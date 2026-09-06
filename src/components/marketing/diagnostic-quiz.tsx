@@ -1265,6 +1265,11 @@ export function DiagnosticQuiz({
   function signUpHref(): string {
     const params = new URLSearchParams();
     if (email) params.set("email", email);
+    // Le CTA gratuit du résultat doit tenir sa promesse : conserver le
+    // bilan, entrer dans l'app et obtenir une première valeur avant toute
+    // proposition payante. Les CTA d'offre continuent, eux, de transmettre
+    // explicitement leur plan à /sign-up puis reviennent vers /pricing.
+    params.set("redirect_to", "/bienvenue");
     const query = params.toString();
     return query ? `/sign-up?${query}` : "/sign-up";
   }
