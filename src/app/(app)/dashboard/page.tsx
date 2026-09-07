@@ -21,6 +21,8 @@ import { RestDayCheckin } from "@/components/daily/rest-day-checkin";
 import { ReperesDuJour } from "@/components/dashboard/reperes-du-jour";
 import { ObjectifCheminCard } from "@/components/dashboard/objectif-chemin-card";
 import { DashboardCommandRail } from "@/components/dashboard/dashboard-command-rail";
+import { CapitalPhysiqueCard } from "@/components/dashboard/capital-physique-card";
+import { construireCapitalPhysique } from "@/lib/insight/capital-physique";
 
 function nomSeanceCourt(nom: string) {
   const normalise = nom.toLowerCase();
@@ -44,7 +46,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount] = await Promise.all([
+  const [validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount, testsPhysiques] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -71,6 +73,11 @@ export default async function DashboardPage() {
     prisma.seanceLog.count({
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) } },
     }),
+    prisma.testMaxi.findMany({
+      where: { userId: user.id },
+      orderBy: { date: "desc" },
+      select: { exercice: true, valeur: true, unite: true, date: true },
+    }),
   ]);
 
   // objectifsJournaliers vit à la racine du contenu nutrition généré.
@@ -92,6 +99,7 @@ export default async function DashboardPage() {
     frequenceCardiaqueRepos: user.profile?.frequenceCardiaqueRepos ?? null,
   });
   const ageCoai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies: diesRecents });
+  const capitalPhysique = construireCapitalPhysique(testsPhysiques, user.profile);
 
   // Un programme EN_ATTENTE reste invisible tant qu'Anthony ne l'a pas
   // validé. GENERE_IA est le seul statut non validé publiable.
@@ -256,6 +264,8 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
+
+      <CapitalPhysiqueCard {...capitalPhysique} />
 
       {/* Progression secondaire : visible après l'action du jour, pas avant. */}
       <ObjectifCheminCard

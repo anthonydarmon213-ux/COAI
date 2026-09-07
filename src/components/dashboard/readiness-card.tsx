@@ -64,8 +64,8 @@ export function ReadinessCard({ readiness, compact = false }: { readiness: Readi
             />
           </svg>
           <span className="absolute flex flex-col items-center">
-            <span className={`font-display text-base font-bold ${couleur.texte}`}>{NIVEAU_LABEL[readiness.niveau]}</span>
-            <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.1em] text-graphite-500">aujourd’hui</span>
+            <span className={`font-display text-3xl font-bold leading-none ${couleur.texte}`}>{readiness.score}</span>
+            <span className="mt-1 font-mono text-[8px] font-bold uppercase tracking-[0.1em] text-graphite-300">{NIVEAU_LABEL[readiness.niveau]}</span>
           </span>
         </div>
 
