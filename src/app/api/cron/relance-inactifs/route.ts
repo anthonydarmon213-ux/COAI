@@ -421,14 +421,14 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
 
     const envoye = await sendEmail(
       email,
-      "Ton accompagnement COAI est prêt",
+      "Ton espace COAI est prêt",
       `Bonjour,\n\n` +
-        `Tu as terminé ton diagnostic COAI, mais tu n'as pas encore activé ton accompagnement. ` +
-        `Ton profil est prêt : il ne te reste qu'à choisir l'accompagnement qui correspond au niveau de suivi que tu veux.\n\n` +
-        `Choisis ton accompagnement : ${appUrl}/pricing\n\n` +
-        `Standard IA : 7 jours d'essai, puis 19,99 €/mois (ou 119 €/an), avec ton Personal Trainer IA disponible 24h/24.\n` +
-        `Premium Remote : ta transformation physique accompagnée personnellement par Anthony pendant 3 mois, 960 €, sur devis via WhatsApp.\n` +
-        `VIP Présentiel : accompagnement individuel en présentiel avec Anthony, 1 200 € pour un engagement de 3 mois minimum (soit 100 €/séance), à domicile, en entreprise, en club ou à distance, sur devis via WhatsApp.\n\n` +
+        `Tu as terminé ton bilan de forme COAI, mais tu n'as pas encore créé ton espace personnel. ` +
+        `Ton résultat est prêt : entre gratuitement dans l'application, choisis un exercice et enregistre une série. ` +
+        `Ta première courbe de progression apparaîtra immédiatement.\n\n` +
+        `Créer mon espace et poser mon premier repère : ${appUrl}/sign-up?redirect_to=%2Fbienvenue\n\n` +
+        `C'est gratuit, sans carte bancaire et cela prend moins d'une minute. ` +
+        `Tu découvriras ensuite l'accompagnement recommandé, seulement après avoir essayé COAI.\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;
@@ -524,7 +524,7 @@ async function relancerComptesSansPremierRepere(appUrl: string): Promise<number>
       "Ton premier repère COAI prend moins d'une minute",
       `Bonjour${nom},\n\n` +
         `Ton bilan est bien enregistré. Pour voir COAI travailler avec une donnée réelle, choisis simplement un exercice et note une série : ta première courbe de progression apparaîtra.\n\n` +
-        `Poser mon premier repère gratuitement : ${appUrl}/suivi/repcount\n\n` +
+        `Poser mon premier repère gratuitement : ${appUrl}/suivi/repcount?onboarding=1\n\n` +
         `Aucune carte bancaire n'est demandée. Tu choisiras un accompagnement seulement après avoir essayé.\n\n` +
         `À bientôt,\nL'équipe COAI` +
         (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : "")

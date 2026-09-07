@@ -21,7 +21,12 @@ async function resoudreCta(email: string): Promise<{ label: string; href: string
     where: { email: { equals: email, mode: "insensitive" } },
     select: { id: true },
   });
-  if (!user) return { label: "Voir mes accompagnements", href: "/pricing" };
+  if (!user) {
+    return {
+      label: "Créer mon espace gratuit et poser mon premier repère",
+      href: "/sign-up?redirect_to=%2Fbienvenue",
+    };
+  }
 
   const aUnProgramme = await prisma.programmeGenerated.findFirst({
     where: { userId: user.id },
@@ -29,7 +34,10 @@ async function resoudreCta(email: string): Promise<{ label: string; href: string
   });
   if (aUnProgramme) return { label: "Voir mon programme", href: "/programme/entrainement" };
 
-  return { label: "Compléter mon profil", href: "/compte/profil" };
+  return {
+    label: "Poser mon premier repère RepCount",
+    href: "/suivi/repcount?onboarding=1",
+  };
 }
 
 const bodySchema = z.object({

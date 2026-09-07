@@ -124,7 +124,7 @@ export function CompleterInscriptionForm({
       </label>
       {error && <p className="text-sm text-red-400">{error}</p>}
       <Button type="submit" disabled={loading}>
-        {loading ? "Création du compte…" : "Créer mon compte et choisir mon accompagnement →"}
+        {loading ? "Création du compte…" : "Créer mon espace et commencer →"}
       </Button>
     </form>
   );
