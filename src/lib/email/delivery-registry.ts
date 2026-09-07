@@ -7,6 +7,32 @@ export interface RegistryDatabase {
   transaction<T>(work: (tx: RegistryTransaction) => Promise<T>): Promise<T>;
 }
 
+export async function deliverOnce(db: RegistryDatabase, request: {
+  deliveryKey: string;
+  recipientKey: string;
+  kind: string;
+  eligible: () => Promise<boolean>;
+  send: () => Promise<boolean>;
+}): Promise<"SENT" | "SKIPPED" | "UNCERTAIN"> {
+  const { deliveryKey, recipientKey, kind } = request;
+  if (!(await reserveDelivery(db, deliveryKey, recipientKey, kind))) return "SKIPPED";
+  try {
+    // Recontrôler après réservation : la liste du cron peut être ancienne.
+    if (!(await request.eligible())) {
+      await finishDelivery(db, deliveryKey, recipientKey, "SUPPRESSED");
+      return "SKIPPED";
+    }
+    const sent = await request.send();
+    const recorded = await finishDelivery(db, deliveryKey, recipientKey, sent ? "SENT" : "UNCERTAIN");
+    return sent && recorded ? "SENT" : "UNCERTAIN";
+  } catch (error) {
+    // L'échec peut survenir après acceptation par le fournisseur. Ne pas
+    // libérer la réservation ni réessayer automatiquement.
+    await finishDelivery(db, deliveryKey, recipientKey, "UNCERTAIN").catch(() => undefined);
+    throw error;
+  }
+}
+
 export async function reserveDelivery(db: RegistryDatabase, deliveryKey: string, recipientKey: string, kind: string): Promise<boolean> {
   return db.transaction(async tx => {
     await tx.query(`INSERT INTO email_recipient_gates ("recipientKey") VALUES ($1) ON CONFLICT DO NOTHING`, [recipientKey]);

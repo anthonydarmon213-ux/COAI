@@ -10,7 +10,7 @@ const { pathToFileURL } = require('node:url');
   const sandbox = { exports: {} };
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/lib/email/delivery-registry.ts'),'utf8'),
     { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, sandbox);
-  const { reserveDelivery: reserve, finishDelivery: finish } = sandbox.exports;
+  const { reserveDelivery: reserve, finishDelivery: finish, deliverOnce } = sandbox.exports;
   try {
     await db.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;');
     await db.exec(fs.readFileSync(process.argv[3] || path.join(__dirname,'fixtures/email-delivery-registry.sql'),'utf8'));
@@ -48,7 +48,20 @@ const { pathToFileURL } = require('node:url');
     assert.equal(await finish(db,'c:3','c','UNCERTAIN'),true);
     assert.equal(await reserve(db,'c:3','c','j3'),false);
     await assert.rejects(finish(db,'c:3','c','SENT',-1),/Invalid cooldown/);
-    console.log('PASS: 23 registry lifecycle and transaction-failure assertions against local SQL');
+    let sends = 0;
+    const request = { deliveryKey:'d:3', recipientKey:'d', kind:'j3', eligible:async()=>true,
+      send:async()=>{ sends++; return true; } };
+    assert.equal(await deliverOnce(db,request),'SENT');
+    assert.equal(await deliverOnce(db,request),'SKIPPED');
+    assert.equal(sends,1);
+    assert.equal(await deliverOnce(db,{...request,deliveryKey:'e:3',recipientKey:'e',eligible:async()=>false}),'SKIPPED');
+    assert.equal(sends,1);
+    const timeout = {...request,deliveryKey:'f:3',recipientKey:'f',send:async()=>{sends++;throw new Error('provider timeout');}};
+    await assert.rejects(deliverOnce(db,timeout),/provider timeout/);
+    assert.equal(await deliverOnce(db,timeout),'SKIPPED');
+    assert.equal(sends,2);
+    assert.equal((await db.query(`SELECT state FROM email_deliveries WHERE "deliveryKey"='f:3'`)).rows[0].state,'UNCERTAIN');
+    console.log('PASS: 32 registry, transaction-failure and mocked delivery assertions against local SQL');
     console.log('LIMIT: single database connection; distributed races and provider delivery not validated');
   } finally { await db.close(); }
 })().catch(error=>{ console.error(error); process.exitCode=1; });
