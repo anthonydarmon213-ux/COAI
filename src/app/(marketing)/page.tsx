@@ -102,6 +102,88 @@ const PILIERS_VISUELS = [
   },
 ];
 
+const QUALITES_PHYSIQUES = ["Force", "Souplesse", "Équilibre", "Coordination", "Endurance", "Posture"];
+const LEVIERS_QUOTIDIENS = ["Respiration", "Hydratation", "Alimentation", "Sommeil", "Gestion du stress"];
+
+function CorpsCompletSection() {
+  return (
+    <Reveal>
+      <section
+        className="mx-auto my-8 w-[calc(100%-2rem)] max-w-6xl overflow-hidden rounded-[2.5rem] border border-cyan-300/20 bg-[radial-gradient(circle_at_8%_15%,rgba(56,189,248,.12),transparent_24rem),radial-gradient(circle_at_92%_85%,rgba(212,175,55,.13),transparent_26rem),rgba(255,255,255,.025)] px-6 py-14 shadow-[0_32px_100px_-65px_rgba(56,189,248,.6)] sm:px-12 sm:py-20"
+        aria-labelledby="corps-complet-title"
+      >
+        <div className="mx-auto max-w-3xl text-center">
+          <SectionLabel>Santé · bien-être · longévité</SectionLabel>
+          <h2
+            id="corps-complet-title"
+            className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.04em] text-white sm:text-5xl"
+          >
+            Un corps complet. Pas seulement musclé.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
+            COAI développe tes capacités physiques et les habitudes qui permettent à ton corps
+            de progresser, récupérer et durer.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_auto_1fr_auto_1.08fr] lg:items-stretch">
+          <article className="rounded-3xl border border-cyan-300/20 bg-cyan-300/[0.045] p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-200">01 · Tes qualités physiques</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {QUALITES_PHYSIQUES.map((qualite) => (
+                <span key={qualite} className="rounded-full border border-cyan-200/20 bg-black/20 px-3.5 py-2 text-sm font-semibold text-white">
+                  {qualite}
+                </span>
+              ))}
+            </div>
+          </article>
+
+          <div className="hidden items-center text-2xl text-laiton-300/70 lg:flex" aria-hidden="true">→</div>
+
+          <article className="rounded-3xl border border-white/[0.1] bg-white/[0.035] p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-200">02 · Tes leviers quotidiens</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {LEVIERS_QUOTIDIENS.map((levier) => (
+                <span key={levier} className="rounded-full border border-laiton-200/20 bg-black/20 px-3.5 py-2 text-sm font-semibold text-white">
+                  {levier}
+                </span>
+              ))}
+            </div>
+          </article>
+
+          <div className="hidden items-center text-2xl text-laiton-300/70 lg:flex" aria-hidden="true">→</div>
+
+          <article className="flex flex-col justify-between rounded-3xl border border-laiton-300/40 bg-[linear-gradient(145deg,rgba(212,175,55,.16),rgba(255,255,255,.035))] p-6 shadow-[0_24px_70px_-42px_rgba(212,175,55,.65)]">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-laiton-200">03 · Le résultat recherché</p>
+              <p className="mt-4 font-display text-2xl font-semibold leading-tight text-white sm:text-3xl">
+                Un physique esthétique, athlétique et fonctionnel.
+              </p>
+            </div>
+            <div className="mt-5 border-t border-laiton-200/20 pt-4">
+              <p className="text-sm font-semibold leading-6 text-laiton-100">
+                Au service de ta santé, de ton bien-être et de ta longévité.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-graphite-200">
+                Une meilleure posture, plus d&apos;aisance, plus de confiance et moins de douleurs au quotidien.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/diagnostic"
+            className="inline-flex min-h-14 items-center justify-center rounded-full bg-laiton-300 px-8 py-4 text-sm font-bold uppercase tracking-[0.04em] text-[#101214] transition hover:-translate-y-0.5 hover:bg-laiton-200"
+          >
+            Faire mon bilan de forme offert →
+          </Link>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
 function PiliersVisuelsSection() {
   return (
     <Reveal>
@@ -262,6 +344,8 @@ export default function LandingPage() {
       </section>
 
       <PiliersVisuelsSection />
+
+      <CorpsCompletSection />
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 py-20 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
         <div>
