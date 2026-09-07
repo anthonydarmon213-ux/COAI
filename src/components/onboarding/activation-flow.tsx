@@ -35,6 +35,7 @@ type Etat =
   | "debloquer"
   | "generation"
   | "pret"
+  | "erreur_bilan"
   | "erreur";
 
 type ProfilLike = Parameters<typeof computeProfilCompletion>[0];
@@ -121,13 +122,24 @@ export function ActivationFlow({
         let profilCourant: ProfilLike | null = profilInitial;
 
         if (reponses) {
-          const res = await fetch("/api/profil", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(reponses),
-          });
-          clearDiagnosticAnswers();
-          if (res.ok) profilCourant = await res.json();
+          try {
+            const res = await fetch("/api/profil", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(reponses),
+            });
+            if (!res.ok) throw new Error("Le bilan n'a pas pu être enregistré");
+            const savedProfile = await res.json();
+            if (!savedProfile || typeof savedProfile !== "object" || Array.isArray(savedProfile)) {
+              throw new Error("Réponse de sauvegarde invalide");
+            }
+            profilCourant = savedProfile;
+            // Garder la copie locale tant que la sauvegarde n'est pas confirmée.
+            clearDiagnosticAnswers();
+          } catch {
+            if (!annule) setEtat("erreur_bilan");
+            return;
+          }
         }
 
         const calc = computeProfilCompletion(profilCourant);
@@ -284,6 +296,17 @@ export function ActivationFlow({
         <Link href="/programme/entrainement?onboarding=1#seance-du-jour">
           <Button className="px-8 py-3">Commencer ma première séance</Button>
         </Link>
+      </div>
+    );
+  }
+
+  if (etat === "erreur_bilan") {
+    return (
+      <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-8 text-center">
+        <p className="text-sm text-graphite-400">
+          Ton bilan n’a pas pu être synchronisé. Tes réponses sont conservées dans ce navigateur.
+        </p>
+        <Button onClick={() => window.location.reload()}>Réessayer la sauvegarde</Button>
       </div>
     );
   }
