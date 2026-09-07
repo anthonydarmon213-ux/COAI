@@ -5,11 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { clearParrainageCookie, readParrainageCookie } from "@/lib/parrainage/cookie";
-import {
-  readIntendedBillingCookie,
-  readIntendedPlanCookie,
-  readIntendedVipSessionsCookie,
-} from "@/lib/checkout/intended-plan-cookie";
 import { clearUtmCookie, readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
@@ -20,7 +15,6 @@ import Link from "next/link";
 // confirmation explicite sur l'écran des formules.
 export function CompleterInscriptionForm({
   prenomSuggere,
-  returnTo,
 }: {
   prenomSuggere: string;
   returnTo?: string | null;
@@ -59,9 +53,6 @@ export function CompleterInscriptionForm({
         }),
       });
       if (!res.ok) throw new Error("Impossible de finaliser la création du compte.");
-      const intendedPlan = readIntendedPlanCookie();
-      const intendedVipSessions = readIntendedVipSessionsCookie();
-      const intendedBilling = readIntendedBillingCookie();
       clearParrainageCookie();
       clearUtmCookie();
 
@@ -69,23 +60,9 @@ export function CompleterInscriptionForm({
       trackMetaEvent("CompleteRegistration");
       trackFunnelEvent("signup_completed", {});
 
-      // Destination après inscription (01/09/2026, demande Anthony : « je veux
-      // que la personne rentre direct dans l'interface après le diag »).
-      //
-      // Deux intentions différentes, deux destinations :
-      // - venu des tarifs en ayant choisi une formule → on l'y ramène, sinon
-      //   on lui fait perdre son achat en cours ;
-      // - venu du diagnostic, sans formule choisie → il entre directement
-      //   dans l'app. Le renvoyer vers /pricing lui montrait un prix avant
-      //   d'avoir vu le produit : la friction que ce changement supprime.
-      if (intendedPlan) {
-        const params = new URLSearchParams({ from: "signup", selected: intendedPlan });
-        params.set("billing", intendedBilling);
-        params.set("vipSessions", String(intendedVipSessions));
-        window.location.href = `/pricing?${params.toString()}`;
-        return;
-      }
-      window.location.href = returnTo ?? "/dashboard?from=signup";
+      // La première expérience précède toujours le choix commercial.
+      // Une ancienne intention d'achat ne doit pas court-circuiter l'accueil.
+      window.location.href = "/bienvenue";
     } catch (err) {
       console.error("[completer-inscription]", err);
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");

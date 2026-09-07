@@ -131,7 +131,7 @@ export default async function DashboardPage() {
     : pendingCoach
       ? {
           kicker: "Validation en cours",
-          title: "Anthony relit ton programme.",
+          title: "Ton coach relit ton programme.",
           description: "Ton programme reste privé jusqu'à sa validation. Tu seras guidé dès qu'il sera prêt.",
         }
     : !programme
@@ -186,23 +186,29 @@ export default async function DashboardPage() {
     <div className="coai-dashboard flex flex-col gap-8">
       <DashboardIntroVideo />
 
-      {/* BLOC 1 — Hero + Readiness du jour */}
+      {/* BLOC 1 — Accueil personnel */}
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-6 px-6 py-7 sm:px-8 sm:py-9">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(56,189,248,.9)]" />
           COAI Live · ton plan du jour
         </div>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-5">
+          <div className="flex min-w-0 flex-wrap items-center gap-5">
             <DashboardAvatar resultat={ageCoai} />
             <div>
-              <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
+              <h1 className="break-words font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
                 {user.prenom ? `Bonjour ${user.prenom}.` : "Bonjour."}
               </h1>
               <p className="mt-2 max-w-xl text-base leading-7 text-graphite-300">{objective}</p>
             </div>
           </div>
-          <ReadinessCard readiness={readiness} compact />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href="/suivi/repcount?onboarding=1" className="inline-flex min-h-12 items-center rounded-full bg-cyan-200 px-5 py-3 text-sm font-bold text-[#111216]">
+            Enregistrer une série →
+          </Link>
+          <Link href="/fonctionnalites" className="text-sm font-semibold text-white underline underline-offset-4">Découvrir mes fonctions gratuites</Link>
+          <p className="w-full text-sm text-graphite-300">Note tes répétitions et ta charge. Retrouve ton repère à la prochaine séance.</p>
         </div>
         <DashboardCommandRail
           profil={completion.pourcentage}
@@ -227,7 +233,7 @@ export default async function DashboardPage() {
           ) : pendingCoach ? (
             <section className="coai-glass flex flex-col gap-3 p-6 text-center">
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Validation en cours</p>
-              <h2 className="text-2xl text-white">Anthony relit ton programme.</h2>
+              <h2 className="text-2xl text-white">Ton coach relit ton programme.</h2>
               <p className="text-sm leading-6 text-graphite-300">Son contenu reste privé jusqu&apos;à sa validation.</p>
             </section>
           ) : !programme ? (
@@ -264,6 +270,10 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
+
+      {(readiness.disponible || (completion.essentielComplet && sourceSession && !pendingCoach)) && (
+        <ReadinessCard readiness={readiness} />
+      )}
 
       <CapitalPhysiqueCard {...capitalPhysique} />
 

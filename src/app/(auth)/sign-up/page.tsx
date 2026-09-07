@@ -16,7 +16,6 @@ import {
   type IntendedPlan,
 } from "@/lib/checkout/intended-plan-cookie";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
-import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
 import Link from "next/link";
 
 // L'inscription reste gratuite et ne déclenche aucun paiement. Le choix
@@ -56,10 +55,7 @@ export default function SignUpPage() {
   const requestedBilling: IntendedBilling =
     billingParam === "ANNUAL" ? "ANNUAL" : billingParam === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
   const arriveDepuisInstagram = searchParams.get("source") === "instagram";
-  const requestedReturn = sanitizeReturnTo(searchParams.get("redirect_to"));
-  const destinationApresInscription = requestedPlan
-    ? `/pricing?from=signin&selected=${requestedPlan}&billing=${requestedBilling}`
-    : requestedReturn ?? "/bienvenue";
+  const destinationApresInscription = "/bienvenue";
 
   useEffect(() => {
     const ref = searchParams.get("ref");

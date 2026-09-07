@@ -317,7 +317,7 @@ export async function PilierPage({
             <section id={`pilier-${pilier.toLowerCase()}`} key={pilier} className="scroll-mt-6">
               <Card className="flex flex-col gap-3 p-6 text-center">
                 <Badge tone="warning">À valider par le coach</Badge>
-                <h2 className="text-2xl font-semibold text-white">Anthony relit ton programme.</h2>
+                <h2 className="text-2xl font-semibold text-white">Ton coach relit ton programme.</h2>
                 <p className="text-sm leading-6 text-graphite-300">
                   Son contenu reste privé jusqu&apos;à sa validation.
                 </p>

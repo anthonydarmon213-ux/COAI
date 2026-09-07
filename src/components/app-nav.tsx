@@ -36,6 +36,9 @@ const ONGLETS: {
   teinte: string;
   sous?: SousLien[];
 }[] = [
+  { href: "/fonctionnalites", label: "Fonctionnalités", icon: LayoutGrid, match: "/fonctionnalites", teinte: "56,189,248" },
+  { href: "/club", label: "COAI Club", icon: CalendarDays, match: "/club", teinte: "56,189,248" },
+  { href: "/conseils", label: "Articles & conseils", icon: ClipboardList, match: "/conseils", teinte: "148,163,184" },
   { href: "/dashboard", label: "Aujourd’hui", icon: CalendarDays, match: "/dashboard", teinte: "56,189,248" },
   // Le carnet de séances (RepCount) est promu en entrée principale
   // (01/09/2026, demande Anthony : « en priorité et en avant »). Il était
@@ -121,7 +124,6 @@ const ONGLETS: {
   // présentes ailleurs dans cette colonne — neuf doublons sur neuf, pour
   // un menu passant à 30 liens dans 224 px. La pédagogie se fait sur la
   // page, pas dans la barre.
-  { href: "/fonctionnalites", label: "Fonctionnalités", icon: LayoutGrid, match: "/fonctionnalites", teinte: "148,163,184" },
 ];
 
 function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {

@@ -176,12 +176,12 @@ export function ActivationFlow({
       <div className="flex w-full max-w-md flex-col items-center gap-3 text-center">
         <p className="text-sm font-medium text-emerald-300">Ton bilan est bien enregistré.</p>
         <Link
-          href="/suivi/repcount?onboarding=1"
+          href="/fonctionnalites"
           className="coai-rainbow-cta inline-flex min-h-14 w-full items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-20px_rgba(102,126,255,.75)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_65px_-18px_rgba(228,92,150,.65)]"
         >
-          Poser mon premier repère&nbsp; →
+          Découvrir mon espace COAI&nbsp; →
         </Link>
-        <p className="text-xs leading-5 text-graphite-500">Moins d’une minute, sans carte bancaire. Ta première courbe commence ici.</p>
+        <p className="text-xs leading-5 text-graphite-500">Découvre les fonctions gratuites, essaie-les, puis choisis ton accompagnement à ton rythme.</p>
       </div>
     );
   }
