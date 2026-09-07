@@ -1513,34 +1513,34 @@ export function DiagnosticQuiz({
         <div key={step} className="coai-diagnostic-stage px-6 py-7 sm:px-8">
           {step === "intro" && (
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
-              <div className="coai-diagnostic-kicker" aria-label="Ton bilan initial et ton Score COAI">
+              <div className="coai-diagnostic-kicker" aria-label="Ton bilan de forme offert">
                 <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
                 <span>Bilan de forme offert · résultat immédiat</span>
               </div>
               <h1 className="max-w-xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl">
-                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Quel âge a vraiment ton corps ?"}
+                {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Ton Capital Physique. Ton prochain cap."}
               </h1>
               <p className="max-w-lg text-base leading-7 text-graphite-400">
                 {resumable ? (
                   "Tes réponses précédentes sont toujours là — inutile de tout recommencer."
                 ) : (
                   <>
-                    En 5 minutes, découvre ton <strong className="text-graphite-100">Âge COAI</strong> — le
-                    reflet de ton hygiène de vie réelle : sommeil, alimentation, activité, régularité.
-                    Il peut être plus jeune que ton âge. Ou plus vieux.
+                    Fais le point sur tes habitudes, ton objectif et ton rythme de vie.
+                    Découvre tes <strong className="text-graphite-100">priorités pour progresser</strong> et
+                    l&apos;accompagnement adapté à ton quotidien.
                   </>
                 )}
               </p>
               {!resumable && <DiagnosticScanPortal />}
               {!resumable && (
                 <p className="max-w-lg rounded-xl border border-laiton-400/20 bg-laiton-400/[0.07] px-4 py-3 text-sm leading-6 text-laiton-100">
-                  Ce ne sont pas les kilos qui décident de ta longévité, mais ce que tu fais chaque jour.
-                  Le bilan mesure ces habitudes-là, puis te dit lesquelles changer en premier.
+                  À la fin : ton profil expliqué, tes axes de progression et une proposition
+                  d&apos;accompagnement. Tu découvres ton bilan avant de choisir la suite.
                 </p>
               )}
               {!resumable && (
                 <div className="grid w-full max-w-xl grid-cols-3 gap-2 text-left sm:gap-3">
-                  {[{ value: "17 ans", label: "d'expérience terrain" }, { value: "5 min", label: "et tu as ton âge" }, { value: "0 €", label: "sans carte bancaire" }].map((proof) => (
+                  {[{ value: "Toi", label: "ton objectif, ton rythme" }, { value: "≈ 5 min", label: "pour faire le point" }, { value: "Offert", label: "sans carte bancaire" }].map((proof) => (
                     <div key={proof.label} className="coai-diagnostic-proof">
                       <strong>{proof.value}</strong>
                       <span>{proof.label}</span>
@@ -1561,11 +1561,11 @@ export function DiagnosticQuiz({
                 </div>
               ) : (
                 <Button onClick={startDiagnostic} className="coai-scan-launch mt-2 whitespace-nowrap px-5 py-3.5 text-[0.78rem] min-[390px]:px-8 min-[390px]:text-sm">
-                  Lancer mon scan COAI
+                  Commencer mon bilan offert
                 </Button>
               )}
               <span className="text-xs text-graphite-600">
-                Gratuit · résultat immédiat · estimation de forme, pas une mesure médicale
+                Questionnaire de forme · basé sur tes réponses · pas un diagnostic médical
               </span>
             </div>
           )}
