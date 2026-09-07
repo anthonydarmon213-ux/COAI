@@ -125,7 +125,9 @@ export async function PilierPage({
   const plan = getEffectivePlan(user.subscription);
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
   const indexPilierActif = PILIERS.indexOf(pilierActif);
-  const aUnContenu = Boolean(valides[indexPilierActif] || derniers[indexPilierActif]);
+  const dernierActif = derniers[indexPilierActif];
+  const aUnContenu = Boolean(valides[indexPilierActif] || dernierActif?.statut === "GENERE_IA");
+  const enValidation = !aUnContenu && dernierActif?.statut === "EN_ATTENTE";
 
   // Score sommeil (19/08/2026, demande Anthony) — requête limitée au pilier
   // Récupération, jamais chargée pour Entraînement/Nutrition.
@@ -203,7 +205,7 @@ export async function PilierPage({
               </div>
               <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{heroParPilier[pilierActif].titre}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
-                {heroParPilier[pilierActif].texte}
+                {enValidation ? "Ton programme attend la validation de ton coach. En attendant, tu peux enregistrer tes exercices dans RepCount." : heroParPilier[pilierActif].texte}
               </p>
             </div>
             {/* La carte Story a laisse place au telechargement de la fiche
@@ -211,14 +213,14 @@ export async function PilierPage({
                 story, aucun interet — la fiche seance, ca c'est beau, c'est
                 ca qu'il faut pouvoir telecharger"). La fiche reunit les trois
                 piliers en un seul PDF. */}
-            <div className="flex flex-wrap gap-2">
+            {aUnContenu && <div className="flex flex-wrap gap-2">
               <a
                 href="/api/programmes/fiche-complete"
                 className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-semibold transition"
               >
                 Télécharger ma fiche (PDF)
               </a>
-            </div>
+            </div>}
           </div>
 
           <nav aria-label="Choisir un pilier" className="coai-pillar-switcher">
@@ -235,7 +237,7 @@ export async function PilierPage({
             ))}
           </nav>
 
-          <div className="coai-pillar-daily flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          {aUnContenu && <div className="coai-pillar-daily flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">À faire en premier · 45 secondes</p>
               <h2 className="mt-1.5 text-lg font-semibold text-white">Comment te sens-tu aujourd&apos;hui ?</h2>
@@ -244,7 +246,7 @@ export async function PilierPage({
             <Link href="/dashboard#check-in-du-jour" className="coai-pillar-primary inline-flex shrink-0 items-center justify-center rounded-full px-5 py-3 text-sm font-bold transition">
               Faire mon bilan →
             </Link>
-          </div>
+          </div>}
 
           <a
             href={`#pilier-${pilierActif.toLowerCase()}`}
@@ -259,7 +261,7 @@ export async function PilierPage({
                 <span className="mt-1 block max-w-[36rem] text-sm leading-5 text-graphite-100">{titresApercu[indexPilierActif]}</span>
               </span>
               <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${aUnContenu ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-graphite-400"}`}>
-                {aUnContenu ? "Prêt" : "À créer"}
+                {aUnContenu ? "Prêt" : enValidation ? "En validation" : "À créer"}
               </span>
             </span>
           </a>
@@ -273,7 +275,7 @@ export async function PilierPage({
         </p>
       </details>
 
-      {!peutGenerer && !aUnContenu && (
+      {!peutGenerer && !aUnContenu && !enValidation && (
         <Card className="flex flex-col items-start gap-4 p-5 sm:p-8">
           <p className="text-sm font-semibold leading-6 text-graphite-200">
             Ton profil est prêt. Un seul programme, tout inclus — pas juste l&apos;entraînement.
@@ -321,6 +323,9 @@ export async function PilierPage({
                 <p className="text-sm leading-6 text-graphite-300">
                   Son contenu reste privé jusqu&apos;à sa validation.
                 </p>
+                <Link href="/suivi/repcount" className="coai-pillar-primary mx-auto inline-flex rounded-full px-5 py-3 text-sm font-bold">
+                  Enregistrer mes exercices dans RepCount →
+                </Link>
               </Card>
             </section>
           );
