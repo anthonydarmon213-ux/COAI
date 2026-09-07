@@ -140,6 +140,7 @@ model User {
 
   @@index([checkoutStartedAt, checkoutReminderSentAt])
   @@index([firstValueReminderSentAt, createdAt])
+  @@index([parraineParId])
   @@map("users")
 }
 
@@ -157,6 +158,7 @@ model CoachNote {
   updatedAt DateTime @updatedAt
 
   @@index([clientId, createdAt])
+  @@index([authorId])
   @@map("coach_notes")
 }
 
@@ -608,6 +610,7 @@ model Avis {
   commentaire String
   createdAt   DateTime @default(now())
 
+  @@index([userId])
   @@map("avis")
 }
 
@@ -689,6 +692,7 @@ model Mesure {
   photoPath                  String?
   createdAt                  DateTime @default(now())
 
+  @@index([userId])
   @@map("mesures")
 }
 
@@ -725,6 +729,7 @@ model TestMaxi {
   notes     String?
   createdAt DateTime     @default(now())
 
+  @@index([userId])
   @@map("tests_maxi")
 }
 
@@ -742,6 +747,7 @@ model WhatsAppEvent {
   payload   Json
   createdAt DateTime          @default(now())
 
+  @@index([userId])
   @@map("whatsapp_events")
 }
 
