@@ -26,9 +26,9 @@ function tierId(plan: string) {
 }
 
 const COMPARAISON_RAPIDE = [
-  ["Standard IA", "Je veux avancer dès maintenant", "7 jours offerts · dès 9,92 €/mois"],
-  ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
+  ["Standard IA", "Je veux avancer dès maintenant", "7 jours offerts · 19,99 €/mois ou 119 €/an"],
   ["Premium Remote", "Je veux une transformation encadrée à distance", "960 € · transformation sur 3 mois"],
+  ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
 ] as const;
 
 export const metadata: Metadata = {
@@ -122,11 +122,12 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </div>
       </section>
 
-      <section
-        id="pass-ia"
-        className="relative w-full max-w-5xl scroll-mt-24 overflow-hidden rounded-[2rem] border border-cyan-300/35 bg-[radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(212,175,55,0.14),transparent_38%),rgba(255,255,255,0.035)] px-6 py-8 shadow-[0_32px_120px_-55px_rgba(56,189,248,0.7)] sm:px-10 sm:py-10"
-        aria-labelledby="standard-ia-title"
-      >
+      <div className="flex w-full flex-col items-center gap-8">
+        <section
+          id="pass-ia"
+          className="relative order-1 w-full max-w-5xl scroll-mt-24 overflow-hidden rounded-[2rem] border border-cyan-300/35 bg-[radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(212,175,55,0.14),transparent_38%),rgba(255,255,255,0.035)] px-6 py-8 shadow-[0_32px_120px_-55px_rgba(56,189,248,0.7)] sm:px-10 sm:py-10"
+          aria-labelledby="standard-ia-title"
+        >
         <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border border-cyan-200/20 bg-cyan-300/[0.06] blur-[1px]" />
         <div className="relative grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
           <div>
@@ -163,12 +164,12 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             <div className="mt-6 space-y-2.5">
               <SubscribeButton plan="PASS_IA" billing="MONTHLY" label="Démarrer mes 7 jours offerts" className="coai-rainbow-cta w-full border-0 text-[#111216]" />
               <SubscribeButton plan="PASS_IA" billing="QUARTERLY" label={`3 mois · ${prixTrimestreCentimes() / 100}€`} className="w-full border border-cyan-300/25 bg-cyan-300/[0.07] text-cyan-100" />
-              <SubscribeButton plan="PASS_IA" billing="ANNUAL" label="Annuel · 119€ (meilleure valeur)" className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200" />
+              <SubscribeButton plan="PASS_IA" billing="ANNUAL" label="Annuel · 119€ (meilleure valeur)" className="w-full border border-laiton-400/35 bg-laiton-400/10 text-[#111216]" />
             </div>
             <p className="mt-4 text-center text-[11px] text-graphite-400">🔒 Paiement sécurisé · aucun prélèvement avant la fin de l’essai</p>
           </div>
         </div>
-      </section>
+        </section>
 
       {/* Deux cartes principales (22/08/2026, demande Anthony) — VIP sort
           de la grille et devient un lien d'upsell sous les cartes : à trois
@@ -196,9 +197,9 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           pack 3 mois, pas le prix/séance (même jour, "on ne vend pas des
           séances on vend une transformation") — champs repris directement de
           TIER_BY_SERVICE.VIP pour ne jamais diverger de tiers.ts. */}
-      <div className="w-full max-w-5xl rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+      <div id="full-presentiel" className="order-3 w-full max-w-5xl scroll-mt-24 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0 flex-1">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
               {TIER_BY_SERVICE.VIP.eyebrow}
             </p>
@@ -240,7 +241,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
               Facture professionnelle fournie, déductible en frais d&apos;entreprise.
             </p>
           </div>
-          <div className="shrink-0 space-y-2">
+          <div className="w-full space-y-2 lg:w-auto lg:min-w-[22rem] lg:shrink-0">
             <a
               className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
               href={vipReservationHref(TIER_BY_SERVICE.VIP.devisWhatsappLabel ?? TIER_BY_SERVICE.VIP.nom, TIER_BY_SERVICE.VIP.devisPriceLabel ?? `${TIER_BY_SERVICE.VIP.prix} ${TIER_BY_SERVICE.VIP.suffixe}`) ?? "/vip"}
@@ -266,7 +267,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
         </div>
       </div>
 
-      <div className="grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="order-2 grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
         {TIERS.filter((tier) => tier.plan === "STANDARD").map((tier) => (
           <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
             <div className="flex min-h-6 items-center justify-between gap-3">
@@ -352,7 +353,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
                           plan="PASS_IA"
                           billing="ANNUAL"
                           label="Choisir l'annuel · 119€/an"
-                          className="w-full border border-laiton-400/35 bg-laiton-400/10 text-laiton-200"
+                          className="w-full border border-laiton-400/35 bg-laiton-400/10 text-[#111216]"
                         />
                         {/* Marche intermediaire (02/09/2026) : l'ecart entre
                             19,99 €/mois et 9,92 €/mois en annuel laissait
@@ -394,6 +395,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
             )}
           </Card>
         ))}
+      </div>
       </div>
 
       <div className="w-full max-w-5xl rounded-2xl border border-white/[0.08] bg-white/[0.025] px-5 py-4 text-center">
