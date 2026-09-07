@@ -5,6 +5,7 @@ import { sendEmail, sendAdminNotification } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
+import { hasDiagnosticOptOut } from "@/lib/email/diagnostic-suppression";
 import { stripe } from "@/lib/stripe/client";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
@@ -391,6 +392,7 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
     where: {
       conversionReminderSentAt: null,
       resultEmailSentAt: { not: null },
+      optedOutAt: null,
       createdAt: {
         gte: new Date(maintenant - RELANCE_DIAGNOSTIC_FENETRE_MS),
         lte: new Date(maintenant - RELANCE_DIAGNOSTIC_APRES_MS),
@@ -419,6 +421,9 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
       continue;
     }
 
+    if (await hasDiagnosticOptOut(email)) continue;
+    const unsubscribe = buildUnsubscribeLink(appUrl, email);
+    if (!unsubscribe) continue;
     const envoye = await sendEmail(
       email,
       "Ton espace COAI est prêt",
@@ -429,7 +434,7 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
         `Créer mon espace et poser mon premier repère : ${appUrl}/sign-up?redirect_to=%2Fbienvenue\n\n` +
         `C'est gratuit, sans carte bancaire et cela prend moins d'une minute. ` +
         `Tu découvriras ensuite l'accompagnement recommandé, seulement après avoir essayé COAI.\n\n` +
-        `À bientôt,\nL'équipe COAI`
+        `À bientôt,\nL'équipe COAI\n\nNe plus recevoir ces emails : ${unsubscribe}`
     );
     if (!envoye) continue;
 
@@ -517,8 +522,10 @@ async function relancerComptesSansPremierRepere(appUrl: string): Promise<number>
 
   let relancesPremiereValeur = 0;
   for (const user of candidats) {
+    if (await hasDiagnosticOptOut(user.email)) continue;
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const unsubscribe = buildUnsubscribeLink(appUrl, user.email);
+    if (!unsubscribe) continue;
     const envoye = await sendEmail(
       user.email,
       "Ton premier repère COAI prend moins d'une minute",

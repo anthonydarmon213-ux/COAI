@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/client";
 import { sendEmail } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
+import { hasDiagnosticOptOut } from "@/lib/email/diagnostic-suppression";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 // Séquence de nurture post-diagnostic (16/08/2026, "machine d'acquisition
@@ -114,7 +115,9 @@ async function envoyerEtape(etape: Etape, appUrl: string): Promise<number> {
       continue;
     }
 
+    if (await hasDiagnosticOptOut(email)) continue;
     const unsubscribe = buildUnsubscribeLink(appUrl, email);
+    if (!unsubscribe) continue;
     const envoye = await sendEmail(email, etape.sujet, etape.corps(appUrl, unsubscribe));
     if (!envoye) continue;
 
