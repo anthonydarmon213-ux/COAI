@@ -7,6 +7,7 @@ import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
 import { hasDiagnosticOptOut, isDiagnosticReminderDue } from "@/lib/email/diagnostic-suppression";
 import { stripe } from "@/lib/stripe/client";
+import { sendDiagnosticReminder } from "@/lib/email/send-diagnostic-reminder";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
 // Coaching Hybride/Premium le 11/08/2026). À l'origine réservé au palier
@@ -425,8 +426,9 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
     if (!(await isDiagnosticReminderDue(email, "conversionReminderSentAt"))) continue;
     const unsubscribe = buildUnsubscribeLink(appUrl, email);
     if (!unsubscribe) continue;
-    const envoye = await sendEmail(
+    const envoye = await sendDiagnosticReminder(
       email,
+      "conversionReminderSentAt",
       "Ton espace COAI est prêt",
       `Bonjour,\n\n` +
         `Tu as terminé ton bilan de forme COAI, mais tu n'as pas encore créé ton espace personnel. ` +

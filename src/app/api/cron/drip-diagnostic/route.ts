@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/client";
-import { sendEmail } from "@/lib/email/client";
+import { sendDiagnosticReminder } from "@/lib/email/send-diagnostic-reminder";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
 import { hasDiagnosticOptOut, isDiagnosticReminderDue } from "@/lib/email/diagnostic-suppression";
@@ -119,7 +119,7 @@ async function envoyerEtape(etape: Etape, appUrl: string): Promise<number> {
     if (!(await isDiagnosticReminderDue(email, etape.champ))) continue;
     const unsubscribe = buildUnsubscribeLink(appUrl, email);
     if (!unsubscribe) continue;
-    const envoye = await sendEmail(email, etape.sujet, etape.corps(appUrl, unsubscribe));
+    const envoye = await sendDiagnosticReminder(email, etape.champ, etape.sujet, etape.corps(appUrl, unsubscribe));
     if (!envoye) continue;
 
     await prisma.diagnosticLead.updateMany({

@@ -336,6 +336,33 @@ model Subscription {
 // le même webhook plusieurs fois : cette table évite les notifications,
 // récompenses de parrainage et mutations répétées. Aucun contenu bancaire
 // ni payload Stripe n'est conservé.
+model EmailRecipientGate {
+  recipientKey      String @id
+  nextAllowedAt     DateTime?
+  activeDeliveryKey String?
+  updatedAt        DateTime @default(now())
+  deliveries       EmailDelivery[]
+
+  @@map("email_recipient_gates")
+}
+
+// Contrainte des états et index unique partiel définis dans la migration SQL.
+model EmailDelivery {
+  deliveryKey  String @id
+  recipientKey String
+  recipient    EmailRecipientGate @relation(fields: [recipientKey], references: [recipientKey], onDelete: NoAction, onUpdate: NoAction)
+  kind         String
+  state        String @default("RESERVED")
+  providerId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  sentAt       DateTime?
+
+  @@index([state, createdAt], map: "email_deliveries_state_created_idx")
+  @@index([recipientKey], map: "email_deliveries_recipient_idx")
+  @@map("email_deliveries")
+}
+
 model StripeWebhookEvent {
   id          String   @id
   type        String
