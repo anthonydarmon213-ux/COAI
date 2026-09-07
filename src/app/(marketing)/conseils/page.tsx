@@ -16,6 +16,22 @@ export const metadata: Metadata = {
 
 const ARTICLES = [
   {
+    href: "/conseils/bienfaits-musculation",
+    categorie: "Musculation · Santé",
+    titre: "Les bienfaits de la musculation après 35 ans",
+    description:
+      "Force, os, silhouette, autonomie et bien-être : pourquoi le renforcement musculaire est un véritable investissement santé — sans rechercher le volume à tout prix.",
+    lecture: "9 min",
+  },
+  {
+    href: "/conseils/pourquoi-prendre-un-coach-sportif",
+    categorie: "Coaching · Progression",
+    titre: "Pourquoi prendre un coach, même quand on sait déjà s’entraîner ?",
+    description:
+      "Les athlètes de haut niveau ne manquent pas d’exercices. Ils s’entourent pour mieux décider, ajuster leur charge, recevoir du feedback et rester réguliers. Voici ce que cela change aussi dans la vraie vie.",
+    lecture: "9 min",
+  },
+  {
     href: "/conseils/prevenir-sarcopenie",
     categorie: "Force · Longévité",
     titre: "Sarcopénie : comment préserver sa force et son autonomie ?",

@@ -178,6 +178,14 @@ export default function PrevenirSarcopeniePage() {
               <li><a className="text-cyan-200 underline underline-offset-4" href="https://www.has-sante.fr/upload/docs/application/pdf/2019-07/app_248_ref_aps_pa_vf.pdf" target="_blank" rel="noreferrer">Haute Autorité de Santé : activité physique chez les personnes âgées</a></li>
             </ul>
           </section>
+
+          <section className="rounded-3xl border border-white/[0.08] bg-white/[0.025] p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-laiton-200">À lire ensuite</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Link className="text-cyan-200 underline underline-offset-4" href="/conseils/bienfaits-musculation">Les bienfaits de la musculation après 35 ans →</Link>
+              <Link className="text-cyan-200 underline underline-offset-4" href="/conseils/pourquoi-prendre-un-coach-sportif">Pourquoi prendre un coach sportif ? →</Link>
+            </div>
+          </section>
         </div>
 
         <aside className="mt-12 rounded-[2rem] border border-laiton-300/35 bg-laiton-300/[0.08] p-7 text-center sm:p-10">
