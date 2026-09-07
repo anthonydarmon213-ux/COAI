@@ -93,7 +93,13 @@ const PDF_SLUG: Record<Pilier, string> = {
 // Chaque pilier possède sa page dédiée. Le composant reste partagé pour
 // conserver la même qualité visuelle, mais il ne rend que le contenu demandé
 // par la route active : entraînement, alimentation ou récupération.
-export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
+export async function PilierPage({
+  pilierActif,
+  premiereSeance = false,
+}: {
+  pilierActif: Pilier;
+  premiereSeance?: boolean;
+}) {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
@@ -397,7 +403,7 @@ export async function PilierPage({ pilierActif }: { pilierActif: Pilier }) {
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParPilier[i]} dureeProfil={user.profile?.dureeSeanceMinutes} />;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParPilier[i]} dureeProfil={user.profile?.dureeSeanceMinutes} premiereSeance={premiereSeance} />;
                 if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParPilier[i]} />;
                 if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParPilier[i]} sexe={user.profile?.sexe} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;

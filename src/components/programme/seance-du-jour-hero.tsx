@@ -19,16 +19,21 @@ export function SeanceDuJourHero({
   contenu,
   photosParExercice,
   dureeProfil,
+  premiereSeance = false,
 }: {
   contenu: unknown;
   photosParExercice?: Record<string, string | null>;
   dureeProfil?: number | null;
+  premiereSeance?: boolean;
 }) {
-  const seance = getWorkoutForDate(contenu, new Date());
+  const premiereSeanceDuProgramme = isPlainObject(contenu) && Array.isArray(contenu.seances)
+    ? contenu.seances.find(isPlainObject) ?? null
+    : null;
+  const seance = premiereSeance ? premiereSeanceDuProgramme : getWorkoutForDate(contenu, new Date());
 
   if (!seance || !isPlainObject(seance)) {
     return (
-      <section className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] px-5 py-5">
+      <section id="seance-du-jour" className="scroll-mt-24 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] px-5 py-5">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Aujourd&apos;hui</p>
         <h2 className="mt-1.5 text-lg font-semibold text-white">Journée de récupération.</h2>
         <p className="mt-1 text-xs leading-5 text-graphite-400">
@@ -50,7 +55,7 @@ export function SeanceDuJourHero({
   const minutes = getSessionDuration(seance, dureeProfil ?? 45);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-laiton-400/30 bg-white/[0.03]">
+    <section id="seance-du-jour" className="relative scroll-mt-24 overflow-hidden rounded-2xl border border-laiton-400/30 bg-white/[0.03]">
       {photoUrl && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- source Pexels externe */}
@@ -60,7 +65,9 @@ export function SeanceDuJourHero({
       )}
 
       <div className="relative px-5 py-5">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Ta séance d&apos;aujourd&apos;hui</p>
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
+          {premiereSeance ? "Ta première séance" : "Ta séance d’aujourd’hui"}
+        </p>
         <h2 className="mt-1.5 font-display text-xl font-semibold text-white">{nom}</h2>
 
         <div className="mt-2 flex flex-wrap gap-1.5">

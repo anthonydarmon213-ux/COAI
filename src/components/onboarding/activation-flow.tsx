@@ -266,7 +266,7 @@ export function ActivationFlow({
         <p className="max-w-sm text-sm leading-6 text-graphite-300">
           Entraînement, nutrition et récupération, personnalisés à partir de ton profil.
         </p>
-        <Link href="/programme/entrainement">
+        <Link href="/programme/entrainement?onboarding=1#seance-du-jour">
           <Button className="px-8 py-3">Commencer ma première séance</Button>
         </Link>
       </div>

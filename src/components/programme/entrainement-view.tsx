@@ -20,11 +20,13 @@ export function EntrainementView({
   showContreIndications = false,
   photosParExercice,
   dureeProfil,
+  premiereSeance = false,
 }: {
   data: unknown;
   showContreIndications?: boolean;
   photosParExercice?: Record<string, string | null>;
   dureeProfil?: number | null;
+  premiereSeance?: boolean;
 }) {
   if (!isPlainObject(data)) return <JsonView data={data} typeMedia="exercice" />;
 
@@ -50,7 +52,7 @@ export function EntrainementView({
       {showContreIndications && <ContreIndications items={contreIndications} />}
       {/* Séance du jour en tête (22/08/2026) — le lecteur est accessible en
           un clic, sans avoir à deviner quel jour ouvrir dans l'accordéon. */}
-      <SeanceDuJourHero contenu={data} photosParExercice={photosParExercice} dureeProfil={dureeProfil} />
+      <SeanceDuJourHero contenu={data} photosParExercice={photosParExercice} dureeProfil={dureeProfil} premiereSeance={premiereSeance} />
       <Link
         href="/suivi/repcount"
         className="group flex items-center justify-between gap-4 rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/[0.08] to-laiton-400/[0.07] p-4 transition hover:border-cyan-300/40"
