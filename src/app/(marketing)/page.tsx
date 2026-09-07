@@ -118,11 +118,11 @@ function CorpsCompletSection() {
             id="corps-complet-title"
             className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.04em] text-white sm:text-5xl"
           >
-            Un corps complet. Pas seulement musclé.
+            Pas de gonflette. Du muscle utile.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg">
-            COAI développe tes capacités physiques et les habitudes qui permettent à ton corps
-            de progresser, récupérer et durer.
+            COAI ne recherche pas le volume à tout prix. On construit un corps fort, mobile,
+            coordonné et endurant, au service de ta santé. La silhouette athlétique en découle.
           </p>
         </div>
 
@@ -346,6 +346,27 @@ export default function LandingPage() {
       <PiliersVisuelsSection />
 
       <CorpsCompletSection />
+
+      <Reveal>
+        <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-12 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-3xl">
+            <SectionLabel>Conseils COAI · longévité</SectionLabel>
+            <h2 className="mt-4 font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
+              Sarcopénie : pourquoi le muscle utile protège ton avenir.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-graphite-300">
+              Comprendre la perte de force liée à l’âge et les leviers concrets pour préserver
+              muscle, équilibre, autonomie et qualité de vie.
+            </p>
+          </div>
+          <Link
+            href="/conseils/prevenir-sarcopenie"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-300/[0.06] px-6 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/55 hover:bg-cyan-300/[0.1]"
+          >
+            Lire l’article →
+          </Link>
+        </section>
+      </Reveal>
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 py-20 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
         <div>

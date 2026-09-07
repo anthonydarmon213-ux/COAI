@@ -14,6 +14,9 @@ import { CoaiMark } from "@/components/brand/coai-mark";
 //   Standard IA et Premium Remote n'en ont pas — asymetrie qui donnait plus
 //   de poids visuel a une offre qu'aux deux autres. Reste accessible via
 //   "Nos accompagnements" (/pricing), qui liste les trois.
+// "Conseils" devient le cinquieme lien le 07/09/2026 : contrairement aux
+// anciennes ancres retirees, il ouvre un contenu editorial distinct et rend
+// le nouveau blog sante/longevite accessible sans alourdir le parcours CTA.
 const LIENS = [
   { href: "/", label: "Accueil" },
   // Accès direct aux tarifs (11/08/2026, correction Anthony) : le diagnostic
@@ -21,6 +24,7 @@ const LIENS = [
   // obligatoire avant de consulter les offres — cf. /pricing, déjà public.
   { href: "/pricing", label: "Nos accompagnements" },
   { href: "/entreprise", label: "COAI Entreprise" },
+  { href: "/conseils", label: "Conseils" },
   { href: "/a-propos", label: "À propos" },
 ];
 
