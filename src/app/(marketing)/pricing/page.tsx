@@ -28,7 +28,7 @@ function tierId(plan: string) {
 const COMPARAISON_RAPIDE = [
   ["Standard IA", "Je veux avancer dès maintenant", "7 jours offerts · dès 9,92 €/mois"],
   ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
-  ["Premium Remote", "Je veux un coaching 1:1 à distance", "960 €/3 mois minimum (soit 80 €/séance)"],
+  ["Premium Remote", "Je veux une transformation encadrée à distance", "960 € · transformation sur 3 mois"],
 ] as const;
 
 export const metadata: Metadata = {

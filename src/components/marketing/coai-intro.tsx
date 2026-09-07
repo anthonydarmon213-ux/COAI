@@ -40,9 +40,15 @@ export function CoaiIntro() {
           Pour dirigeants &amp; entrepreneurs de 35 à 65 ans
         </p>
 
-        <h1 className="mt-6 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
+        <h1 className="mt-5 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
           Retrouve un corps fort et ton énergie,
-          <span className="mt-2 block bg-gradient-to-r from-cyan-200 via-white to-laiton-200 bg-clip-text text-transparent">sans sacrifier ton agenda.</span>
+          {/* Couleur pleine volontaire : le couple bg-clip-text /
+              text-transparent disparaissait dans certains WebViews Chromium,
+              laissant visuellement un grand trou au milieu du hero alors que
+              la phrase restait présente dans l'arbre d'accessibilité. */}
+          <span className="mt-2 block text-laiton-200 drop-shadow-[0_0_28px_rgba(212,175,55,.22)]">
+            sans sacrifier ton agenda.
+          </span>
         </h1>
 
         {/* Reformule le 04/09/2026 (Anthony : « la methode d'un coach
@@ -52,17 +58,17 @@ export function CoaiIntro() {
             ce qui se lisait comme une liste plutot qu'une phrase. Le "avec"
             relie proprement le diplome a l'experience, et le prenom cree un
             lien direct avec la photo d'Anthony juste en dessous. */}
-        <p className="mt-8 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
+        <p className="mt-6 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
           La Méthode COAI Adapt transforme ton bilan en plan quotidien qui évolue avec
           ton sommeil, ton énergie, tes déplacements et tes progrès.
         </p>
 
-        <div className="mt-10">
+        <div className="mt-8">
           {/* coai-cta-glow : halo laiton qui respire autour du bouton
               (cf. globals.css) — reprend l'effet de charlesdenis.fr. */}
           <span className="coai-cta-glow">
             <LeadCtaLink placement="hero" className="px-10 py-5 text-sm font-extrabold sm:text-base">
-              Découvrir mon Âge COAI →
+              Faire mon bilan de forme offert →
             </LeadCtaLink>
           </span>
           {/* Ligne de reassurance retiree le 04/09/2026 (Anthony : « enleve »). */}
@@ -101,7 +107,7 @@ export function CoaiIntro() {
           on n'en voyait qu'un filet. En portrait plein cadre ici, elle est
           enfin lisible, et c'est elle qui porte la confiance — un visage réel
           plutôt qu'un visuel généré. */}
-      <div className="relative z-10 mx-auto mt-16 w-full max-w-lg sm:mt-20">
+      <div className="relative z-10 mx-auto mt-12 w-full max-w-lg sm:mt-16">
         <div className="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] border-x border-t border-cyan-300/20 shadow-[0_-30px_120px_-40px_rgba(56,189,248,.34)]">
           {/* Recadrage : la photo source est un portrait haut dont le tiers
               supérieur est le plafond et les sangles TRX. En plein cadre, il

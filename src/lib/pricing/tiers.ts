@@ -186,7 +186,7 @@ export const TIERS: Tier[] = [
     eyebrow: "COACHING 1:1 AVEC ANTHONY · 15 PLACES MAX",
     prix: "960 €",
     suffixe: "/ pack 3 mois minimum",
-    noteFacturation: "Soit 80 €/séance, environ 1 séance par semaine. Pack 6 mois : 1 920 € (même tarif à la séance).",
+    noteFacturation: "Ta transformation physique sur 3 mois, accompagnée personnellement par Anthony. Parcours 6 mois : 1 920 €.",
     description:
       "Une expérience de transformation physique encadrée personnellement par moi, à distance, sur un engagement minimum de 3 mois (ou 6 pour aller plus loin) — payé en une fois. Ton programme, tes ajustements et ton suivi, sans jamais rester seul entre deux séances.",
     features: [
@@ -200,8 +200,8 @@ export const TIERS: Tier[] = [
     plan: "STANDARD",
     limitedSpots: true,
     sessions: [
-      { count: 3, label: "Pack 3 mois minimum (~12 séances, 1/semaine)", prix: "960 € au total (soit 80 €/séance)" },
-      { count: 6, label: "Pack 6 mois (~24 séances, 1/semaine)", prix: "1 920 € au total (soit 80 €/séance)" },
+      { count: 3, label: "Transformation accompagnée sur 3 mois", prix: "960 € au total" },
+      { count: 6, label: "Transformation approfondie sur 6 mois", prix: "1 920 € au total" },
     ],
     devisTagline: "Une transformation physique encadrée par moi à distance — pack 3 mois minimum (960 €) ou 6 mois (1 920 €), payé en une fois. 15 places maximum.",
     devisWhatsappLabel: "le Premium Remote",

@@ -217,7 +217,7 @@ const STRUCTURED_DATA = {
 // bon moment, dans le quiz lui-même et sur /pricing, pas listés d'avance
 // ici où ils ne font qu'allonger le parcours avant même de commencer.
 const PARCOURS_COURT = [
-  ["01", "Fais ton bilan gratuit", "Découvre ton Âge COAI et ton score en moins de 5 minutes, sans carte bancaire."],
+  ["01", "Fais ton bilan de forme offert", "Obtiens ton résultat et tes priorités en moins de 5 minutes, sans carte bancaire."],
   ["02", "Choisis ton accompagnement", "Ton programme personnalisé, puis Standard IA, Premium Remote ou VIP Présentiel."],
   ["03", "Commence ta première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;

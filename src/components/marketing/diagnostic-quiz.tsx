@@ -1515,7 +1515,7 @@ export function DiagnosticQuiz({
             <div className="flex flex-col items-center gap-5 py-5 text-center sm:py-10">
               <div className="coai-diagnostic-kicker" aria-label="Ton bilan initial et ton Score COAI">
                 <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-                <span>Bilan offert · Âge COAI &amp; Score COAI</span>
+                <span>Bilan de forme offert · résultat immédiat</span>
               </div>
               <h1 className="max-w-xl font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl">
                 {resumable ? "Reprenons où tu t'étais arrêté(e)." : "Quel âge a vraiment ton corps ?"}
