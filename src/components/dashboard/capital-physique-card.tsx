@@ -71,7 +71,7 @@ export function CapitalPhysiqueCard({
             Force, mobilité, équilibre, coordination, endurance et posture : COAI construit une vision utile de ton corps, puis fait évoluer ton programme avec toi.
           </p>
 
-          <div className="relative mx-auto mt-7 aspect-square w-full max-w-[18rem]" aria-label={`Cartographie complétée sur ${nombreMesures} qualités physiques sur 6`}>
+          <div className="relative mx-auto mt-7 aspect-square w-full max-w-[18rem]" aria-label={`Cartographie complétée : ${nombreMesures} ${nombreMesures > 1 ? "qualités physiques suivies" : "qualité physique suivie"} sur 6`}>
             <div aria-hidden="true" className="absolute inset-[13%] animate-pulse rounded-full bg-cyan-300/[0.045] blur-xl" />
             <svg viewBox="0 0 200 200" className="relative h-full w-full overflow-visible" role="img" aria-hidden="true">
               <defs>
