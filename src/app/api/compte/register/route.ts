@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { profileDepuisReponsesLead } from "@/lib/diagnostic/profile-from-lead";
 
 const bodySchema = z.object({
   consentRgpd: z.boolean(),
@@ -48,6 +49,33 @@ export async function POST(request: Request) {
     parraineParId = parrain?.id;
   }
 
+  // Récupération serveur du dernier vrai bilan associé à l'adresse
+  // authentifiée. Le pont localStorage reste utile pour une navigation dans
+  // le même navigateur, mais ne suffit pas lorsqu'une personne ouvre son
+  // email de confirmation sur un autre appareil. On limite la recherche aux
+  // 30 derniers jours et le convertisseur ignore les autres types de leads
+  // (newsletter, appel découverte, entreprise...).
+  const leadsRecents = await prisma.diagnosticLead.findMany({
+    where: {
+      email: { equals: authUser.email, mode: "insensitive" },
+      resultEmailSentAt: { not: null },
+      createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+    },
+    select: {
+      reponses: true,
+      utmSource: true,
+      utmMedium: true,
+      utmCampaign: true,
+      utmContent: true,
+      utmTerm: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+  const leadAvecProfil = leadsRecents
+    .map((lead) => ({ lead, profile: profileDepuisReponsesLead(lead.reponses) }))
+    .find((item) => item.profile);
+
   const user = await prisma.user.upsert({
     where: { supabaseAuthId: authUser.id },
     update: {},
@@ -58,13 +86,24 @@ export async function POST(request: Request) {
       consentRgpdAt: new Date(),
       consentSanteAt: new Date(),
       parraineParId,
-      utmSource: parsed.data.utmSource,
-      utmMedium: parsed.data.utmMedium,
-      utmCampaign: parsed.data.utmCampaign,
-      utmContent: parsed.data.utmContent,
-      utmTerm: parsed.data.utmTerm,
+      utmSource: parsed.data.utmSource ?? leadAvecProfil?.lead.utmSource,
+      utmMedium: parsed.data.utmMedium ?? leadAvecProfil?.lead.utmMedium,
+      utmCampaign: parsed.data.utmCampaign ?? leadAvecProfil?.lead.utmCampaign,
+      utmContent: parsed.data.utmContent ?? leadAvecProfil?.lead.utmContent,
+      utmTerm: parsed.data.utmTerm ?? leadAvecProfil?.lead.utmTerm,
     },
   });
+
+  // Jamais d'écrasement : si le profil existe déjà, l'appel idempotent à
+  // register ne modifie aucune donnée. Le consentement santé vient d'être
+  // explicitement recueilli avant cette copie.
+  if (leadAvecProfil?.profile) {
+    await prisma.profile.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: { userId: user.id, ...leadAvecProfil.profile },
+    });
+  }
 
   return NextResponse.json(user, { status: 201 });
 }
