@@ -75,7 +75,16 @@ export default async function AdminBusinessPage() {
         email: true,
         createdAt: true,
         subscription: { select: { status: true, trialEnd: true } },
-        _count: { select: { seances: true, testsMaxi: true } },
+        seances: {
+          select: { createdAt: true },
+          orderBy: { createdAt: "asc" },
+          take: 1,
+        },
+        testsMaxi: {
+          select: { createdAt: true },
+          orderBy: { createdAt: "asc" },
+          take: 1,
+        },
       },
     }),
   ]);
@@ -157,9 +166,40 @@ export default async function AdminBusinessPage() {
   // RepCount est volontairement la première valeur gratuite du produit. Ne
   // compter que les séances rendait invisibles les utilisateurs qui avaient
   // déjà enregistré une charge et obtenu leur courbe de progression.
-  const actifsDepuisDiagnostic = inscritsDepuisDiagnostic.filter(
-    (user) => user._count.seances > 0 || user._count.testsMaxi > 0
+  const premiereValeurDe = (user: (typeof usersAvecAbonnement)[number]) => {
+    const dates = [user.seances[0]?.createdAt, user.testsMaxi[0]?.createdAt]
+      .filter((date): date is Date => Boolean(date))
+      .sort((a, b) => a.getTime() - b.getTime());
+    return dates[0] ?? null;
+  };
+  const actifsDepuisDiagnostic = inscritsDepuisDiagnostic.filter((user) => Boolean(premiereValeurDe(user)));
+  const delaisPremiereValeurHeures = actifsDepuisDiagnostic
+    .map((user) => {
+      const premiereValeur = premiereValeurDe(user);
+      return premiereValeur ? (premiereValeur.getTime() - user.createdAt.getTime()) / (60 * 60 * 1000) : null;
+    })
+    .filter((delai): delai is number => delai !== null && delai >= 0)
+    .sort((a, b) => a - b);
+  const milieuDelais = Math.floor(delaisPremiereValeurHeures.length / 2);
+  const valeurMilieu = delaisPremiereValeurHeures[milieuDelais] ?? null;
+  const valeurAvantMilieu = delaisPremiereValeurHeures[milieuDelais - 1] ?? valeurMilieu;
+  const delaiMedianPremiereValeur: number | null = valeurMilieu === null
+    ? null
+    : delaisPremiereValeurHeures.length % 2 === 0 && valeurAvantMilieu !== null
+      ? (valeurAvantMilieu + valeurMilieu) / 2
+      : valeurMilieu;
+  const comptesEligibles24h = inscritsDepuisDiagnostic.filter(
+    (user) => user.createdAt.getTime() <= maintenant.getTime() - 24 * 60 * 60 * 1000
   );
+  const actifsSous24h = comptesEligibles24h.filter((user) => {
+    const premiereValeur = premiereValeurDe(user);
+    return Boolean(
+      premiereValeur && premiereValeur.getTime() - user.createdAt.getTime() <= 24 * 60 * 60 * 1000
+    );
+  });
+  const tauxActivation24h = comptesEligibles24h.length > 0
+    ? (actifsSous24h.length / comptesEligibles24h.length) * 100
+    : 0;
   const essaisDepuisDiagnostic = inscritsDepuisDiagnostic.filter(
     (user) =>
       user.subscription?.status === "ACTIVE" &&
@@ -189,7 +229,7 @@ export default async function AdminBusinessPage() {
     const candidat = utilisateurParEmail.get(emailNormalise);
     const user = candidat && candidat.createdAt >= lead.createdAt ? candidat : undefined;
     if (user) ligne.comptes++;
-    if (user && (user._count.seances > 0 || user._count.testsMaxi > 0)) ligne.actifs++;
+    if (user && premiereValeurDe(user)) ligne.actifs++;
     if (
       user?.subscription?.status === "ACTIVE" &&
       user.subscription.trialEnd &&
@@ -303,10 +343,21 @@ export default async function AdminBusinessPage() {
               Mesure interne agrégée : diagnostic → compte → premier repère ou séance → essai → paiement.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <StatCard label="Diagnostics" value={String(leadsUniques)} sublabel="Prospects uniques" highlight />
             <StatCard label="Comptes créés" value={String(inscritsDepuisDiagnostic.length)} sublabel={`${tauxLeadInscription.toFixed(1)} % des diagnostics`} />
             <StatCard label="Première valeur" value={String(actifsDepuisDiagnostic.length)} sublabel={`${tauxInscriptionActivation.toFixed(1)} % des comptes`} highlight />
+            <StatCard
+              label="Activation en 24 h"
+              value={`${tauxActivation24h.toFixed(1)}%`}
+              sublabel={`${actifsSous24h.length}/${comptesEligibles24h.length} compte(s) avec 24 h de recul`}
+              highlight
+            />
+            <StatCard
+              label="Délai médian"
+              value={delaiMedianPremiereValeur === null ? "—" : delaiMedianPremiereValeur < 1 ? `${Math.max(1, Math.round(delaiMedianPremiereValeur * 60))} min` : `${delaiMedianPremiereValeur.toFixed(1)} h`}
+              sublabel="Compte → première valeur"
+            />
             <StatCard label="Essais actifs" value={String(essaisDepuisDiagnostic.length)} sublabel={`${tauxInscriptionEssai.toFixed(1)} % des comptes`} />
             <StatCard label="Clients payants" value={String(payantsDepuisDiagnostic.length)} sublabel={`${tauxLeadPayant.toFixed(1)} % des diagnostics`} highlight />
           </div>
