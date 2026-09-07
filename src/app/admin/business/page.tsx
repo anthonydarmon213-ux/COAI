@@ -89,6 +89,23 @@ export default async function AdminBusinessPage() {
     }),
   ]);
 
+  // Read-only triage: an uncertain send must never be retried from this screen.
+  const emailAttentionWhere = {
+    OR: [
+      { state: "UNCERTAIN" },
+      { state: "RESERVED", updatedAt: { lt: new Date(Date.now() - 15 * 60 * 1000) } },
+    ],
+  };
+  const [emailAttentionCount, emailAttention] = await Promise.all([
+    prisma.emailDelivery.count({ where: emailAttentionWhere }),
+    prisma.emailDelivery.findMany({
+      where: emailAttentionWhere,
+      select: { deliveryKey: true, kind: true, state: true, updatedAt: true },
+      orderBy: { updatedAt: "asc" },
+      take: 20,
+    }),
+  ]);
+
   const maintenant = new Date();
   const ilYA30Jours = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const activeSubs = subscriptions.filter((s) => s.status === "ACTIVE");
@@ -279,6 +296,36 @@ export default async function AdminBusinessPage() {
             Données réelles en direct depuis la base — généré le {genereLe}.
           </p>
         </div>
+
+        <Card>
+          <SectionLabel>Fiabilité des relances du bilan</SectionLabel>
+          <h2 className="mt-3 text-xl font-semibold">
+            {emailAttentionCount} envoi(s) à vérifier
+          </h2>
+          <p className="mt-2 text-sm text-graphite-400">
+            Résultat incertain ou réservation de plus de 15 minutes. Les prochains envois
+            à ces destinataires restent bloqués pour éviter un doublon. Vérifier les journaux
+            du fournisseur avant toute réconciliation ; aucun renvoi automatique ici.
+          </p>
+          {emailAttentionCount === 0 ? (
+            <p className="mt-3 text-sm">Aucun blocage détecté. Cela ne confirme pas la réception des emails.</p>
+          ) : (
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm font-semibold">
+                Voir les {emailAttention.length} plus anciens dossiers
+              </summary>
+              <ul className="mt-3 space-y-3">
+                {emailAttention.map((delivery) => (
+                  <li key={delivery.deliveryKey} className="rounded-xl border border-acier/25 p-3 text-sm">
+                    <p>{delivery.kind} · {delivery.state === "UNCERTAIN" ? "Résultat incertain" : "Réservation ancienne"}</p>
+                    <p className="text-graphite-400">Dernière mise à jour : {delivery.updatedAt.toISOString()} (UTC)</p>
+                    <code className="mt-1 block break-all text-xs">{delivery.deliveryKey}</code>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </Card>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} Standard IA · ${nbStandard} Premium Remote · ${essaisActifs.length} essai(s)`} highlight />
