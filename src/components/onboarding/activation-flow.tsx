@@ -56,6 +56,7 @@ export function ActivationFlow({
   coachValidationRequise,
   profilInitial,
   declencherGenerationAuto = true,
+  stripeSessionId,
 }: {
   coachValidationRequise: boolean;
   profilInitial: ProfilLike | null;
@@ -68,6 +69,7 @@ export function ActivationFlow({
   // Toujours vrai après un vrai paiement (essai ou achat immédiat) : là,
   // l'utilisateur vient de payer, il attend son programme tout de suite.
   declencherGenerationAuto?: boolean;
+  stripeSessionId?: string;
 }) {
   const [etat, setEtat] = useState<Etat>("verification");
   const [completion, setCompletion] = useState<CompletionProfil | null>(null);
@@ -77,6 +79,19 @@ export function ActivationFlow({
 
     async function lancerGeneration() {
       setEtat("generation");
+      // Le webhook reste la source normale, mais sa latence ne doit jamais
+      // retarder la valeur promise à un client revenu d'un Checkout valide.
+      if (stripeSessionId) {
+        try {
+          await fetch("/api/stripe/confirm-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId: stripeSessionId }),
+          });
+        } catch {
+          // Repli naturel : les tentatives ci-dessous attendent le webhook.
+        }
+      }
       // Best-effort contre le décalage webhook Stripe : l'abonnement/achat
       // peut ne pas être encore visible en base au moment exact où cette
       // page se charge (redirection Stripe quasi instantanée, webhook

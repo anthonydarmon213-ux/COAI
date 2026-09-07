@@ -258,6 +258,7 @@ export default async function BienvenuePage({
       <ActivationFlow
         coachValidationRequise={coachValidationRequise}
         profilInitial={user.profile ?? null}
+        stripeSessionId={sessionVerifiee?.id}
       />
 
       {/* Carte d'embarquement COAI — écho volontaire au "salon privé avant
