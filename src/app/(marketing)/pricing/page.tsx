@@ -421,7 +421,7 @@ export default function PricingPage({ searchParams }: { searchParams?: PricingSe
           sont maintenant regroupees apres les trois offres. */}
       <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
         <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
-        <p className="mt-1 text-xs text-graphite-400">Standard IA : 7 jours d&apos;essai avant le premier prélèvement. Premium Remote et VIP Présentiel se règlent sur devis, via WhatsApp — packs 3 ou 6 mois uniquement, pas de séance isolée en dehors de l&apos;essai.</p>
+        <p className="mt-1 text-xs text-graphite-400">Standard IA : 7 jours d&apos;essai avant le premier prélèvement. Premium Remote et VIP Présentiel : transformations encadrées sur 3 ou 6 mois, sur devis via WhatsApp.</p>
       </div>
 
 

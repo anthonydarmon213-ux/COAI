@@ -205,16 +205,14 @@ export const TIERS: Tier[] = [
     ],
     devisTagline: "Une transformation physique encadrée par moi à distance — pack 3 mois minimum (960 €) ou 6 mois (1 920 €), payé en une fois. 15 places maximum.",
     devisWhatsappLabel: "le Premium Remote",
-    devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel. Pas de séance isolée en dehors de l'essai.",
+    devisFootnote: "Pack payé en une fois à la signature. Places limitées à 15 pour garder un vrai suivi individuel et une transformation réellement accompagnée.",
     devisPriceLabel: "960 € pour 3 mois minimum (ou 1 920 € pour 6 mois)",
-    // Séance d'essai (04/09/2026, remplace le bouton "appel visio avant de
-    // signer" ajouté plus tôt le même jour — décision Anthony : "on ne vend
-    // pas des séances on vend une transformation", donc pas de vente à
-    // l'unité en dehors de cette unique séance test, déduite du pack si la
-    // personne enchaîne).
+    // Anthony (07/09/2026) : retirer le prix par séance de Premium Remote et
+    // vendre la transformation complète. Le second CTA reste un contact
+    // commercial à faible friction, sans créer une nouvelle offre isolée.
     devisSecondaryCta: {
-      label: "Réserver ma séance d'essai (80 €, déduite si je continue)",
-      whatsappMessage: "Bonjour Anthony, je souhaite réserver une séance d'essai pour Premium Remote (80 €, déduite du pack si je m'engage ensuite sur 3 ou 6 mois).",
+      label: "Vérifier si Premium Remote me correspond",
+      whatsappMessage: "Bonjour Anthony, j'aimerais vérifier si l'accompagnement Premium Remote correspond à mon objectif et à ma situation.",
     },
   },
   {
