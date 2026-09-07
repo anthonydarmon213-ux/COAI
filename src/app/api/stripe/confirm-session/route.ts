@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   if (!authUser) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
-  const sessionId = typeof body.sessionId === "string" ? body.sessionId : "";
+  const sessionId = body && typeof body.sessionId === "string" ? body.sessionId : "";
   if (!sessionId.startsWith("cs_")) {
     return NextResponse.json({ error: "Session Stripe invalide" }, { status: 400 });
   }
