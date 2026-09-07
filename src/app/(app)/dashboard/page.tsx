@@ -147,7 +147,7 @@ export default async function DashboardPage() {
             kicker: "Ta mission du jour",
             title: "Pose ton premier repère gratuitement.",
             description: "Choisis un exercice, note une série et découvre comment COAI construit ta courbe de progression. Aucun abonnement nécessaire pour essayer.",
-            href: "/suivi/repcount",
+            href: "/suivi/repcount?onboarding=1",
             cta: "Tester RepCount gratuitement →",
           }
       : sourceSession

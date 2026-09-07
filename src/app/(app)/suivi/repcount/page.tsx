@@ -18,7 +18,7 @@ export const metadata = {
 export default async function RepCountPage({
   searchParams,
 }: {
-  searchParams?: { exercice?: string | string[] };
+  searchParams?: { exercice?: string | string[]; onboarding?: string };
 }) {
   // Date rendue sur le serveur, forcee sur Europe/Paris : l'hebergeur tourne
   // en UTC et afficherait la veille en soiree. C'est bien ce jour-la que les
@@ -34,6 +34,7 @@ export default async function RepCountPage({
     : searchParams?.exercice ?? "";
   const user = await getCurrentAppUser();
   const hasAccess = Boolean(user && hasProgrammeAccess(user, user.subscription));
+  const onboarding = searchParams?.onboarding === "1";
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-col gap-6">
@@ -45,11 +46,12 @@ export default async function RepCountPage({
           </span>
         </div>
         <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-white">
-          Note ta série.
+          {onboarding ? "Pose ton premier repère." : "Note ta série."}
         </h1>
         <p className="mt-2 text-sm leading-6 text-graphite-300">
-          Répétitions, charge, repos. Tu vois ce que tu avais fait la dernière
-          fois, et ce que ça donne d&apos;une semaine à l&apos;autre.
+          {onboarding
+            ? "Choisis un mouvement que tu connais, ajuste ta dernière série et enregistre-la. COAI construira ta progression à partir de ce point de départ."
+            : "Répétitions, charge, repos. Tu vois ce que tu avais fait la dernière fois, et ce que ça donne d’une semaine à l’autre."}
         </p>
       </header>
 
@@ -57,6 +59,7 @@ export default async function RepCountPage({
         exercices={EXERCICES.map((e) => e.nom)}
         exerciceInitial={exerciceInitial}
         hasAccess={hasAccess}
+        onboarding={onboarding}
       />
     </main>
   );

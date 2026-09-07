@@ -350,10 +350,12 @@ export function RepCount({
   exercices,
   exerciceInitial = "",
   hasAccess = false,
+  onboarding = false,
 }: {
   exercices: string[];
   exerciceInitial?: string;
   hasAccess?: boolean;
+  onboarding?: boolean;
 }) {
   const [nom, setNom] = useState(exerciceInitial);
   const [reps, setReps] = useState(10);
@@ -415,8 +417,8 @@ export function RepCount({
     setEnregistre(false);
   }, [reps, charge]);
 
-  const enregistrer = useCallback(async () => {
-    if (!nom.trim() || sets.length === 0 || enregistrementEnCours) return;
+  const sauvegarder = useCallback(async (seriesAEnregistrer: SetSaisi[]) => {
+    if (!nom.trim() || seriesAEnregistrer.length === 0 || enregistrementEnCours) return;
     setErreur(null);
     setEnregistrementEnCours(true);
     try {
@@ -429,13 +431,14 @@ export function RepCount({
           exercices: [
             {
               nom: nom.trim(),
-              sets: sets.map((s, i) => ({ set: i + 1, reps: s.reps, charge: s.charge })),
+              sets: seriesAEnregistrer.map((s, i) => ({ set: i + 1, reps: s.reps, charge: s.charge })),
             },
           ],
         }),
       });
       if (!r.ok) throw new Error("enregistrement_refuse");
       setSets([]);
+      setRepos(null);
       setEnregistre(true);
       if (r.headers.get("X-COAI-First-Source") === "1") {
         trackFunnelEvent("first_repcount_saved");
@@ -446,7 +449,15 @@ export function RepCount({
     } finally {
       setEnregistrementEnCours(false);
     }
-  }, [nom, sets, charger, enregistrementEnCours]);
+  }, [nom, charger, enregistrementEnCours]);
+
+  const enregistrer = useCallback(async () => {
+    await sauvegarder(sets);
+  }, [sauvegarder, sets]);
+
+  const enregistrerPremierRepere = useCallback(async () => {
+    await sauvegarder([{ reps, charge }]);
+  }, [sauvegarder, reps, charge]);
 
   const Stepper = ({
     label,
@@ -494,6 +505,21 @@ export function RepCount({
 
   return (
     <div className="flex flex-col gap-5">
+      {onboarding && historique.length === 0 && !enregistre && (
+        <section className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_90%_0%,rgba(34,211,238,.15),transparent_15rem),rgba(255,255,255,.025)] p-4">
+          <div aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full border border-laiton-300/15" />
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.17em] text-laiton-200">Première victoire · moins d’une minute</p>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[10px] text-graphite-300">
+            {["Choisis", "Ajuste", "Enregistre"].map((etape, index) => (
+              <div key={etape} className="rounded-xl border border-white/[0.08] bg-black/20 px-2 py-2.5">
+                <span className="mx-auto mb-1 grid h-5 w-5 place-items-center rounded-full border border-cyan-300/25 text-[9px] font-bold text-cyan-200">{index + 1}</span>
+                {etape}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div>
         <label htmlFor="repcount-exercice" className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan-200">
           Exercice
@@ -511,6 +537,24 @@ export function RepCount({
             <option key={e} value={e} />
           ))}
         </datalist>
+        {onboarding && !nom && (
+          <div className="mt-2.5 flex flex-wrap gap-2" aria-label="Mouvements rapides">
+            {[
+              { nom: "Squat poids du corps", charge: 0 },
+              { nom: "Pompes", charge: 0 },
+              { nom: "Développé couché (barre)", charge: 20 },
+            ].map((choix) => (
+              <button
+                key={choix.nom}
+                type="button"
+                onClick={() => { setNom(choix.nom); setCharge(choix.charge); }}
+                className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-[11px] font-semibold text-graphite-200 transition hover:border-cyan-300/30 hover:text-white"
+              >
+                {choix.nom}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* La performance précédente est affichée avant la saisie : c'est elle
@@ -547,14 +591,30 @@ export function RepCount({
         <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
       </div>
 
-      <button
-        type="button"
-        onClick={ajouterSerie}
-        disabled={!nom.trim()}
-        className="rounded-full bg-cyan-300 py-4 text-base font-bold text-[#04121a] transition disabled:opacity-40"
-      >
-        Valider la série
-      </button>
+      {onboarding && sets.length === 0 && historique.length === 0 ? (
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={enregistrerPremierRepere}
+            disabled={!nom.trim() || enregistrementEnCours}
+            className="coai-rainbow-cta rounded-full py-4 text-base font-extrabold text-[#071116] transition disabled:opacity-40"
+          >
+            {enregistrementEnCours ? "Enregistrement…" : "Enregistrer mon premier repère →"}
+          </button>
+          <button type="button" onClick={ajouterSerie} disabled={!nom.trim()} className="py-2 text-xs text-graphite-400 underline disabled:opacity-40">
+            Je veux ajouter plusieurs séries
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={ajouterSerie}
+          disabled={!nom.trim()}
+          className="rounded-full bg-cyan-300 py-4 text-base font-bold text-[#04121a] transition disabled:opacity-40"
+        >
+          Valider la série
+        </button>
+      )}
 
       {repos !== null && (
         <div className="rounded-xl border border-cyan-300/25 bg-cyan-300/[0.06] px-4 py-3 text-center" role="status">
@@ -612,10 +672,17 @@ export function RepCount({
       {erreur && <p className="text-sm text-rose-300">{erreur}</p>}
       {enregistre && (
         <div className="rounded-xl border border-emerald-300/25 bg-emerald-300/[0.06] px-4 py-3" role="status">
-          <p className="text-sm font-semibold text-emerald-300">Séance enregistrée ✓</p>
+          <p className="text-sm font-semibold text-emerald-300">{onboarding ? "Premier repère posé ✓" : "Séance enregistrée ✓"}</p>
           <p className="mt-1 text-xs text-graphite-300">
-            Ta courbe est à jour. Reviens à la prochaine séance pour battre ton repère.
+            {onboarding
+              ? "Ta progression commence maintenant. La prochaine séance donnera à COAI un premier point de comparaison."
+              : "Ta courbe est à jour. Reviens à la prochaine séance pour battre ton repère."}
           </p>
+          {onboarding && (
+            <Link href="/dashboard" className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-cyan-300/25 bg-cyan-300/[0.07] px-5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/[0.12]">
+              Voir mon espace COAI →
+            </Link>
+          )}
           {!hasAccess && (
             <div className="mt-3 border-t border-emerald-200/15 pt-3">
               <p className="text-xs leading-5 text-graphite-200">
