@@ -328,7 +328,7 @@ export default async function AdminBusinessPage() {
         </Card>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} Standard IA · ${nbStandard} Premium Remote · ${essaisActifs.length} essai(s)`} highlight />
+          <StatCard label="Abonnés actifs" value={String(nbActifs)} sublabel={`${nbImpulsion} COAI Essentiel · ${nbStandard} Premium Remote · ${essaisActifs.length} essai(s)`} highlight />
           <StatCard label="MRR" value={eurCents.format(mrr)} sublabel="Revenu mensuel récurrent" highlight />
           <StatCard label="ARR projeté" value={eurCents.format(arr)} sublabel="MRR × 12" />
           <StatCard

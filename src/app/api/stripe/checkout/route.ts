@@ -15,7 +15,7 @@ import { prisma } from "@/lib/db/client";
 // était jusqu'ici ignoré côté serveur.
 const offresParPlan = () => ({
   PASS_IA: {
-    name: "COAI — Standard IA",
+    name: "COAI Essentiel",
     trialDays: 7,
     MONTHLY: { amount: 1999, interval: "month", count: 1 },
     // 49 € les 3 mois, soit 16,33 €/mois : assez proche du mensuel pour ne

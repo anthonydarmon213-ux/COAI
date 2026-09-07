@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     },
   });
 
-  // Même quota que le coach IA sur le site (4 questions/mois, Standard IA
+  // Même quota que le coach IA sur le site (4 questions/mois, COAI Essentiel
   // uniquement) — sans ça WhatsApp serait une voie de contournement du
   // quota web pour le même service.
   const estLimite = getEffectivePlan(user.subscription) === "PASS_IA";
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     if (questionsUtilisees >= QUOTA_LIMITE) {
       const reply =
-        "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre Standard IA. Passe à Premium Remote — un accompagnement individuel avec Anthony, 960€ pour un engagement de 3 mois minimum, sur devis — pour un accès illimité au coach IA et le regard d'un coach humain.";
+        "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre COAI Essentiel. Passe à Premium Remote — un accompagnement individuel avec Anthony, 960€ pour un engagement de 3 mois minimum, sur devis — pour un accès illimité au coach IA et le regard d'un coach humain.";
       await prisma.whatsAppEvent.create({
         data: { userId: user.id, direction: "OUTBOUND", payload: { reply } as Prisma.InputJsonValue },
       });

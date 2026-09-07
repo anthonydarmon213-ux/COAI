@@ -102,7 +102,7 @@ export default function CoachSportifParisPage() {
         <Card className="flex flex-col gap-3 text-center">
           <h2 className="text-lg font-semibold text-white">Accompagnement COAI à distance</h2>
           <p className="text-sm leading-6 text-graphite-300">
-            Personal Trainer IA avec Standard IA à 19,99€/mois (ou 119€/an), ou avec le regard et les ajustements
+            Personal Trainer IA avec COAI Essentiel à 19,99€/mois (ou 119€/an), ou avec le regard et les ajustements
             d&apos;un coach humain avec Premium Remote, dans le cadre d&apos;un accompagnement sur devis (engagement
             minimum 3 mois) — accessible depuis n&apos;importe où.
           </p>

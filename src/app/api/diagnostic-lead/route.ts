@@ -126,7 +126,7 @@ export async function POST(request: Request) {
   // coachPreference, sans tenir compte de la contrainte santé ni du niveau).
   const offreRecommandee = diagnostic
     ? `${diagnostic.recommandation.label} — ${diagnostic.recommandation.raison}`
-    : "Standard IA — Personal Trainer IA 24/7";
+    : "COAI Essentiel — Personal Trainer IA 24/7";
 
   const notifText = [
     `${emailNormalise} vient de terminer le diagnostic gratuit sur coai.fr.`,

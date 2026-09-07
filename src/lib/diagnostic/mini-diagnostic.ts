@@ -376,8 +376,8 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   if (r.budget === "COMMENCER_IA") {
     return {
       service: "IMPULSION",
-      label: "Standard IA",
-      raison: "Tu préfères commencer avec un budget maîtrisé : Standard IA te donne 7 jours d'essai, puis un programme complet et un Personal Trainer IA disponible 24h/24, avec mon WhatsApp en renfort si besoin.",
+      label: "COAI Essentiel",
+      raison: "Tu préfères commencer avec un budget maîtrisé : COAI Essentiel te donne 7 jours d'essai, puis un programme complet et un Personal Trainer IA disponible 24h/24, avec mon WhatsApp en renfort si besoin.",
     };
   }
 
@@ -423,7 +423,7 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
     }
     return {
       service: "IMPULSION",
-      label: "Standard IA",
+      label: "COAI Essentiel",
       raison: "Ton profil te permet de démarrer avec un Personal Trainer IA disponible 24h/24, tout en conservant un programme évolutif.",
     };
   })();

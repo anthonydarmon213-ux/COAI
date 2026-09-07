@@ -15,7 +15,7 @@ export default async function AdminSuiviPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  // Périmètre Premium Remote uniquement — Standard IA n'a aucun suivi humain
+  // Périmètre Premium Remote uniquement — COAI Essentiel n'a aucun suivi humain
   // (positionnement du palier), pas de raison de le faire remonter ici.
   const abonnesTransformation = await prisma.user.findMany({
     where: { subscription: { plan: "STANDARD", status: { in: ["ACTIVE", "PAST_DUE"] } } },

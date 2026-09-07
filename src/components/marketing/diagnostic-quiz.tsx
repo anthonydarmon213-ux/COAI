@@ -1640,7 +1640,7 @@ export function DiagnosticQuiz({
               <div className="flex flex-col gap-2">
                 <ChoixVisuel
                   label="En autonomie, avec l'IA"
-                  hint="Standard IA — mon WhatsApp si besoin"
+                  hint="COAI Essentiel — mon WhatsApp si besoin"
                   active={coachPreference === "FULL_IA"}
                   onClick={() => chooseSingle(setCoachPreference, "FULL_IA")}
                 />
@@ -1688,7 +1688,7 @@ export function DiagnosticQuiz({
           {/* Filtre budget (04/09/2026, demande Anthony) : pas de prix
               affiché, juste une question qualitative — le montant exact
               n'a rien à faire ici (cf. règle "pas de prix sur le diag").
-              Sert uniquement à recadrer vers Standard IA si la personne
+              Sert uniquement à recadrer vers COAI Essentiel si la personne
               n'a pas le budget pour un accompagnement humain. */}
           {step === "budget" && (
             <div className="flex flex-col gap-4">

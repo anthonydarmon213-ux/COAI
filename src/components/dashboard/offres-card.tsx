@@ -10,19 +10,19 @@ import type { ServiceRecommande } from "@/lib/dashboard/besoins-identifies";
 // le produit. Il découvre maintenant l'app, puis les accompagnements ici.
 //
 // Les noms affichés sont les noms COMMERCIAUX. En base, les plans portent
-// des identifiants trompeurs — le plan « GRATUIT » correspond au Standard IA
+// des identifiants trompeurs — le plan « GRATUIT » correspond au COAI Essentiel
 // facturé 19,99 €. Cette carte ne les expose jamais.
 //
 // Noms et prix mis à jour le 04/09/2026 : cette carte affichait encore
 // "Pass IA / Coaching Hybride / Coaching VIP" avec l'ancien modèle par
 // abonnement mensuel (99€/mois, 200€/séance) — jamais synchronisée avec le
 // repositionnement en pack 3/6 mois fait sur les pages publiques le même
-// jour, puis avec le renommage en Standard IA / Premium Remote / VIP
+// jour, puis avec le renommage en COAI Essentiel / Premium Remote / VIP
 // Présentiel. Prix repris de src/lib/pricing/tiers.ts.
 const OFFRES = [
   {
     service: "IMPULSION" as const,
-    nom: "Standard IA",
+    nom: "COAI Essentiel",
     prix: "19,99 €",
     unite: "/mois",
     note: "ou 119 €/an, soit 9,99 €/mois",
@@ -37,7 +37,7 @@ const OFFRES = [
     unite: "/pack 3 mois min.",
     note: "Ta transformation physique sur 3 mois, accompagnée par Anthony",
     pour: "Tu veux transformer ton corps avec Anthony à tes côtés",
-    inclus: ["Tout le Standard IA", "Échanges avec Anthony", "Ajustements personnalisés"],
+    inclus: ["Tout le COAI Essentiel", "Échanges avec Anthony", "Ajustements personnalisés"],
     href: "/pricing#full-remote",
   },
   {

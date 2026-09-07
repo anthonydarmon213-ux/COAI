@@ -15,7 +15,7 @@ export type BesoinIdentifie = {
 };
 
 export const SERVICE_INFO: Record<ServiceRecommande, { label: string; href: string }> = {
-  IMPULSION: { label: "Standard IA — 19,99€/mois ou 119€/an", href: "/pricing#pass-ia" },
+  IMPULSION: { label: "COAI Essentiel — 19,99€/mois ou 119€/an", href: "/pricing#pass-ia" },
   TRANSFORMATION: { label: "Premium Remote — dès 960€ le pack 3 mois minimum, sur devis", href: "/pricing#full-remote" },
   VIP: { label: "VIP Présentiel — dès 1 200€ le pack 3 mois minimum", href: "/pricing#full-presentiel" },
 };

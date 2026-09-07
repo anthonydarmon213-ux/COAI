@@ -86,7 +86,7 @@ export default async function CorrectionMouvementPage() {
         <section className="rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] p-6">
           {/* Nom de plan mis à jour deux fois le 04/09/2026 : "Coaching
               Hybride" (obsolète) → "Full Remote" → "Premium Remote", suite
-              au renommage des 3 offres en Standard IA / Premium Remote /
+              au renommage des 3 offres en COAI Essentiel / Premium Remote /
               VIP Présentiel demandé par Anthony. */}
           <p className="font-semibold text-white">Inclus à partir du Premium Remote.</p>
           <p className="mt-2 text-sm leading-6 text-graphite-300">

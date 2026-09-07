@@ -11,7 +11,7 @@ import { CoaiMark } from "@/components/brand/coai-mark";
 // - "Comment ca marche" : une ancre vers une section de la home, deja
 //   accessible en scrollant depuis l'accueil — redondant en haut de page.
 // - "VIP Presentiel" : un lien dedie a une seule des trois offres, alors que
-//   Standard IA et Premium Remote n'en ont pas — asymetrie qui donnait plus
+//   COAI Essentiel et Premium Remote n'en ont pas — asymetrie qui donnait plus
 //   de poids visuel a une offre qu'aux deux autres. Reste accessible via
 //   "Nos accompagnements" (/pricing), qui liste les trois.
 // "Conseils" devient le cinquieme lien le 07/09/2026 : contrairement aux

@@ -93,7 +93,7 @@ export async function POST(request: Request) {
         "",
         "Voici ce que tu recevras en priorité :",
         "• Des conseils pratiques entraînement, nutrition et récupération, directement appliquables.",
-        "• Des explications claires sur nos offres : Standard IA, Premium Remote, VIP Présentiel.",
+        "• Des explications claires sur nos offres : COAI Essentiel, Premium Remote, VIP Présentiel.",
         "• Des exemples de services : plans, progressions, routines de récupération.",
         "",
         `Ton lien de ressources : ${appUrl}/bilan-forme-gratuit`,
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
         `<li>Nutrition : idées de repas et habitudes solides</li>`,
         `<li>Récupération : mobilité, sommeil, respiration</li>`,
         `</ul>`,
-        `<p>Nos offres : <strong>Standard IA</strong> (programme personnalisé), <strong>Premium Remote</strong> (ajustement humain à distance), <strong>VIP Présentiel</strong> (suivi premium en personne).</p>`,
+        `<p>Nos offres : <strong>COAI Essentiel</strong> (programme personnalisé), <strong>Premium Remote</strong> (ajustement humain à distance), <strong>VIP Présentiel</strong> (suivi premium en personne).</p>`,
         `<p><a href="${appUrl}/pricing">Voir les accompagnements</a></p>`,
         `${unsubscribe ? `<p><a href="${unsubscribe}">Désabonnement</a></p>` : ""}`,
       ].join("");

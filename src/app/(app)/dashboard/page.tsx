@@ -111,7 +111,7 @@ export default async function DashboardPage() {
   const hasAccess = hasProgrammeAccess(user, user.subscription);
   const serviceRecommande = recommanderServiceDepuisProfil(user.profile);
   // Un ancien déblocage à vie conserve son programme, mais ne doit jamais
-  // se voir revendre Standard IA. S'il souhaite davantage d'accompagnement,
+  // se voir revendre COAI Essentiel. S'il souhaite davantage d'accompagnement,
   // Premium Remote est le premier niveau supplémentaire cohérent.
   const serviceAProposer = hasAccess && serviceRecommande === "IMPULSION" ? "TRANSFORMATION" : serviceRecommande;
   const insight = !programme && !hasAccess ? await getCoaiInsight(user.id) : null;

@@ -156,7 +156,7 @@ export function vipReservationHref(sessionLabel = "accompagnement VIP", prix = "
 //   bouton visio précédent n'existait que sur Full Remote.
 export const TIERS: Tier[] = [
   {
-    nom: "Standard IA",
+    nom: "COAI Essentiel",
     eyebrow: "L'OFFRE ESSENTIELLE · TON PT 24H/24 + WHATSAPP",
     prix: "19,99€",
     suffixe: "/mois",

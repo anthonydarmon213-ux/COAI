@@ -259,9 +259,9 @@ async function alerterDouleurImpulsion(appUrl: string): Promise<number> {
 
     const extrait = (seanceAvecDouleur.ressenti || seanceAvecDouleur.notes || "").slice(0, 200);
     await sendAdminNotification(
-      "Douleur signalée — palier Standard IA",
+      "Douleur signalée — palier COAI Essentiel",
       `${user.prenom ? user.prenom : "Un abonné"} (${user.email}) a mentionné une gêne/douleur dans une séance ` +
-        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier Standard IA, pas de relecture humaine) : « ${extrait} »`
+        `du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} (palier COAI Essentiel, pas de relecture humaine) : « ${extrait} »`
     );
 
     if (envoyeUtilisateur) {
@@ -585,7 +585,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
     // prudence pour une donnee historique deja en base : "Coaching Hybride"
     // et "99 €/mois" etaient a la fois l'ancien nom ET un tarif qui n'existe
     // plus (pack 3 mois minimum, sur devis, pas d'abonnement mensuel).
-    const plan = user.checkoutPlan === "STANDARD" ? "Premium Remote" : "Standard IA";
+    const plan = user.checkoutPlan === "STANDARD" ? "Premium Remote" : "COAI Essentiel";
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const reprise = user.subscription?.trialEnd
       ? "Tu peux reprendre ton inscription ici"

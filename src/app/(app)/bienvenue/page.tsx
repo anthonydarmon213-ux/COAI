@@ -30,7 +30,7 @@ const CONTENU_PAR_PLAN: Record<
   }
 > = {
   PASS_IA: {
-    formule: "Standard IA",
+    formule: "COAI Essentiel",
     sousTitre: "Ton coach personnel augmenté reste disponible 24h/24 et fait évoluer ton programme.",
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },

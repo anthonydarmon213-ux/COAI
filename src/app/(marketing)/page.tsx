@@ -57,11 +57,11 @@ const FAQ = [
       // gratuit, comment on paie, et renvoie vers la page tarifs pour qui
       // veut les chiffres tout de suite. Masquer un prix a quelqu'un qui le
       // demande le ferait fuir plus surement que le prix lui-meme.
-      "Non. Le bilan est offert, sans carte bancaire, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — Standard IA par abonnement mensuel sans engagement, les deux transformations avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
+      "Non. Le bilan est offert, sans carte bancaire, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — COAI Essentiel par abonnement mensuel sans engagement, les deux transformations avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
   },
   {
     question: "Je peux résilier quand je veux ?",
-    reponse: "Standard IA est un abonnement mensuel sans engagement, résiliable à tout moment depuis ton compte. Premium Remote et VIP Présentiel sont des transformations encadrées sur 3 ou 6 mois, payées en une fois à la signature — l'objectif, le cadre et l'engagement se discutent directement avec Anthony avant de signer.",
+    reponse: "COAI Essentiel est un abonnement mensuel sans engagement, résiliable à tout moment depuis ton compte. Premium Remote et VIP Présentiel sont des transformations encadrées sur 3 ou 6 mois, payées en une fois à la signature — l'objectif, le cadre et l'engagement se discutent directement avec Anthony avant de signer.",
   },
   {
     question: "Et si mon programme ne me convient pas ?",
@@ -276,7 +276,7 @@ const STRUCTURED_DATA = {
       areaServed: "FR",
       description: DESCRIPTION,
       offers: [
-        { "@type": "Offer", name: "Standard IA", price: "19.99", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "COAI Essentiel", price: "19.99", priceCurrency: "EUR" },
         { "@type": "Offer", name: "Premium Remote", price: "960", priceCurrency: "EUR" },
         { "@type": "Offer", name: "VIP Présentiel", price: "1200", priceCurrency: "EUR" },
       ],
@@ -300,7 +300,7 @@ const STRUCTURED_DATA = {
 // ici où ils ne font qu'allonger le parcours avant même de commencer.
 const PARCOURS_COURT = [
   ["01", "Fais ton bilan de forme offert", "Obtiens ton résultat et tes priorités en moins de 5 minutes, sans carte bancaire."],
-  ["02", "Choisis ton accompagnement", "Ton programme personnalisé, puis Standard IA, Premium Remote ou VIP Présentiel."],
+  ["02", "Choisis ton accompagnement", "Ton programme personnalisé, puis COAI Essentiel, Premium Remote ou VIP Présentiel."],
   ["03", "Commence ta première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;
 

@@ -37,7 +37,7 @@ export default function AProposPage() {
             nutrition et de récupération aussi précis qu&apos;une consultation privée — généré en
             quelques secondes par l&apos;IA, à partir d&apos;un vrai profil, pas d&apos;un modèle
             générique. Sur Premium Remote et VIP Présentiel, il n&apos;est jamais livré sans qu&apos;Anthony, ou un
-            coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé ; sur Standard IA, il
+            coach qu&apos;il a formé, ne l&apos;ait relu, corrigé, validé ; sur COAI Essentiel, il
             reste généré par l&apos;IA seule, sans relecture.
           </p>
           <p>

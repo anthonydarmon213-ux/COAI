@@ -1,435 +1,97 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SubscribeButton } from "@/components/compte/subscribe-button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
 import { BackLink } from "@/components/marketing/back-link";
 import { TrackConversion } from "@/components/analytics/track-conversion";
-import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
-import { TIERS, TIER_BY_SERVICE, vipReservationHref } from "@/lib/pricing/tiers";
+import { StandardBilling } from "@/components/marketing/standard-billing";
+import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
+import { TIER_BY_SERVICE, vipReservationHref } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
-type PricingSearchParams = {
-  checkout?: string;
-  from?: string;
-  selected?: string;
-  billing?: string;
-  vipSessions?: string;
-};
-
-function tierId(plan: string) {
-  if (plan === "PASS_IA") return "pass-ia";
-  if (plan === "STANDARD") return "full-remote";
-  return "full-presentiel";
-}
-
-const COMPARAISON_RAPIDE = [
-  ["Standard IA", "Je veux avancer dès maintenant", "7 jours offerts · 19,99 €/mois ou 119 €/an"],
-  ["Premium Remote", "Je veux une transformation encadrée à distance", "960 € · transformation sur 3 mois"],
-  ["VIP Présentiel", "Je veux une attention maximale", "1 200 €/3 mois minimum (soit 100 €/séance)"],
-] as const;
-
 export const metadata: Metadata = {
-  title: "Tarifs — Personal Training réimaginé | COAI",
-  description: "Choisis le niveau d'attention dont tu as besoin : Standard IA, Premium Remote ou VIP Présentiel.",
+  title: "Abonnements et accompagnements | COAI",
+  description: "Compare COAI Essentiel, Premium Remote et VIP Présentiel : inclus, tarifs et modalités de facturation.",
   alternates: { canonical: "/pricing" },
 };
 
-export default function PricingPage({ searchParams }: { searchParams?: PricingSearchParams }) {
-  const selectedPlan = searchParams?.selected;
-  const selectedBilling = searchParams?.billing === "ANNUAL"
-    ? "ANNUAL"
-    : searchParams?.billing === "QUARTERLY"
-      ? "QUARTERLY"
-      : "MONTHLY";
-  const arriveApresCreation = searchParams?.from === "signup";
-  const repriseStandard = arriveApresCreation && selectedPlan === "PASS_IA";
-  const reprisePrix = selectedBilling === "ANNUAL"
-    ? "119 € / an"
-    : selectedBilling === "QUARTERLY"
-      ? `${prixTrimestreCentimes() / 100} € / 3 mois`
-      : "19,99 € / mois";
-
+function Benefits({ included, excluded }: { included: string[]; excluded: string[] }) {
   return (
-    <main className="coai-landing-lux flex min-h-screen flex-col items-center gap-8 px-6 pb-20 pt-16 sm:pt-20">
+    <div className="border-t border-white/10 pt-6">
+      <h3 className="text-xs font-semibold uppercase tracking-widest text-cyan-200">Inclus</h3>
+      <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-200">
+        {included.map(item => <li key={item} className="flex gap-3"><span aria-hidden="true" className="text-cyan-200">✓</span><span>{item}</span></li>)}
+      </ul>
+      <h3 className="mt-6 text-xs font-semibold uppercase tracking-widest text-slate-400">Non inclus</h3>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+        {excluded.map(item => <li key={item} className="flex gap-3"><span aria-hidden="true">—</span><span>{item}</span></li>)}
+      </ul>
+    </div>
+  );
+}
+
+export default function PricingPage({ searchParams }: { searchParams?: { checkout?: string; from?: string; selected?: string; billing?: string; vipSessions?: string } }) {
+  const billing = searchParams?.billing === "ANNUAL" ? "ANNUAL" : searchParams?.billing === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
+  const remote = TIER_BY_SERVICE.TRANSFORMATION;
+  const vip = TIER_BY_SERVICE.VIP;
+  return (
+    <main className="coai-landing-lux min-h-screen px-5 pb-20 pt-12 sm:px-8">
       <TrackConversion name="pricing_viewed" />
-      <div className="w-full max-w-6xl"><BackLink /></div>
-      <div className="max-w-4xl text-center">
-        <SectionLabel>Choisis ton accompagnement</SectionLabel>
-        <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
-          Trois niveaux. Un même objectif&nbsp;: <span className="bg-gradient-to-r from-cyan-200 to-laiton-200 bg-clip-text text-transparent">ta meilleure forme.</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-graphite-300">
-          Commence en autonomie avec COAI ou ajoute le suivi personnel d&apos;Anthony. Chaque formule associe entraînement, nutrition et récupération à ton agenda réel.
-        </p>
-      </div>
+      <div className="mx-auto max-w-6xl">
+        <BackLink />
+        <header className="mx-auto mb-10 mt-8 max-w-3xl text-center">
+          <SectionLabel>Les accompagnements COAI</SectionLabel>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Ta meilleure forme.<br /><span className="text-cyan-200">À ton rythme, avec le bon suivi.</span></h1>
+          <p className="mt-5 text-base leading-7 text-slate-300">Entraînement, alimentation et récupération. Choisis ton programme en autonomie, un coach à distance ou des séances privées.</p>
+        </header>
+        {searchParams?.from === "signup" && <p className="mb-6 rounded-2xl border border-cyan-300/30 bg-cyan-300/5 p-4 text-center text-slate-200">Ton compte est prêt. Aucun paiement n’a encore été effectué. Ton choix de facturation COAI Essentiel est conservé ci-dessous.</p>}
+        {searchParams?.checkout === "cancel" && <p className="mb-6 rounded-2xl border border-white/20 p-4 text-center text-slate-200">Tu as quitté le paiement. Tu peux revoir ton choix ci-dessous.</p>}
+        <p className="mb-6 text-center text-sm text-slate-300">Mensuel ou annuel pour COAI Essentiel. Les accompagnements Remote et VIP sont des packs sur devis.</p>
 
-      {arriveApresCreation && (
-        <Card className={`w-full max-w-4xl px-6 py-5 ${repriseStandard ? "border-cyan-300/30 bg-cyan-300/[0.06]" : "border-emerald-400/25 bg-emerald-400/[0.06]"}`}>
-          {repriseStandard ? (
-            <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div>
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200">
-                  Ton compte est prêt · ton choix est conservé
-                </p>
-                <h2 className="mt-2 font-display text-2xl font-semibold text-white">Standard IA · {reprisePrix}</h2>
-                <p className="mt-1 text-sm leading-6 text-graphite-300">
-                  Confirme tes 7 jours d&apos;essai. Aucun prélèvement avant leur fin.
-                </p>
-              </div>
-              <div className="min-w-64">
-                <SubscribeButton
-                  plan="PASS_IA"
-                  billing={selectedBilling}
-                  label="Confirmer mes 7 jours offerts →"
-                  className="coai-rainbow-cta w-full border-0 text-[#111216]"
-                />
-                <a href="#pass-ia" className="mt-2 block text-center text-xs text-graphite-400 underline decoration-white/20 underline-offset-4 hover:text-white">
-                  Modifier mon choix
-                </a>
-              </div>
+        <div className="grid items-start gap-6 xl:grid-cols-3">
+          <section id="pass-ia" aria-labelledby="standard-title" className="scroll-mt-24 overflow-hidden rounded-3xl border border-cyan-200/40 bg-slate-950/60">
+            <p className="bg-cyan-200/10 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-cyan-100">01 · En autonomie</p>
+            <div className="space-y-6 p-6">
+              <div><h2 id="standard-title" className="text-3xl font-semibold text-white">COAI Essentiel</h2><p className="mt-3 text-sm leading-6 text-slate-300">Ton programme personnalisé et tes repères pour progresser au quotidien.</p></div>
+              <StandardBilling initialBilling={billing} quarterlyPrice={prixTrimestreCentimes() / 100} />
+              <Benefits included={["Programme personnalisé à partir de ton bilan", "Adaptation des séances à ta forme et au temps disponible", "Coach IA disponible 24 h/24", "Repères d’alimentation et de récupération", "Suivi des séances, charges et progression"]} excluded={["Suivi individuel régulier par un coach humain", "Séances privées en présentiel"]} />
             </div>
-          ) : (
-            <div className="text-center">
-              <p className="font-semibold text-white">✓ Ton compte gratuit est prêt.</p>
-              <p className="mt-1 text-sm text-graphite-300">Aucun paiement n&apos;a encore été effectué.</p>
+          </section>
+
+          <section id="full-remote" aria-labelledby="remote-title" className="scroll-mt-24 overflow-hidden rounded-3xl border border-laiton-300/40 bg-slate-950/60">
+            <p className="bg-laiton-300/10 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-laiton-200">02 · Avec ton coach à distance</p>
+            <div className="space-y-6 p-6">
+              <div><h2 id="remote-title" className="text-3xl font-semibold text-white">{remote.nom}</h2><p className="mt-3 text-sm leading-6 text-slate-300">Ta transformation physique accompagnée personnellement par Anthony, à distance.</p></div>
+              <div><p className="text-5xl font-semibold text-white">{remote.prix}</p><p className="mt-2 text-base text-slate-200">Le pack de 3 mois</p><p className="mt-3 text-sm leading-6 text-slate-300">Payé en une fois à la signature. Accompagnement de 6 mois : 1 920 €. Ce n’est pas un abonnement mensuel.</p></div>
+              <a href={vipReservationHref(remote.devisWhatsappLabel, remote.devisPriceLabel) ?? "/vip"} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center rounded-full bg-laiton-200 px-5 py-3 text-center text-sm font-bold text-slate-950">Échanger sur mon accompagnement</a>
+              <Benefits included={remote.features.slice(0, 5)} excluded={["Séances privées en présentiel", "Accès illimité aux créneaux du coach"]} />
+              <p className="text-xs leading-5 text-slate-400">Sur devis, selon les disponibilités. Objectifs et modalités définis ensemble avant engagement.</p>
             </div>
-          )}
-        </Card>
-      )}
+          </section>
 
-      {searchParams?.checkout === "cancel" && (
-        <Card className="w-full max-w-4xl border-laiton-400/30 px-6 py-5 text-center">
-          <p className="font-semibold text-white">Aucun abonnement n&apos;a été créé.</p>
-          <p className="mt-1 text-sm text-graphite-300">Ton choix est conservé. Tu peux reprendre ici sans recommencer ton bilan.</p>
-        </Card>
-      )}
-
-      <section className="w-full max-w-5xl" aria-labelledby="comparatif-rapide">
-        <h2 id="comparatif-rapide" className="text-center text-sm font-semibold uppercase tracking-[0.16em] text-laiton-300">
-          Choisir en 10 secondes
-        </h2>
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {COMPARAISON_RAPIDE.map(([nom, besoin, niveau]) => (
-            <a key={nom} href={`#${nom === "Standard IA" ? "pass-ia" : nom === "Premium Remote" ? "full-remote" : "full-presentiel"}`} className={`rounded-2xl border px-5 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 ${nom === "Standard IA" ? "border-cyan-300/30 bg-cyan-300/[0.07] hover:border-cyan-300/55 focus-visible:ring-cyan-300/50" : "border-white/[0.08] bg-white/[0.035] hover:border-laiton-400/45 hover:bg-white/[0.06] focus-visible:ring-laiton-400/60"}`}>
-              <strong className="block text-base text-white">{nom}</strong>
-              <span className="mt-1.5 block text-sm font-semibold text-laiton-300">{besoin}</span>
-              <span className="mt-1 block text-xs leading-5 text-graphite-400">{niveau}</span>
-            </a>
-          ))}
+          <section id="full-presentiel" aria-labelledby="vip-title" className="scroll-mt-24 overflow-hidden rounded-3xl border border-white/20 bg-slate-950/60">
+            <p className="bg-white/5 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-laiton-200">03 · Avec ton coach en présentiel</p>
+            <div className="space-y-6 p-6">
+              <div><h2 id="vip-title" className="text-3xl font-semibold text-white">{vip.nom}</h2><p className="mt-3 text-sm leading-6 text-slate-300">Tes séances privées avec Anthony, pour un accompagnement au plus près de toi.</p></div>
+              <div><p className="text-5xl font-semibold text-white">{vip.prix}</p><p className="mt-2 text-base text-slate-200">Le pack de 3 mois · particulier</p><p className="mt-3 text-sm leading-6 text-slate-300">Payé en une fois à la signature. Environ une séance par semaine. Pack de 6 mois : 2 400 €.</p></div>
+              <a href={vipReservationHref(vip.devisWhatsappLabel, vip.devisPriceLabel) ?? "/vip"} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center rounded-full bg-laiton-200 px-5 py-3 text-center text-sm font-bold text-slate-950">Demander mon devis VIP</a>
+              <Benefits included={vip.features.slice(0, 3)} excluded={["Séances supplémentaires hors du pack convenu", "Séances à l’unité, hors séance d’essai"]} />
+              <details className="border-t border-white/10 pt-4 text-sm text-slate-300">
+                <summary className="cursor-pointer">Essai et tarif entreprise</summary>
+                <p className="mt-3 leading-6">Particulier : 100 € TTC par séance, soit 1 200 € pour le pack de 3 mois. Entreprise : 200 € HT par séance + TVA 20 %, soit 240 € TTC. Facture fournie.</p>
+                {vip.devisSecondaryCta && <a href={buildWhatsAppLink(vip.devisSecondaryCta.whatsappMessage) ?? "/vip"} target="_blank" rel="noreferrer" className="mt-3 block text-laiton-200 underline">{vip.devisSecondaryCta.label}</a>}
+              </details>
+            </div>
+          </section>
         </div>
-      </section>
 
-      <div className="flex w-full flex-col items-center gap-8">
-        <section
-          id="pass-ia"
-          className="relative order-1 w-full max-w-5xl scroll-mt-24 overflow-hidden rounded-[2rem] border border-cyan-300/35 bg-[radial-gradient(circle_at_80%_10%,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(212,175,55,0.14),transparent_38%),rgba(255,255,255,0.035)] px-6 py-8 shadow-[0_32px_120px_-55px_rgba(56,189,248,0.7)] sm:px-10 sm:py-10"
-          aria-labelledby="standard-ia-title"
-        >
-        <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border border-cyan-200/20 bg-cyan-300/[0.06] blur-[1px]" />
-        <div className="relative grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-200/[0.08] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-100">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300" />
-                Coaching adaptatif actif 24h/24
-              </span>
-              <Badge tone="warning">Recommandé</Badge>
-            </div>
-            <h2 id="standard-ia-title" className="mt-5 font-display text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
-              Ton coach personnel.<br /><span className="text-laiton-300">Chaque jour.</span>
-            </h2>
-            <p className="mt-4 max-w-xl text-base leading-7 text-graphite-300">
-              COAI transforme ton bilan en programme, puis ajuste ta séance selon ton énergie,
-              ton sommeil, tes douleurs et le temps dont tu disposes réellement.
-            </p>
-            <div className="mt-6 grid max-w-xl gap-3 sm:grid-cols-3">
-              {["Programme immédiat", "Séance adaptée chaque jour", "Coach IA dans ta poche"].map((item) => (
-                <div key={item} className="rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3 text-sm font-medium text-white">
-                  <span className="mr-2 text-cyan-300">◆</span>{item}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/[0.1] bg-black/30 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl sm:p-6">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">Standard IA · 7 jours offerts</p>
-            <div className="mt-3 flex items-end gap-2">
-              <strong className="text-5xl tracking-[-0.06em] text-white">19,99€</strong>
-              <span className="pb-1 text-sm text-graphite-400">/mois</span>
-            </div>
-            <p className="mt-2 text-xs text-graphite-400">Sans engagement · annulation en 1 clic</p>
-            <div className="mt-6 space-y-2.5">
-              <SubscribeButton plan="PASS_IA" billing="MONTHLY" label="Démarrer mes 7 jours offerts" className="coai-rainbow-cta w-full border-0 text-[#111216]" />
-              <SubscribeButton plan="PASS_IA" billing="QUARTERLY" label={`3 mois · ${prixTrimestreCentimes() / 100}€`} className="w-full border border-cyan-300/25 bg-cyan-300/[0.07] text-cyan-100" />
-              <SubscribeButton plan="PASS_IA" billing="ANNUAL" label="Annuel · 119€ (meilleure valeur)" className="w-full border border-laiton-400/35 bg-laiton-400/10 text-[#111216]" />
-            </div>
-            <p className="mt-4 text-center text-[11px] text-graphite-400">🔒 Paiement sécurisé · aucun prélèvement avant la fin de l’essai</p>
-          </div>
-        </div>
+        <section className="mt-10 rounded-3xl border border-cyan-200/20 bg-cyan-200/5 p-6 text-center">
+          <h2 className="text-xl font-semibold text-white">Déjà inclus gratuitement dans COAI</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-300">Ton bilan de forme, le carnet de séances, le suivi des charges et les bibliothèques d’exercices et de recettes. Ces fonctions restent accessibles sans abonnement.</p>
+          <Link href="/fonctionnalites" className="mt-4 inline-block font-semibold text-cyan-200 underline underline-offset-4">Comparer les fonctions gratuites et payantes →</Link>
+          <Link href="/dashboard" className="mt-3 block text-sm text-slate-200 underline underline-offset-4">Explorer gratuitement, sans carte bancaire</Link>
         </section>
-
-      {/* Deux cartes principales (22/08/2026, demande Anthony) — VIP sort
-          de la grille et devient un lien d'upsell sous les cartes : à trois
-          colonnes, le VIP écrasait visuellement les deux offres réellement
-          souscrites en ligne. Depuis le 02/09/2026 il n'est plus vendu par
-          abonnement : pack de séances (100 €/séance particulier, 200 €/séance
-          entreprise sur devis) conclu sur WhatsApp. */}
-      {/* Sortie gratuite (02/09/2026, demande Anthony — "je ne peux pas entrer
-          sans prendre un abo ?"). Le tunnel du diagnostic proposait bien
-          l'entree libre, mais quiconque arrivait ici par le menu ou par un
-          lien externe ne voyait que des boutons payants : la page ressemblait
-          a un mur alors que l'application est ouverte sans carte bancaire. */}
-      {/* Ordre inverse le 04/09/2026 (demande Anthony : « mets l'accent sur
-          l'humain d'abord, et si la personne n'a pas les moyens, guide-la
-          vers l'IA »). La page listait les offres du moins cher au plus cher,
-          donc l'IA en premier : le visiteur voyait l'offre sans coach avant
-          d'avoir vu Anthony. VIP Presentiel ouvre desormais la page, Standard
-          IA ferme la marche comme porte d'entree. */}
-      {/* Le Full Présentiel VIP ne se souscrit pas en ligne : il sort donc de
-          la grille des abonnements et devient une carte a part, conclue sur
-          WhatsApp — comme Full Remote (cf. tier.sessions plus haut). Tarif
-          entreprise (200 €/séance) volontairement absent d'ici (04/09/2026,
-          décision Anthony) : seul le tarif particulier (100 €) est public,
-          l'entreprise reste sur devis via WhatsApp. Prix affiché = total du
-          pack 3 mois, pas le prix/séance (même jour, "on ne vend pas des
-          séances on vend une transformation") — champs repris directement de
-          TIER_BY_SERVICE.VIP pour ne jamais diverger de tiers.ts. */}
-      <div id="full-presentiel" className="order-3 w-full max-w-5xl scroll-mt-24 rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.05] px-6 py-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0 flex-1">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">
-              {TIER_BY_SERVICE.VIP.eyebrow}
-            </p>
-            {/* Nom de l'offre ajoute le 04/09/2026 : cette carte n'affichait
-                que son sur-titre puis le prix, jamais « VIP Presentiel ».
-                Passable tant qu'elle fermait la page apres les deux autres
-                cartes nommees ; intenable maintenant qu'elle l'ouvre — le
-                visiteur tombait sur 1 200 EUR sans savoir de quelle offre il
-                s'agit. Meme niveau de titre que les deux autres cartes. */}
-            <h2 className="mt-2 text-3xl font-semibold text-white">{TIER_BY_SERVICE.VIP.nom}</h2>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="font-display text-4xl font-semibold text-white">{TIER_BY_SERVICE.VIP.prix}</span>
-              <span className="text-sm text-graphite-400">{TIER_BY_SERVICE.VIP.suffixe}</span>
-            </div>
-            {TIER_BY_SERVICE.VIP.noteFacturation && (
-              <p className="mt-1 text-xs text-graphite-500">{TIER_BY_SERVICE.VIP.noteFacturation}</p>
-            )}
-            <p className="mt-3 max-w-md text-sm leading-6 text-graphite-300">
-              Séances privées avec Anthony, à domicile, en entreprise ou en club —
-              environ 1 séance par semaine. (Un suivi individuel à distance ? C&apos;est Premium Remote.)
-            </p>
-            {/* Les deux tarifs sont affiches cote a cote depuis le 04/09/2026
-                (demande Anthony) : le prix entreprise etait jusque-la garde
-                pour le devis, ce qui obligeait une societe a ecrire avant de
-                savoir si elle etait dans les clous. TTC cote particulier (seul
-                affichage autorise pour un consommateur), HT cote entreprise
-                (usage entre professionnels). */}
-            <div className="mt-3 grid max-w-md gap-2 sm:grid-cols-2">
-              <p className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-xs leading-5 text-graphite-300">
-                <span className="block font-semibold text-white">Particulier</span>
-                100 €/séance TTC, soit 1 200 € le pack 3 mois.
-              </p>
-              <p className="rounded-xl border border-laiton-300/25 bg-laiton-300/[0.06] px-3 py-2.5 text-xs leading-5 text-graphite-300">
-                <span className="block font-semibold text-white">Entreprise</span>
-                200 € HT/séance + TVA 20 % — soit 240 € TTC. Facture professionnelle déductible.
-              </p>
-            </div>
-            <p className="mt-2 text-sm text-laiton-200">
-              Facture professionnelle fournie, déductible en frais d&apos;entreprise.
-            </p>
-          </div>
-          <div className="w-full space-y-2 lg:w-auto lg:min-w-[22rem] lg:shrink-0">
-            <a
-              className="coai-rainbow-cta flex items-center justify-center rounded-full border-0 px-7 py-3.5 text-center text-sm font-bold text-graphite-950"
-              href={vipReservationHref(TIER_BY_SERVICE.VIP.devisWhatsappLabel ?? TIER_BY_SERVICE.VIP.nom, TIER_BY_SERVICE.VIP.devisPriceLabel ?? `${TIER_BY_SERVICE.VIP.prix} ${TIER_BY_SERVICE.VIP.suffixe}`) ?? "/vip"}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Demander mon devis sur WhatsApp
-            </a>
-            {TIER_BY_SERVICE.VIP.devisSecondaryCta && (
-              <a
-                className="flex items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-7 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
-                href={buildWhatsAppLink(TIER_BY_SERVICE.VIP.devisSecondaryCta.whatsappMessage) ?? "/vip"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {TIER_BY_SERVICE.VIP.devisSecondaryCta.label}
-              </a>
-            )}
-            <p className="text-center text-[11px] text-graphite-500">
-              Réponse directe · places extrêmement limitées
-            </p>
-          </div>
-        </div>
+        <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-6 text-slate-400">COAI Essentiel : renouvellement selon la période choisie, résiliable avant le prochain renouvellement. Remote et VIP : engagement de 3 ou 6 mois sur devis, selon les disponibilités. Les conditions applicables sont précisées avant tout paiement. <Link href="/cgv" className="underline">Lire les CGV</Link>.</p>
       </div>
-
-      <div className="order-2 grid w-full max-w-5xl scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-2">
-        {TIERS.filter((tier) => tier.plan === "STANDARD").map((tier) => (
-          <Card key={tier.nom} id={tierId(tier.plan)} className={`flex scroll-mt-24 flex-col gap-5 px-6 py-8 ${tier.mostPopular || selectedPlan === tier.plan ? "border-laiton-400/80 shadow-[0_28px_90px_-45px_rgba(214,170,96,.75)]" : ""}`}>
-            <div className="flex min-h-6 items-center justify-between gap-3">
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-300">{tier.eyebrow}</span>
-              {selectedPlan === tier.plan ? (
-                <Badge tone="warning">
-                  {tier.plan === "PASS_IA" && selectedBilling === "ANNUAL" ? "Ton choix · annuel" : "Ton choix"}
-                </Badge>
-              ) : tier.mostPopular && <Badge tone="warning">Offre phare</Badge>}
-            </div>
-            <div>
-              <h2 className="text-3xl font-semibold text-white">{tier.nom}</h2>
-              <div className="mt-4 flex items-baseline gap-1">
-                <strong className="text-5xl tracking-[-0.05em] text-white">{tier.prix}</strong>
-                <span className="text-sm text-graphite-400">{tier.suffixe}</span>
-              </div>
-              {tier.trial && <p className="mt-2 text-sm font-medium text-laiton-300">7 jours d&apos;essai</p>}
-              {tier.noteFacturation && <p className="mt-1 text-xs leading-5 text-graphite-500">{tier.noteFacturation}</p>}
-            </div>
-            {tier.founderOffer && <MembreFondateurBadge />}
-            <p className="min-h-20 text-sm leading-6 text-graphite-300">{tier.description}</p>
-            {tier.sessions && (
-              <div className="space-y-4 rounded-2xl border border-laiton-300/20 bg-laiton-300/[0.05] p-5">
-                <div>
-                  <p className="text-xs uppercase tracking-widest text-laiton-300">{tier.nom}</p>
-                  <p className="mt-2 text-sm font-semibold text-white">{tier.devisPriceLabel ?? `${tier.prix} ${tier.suffixe}, puis sur devis`}</p>
-                  <p className="mt-1 text-xs leading-5 text-graphite-400">{tier.devisTagline}</p>
-                </div>
-                <a
-                  className="coai-rainbow-cta flex w-full items-center justify-center rounded-full border-0 px-6 py-3.5 text-center text-sm font-bold text-graphite-950"
-                  href={vipReservationHref(tier.devisWhatsappLabel ?? tier.nom, tier.devisPriceLabel ?? `${tier.prix} ${tier.suffixe}, puis sur devis`) ?? "/vip"}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {tier.devisSecondaryCta ? "Souscrire directement sur WhatsApp" : "Demander mon devis sur WhatsApp"}
-                </a>
-                {tier.devisSecondaryCta && (
-                  <a
-                    className="flex w-full items-center justify-center rounded-full border border-laiton-300/35 bg-laiton-300/[0.06] px-6 py-3.5 text-center text-sm font-semibold text-laiton-200 transition hover:bg-laiton-300/[0.1]"
-                    href={buildWhatsAppLink(tier.devisSecondaryCta.whatsappMessage) ?? "/vip"}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {tier.devisSecondaryCta.label}
-                  </a>
-                )}
-                <p className="text-center text-[11px] text-graphite-500">
-                  {tier.devisFootnote}
-                </p>
-              </div>
-            )}
-
-            <div className="flex-1" />
-            {!tier.sessions && (
-              <>
-                {tier.plan === "PASS_IA" && selectedBilling === "ANNUAL" ? (
-                  <>
-                    <SubscribeButton
-                      plan="PASS_IA"
-                      billing="ANNUAL"
-                      label="Confirmer l'annuel · 119€/an"
-                      className="coai-rainbow-cta w-full border-0 text-[#111216]"
-                    />
-                    <SubscribeButton
-                      plan="PASS_IA"
-                      billing="MONTHLY"
-                      label="Choisir le mensuel · 19,99€/mois"
-                      className="w-full border border-white/15 bg-white/[0.035] text-white"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <SubscribeButton
-                      plan={tier.plan}
-                      billing="MONTHLY"
-                      label={tier.trial ? `Choisir ${tier.nom} · 7 jours offerts` : `Choisir ${tier.nom}`}
-                      className="coai-rainbow-cta w-full border-0 text-[#111216]"
-                    />
-                    {/* Option annuelle proposée uniquement sur Pass IA. */}
-                    {tier.plan === "PASS_IA" && (
-                      <>
-                        <SubscribeButton
-                          plan="PASS_IA"
-                          billing="ANNUAL"
-                          label="Choisir l'annuel · 119€/an"
-                          className="w-full border border-laiton-400/35 bg-laiton-400/10 text-[#111216]"
-                        />
-                        {/* Marche intermediaire (02/09/2026) : l'ecart entre
-                            19,99 €/mois et 9,92 €/mois en annuel laissait
-                            partir ceux que l'engagement d'un an rebute. */}
-                        <SubscribeButton
-                          plan="PASS_IA"
-                          billing="QUARTERLY"
-                          label={`Choisir 3 mois · ${prixTrimestreCentimes() / 100}€`}
-                          className="w-full border border-white/15 bg-white/[0.035] text-white"
-                        />
-                      </>
-                    )}
-                  </>
-                )}
-                {/* Réassurance sous le bouton (22/08/2026, demande
-                    Anthony). Apple Pay / Google Pay apparaissent
-                    automatiquement dans Stripe Checkout quand ils sont
-                    activés côté dashboard Stripe — on ne les annonce donc
-                    pas ici en dur, pour ne rien promettre que la page de
-                    paiement n'afficherait pas réellement. */}
-                <p className="text-center text-[11px] font-medium text-graphite-400">
-                  🔒 Paiement sécurisé · Sans engagement · Annulation en 1 clic
-                </p>
-                <p className="text-center text-[11px] text-graphite-500">
-                  En continuant, tu acceptes les <Link href="/cgv" target="_blank" className="underline">CGV</Link>
-                  {tier.trial ? " — 7 jours d'essai, puis prélèvement sauf résiliation." : "."}
-                </p>
-              </>
-            )}
-
-            <ul className="space-y-3 text-sm leading-6 text-graphite-200">
-              {tier.features.slice(0, 4).map((feature) => <li key={feature} className="flex gap-3"><span className="text-laiton-400">✓</span><span>{feature}</span></li>)}
-            </ul>
-
-            {tier.plan === "PREMIUM" && (
-              <a className="text-center text-sm font-semibold text-laiton-300 underline underline-offset-4" href={vipReservationHref("une transformation physique privée de longue durée", "sur devis") ?? "/vip"} target="_blank" rel="noreferrer">
-                Parler d&apos;une transformation physique privée plus longue
-              </a>
-            )}
-          </Card>
-        ))}
-      </div>
-      </div>
-
-      <div className="w-full max-w-5xl rounded-2xl border border-white/[0.08] bg-white/[0.025] px-5 py-4 text-center">
-        <p className="text-sm font-semibold text-white">Tu préfères explorer avant de choisir ?</p>
-        <p className="mx-auto mt-1 max-w-2xl text-xs leading-5 text-graphite-400">
-          Entre gratuitement dans COAI pour découvrir le carnet, les mesures, les exercices et les recettes — sans carte bancaire.
-        </p>
-        <Link href="/dashboard" className="mt-3 inline-flex text-sm font-semibold text-graphite-200 underline decoration-white/25 underline-offset-4">
-          Explorer l&apos;application gratuitement →
-        </Link>
-      </div>
-
-      {/* Compte a rebours descendu ici le 04/09/2026 : place en haut de
-          page, il affichait 19,99 EUR/mois avant meme la premiere offre
-          humaine, ce qui annulait l'inversion d'ordre faite le meme jour
-          (« l'humain d'abord, l'IA pour qui n'a pas les moyens »). Il
-          promeut Standard IA : sa place est apres les trois offres, a cote
-          de celle qu'il concerne.
-          Note : la promesse « prix bloque a vie » et la date du 31 octobre
-          restent a verifier — elles n'ont pas ete revues ici. */}
-      {/* Bandeau descendu ici le 04/09/2026, meme raison que le compte a
-          rebours juste en dessous : il ouvrait la page tarifs en parlant du
-          prix du Pass IA, donc l'offre sans coach etait la premiere chose
-          lue, avant meme d'avoir vu Anthony. Les deux promos Standard IA
-          sont maintenant regroupees apres les trois offres. */}
-      <div className="w-full max-w-5xl rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] px-5 py-4 text-center">
-        <p className="text-sm font-semibold text-white">Ensuite : ton programme est activé, ta première séance t&apos;attend.</p>
-        <p className="mt-1 text-xs text-graphite-400">Standard IA : 7 jours d&apos;essai avant le premier prélèvement. Premium Remote et VIP Présentiel : transformations encadrées sur 3 ou 6 mois, sur devis via WhatsApp.</p>
-      </div>
-
-
-      <p className="max-w-2xl text-center text-xs leading-5 text-graphite-400">
-        Standard IA est un abonnement mensuel sans engagement, résiliable à tout moment. Premium Remote et VIP Présentiel (packs de séances engagés 3 ou 6 mois, payés en une fois) se règlent sur devis, conclus directement avec Anthony, sous réserve de disponibilité. Voir les <Link href="/cgv" className="underline">CGV</Link>.
-      </p>
     </main>
   );
 }
