@@ -5,7 +5,7 @@ import { sendEmail, sendAdminNotification } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
-import { hasDiagnosticOptOut } from "@/lib/email/diagnostic-suppression";
+import { hasDiagnosticOptOut, isDiagnosticReminderDue } from "@/lib/email/diagnostic-suppression";
 import { stripe } from "@/lib/stripe/client";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
@@ -422,6 +422,7 @@ async function relancerDiagnosticsNonConvertis(appUrl: string): Promise<number> 
     }
 
     if (await hasDiagnosticOptOut(email)) continue;
+    if (!(await isDiagnosticReminderDue(email, "conversionReminderSentAt"))) continue;
     const unsubscribe = buildUnsubscribeLink(appUrl, email);
     if (!unsubscribe) continue;
     const envoye = await sendEmail(

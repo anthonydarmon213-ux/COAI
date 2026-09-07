@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db/client";
 import { sendEmail } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
-import { hasDiagnosticOptOut } from "@/lib/email/diagnostic-suppression";
+import { hasDiagnosticOptOut, isDiagnosticReminderDue } from "@/lib/email/diagnostic-suppression";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 // Séquence de nurture post-diagnostic (16/08/2026, "machine d'acquisition
@@ -116,6 +116,7 @@ async function envoyerEtape(etape: Etape, appUrl: string): Promise<number> {
     }
 
     if (await hasDiagnosticOptOut(email)) continue;
+    if (!(await isDiagnosticReminderDue(email, etape.champ))) continue;
     const unsubscribe = buildUnsubscribeLink(appUrl, email);
     if (!unsubscribe) continue;
     const envoye = await sendEmail(email, etape.sujet, etape.corps(appUrl, unsubscribe));
@@ -137,7 +138,10 @@ export async function GET(request: Request) {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://coai.fr";
-  const [j3, j5, j7] = await Promise.all(ETAPES.map((etape) => envoyerEtape(etape, appUrl)));
+  // Chaque étape relit les horodatages persistés par la précédente.
+  const counts: number[] = [];
+  for (const etape of ETAPES) counts.push(await envoyerEtape(etape, appUrl));
+  const [j3, j5, j7] = counts;
 
   return NextResponse.json({ j3, j5, j7 });
 }
