@@ -390,7 +390,7 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
       return {
         service: "VIP",
         label: "VIP Présentiel",
-        raison: "Tu as choisi l'attention maximale : un accompagnement 1-to-1 avec Anthony, à domicile, en entreprise, en club ou à distance.",
+        raison: "Tu souhaites des séances individuelles en présentiel à Paris et ses environs : à domicile, en entreprise ou en club.",
       };
     }
     if (sante.length > 0) {
@@ -433,11 +433,11 @@ function recommanderFormule(r: ReponsesDiagnostic, sante: string[]): MiniDiagnos
   // Paris/proche, quelle que soit la raison qui a mené à cette
   // recommandation (préférence explicite ou niveau avancé) — ailleurs,
   // Premium Remote donne le même accompagnement individuel, à distance.
-  if (brute.label === "VIP Présentiel" && r.localisation === "AILLEURS") {
+  if (brute.label === "VIP Présentiel" && r.localisation !== "PARIS") {
     return {
       service: "TRANSFORMATION",
       label: "Premium Remote",
-      raison: "Le VIP Présentiel se fait uniquement à Paris et ses environs. Depuis chez toi, Premium Remote te donne le même accompagnement individuel avec moi, à distance.",
+      raison: "Le VIP Présentiel nécessite de confirmer une localisation à Paris ou à proximité. En attendant, Premium Remote est une option de suivi individuel à distance ; tu peux préciser ta localisation pour étudier le présentiel.",
     };
   }
 

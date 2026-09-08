@@ -1410,10 +1410,13 @@ export function DiagnosticQuiz({
   // son diagnostic, elle a déjà répondu à 10 questions pour ça.
   async function submitLeadAndReveal() {
     setLeadEnvoi("loading");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
     try {
       const utm = readUtmCookie();
       await fetch("/api/diagnostic-lead", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
@@ -1461,6 +1464,7 @@ export function DiagnosticQuiz({
     } catch {
       // best-effort, cf. commentaire ci-dessus
     } finally {
+      clearTimeout(timeout);
       // Seul point d'entrée du funnel qui n'envoyait encore aucun signal de
       // conversion (11/08/2026) — pourtant c'est la page vers laquelle
       // pointent les pubs Meta actuelles (cf. CLAUDE.md, /coach-sportif-paris
