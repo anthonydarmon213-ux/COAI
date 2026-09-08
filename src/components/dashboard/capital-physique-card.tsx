@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useId, useState } from "react";
+import styles from "./capital-physique-card.module.css";
 import {
   Activity,
   Crosshair,
@@ -28,6 +32,15 @@ const POINTS = [
   [32, 61],
 ] as const;
 
+const EXPLICATION: Record<RepereCapitalPhysique["id"], string> = {
+  force: "Les charges et les tests enregistrés constituent tes repères de force. Compare tes propres résultats au fil du temps.",
+  mobilite: "Ce repère suit ta souplesse et ton aisance de mouvement à partir des tests enregistrés.",
+  equilibre: "Tes tests de stabilité permettent de suivre cet axe, indépendamment de tes charges ou de ton endurance.",
+  coordination: "La coordination s’observe dans les mouvements. COAI n’attribue pas de score automatique à cet axe.",
+  endurance: "Tes tests cardio ou ta VO₂ max renseignée servent de repères pour cet axe.",
+  posture: "Cet axe indique la présence d’une analyse posturale, pas une note ni un diagnostic médical.",
+};
+
 function pointsPolygone(reperes: RepereCapitalPhysique[]) {
   return reperes
     .map((repere, index) => {
@@ -46,10 +59,13 @@ export function CapitalPhysiqueCard({
   nombreMesures: number;
 }) {
   const complet = nombreMesures === reperes.length;
+  const [selection, setSelection] = useState<RepereCapitalPhysique["id"] | null>(null);
+  const uid = useId().replace(/:/g, "");
+  const selected = reperes.find((repere) => repere.id === selection);
 
   return (
     <section
-      className="animate-reveal relative overflow-hidden rounded-[1.75rem] border border-cyan-300/20 bg-[radial-gradient(circle_at_18%_42%,rgba(34,211,238,.13),transparent_31%),linear-gradient(135deg,rgba(2,15,22,.96),rgba(16,16,18,.94)_56%,rgba(201,162,98,.08))] p-6 shadow-[0_28px_90px_-60px_rgba(34,211,238,.85)] sm:p-8"
+      className={`${styles.card} relative overflow-hidden rounded-[1.75rem] border border-cyan-300/20 bg-[radial-gradient(circle_at_18%_42%,rgba(34,211,238,.13),transparent_31%),linear-gradient(135deg,rgba(2,15,22,.96),rgba(16,16,18,.94)_56%,rgba(201,162,98,.08))] p-6 shadow-[0_28px_90px_-60px_rgba(34,211,238,.85)] sm:p-8`}
       aria-labelledby="capital-physique-title"
     >
       <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full border border-laiton-300/10 shadow-[0_0_90px_rgba(201,162,98,.08)]" />
@@ -72,14 +88,14 @@ export function CapitalPhysiqueCard({
           </p>
 
           <div className="relative mx-auto mt-7 aspect-square w-full max-w-[18rem]" aria-label={`Cartographie complétée : ${nombreMesures} ${nombreMesures > 1 ? "qualités physiques suivies" : "qualité physique suivie"} sur 6`}>
-            <div aria-hidden="true" className="absolute inset-[13%] animate-pulse rounded-full bg-cyan-300/[0.045] blur-xl" />
+            <div aria-hidden="true" className="absolute inset-[13%] rounded-full bg-cyan-300/[0.045] blur-xl" />
             <svg viewBox="0 0 200 200" className="relative h-full w-full overflow-visible" role="img" aria-hidden="true">
               <defs>
-                <linearGradient id="capital-fill" x1="0" y1="0" x2="1" y2="1">
+                <linearGradient id={`${uid}-fill`} x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0" stopColor="#67e8f9" stopOpacity=".45" />
                   <stop offset="1" stopColor="#f3cf78" stopOpacity=".28" />
                 </linearGradient>
-                <filter id="capital-glow">
+                <filter id={`${uid}-glow`}>
                   <feGaussianBlur stdDeviation="2.4" result="blur" />
                   <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
@@ -93,8 +109,8 @@ export function CapitalPhysiqueCard({
                   strokeWidth="1"
                 />
               ))}
-              {POINTS.map(([x, y]) => <line key={`${x}-${y}`} x1="100" y1="100" x2={x} y2={y} stroke="rgba(255,255,255,.07)" />)}
-              <polygon points={pointsPolygone(reperes)} fill="url(#capital-fill)" stroke="#67e8f9" strokeWidth="1.5" filter="url(#capital-glow)" />
+              {POINTS.map(([x, y], index) => <line className={styles.axis} key={`${x}-${y}`} x1="100" y1="100" x2={x} y2={y} pathLength="1" stroke={selection === reperes[index]?.id ? "#f3cf78" : "rgba(103,232,249,.22)"} strokeWidth={selection === reperes[index]?.id ? 2 : 1} />)}
+              <polygon className={styles.shape} points={pointsPolygone(reperes)} fill={`url(#${uid}-fill)`} stroke="#67e8f9" strokeWidth="1.5" filter={`url(#${uid}-glow)`} />
               {reperes.map((repere, index) => {
                 const [x, y] = POINTS[index]!;
                 const couverture = repere.statut === "MESURE" ? 0.9 : repere.statut === "A_OBSERVER" ? 0.52 : 0.34;
@@ -104,10 +120,15 @@ export function CapitalPhysiqueCard({
               <text x="100" y="98" textAnchor="middle" fill="#ffffff" fontSize="18" fontWeight="700">{nombreMesures}/6</text>
               <text x="100" y="112" textAnchor="middle" fill="#9ca3af" fontSize="6" letterSpacing="1.2">REPÈRES</text>
             </svg>
+            {reperes.map((repere, index) => {
+              const [x, y] = POINTS[index]!;
+              return <button key={repere.id} type="button" onClick={() => setSelection(repere.id)} aria-label={`Explorer ${repere.label}`} aria-pressed={selection === repere.id} aria-controls={`${uid}-detail`} className={styles.node} style={{ left: `${x / 2}%`, top: `${y / 2}%` }}><span aria-hidden="true" className={styles.dot} /></button>;
+            })}
             <p className="mt-1 text-center text-[10px] leading-4 text-graphite-500">
               La forme montre la couverture de ton suivi, pas une note médicale.
             </p>
           </div>
+          <p className="mt-8 text-center text-xs text-cyan-200">Touche un point pour explorer un axe.</p>
         </div>
 
         <div>
@@ -116,20 +137,23 @@ export function CapitalPhysiqueCard({
               const Icone = ICONE[repere.id];
               const mesure = repere.statut === "MESURE";
               return (
-                <div key={repere.id} className={`group flex min-h-[5.7rem] items-center gap-3 rounded-2xl border p-3.5 transition hover:-translate-y-0.5 ${mesure ? "border-laiton-300/20 bg-laiton-300/[0.055]" : "border-white/[0.08] bg-white/[0.025]"}`}>
+                <button type="button" onClick={() => setSelection(repere.id)} aria-pressed={selection === repere.id} aria-controls={`${uid}-detail`} key={repere.id} className={`group flex min-h-[5.7rem] items-center gap-3 rounded-2xl border p-3.5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-200 ${selection === repere.id ? "border-cyan-200 bg-cyan-300/10" : mesure ? "border-laiton-300/20 bg-laiton-300/[0.055]" : "border-white/[0.08] bg-white/[0.025]"}`}>
                   <span className={`grid h-10 w-10 flex-none place-items-center rounded-full border ${mesure ? "border-laiton-300/30 bg-laiton-300/10 text-laiton-200" : "border-cyan-300/15 bg-cyan-300/[0.06] text-cyan-200"}`}>
                     <Icone size={18} strokeWidth={1.8} aria-hidden="true" />
                   </span>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-white">{repere.label}</h3>
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white">{repere.label}</span>
                       <span className={`h-1.5 w-1.5 rounded-full ${mesure ? "bg-emerald-300 shadow-[0_0_9px_rgba(110,231,183,.8)]" : "bg-graphite-600"}`} />
-                    </div>
-                    <p className="mt-1 truncate text-[11px] text-graphite-400">{repere.detail}</p>
-                  </div>
-                </div>
+                    </span>
+                    <span className="mt-1 block truncate text-[11px] text-graphite-400">{repere.detail}</span>
+                  </span>
+                </button>
               );
             })}
+          </div>
+          <div id={`${uid}-detail`} aria-live="polite" aria-atomic="true" className="mt-3 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.04] p-4">
+            {selected ? <><p className="text-sm font-bold text-cyan-100">{selected.label}</p><p className="mt-2 text-sm leading-6 text-graphite-200">{selected.detail}</p><p className="mt-2 text-xs leading-5 text-graphite-300">{EXPLICATION[selected.id]}</p></> : <p className="text-xs leading-5 text-graphite-300">Sélectionne un axe pour comprendre ton repère. Une donnée manquante ne signifie pas un mauvais niveau.</p>}
           </div>
 
           <div className="mt-5 rounded-2xl border border-white/[0.08] bg-black/20 p-4">

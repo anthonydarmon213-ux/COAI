@@ -1,0 +1,11 @@
+.axis { stroke-dasharray: 1; animation: trace 850ms ease-out both; }
+.shape { transform-origin: 100px 100px; animation: appear 650ms ease-out both; }
+.node { position: absolute; display: grid; place-items: center; width: 44px; height: 44px; transform: translate(-50%, -50%); border-radius: 50%; background: transparent; }
+.dot { width: 7px; height: 7px; background: #67e8f9; border-radius: 50%; box-shadow: 0 0 10px #22d3ee80; }
+.node[aria-pressed="true"] .dot { background: #f3cf78; box-shadow: 0 0 16px #f3cf78; }
+.node:focus-visible { outline: 2px solid #67e8f9; outline-offset: 1px; }
+@keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes appear { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .card *, .card *::before, .card *::after { animation: none !important; transition: none !important; }
+}
