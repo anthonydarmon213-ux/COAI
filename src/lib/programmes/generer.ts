@@ -4,7 +4,7 @@ import {
   type StructureEntrainement,
 } from "@/lib/ai/prompts/programme-entrainement-structure";
 import { buildProgrammeEntrainementSessionPrompt } from "@/lib/ai/prompts/programme-entrainement-session";
-import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import { verifierQualiteSeance } from "@/lib/programmes/qualite-seance";
 import {
   buildProgrammeNutritionStructurePrompt,
   type StructureNutrition,
@@ -46,11 +46,8 @@ async function genererEntrainement(profil: ProfilUtilisateur, usage: AIUsageCont
     buildProgrammeEntrainementStructurePrompt(profil), usage
   );
 
-  // Une seule relance si le compte ne correspond pas : le modèle respecte
-  // la consigne dans l'immense majorité des cas, et boucler indéfiniment
-  // coûterait cher pour un gain marginal. Si la relance échoue aussi, on
-  // garde la structure obtenue plutôt que de bloquer la génération — un
-  // programme à 2 séances reste utilisable, une erreur ne l'est pas.
+  // Une seule relance si le compte ne correspond pas, puis contrôle strict :
+  // ne pas enregistrer une fréquence différente de l'engagement demandé.
   const attendu = seancesAttendues(profil.frequenceEntrainement);
   if (attendu !== null && Array.isArray(structure.jours) && structure.jours.length !== attendu) {
     console.warn(
@@ -65,22 +62,18 @@ async function genererEntrainement(profil: ProfilUtilisateur, usage: AIUsageCont
     }
   }
 
-  const seancesBrutes = await Promise.all(
-    structure.jours.map((jour) =>
-      generateWithAI<{ exercices?: unknown[] }>(buildProgrammeEntrainementSessionPrompt(profil, jour), usage)
-    )
-  );
-
-  // Filet de sécurité : le prompt impose déjà la liste blanche, mais un
-  // modèle peut dévier. On retire ici tout exercice sans démonstration
-  // plutôt que d'afficher une fiche vide à l'utilisateur. filtrerExercicesAvecMedias
-  // renvoie aussi le nom canonique, ce qui garantit que photo, vidéo et
-  // schéma musculaire décrivent bien le même mouvement.
-  const seances = seancesBrutes.map((seance) => ({
-    ...seance,
-    exercices: Array.isArray(seance?.exercices)
-      ? filtrerExercicesAvecMedias(seance.exercices)
-      : [],
+  if (!Array.isArray(structure.jours) || !structure.jours.length || (attendu !== null && structure.jours.length !== attendu)) {
+    throw new Error("Structure d'entraînement incomplète : aucune publication du programme.");
+  }
+  const seances = await Promise.all(structure.jours.map(async (jour) => {
+    const prompt = buildProgrammeEntrainementSessionPrompt(profil, jour);
+    let controle = verifierQualiteSeance(await generateWithAI(prompt, usage));
+    if (controle.erreurs.length) {
+      // Une seule réparation : coût borné, aucune séance tronquée enregistrée.
+      controle = verifierQualiteSeance(await generateWithAI(`${prompt}\n\nCorrige ces défauts de la tentative précédente et renvoie une séance complète : ${controle.erreurs.join(" ; ")}.`, usage));
+    }
+    if (controle.erreurs.length) throw new Error("Séance incomplète après contrôle : génération à recommencer.");
+    return controle.seance;
   }));
 
   return {

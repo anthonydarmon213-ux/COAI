@@ -28,6 +28,7 @@ Niveau : ${profil.niveau ?? "non renseigné"}
 Durée de séance visée : ${profil.dureeSeanceMinutes ? `${profil.dureeSeanceMinutes} minutes` : "non renseignée"}
 Contraintes de santé : ${profil.contraintesSante ?? "aucune connue"}
 Antécédents médicaux : ${profil.antecedentsMedicaux ?? "aucun connu"}
+Retours et directives du cycle précédent : ${profil.directivesAdaptation ?? "aucun retour disponible : ne pas inventer de performance ni de point faible"}
 Âge : ${profil.age ? `${profil.age} ans` : "non renseigné"}
 Sexe : ${profil.sexe ?? "non renseigné"}
 Morphologie : ${profil.morphologie ?? "non renseignée"}
@@ -62,7 +63,21 @@ ${EXERCICES_AUTORISES.map((n) => `- ${n}`).join("\n")}
 N'invente jamais un nom absent de cette liste, même si l'exercice te semble
 pertinent : il ne dispose d'aucune démonstration et la fiche s'afficherait
 vide pour l'utilisateur. Si aucun exercice de la liste ne convient pour un
-créneau, choisis le plus proche disponible plutôt que d'en inventer un.
+créneau, ne force jamais une substitution incompatible avec les contraintes de la personne.
+La sécurité prime sur le remplissage du programme.
+
+MÉTHODE COAI — CYCLE DE 4 SEMAINES
+Priorise l'objectif déclaré, sans inventer de point faible. Place le travail prioritaire
+au début du corps de séance, après échauffement et mobilité. Préfère des supersets simples
+pectoraux/dos ou biceps/triceps lorsque niveau, matériel et contraintes le permettent.
+Pour chaque paire, indique dans methode A1 ou A2, le partenaire exact, les tours, la
+transition entre exercices et le repos entre tours. Même nombre de séries dans la paire.
+Garde des séries classiques lorsque la technique ou les contraintes l'exigent.
+Termine le corps de séance par du gainage/abdos adapté, sauf contre-indication explicitée.
+Échauffement, mobilité, travail, repos et retour au calme sont INCLUS dans la durée visée.
+Ne prescris pas de charge en kg inventée. Les retours disponibles guident charge, volume,
+repos et méthode ; conserve les repères utiles plutôt que de tout changer.
+Pendant les repos : rappel discret de boire si besoin, pas d'étirement obligatoire.
 
 Réponds au format JSON avec : "jour" ("${jour.jour}"), "nom" (nom de la séance), "photoQuerySeance"
 (terme de recherche court EN ANGLAIS pour une photo de stock illustrant l'ambiance de CETTE séance
@@ -83,7 +98,7 @@ Pour CHAQUE exercice, inclus obligatoirement :
 - "repetitions" (nombre ou fourchette précis, ex: "8-12 répétitions" — jamais vague comme "quelques répétitions")
 - "repos" (temps de récupération entre les séries, ex: "90 sec", adapté à l'objectif) — à placer juste après "repetitions"
 - "charge" : repère de difficulté/RPE pour choisir la bonne charge (l'IA ne connaît pas le poids max réel de la personne), ex: "charge permettant de sentir les 2 dernières répétitions difficiles mais réalisables avec une technique propre — arrête-toi 1 à 2 répétitions avant l'échec technique" — ou "poids du corps" pour les exercices au poids du corps.
-- "methode" ("Série classique" par défaut ; techniques d'intensification comme superset/bi-set/drop-set réservées aux niveaux intermédiaire/avancé, avec parcimonie, jamais pour un débutant)
+- "methode" (superset simple et explicite si adapté, sinon "Série classique" ; aucun drop-set imposé)
 - "photoQuery" : un terme de recherche court EN ANGLAIS pour trouver une photo de stock illustrant
   ce mouvement précis (ex: "barbell bench press", "bodyweight squat", "seated cable row") — jamais
   le nom français traduit littéralement, une vraie requête de recherche naturelle en anglais.
