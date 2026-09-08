@@ -92,6 +92,15 @@ export function EntrainementView({
             (typeof photoQuerySeance === "string" ? photosParExercice?.[photoQuerySeance] : null);
           return (
             <>
+              <div className="rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-950/40 to-black p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-cyan-200">Ton parcours de séance</p>
+                <ol className="mt-3 grid gap-2 text-sm text-white sm:grid-cols-3">
+                  <li className="rounded-xl border border-white/10 p-3"><span className="mr-2 text-cyan-200">01</span>Échauffement</li>
+                  <li className="rounded-xl border border-white/10 p-3"><span className="mr-2 text-cyan-200">02</span>Corps de séance</li>
+                  <li className="rounded-xl border border-white/10 p-3"><span className="mr-2 text-laiton-200">03</span>Retour au calme</li>
+                </ol>
+                <p className="mt-3 text-xs leading-5 text-graphite-300">Découvre les mouvements ci-dessous, puis lance la séance guidée. Les charges se renseignent pendant la séance.</p>
+              </div>
               {photoSeanceUrl && (
                 // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
                 <img src={photoSeanceUrl} alt="" className="h-36 w-full rounded-xl object-cover object-center" loading="lazy" />
@@ -106,31 +115,32 @@ export function EntrainementView({
                 />
               )}
               {echauffement && (
-                <div className="coai-session-note rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
-                    🔥 Échauffement
-                  </span>
-                  <p className="mt-1 text-xs leading-5 text-graphite-300">
+                <section className="coai-session-note rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.04] p-5">
+                  <h3 className="text-base font-semibold text-cyan-100">
+                    01 · Échauffement
+                  </h3>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-7 text-graphite-200">
                     {String(echauffement)}
                   </p>
-                </div>
+                </section>
               )}
               {Array.isArray(exercices) && exercices.length > 0 && (
                 <div className="flex flex-col gap-2">
+                  <h3 className="mb-2 mt-3 text-base font-semibold text-white">02 · Corps de séance <span className="text-sm font-normal text-graphite-400">— {exercices.length} exercices</span></h3>
                   {exercices.map((exercice, j) => (
                     <ExerciceCard key={j} exercice={exercice} photosParExercice={photosParExercice} />
                   ))}
                 </div>
               )}
               {retourAuCalme && (
-                <div className="coai-session-note rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
-                    🧘 Retour au calme
-                  </span>
-                  <p className="mt-1 text-xs leading-5 text-graphite-300">
+                <section className="coai-session-note rounded-2xl border border-laiton-300/25 bg-laiton-300/[0.04] p-5">
+                  <h3 className="text-base font-semibold text-laiton-100">
+                    03 · Retour au calme
+                  </h3>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-7 text-graphite-200">
                     {String(retourAuCalme)}
                   </p>
-                </div>
+                </section>
               )}
               {Object.keys(detailSeance).length > 0 && (
                 <JsonView data={detailSeance} typeMedia="exercice" />
