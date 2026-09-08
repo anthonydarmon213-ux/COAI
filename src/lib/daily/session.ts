@@ -17,7 +17,7 @@ export type DailyCheckinInput = {
   food?: "PAS_ENCORE" | "LEGER" | "EQUILIBRE" | "LOURD";
   pain: boolean;
   painArea?: string;
-  availableMinutes: 15 | 25 | 40 | 60 | 75;
+  availableMinutes: 15 | 20 | 25 | 40 | 60 | 75;
   equipementDuJour?: string;
 };
 

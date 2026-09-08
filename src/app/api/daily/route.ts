@@ -49,7 +49,7 @@ const requestSchema = z.discriminatedUnion("action", [
     // (le formulaire complet l'envoie toujours, cf. DailyExperience), mais un
     // check-in léger les jours de repos (RestDayCheckin) n'a aucune séance à
     // dimensionner, donc rien à demander ici.
-    availableMinutes: z.union([z.literal(15), z.literal(25), z.literal(40), z.literal(60), z.literal(75)]).optional(),
+    availableMinutes: z.union([z.literal(15), z.literal(20), z.literal(25), z.literal(40), z.literal(60), z.literal(75)]).optional(),
     // Matériel réellement dispo ce jour-là (22/08/2026, demande Anthony :
     // "ça peut évoluer") — facultatif : sans réponse, la séance continue
     // d'utiliser l'équipement du profil, exactement comme avant.

@@ -172,6 +172,9 @@ export function CapitalPhysiqueCard({
               <Link href="/suivi/progression" className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/25 bg-cyan-300/[0.06] px-5 py-2.5 text-xs font-bold text-cyan-100 transition hover:bg-cyan-300/[0.12]">
                 Voir ma progression
               </Link>
+              <Link href="/programme/seance-du-jour" className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 px-5 py-2.5 text-xs font-bold text-white focus-visible:outline focus-visible:outline-cyan-200">
+                Préparer ma séance du jour →
+              </Link>
             </div>
           </div>
         </div>

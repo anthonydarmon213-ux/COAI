@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DailyCoach } from "@/components/daily/daily-coach";
-import { ensureWorkoutCompleteness, isCoreExercise } from "@/lib/daily/session";
+import { adaptWorkout, ensureWorkoutCompleteness, isCoreExercise, type DailyCheckinInput } from "@/lib/daily/session";
 import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 
 type Session = Record<string, unknown> & {
@@ -54,7 +54,7 @@ const FOOD = [
   ["PAS_ENCORE", "Pas encore mangé"], ["LEGER", "Plutôt léger"],
   ["EQUILIBRE", "Équilibré"], ["LOURD", "Repas lourd"],
 ] as const;
-const TIMES = [[15, "15 min"], [25, "25 min"], [40, "40 min"], [60, "60 min"], [75, "60+ min"]] as const;
+const TIMES = [[15, "15 min"], [20, "20 min"], [25, "25 min"], [40, "40 min"], [60, "60 min"], [75, "60+ min"]] as const;
 const FEEDBACK = [["TROP_FACILE", "Trop facile"], ["BIEN_DOSEE", "Bien dosée"], ["TROP_DURE", "Trop dure"]] as const;
 const AREAS = ["Dos", "Épaule", "Genou", "Cheville", "Poignet", "Hanche", "Cou", "Autre"];
 
@@ -158,6 +158,7 @@ export function DailyExperience({
     return MATERIELS_DU_JOUR.filter((m) => source.includes(m));
   });
   const [loading, setLoading] = useState(false);
+  const [proposal, setProposal] = useState<{ input: DailyCheckinInput; summary: Adaptation } | null>(null);
   const [error, setError] = useState("");
   const [feedbackOpen, setFeedbackOpen] = useState(Boolean(initialDaily?.completedAt && !initialDaily?.workoutRating));
   const [rating, setRating] = useState("");
@@ -225,7 +226,14 @@ export function DailyExperience({
   async function submitCheckin() {
     if (!checkinReady) return setError("Complète les repères essentiels pour adapter ta séance.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
-    await post({ action: "checkin", sleep, energy, chargeMentale: chargeMentale || undefined, food: food || undefined, pain, painArea: pain ? painArea : undefined, availableMinutes, equipementDuJour: equipementDuJour.join(", ") });
+    const input = { sleep, energy, chargeMentale: chargeMentale || undefined, food: food || undefined, pain, painArea: pain ? painArea : undefined, availableMinutes, equipementDuJour: equipementDuJour.join(", ") } as DailyCheckinInput;
+    setError("");
+    setProposal({ input, summary: adaptWorkout(sourceSession, input, expectedMinutes).summary });
+  }
+
+  async function confirmProposal() {
+    if (!proposal || loading) return;
+    if (await post({ action: "checkin", ...proposal.input })) setProposal(null);
   }
 
   async function completeWorkout() {
@@ -248,7 +256,21 @@ export function DailyExperience({
         </div>
       )}
 
-      {!checkinDone && (
+      {proposal && !checkinDone && (
+        <section className="rounded-[2rem] border border-cyan-300/30 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,.12),transparent_70%)] p-5 sm:p-8" aria-labelledby="daily-proposal-title">
+          <p className="text-xs font-bold uppercase tracking-widest text-cyan-200">Aperçu · rien n’est encore enregistré</p>
+          <h2 id="daily-proposal-title" className="mt-3 text-2xl font-bold text-white">{proposal.summary.title}</h2>
+          <p className="mt-3 text-sm leading-6 text-graphite-200">{proposal.summary.reason}</p>
+          <ul className="mt-4 space-y-2 text-sm text-cyan-100">{proposal.summary.changes.map(change => <li key={change}>✓ {change}</li>)}</ul>
+          <p className="mt-4 text-xs leading-5 text-graphite-300">Ces ajustements concernent la séance du jour. Ton programme d’origine reste intact. Le serveur vérifiera à nouveau la proposition lors de la confirmation.</p>
+          {error && <p role="alert" className="mt-3 text-sm text-red-300">{error}</p>}
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button disabled={loading} onClick={confirmProposal}>{loading ? "Enregistrement…" : "Confirmer ma séance du jour"}</Button>
+            <Button variant="secondary" disabled={loading} onClick={() => { setProposal(null); setError(""); }}>Modifier mes réponses</Button>
+          </div>
+        </section>
+      )}
+      {!checkinDone && !proposal && (
         <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[radial-gradient(circle_at_88%_0%,rgba(201,162,98,.1),transparent_20rem),#111518] p-5 text-white shadow-[0_30px_90px_-55px_rgba(0,0,0,.85)] sm:p-8">
           <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-laiton-400/20" />
           <div className="flex items-start justify-between gap-4">
@@ -279,7 +301,7 @@ export function DailyExperience({
               {loading
                 ? "Ton coach prépare ta séance…"
                 : checkinReady
-                  ? "Adapter ma séance →"
+                  ? "Voir les ajustements →"
                   : `${missingCheckinAnswers} réponse${missingCheckinAnswers > 1 ? "s" : ""} restante${missingCheckinAnswers > 1 ? "s" : ""}`}
             </Button>
             {!checkinReady && (
