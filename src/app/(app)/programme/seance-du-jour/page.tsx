@@ -40,16 +40,31 @@ export default async function SeanceDuJourPage() {
   const seance = programme ? getWorkoutForDate(programme.contenu, today()) : null;
 
   if (!seance) {
+    // Ne jamais lire ni afficher le contenu d'un programme en attente.
+    const enAttente = !programme && await prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "EN_ATTENTE" },
+      select: { id: true },
+    });
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="font-editorial text-3xl text-white">Pas de séance aujourd&apos;hui</h1>
+        <h1 className="font-editorial text-3xl text-white">
+          {enAttente ? "Ton programme attend sa validation" : programme ? "Pas de séance planifiée aujourd’hui" : "Ton programme n’est pas encore disponible"}
+        </h1>
         <p className="max-w-xl text-sm leading-6 text-graphite-400">
-          Ton programme prévoit du repos, ou il n&apos;a pas encore été généré. La fiche sera
-          disponible dès ta prochaine séance planifiée.
+          {enAttente
+            ? "Ton coach doit valider ton programme avant que ta fiche séance soit accessible. En attendant, tu peux retrouver tes exercices et tes charges dans RepCount."
+            : programme
+              ? "Aucune séance n’est prévue à cette date dans ton programme. Consulte ton entraînement pour retrouver ton planning."
+              : "Consulte ton espace entraînement pour connaître la prochaine étape et préparer ta première séance."}
         </p>
         <Link href="/programme/entrainement" className="text-sm text-laiton-300 underline">
           Voir mon programme →
         </Link>
+        {enAttente && (
+          <Link href="/suivi/repcount" className="text-sm text-cyan-300 underline">
+            Ouvrir RepCount →
+          </Link>
+        )}
       </div>
     );
   }
