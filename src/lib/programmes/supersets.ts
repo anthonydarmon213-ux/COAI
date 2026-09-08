@@ -26,7 +26,7 @@ function familles(nom: string): Famille[] {
 const PAIRES_ANTAGONISTES: ReadonlySet<string> = new Set([
   "dos|pectoraux",
   "biceps|triceps",
-  "epaules|dos",
+  "dos|epaules",
   "ischios|quadriceps",
 ]);
 

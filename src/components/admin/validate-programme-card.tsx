@@ -71,6 +71,7 @@ export function ValidateProgrammeCard({
   const [draft, setDraft] = useState(() => JSON.stringify(contenu, null, 2));
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmationRejet, setConfirmationRejet] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const items = checklistItems(contenu);
   const [checked, setChecked] = useState<boolean[]>(() => items.map(() => false));
@@ -103,7 +104,7 @@ export function ValidateProgrammeCard({
   }
 
   async function rejeter() {
-    if (!window.confirm("Rejeter cette génération ? Elle sera supprimée définitivement.")) return;
+    if (!confirmationRejet || loading) return;
     setLoading(true);
     setError(null);
     try {
@@ -201,22 +202,33 @@ export function ValidateProgrammeCard({
         onChange={(e) => setNote(e.target.value)}
       />
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+
+      {confirmationRejet && (
+        <section className="rounded-xl border border-red-400/40 bg-red-950/20 p-4" aria-label="Confirmation du rejet">
+          <p className="text-sm font-semibold text-white">Rejeter ce programme ?</p>
+          <p className="mt-2 text-sm text-graphite-300">Cette génération sera supprimée définitivement. Cette action ne valide aucun programme.</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Button variant="ghost" disabled={loading} onClick={() => setConfirmationRejet(false)}>Conserver le programme</Button>
+            <Button disabled={loading} onClick={rejeter}>{loading ? "Rejet en cours…" : "Confirmer le rejet définitif"}</Button>
+          </div>
+        </section>
+      )}
 
       <div className="flex gap-2">
         {editing ? (
           <Button onClick={validerAvecModifications} disabled={loading || !checklistComplete}>
-            {loading ? "Validation…" : "Valider avec ces modifications"}
+            {loading ? "Traitement…" : "Valider avec ces modifications"}
           </Button>
         ) : (
           <Button onClick={() => valider()} disabled={loading || !checklistComplete}>
-            {loading ? "Validation…" : "Valider tel quel"}
+            {loading ? "Traitement…" : "Valider tel quel"}
           </Button>
         )}
         <Button
           variant="ghost"
           className="text-red-400 hover:text-red-300"
-          onClick={rejeter}
+          onClick={() => setConfirmationRejet(true)}
           disabled={loading}
         >
           Rejeter
