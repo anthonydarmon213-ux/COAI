@@ -26,7 +26,7 @@ const TABLE: Entree[] = [
   { motifs: ["rowing elastique", "rowing a l'elastique"], video: { fichier: "rowing-elastique", description: "Rowing penché à l'élastique" } },
   { motifs: ["face pull elastique", "face pull"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
   { motifs: ["kickback elastique", "kickback"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
-  { motifs: ["developpe incline (machine)", "developpe incline machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
+  { motifs: ["developpe incline (machine)", "developpe incline machine", "developpe incline a la machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
   // Lot fonctionnel réel du 25/08/2026. Les variantes précises restent
   // avant les motifs génériques (notamment « burpee »).
   { motifs: ["ballon leste par-dessus l'epaule", "medecine ball par-dessus l'epaule"], video: { fichier: "medecine-ball-par-dessus-epaule", description: "Ballon lesté par-dessus l’épaule" } },
