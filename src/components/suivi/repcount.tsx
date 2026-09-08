@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Activity } from "lucide-react";
+import { ChandeliersCharges } from "@/components/suivi/chandeliers-charges";
 import {
   comparerAvantApres,
   historiquePourExercice,
@@ -594,6 +595,7 @@ export function RepCount({
       )}
 
       {historique.length > 0 && <CourbeProgression historique={historique} />}
+      {historique.length > 0 && <ChandeliersCharges key={nom.trim()} historique={historique} />}
 
       <div className="flex gap-3">
         <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} />
