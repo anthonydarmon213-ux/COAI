@@ -368,6 +368,8 @@ export function RepCount({
   const [erreur, setErreur] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
   const prefillRef = useRef<string | null>(null);
+  const sauvegardeRef = useRef<{ signature: string; date: string } | null>(null);
+  const requeteEnCoursRef = useRef(false);
 
   const charger = useCallback(async () => {
     const r = await fetch("/api/seances");
@@ -418,7 +420,12 @@ export function RepCount({
   }, [reps, charge]);
 
   const sauvegarder = useCallback(async (seriesAEnregistrer: SetSaisi[]) => {
-    if (!nom.trim() || seriesAEnregistrer.length === 0 || enregistrementEnCours) return;
+    if (!nom.trim() || seriesAEnregistrer.length === 0 || requeteEnCoursRef.current) return;
+    const signature = JSON.stringify({ nom: nom.trim(), series: seriesAEnregistrer });
+    if (sauvegardeRef.current?.signature !== signature) {
+      sauvegardeRef.current = { signature, date: new Date().toISOString() };
+    }
+    requeteEnCoursRef.current = true;
     setErreur(null);
     setEnregistrementEnCours(true);
     try {
@@ -426,7 +433,7 @@ export function RepCount({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: new Date().toISOString(),
+          date: sauvegardeRef.current.date,
           source: "REPCOUNT",
           exercices: [
             {
@@ -437,6 +444,7 @@ export function RepCount({
         }),
       });
       if (!r.ok) throw new Error("enregistrement_refuse");
+      sauvegardeRef.current = null;
       setSets([]);
       setRepos(null);
       setEnregistre(true);
@@ -447,9 +455,10 @@ export function RepCount({
     } catch {
       setErreur("L'enregistrement a échoué. Réessaie.");
     } finally {
+      requeteEnCoursRef.current = false;
       setEnregistrementEnCours(false);
     }
-  }, [nom, charger, enregistrementEnCours]);
+  }, [nom, charger]);
 
   const enregistrer = useCallback(async () => {
     await sauvegarder(sets);
