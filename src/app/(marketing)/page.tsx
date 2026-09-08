@@ -220,14 +220,6 @@ function PiliersVisuelsSection() {
                   <p className="mt-3 max-w-xs text-sm leading-6 text-white/75">{pilier.description}</p>
                 </div>
               </article>
-              {pilier.categorie === "Récupération" ? (
-                <Link
-                  href="/diagnostic"
-                  className="inline-flex min-h-14 items-center justify-center rounded-full bg-laiton-400 px-6 text-center text-sm font-semibold text-graphite-950 shadow-[0_16px_45px_-18px_rgba(212,175,55,.8)] transition hover:-translate-y-0.5 hover:bg-laiton-300"
-                >
-                  Faire mon bilan gratuit →
-                </Link>
-              ) : null}
             </div>
           ))}
         </div>
@@ -313,6 +305,27 @@ export default function LandingPage() {
       />
       <TrackConversion name="landing_viewed" />
       <CoaiIntro />
+      <section className="mx-auto w-full max-w-6xl px-6 py-14">
+        <SectionLabel>Dans ton application</SectionLabel>
+        <h2 className="mt-3 font-display text-3xl font-semibold text-white sm:text-4xl">Vois le mouvement. Suis ta séance. Note tes progrès.</h2>
+        <p className="mt-4 max-w-2xl leading-7 text-graphite-300">Un aperçu des démonstrations de la bibliothèque COAI. Dans ta séance, retrouve les consignes, les séries, les répétitions et le repos ; dans RepCount, enregistre tes charges et consulte leur évolution.</p>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {[
+            { fichier: "developpe-couche-classique", titre: "Développé couché à la barre", detail: "Observe la démonstration avant de commencer." },
+            { fichier: "tirage-horizontal", titre: "Tirage horizontal à la poulie", detail: "Retrouve les repères de ton exercice dans la séance." },
+            { fichier: "pompes", titre: "Pompes au sol", detail: "Enregistre tes répétitions pour garder une trace." },
+          ].map(({ fichier, titre, detail }) => (
+            <article key={fichier} className="overflow-hidden rounded-2xl border border-cyan-300/20 bg-white/[0.025]">
+              <video controls playsInline preload="none" poster={`/videos/exercices/posters/${fichier}.jpg`} className="aspect-[4/3] w-full bg-black object-contain" aria-label={`Démonstration : ${titre}`}>
+                <source src={`/videos/exercices/${fichier}.mp4`} type="video/mp4" />
+                Ton navigateur ne peut pas lire cette vidéo.
+              </video>
+              <div className="p-5"><h3 className="font-semibold text-white">{titre}</h3><p className="mt-2 text-sm leading-6 text-graphite-300">{detail}</p></div>
+            </article>
+          ))}
+        </div>
+        <Link href="/fonctionnalites" className="mt-6 inline-flex min-h-11 items-center font-semibold text-cyan-200 underline underline-offset-4">Explorer les fonctionnalités →</Link>
+      </section>
       <MobileLeadBar />
 
       <section id="comment-ca-marche" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-20 sm:py-24">
@@ -335,8 +348,6 @@ export default function LandingPage() {
           ))}
         </ol>
         <div className="mt-9 text-center">
-          <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>
-          <p className="mt-3 text-xs text-graphite-500">Aucune carte bancaire · résultat immédiat · sans engagement</p>
           <Link href="/pricing" className="mt-4 inline-block text-sm font-semibold text-laiton-300 underline underline-offset-4 transition hover:text-laiton-200">
             Voir les accompagnements →
           </Link>
@@ -429,14 +440,6 @@ export default function LandingPage() {
             tarifs : decision Anthony du meme jour, le prix arrive apres le
             bilan et apres avoir vu l'application, pas avant. */}
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <span className="coai-cta-glow">
-            <Link
-              href="/diagnostic"
-              className="inline-flex rounded-full bg-laiton-300 px-8 py-4 text-sm font-bold uppercase tracking-[0.05em] text-[#0d0d0c] transition hover:bg-laiton-200"
-            >
-              Faire mon bilan gratuit →
-            </Link>
-          </span>
           {/* Depuis le 04/09/2026 ce bouton mene a un formulaire de demande
               d'appel (/appel-decouverte) et non plus directement a WhatsApp :
               WhatsApp suppose que la personne ecrive elle-meme le premier
@@ -518,11 +521,6 @@ export default function LandingPage() {
           Chaque nouvelle recette, chaque nouvelle vidéo, chaque amélioration :
           incluse, sans supplément.
         </p>
-        <div className="mt-8 flex justify-center">
-          <Link href="/diagnostic">
-            <Button>Faire mon bilan gratuit</Button>
-          </Link>
-        </div>
       </section>
       </Reveal>
 
