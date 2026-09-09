@@ -214,6 +214,11 @@ export async function PilierPage({
                 ca qu'il faut pouvoir telecharger"). La fiche reunit les trois
                 piliers en un seul PDF. */}
             {aUnContenu && <div className="flex flex-wrap gap-2">
+              {pilierActif === "ENTRAINEMENT" && (
+                <a href="#seance-du-jour" className="coai-pillar-primary inline-flex min-h-11 items-center rounded-full px-5 text-sm font-bold">
+                  Accéder à ma séance →
+                </a>
+              )}
               <a
                 href="/api/programmes/fiche-complete"
                 className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-semibold transition"
@@ -319,11 +324,16 @@ export async function PilierPage({
             <section id={`pilier-${pilier.toLowerCase()}`} key={pilier} className="scroll-mt-6">
               <Card className="flex flex-col gap-3 p-6 text-center">
                 <Badge tone="warning">À valider par le coach</Badge>
-                <h2 className="text-2xl font-semibold text-white">Ton coach relit ton programme.</h2>
+                <h2 className="text-2xl font-semibold text-white">Programme en attente de validation</h2>
                 <p className="text-sm leading-6 text-graphite-300">
-                  Son contenu reste privé jusqu&apos;à sa validation.
+                  La séance n&apos;est pas encore accessible. Tu peux consulter les démonstrations des exercices en attendant.
                 </p>
-                <Link href="/suivi/repcount" className="coai-pillar-primary mx-auto inline-flex rounded-full px-5 py-3 text-sm font-bold">
+                {pilier === "ENTRAINEMENT" && (
+                  <Link href="/programme/exercices" className="coai-pillar-primary mx-auto inline-flex rounded-full px-5 py-3 text-sm font-bold">
+                    Voir les exercices et leurs vidéos →
+                  </Link>
+                )}
+                <Link href="/suivi/repcount" className="mx-auto inline-flex min-h-11 items-center text-sm underline underline-offset-4">
                   Enregistrer mes exercices dans RepCount →
                 </Link>
               </Card>

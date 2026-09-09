@@ -57,11 +57,11 @@ const ONGLETS: {
     match: "/programme",
     teinte: "76,201,240",
     sous: [
-      { href: "/programme/entrainement", label: "Séance du jour" },
+      { href: "/programme/entrainement", label: "Mon programme" },
       // "Ma fiche séance" plutôt que "Fiche imprimable" (23/08/2026,
       // Anthony : "personne ne va imprimer") — l'usage réel est de la
       // consulter et de la partager ; le PDF n'est qu'une des sorties.
-      { href: "/programme/seance-du-jour", label: "Ma fiche séance" },
+      { href: "/programme/seance-du-jour", label: "Fiche du jour" },
       { href: "/programme/exercices", label: "Bibliothèque d’exercices" },
       { href: "/programme/programmes-prets", label: "Programmes prêts" },
       { href: "/programme/correction-mouvement", label: "Correction de mouvement" },
