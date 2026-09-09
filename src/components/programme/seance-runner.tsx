@@ -9,6 +9,8 @@ import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { MotionCheck } from "@/components/programme/motion-check";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
+import { ExerciceVideo } from "@/components/programme/exercice-video";
+import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -667,7 +669,9 @@ export function SeanceRunner({
 
             {step.type === "set" && (() => {
               const photoQuery = typeof step.exercice.photoQuery === "string" ? step.exercice.photoQuery : undefined;
-              const photoUrl = photoCoaiPourNom(step.nom) ?? (photoQuery ? photosParExercice?.[photoQuery] : null);
+              const nomActif = substitutions[step.nom]?.variante ?? step.nom;
+              const photoUrl = photoCoaiPourNom(nomActif) ?? (!substitutions[step.nom] && photoQuery ? photosParExercice?.[photoQuery] : null);
+              const videoDisponible = Boolean(videoCoaiPourNom(nomActif));
               const cle = `${step.exerciceIndex}-${step.setIndex}`;
               const saisi = realise[cle] ?? { reps: "", charge: "" };
               return (
@@ -687,15 +691,17 @@ export function SeanceRunner({
                         si l'exercice est reconnu dans la table des muscles :
                         une silhouette éteinte laisserait croire à un bug. */}
                     {(() => {
-                      const cible = musclesPourExercice(step.nom);
+                      const cible = musclesPourExercice(nomActif);
                       if (!cible) return null;
                       return <MuscleMap activeMuscles={cible.muscles} vue={cible.vue} compact />;
                     })()}
 
-                    {photoUrl && (
+                    {videoDisponible ? (
+                      <ExerciceVideo key={nomActif} nom={nomActif} className="w-full max-w-sm" />
+                    ) : photoUrl && (
                       <div className="relative w-full max-w-sm overflow-hidden rounded-2xl">
                         {/* eslint-disable-next-line @next/next/no-img-element -- cascade visuel COAI puis stock */}
-                        <img src={photoUrl} alt={`Position de référence : ${step.nom}`} className="h-52 w-full object-cover object-center" loading="eager" />
+                        <img src={photoUrl} alt={`Position de référence : ${nomActif}`} className="h-52 w-full object-cover object-center" loading="eager" />
                         <CoaiImageMark />
                       </div>
                     )}
@@ -717,7 +723,7 @@ export function SeanceRunner({
                     )}
                   </div>
 
-                  {estPolyarticulaire(step.nom) && <MotionCheck nomExercice={step.nom} />}
+                  {estPolyarticulaire(nomActif) && <MotionCheck key={nomActif} nomExercice={nomActif} />}
 
                   {/* La consigne reste derrière un bouton plutôt qu'affichée
                       en clair : c'est une phrase longue (repère de charge
