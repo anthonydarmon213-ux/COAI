@@ -25,7 +25,7 @@ const TABLE: Entree[] = [
   { motifs: ["mollets unilateral haltere", "mollet unilateral haltere"], video: { fichier: "mollets-unilateral-haltere", description: "Mollets unilatéral avec haltère" } },
   { motifs: ["rowing elastique", "rowing a l'elastique"], video: { fichier: "rowing-elastique", description: "Rowing penché à l'élastique" } },
   { motifs: ["face pull elastique", "face pull"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
-  { motifs: ["kickback elastique", "kickback"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
+  { motifs: ["kickback triceps a l'elastique", "kickback triceps elastique"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
   { motifs: ["developpe incline (machine)", "developpe incline machine", "developpe incline a la machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
   // Lot fonctionnel réel du 25/08/2026. Les variantes précises restent
   // avant les motifs génériques (notamment « burpee »).
@@ -139,6 +139,9 @@ function normaliser(texte: string): string {
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {
   const normalise = normaliser(nom);
+  // La démonstration de traction libre ne montre pas le réglage ni
+  // l'exécution sur une machine assistée. Ne jamais utiliser ce repli.
+  if (/(traction|pull[ -]?up)/.test(normalise) && /(guide|assist|machine)/.test(normalise)) return null;
   const entree = TABLE.find(({ motifs }) =>
     motifs.some((motif) => normalise.includes(normaliser(motif)))
   );
