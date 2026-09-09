@@ -218,6 +218,7 @@ function CercleMinuteur({ secondesRestantes, secondesTotal }: { secondesRestante
 }
 
 type Realise = { reps: string; charge: string };
+type Substitutions = Record<string, { variante: string; consigne: string }>;
 
 // Reprise d'entraînement (01/09/2026, demande Anthony). Jusqu'ici le
 // lecteur ne persistait rien : le chrono repartait de Date.now() au montage
@@ -236,6 +237,8 @@ type SeanceSauvegardee = {
   debut: number;
   index: number;
   realise: Record<string, Realise>;
+  substitutions?: Substitutions;
+  seanceCondensee?: boolean;
 };
 
 function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
@@ -246,7 +249,11 @@ function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
     const d = JSON.parse(brut) as SeanceSauvegardee;
     // On ne reprend que LA MÊME séance : restaurer la position d'une autre
     // séance sur des exercices différents produirait un état incohérent.
-    if (d?.nomSeance !== nomSeance || typeof d.debut !== "number") return null;
+    if (d?.nomSeance !== nomSeance || typeof d.debut !== "number" || !Number.isFinite(d.debut)) return null;
+    if (!Number.isInteger(d.index) || d.index < 0 || !isPlainObject(d.realise)) return null;
+    if (!Object.values(d.realise).every((v) => isPlainObject(v) && typeof v.reps === "string" && typeof v.charge === "string")) return null;
+    if (d.substitutions !== undefined && (!isPlainObject(d.substitutions) || !Object.values(d.substitutions).every((v) => isPlainObject(v) && typeof v.variante === "string" && typeof v.consigne === "string"))) return null;
+    if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
     if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
       window.localStorage.removeItem(CLE_SEANCE);
       return null;
@@ -281,12 +288,15 @@ export function SeanceRunner({
   photosParExercice?: Record<string, string | null>;
   onClose: () => void;
 }) {
+  // Restaurer les ajustements avant de reconstruire les étapes : l'index
+  // d'une séance courte ne désigne pas la même série dans la séance complète.
+  const [sauvegarde] = useState(() => lireSauvegarde(nomSeance));
   // Ajustements en direct (22/08/2026, demande Anthony) — appliqués
   // uniquement à la séance en cours, jamais écrits dans le programme
   // généré : c'est un dépannage du jour, pas une modification du plan.
   const [ajustementOuvert, setAjustementOuvert] = useState(false);
-  const [substitutions, setSubstitutions] = useState<Record<string, { variante: string; consigne: string }>>({});
-  const [seanceCondensee, setSeanceCondensee] = useState(false);
+  const [substitutions, setSubstitutions] = useState<Substitutions>(() => sauvegarde?.substitutions ?? {});
+  const [seanceCondensee, setSeanceCondensee] = useState(() => sauvegarde?.seanceCondensee ?? false);
   const [dicteeActive, setDicteeActive] = useState(false);
   // Résolu une seule fois : la disponibilité de la Web Speech API ne change
   // pas pendant la séance, et instancier à chaque rendu créerait des objets
@@ -321,9 +331,8 @@ export function SeanceRunner({
   }, [tousLesSteps, seanceCondensee]);
   // Restauration synchrone à l'initialisation : passer par un useEffect
   // ferait clignoter l'écran sur l'état vierge avant de sauter à la reprise.
-  const sauvegarde = useMemo(() => lireSauvegarde(nomSeance), [nomSeance]);
   const [reprise] = useState(() => sauvegarde !== null);
-  const [index, setIndex] = useState(() => sauvegarde?.index ?? 0);
+  const [index, setIndex] = useState(() => Math.min(sauvegarde?.index ?? 0, Math.max(0, steps.length - 1)));
   const [secondesRestantes, setSecondesRestantes] = useState(0);
   const [chronoGlobal, setChronoGlobal] = useState(0);
   const [termine, setTermine] = useState(false);
@@ -347,13 +356,13 @@ export function SeanceRunner({
     try {
       window.localStorage.setItem(
         CLE_SEANCE,
-        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise } satisfies SeanceSauvegardee)
+        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee } satisfies SeanceSauvegardee)
       );
     } catch {
       // Quota dépassé ou navigation privée : la séance continue normalement,
       // elle ne sera simplement pas reprenable.
     }
-  }, [termine, nomSeance, index, realise]);
+  }, [termine, nomSeance, index, realise, substitutions, seanceCondensee]);
   const bip = useBip();
 
   const step = steps[index];
