@@ -9,6 +9,7 @@ import { CoaiIntro } from "@/components/marketing/coai-intro";
 import { Reveal } from "@/components/marketing/reveal";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { MobileLeadBar } from "@/components/marketing/lead-cta";
+import { ChandeliersCharges } from "@/components/suivi/chandeliers-charges";
 
 const TITLE = "COAI — Coaching adaptatif pour dirigeants et entrepreneurs";
 // "Santé et longévité" ajouté le 04/09/2026 (demande Anthony, inspiration
@@ -171,14 +172,6 @@ function CorpsCompletSection() {
           </article>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link
-            href="/diagnostic"
-            className="inline-flex min-h-14 items-center justify-center rounded-full bg-laiton-300 px-8 py-4 text-sm font-bold uppercase tracking-[0.04em] text-[#101214] transition hover:-translate-y-0.5 hover:bg-laiton-200"
-          >
-            Faire mon bilan de forme offert →
-          </Link>
-        </div>
       </section>
     </Reveal>
   );
@@ -327,6 +320,21 @@ export default function LandingPage() {
               <div className="p-5"><h3 className="font-semibold text-white">{titre}</h3><p className="mt-2 text-sm leading-6 text-graphite-300">{detail}</p></div>
             </article>
           ))}
+        </div>
+        <div className="mt-8 grid items-start gap-6 rounded-3xl border border-cyan-300/20 bg-black/30 p-5 sm:p-8 lg:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-200">RepCount · Démonstration interactive</p>
+            <h3 className="mt-4 font-display text-2xl font-semibold text-white sm:text-3xl">Tes efforts ne disparaissent plus après la séance.</h3>
+            <p className="mt-4 leading-7 text-graphite-300">Note tes charges et tes répétitions. Retrouve ensuite le détail de chaque séance pour comparer ce que tu as réellement fait.</p>
+            <p className="mt-4 rounded-xl border border-laiton-300/20 p-4 text-sm leading-6 text-laiton-200">Essaie le sélecteur « Explorer une séance » : le détail des séries change avec la date choisie.</p>
+            <p className="mt-4 text-sm leading-6 text-graphite-300">Exemple fictif de développé couché, sans données de membre. Ces charges illustrent le fonctionnement du suivi : ce ne sont ni des objectifs ni une promesse de résultat.</p>
+          </div>
+          <ChandeliersCharges historique={[
+            { date: new Date("2026-09-08T12:00:00Z"), charges: [40, 45, 45] },
+            { date: new Date("2026-09-05T12:00:00Z"), charges: [40, 42.5, 40] },
+            { date: new Date("2026-09-02T12:00:00Z"), charges: [35, 40, 40] },
+            { date: new Date("2026-08-30T12:00:00Z"), charges: [35, 37.5, 35] },
+          ].map(({ date, charges }) => ({ date, sets: charges.map(charge => ({ charge, reps: 10 })), volume: charges.reduce((total, charge) => total + charge * 10, 0), meilleureSerie: { charge: Math.max(...charges), reps: 10 } }))} />
         </div>
         <Link href="/fonctionnalites" className="mt-6 inline-flex min-h-11 items-center font-semibold text-cyan-200 underline underline-offset-4">Explorer les fonctionnalités →</Link>
       </section>
