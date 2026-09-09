@@ -20,7 +20,7 @@ const TITLE = "COAI — Coaching adaptatif pour dirigeants et entrepreneurs";
 // précisée le même jour ("Santé et longévité" plutôt que "longévité" seul,
 // retour direct d'Anthony).
 const DESCRIPTION =
-  "La Méthode COAI Adapt transforme ton bilan en coaching quotidien qui évolue avec ton agenda, ton énergie et tes progrès. Bilan offert en moins de 5 minutes.";
+  "La Méthode COAI Adapt transforme ton bilan en coaching quotidien qui évolue avec ton agenda, ton énergie et tes progrès. Bilan offert en 3 minutes.";
 
 // 11/08/2026 : sans ce bloc openGraph/twitter dédié, chaque page publique
 // affichait le titre/description génériques du layout racine ("COAI — HI ×
@@ -58,7 +58,7 @@ const FAQ = [
       // gratuit, comment on paie, et renvoie vers la page tarifs pour qui
       // veut les chiffres tout de suite. Masquer un prix a quelqu'un qui le
       // demande le ferait fuir plus surement que le prix lui-meme.
-      "Non. Le bilan est offert, sans carte bancaire, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — COAI Essentiel par abonnement mensuel sans engagement, les deux transformations avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
+      "Non. Le bilan est offert, et dix fonctions de l'application restent gratuites : carnet de séances, records, mesures, bibliothèque d'exercices et recettes. Les accompagnements payants te sont présentés après ton bilan, quand tu as vu l'application et ce qu'elle fait pour toi — COAI Essentiel par abonnement mensuel sans engagement, les deux transformations avec Anthony par pack de 3 ou 6 mois, sur devis via WhatsApp. Tous les tarifs sont détaillés sur la page Accompagnements si tu veux les voir dès maintenant.",
   },
   {
     question: "Je peux résilier quand je veux ?",
@@ -284,7 +284,7 @@ const STRUCTURED_DATA = {
 // bon moment, dans le quiz lui-même et sur /pricing, pas listés d'avance
 // ici où ils ne font qu'allonger le parcours avant même de commencer.
 const PARCOURS_COURT = [
-  ["01", "Fais ton bilan de forme offert", "Obtiens ton résultat et tes priorités en moins de 5 minutes, sans carte bancaire."],
+  ["01", "Fais ton bilan de forme offert", "Obtiens ton résultat et tes priorités en 3 minutes."],
   ["02", "Choisis ton accompagnement", "Ton programme personnalisé, puis COAI Essentiel, Premium Remote ou VIP Présentiel."],
   ["03", "Commence ta première séance", "COAI te guide immédiatement, étape par étape."],
 ] as const;
@@ -537,7 +537,7 @@ export default function LandingPage() {
       </Reveal>
 
       <section className="coai-future-cta relative mx-auto mb-16 flex w-[calc(100%-2rem)] max-w-6xl flex-col items-center gap-5 overflow-hidden rounded-[2.5rem] border border-laiton-300/20 px-6 py-20 text-center">
-        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · moins de 5 minutes</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-laiton-300">Bilan offert · 3 minutes</span>
         <h2 className="max-w-3xl font-display text-3xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">Découvre ton point de départ.</h2>
         <p className="max-w-2xl text-graphite-200">Le bilan est offert. Tu verras ton résultat avant de créer un compte ou de choisir un accompagnement.</p>
         <Link href="/diagnostic"><Button>Faire mon bilan gratuit</Button></Link>

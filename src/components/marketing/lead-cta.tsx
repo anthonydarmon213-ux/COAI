@@ -32,7 +32,7 @@ export function MobileLeadBar() {
       <div className="mx-auto flex max-w-md items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-white">Ton bilan personnalisé offert</p>
-          <p className="text-xs text-white/55">5 min · sans carte bancaire</p>
+          <p className="text-xs text-white/55">Ton bilan en 3 minutes</p>
         </div>
         <LeadCtaLink placement="mobile_sticky" className="min-h-11 shrink-0 px-5 py-2.5 text-xs">
           Commencer
