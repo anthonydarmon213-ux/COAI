@@ -101,8 +101,13 @@ export function ActivationFlow({
       let dernierStatut = 0;
       for (let tentative = 0; tentative < RETRIES_GENERATION && dernierStatut !== 201; tentative++) {
         if (tentative > 0) await sleep(DELAI_RETRY_MS);
+        if (annule) return;
         const res = await fetch("/api/programmes/generate", { method: "POST" });
         dernierStatut = res.status;
+        // Seul le retard de synchronisation des droits justifie une
+        // nouvelle tentative. Une erreur fournisseur ou un quota ne doit
+        // pas déclencher une rafale de générations potentiellement payantes.
+        if (dernierStatut !== 403) break;
       }
       if (annule) return;
       if (dernierStatut === 201) {

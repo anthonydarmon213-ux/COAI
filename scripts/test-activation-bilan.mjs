@@ -36,3 +36,25 @@ for(const scenario of ['http-error','network-error','invalid-json','null-json','
  assert.equal(states.at(-1),scenario==='success'?'exploration':'erreur_bilan');
  console.log(`PASS ${scenario}: clear=${cleared}, state=${states.at(-1)}`);
 }
+
+for (const statuses of [[201], [403,201], [403,403,403,403,403,403], [429], [502], [401], [422]]) {
+ const effects=[], states=[]; let calls=0;
+ const imports={
+  react:{useEffect:fn=>effects.push(fn),useState:initial=>[initial,value=>states.push(value)]},
+  'react/jsx-runtime':{jsx:()=>null,jsxs:()=>null},
+  'next/link':{}, '@/components/ui/button':{}, '@/components/ui/section-label':{}, '@/components/compte/profil-completion':{},
+  '@/lib/diagnostic/storage':{readDiagnosticAnswers:()=>null,clearDiagnosticAnswers:()=>assert.fail('No answers to clear')},
+  '@/lib/diagnostic/progress-storage':{readDiagnosticProgress:()=>null},
+  '@/lib/analytics/funnel-events':{trackFunnelEvent:()=>{}},
+  '@/lib/profil/completion':{computeProfilCompletion:()=>({essentielComplet:true})},
+ };
+ const box={exports:{},require:n=>{assert.ok(n in imports,n);return imports[n];},setTimeout:fn=>{fn();return 0;},
+  fetch:async url=>{assert.equal(url,'/api/programmes/generate'); return {status:statuses[Math.min(calls++,statuses.length-1)]};}};
+ vm.runInNewContext(compiled,box);
+ box.exports.ActivationFlow({coachValidationRequise:false,profilInitial:{},declencherGenerationAuto:true});
+ effects[0](); await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(calls,statuses.length);
+ const last=statuses.at(-1);
+ assert.equal(states.at(-1),last===201?'pret':last===403?'debloquer':'erreur');
+ console.log(`PASS generation ${statuses.join('→')}: ${calls} request(s), no real API call`);
+}
