@@ -23,4 +23,8 @@ for (const key of ['series','repetitions','repos','charge','methode']) {const s=
 assert.ok(check({...valid(),exercices:[]}).erreurs.length);
 assert.ok(check({...valid(),exercices:[{...valid().exercices[0],nom:'Exercice inventé'}]}).erreurs.length);
 assert.ok(check(null).erreurs.length);
-console.log('PASS: 12 contrôles de complétude, catalogue réel chargé');
+for (const [key,value] of [['series',-3],['series',0],['series',2.5],['repetitions','0-10'],['repos','-60 sec'],['repos',Infinity],['series','−3']]) {
+  const s=valid();s.exercices[0][key]=value;assert.ok(check(s).erreurs.length, `${key}: ${value}`);
+}
+const sansRepos=valid();sansRepos.exercices[0].repos='0 sec';assert.equal(check(sansRepos).erreurs.length,0);
+console.log('PASS: 20 contrôles de complétude, catalogue réel chargé');

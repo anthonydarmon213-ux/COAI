@@ -15,7 +15,13 @@ export function verifierQualiteSeance(value: unknown) {
   exercices.forEach((exercice, index) => {
     for (const champ of ["series", "repetitions", "repos"]) {
       const valeur = exercice[champ];
-      if ((typeof valeur !== "string" && typeof valeur !== "number") || !/\d/.test(String(valeur))) {
+      const texte = String(valeur).trim();
+      const nombres = texte.match(/\d+(?:[.,]\d+)?/g)?.map(n => Number(n.replace(",", "."))) ?? [];
+      const negatif = /(?:^|\s)[−-]\s*\d/.test(texte);
+      if ((typeof valeur !== "string" && typeof valeur !== "number") || !nombres.length ||
+          negatif || nombres.some(n => !Number.isFinite(n) || (champ === "repos" ? n < 0 : n <= 0)) ||
+          (champ === "series" && nombres.some(n => !Number.isInteger(n))) ||
+          (typeof valeur === "number" && !Number.isFinite(valeur))) {
         erreurs.push(`exercice ${index + 1} : ${champ} chiffré manquant`);
       }
     }
