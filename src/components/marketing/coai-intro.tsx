@@ -37,7 +37,7 @@ export function CoaiIntro() {
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center">
         <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.055] px-4 py-2 text-[11px] font-bold uppercase leading-4 tracking-[0.2em] text-cyan-200 sm:text-xs">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(56,189,248,.9)]" />
-          Pour dirigeants &amp; entrepreneurs de 35 à 65 ans
+          Pour dirigeants &amp; entrepreneurs de 35 ans et plus
         </p>
 
         <h1 className="mt-5 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
