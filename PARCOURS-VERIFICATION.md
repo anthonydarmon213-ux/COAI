@@ -11,7 +11,7 @@ Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve
 | Première séance | Navigation actualisée vue en production ; tests locaux des remplacements et du suivi | Compte connecté actuellement en attente de validation coach ; lecture, reprise et fin réelles non vérifiées |
 | RepCount | Pas de nouvelle preuve de bout en bout | Sauvegarde puis relecture sur compte de test |
 | Mesure | Ouverture du lecteur distinguée de première séance enregistrée | Réception effective des événements ; agrégation du tunnel |
-| Relances | Test de cadence réussi | Test du registre d'envoi nécessite le chemin du module PGlite ; aucun email envoyé dans cet audit |
+| Relances | Test de cadence et 32 assertions du registre réussis sur SQL local (doublons, délai, rollback, statut incertain) | Concurrence distribuée, schéma effectivement déployé, exécution des crons et réception fournisseur non vérifiés ; aucun email envoyé dans cet audit |
 
 ## Sémantique des événements
 
@@ -20,3 +20,9 @@ Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve
 - `workout_completed` : séance PROGRAMME enregistrée, événement existant.
 
 Les logs serveur ne constituent pas à eux seuls un tableau de conversion. Les événements navigateur peuvent être absents quand GA4 n'est pas chargé.
+
+## Reproduire le test des relances
+
+`node scripts/test-delivery-registry.cjs /chemin/vers/@electric-sql/pglite/dist/index.js`
+
+Le 9 septembre, le module existant `/tmp/coai-local-db-P9se0u/node_modules/@electric-sql/pglite/dist/index.js` a permis d'exécuter le test. Ce chemin temporaire n'est pas une dépendance durable. Le test crée une base en mémoire et simule le fournisseur ; il ne se connecte pas à la base de production.

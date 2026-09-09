@@ -5,6 +5,9 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const { pathToFileURL } = require('node:url');
 (async () => {
+  if (!process.argv[2]) {
+    throw new Error('Usage: node scripts/test-delivery-registry.cjs /chemin/vers/@electric-sql/pglite/dist/index.js [schema.sql]. Test SQL local uniquement, aucun email envoyé.');
+  }
   const { PGlite } = await import(pathToFileURL(process.argv[2]).href);
   const db = new PGlite();
   const sandbox = { exports: {} };
