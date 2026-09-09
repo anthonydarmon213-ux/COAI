@@ -31,6 +31,7 @@ export type FunnelEventName =
   | "first_repcount_saved"
   | "first_programme_viewed"
   | "first_workout_started"
+  | "workout_player_opened"
   | "progress_shared"
   | "referral_link_shared"
   | "diagnostic_result_shared";

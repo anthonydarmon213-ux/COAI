@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { SeanceRunner } from "@/components/programme/seance-runner";
+import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 
 // Bouton client isolé (21/08/2026) : entrainement-view.tsx reste un
 // composant serveur, seul ce déclencheur + le lecteur plein écran ont
@@ -63,7 +64,12 @@ export function DemarrerSeanceButton({
     <>
       <button
         type="button"
-        onClick={() => setOuvert(true)}
+        onClick={() => {
+          setOuvert(true);
+          // Ouverture du lecteur, pas preuve de réalisation d'une séance.
+          // Aucun nom d'exercice ni donnée de santé n'est envoyé à GA4.
+          trackFunnelEvent("workout_player_opened");
+        }}
         className="coai-rainbow-cta w-full rounded-xl border-0 py-3 text-sm font-extrabold text-[#111216]"
       >
         ▶ Démarrer la séance

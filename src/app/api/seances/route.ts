@@ -103,7 +103,7 @@ export async function POST(request: Request) {
   });
 
   if (source === "PROGRAMME") {
-    if (entreesDeCetteSource === 0) trackServerEvent("first_workout_started", user.id);
+    if (entreesDeCetteSource === 0) trackServerEvent("first_workout_completed", user.id);
     trackServerEvent("workout_completed", user.id);
     if (parsed.data.difficulte != null || parsed.data.energie != null || parsed.data.douleur) {
       trackServerEvent("workout_checkin_completed", user.id);
