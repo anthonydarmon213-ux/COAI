@@ -307,6 +307,10 @@ export default function LandingPage() {
       <CoaiIntro />
       <section className="mx-auto w-full max-w-6xl px-6 py-14">
         <SectionLabel>Dans ton application</SectionLabel>
+        <figure className="my-6 overflow-hidden rounded-2xl border border-cyan-300/20 bg-black">
+          <Image src="/coai-bilan-apercu.png" alt="Écran réel du bilan COAI : objectif, sommeil, énergie, mouvement et récupération." width={1280} height={1000} sizes="(max-width: 768px) 100vw, 1104px" className="h-auto w-full" />
+          <figcaption className="px-5 py-3 text-sm text-graphite-300">Aperçu réel du bilan : comprendre ton point de départ avant de choisir ton accompagnement.</figcaption>
+        </figure>
         <h2 className="mt-3 font-display text-3xl font-semibold text-white sm:text-4xl">Vois le mouvement. Suis ta séance. Note tes progrès.</h2>
         <p className="mt-4 max-w-2xl leading-7 text-graphite-300">Un aperçu des démonstrations de la bibliothèque COAI. Dans ta séance, retrouve les consignes, les séries, les répétitions et le repos ; dans RepCount, enregistre tes charges et consulte leur évolution.</p>
         <div className="mt-8 grid gap-5 md:grid-cols-3">
