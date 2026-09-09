@@ -239,6 +239,7 @@ type SeanceSauvegardee = {
   realise: Record<string, Realise>;
   substitutions?: Substitutions;
   seanceCondensee?: boolean;
+  nomsRealises?: Record<string, string>;
 };
 
 function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
@@ -254,6 +255,7 @@ function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
     if (!Object.values(d.realise).every((v) => isPlainObject(v) && typeof v.reps === "string" && typeof v.charge === "string")) return null;
     if (d.substitutions !== undefined && (!isPlainObject(d.substitutions) || !Object.values(d.substitutions).every((v) => isPlainObject(v) && typeof v.variante === "string" && typeof v.consigne === "string"))) return null;
     if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
+    if (d.nomsRealises !== undefined && (!isPlainObject(d.nomsRealises) || !Object.values(d.nomsRealises).every((v) => typeof v === "string"))) return null;
     if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
       window.localStorage.removeItem(CLE_SEANCE);
       return null;
@@ -345,6 +347,7 @@ export function SeanceRunner({
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
   const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
+  const [nomsRealises, setNomsRealises] = useState<Record<string, string>>(() => sauvegarde?.nomsRealises ?? {});
   const debutRef = useRef(sauvegarde?.debut ?? Date.now());
   const finRef = useRef<string | null>(null);
 
@@ -356,13 +359,13 @@ export function SeanceRunner({
     try {
       window.localStorage.setItem(
         CLE_SEANCE,
-        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee } satisfies SeanceSauvegardee)
+        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee, nomsRealises } satisfies SeanceSauvegardee)
       );
     } catch {
       // Quota dépassé ou navigation privée : la séance continue normalement,
       // elle ne sera simplement pas reprenable.
     }
-  }, [termine, nomSeance, index, realise, substitutions, seanceCondensee]);
+  }, [termine, nomSeance, index, realise, substitutions, seanceCondensee, nomsRealises]);
   const bip = useBip();
 
   const step = steps[index];
@@ -387,13 +390,13 @@ export function SeanceRunner({
     if (!voixActive || !step) return;
     if (step.type === "set") {
       const reps = typeof step.exercice.repetitions === "string" ? `, ${step.exercice.repetitions}` : "";
-      parler(`${step.nom}. Série ${step.setIndex} sur ${step.totalSets}${reps}`, { interrompre: true });
+      parler(`${substitutions[step.nom]?.variante ?? step.nom}. Série ${step.setIndex} sur ${step.totalSets}${substitutions[step.nom] ? "" : reps}`, { interrompre: true });
     } else if (step.type === "echauffement") {
       parler("Échauffement", { interrompre: true });
     } else if (step.type === "calme") {
       parler("Retour au calme", { interrompre: true });
     }
-  }, [index, step, voixActive]);
+  }, [index, step, voixActive, substitutions]);
 
   // Décompte de fin de repos : 3, 2, 1 puis "c'est parti".
   useEffect(() => {
@@ -427,7 +430,10 @@ export function SeanceRunner({
       if (s.type !== "set" || i >= index + 1) return;
       const cle = `${s.exerciceIndex}-${s.setIndex}`;
       const saisi = realise[cle];
-      const entree = parExercice.get(s.nom) ?? { nom: s.nom, series: 0, sets: [] };
+      // Le nom est figé au moment de valider la série : un remplacement
+      // ultérieur ne doit pas réattribuer les séries déjà réalisées.
+      const nom = nomsRealises[cle] ?? (i === index ? substitutions[s.nom]?.variante : undefined) ?? s.nom;
+      const entree = parExercice.get(nom) ?? { nom, series: 0, sets: [] };
       entree.series += 1;
       const reps = Number(saisi?.reps);
       const charge = Number(saisi?.charge);
@@ -435,7 +441,7 @@ export function SeanceRunner({
         entree.sets.push({ set: entree.series, reps, charge });
         entree.chargeKg = charge;
       }
-      parExercice.set(s.nom, entree);
+      parExercice.set(nom, entree);
     });
     const listeBilan: BilanExercice[] = [...parExercice.values()].map((e) => ({
       nom: e.nom, series: e.series, sets: e.sets.map((x) => ({ reps: x.reps, charge: x.charge })),
@@ -506,11 +512,11 @@ export function SeanceRunner({
         const contexte = step?.type === "set"
           ? {
               sessionName: nomSeance,
-              exerciseName: step.nom,
+              exerciseName: substitutions[step.nom]?.variante ?? step.nom,
               series: typeof step.exercice.series === "string" ? step.exercice.series : undefined,
-              repetitions: typeof step.exercice.repetitions === "string" ? step.exercice.repetitions : undefined,
+              repetitions: !substitutions[step.nom] && typeof step.exercice.repetitions === "string" ? step.exercice.repetitions : undefined,
               rest: typeof step.exercice.repos === "string" ? step.exercice.repos : undefined,
-              loadGuidance: typeof step.exercice.charge === "string" ? step.exercice.charge : undefined,
+              loadGuidance: substitutions[step.nom]?.consigne ?? (typeof step.exercice.charge === "string" ? step.exercice.charge : undefined),
             }
           : { sessionName: nomSeance };
 
@@ -553,6 +559,9 @@ export function SeanceRunner({
 
   function suivant() {
     setConsigneOuverte(false);
+    if (step?.type === "set") {
+      setNomsRealises((prev) => ({ ...prev, [`${step.exerciceIndex}-${step.setIndex}`]: substitutions[step.nom]?.variante ?? step.nom }));
+    }
     if (index + 1 >= steps.length) {
       terminerSeance();
       return;
@@ -567,7 +576,7 @@ export function SeanceRunner({
   if (steps.length === 0 || !step) return null;
 
   const prochainSet = steps.slice(index + 1).find((s): s is Extract<Step, { type: "set" }> => s.type === "set");
-  const consigne = step.type === "set" && typeof step.exercice.charge === "string" ? step.exercice.charge : null;
+  const consigne = step.type === "set" ? substitutions[step.nom]?.consigne ?? (typeof step.exercice.charge === "string" ? step.exercice.charge : null) : null;
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
@@ -727,7 +736,7 @@ export function SeanceRunner({
                         Remplace {step.nom} · {substitutions[step.nom]?.consigne}
                       </p>
                     )}
-                    {typeof step.exercice.repetitions === "string" && (
+                    {!substitutions[step.nom] && typeof step.exercice.repetitions === "string" && (
                       <p className="mt-1 text-sm text-graphite-300">Visé : {String(step.exercice.repetitions)}</p>
                     )}
                   </div>
@@ -864,7 +873,7 @@ export function SeanceRunner({
               </button>
             )}
             {prochainSet && (
-              <p className="text-center text-[11px] uppercase tracking-wide text-graphite-600">À venir · {prochainSet.nom}</p>
+              <p className="text-center text-[11px] uppercase tracking-wide text-graphite-600">À venir · {substitutions[prochainSet.nom]?.variante ?? prochainSet.nom}</p>
             )}
             <button
               type="button"
