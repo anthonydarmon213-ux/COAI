@@ -10,6 +10,12 @@ Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve
 - `test-onboarding-programme-reuse.cjs` : véritable route avec persistance simulée ; mêmes identifiants après trois reprises, aucun contrôle de quota supplémentaire pour la réutilisation, pas de contenu retourné, statut EN_ATTENTE conservé, pilier manquant seulement, régénération explicite, refus 401/403. `test-activation-bilan.mjs` inclut l'échec partiel.
 - Limite explicite : deux premières requêtes réellement concurrentes peuvent encore constater ensemble un pilier manquant. La protection distribuée de la création/version et la reprise d'un processus interrompu restent à réaliser ; ce lot ne prétend pas les résoudre.
 
+## Registre email : preuves supplémentaires
+
+- Lecture seule du catalogue PostgreSQL du projet Supabase COAI `fczkfddfgooocqqkqsqw` : `email_deliveries` et `email_recipient_gates` existent, RLS activée sur les deux. Ce contrôle de présence ne certifie pas les permissions complètes ni l'exécution des crons.
+- `node scripts/test-delivery-concurrency.cjs` : véritables module et adaptateur Prisma, deux clients PostgreSQL séparés sur `127.0.0.1:54322`, quatre tentatives simultanées répétées trois fois → un seul envoi simulé et une seule ligne SENT. Deux messages différents pour un même destinataire respectent également le verrou. Une issue fournisseur incertaine reste UNCERTAIN et une autre connexion ne réessaie pas.
+- Données uniquement aléatoires de test, supprimées en fin de test ; aucun email externe, migration ou modification de client. Reste à intégrer ce registre aux rappels qui ne l'utilisent pas encore, tester les processus interrompus et contrôler la délivrabilité réelle.
+
 ## Choix annuel et connexion — 10 septembre
 
 - Reproduction navigateur local : choix annuel sur la tarification anonyme → inscription avec `plan=PASS_IA&billing=ANNUAL` → lien « Se connecter » → connexion du compte fictif. Avant correction : `/bienvenue`, sans reprise de l'offre. Le lien imposait cette destination et court-circuitait la reprise du cookie d'intention.
