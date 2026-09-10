@@ -34,12 +34,22 @@ Ce contrôle n'est **pas** un pare-feu ni une protection intégrée à l'applica
 | Création de compte | Compte fictif local créé et confirmé via Mailpit | Ordre bilan avant inscription et conservation des réponses |
 | Paiement / essai | Checkout Stripe test, webhook HTTP 200, souscription locale et retour navigateur vérifiés | Cas refus, annulation et redélivrance réelle du même événement |
 | Activation | Essai actif, bilan connecté puis génération socle locale réussis ; Full Body débutant 1/2 séances corrigé | Autres variantes, cohérence des illustrations et qualité globale |
-| Première séance | Compte fictif local actif, lecteur ouvert, vidéo presse lue, six séries synthétiques saisies | Reprise et fin réelles non vérifiées ; test arrêté au premier maintien |
-| RepCount | Série enregistrée, historique retrouvé après rechargement, persistance SQL vérifiée | Enregistrement depuis une séance PROGRAMME complète |
+| Première séance | Deux séances synthétiques complètes enregistrées depuis le lecteur local, 12 séries chacune ; reprise après rechargement et bilan facultatif vérifiés | Équivalence production, autres variantes, reprise réseau dégradé avec check-in |
+| RepCount | Historique PROGRAMME retrouvé après rechargement ; planche 2×30 s, courbe 60 s et saisie en maintien | Parcours complet mobile au-delà de cet écran, toutes les variantes |
 | Mesure | Ouverture du lecteur distinguée de première séance enregistrée | Réception effective des événements ; agrégation du tunnel |
 | Relances | Test de cadence et 32 assertions du registre réussis sur SQL local (doublons, délai, rollback, statut incertain) | Concurrence distribuée, schéma effectivement déployé, exécution des crons et réception fournisseur non vérifiés ; aucun email envoyé dans cet audit |
 
 ## Sémantique des événements
+
+### Mise à jour E2E du 10 septembre — navigateur isolé
+
+Les limitations « Mac verrouillé » décrites plus haut sont historiques : un Chromium headless indépendant, sans profil personnel, permet désormais les tests locaux. Aucun contournement de session personnelle.
+
+- Première séance : échauffement, 12 séries, retour au calme, enregistrement source PROGRAMME `60defb58-206f-40ec-9acb-1eab816ac33e`. Rechargement après la première série puis reprise au repos, série conservée. Lecture authentifiée de `/api/seances` et navigation du récapitulatif vers RepCount ; planche 2×30 s, total 60 s après rechargement. Viewport 390×844 sans débordement horizontal.
+- Lacune découverte : aucun ressenti proposé dans le lecteur. Ajout d'un bilan facultatif à la dernière étape, sans valeur précochée, sans nouvelle page ni API IA. Difficulté/énergie 1–5 et douleur/zone utilisent les champs existants de `/api/seances`. Les réponses ne sont pas copiées dans localStorage ; conservées en mémoire pour une nouvelle tentative d'enregistrement. Rechargement avant envoi : elles doivent être resaisies.
+- Test navigateur du nouveau formulaire : sélection difficulté 4, énergie 2, douleur légère, genou. API après enregistrement : mêmes quatre valeurs et six exercices, séance `4dcc4891-513d-4143-b10a-fd89107c7410`. Rendu mobile inspecté. `test-seance-checkin.cjs` vérifie les vrais contrôles, remise à zéro de la zone, absence de réponses implicites, désactivation pendant envoi et compatibilité avec le véritable schéma API.
+- Correction du faux message « enregistrée » en cas d'échec et verrou synchrone contre le double clic dans le lecteur.
+- Ce sont des données sportives fictives et des tests accélérés, sans prescription ni durée réelle prouvée. L'adaptation automatique à partir de ces réponses et la réception analytique restent à vérifier. Des modifications tierces préexistantes du worktree ne font pas partie de ce lot ; ces tests locaux ne certifient pas à eux seuls toute la production.
 
 - `workout_player_opened` : clic qui ouvre le lecteur, via le mécanisme GA4 existant. Peut inclure une reprise ; ne prouve pas une séance réalisée. Aucune donnée d'exercice transmise.
 - `first_workout_completed` : première séance PROGRAMME enregistrée par l'API. Remplace le libellé trompeur `first_workout_started` dans les logs serveur à partir de ce lot ; ne pas mélanger les deux séries historiques.

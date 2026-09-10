@@ -1,0 +1,47 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const ts = require('typescript');
+const React = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+const root = path.resolve(__dirname, '..');
+const filename = path.join(root, 'src/components/programme/seance-checkin.tsx');
+const source = fs.readFileSync(filename, 'utf8');
+const moduleObject = { exports: {} };
+vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText, { module: moduleObject, exports: moduleObject.exports, require });
+const { SeanceCheckin } = moduleObject.exports;
+let value = {};
+function tree(disabled = false) { return SeanceCheckin({ value, onChange: next => { value = next; }, disabled }); }
+function selects(node) {
+  if (!node || typeof node !== 'object') return [];
+  return [ ...(node.type === 'select' ? [node] : []), ...React.Children.toArray(node.props?.children).flatMap(selects) ];
+}
+assert.equal(selects(tree()).length, 3);
+assert.ok(selects(tree()).every(s => s.props.value === '' && !s.props.required));
+selects(tree())[0].props.onChange({ target: { value: '4' } });
+selects(tree())[1].props.onChange({ target: { value: '2' } });
+selects(tree())[2].props.onChange({ target: { value: 'IMPORTANTE' } });
+selects(tree())[3].props.onChange({ target: { value: 'Genou' } });
+assert.equal(value.difficulte, 4);
+assert.equal(value.energie, 2);
+assert.equal(value.douleurZone, 'Genou');
+assert.match(renderToStaticMarkup(tree()), /Demande un avis professionnel/);
+assert.equal(tree(true).props.disabled, true);
+selects(tree())[2].props.onChange({ target: { value: 'AUCUNE' } });
+assert.equal(value.douleurZone, undefined);
+assert.equal(selects(tree()).length, 3);
+selects(tree())[2].props.onChange({ target: { value: '' } });
+selects(tree())[0].props.onChange({ target: { value: '' } });
+selects(tree())[1].props.onChange({ target: { value: '' } });
+assert.equal(JSON.stringify(value), '{}', 'Skipping must not invent a pain or energy answer');
+const api = fs.readFileSync(path.join(root, 'src/app/api/seances/route.ts'), 'utf8');
+const schemaContext = { z: require('zod').z };
+vm.runInNewContext(ts.transpileModule(api.slice(api.indexOf('const setSchema'), api.indexOf('export async function GET')) + '\nglobalThis.schema = bodySchema;', {}).outputText, schemaContext);
+const base = { date: new Date().toISOString(), source: 'PROGRAMME', exercices: [] };
+assert.equal(schemaContext.schema.safeParse(base).success, true);
+const parsed = schemaContext.schema.parse({ ...base, difficulte: 4, energie: 2, douleur: 'IMPORTANTE', douleurZone: 'Genou' });
+assert.equal(parsed.difficulte, 4);
+assert.equal(parsed.douleurZone, 'Genou');
+assert.equal(schemaContext.schema.safeParse({ ...base, energie: 6 }).success, false);
+console.log('PASS check-in: optional answers, controlled values, pain zone reset, disabled pending, actual API schema compatibility');

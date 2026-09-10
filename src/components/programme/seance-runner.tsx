@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { voixDisponible, lirePreferenceVoix, ecrirePreferenceVoix, parler, stopperVoix } from "@/lib/voice/speech";
 import { MuscleMap } from "@/components/programme/muscle-map";
 import { SeanceBilan, type BilanExercice } from "@/components/programme/seance-bilan";
+import { SeanceCheckin, type SeanceCheckinValeurs } from "@/components/programme/seance-checkin";
 import { musclesPourExercice, estPolyarticulaire } from "@/lib/exercices/muscles";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
@@ -333,6 +334,9 @@ export function SeanceRunner({
   const [bilan, setBilan] = useState<BilanExercice[]>([]);
   const [tonnagePrecedent, setTonnagePrecedent] = useState<number | null>(null);
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const envoiRef = useRef(false);
+  // Pas de réponse présélectionnée ni de copie des douleurs dans le stockage local.
+  const [checkin, setCheckin] = useState<SeanceCheckinValeurs>({});
   const [erreurSauvegarde, setErreurSauvegarde] = useState(false);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
@@ -409,7 +413,8 @@ export function SeanceRunner({
   }, [step, secondesRestantes, bip]);
 
   async function terminerSeance() {
-    if (envoiEnCours) return;
+    if (envoiRef.current) return;
+    envoiRef.current = true;
     setEnvoiEnCours(true);
     setErreurSauvegarde(false);
     finRef.current ??= new Date().toISOString();
@@ -466,6 +471,7 @@ export function SeanceRunner({
           source: "PROGRAMME",
           exercices: [...parExercice.values()],
           dureeMinutes,
+          ...checkin,
           notes: `Séance guidée : ${nomSeance}`,
         }),
       });
@@ -479,6 +485,7 @@ export function SeanceRunner({
       // acquise ni effacer les séries tant que le serveur ne les a pas reçues.
       setErreurSauvegarde(true);
     } finally {
+      envoiRef.current = false;
       setEnvoiEnCours(false);
       setTermine(true);
     }
@@ -812,6 +819,8 @@ export function SeanceRunner({
                 </div>
               );
             })()}
+
+            {index + 1 >= steps.length && <SeanceCheckin value={checkin} onChange={setCheckin} disabled={envoiEnCours} />}
 
             {step.type === "repos" && (
               <>

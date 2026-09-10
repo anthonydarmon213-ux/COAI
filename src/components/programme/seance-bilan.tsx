@@ -178,7 +178,7 @@ export function SeanceBilan({
         Terminer
       </button>
       <p className="text-[11px] text-graphite-400">
-        {dureeSecondes > 0 ? "Ta séance est enregistrée dans ton suivi." : ""}
+        {dureeSecondes > 0 && !sauvegardeErreur && !enregistrementEnCours ? "Ta séance est enregistrée dans ton suivi." : ""}
       </p>
     </div>
   );
