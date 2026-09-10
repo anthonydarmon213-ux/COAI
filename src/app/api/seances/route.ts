@@ -8,6 +8,7 @@ const setSchema = z.object({
   set: z.number().int().positive(),
   reps: z.number().int().nonnegative(),
   charge: z.number().nonnegative(),
+  dureeSecondes: z.number().int().positive().max(3600).optional(),
   rpe: z.number().min(1).max(10).optional(),
 });
 

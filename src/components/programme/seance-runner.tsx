@@ -11,6 +11,7 @@ import { MotionCheck } from "@/components/programme/motion-check";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 import { ExerciceVideo } from "@/components/programme/exercice-video";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
+import { parseReposSeconds } from "@/lib/programmes/repos";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -37,18 +38,6 @@ function parseSeries(value: unknown): number {
   const match = typeof value === "string" ? value.match(/\d+/) : null;
   const n = match ? parseInt(match[0], 10) : 1;
   return Number.isFinite(n) && n > 0 ? Math.min(n, 10) : 1;
-}
-
-function parseReposSeconds(value: unknown): number {
-  if (typeof value !== "string") return 60;
-  const isMinutes = /min/i.test(value);
-  const nombres = value.match(/\d+/g)?.map(Number) ?? [];
-  if (nombres.length === 0) return 60;
-  // Une fourchette ("60-90 sec") retient le haut de fourchette — mieux vaut
-  // un repos un peu long que trop court, jamais l'inverse pour la sécurité.
-  const valeur = Math.max(...nombres);
-  const secondes = isMinutes ? valeur * 60 : valeur;
-  return Math.min(Math.max(secondes, 10), 600);
 }
 
 // Découpe l'échauffement/retour au calme (une phrase longue générée par
@@ -217,7 +206,7 @@ function CercleMinuteur({ secondesRestantes, secondesTotal }: { secondesRestante
   );
 }
 
-type Realise = { reps: string; charge: string };
+type Realise = { reps: string; charge: string; dureeSecondes?: string };
 type Substitutions = Record<string, { variante: string; consigne: string }>;
 
 // Reprise d'entraînement (01/09/2026, demande Anthony). Jusqu'ici le
@@ -253,6 +242,7 @@ function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
     if (d?.nomSeance !== nomSeance || typeof d.debut !== "number" || !Number.isFinite(d.debut)) return null;
     if (!Number.isInteger(d.index) || d.index < 0 || !isPlainObject(d.realise)) return null;
     if (!Object.values(d.realise).every((v) => isPlainObject(v) && typeof v.reps === "string" && typeof v.charge === "string")) return null;
+    if (!Object.values(d.realise).every((v) => v.dureeSecondes === undefined || typeof v.dureeSecondes === "string")) return null;
     if (d.substitutions !== undefined && (!isPlainObject(d.substitutions) || !Object.values(d.substitutions).every((v) => isPlainObject(v) && typeof v.variante === "string" && typeof v.consigne === "string"))) return null;
     if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
     if (d.nomsRealises !== undefined && (!isPlainObject(d.nomsRealises) || !Object.values(d.nomsRealises).every((v) => typeof v === "string"))) return null;
@@ -424,7 +414,7 @@ export function SeanceRunner({
     setErreurSauvegarde(false);
     finRef.current ??= new Date().toISOString();
     const dureeMinutes = Math.max(1, Math.round((Date.now() - debutRef.current) / 60000));
-    type SetDetail = { set: number; reps: number; charge: number };
+    type SetDetail = { set: number; reps: number; charge: number; dureeSecondes?: number };
     const parExercice = new Map<string, { nom: string; series: number; chargeKg?: number; sets: SetDetail[] }>();
     steps.forEach((s, i) => {
       if (s.type !== "set" || i >= index + 1) return;
@@ -437,14 +427,17 @@ export function SeanceRunner({
       entree.series += 1;
       const reps = Number(saisi?.reps);
       const charge = Number(saisi?.charge);
-      if (Number.isFinite(reps) && reps > 0 && Number.isFinite(charge) && charge >= 0) {
+      const dureeSecondes = Number(saisi?.dureeSecondes);
+      if (Number.isInteger(dureeSecondes) && dureeSecondes > 0 && dureeSecondes <= 3600) {
+        entree.sets.push({ set: entree.series, reps: 0, charge: 0, dureeSecondes });
+      } else if (Number.isFinite(reps) && reps > 0 && Number.isFinite(charge) && charge >= 0) {
         entree.sets.push({ set: entree.series, reps, charge });
         entree.chargeKg = charge;
       }
       parExercice.set(nom, entree);
     });
     const listeBilan: BilanExercice[] = [...parExercice.values()].map((e) => ({
-      nom: e.nom, series: e.series, sets: e.sets.map((x) => ({ reps: x.reps, charge: x.charge })),
+      nom: e.nom, series: e.series, sets: e.sets.map((x) => ({ reps: x.reps, charge: x.charge, dureeSecondes: x.dureeSecondes })),
     }));
     setBilan(listeBilan);
 
@@ -692,6 +685,7 @@ export function SeanceRunner({
               const videoDisponible = Boolean(videoCoaiPourNom(nomActif));
               const cle = `${step.exerciceIndex}-${step.setIndex}`;
               const saisi = realise[cle] ?? { reps: "", charge: "" };
+              const isometrique = !substitutions[step.nom] && /isom[eé]trique/i.test(String(step.exercice.methode ?? ""));
               return (
                 /* Deux colonnes sur desktop (23/08/2026, signalé par Anthony :
                    "il faut que je déroule beaucoup pour voir les instructions,
@@ -759,7 +753,7 @@ export function SeanceRunner({
 
                   {/* Saisie de ce qui a été réellement fait — facultative :
                       laisser vide reste valable, la série compte quand même. */}
-                  {vocalDisponible && (
+                  {vocalDisponible && !isometrique && (
                     <button
                       type="button"
                       onClick={() => {
@@ -796,15 +790,15 @@ export function SeanceRunner({
 
                   <div className="grid w-full max-w-xs grid-cols-2 gap-2.5 text-left">
                     <label className="flex flex-col gap-1">
-                      <span className="font-mono text-[9px] uppercase tracking-widest text-graphite-500">Reps faites</span>
+                      <span className="font-mono text-[9px] uppercase tracking-widest text-graphite-500">{isometrique ? "Maintien (secondes)" : "Reps faites"}</span>
                       <input
                         type="number" inputMode="numeric" min="0" max="999" placeholder="—"
-                        value={saisi.reps}
-                        onChange={(e) => setRealise((r) => ({ ...r, [cle]: { ...saisi, reps: e.target.value } }))}
+                        value={isometrique ? saisi.dureeSecondes ?? "" : saisi.reps}
+                        onChange={(e) => setRealise((r) => ({ ...r, [cle]: isometrique ? { ...saisi, reps: "", charge: "", dureeSecondes: e.target.value } : { ...saisi, dureeSecondes: undefined, reps: e.target.value } }))}
                         className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-center text-lg font-semibold tabular-nums text-white outline-none focus:border-laiton-400/60"
                       />
                     </label>
-                    <label className="flex flex-col gap-1">
+                    {!isometrique && <label className="flex flex-col gap-1">
                       <span className="font-mono text-[9px] uppercase tracking-widest text-graphite-500">Charge (kg)</span>
                       <input
                         type="number" inputMode="decimal" min="0" max="500" placeholder="—"
@@ -812,7 +806,7 @@ export function SeanceRunner({
                         onChange={(e) => setRealise((r) => ({ ...r, [cle]: { ...saisi, charge: e.target.value } }))}
                         className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-center text-lg font-semibold tabular-nums text-white outline-none focus:border-laiton-400/60"
                       />
-                    </label>
+                    </label>}
                   </div>
                   </div>
                 </div>

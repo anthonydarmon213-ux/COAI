@@ -7,6 +7,7 @@ import type {
   ObjectifSocle,
   RegimeSocle,
 } from "@/lib/programmes-socles/cle";
+import { fullBodyValide } from "@/lib/programmes-socles/full-body-valide";
 
 // Bibliothèque éditoriale COAI : ces programmes sont construits une fois,
 // versionnés et servis à tous les abonnés Pass IA sans aucun appel à un
@@ -152,8 +153,11 @@ const LABEL_OBJECTIF: Record<ObjectifSocle, string> = {
   PERFORMANCE: "Performance",
 };
 
-export function construireSocleEntrainement(cle: CleEntrainement) {
+export function construireSocleEntrainement(cle: CleEntrainement, dureeSeanceMinutes?: number | null) {
   const { objectif, niveau, frequence } = decomposerCleEntrainement(cle);
+  if (niveau === "DEBUTANT" && (frequence === 1 || frequence === 2)) {
+    return fullBodyValide(frequence, dureeSeanceMinutes);
+  }
   const format = prescription(objectif, niveau);
   const seances = SEANCES.slice(0, frequence).map((modele, index) => ({
     jour: JOURS_ENTRAINEMENT[index] ?? "Lundi",

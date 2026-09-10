@@ -18,6 +18,7 @@ type ProfilSocle = {
   objectifs?: string | null;
   niveau?: string | null;
   frequenceEntrainement?: string | null;
+  dureeSeanceMinutes?: number | null;
   allergiesAlimentaires?: string | null;
   habitudesAlimentaires?: string | null;
 };
@@ -48,7 +49,7 @@ async function lire(sousDossier: string, cle: string): Promise<unknown | null> {
  */
 export async function socleEntrainement(profil: ProfilSocle) {
   const cle = cleEntrainement(profil);
-  return (await lire("entrainement", cle)) ?? construireSocleEntrainement(cle);
+  return (await lire("entrainement", cle)) ?? construireSocleEntrainement(cle, profil.dureeSeanceMinutes);
 }
 
 export async function socleNutrition(profil: ProfilSocle) {

@@ -16,7 +16,7 @@ import { SeanceShareButton } from "@/components/programme/seance-share-button";
 // précédente n'apparaît que si elle existe — jamais de « +0 % » au premier
 // entraînement, qui donnerait le sentiment de n'avoir rien fait.
 
-export type BilanExercice = { nom: string; series: number; sets: { reps: number; charge: number }[] };
+export type BilanExercice = { nom: string; series: number; sets: { reps: number; charge: number; dureeSecondes?: number }[] };
 
 function useCompteur(cible: number, actif: boolean, duree = 1100) {
   const [valeur, setValeur] = useState(0);
@@ -142,6 +142,7 @@ export function SeanceBilan({
         <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-left">
           {exercices.map((e) => {
             const t = e.sets.reduce((s, x) => s + x.reps * x.charge, 0);
+            const maintien = e.sets.reduce((s, x) => s + (x.dureeSecondes ?? 0), 0);
             return (
               <Link
                 key={e.nom}
@@ -150,7 +151,7 @@ export function SeanceBilan({
               >
                 <span className="min-w-0 truncate text-graphite-200">{e.nom}</span>
                 <span className="flex-none font-mono tabular-nums text-graphite-400 transition group-hover:text-cyan-200">
-                  {e.series} × {t > 0 ? `${t.toLocaleString("fr-FR")} kg` : "—"}
+                  {e.series} séries · {maintien > 0 ? `${maintien} s de maintien` : t > 0 ? `${t.toLocaleString("fr-FR")} kg cumulés` : "poids du corps"}
                   <span className="ml-1.5" aria-hidden="true">↗</span>
                 </span>
               </Link>
