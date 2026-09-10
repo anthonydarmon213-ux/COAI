@@ -477,8 +477,10 @@ async function relancerEssaisNonActives(appUrl: string): Promise<number> {
       `Bonjour${nom},\n\n` +
         `Ton essai COAI est actif, mais ton programme personnalisé n'a pas encore été généré. ` +
         `Il te suffit de reprendre ton profil : COAI prépare ensuite ton entraînement, ta nutrition et ta récupération.\n\n` +
-        `Terminer mon activation : ${appUrl}/bienvenue\n\n` +
-        `Tu disposes toujours de tes 7 jours d'essai, sans engagement.\n\n` +
+        // Le paramètre reprend le parcours d'activation ; /bienvenue
+        // revérifie l'abonnement en base, il ne donne aucun droit à lui seul.
+        `Terminer mon activation : ${appUrl}/bienvenue?plan=${encodeURIComponent(subscription.plan)}\n\n` +
+        `Retrouve la date de fin de ton essai et les modalités de ton abonnement dans ton espace : ${appUrl}/compte/abonnement\n\n` +
         `À bientôt,\nL'équipe COAI`
     );
     if (!envoye) continue;

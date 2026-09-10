@@ -236,19 +236,21 @@ export default async function BienvenuePage({
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
-      <TrackConversion
+      {/* Une reprise depuis un rappel n'est pas un nouvel achat. Seul un
+          retour Checkout vérifié peut produire ces événements. */}
+      {sessionVerifiee && <><TrackConversion
         name="subscription_started"
         params={{ plan, billing: billingVerifie }}
         metaEvent={metaEventAchat}
         metaParams={{ value: valeurConversion, currency: "EUR" }}
         onceKey={conversionKey}
       />
-      <TrackConversion name="checkout_completed" params={{ plan }} onceKey={conversionKey} />
+      <TrackConversion name="checkout_completed" params={{ plan }} onceKey={conversionKey} /></>}
 
       <div className="flex flex-col items-center gap-3">
-        <SectionLabel>{enEssai ? "Essai activé" : "Accès confirmé"}</SectionLabel>
+        <SectionLabel>{enEssai ? (sessionVerifiee ? "Essai activé" : "Essai en cours") : "Accès confirmé"}</SectionLabel>
         <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-4xl">
-          {enEssai ? "Tes 7 jours d'essai commencent." : `Bienvenue${prenom ? `, ${prenom}` : ""}.`}
+          {enEssai ? (sessionVerifiee ? "Tes 7 jours d'essai commencent." : "Reprenons ton activation.") : `Bienvenue${prenom ? `, ${prenom}` : ""}.`}
         </h1>
         <p className="max-w-md text-sm leading-6 text-graphite-400">
           COAI prépare ton programme. Ta première séance sera accessible juste ici, sans chercher dans les menus.

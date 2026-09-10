@@ -11,6 +11,14 @@ Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve
 
 ## Préparation du test isolé — 10 septembre
 
+### Reprise d'essai depuis une relance
+
+- Le rappel d'essai actif sans programme dirigeait vers `/bienvenue` en mode exploration. Le lien inclut maintenant la formule persistée ; la page conserve sa vérification de l'abonnement en base avant activation. Le message ne promet plus sept jours supplémentaires.
+- Une reprise sans session Checkout vérifiée n'émet plus de nouveaux événements d'achat et affiche « Essai en cours », pas un nouvel essai. `test-trial-reminder.cjs` utilise la véritable fonction du rappel et la page de destination : succès/échec fournisseur simulé, horodatage seulement après succès, abonnement actif/absent/annulé/en retard, et vrai chemin de retour Checkout simulé conservant ses événements. Aucun envoi externe.
+- Test navigateur du compte gratuit fictif : `/bienvenue?plan=PASS_IA` reste en exploration, sans ouverture des droits. Le lien seul ne vaut donc pas abonnement.
+- Reprise du bilan mobile : Checkout TEST affiche 7 jours gratuits puis 19,99 €/mois ; annulation par « Retour à COAI » vers `/pricing?checkout=cancel&selected=PASS_IA&billing=MONTHLY#pass-ia`, compte toujours connecté. Pas d'activation ni de débit pour cette fixture.
+- Relances : l'audit constate que le registre anti-doublon est utilisé par les rappels diagnostic, mais pas encore par tous les rappels d'activation, checkout et paiement. Concurrence, réception fournisseur et configuration effective des crons restent à vérifier ; aucune garantie globale d'envoi unique n'est revendiquée.
+
 ### Bilan anonyme mobile → inscription depuis l'essai
 
 - Navigateur isolé, 390 × 844, traceurs refusés, fixture féminine 42 ans / 168 cm / 65 kg, débutante, reprise, salle, 45 min, 2 séances/semaine. Rechargement à l'étape alimentation : « Continuer mon diagnostic » reprend cette étape ; résultat obtenu avant création de compte.
