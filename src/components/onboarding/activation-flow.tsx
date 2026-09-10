@@ -9,6 +9,7 @@ import { readDiagnosticProgress } from "@/lib/diagnostic/progress-storage";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { computeProfilCompletion, type CompletionProfil } from "@/lib/profil/completion";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
+import { readIntendedPlanCookie, readIntendedBillingCookie, readIntendedVipSessionsCookie } from "@/lib/checkout/intended-plan-cookie";
 
 // Rendu sur /bienvenue, juste après l'activation Stripe (essai ou paiement
 // immédiat).
@@ -74,6 +75,7 @@ export function ActivationFlow({
 }) {
   const [etat, setEtat] = useState<Etat>("verification");
   const [completion, setCompletion] = useState<CompletionProfil | null>(null);
+  const [repriseOffre, setRepriseOffre] = useState<{ href: string; label: string } | null>(null);
 
   useEffect(() => {
     let annule = false;
@@ -154,6 +156,16 @@ export function ActivationFlow({
           if (declencherGenerationAuto) {
             await lancerGeneration();
           } else {
+            // Une intention n'est pas un droit d'accès : proposer une reprise
+            // explicite, jamais un paiement ni une génération automatiques.
+            const plan = readIntendedPlanCookie();
+            if (plan) {
+              const anchor = plan === "PASS_IA" ? "pass-ia" : plan === "STANDARD" ? "full-remote" : "full-presentiel";
+              setRepriseOffre({
+                href: `/pricing?selected=${plan}&billing=${readIntendedBillingCookie()}&vipSessions=${readIntendedVipSessionsCookie()}#${anchor}`,
+                label: plan === "PASS_IA" ? "Continuer vers mon essai" : "Retrouver mon accompagnement",
+              });
+            }
             // L'accès libre attend que les réponses du bilan aient bien été
             // enregistrées avant d'ouvrir le dashboard. Cela évite qu'un
             // clic immédiat sur /bienvenue devance la synchronisation du
@@ -193,12 +205,18 @@ export function ActivationFlow({
       <div className="flex w-full max-w-md flex-col items-center gap-3 text-center">
         <p className="text-sm font-medium text-emerald-300">Ton bilan est bien enregistré.</p>
         <Link
-          href="/fonctionnalites"
+          href={repriseOffre?.href ?? "/fonctionnalites"}
           className="coai-rainbow-cta inline-flex min-h-14 w-full items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-[#111216] shadow-[0_20px_55px_-20px_rgba(102,126,255,.75)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_65px_-18px_rgba(228,92,150,.65)]"
         >
-          Découvrir mon espace COAI&nbsp; →
+          {repriseOffre?.label ?? "Découvrir mon espace COAI"}&nbsp; →
         </Link>
-        <p className="text-xs leading-5 text-graphite-500">Découvre les fonctions gratuites, essaie-les, puis choisis ton accompagnement à ton rythme.</p>
+        {repriseOffre ? (
+          <Link href="/fonctionnalites" className="text-sm text-graphite-300 underline underline-offset-4 hover:text-white">
+            Découvrir d’abord mon espace gratuit
+          </Link>
+        ) : (
+          <p className="text-xs leading-5 text-graphite-500">Découvre les fonctions gratuites, essaie-les, puis choisis ton accompagnement à ton rythme.</p>
+        )}
       </div>
     );
   }
