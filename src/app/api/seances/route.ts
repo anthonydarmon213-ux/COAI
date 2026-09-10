@@ -72,49 +72,48 @@ export async function POST(request: Request) {
   // même date ISO. Si la première écriture avait réussi mais que sa réponse
   // s'était perdue, on renvoie la séance existante au lieu de créer un
   // doublon dans l'historique et les statistiques.
-  const dejaEnregistree = await prisma.seanceLog.findFirst({
-    where: { userId: user.id, date: parsed.data.date },
-  });
-  if (dejaEnregistree) {
-    const nbDeCetteSource = await prisma.seanceLog.count({ where: { userId: user.id, source } });
-    return NextResponse.json(dejaEnregistree, {
-      status: 200,
-      headers: {
-        "X-COAI-First-Source": dejaEnregistree.source === source && nbDeCetteSource === 1 ? "1" : "0",
+  const { seance, created, first } = await prisma.$transaction(async tx => {
+    // Sérialise seulement les écritures de ce membre. Aucun appel externe
+    // dans cette courte transaction ; le verrou est libéré au commit/rollback.
+    await tx.$queryRaw`SELECT id FROM users WHERE id = ${user.id} FOR UPDATE`;
+    const dejaEnregistree = await tx.seanceLog.findFirst({
+      where: { userId: user.id, date: parsed.data.date },
+    });
+    const entreesDeCetteSource = await tx.seanceLog.count({ where: { userId: user.id, source } });
+    if (dejaEnregistree) return {
+      seance: dejaEnregistree, created: false,
+      first: dejaEnregistree.source === source && entreesDeCetteSource === 1,
+    };
+    const seance = await tx.seanceLog.create({
+      data: {
+        userId: user.id,
+        date: parsed.data.date,
+        exercices: parsed.data.exercices,
+        source,
+        ressenti: parsed.data.ressenti,
+        notes: parsed.data.notes,
+        difficulte: parsed.data.difficulte,
+        energie: parsed.data.energie,
+        douleur: parsed.data.douleur,
+        douleurZone: parsed.data.douleur === "AUCUNE" ? undefined : parsed.data.douleurZone,
+        dureeMinutes: parsed.data.dureeMinutes,
       },
     });
-  }
-
-  const entreesDeCetteSource = await prisma.seanceLog.count({ where: { userId: user.id, source } });
-
-  const seance = await prisma.seanceLog.create({
-    data: {
-      userId: user.id,
-      date: parsed.data.date,
-      exercices: parsed.data.exercices,
-      source,
-      ressenti: parsed.data.ressenti,
-      notes: parsed.data.notes,
-      difficulte: parsed.data.difficulte,
-      energie: parsed.data.energie,
-      douleur: parsed.data.douleur,
-      douleurZone: parsed.data.douleur === "AUCUNE" ? undefined : parsed.data.douleurZone,
-      dureeMinutes: parsed.data.dureeMinutes,
-    },
+    return { seance, created: true, first: entreesDeCetteSource === 0 };
   });
 
-  if (source === "PROGRAMME") {
-    if (entreesDeCetteSource === 0) trackServerEvent("first_workout_completed", user.id);
+  if (created && source === "PROGRAMME") {
+    if (first) trackServerEvent("first_workout_completed", user.id);
     trackServerEvent("workout_completed", user.id);
     if (parsed.data.difficulte != null || parsed.data.energie != null || parsed.data.douleur) {
       trackServerEvent("workout_checkin_completed", user.id);
     }
-  } else if (source === "REPCOUNT") {
-    trackServerEvent("repcount_saved", user.id, { first: entreesDeCetteSource === 0 });
+  } else if (created && source === "REPCOUNT") {
+    trackServerEvent("repcount_saved", user.id, { first });
   }
 
   return NextResponse.json(seance, {
-    status: 201,
-    headers: { "X-COAI-First-Source": entreesDeCetteSource === 0 ? "1" : "0" },
+    status: created ? 201 : 200,
+    headers: { "X-COAI-First-Source": first ? "1" : "0" },
   });
 }

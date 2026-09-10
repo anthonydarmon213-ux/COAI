@@ -2,6 +2,12 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Enregistrement concurrent de séance — 10 septembre
+
+- `POST /api/seances` faisait recherche, comptage et insertion sans transaction : deux requêtes pouvaient toutes deux ne rien trouver, insérer deux lignes et annoncer deux premières séances. Transaction courte, verrou de la ligne membre existante, recherche/comptage/insertion atomiques ; événements serveur émis seulement après une nouvelle écriture validée. Pas de migration ni appel externe dans la transaction.
+- `node scripts/test-seance-concurrency.cjs` appelle la vraie route avec deux clients PostgreSQL locaux, identité et événements simulés : quatre demandes identiques → 1 réponse 201, 3 réponses 200, un identifiant, une ligne, un événement premier ; PROGRAMME et REPCOUNT testés. Reprise avec réponse perdue sans écrasement, deux dates distinctes conservées avec un seul premier événement, rollback après insertion puis reprise par l'autre connexion, refus anonyme. Fixtures aléatoires supprimées après test.
+- Limites : ce test n'est pas un échange HTTP navigateur, ni une preuve de réception GA4/Meta. Le webhook WhatsApp utilise un autre chemin d'écriture ; sa déduplication reste séparée. L'en-tête First-Source reste renvoyé sur reprise pour récupérer une réponse perdue ; la déduplication publicitaire côté navigateur reste à vérifier. La cohorte admin repose sur les membres distincts en base, pas sur le nombre de logs console.
+
 ## Rechargement de l'activation — 10 septembre
 
 - L'accueil post-essai appelait systématiquement la génération, même avec les trois piliers déjà présents. Base locale du compte fictif `08440874-5d8a-4577-9bf7-7756a84696b3` : 18 lignes après les reprises précédentes, avec certaines versions concurrentes identiques. Aucun appel IA payant dans cet environnement.
