@@ -383,48 +383,56 @@ export async function reprendreProgrammeHabituel(
   userId: string,
   pilier: Pilier
 ): Promise<{ nouvelleVersion: number } | null> {
-  const dernierProgramme = await prisma.programmeGenerated.findFirst({
-    where: { userId, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
-    orderBy: { generatedAt: "desc" },
+  const resultat = await prisma.$transaction(async tx => {
+    // Même verrou que la génération : relecture, copie et historique sont
+    // atomiques. Un second clic relit le programme non temporaire et s'arrête.
+    await tx.$queryRaw`SELECT id FROM users WHERE id=${userId} FOR UPDATE`;
+    const dernierProgramme = await tx.programmeGenerated.findFirst({
+      where: { userId, pilier, statut: { in: ["VALIDE", "GENERE_IA"] } },
+      orderBy: [{ version: "desc" }, { generatedAt: "desc" }, { id: "desc" }],
+    });
+    if (!dernierProgramme || !dernierProgramme.temporaire) return null;
+
+    const adaptationVoyage = await tx.programmeAdaptation.findFirst({
+      where: { userId, pilier, programmeSuivantId: dernierProgramme.id },
+      orderBy: { createdAt: "desc" },
+    });
+    const programmeAvantVoyage = adaptationVoyage?.programmePrecedentId
+      ? await tx.programmeGenerated.findUnique({ where: { id: adaptationVoyage.programmePrecedentId } })
+      : null;
+    if (!programmeAvantVoyage || programmeAvantVoyage.userId !== userId || programmeAvantVoyage.pilier !== pilier) return null;
+
+    const dernierNumero = await tx.programmeGenerated.findFirst({
+      where: { userId, pilier }, orderBy: { version: "desc" }, select: { version: true },
+    });
+    const version = (dernierNumero?.version ?? 0) + 1;
+    const nouveauProgramme = await tx.programmeGenerated.create({
+      data: {
+        userId,
+        pilier,
+        contenu: programmeAvantVoyage.contenu as object,
+        statut: programmeAvantVoyage.statut,
+        version,
+        temporaire: false,
+      },
+    });
+
+    await tx.programmeAdaptation.create({
+      data: {
+        userId,
+        pilier,
+        decision: "GARDER",
+        changements: [],
+        resume: "Retour au programme habituel après le mode voyage.",
+        programmePrecedentId: dernierProgramme.id,
+        programmeSuivantId: nouveauProgramme.id,
+        statut: "APPLIQUEE",
+        contexte: { type: "FIN_VOYAGE" },
+      },
+    });
+
+    return { nouvelleVersion: nouveauProgramme.version };
   });
-  if (!dernierProgramme || !dernierProgramme.temporaire) return null;
-
-  const adaptationVoyage = await prisma.programmeAdaptation.findFirst({
-    where: { userId, pilier, programmeSuivantId: dernierProgramme.id },
-    orderBy: { createdAt: "desc" },
-  });
-  const programmeAvantVoyage = adaptationVoyage?.programmePrecedentId
-    ? await prisma.programmeGenerated.findUnique({ where: { id: adaptationVoyage.programmePrecedentId } })
-    : null;
-  if (!programmeAvantVoyage) return null;
-
-  const version = await prochaineVersion(userId, pilier);
-  const nouveauProgramme = await prisma.programmeGenerated.create({
-    data: {
-      userId,
-      pilier,
-      contenu: programmeAvantVoyage.contenu as object,
-      statut: programmeAvantVoyage.statut,
-      version,
-      temporaire: false,
-    },
-  });
-
-  await prisma.programmeAdaptation.create({
-    data: {
-      userId,
-      pilier,
-      decision: "GARDER",
-      changements: [],
-      resume: "Retour au programme habituel après le mode voyage.",
-      programmePrecedentId: dernierProgramme.id,
-      programmeSuivantId: nouveauProgramme.id,
-      statut: "APPLIQUEE",
-      contexte: { type: "FIN_VOYAGE" },
-    },
-  });
-
-  trackServerEvent("travel_mode_finished", userId, { pilier });
-
-  return { nouvelleVersion: nouveauProgramme.version };
+  if (resultat) trackServerEvent("travel_mode_finished", userId, { pilier });
+  return resultat;
 }

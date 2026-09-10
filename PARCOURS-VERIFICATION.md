@@ -2,6 +2,12 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Reprise du programme habituel — écriture atomique
+
+- Relecture sous verrou utilisateur partagé avec la génération, copie du programme et historique FIN_VOYAGE dans une même transaction courte. Version calculée sous verrou, aucune IA/email dans la transaction. Nouvelle vérification utilisateur/pilier de la source historique avant copie.
+- `test-programme-resume-concurrency.cjs` exécute la vraie fonction sur deux clients PostgreSQL locaux : quatre reprises simultanées créent une seule version 3, une entrée d'historique et un événement. Panne avant commit : aucune écriture ; reprise suivante valide ; nouvel appel sans voyage ne crée rien. Référence vers un autre utilisateur refusée. Fixtures exactes supprimées.
+- Limite : la confirmation d'une adaptation IA reste un auteur de versions à coordonner ; les appels IA concurrents avant sauvegarde ne sont pas couverts. Aucune migration ni requête de génération payante.
+
 ## Accès direct au résultat complet
 
 - Dès le premier écran de révélation : bouton principal « Voir mon bilan complet », parcours détaillé facultatif. Plus de clic implicite sur le conteneur ; boutons natifs pour la révélation et les pauses du questionnaire. Aucune question sautée, calcul et recommandation inchangés.
