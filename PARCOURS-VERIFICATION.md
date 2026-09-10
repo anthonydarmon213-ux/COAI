@@ -2,6 +2,14 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Préparation du test isolé — 10 septembre
+
+Le client Stripe local est déjà authentifié avec un accès **test** à COAI. La liste des prix actifs en mode test est vide. Aucun paiement, prix ou client n'a été créé lors de cette vérification. L'absence de clé Stripe de test n'est donc pas le blocage ; il reste à préparer une base et une authentification de test isolées.
+
+`node scripts/check-local-test-env.mjs` contrôle uniquement les variables du processus, sans lire de fichier `.env`, sans appel réseau et sans afficher de secret. Il refuse les adresses non locales, les clés Stripe réelles et les intégrations externes de génération, notification et suivi. Tests : `node scripts/test-local-test-env.mjs`.
+
+Ce contrôle n'est **pas** un pare-feu ni une protection intégrée à l'application : il ne démarre pas le serveur, ne vérifie pas les identifiants auprès des fournisseurs et ne couvre pas des variables chargées ultérieurement par Next.js. Avant un test complet, vérifier aussi les fichiers `.env*`, les services locaux, les prix Stripe de test et le webhook. Ne pas utiliser les identifiants Supabase de production. Ne pas lancer `npm run build` pour tester : ce script exécute des migrations.
+
 | Étape | Preuve obtenue | À vérifier encore |
 | --- | --- | --- |
 | Bilan / recommandation | Tests locaux de cadence et de recommandation réussis | Parcours mobile complet, résultat et reprise |
