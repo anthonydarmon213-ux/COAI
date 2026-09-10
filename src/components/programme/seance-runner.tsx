@@ -13,6 +13,8 @@ import { variantesPourExercice } from "@/lib/exercices/variantes";
 import { ExerciceVideo } from "@/components/programme/exercice-video";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 import { parseReposSeconds } from "@/lib/programmes/repos";
+import { TrackConversion } from "@/components/analytics/track-conversion";
+import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -338,6 +340,7 @@ export function SeanceRunner({
   // Pas de réponse présélectionnée ni de copie des douleurs dans le stockage local.
   const [checkin, setCheckin] = useState<SeanceCheckinValeurs>({});
   const [erreurSauvegarde, setErreurSauvegarde] = useState(false);
+  const [premiereSeanceId, setPremiereSeanceId] = useState<string | null>(null);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
   const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
@@ -476,6 +479,8 @@ export function SeanceRunner({
         }),
       });
       if (!reponse.ok) throw new Error("sauvegarde_seance_refusee");
+      const firstId = await firstSavedConversionId(reponse, "PROGRAMME");
+      if (firstId) setPremiereSeanceId(firstId);
       // La séance est confirmée côté serveur : la reprise locale peut
       // maintenant être supprimée sans risque de perdre l'effort saisi.
       effacerSauvegarde();
@@ -580,6 +585,7 @@ export function SeanceRunner({
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
+      {premiereSeanceId && <TrackConversion name="first_workout_completed" onceKey={premiereSeanceId} />}
       {!termine && reprise && (
         <div className="border-b border-laiton-300/25 bg-laiton-400/[0.08] px-4 py-2.5 text-center text-xs text-laiton-100">
           Séance reprise là où tu l&apos;avais laissée — chrono et séries conservés.

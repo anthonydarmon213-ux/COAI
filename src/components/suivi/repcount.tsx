@@ -13,7 +13,8 @@ import {
   type PerfExercice,
   type SetSaisi,
 } from "@/lib/suivi/historique-exercice";
-import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { TrackConversion } from "@/components/analytics/track-conversion";
+import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 
 const REPOS_DEFAUT = 90;
 
@@ -373,6 +374,7 @@ export function RepCount({
   const [enregistre, setEnregistre] = useState(false);
   const [enregistrementEnCours, setEnregistrementEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [premierRepereId, setPremierRepereId] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
   const prefillRef = useRef<string | null>(null);
   const sauvegardeRef = useRef<{ signature: string; date: string } | null>(null);
@@ -454,13 +456,12 @@ export function RepCount({
         }),
       });
       if (!r.ok) throw new Error("enregistrement_refuse");
+      const firstId = await firstSavedConversionId(r, "REPCOUNT");
+      if (firstId) setPremierRepereId(firstId);
       sauvegardeRef.current = null;
       setSets([]);
       setRepos(null);
       setEnregistre(true);
-      if (r.headers.get("X-COAI-First-Source") === "1") {
-        trackFunnelEvent("first_repcount_saved");
-      }
       void charger();
     } catch {
       setErreur("L'enregistrement a échoué. Réessaie.");
@@ -524,6 +525,7 @@ export function RepCount({
 
   return (
     <div className="flex flex-col gap-5">
+      {premierRepereId && <TrackConversion name="first_repcount_saved" onceKey={premierRepereId} />}
       {onboarding && historique.length === 0 && !enregistre && (
         <section className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_90%_0%,rgba(34,211,238,.15),transparent_15rem),rgba(255,255,255,.025)] p-4">
           <div aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full border border-laiton-300/15" />
