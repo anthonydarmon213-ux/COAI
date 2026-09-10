@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Rappel de fin d'essai — vérification avant annonce
+
+- Registre de service par abonnement et date de fin d'essai : deux exécutions concurrentes ne peuvent plus envoyer deux rappels. Après réservation, relecture de l'état local ACTIVE, absence d'annulation, même abonnement Stripe/date et échéance dans les 72 h, rappel non traité.
+- Avant réservation, lecture Stripe : uniquement un abonnement encore `trialing`, sans annulation programmée, avec la même date de fin et un prix disponible. Panne Stripe ou état divergent : aucun envoi, aucune réservation consommée ; reprise possible au prochain cron si toujours dans la fenêtre. Suppression de l'ancien repli qui annonçait la fin d'essai même sans vérification Stripe.
+- `test-essential-reminders.cjs` couvre le vrai cron/helper/registre sur deux connexions PostgreSQL locales, fournisseur et données métier simulés : concurrence, reprise, éligibilité périmée, refus d'envoi, essai annulé/terminé/reporté et panne Stripe. Pas d'email réel, de mutation Stripe ni de nouveau schéma.
+- Limites : il reste une course entre la dernière lecture et l'envoi réseau ; les lignes incertaines requièrent réconciliation. La livraison effective et l'exécution du cron en production ne sont pas démontrées par ces tests.
+
 ## Rappel du premier repère — verrou et éligibilité fraîche
 
 - Le rappel des comptes gratuits passe par le registre existant : clé par compte, adresse hachée partagée avec les relances du bilan et leur cadence de 48 h. Pas de nouvelle table, migration ou fournisseur.

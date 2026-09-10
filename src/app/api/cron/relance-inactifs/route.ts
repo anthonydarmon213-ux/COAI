@@ -59,35 +59,6 @@ function formatPrixStripe(
   return `${montant}/mois`;
 }
 
-// Le tarif trimestriel peut varier selon la date de souscription. Le lire
-// depuis l'abonnement Stripe évite qu'une relance envoyée après la fin d'une
-// offre annonce le nouveau tarif à quelqu'un qui a verrouillé l'ancien.
-async function lirePrixPremierPrelevement(subscription: {
-  stripeSubscriptionId: string | null;
-  plan: SubscriptionPlan;
-  billingInterval: "MONTHLY" | "QUARTERLY" | "ANNUAL";
-}): Promise<string> {
-  if (subscription.stripeSubscriptionId) {
-    try {
-      const stripeSubscription = await stripe.subscriptions.retrieve(
-        subscription.stripeSubscriptionId
-      );
-      const price = stripeSubscription.items.data[0]?.price;
-      if (price?.unit_amount !== null && price?.unit_amount !== undefined && price.currency) {
-        return formatPrixStripe(price.unit_amount, price.currency, subscription.billingInterval);
-      }
-    } catch (error) {
-      console.error("Impossible de lire le tarif Stripe pour le rappel d'essai", error);
-    }
-  }
-
-  // En cas d'indisponibilité Stripe, ne jamais inventer un montant : le
-  // client retrouve le tarif exact dans son portail d'abonnement.
-  return subscription.plan === "STANDARD"
-    ? "au tarif convenu lors de ton inscription"
-    : "au tarif choisi lors de ton inscription";
-}
-
 // Même fenêtre et mêmes mots-clés que /admin/suivi (détection douleur côté
 // Coaching Hybride) — gardés synchronisés à la main, les deux vivent dans des
 // fichiers séparés (l'un lu par un coach humain, l'autre déclenché par cron)
@@ -352,8 +323,21 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
 
   let rappels = 0;
   for (const subscription of candidats) {
-    if (!subscription.trialEnd) continue;
-    const prix = await lirePrixPremierPrelevement(subscription);
+    if (!subscription.trialEnd || !subscription.stripeSubscriptionId) continue;
+    // Vérifier Stripe avant de réserver : une panne de lecture ne doit pas
+    // consommer définitivement le rappel ni annoncer un débit hypothétique.
+    let prix: string;
+    try {
+      const current = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+      if (current.status !== "trialing" || current.cancel_at_period_end || current.cancel_at ||
+          !current.trial_end || current.trial_end * 1000 !== subscription.trialEnd.getTime()) continue;
+      const price = current.items.data[0]?.price;
+      if (price?.unit_amount == null || !price.currency) continue;
+      prix = formatPrixStripe(price.unit_amount, price.currency, subscription.billingInterval);
+    } catch {
+      console.warn("Rappel de fin d'essai différé : vérification Stripe indisponible");
+      continue;
+    }
     const date = subscription.trialEnd.toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "long",
@@ -364,7 +348,21 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
     const engagement = subscription.billingInterval === "MONTHLY"
       ? "sans engagement"
       : "renouvelé automatiquement à cette échéance";
-    const envoye = await sendEmail(
+    const envoye = await sendEssentialReminder({
+      kind: "trial-ending",
+      eventId: `${subscription.id}:${subscription.trialEnd.toISOString()}`,
+      eligible: async () => {
+        const now = new Date();
+        return Boolean(await prisma.subscription.findFirst({
+          where: { id: subscription.id, status: "ACTIVE", cancelAtPeriodEnd: false,
+            stripeSubscriptionId: subscription.stripeSubscriptionId,
+            trialReminderSentAt: null,
+            trialEnd: { equals: subscription.trialEnd, gt: now,
+              lte: new Date(now.getTime() + RAPPEL_ESSAI_AVANT_MS) } },
+          select: { id: true },
+        }));
+      },
+      send: () => sendEmail(
       subscription.user.email,
       "Ton essai COAI se termine bientôt",
       `Bonjour${nom},\n\n` +
@@ -372,11 +370,12 @@ async function rappelerFinEssai(appUrl: string): Promise<number> {
         `Profite des derniers jours pour ouvrir ta séance du jour et tester ton accompagnement : ${appUrl}/aujourdhui\n\n` +
         `Tu peux consulter ou gérer ton abonnement à tout moment ici : ${appUrl}/compte/abonnement\n\n` +
         `À bientôt,\nL'équipe COAI`
-    );
+      ),
+    });
     if (!envoye) continue;
 
-    await prisma.subscription.update({
-      where: { id: subscription.id },
+    await prisma.subscription.updateMany({
+      where: { id: subscription.id, trialEnd: subscription.trialEnd },
       data: { trialReminderSentAt: new Date() },
     });
     rappels++;

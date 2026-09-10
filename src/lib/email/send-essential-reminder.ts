@@ -6,7 +6,7 @@ import { registryDatabase } from "./registry-prisma";
 // de tout un destinataire : un email promotionnel ne doit jamais bloquer un
 // rappel de paiement. Aucun email ni contenu personnel dans les clés.
 export async function sendEssentialReminder(request: {
-  kind: "trial-activation" | "payment-recovery";
+  kind: "trial-activation" | "payment-recovery" | "trial-ending";
   eventId: string;
   eligible: () => Promise<boolean>;
   send: () => Promise<boolean>;
