@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { ConfirmationEmail } from "@/components/auth/confirmation-email";
 import { storeParrainageCookie } from "@/lib/parrainage/cookie";
 import {
   storeIntendedPlanCookie,
@@ -133,6 +134,9 @@ export default function SignUpPage() {
             Clique dessus pour activer ton compte — pense à vérifier tes spams si tu ne le vois pas
             passer.
           </p>
+          <ConfirmationEmail initialEmail={email} returnTo={destinationApresInscription} initialCooldown={60} />
+          <button type="button" className="text-sm text-graphite-300 underline" onClick={() => { setEmailEnvoye(false); setPassword(""); }}>Corriger mon adresse email</button>
+          <Link href={`/sign-in?redirect_to=${encodeURIComponent(destinationApresInscription)}`} className="text-sm text-graphite-300 underline">Mon compte est déjà confirmé · me connecter</Link>
         </Card>
       </main>
     );

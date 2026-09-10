@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
+import { ConfirmationEmail } from "@/components/auth/confirmation-email";
+import { authLinkIssue, type AuthLinkIssue } from "@/lib/auth/confirmation";
 import {
   readIntendedBillingCookie,
   readIntendedPlanCookie,
@@ -31,6 +33,13 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [linkIssue, setLinkIssue] = useState<AuthLinkIssue | null>(null);
+  useEffect(() => {
+    const update = () => setLinkIssue(authLinkIssue(window.location.search, window.location.hash));
+    update();
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, [searchParams]);
 
   function destinationApresConnexion() {
     if (returnTo) return returnTo;
@@ -47,13 +56,19 @@ export default function SignInPage() {
     try {
       const supabase = createSupabaseBrowserClient();
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      if (signInError) throw signInError;
+      if (signInError) {
+        if (signInError.code === "email_not_confirmed") {
+          setLinkIssue("confirmation");
+          setError("Confirme ton adresse email avant de te connecter.");
+          return;
+        }
+        throw signInError;
+      }
 
       router.push(destinationApresConnexion());
       router.refresh();
     } catch (err) {
-      console.error("[sign-in]", err);
-      setError(err instanceof Error ? err.message : "Identifiants invalides.");
+      setError("Connexion impossible. Vérifie ton email et ton mot de passe, puis réessaie.");
     } finally {
       setLoading(false);
     }
@@ -72,6 +87,9 @@ export default function SignInPage() {
           <SectionLabel>Connexion</SectionLabel>
           <h1 className="text-xl font-semibold text-graphite-50">Se connecter</h1>
         </div>
+        {linkIssue && <p role="alert" className="text-sm leading-6 text-amber-200">
+          {linkIssue === "oauth" ? "La connexion n’a pas abouti. Réessaie avec Google ou ton email." : "Ce lien a expiré, a déjà été utilisé ou ne peut pas être ouvert ici. Si ton compte est confirmé, connecte-toi. Sinon, demande un nouveau lien ci-dessous."}
+        </p>}
         <GoogleSignInButton redirectTo={returnTo} />
         <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
           <div className="h-px flex-1 bg-graphite-800" />
@@ -82,6 +100,7 @@ export default function SignInPage() {
           <Field label="Email">
             <Input
               type="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -90,6 +109,7 @@ export default function SignInPage() {
           <Field label="Mot de passe">
             <Input
               type="password"
+              autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -100,6 +120,7 @@ export default function SignInPage() {
             {loading ? "Connexion…" : "Se connecter"}
           </Button>
         </form>
+        {linkIssue && linkIssue !== "oauth" && <ConfirmationEmail initialEmail={email} returnTo={returnTo} />}
         <Link href="/mot-de-passe-oublie" className="text-sm text-graphite-400 underline">
           Mot de passe oublié ?
         </Link>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
+import { authFailureDestination } from "@/lib/auth/confirmation";
 
 // Point d'atterrissage du flow OAuth (ex: Google) initié par
 // supabase.auth.signInWithOAuth. Échange le code contre une session, puis
@@ -15,13 +16,13 @@ export async function GET(request: Request) {
   const returnTo = sanitizeReturnTo(searchParams.get("redirect_to"));
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/sign-in`);
+    return NextResponse.redirect(authFailureDestination(origin, returnTo, searchParams.get("error_code") ?? undefined));
   }
 
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data.user) {
-    return NextResponse.redirect(`${origin}/sign-in?error=oauth`);
+    return NextResponse.redirect(authFailureDestination(origin, returnTo, error?.code));
   }
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: data.user.id } });
