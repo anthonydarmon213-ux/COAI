@@ -20,3 +20,20 @@ export function sanitizeReturnTo(value: string | null | undefined): string | nul
   if (value.includes("://")) return null;
   return value;
 }
+
+// Ne transmettre à l'inscription que l'intention commerciale reconnue,
+// jamais un code de confirmation ni une destination arbitraire.
+export function signupHrefForReturnTo(value: string | null | undefined): string {
+  const safe = sanitizeReturnTo(value);
+  if (!safe) return "/sign-up";
+  const destination = new URL(safe, "https://coai.fr");
+  if (destination.pathname !== "/pricing" && destination.pathname !== "/bienvenue") return "/sign-up";
+  const plan = destination.searchParams.get(destination.pathname === "/pricing" ? "selected" : "plan");
+  if (plan !== "PASS_IA" && plan !== "STANDARD" && plan !== "PREMIUM") return "/sign-up";
+  const requestedBilling = destination.searchParams.get("billing");
+  const billing = requestedBilling === "ANNUAL" || requestedBilling === "QUARTERLY" ? requestedBilling : "MONTHLY";
+  const query = new URLSearchParams({ plan, billing });
+  const sessions = destination.searchParams.get("vipSessions");
+  if (plan === "PREMIUM" && sessions && ["1", "2", "3", "4"].includes(sessions)) query.set("vipSessions", sessions);
+  return `/sign-up?${query}`;
+}

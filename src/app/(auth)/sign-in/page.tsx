@@ -9,7 +9,7 @@ import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
-import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
+import { sanitizeReturnTo, signupHrefForReturnTo } from "@/lib/auth/safe-redirect";
 import { ConfirmationEmail } from "@/components/auth/confirmation-email";
 import { authLinkIssue, type AuthLinkIssue } from "@/lib/auth/confirmation";
 import {
@@ -126,7 +126,7 @@ export default function SignInPage() {
         </Link>
         <p className="text-sm text-graphite-400">
           Pas encore de compte ?{" "}
-          <Link href="/sign-up" className="underline">
+          <Link href={signupHrefForReturnTo(returnTo)} className="underline">
             S&apos;inscrire
           </Link>
         </p>

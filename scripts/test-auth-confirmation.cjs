@@ -14,6 +14,15 @@ function load(file, mocks={}) {
   return exports;
 }
 Object.assign(helpers,load('src/lib/auth/confirmation.ts'));
+const {signupHrefForReturnTo} = load('src/lib/auth/safe-redirect.ts');
+for (const [value, expected] of [
+  ['/bienvenue?plan=PASS_IA&billing=ANNUAL', '/sign-up?plan=PASS_IA&billing=ANNUAL'],
+  ['/pricing?selected=PASS_IA&billing=MONTHLY', '/sign-up?plan=PASS_IA&billing=MONTHLY'],
+  ['/pricing?selected=PREMIUM&billing=QUARTERLY&vipSessions=3', '/sign-up?plan=PREMIUM&billing=QUARTERLY&vipSessions=3'],
+  ['/pricing?selected=PASS_IA&billing=wrong&code=secret', '/sign-up?plan=PASS_IA&billing=MONTHLY'],
+  ['/pricing?selected=wrong', '/sign-up'], ['/admin?plan=PASS_IA', '/sign-up'],
+  ['https://evil.test/pricing?selected=PASS_IA', '/sign-up'], [null, '/sign-up'],
+]) assert.equal(signupHrefForReturnTo(value), expected);
 for(const [search,hash,expected] of [
   ['','','null'],['?error=otp_expired','','confirmation'],['','#error=access_denied&error_code=otp_expired','confirmation'],
   ['?error=email_not_confirmed','','confirmation'],['?error=oauth','','oauth'],['?error=bad_code_verifier','','link'],
