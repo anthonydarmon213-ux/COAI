@@ -57,6 +57,12 @@ export default function SignUpPage() {
     billingParam === "ANNUAL" ? "ANNUAL" : billingParam === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
   const arriveDepuisInstagram = searchParams.get("source") === "instagram";
   const destinationApresInscription = "/bienvenue";
+  // Un compte existant doit retrouver l'offre choisie, sans déclencher
+  // automatiquement un paiement. Les nouveaux inscrits gardent l'accueil
+  // qui sauvegarde leur bilan avant l'activation.
+  const destinationApresConnexion = requestedPlan
+    ? `/pricing?from=signin&selected=${requestedPlan}&billing=${requestedBilling}`
+    : destinationApresInscription;
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -136,7 +142,7 @@ export default function SignUpPage() {
           </p>
           <ConfirmationEmail initialEmail={email} returnTo={destinationApresInscription} initialCooldown={60} />
           <button type="button" className="text-sm text-graphite-300 underline" onClick={() => { setEmailEnvoye(false); setPassword(""); }}>Corriger mon adresse email</button>
-          <Link href={`/sign-in?redirect_to=${encodeURIComponent(destinationApresInscription)}`} className="text-sm text-graphite-300 underline">Mon compte est déjà confirmé · me connecter</Link>
+          <Link href={`/sign-in?redirect_to=${encodeURIComponent(destinationApresConnexion)}`} className="text-sm text-graphite-300 underline">Mon compte est déjà confirmé · me connecter</Link>
         </Card>
       </main>
     );
@@ -220,7 +226,7 @@ export default function SignUpPage() {
           </form>
           <p className="text-sm text-graphite-400">
             Déjà un compte ?{" "}
-            <Link href={`/sign-in?redirect_to=${encodeURIComponent(destinationApresInscription)}`} className="underline">
+            <Link href={`/sign-in?redirect_to=${encodeURIComponent(destinationApresConnexion)}`} className="underline">
               Se connecter
             </Link>
           </p>

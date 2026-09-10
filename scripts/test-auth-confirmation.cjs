@@ -29,6 +29,40 @@ assert.equal(helpers.authFailureDestination('http://localhost:3050','/bienvenue'
 assert.ok(helpers.confirmationSendError({code:'over_email_send_rate_limit'}).includes('Patiente'));
 assert.ok(!helpers.confirmationSendError({message:'secret'}).includes('secret'));
 
+// Liens réellement rendus par l'inscription : un compte existant retrouve
+// son choix tarifaire. Le nouveau compte conserve le parcours de bienvenue.
+for (const [query, expected] of [
+  ['plan=PASS_IA&billing=ANNUAL', '/pricing?from=signin&selected=PASS_IA&billing=ANNUAL'],
+  ['plan=PASS_IA&billing=MONTHLY', '/pricing?from=signin&selected=PASS_IA&billing=MONTHLY'],
+  ['plan=PASS_IA&billing=invalid', '/pricing?from=signin&selected=PASS_IA&billing=MONTHLY'],
+  ['plan=https://evil.test', '/bienvenue'],
+  ['', '/bienvenue'],
+]) {
+  const React = require('react');
+  const mocks = {
+    react: {...React, useState: value => [typeof value === 'function' ? value() : value, () => {}], useEffect: () => {}},
+    'next/navigation': {useSearchParams: () => new URLSearchParams(query)},
+    'next/link': {default: 'a'},
+    '@/lib/auth/client': {createSupabaseBrowserClient: () => {throw Error('No auth call during render');}},
+    '@/lib/parrainage/cookie': {storeParrainageCookie() {}},
+    '@/lib/analytics/funnel-events': {trackFunnelEvent() {}},
+  };
+  for (const [file, name] of [['ui/button','Button'], ['ui/input','Input'], ['ui/field','Field'], ['ui/card','Card'], ['ui/section-label','SectionLabel'], ['auth/google-sign-in-button','GoogleSignInButton'], ['auth/confirmation-email','ConfirmationEmail']]) {
+    mocks[`@/components/${file}`] = {[name]: name};
+  }
+  const page = load('src/app/(auth)/sign-up/page.tsx', mocks).default();
+  const links = [];
+  function visit(node) {
+    if (Array.isArray(node)) return node.forEach(visit);
+    if (!node?.props) return;
+    if (node.props.href?.startsWith('/sign-in?')) links.push(node.props.href);
+    visit(node.props.children);
+  }
+  visit(page);
+  assert.equal(links.length, 1);
+  assert.equal(new URL(links[0], 'http://localhost').searchParams.get('redirect_to'), expected);
+}
+
 (async()=>{
   let exchangeCalls=0;
   const callback = load('src/app/auth/callback/route.ts',{

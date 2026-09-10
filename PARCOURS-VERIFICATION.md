@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Choix annuel et connexion — 10 septembre
+
+- Reproduction navigateur local : choix annuel sur la tarification anonyme → inscription avec `plan=PASS_IA&billing=ANNUAL` → lien « Se connecter » → connexion du compte fictif. Avant correction : `/bienvenue`, sans reprise de l'offre. Le lien imposait cette destination et court-circuitait la reprise du cookie d'intention.
+- Correction des deux liens de connexion de l'inscription : retour à la tarification avec la formule et la périodicité validées. Nouveau compte, confirmation email et sauvegarde du bilan restent sur leur parcours de bienvenue ; aucun paiement automatique ajouté.
+- Après correction, connexion réelle du compte fictif local → `/pricing?from=signin&selected=PASS_IA&billing=ANNUAL`, bouton annuel 119 €/an présent. `test-auth-confirmation.cjs` contrôle les liens rendus pour annuel, mensuel, périodicité invalide, formule invalide et absence d'intention, plus les tests de confirmation existants.
+- Une session Checkout annuelle TEST a été créée via le vrai bouton (HTTP 200, `cs_test_a1r0Ec4vgeULHkH1VfSzS4e6VqrrOKPvFxKg3RpGxlnGRtW7fqbnDogdca`). Le navigateur automatisé a perdu la page pendant la redirection ; rouvrir l'URL sans son fragment Stripe donne « This link is incomplete ». Ce n'est pas une preuve d'échec de l'application. Annulation dans Stripe, carte refusée et nouvelle tentative restent à vérifier. Aucun débit réel ni email externe.
+
 ## Préparation du test isolé — 10 septembre
 
 Supabase local tourne désormais dans Colima `coai-test`, réseau `coai-e2e-loopback` limité à `127.0.0.1` (ports 54321/54322/54324 vérifiés avec lsof). CLI épinglé à 2.117.0 ; configuration temporaire `/tmp/coai-e2e-supabase-sloAPQ`. Les 81 migrations ont été appliquées uniquement à cette base locale vide. Le serveur Next local utilise le port 3050, sans clés de génération ou notifications externes. Stripe utilise désormais la clé de test existante, chargée en mémoire par un lanceur local, sans copie dans le dépôt.
