@@ -2,6 +2,12 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Navigation explicite du bilan
+
+- Contrôle production mobile 390 px : les choix niveau/lieu/durée/fréquence/alimentation/sommeil avançaient automatiquement malgré le bouton Continuer ; l'activité quotidienne attendait une validation. Dernière étape sans débordement horizontal, mais consentement diagnostic/promotion encore couplé (non corrigé dans ce lot). Aucun email ni paiement envoyé.
+- Suppression du timer de 220 ms dans le gestionnaire commun des choix simples. La sélection et sa correction restent sur la question ; Continuer valide explicitement. Les transitions d'analyse ne sont pas modifiées.
+- Test navigateur local : niveau Débutant puis Intermédiaire reste sur la question, Continuer ouvre les objectifs et Retour ramène au niveau. Test `test-diagnostic-manual-navigation.cjs` sur le vrai gestionnaire : aucun timer/navigation lors des sélections, bouton explicite conservé. Ce test ciblé ne remplace pas une validation complète du bilan.
+
 ## Écriture concurrente des programmes — tables existantes
 
 - La route de génération enregistre chaque pilier dans une transaction courte avec verrou sur la ligne utilisateur existante. En onboarding, elle relit le programme après verrouillage et reprend son identifiant plutôt que créer un doublon. La version d'une génération explicite est calculée sous le même verrou. Aucun appel IA/email dans la transaction, aucune migration.

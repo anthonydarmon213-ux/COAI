@@ -795,12 +795,9 @@ export function DiagnosticQuiz({
 
   function chooseSingle<T>(setter: (value: T) => void, value: T) {
     setter(value);
-    // Les écrans à choix unique n'ont rien d'autre à valider : un second
-    // clic sur « Continuer » doublait le nombre de gestes sans améliorer la
-    // qualité du bilan. Le court délai laisse apparaître la sélection avant
-    // la transition. Les choix multiples, la santé, la morphologie et
-    // l'email conservent volontairement leur validation explicite.
-    window.setTimeout(goNext, 220);
+    // La sélection reste modifiable. Seul « Continuer » valide la question,
+    // comme sur les écrans à choix multiples ; aucun délai ne peut avancer
+    // après un clic sur Retour ou déclencher une seconde transition.
   }
   function goBack() {
     const i = STEP_ORDER.indexOf(step);
