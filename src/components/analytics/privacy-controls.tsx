@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "./google-analytics";
 import { MetaPixel } from "./meta-pixel";
@@ -11,6 +12,11 @@ import { captureUtmFromLocation, clearUtmCookie } from "@/lib/attribution/utm-co
 // Clarity is deliberately not mounted: session replay needs a separate review
 // of sensitive health screens; an audience choice is not sufficient for that.
 export function PrivacyControls() {
+  const pathname = usePathname();
+  // Authentication must remain usable without answering an optional consent prompt.
+  // The root layout renders this panel after the page, so normal flow never
+  // covers the form, including on small screens or with enlarged text.
+  const inline = ["/sign-in", "/sign-up", "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe"].includes(pathname);
   const [choices, setChoices] = useState<PrivacyChoices | null>(null);
   const [draft, setDraft] = useState<PrivacyChoices>(REFUSE_ALL);
   const [open, setOpen] = useState(false);
@@ -64,7 +70,7 @@ export function PrivacyControls() {
   return <>
     {choices?.audience && <><GoogleAnalytics /><Analytics /></>}
     {choices?.marketing && <MetaPixel />}
-    {open ? <section aria-label="Préférences de confidentialité" className="fixed inset-x-3 bottom-3 z-[100] mx-auto max-h-[75dvh] max-w-xl overflow-y-auto rounded-2xl border border-white/20 bg-[#101b23] p-5 text-white shadow-2xl">
+    {open ? <section aria-label="Préférences de confidentialité" className={`${inline ? "relative mx-3 mb-6 sm:mx-auto" : "fixed inset-x-3 bottom-3 z-[100] mx-auto max-h-[75dvh] overflow-y-auto"} max-w-xl rounded-2xl border border-white/20 bg-[#101b23] p-5 text-white shadow-2xl`}>
       <h2 className="text-lg font-semibold">Tes choix de confidentialité</h2>
       <p className="mt-2 text-sm text-slate-300">Autoriser la mesure d’audience (Google, Vercel) et l’attribution publicitaire (Meta, COAI) ? Le bilan et les séances restent accessibles si tu refuses.</p>
       {details && <><label className="mt-3 flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={draft.audience} onChange={event => setDraft({ ...draft, audience: event.target.checked })} />Mesure d’audience — Google Analytics et Vercel</label>

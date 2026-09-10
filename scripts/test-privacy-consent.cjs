@@ -50,14 +50,34 @@ assert.equal(consent.saveConsent(consent.REFUSE_ALL), false);
 assert.equal(analytics.trackMetaEvent('test'), false);
 // Render the actual client boundary on the server: no optional scripts or pixel.
 const React = require('react');
-const component = load('src/components/analytics/privacy-controls.tsx', {
+let pathname = '/sign-in';
+const dependencies = {
   react: React, 'react/jsx-runtime': require('react/jsx-runtime'),
+  'next/navigation': { usePathname: () => pathname },
   '@vercel/analytics/next': { Analytics: () => React.createElement('script', { src: 'vercel-tracker' }) },
   './google-analytics': { GoogleAnalytics: () => React.createElement('script', { src: 'google-tracker' }) },
   './meta-pixel': { MetaPixel: () => React.createElement('script', { src: 'meta-tracker' }) },
   '@/lib/analytics/consent': consent, '@/lib/attribution/utm-cookie': utm,
-}, {});
+};
+const component = load('src/components/analytics/privacy-controls.tsx', dependencies, {});
 const html = require('react-dom/server').renderToStaticMarkup(React.createElement(component.PrivacyControls));
 assert.ok(!html.includes('<script') && !html.includes('<img'));
+// Render the actual open panel with no choice. Only its placement changes;
+// authentication is not consent and must not mount optional trackers.
+for (const route of ['/sign-in', '/sign-up', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/', '/dashboard']) {
+  pathname = route;
+  let stateIndex = 0;
+  const openPanel = load('src/components/analytics/privacy-controls.tsx', {
+    ...dependencies,
+    react: { ...React, useState: initial => [stateIndex++ === 2 ? true : initial, () => {}] },
+  }, {});
+  const markup = require('react-dom/server').renderToStaticMarkup(React.createElement(openPanel.PrivacyControls));
+  const sectionClass = markup.match(/<section[^>]*class="([^"]+)"/)[1];
+  const auth = !['/', '/dashboard'].includes(route);
+  assert.equal(sectionClass.split(' ').includes('fixed'), !auth, route);
+  assert.equal(sectionClass.split(' ').includes('relative'), auth, route);
+  assert.ok(markup.includes('Tout refuser') && markup.includes('Tout accepter') && markup.includes('Personnaliser'));
+  assert.ok(!markup.includes('<script') && !markup.includes('<img'), route + ' fails closed');
+}
 assert.ok(!fs.readFileSync(path.join(root, 'src/app/layout.tsx'), 'utf8').includes('MicrosoftClarity'));
 console.log('PASS privacy: SSR, purpose separation, refusal, expiry, malformed/blocked storage, UTM gating, no Clarity mount');

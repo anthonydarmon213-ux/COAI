@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Connexion sans obstacle de consentement — 10 septembre
+
+- Défaut reproduit à 1280 × 720 : bouton de connexion à y=487–533, panneau fixe à y=462–708 ; le centre du bouton touchait le titre du panneau, pas le bouton.
+- Sur connexion, inscription, mot de passe oublié et réinitialisation uniquement, le panneau reste dans le flux après le formulaire. Ailleurs, son placement fixe est conservé. Aucun changement de finalités, de durée ou de logique d'accord.
+- Après correction : panneau à y=720, bouton directement atteignable. Test Chromium local à 390 × 844 avec le compte fictif existant `confirmation-reprise-10sept@example.test` : connexion réussie vers `/dashboard` sans accepter ni refuser le suivi. Après connexion, `coai_privacy_v1` reste absent, aucun script optionnel détecté, largeur document = viewport = 390. Capture de connexion inspectée `screenshot-1789055434322.png` ; session fermée.
+- `test-privacy-consent.cjs` rend le véritable panneau ouvert sur les quatre routes et sur accueil/dashboard : placement attendu, trois choix présents, aucun script/pixel sans accord. Les tests de séparation des finalités, expiration et stockage bloqué restent actifs. La réception fournisseur n'est pas prouvée par ce contrôle local sans clés de suivi.
+
 ## Tableau d'activation — vérification navigateur du 10 septembre
 
 - Session Chromium isolée `coai-admin-audit`, viewport 390 × 844, base loopback. Compte fictif `confirmation-reprise-10sept@example.test` : non-administrateur redirigé vers `/dashboard`. Droit `isAdmin` temporaire limité à cet identifiant/email local, restauré dans un `finally` puis vérifié ; nouvel accès après retrait à nouveau redirigé. Navigateur fermé.
