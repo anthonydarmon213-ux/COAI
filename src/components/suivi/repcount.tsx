@@ -7,6 +7,9 @@ import { ChandeliersCharges } from "@/components/suivi/chandeliers-charges";
 import {
   comparerAvantApres,
   historiquePourExercice,
+  historiqueParMesure,
+  totalMaintien,
+  formatSerie,
   type PerfExercice,
   type SetSaisi,
 } from "@/lib/suivi/historique-exercice";
@@ -35,14 +38,15 @@ function JumeauSeance({
 }) {
   const suitLaCharge =
     reference.sets.some((serie) => serie.charge > 0) || sets.some((serie) => serie.charge > 0);
-  const valeurActuelle = suitLaCharge
+  const suitLeMaintien = sets.some(s => s.dureeSecondes != null);
+  const valeurActuelle = suitLeMaintien ? totalMaintien(sets) : suitLaCharge
     ? sets.reduce((total, serie) => total + serie.reps * serie.charge, 0)
     : sets.reduce((total, serie) => total + serie.reps, 0);
-  const valeurReference = suitLaCharge ? reference.volume : totalRepetitions(reference);
+  const valeurReference = suitLeMaintien ? totalMaintien(reference.sets) : suitLaCharge ? reference.volume : totalRepetitions(reference);
   const ratio = valeurReference > 0 ? valeurActuelle / valeurReference : 0;
   const pourcentage = Math.max(0, Math.round(ratio * 100));
   const progressionVisuelle = Math.min(100, pourcentage);
-  const unite = suitLaCharge ? "kg de volume" : "répétitions";
+  const unite = suitLeMaintien ? "secondes de maintien" : suitLaCharge ? "kg de volume" : "répétitions";
   const lecture =
     ratio < 0.5
       ? "Ta séance prend forme."
@@ -147,11 +151,11 @@ function prochainCap({
   };
 }
 
-function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
+function CourbeProgression({ historique, maintien = false }: { historique: PerfExercice[]; maintien?: boolean }) {
   const chronologie = historique.slice(0, 10).reverse();
   const suitLaCharge = chronologie.some((perf) => meilleureCharge(perf) > 0);
   const valeurs = chronologie.map((perf) =>
-    suitLaCharge ? meilleureCharge(perf) : totalRepetitions(perf)
+    maintien ? totalMaintien(perf.sets) : suitLaCharge ? meilleureCharge(perf) : totalRepetitions(perf)
   );
   const minimum = Math.min(...valeurs);
   const maximum = Math.max(...valeurs);
@@ -179,7 +183,7 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
   const progression = valeurPrecedente === null ? null : derniere.valeur - valeurPrecedente;
   const record = Math.max(...valeurs);
   const estRecord = derniere.valeur >= record;
-  const unite = suitLaCharge ? "kg" : "reps";
+  const unite = maintien ? "s" : suitLaCharge ? "kg" : "reps";
   const cap = prochainCap({
     nombreSeances: chronologie.length,
     derniereValeur: derniere.valeur,
@@ -199,7 +203,7 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
             Progression RepCount
           </p>
           <p className="mt-1 text-sm text-graphite-300">
-            {suitLaCharge ? "Meilleure charge par séance" : "Répétitions par séance"}
+            {maintien ? "Secondes de maintien par séance" : suitLaCharge ? "Meilleure charge par séance" : "Répétitions par séance"}
           </p>
         </div>
         {estRecord && chronologie.length > 1 && (
@@ -212,7 +216,7 @@ function CourbeProgression({ historique }: { historique: PerfExercice[] }) {
       <div className="relative mt-3" aria-label={`Évolution sur ${chronologie.length} séances`}>
         <svg viewBox={`0 0 ${largeur} ${hauteur}`} className="h-auto w-full" role="img">
           <title>
-            {suitLaCharge ? "Courbe des meilleures charges" : "Courbe des répétitions"}
+            {maintien ? "Courbe des maintiens en secondes" : suitLaCharge ? "Courbe des meilleures charges" : "Courbe des répétitions"}
           </title>
           <defs>
             <linearGradient id="repcount-line" x1="0" y1="0" x2="1" y2="0">
@@ -361,6 +365,8 @@ export function RepCount({
   const [nom, setNom] = useState(exerciceInitial);
   const [reps, setReps] = useState(10);
   const [charge, setCharge] = useState(20);
+  const [maintien, setMaintien] = useState(false);
+  const [dureeSecondes, setDureeSecondes] = useState(30);
   const [sets, setSets] = useState<SetSaisi[]>([]);
   const [seances, setSeances] = useState<{ date: string; exercices: unknown }[]>([]);
   const [repos, setRepos] = useState<number | null>(null);
@@ -398,27 +404,30 @@ export function RepCount({
     () => (nom.trim() ? historiquePourExercice(seances, nom) : []),
     [seances, nom]
   );
-  const comparaison = useMemo(() => comparerAvantApres(historique), [historique]);
+  const historiqueMesure = useMemo(() => historiqueParMesure(historique, maintien), [historique, maintien]);
+  const comparaison = useMemo(() => comparerAvantApres(historiqueMesure), [historiqueMesure]);
 
   // À l'ouverture depuis un bilan de séance, reprend automatiquement la
   // meilleure série connue. L'utilisateur retrouve son repère sans le
   // mémoriser ni le recopier, mais garde la main sur les deux steppers.
   useEffect(() => {
     const cle = nom.trim().toLocaleLowerCase("fr-FR");
-    const derniereSerie = comparaison.precedente?.meilleureSerie;
+    const derniereSerie = historique[0]?.meilleureSerie;
     if (!cle || !derniereSerie || prefillRef.current === cle || sets.length > 0) return;
     setReps(derniereSerie.reps);
     setCharge(derniereSerie.charge);
+    setMaintien(derniereSerie.dureeSecondes != null);
+    if (derniereSerie.dureeSecondes != null) setDureeSecondes(derniereSerie.dureeSecondes);
     prefillRef.current = cle;
-  }, [comparaison.precedente, nom, sets.length]);
+  }, [historique, nom, sets.length]);
 
   const volumeCourant = sets.reduce((t, s) => t + s.reps * s.charge, 0);
 
   const ajouterSerie = useCallback(() => {
-    setSets((s) => [...s, { reps, charge }]);
+    setSets((s) => [...s, maintien ? { reps: 0, charge: 0, dureeSecondes } : { reps, charge }]);
     setRepos(REPOS_DEFAUT);
     setEnregistre(false);
-  }, [reps, charge]);
+  }, [reps, charge, maintien, dureeSecondes]);
 
   const sauvegarder = useCallback(async (seriesAEnregistrer: SetSaisi[]) => {
     if (!nom.trim() || seriesAEnregistrer.length === 0 || requeteEnCoursRef.current) return;
@@ -439,7 +448,7 @@ export function RepCount({
           exercices: [
             {
               nom: nom.trim(),
-              sets: seriesAEnregistrer.map((s, i) => ({ set: i + 1, reps: s.reps, charge: s.charge })),
+              sets: seriesAEnregistrer.map((s, i) => ({ ...s, set: i + 1 })),
             },
           ],
         }),
@@ -466,8 +475,8 @@ export function RepCount({
   }, [sauvegarder, sets]);
 
   const enregistrerPremierRepere = useCallback(async () => {
-    await sauvegarder([{ reps, charge }]);
-  }, [sauvegarder, reps, charge]);
+    await sauvegarder([maintien ? { reps: 0, charge: 0, dureeSecondes } : { reps, charge }]);
+  }, [sauvegarder, reps, charge, maintien, dureeSecondes]);
 
   const Stepper = ({
     label,
@@ -538,6 +547,7 @@ export function RepCount({
           id="repcount-exercice"
           list="repcount-liste"
           value={nom}
+          disabled={sets.length > 0 || enregistrementEnCours}
           onChange={(e) => setNom(e.target.value)}
           placeholder="Développé couché, squat…"
           className="mt-1.5 w-full rounded-xl border border-white/12 bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-graphite-500"
@@ -547,6 +557,7 @@ export function RepCount({
             <option key={e} value={e} />
           ))}
         </datalist>
+        {sets.length > 0 && <p className="mt-2 text-xs text-graphite-400">Enregistre ou retire les séries en cours avant de changer d’exercice.</p>}
         {onboarding && !nom && (
           <div className="mt-2.5 flex flex-wrap gap-2" aria-label="Mouvements rapides">
             {[
@@ -576,12 +587,12 @@ export function RepCount({
           </p>
           <p className="mt-1.5 text-sm text-white">
             {comparaison.precedente.sets
-              .map((s) => `${s.reps}×${s.charge}kg`)
+              .map(formatSerie)
               .join("  ·  ")}
           </p>
           <p className="mt-1 text-xs text-graphite-400">
-            Volume {Math.round(comparaison.precedente.volume)} kg
-            {comparaison.deltaVolume !== null && (
+            {maintien ? `${totalMaintien(comparaison.precedente.sets)} s de maintien cumulé` : `Volume ${Math.round(comparaison.precedente.volume)} kg`}
+            {!maintien && comparaison.deltaVolume !== null && (
               <span className={comparaison.deltaVolume >= 0 ? "text-emerald-300" : "text-amber-300"}>
                 {" "}· {comparaison.deltaVolume >= 0 ? "+" : ""}
                 {Math.round(comparaison.deltaVolume)} kg vs la semaine passée
@@ -594,12 +605,21 @@ export function RepCount({
         </div>
       )}
 
-      {historique.length > 0 && <CourbeProgression historique={historique} />}
-      {historique.length > 0 && <ChandeliersCharges key={nom.trim()} historique={historique} />}
+      {historiqueMesure.length > 0 && <CourbeProgression historique={historiqueMesure} maintien={maintien} />}
+      {!maintien && historiqueMesure.length > 0 && <ChandeliersCharges key={nom.trim()} historique={historiqueMesure} />}
+
+      <label className="text-sm text-graphite-300">Mesure de la série
+        <select value={maintien ? "maintien" : "repetitions"} disabled={sets.length > 0} onChange={e => setMaintien(e.target.value === "maintien")} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white disabled:opacity-50">
+          <option value="repetitions">Répétitions et charge</option>
+          <option value="maintien">Maintien isométrique (secondes)</option>
+        </select>
+      </label>
 
       <div className="flex gap-3">
-        <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} />
-        <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
+        {maintien ? <Stepper label="Maintien" valeur={dureeSecondes} setValeur={v => setDureeSecondes(Math.min(3600, v))} pas={5} unite="s" minimum={1} /> : <>
+          <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} />
+          <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
+        </>}
       </div>
 
       {onboarding && sets.length === 0 && historique.length === 0 ? (
@@ -650,14 +670,13 @@ export function RepCount({
       {sets.length > 0 && (
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-400">
-            {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })} · volume{" "}
-            {Math.round(volumeCourant)} kg
+            {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })} · {maintien ? `${totalMaintien(sets)} s de maintien` : `${Math.round(volumeCourant)} kg de volume`}
           </p>
           <ul className="mt-2 flex flex-col gap-1.5">
             {sets.map((s, i) => (
               <li key={i} className="flex items-center justify-between text-sm text-white">
                 <span>
-                  Série {i + 1} — {s.reps} × {s.charge} kg
+                  Série {i + 1} — {formatSerie(s)}
                 </span>
                 <button
                   type="button"
@@ -719,8 +738,8 @@ export function RepCount({
             {historique.slice(0, 10).map((perf: PerfExercice, i) => (
               <li key={i} className="flex items-center justify-between text-xs text-graphite-300">
                 <span>{formatDate(perf.date)}</span>
-                <span className="text-white">{perf.sets.map((s) => `${s.reps}×${s.charge}`).join(" · ")}</span>
-                <span className="tabular-nums text-graphite-400">{Math.round(perf.volume)} kg</span>
+                <span className="text-white">{perf.sets.map(formatSerie).join(" · ")}</span>
+                <span className="tabular-nums text-graphite-400">{totalMaintien(perf.sets) > 0 ? `${totalMaintien(perf.sets)} s` : `${Math.round(perf.volume)} kg`}</span>
               </li>
             ))}
           </ul>

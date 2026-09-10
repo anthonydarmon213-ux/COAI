@@ -1,4 +1,12 @@
-export type SetSaisi = { reps: number; charge: number };
+export type SetSaisi = { reps: number; charge: number; dureeSecondes?: number };
+
+export function totalMaintien(sets: SetSaisi[]): number {
+  return sets.reduce((total, serie) => total + (serie.dureeSecondes ?? 0), 0);
+}
+
+export function formatSerie(serie: SetSaisi): string {
+  return serie.dureeSecondes ? `${serie.dureeSecondes} s de maintien` : `${serie.reps} × ${serie.charge} kg`;
+}
 
 export type PerfExercice = {
   date: Date;
@@ -27,6 +35,7 @@ export function historiquePourExercice(seances: SeanceBrute[], nom: string): Per
 
   const perfs: PerfExercice[] = [];
   for (const seance of seances) {
+    if (!Number.isFinite(new Date(seance.date).getTime())) continue;
     const liste = Array.isArray(seance.exercices) ? seance.exercices : [];
     for (const brut of liste) {
       if (!brut || typeof brut !== "object") continue;
@@ -35,24 +44,37 @@ export function historiquePourExercice(seances: SeanceBrute[], nom: string): Per
 
       const sets: SetSaisi[] = (Array.isArray(ex.sets) ? ex.sets : [])
         .map((s) => {
-          const v = s as { reps?: unknown; charge?: unknown };
+          const v = (s && typeof s === "object" ? s : {}) as { reps?: unknown; charge?: unknown; dureeSecondes?: unknown };
+          if (typeof v.dureeSecondes === "number" && Number.isInteger(v.dureeSecondes) && v.dureeSecondes > 0 && v.dureeSecondes <= 3600) {
+            return { reps: 0, charge: 0, dureeSecondes: v.dureeSecondes };
+          }
           return {
-            reps: typeof v.reps === "number" ? v.reps : 0,
-            charge: typeof v.charge === "number" ? v.charge : 0,
+            reps: typeof v.reps === "number" && Number.isFinite(v.reps) ? v.reps : 0,
+            charge: typeof v.charge === "number" && Number.isFinite(v.charge) && v.charge >= 0 ? v.charge : 0,
           };
         })
-        .filter((s) => s.reps > 0);
+        .filter((s) => s.reps > 0 || (s.dureeSecondes ?? 0) > 0);
       if (sets.length === 0) continue;
 
       const volume = sets.reduce((total, s) => total + s.reps * s.charge, 0);
       const meilleureSerie = sets.reduce<SetSaisi | null>(
-        (best, s) => (!best || s.charge * s.reps > best.charge * best.reps ? s : best),
+        (best, s) => (!best || (s.dureeSecondes ?? s.charge * s.reps) > (best.dureeSecondes ?? best.charge * best.reps) ? s : best),
         null
       );
       perfs.push({ date: new Date(seance.date), sets, volume, meilleureSerie });
     }
   }
   return perfs.sort((a, b) => b.date.getTime() - a.date.getTime());
+}
+
+/** Une courbe ne compare jamais des secondes et des répétitions. */
+export function historiqueParMesure(historique: PerfExercice[], maintien: boolean): PerfExercice[] {
+  return historique.flatMap(perf => {
+    const sets = perf.sets.filter(s => maintien ? s.dureeSecondes != null : s.dureeSecondes == null);
+    if (!sets.length) return [];
+    return [{ ...perf, sets, volume: sets.reduce((total, s) => total + s.reps * s.charge, 0),
+      meilleureSerie: sets.reduce<SetSaisi | null>((best, s) => !best || (s.dureeSecondes ?? s.reps * s.charge) > (best.dureeSecondes ?? best.reps * best.charge) ? s : best, null) }];
+  });
 }
 
 export type Comparaison = {
