@@ -11,24 +11,27 @@ export async function deliverOnce(db: RegistryDatabase, request: {
   deliveryKey: string;
   recipientKey: string;
   kind: string;
+  cooldownHours?: number;
   eligible: () => Promise<boolean>;
   send: () => Promise<boolean>;
 }): Promise<"SENT" | "SKIPPED" | "UNCERTAIN"> {
   const { deliveryKey, recipientKey, kind } = request;
+  const cooldownHours = request.cooldownHours ?? 48;
+  if (!Number.isFinite(cooldownHours) || cooldownHours < 0) throw new Error("Invalid cooldown");
   if (!(await reserveDelivery(db, deliveryKey, recipientKey, kind))) return "SKIPPED";
   try {
     // Recontrôler après réservation : la liste du cron peut être ancienne.
     if (!(await request.eligible())) {
-      await finishDelivery(db, deliveryKey, recipientKey, "SUPPRESSED");
+      await finishDelivery(db, deliveryKey, recipientKey, "SUPPRESSED", cooldownHours);
       return "SKIPPED";
     }
     const sent = await request.send();
-    const recorded = await finishDelivery(db, deliveryKey, recipientKey, sent ? "SENT" : "UNCERTAIN");
+    const recorded = await finishDelivery(db, deliveryKey, recipientKey, sent ? "SENT" : "UNCERTAIN", cooldownHours);
     return sent && recorded ? "SENT" : "UNCERTAIN";
   } catch (error) {
     // L'échec peut survenir après acceptation par le fournisseur. Ne pas
     // libérer la réservation ni réessayer automatiquement.
-    await finishDelivery(db, deliveryKey, recipientKey, "UNCERTAIN").catch(() => undefined);
+    await finishDelivery(db, deliveryKey, recipientKey, "UNCERTAIN", cooldownHours).catch(() => undefined);
     throw error;
   }
 }

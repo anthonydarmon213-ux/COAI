@@ -8,8 +8,7 @@ import { buildMiniDiagnostic, miniDiagnosticEnTexte, type ReponsesDiagnostic } f
 import { trackServerEvent } from "@/lib/analytics/product-events";
 import { synchroniserLeadHubSpot } from "@/lib/hubspot/contact";
 import { hasDiagnosticOptOut } from "@/lib/email/diagnostic-suppression";
-
-const FENETRE_ANTI_DOUBLON_MS = 5 * 60 * 1000;
+import { sendDiagnosticResult } from "@/lib/email/send-diagnostic-result";
 
 // CTA adapté au statut réel du destinataire (Phase 5.1, 11/08/2026) — cette
 // route est appelée avant tout compte (lead anonyme), mais la même adresse
@@ -209,34 +208,29 @@ export async function POST(request: Request) {
     // à son statut réel (prospect / abonné profil incomplet / abonné avec
     // programme, Phase 5.1 11/08/2026). Protection anti-doublon : ne renvoie
     // pas l'email si la même adresse en a déjà reçu un il y a moins de 5 min
-    // (double-clic, retry réseau côté client) — un nouveau diagnostic plus
-    // tard (résultats différents) reste un envoi légitime, jamais bloqué.
+    // (double-clic, retry réseau côté client). Registre transactionnel avant
+    // envoi : une acceptation incertaine reste réservée pour réconciliation,
+    // sans nouvel essai aveugle. Aucun effet sur l'accès au résultat à l'écran.
     (async () => {
       try {
         if (!diagnostic) return;
 
-        const recent = await prisma.diagnosticLead.findFirst({
-          where: {
-            email: emailNormalise,
-            id: { not: lead.id },
-            resultEmailSentAt: { not: null, gte: new Date(Date.now() - FENETRE_ANTI_DOUBLON_MS) },
-          },
-          select: { id: true },
-        });
-        if (recent) return;
-
         const cta = await resoudreCta(emailNormalise);
-        const envoye = await sendEmail(
-          emailNormalise,
-          "Ton diagnostic COAI",
-          miniDiagnosticEnTexte(diagnostic, appUrl, cta)
-        );
+        const envoye = await sendDiagnosticResult({
+          leadId: lead.id,
+          email: emailNormalise,
+          send: () => sendEmail(
+            emailNormalise,
+            "Ton diagnostic COAI",
+            miniDiagnosticEnTexte(diagnostic, appUrl, cta)
+          ),
+        });
         if (envoye) {
           await prisma.diagnosticLead.update({
             where: { id: lead.id },
             data: { resultEmailSentAt: new Date() },
           });
-          trackServerEvent("diagnostic_email_sent", null, { email: emailNormalise });
+          trackServerEvent("diagnostic_email_sent", null, {});
         }
       } catch (err) {
         console.error("[diagnostic-lead] envoi email résultat :", err);

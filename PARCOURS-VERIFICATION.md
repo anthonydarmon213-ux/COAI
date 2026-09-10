@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Email du résultat — réservation avant envoi
+
+- La route publique utilise désormais le registre existant pour l'email transactionnel du bilan. Verrou par adresse normalisée hachée, namespace indépendant du marketing, clé par lead. Délai de cinq minutes après acceptation ; compatibilité avec les anciens `resultEmailSentAt`. Le délai par défaut des relances reste 48 heures. Aucun changement de schéma.
+- Fournisseur non configuré : pas de réservation. Échec/timeout après réservation : état UNCERTAIN conservé, pas de renvoi aveugle. Succès fournisseur puis panne du marquage du lead : le registre SENT et le délai empêchent un second envoi immédiat. L'adresse email n'est plus mise dans l'événement serveur `diagnostic_email_sent`.
+- `test-diagnostic-result-concurrency.cjs` : vraie route, helper, registre et deux connexions PostgreSQL locales ; quatre requêtes → un envoi, délai voisin de 300 secondes, nouveau résultat autorisé après vieillissement des seules fixtures, erreurs fournisseur/marquage, ancien envoi récent et configuration absente. Réponse 201 préservée. Tests consentement facultatif, concurrence du registre, première valeur et rappels essentiels relancés.
+- Limites : fournisseur simulé, pas de preuve de réception en boîte email. Les réservations incertaines nécessitent toujours une réconciliation explicite. La capture crée encore une ligne lead par requête ; notifications admin et CRM ne sont pas dédupliquées par ce lot. Pas de nouvel email réel, campagne ou appel IA.
+
 ## Confirmation et rejet des adaptations — concurrence
 
 - Confirmation : appel fournisseur hors transaction, puis relecture de la décision sous verrou utilisateur partagé avec génération/reprise. Création de la version et mise à jour de l'adaptation atomiques ; décision déjà traitée = aucune nouvelle version. Calcul du numéro sous verrou. Rejet utilise le même verrou et relit le statut avant écriture.

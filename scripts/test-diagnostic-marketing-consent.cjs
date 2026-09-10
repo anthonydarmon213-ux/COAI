@@ -26,8 +26,9 @@ assert.equal(vm.runInNewContext('eligible()',browser),true);
 browser.email='invalid';assert.equal(vm.runInNewContext('eligible()',browser),false);
 assert.match(quiz,/marketingConsent: consentEmail/);
 let sent=0, crm=0, admin=0;
+const deliveries=[];
 function load(file, imports) {
-  const box={exports:{},process:{env:{}},console,require:n=>{assert.ok(n in imports,n);return imports[n];}};
+  const box={exports:{},process:{env:{RESEND_API_KEY:'fixture-not-used'}},console,require:n=>{assert.ok(n in imports,n);return imports[n];}};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{
     compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},
   }).outputText,box);
@@ -35,6 +36,14 @@ function load(file, imports) {
 }
 const suppression=load('src/lib/email/diagnostic-suppression.ts',{
   '@/lib/db/client':{prisma:db}, './diagnostic-cadence':{},
+});
+const registry=load('src/lib/email/delivery-registry.ts',{});
+const adapter=load('src/lib/email/registry-prisma.ts',{'@/lib/db/client':{prisma:db}});
+const resultEmail=load('src/lib/email/send-diagnostic-result.ts',{
+  'node:crypto':crypto, '@/lib/db/client':{prisma:db}, './registry-prisma':adapter,
+  './delivery-registry':{deliverOnce:(database,request)=>{
+    deliveries.push(request);return registry.deliverOnce(database,request);
+  }},
 });
 const route=load('src/app/api/diagnostic-lead/route.ts',{
   'next/server':{NextResponse:{json:(body,options)=>({body,status:options?.status??200})}},
@@ -45,6 +54,7 @@ const route=load('src/app/api/diagnostic-lead/route.ts',{
   '@/lib/analytics/product-events':{trackServerEvent:()=>{}},
   '@/lib/hubspot/contact':{synchroniserLeadHubSpot:async()=>{crm++;}},
   '@/lib/email/diagnostic-suppression':suppression,
+  '@/lib/email/send-diagnostic-result':resultEmail,
 });
 async function post(email, extras={}) {
   return route.POST(new Request('http://localhost/api/diagnostic-lead',{method:'POST',body:JSON.stringify({email,reponses:{fixture:true,marketingConsent:true},...extras})}));
@@ -67,6 +77,10 @@ async function post(email, extras={}) {
   assert.equal((await post(emails[5],{marketingConsent:'true'})).status,400);
   console.log('PASS actual route/local DB: optional opt-in, absent=false, result sent on refusal, CRM suppressed, old opt-out preserved, phone request separate, forged nested consent overwritten');
  } finally {
+  for(const d of deliveries){
+   await db.$executeRawUnsafe('DELETE FROM email_deliveries WHERE "deliveryKey"=$1',d.deliveryKey);
+   await db.$executeRawUnsafe('DELETE FROM email_recipient_gates WHERE "recipientKey"=$1',d.recipientKey);
+  }
   await db.diagnosticLead.deleteMany({where:{email:{in:emails}}});
   await db.$disconnect();
  }

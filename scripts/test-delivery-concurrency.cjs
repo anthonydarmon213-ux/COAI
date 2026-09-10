@@ -28,6 +28,8 @@ const recipient=()=>{const key=`test-concurrency:${randomUUID()}`;recipients.pus
    assert.equal(sends,1);assert.equal(results.filter(value=>value==='SENT').length,1);
    const rows=await clients[0].$queryRawUnsafe('SELECT state FROM email_deliveries WHERE "recipientKey"=$1',key);
    assert.equal(rows.length,1);assert.equal(rows[0].state,'SENT');
+   const gates=await clients[0].$queryRawUnsafe('SELECT EXTRACT(EPOCH FROM ("nextAllowedAt"-CURRENT_TIMESTAMP)) AS remaining FROM email_recipient_gates WHERE "recipientKey"=$1',key);
+   assert.ok(Number(gates[0].remaining)>172750 && Number(gates[0].remaining)<=172800,'default cooldown must remain 48 hours');
   }
   // Different messages racing for the same recipient respect the gate.
   const key=recipient();let sends=0;
@@ -44,6 +46,10 @@ const recipient=()=>{const key=`test-concurrency:${randomUUID()}`;recipients.pus
   assert.equal(attempts,1);
   const rows=await clients[1].$queryRawUnsafe('SELECT state FROM email_deliveries WHERE "recipientKey"=$1',uncertain);
   assert.equal(rows[0].state,'UNCERTAIN');
+  for(const cooldownHours of [-1,NaN,Infinity]) {
+   await assert.rejects(registry.deliverOnce({transaction:()=>{throw Error('must not reserve');}},
+    {...request,cooldownHours}),/Invalid cooldown/);
+  }
   console.log('PASS: PostgreSQL local, two clients; concurrent identical/different reminders, one send, uncertain outcome blocks duplicate');
   console.log('LIMIT: no real email, no killed process, and callers not using this registry remain unprotected');
  } finally {
