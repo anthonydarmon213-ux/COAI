@@ -2,6 +2,12 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Accès direct au résultat complet
+
+- Dès le premier écran de révélation : bouton principal « Voir mon bilan complet », parcours détaillé facultatif. Plus de clic implicite sur le conteneur ; boutons natifs pour la révélation et les pauses du questionnaire. Aucune question sautée, calcul et recommandation inchangés.
+- Vérification navigateur local 390 × 844 avec `direct-result-10sept@example.test`, sans opt-in marketing : questionnaire complet → premier écran → un clic ouvre le résultat détaillé avec offre/inscription. Capture inspectée `screenshot-1789050728740.png`. Aucun email réel/paiement.
+- Régression sur le vrai gestionnaire : accès direct seulement depuis reveal avec diagnostic présent, pas depuis email ni sans résultat. Compilation et tests consentement/navigation vérifiés séparément. Ce contrôle local ne prouve pas le tunnel connecté complet en production.
+
 ## Résultat du bilan indépendant du marketing
 
 - La case marketing reste décochée et devient facultative. L'email valide suffit à continuer ; la requête transmet explicitement `marketingConsent`. Le téléphone demeure une demande de contact séparée.

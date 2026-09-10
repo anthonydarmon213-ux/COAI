@@ -1266,6 +1266,10 @@ export function DiagnosticQuiz({
     }
   }
 
+  function showCompleteResult() {
+    if (step === "reveal" && diagnostic) setStep("result");
+  }
+
   function signUpHref(): string {
     const params = new URLSearchParams();
     if (email) params.set("email", email);
@@ -2149,8 +2153,7 @@ export function DiagnosticQuiz({
 
           {(step === "respire1" || step === "respire2") && (
             <div
-              onClick={handleBreatherTap}
-              className="flex min-h-[20rem] cursor-pointer flex-col items-center justify-center gap-5 py-10 text-center"
+              className="flex min-h-[20rem] flex-col items-center justify-center gap-5 py-10 text-center"
             >
               <div className="animate-reveal flex flex-col items-center gap-5">
                 <p className="coai-diagnostic-kicker">
@@ -2161,7 +2164,7 @@ export function DiagnosticQuiz({
                   {BREATHERS[step].titre}
                 </h2>
                 <p className="max-w-md text-sm leading-6 text-graphite-400">{BREATHERS[step].texte}</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-600">Touche l&apos;écran pour continuer</p>
+                <Button type="button" onClick={handleBreatherTap}>Continuer mon bilan</Button>
               </div>
             </div>
           )}
@@ -2203,8 +2206,7 @@ export function DiagnosticQuiz({
 
           {step === "reveal" && diagnostic && (
             <div
-              onClick={handleRevealTap}
-              className="flex min-h-[22rem] cursor-pointer flex-col items-center justify-center gap-6 py-10 text-center"
+              className="flex min-h-[22rem] flex-col items-center justify-center gap-6 py-10 text-center"
             >
               <div key={revealIndex} className="animate-reveal flex w-full flex-col items-center gap-6">
                 {revealIndex === 0 && (
@@ -2289,9 +2291,17 @@ export function DiagnosticQuiz({
                   </>
                 )}
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-graphite-600">
-                Touche l&apos;écran pour continuer
-              </p>
+              <div className="flex w-full max-w-sm flex-col gap-3">
+                <Button type="button" onClick={showCompleteResult} className="w-full">
+                  Voir mon bilan complet →
+                </Button>
+                {revealIndex + 1 < revealScreenCount && (
+                  <button type="button" onClick={handleRevealTap}
+                    className="rounded-lg px-4 py-3 text-sm text-graphite-300 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-laiton-300">
+                    Découvrir étape par étape
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
