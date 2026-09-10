@@ -25,19 +25,37 @@ async function main() {
   await assert.rejects(load({ user: { count: async () => { throw Error('database unavailable'); } } })(), /database unavailable/, 'Never replace unavailable data with zero');
   console.log('PASS cohort: same window, member counts, sources separate, check-in optional, DB failures visible');
   if (process.argv.includes('--local')) {
-    // Read-only, hard-coded loopback datasource; never reads a production .env.
+    // Isolated fixtures, hard-coded loopback datasource; never reads production.
     const { PrismaClient } = require('@prisma/client');
+    const id = require('node:crypto').randomUUID();
+    const email = `cohort-${id}@example.test`;
     const prisma = new PrismaClient({ datasources: { db: { url: 'postgresql://postgres:postgres@127.0.0.1:54322/postgres' } } });
     try {
-      const snapshot = await load(prisma)();
-      const fixture = await prisma.user.findUnique({ where: { email: 'parcours-e2e-10sept@example.test' }, select: { seances: { select: { source: true, difficulte: true } } } });
-      assert.ok(fixture, 'Fictitious local account is required');
-      assert.ok(fixture.seances.filter(s => s.source === 'PROGRAMME').length >= 2);
-      assert.equal(snapshot.workouts, 1, 'Two local programme logs must count as one member');
-      assert.equal(snapshot.repcount, 1);
-      assert.equal(snapshot.checkins, 1);
-      console.log('PASS real local database:', JSON.stringify(snapshot));
-    } finally { await prisma.$disconnect(); }
+      const clock = new Date('2042-06-15T12:00:00Z');
+      const createdAt = new Date('2042-06-14T12:00:00Z');
+      const baseline = await load(prisma)(clock);
+      await prisma.user.create({ data: { id, supabaseAuthId: id, email, createdAt } });
+      const programme = await prisma.programmeGenerated.create({ data: {
+        userId: id, pilier: 'ENTRAINEMENT', statut: 'EN_ATTENTE', contenu: { fixture: true }, generatedAt: createdAt,
+      } });
+      const pending = await load(prisma)(clock);
+      assert.equal(pending.accounts, baseline.accounts + 1);
+      assert.equal(pending.programmes, baseline.programmes, 'Pending is not an accessible programme');
+      await prisma.programmeGenerated.update({ where: { id: programme.id }, data: { statut: 'VALIDE' } });
+      await prisma.seanceLog.createMany({ data: [
+        { userId: id, source: 'PROGRAMME', exercices: [], date: createdAt, createdAt, difficulte: 3 },
+        { userId: id, source: 'PROGRAMME', exercices: [], date: createdAt, createdAt },
+        { userId: id, source: 'REPCOUNT', exercices: [], date: createdAt, createdAt },
+      ] });
+      const snapshot = await load(prisma)(clock);
+      for (const field of ['accounts', 'programmes', 'workouts', 'repcount', 'checkins']) {
+        assert.equal(snapshot[field], baseline[field] + 1, `${field} counts members, not rows`);
+      }
+      console.log('PASS local PostgreSQL: isolated member, pending excluded, two workouts count once, RepCount/check-in counted independently');
+    } finally {
+      await prisma.user.deleteMany({ where: { id, email } });
+      await prisma.$disconnect();
+    }
   }
 }
 main().catch(e => { console.error(e.message); process.exitCode = 1; });

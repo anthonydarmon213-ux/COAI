@@ -2,6 +2,20 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Tableau d'activation — vérification navigateur du 10 septembre
+
+- Session Chromium isolée `coai-admin-audit`, viewport 390 × 844, base loopback. Compte fictif `confirmation-reprise-10sept@example.test` : non-administrateur redirigé vers `/dashboard`. Droit `isAdmin` temporaire limité à cet identifiant/email local, restauré dans un `finally` puis vérifié ; nouvel accès après retrait à nouveau redirigé. Navigateur fermé.
+- `/admin/business` : compteurs du bloc « Activation des nouveaux comptes » identiques au véritable `getActivationCohort()` : comptes 4, programmes accessibles 2, séance guidée 2, RepCount 3, bilan de séance 2. Ce sont des fixtures locales, pas des clients ni du chiffre d'affaires. Largeur document = viewport = 390 ; capture inspectée `screenshot-1789054256157.png`.
+- `test-activation-cohort.cjs --local` ne dépend plus d'un ancien compte ni de l'hypothèse qu'un seul membre utilise la base. Il crée ses propres fixtures dans une fenêtre datée isolée, compare les deltas au point de départ, exclut les programmes EN_ATTENTE, compte deux séances comme un membre et nettoie uniquement son identifiant/email exact.
+- Limite : réception GA4/Meta et accès administrateur en production non prouvés par ce test local. Le bandeau de confidentialité initial recouvrait le bouton de connexion dans le viewport par défaut ; refus explicite effectué avant connexion, sans contournement du clic.
+
+## Lecture de la production — 10 septembre, sans envoi
+
+- Projet Supabase COAI `fczkfddfgooocqqkqsqw` confirmé ACTIVE_HEALTHY. Agrégats seuls, aucune identité/réponse de santé lue : sur les 7 derniers jours, 2 nouveaux comptes, 1 avec profil, 0 avec abonnement ACTIVE/programme accessible/séance PROGRAMME/RepCount. Cela ne prouve pas un blocage : aucun parcours récent complet ne fournit une preuve positive de bout en bout.
+- Même fenêtre : 2 leads, 1 marqué `resultEmailSentAt`, 2 avec au moins une ancienne relance marquée. Aucune entrée récente dans le nouveau registre email. Les marqueurs historiques ne prouvent pas une livraison en boîte mail ni l'exécution du nouveau dispositif.
+- Vercel : `RESEND_API_KEY` et `RESEND_FROM_EMAIL` existent en production avec type sensitive, donc non relisibles. Aucune tentative de contournement, aucun secret copié sur disque, aucun appel Resend effectué. Aucun journal retourné par les recherches ciblées 24 h sur les routes diagnostic/relance : absence de résultat, pas preuve de succès ni d'absence d'exécution.
+- Action externe demandée : ouvrir le tableau de bord Resend connecté pour vérifier domaine/envois en lecture seule. Cette connexion n'a pas encore été fournie.
+
 ## Email du résultat — réservation avant envoi
 
 - La route publique utilise désormais le registre existant pour l'email transactionnel du bilan. Verrou par adresse normalisée hachée, namespace indépendant du marketing, clé par lead. Délai de cinq minutes après acceptation ; compatibilité avec les anciens `resultEmailSentAt`. Le délai par défaut des relances reste 48 heures. Aucun changement de schéma.
