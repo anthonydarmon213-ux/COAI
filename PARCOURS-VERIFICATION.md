@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Rappel du premier repère — verrou et éligibilité fraîche
+
+- Le rappel des comptes gratuits passe par le registre existant : clé par compte, adresse hachée partagée avec les relances du bilan et leur cadence de 48 h. Pas de nouvelle table, migration ou fournisseur.
+- Après réservation : désabonnement relu, bilan consenti récent confirmé, compte toujours dans la fenêtre 24 h–7 jours, aucun abonnement, déverrouillage ou séance, et rappel non encore marqué envoyé. Une ancienne liste de candidats ne suffit plus à déclencher l'email.
+- `test-first-value-reminder.cjs` exécute le vrai cron, helper et registre avec deux connexions PostgreSQL locales. Candidats métier et fournisseur simulés : concurrence/reprise sans doublon, compte devenu actif, consentement disparu, désabonnement initial ou tardif, réponse fournisseur incertaine et clé fournisseur absente. Les lignes techniques créées par le test sont supprimées par clés exactes.
+- Aucun email externe ni cron de production invoqué. Une activité survenant après la dernière lecture, pendant l'envoi réseau, reste une course possible. Les envois incertains demandent réconciliation, pas un retry aveugle. Les autres catégories de relance ne sont pas couvertes par ce lot.
+
 ## Même compte : bilan → essai → séance → RepCount — 10 septembre, reprise de midi
 
 Cette reprise complète les preuves antérieures du bilan anonyme mobile pour **la même fixture** `bilan-mobile-10sept@example.test`, membre local `cb914eff-d115-4f6f-8f70-343d4d9ef76c`. Aucun compte client, email externe ou paiement réel. Application locale sur le commit `d012e1b`, avec les modifications tierces préexistantes du worktree ; ce n'est pas une certification du parcours en production.

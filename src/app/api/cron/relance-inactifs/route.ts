@@ -8,7 +8,7 @@ import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
 import { hasDiagnosticOptOut, isDiagnosticReminderDue } from "@/lib/email/diagnostic-suppression";
 import { stripe } from "@/lib/stripe/client";
-import { sendDiagnosticReminder } from "@/lib/email/send-diagnostic-reminder";
+import { sendDiagnosticReminder, sendFirstValueReminder } from "@/lib/email/send-diagnostic-reminder";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
 // Coaching Hybride/Premium le 11/08/2026). À l'origine réservé au palier
@@ -545,16 +545,34 @@ async function relancerComptesSansPremierRepere(appUrl: string): Promise<number>
     const nom = user.prenom ? ` ${user.prenom}` : "";
     const unsubscribe = buildUnsubscribeLink(appUrl, user.email);
     if (!unsubscribe) continue;
-    const envoye = await sendEmail(
-      user.email,
-      "Ton premier repère COAI prend moins d'une minute",
-      `Bonjour${nom},\n\n` +
+    const envoye = await sendFirstValueReminder({
+      userId: user.id,
+      email: user.email,
+      eligible: async () => {
+        const now = Date.now();
+        const recent = new Date(now - RELANCE_PREMIERE_VALEUR_FENETRE_MS);
+        const consent = await prisma.diagnosticLead.findFirst({
+          where: { email: { equals: user.email, mode: "insensitive" },
+            resultEmailSentAt: { not: null }, optedOutAt: null, createdAt: { gte: recent } },
+          select: { id: true },
+        });
+        if (!consent) return false;
+        return Boolean(await prisma.user.findFirst({
+          where: { id: user.id, email: { equals: user.email, mode: "insensitive" },
+            createdAt: { gte: recent, lte: new Date(now - RELANCE_ACTIVATION_APRES_MS) },
+            firstValueReminderSentAt: null, programmeUnlockedAt: null,
+            subscription: null, seances: { none: {} } },
+          select: { id: true },
+        }));
+      },
+      subject: "Ton premier repère COAI prend moins d'une minute",
+      text: `Bonjour${nom},\n\n` +
         `Ton bilan est bien enregistré. Pour voir COAI travailler avec une donnée réelle, choisis simplement un exercice et note une série : ta première courbe de progression apparaîtra.\n\n` +
         `Poser mon premier repère gratuitement : ${appUrl}/suivi/repcount?onboarding=1\n\n` +
         `Aucune carte bancaire n'est demandée. Tu choisiras un accompagnement seulement après avoir essayé.\n\n` +
         `À bientôt,\nL'équipe COAI` +
         (unsubscribe ? `\n\nNe plus recevoir ces emails : ${unsubscribe}` : "")
-    );
+    });
     if (!envoye) continue;
 
     await prisma.user.update({
