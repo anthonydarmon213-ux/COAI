@@ -57,6 +57,9 @@ const request=()=>new Request('http://localhost/api/programmes/generate?mode=onb
  assert.equal(quotaReads,quotaBefore);
  records[0].statut='EN_ATTENTE';
  assert.equal((await box.exports.POST(request())).body.programmes[0].statut,'EN_ATTENTE');
+ assert.equal((await box.exports.POST(new Request('http://localhost/api/programmes/generate',{method:'POST'}))).status,409);
+ assert.equal(records.length,3);
+ records[0].statut='VALIDE'; // Coach validation simulated only in this fixture.
  // A failed partial first generation resumes only the missing pillar.
  records.pop();const preserved=records.map(p=>p.id);
  const partial=await box.exports.POST(request());

@@ -59,6 +59,14 @@ function route(db) {
   await clients[0].programmeGenerated.update({where:{id:initial[0].id},data:{statut:'EN_ATTENTE'}});
   const resumed=await routes[0].POST(request(true));
   assert.equal(resumed.body.programmes.find(p=>p.id===initial[0].id).statut,'EN_ATTENTE');
+  assert.equal((await routes[0].POST(request(false))).status,409);
+  const protectedPending=await helper(clients[1]).saveGeneratedProgramme({
+    userId:id,pilier:initial[0].pilier,statut:'GENERE_IA',contenu:{fixture:true},onboarding:false,
+  });
+  assert.equal(protectedPending.created,false);
+  assert.equal(protectedPending.programme.id,initial[0].id);
+  assert.equal(protectedPending.programme.statut,'EN_ATTENTE');
+  await clients[0].programmeGenerated.update({where:{id:initial[0].id},data:{statut:'VALIDE'}});
   await Promise.all(routes.map(r=>r.POST(request(false))));
   const all=await clients[0].programmeGenerated.findMany({where:{userId:id},orderBy:{version:'asc'}});
   assert.equal(all.length,9);
@@ -77,7 +85,8 @@ function route(db) {
   assert.equal(notifications,0);
   console.log('PASS actual route: 4 concurrent activations → 3 identical IDs, metadata only, pending preserved');
   console.log('PASS concurrent explicit generations: versions 1/2/3; rollback leaves no row, retry creates version 4');
-  console.log('LIMIT: paid calls/crash before saving and adaptation writers not coordinated by this test.');
+  console.log('PASS pending preserved by HTTP and under the save transaction, including explicit regeneration.');
+  console.log('LIMIT: catalogue mocked; no production writes or paid calls.');
  } finally {
   await clients[0].user.deleteMany({where:{id,email:`concurrency-${id}@example.test`}});
   await Promise.all(clients.map(db=>db.$disconnect()));

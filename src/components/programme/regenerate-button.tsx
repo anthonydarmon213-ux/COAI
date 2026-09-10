@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { CoachReviewLink } from "@/components/programme/coach-review-link";
 
 export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean }) {
   const router = useRouter();
@@ -28,6 +29,8 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
         // destiné à l'utilisateur.
         throw new Error(typeof data?.error === "string" ? data.error : "La génération n'a pas abouti.");
       }
+      if (data?.echecs > 0) throw new Error("Une partie du programme n’a pas pu être enregistrée. Retrouve les piliers déjà disponibles dans ton espace.");
+      setConfirmation(false);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -61,12 +64,12 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
             <div className="animate-progress-indeterminate absolute top-0 h-full w-1/3 rounded-full bg-laiton-400" />
           </div>
           <p className="text-xs text-graphite-400">
-            Ça peut prendre jusqu&apos;à une minute — l&apos;IA génère les 3 piliers en
-            parallèle.
+            COAI prépare tes trois piliers à partir de sa bibliothèque.
           </p>
         </div>
       )}
       {error && <p className="text-sm text-red-400">{error}</p>}
+      <CoachReviewLink />
     </div>
   );
 }

@@ -14,6 +14,7 @@ for (const [programmes, expected, echecs = 0] of [
  const values=[],effects=[]; let cursor=0;
  const element=(type,props)=>({type,props});
  const imports={
+  '@/components/programme/coach-review-link':{},
   react:{useEffect:fn=>effects.push(fn),useState:initial=>{const i=cursor++;if(!(i in values))values[i]=initial;return [values[i],value=>values[i]=value];}},
   'react/jsx-runtime':{jsx:element,jsxs:element}, 'next/link':{},
   '@/components/ui/button':{}, '@/components/ui/section-label':{}, '@/components/compte/profil-completion':{},
@@ -48,6 +49,7 @@ for (const [cookie, expected] of [
  const values=[],effects=[],calls=[]; let cursor=0, saved=false;
  const element=(type,props)=>({type,props});
  const imports={
+  '@/components/programme/coach-review-link':{},
   react:{useEffect:fn=>effects.push(fn),useState:initial=>{const i=cursor++;if(!(i in values))values[i]=initial;return [values[i],value=>values[i]=value];}},
   'react/jsx-runtime':{jsx:element,jsxs:element}, 'next/link':{default:'link'},
   '@/components/ui/button':{}, '@/components/ui/section-label':{}, '@/components/compte/profil-completion':{},
@@ -72,6 +74,7 @@ for (const [cookie, expected] of [
 for(const scenario of ['http-error','network-error','invalid-json','null-json','success']) {
  let cleared=0, states=[], effects=[], calls=[];
  const imports={
+  '@/components/programme/coach-review-link':{},
   react:{useEffect:fn=>effects.push(fn),useState:initial=>[initial,value=>states.push(value)]},
   'react/jsx-runtime':{jsx:()=>null,jsxs:()=>null},
   'next/link':{},
@@ -102,9 +105,10 @@ for(const scenario of ['http-error','network-error','invalid-json','null-json','
  console.log(`PASS ${scenario}: clear=${cleared}, state=${states.at(-1)}`);
 }
 
-for (const statuses of [[201], [403,201], [403,403,403,403,403,403], [429], [502], [401], [422]]) {
+for (const statuses of [[409], [201], [403,201], [403,403,403,403,403,403], [429], [502], [401], [422]]) {
  const effects=[], states=[]; let calls=0;
  const imports={
+  '@/components/programme/coach-review-link':{},
   react:{useEffect:fn=>effects.push(fn),useState:initial=>[initial,value=>states.push(value)]},
   'react/jsx-runtime':{jsx:()=>null,jsxs:()=>null},
   'next/link':{}, '@/components/ui/button':{}, '@/components/ui/section-label':{}, '@/components/compte/profil-completion':{},
@@ -115,12 +119,12 @@ for (const statuses of [[201], [403,201], [403,403,403,403,403,403], [429], [502
   '@/lib/checkout/intended-plan-cookie':{readIntendedPlanCookie:()=>null},
  };
  const box={exports:{},require:n=>{assert.ok(n in imports,n);return imports[n];},setTimeout:fn=>{fn();return 0;},
-  fetch:async url=>{assert.equal(url,'/api/programmes/generate?mode=onboarding'); return {status:statuses[Math.min(calls++,statuses.length-1)],json:async()=>({programmes:[{statut:'GENERE_IA'}]})};}};
+  fetch:async url=>{assert.equal(url,'/api/programmes/generate?mode=onboarding'); return {status:statuses[Math.min(calls++,statuses.length-1)],json:async()=>({programmes:[{statut:'GENERE_IA'}],requiresCoachReview:true})};}};
  vm.runInNewContext(compiled,box);
  box.exports.ActivationFlow({coachValidationRequise:false,profilInitial:{},declencherGenerationAuto:true});
  effects[0](); await new Promise(resolve=>setImmediate(resolve));
  assert.equal(calls,statuses.length);
  const last=statuses.at(-1);
- assert.equal(states.at(-1),last===201?'pret':last===403?'debloquer':'erreur');
+ assert.equal(states.at(-1),last===201?'pret':last===403?'debloquer':last===409?'relecture':'erreur');
  console.log(`PASS generation ${statuses.join('→')}: ${calls} request(s), no real API call`);
 }

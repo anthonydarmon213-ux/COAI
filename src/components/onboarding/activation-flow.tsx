@@ -9,6 +9,7 @@ import { readDiagnosticProgress } from "@/lib/diagnostic/progress-storage";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import { computeProfilCompletion, type CompletionProfil } from "@/lib/profil/completion";
 import { ProfilCompletion } from "@/components/compte/profil-completion";
+import { CoachReviewLink } from "@/components/programme/coach-review-link";
 import { readIntendedPlanCookie, readIntendedBillingCookie, readIntendedVipSessionsCookie } from "@/lib/checkout/intended-plan-cookie";
 
 // Rendu sur /bienvenue, juste après l'activation Stripe (essai ou paiement
@@ -37,6 +38,7 @@ type Etat =
   | "generation"
   | "pret"
   | "erreur_bilan"
+  | "relecture"
   | "erreur";
 
 type ProfilLike = Parameters<typeof computeProfilCompletion>[0];
@@ -107,6 +109,13 @@ export function ActivationFlow({
         if (annule) return;
         const res = await fetch("/api/programmes/generate?mode=onboarding", { method: "POST" });
         dernierStatut = res.status;
+        if (res.status === 409) {
+          const result = await res.json();
+          if (result?.requiresCoachReview) {
+            if (!annule) setEtat("relecture");
+            return;
+          }
+        }
         if (res.status === 201) {
           const result = await res.json();
           if (result?.echecs > 0) throw new Error("Programme partiellement préparé");
@@ -304,22 +313,33 @@ export function ActivationFlow({
     );
   }
 
+  if (etat === "relecture") {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 p-6 text-center">
+        <SectionLabel>Un échange avec ton coach est nécessaire</SectionLabel>
+        <p className="max-w-md text-sm leading-6 text-graphite-300">
+          Ton profil ou un programme en attente nécessite une relecture avant de préparer la suite.
+          Aucun nouveau programme n’a été attribué. Envoie ta demande directement à Anthony.
+        </p>
+        <CoachReviewLink />
+        <Link href="/programme/entrainement" className="text-sm underline">Retrouver mon espace programme</Link>
+      </div>
+    );
+  }
   if (etat === "pret") {
-    // Coaching Hybride : la V1 générée reste en attente de relecture par le
-    // coach (statut EN_ATTENTE existant, cf. StatutProgramme) — jamais
-    // présentée comme définitive avant sa validation. Pass IA : 100% IA,
-    // disponible immédiatement, rien à valider.
+    // Reprendre le statut réel, notamment celui des anciennes relectures.
+    // Aucune attente ajoutée uniquement à cause du niveau d'abonnement.
     if (validationRequise) {
       return (
         <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
           <SectionLabel>À valider par ton coach</SectionLabel>
           <p className="max-w-sm text-sm leading-6 text-graphite-300">
-            Ton programme V1 est prêt — entraînement, nutrition et récupération. Anthony (ou un
-            coach qu&apos;il a formé) le relit avant qu&apos;il devienne définitif.
+            Ton programme attend une relecture avant d’être accessible.
           </p>
           <Link href="/programme/entrainement">
-            <Button className="px-8 py-3">Découvrir mon programme</Button>
+            <Button className="px-8 py-3">Voir le statut de mon programme</Button>
           </Link>
+          <CoachReviewLink />
         </div>
       );
     }
@@ -332,6 +352,7 @@ export function ActivationFlow({
         <Link href="/programme/entrainement?onboarding=1#seance-du-jour">
           <Button className="px-8 py-3">Commencer ma première séance</Button>
         </Link>
+        <CoachReviewLink />
       </div>
     );
   }

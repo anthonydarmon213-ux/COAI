@@ -67,12 +67,12 @@ export async function socleRecuperation(profil: ProfilSocle) {
  *
  * Non dès qu'une contrainte de santé, une grossesse ou un post-partum est
  * déclaré : le socle est construit sur un cas général, il ignore ces
- * situations. Ces profils passent toujours par la génération sur mesure,
- * quel que soit leur abonnement — c'est une règle de sécurité, pas une
- * question de prix.
+ * situations. Ces profils sont orientés vers le coach, sans génération IA
+ * payante automatique. Ce filtre d'éligibilité n'est pas un avis médical.
  */
 export function socleAcceptable(profil: {
   contraintesSante?: string | null;
+  antecedentsMedicaux?: string | null;
   statutMaternite?: string | null;
   allergiesAlimentaires?: string | null;
 }): boolean {
@@ -86,6 +86,7 @@ export function socleAcceptable(profil: {
     return !normalisee || /^(aucun|aucune|neant|non|ras|r\.a\.s\.?|rien)$/.test(normalisee);
   };
   if (!estVide(profil.contraintesSante)) return false;
+  if (!estVide(profil.antecedentsMedicaux)) return false;
   const alimentation = (profil.allergiesAlimentaires ?? "").trim().toLowerCase();
   if (estVide(alimentation)) return true;
   // Les régimes éditoriaux couverts ont leur propre menu. Une allergie ou

@@ -25,6 +25,7 @@ import { construireProjection, EVENEMENTS_DECLENCHEURS } from "@/lib/diagnostic/
 import { Gauge } from "@/components/ui/gauge";
 import { FonctionsDiagnosticCard } from "@/components/marketing/fonctions-diagnostic-card";
 import { DiagnosticScanPortal } from "@/components/marketing/diagnostic-scan-portal";
+import { CoachReviewLink } from "@/components/programme/coach-review-link";
 
 // Quiz public (visiteur anonyme, avant inscription) : sert d'aimant à leads
 // — "on la fait goûter, et après on vend" — un aperçu personnalisé gratuit
@@ -710,6 +711,7 @@ export function DiagnosticQuiz({
   // auquel cas le message générique reste affiché.
   const [applyErrorMessage, setApplyErrorMessage] = useState<string | null>(null);
   const [applyNeedsFormule, setApplyNeedsFormule] = useState(false);
+  const [applyNeedsReview, setApplyNeedsReview] = useState(false);
   const [resumable, setResumable] = useState(false);
 
   const stepIndex = questionSteps.indexOf(step);
@@ -1372,6 +1374,8 @@ export function DiagnosticQuiz({
   async function appliquerAuProfil() {
     setApplyStatus("loading");
     setApplyErrorMessage(null);
+    setApplyNeedsReview(false);
+    setApplyNeedsFormule(false);
     let profilApplique = false;
     try {
       const res = await fetch("/api/profil", {
@@ -1397,8 +1401,20 @@ export function DiagnosticQuiz({
         const data = await genRes.json().catch(() => null);
         setApplyErrorMessage(typeof data?.error === "string" ? data.error : null);
         setApplyNeedsFormule(genRes.status === 403);
+        setApplyNeedsReview(data?.requiresCoachReview === true);
         throw new Error();
       }
+      const generated = await genRes.json();
+      if (!Array.isArray(generated?.programmes) || generated.programmes.length === 0) {
+        throw new Error("Statut du programme absent");
+      }
+      if (generated?.programmes?.some((p: { statut: string }) => p.statut === "EN_ATTENTE")) {
+        setApplyNeedsReview(true);
+        setApplyNeedsFormule(false);
+        setApplyErrorMessage("Ton programme attend une relecture avant d’être accessible.");
+        throw new Error("relecture");
+      }
+      if (generated?.echecs > 0) throw new Error("Programme partiellement préparé");
       trackFunnelEvent("first_programme_viewed");
       setApplyStatus("pret");
     } catch {
@@ -2612,7 +2628,7 @@ export function DiagnosticQuiz({
                       <p className="text-sm text-graphite-300">
                         {applyErrorMessage ?? "Ton profil est enregistré, mais la génération de ton programme a rencontré un souci."}
                       </p>
-                      {applyNeedsFormule ? (
+                      {applyNeedsReview ? <CoachReviewLink /> : applyNeedsFormule ? (
                         <Link href="/pricing" className="text-sm text-laiton-300 underline">
                           Choisir mon accompagnement →
                         </Link>

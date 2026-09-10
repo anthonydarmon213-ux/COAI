@@ -65,7 +65,7 @@ const html = require('react-dom/server').renderToStaticMarkup(React.createElemen
 assert.ok(!html.includes('<script') && !html.includes('<img'));
 // Render the actual open panel with no choice. Only its placement changes;
 // authentication is not consent and must not mount optional trackers.
-for (const route of ['/sign-in', '/sign-up', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/', '/dashboard']) {
+for (const route of ['/sign-in', '/sign-up', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/bienvenue', '/', '/dashboard']) {
   pathname = route;
   let stateIndex = 0;
   const openPanel = load('src/components/analytics/privacy-controls.tsx', {

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/client";
 import { generateWithAI, type ProfilUtilisateur } from "@/lib/ai/client";
 import { genererPilier } from "@/lib/programmes/generer";
+import { PROGRAMME_AI_PAID_ENABLED } from "@/lib/programmes/paid-policy";
 import { sendAdminNotification } from "@/lib/email/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import {
@@ -28,6 +29,7 @@ export type ResultatAdaptation = {
   // actuel" (cf. confirmerAdaptation / rejeterAdaptation) avant que le
   // contenu ne soit régénéré et qu'une nouvelle version n'existe.
   enAttenteConfirmation: boolean;
+  requiresCoachReview?: boolean;
 };
 
 function resumerContenuActuel(contenu: unknown): string {
@@ -222,6 +224,15 @@ export async function proposerAdaptation(
     };
   }
 
+  if (!PROGRAMME_AI_PAID_ENABLED) {
+    return {
+      decision: "GARDER",
+      resume: "L’adaptation sur mesure nécessite un échange avec ton coach. Aucune analyse IA payante ni modification de programme n’a été effectuée.",
+      changements: [], donneesSuffisantes: true, adaptationId: null,
+      nouvelleVersion: null, enAttenteConfirmation: false,
+      requiresCoachReview: true,
+    };
+  }
   const profil = buildProfilUtilisateur(user.profile, null);
   const prompt = buildProgrammeAdaptationDecisionPrompt(
     pilier,
@@ -303,7 +314,13 @@ export async function confirmerAdaptation(
   const temporaire = Boolean(contexte._temporaire);
   const finPrevue = typeof contexte._finPrevue === "string" ? new Date(contexte._finPrevue) : null;
 
-  const contenu = await genererPilier(adaptation.pilier, profilAdaptation, userId);
+  let contenu: Awaited<ReturnType<typeof genererPilier>>;
+  try {
+    contenu = await genererPilier(adaptation.pilier, profilAdaptation, userId);
+  } catch {
+    // Garder la proposition et le programme courant intacts.
+    return { error: "Cette adaptation nécessite un échange avec ton coach. Ton programme actuel est conservé ; aucune génération IA payante automatique n’est activée." };
+  }
 
   const plan = getEffectivePlan(user.subscription);
   // Même garde-fou qu'à la génération initiale (route.ts) : jamais de

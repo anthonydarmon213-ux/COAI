@@ -17,6 +17,7 @@ import {
 import { buildProgrammeRecuperationJourPrompt } from "@/lib/ai/prompts/programme-recuperation-jour";
 import type { Pilier } from "@prisma/client";
 import type { AIUsageContext } from "@/lib/ai/usage";
+import { PROGRAMME_AI_PAID_ENABLED } from "@/lib/programmes/paid-policy";
 
 // Extrait de src/app/api/programmes/generate/route.ts (11/08/2026) : logique
 // partagée entre la génération initiale et le moteur d'adaptation
@@ -125,6 +126,11 @@ async function genererRecuperation(profil: ProfilUtilisateur, usage: AIUsageCont
 }
 
 export async function genererPilier(pilier: Pilier, profil: ProfilUtilisateur, userId: string) {
+  // Décision Anthony, 10/09/2026 : verrou partagé avec les adaptations.
+  // Une clé fournisseur ou un paramètre client ne vaut pas accord de dépense.
+  if (!PROGRAMME_AI_PAID_ENABLED) {
+    throw new Error("Cette adaptation nécessite un échange avec ton coach. Aucune génération IA payante automatique n’est activée.");
+  }
   const usage = { userId, feature: `programme_${pilier.toLowerCase()}` };
   switch (pilier) {
     case "ENTRAINEMENT":

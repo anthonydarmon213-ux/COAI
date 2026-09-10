@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CoachReviewLink } from "@/components/programme/coach-review-link";
 
 export type ResultatAdaptationUI = {
   decision: "GARDER" | "PROGRESSER" | "REDUIRE" | "MODIFIER" | "ADAPTER";
@@ -13,6 +14,7 @@ export type ResultatAdaptationUI = {
   nouvelleVersion: number | null;
   adaptationId: string | null;
   enAttenteConfirmation: boolean;
+  requiresCoachReview?: boolean;
 };
 
 const DECISION_LABEL: Record<
@@ -79,7 +81,7 @@ export function AdaptationResultat({ resultat }: { resultat: ResultatAdaptationU
 
   return (
     <>
-      <Badge tone={DECISION_LABEL[resultat.decision].tone}>{DECISION_LABEL[resultat.decision].label}</Badge>
+      <Badge tone={DECISION_LABEL[resultat.decision].tone}>{resultat.requiresCoachReview ? "Échange avec le coach" : DECISION_LABEL[resultat.decision].label}</Badge>
       <p className="text-sm leading-6 text-graphite-200">{resultat.resume}</p>
       {resultat.changements.length > 0 && (
         <ul className="flex flex-col gap-1 text-xs text-graphite-400">
@@ -115,6 +117,7 @@ export function AdaptationResultat({ resultat }: { resultat: ResultatAdaptationU
       )}
 
       {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
+      {(resultat.requiresCoachReview || error) && <CoachReviewLink />}
 
       {nouvelleVersion && (
         <p className="mt-1 text-xs text-laiton-300">

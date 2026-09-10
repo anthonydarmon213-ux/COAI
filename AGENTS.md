@@ -85,6 +85,17 @@ Ne pas trancher seul : modèle économique (abonnement vs vente à l'unité),
 verrouillage de fonctions existantes, migrations Prisma en production,
 mise en ligne d'un tunnel de paiement, contenu éditorial non relu.
 
+### Décision confirmée — programmes, 10/09/2026
+
+Anthony a confirmé : bibliothèque COAI en priorité pour toutes les offres,
+aucun appel IA payant automatique pour générer ou adapter les programmes,
+relecture sur demande ou pour les profils hors cadre. Ne pas déverrouiller
+les anciens programmes EN_ATTENTE ni permettre à « Recréer » de contourner
+leur relecture. Les antécédents médicaux font partie du filtre d'éligibilité.
+Une demande humaine passe par le contact réel d'Anthony, pas par le chat IA ;
+ne jamais prétendre qu'une demande a été envoyée avant son envoi effectif.
+La réactivation de la génération payante demande une nouvelle autorisation.
+
 ## État au 01/09/2026
 
 - 77 fiches exercices, 59 avec vidéo, 54 entièrement filmées

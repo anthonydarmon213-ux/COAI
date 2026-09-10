@@ -17,7 +17,7 @@ export function PrivacyControls() {
   // Authentication must remain usable without answering an optional consent prompt.
   // The root layout renders this panel after the page, so normal flow never
   // covers the form, including on small screens or with enlarged text.
-  const inline = ["/sign-in", "/sign-up", "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe"].includes(pathname);
+  const inline = ["/sign-in", "/sign-up", "/mot-de-passe-oublie", "/reinitialiser-mot-de-passe", "/bienvenue"].includes(pathname);
   const [choices, setChoices] = useState<PrivacyChoices | null>(null);
   const [draft, setDraft] = useState<PrivacyChoices>(REFUSE_ALL);
   const [open, setOpen] = useState(false);

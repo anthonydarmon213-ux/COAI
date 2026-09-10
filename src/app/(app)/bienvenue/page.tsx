@@ -4,7 +4,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
-import { hasPaidSubscription, hasSuiviAccess } from "@/lib/subscription/plan";
+import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { stripe } from "@/lib/stripe/client";
 import type Stripe from "stripe";
 
@@ -45,7 +45,7 @@ const CONTENU_PAR_PLAN: Record<
     etapes: [
       { titre: "Ton profil", texte: "Objectifs, niveau, contraintes — la base de tout le reste." },
       { titre: "Ton bilan du jour", texte: "Temps disponible, sommeil, forme et douleurs du jour." },
-      { titre: "Validé par ton coach", texte: "Un regard humain relit, nuance et ajuste les décisions importantes." },
+      { titre: "Ton coach sur demande", texte: "Demande une relecture ou un ajustement humain lorsque tu en as besoin." },
       { titre: "Suivi jusqu'à ton objectif", texte: "Ton coach revient vers toi si besoin — jusqu'à ce que tu y sois." },
     ],
   },
@@ -69,7 +69,8 @@ export default async function BienvenuePage({
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const coachValidationRequise = hasSuiviAccess(user.subscription);
+  // Le vrai statut de l'API fait foi, jamais le niveau d'abonnement.
+  const coachValidationRequise = false;
 
   // Les paramètres visibles dans l'URL sont modifiables par n'importe qui.
   // La session Stripe est donc relue côté serveur et doit appartenir au
@@ -253,7 +254,7 @@ export default async function BienvenuePage({
           {enEssai ? (sessionVerifiee ? "Tes 7 jours d'essai commencent." : "Reprenons ton activation.") : `Bienvenue${prenom ? `, ${prenom}` : ""}.`}
         </h1>
         <p className="max-w-md text-sm leading-6 text-graphite-400">
-          COAI prépare ton programme. Ta première séance sera accessible juste ici, sans chercher dans les menus.
+          Retrouve ici la préparation de ton programme et la prochaine étape adaptée à ton profil.
         </p>
       </div>
 
