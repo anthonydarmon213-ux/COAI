@@ -12,6 +12,7 @@ import { getCapacitySnapshot } from "@/lib/admin/capacity";
 import { AIEconomicsPanel } from "@/components/admin/ai-economics-panel";
 import { getAIEconomics } from "@/lib/admin/ai-economics";
 import { getRevenueMetrics } from "@/lib/admin/revenue-metrics";
+import { getActivationCohort } from "@/lib/admin/activation-cohort";
 import { prixTrimestreCentimes } from "@/lib/pricing/offre-rentree";
 
 // Prix des paliers payants (cf. commentaire SubscriptionPlan dans le schema).
@@ -40,7 +41,7 @@ export default async function AdminBusinessPage() {
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!admin?.isAdmin) redirect("/dashboard");
 
-  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement] = await Promise.all([
+  const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement, activationCohort] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
       select: { plan: true, billingInterval: true, amountCents: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, createdAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: { where: { source: "PROGRAMME" } } } } } } },
@@ -87,6 +88,7 @@ export default async function AdminBusinessPage() {
         },
       },
     }),
+    getActivationCohort(),
   ]);
 
   // Read-only triage: an uncertain send must never be retried from this screen.
@@ -490,6 +492,19 @@ export default async function AdminBusinessPage() {
             <StatCard label="Filleuls en essai" value={String(filleulsEnEssai)} sublabel="Conversion encore en cours" />
             <StatCard label="Conversion parrainage" value={`${conversionParrainage.toFixed(1)}%`} sublabel={`${filleulsConvertis} filleul(s) devenu(s) payant(s)`} highlight />
           </div>
+        </section>
+
+        <section className="flex flex-col gap-3" aria-label="Activation des nouveaux comptes">
+          <SectionLabel>Premiers usages · inscrits des 30 derniers jours</SectionLabel>
+          <p className="text-xs text-graphite-400">Comptes uniques, d’après les données enregistrées. Un membre compte une seule fois par indicateur, même après plusieurs séances. Ce ne sont pas des clics ni des paiements.</p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <StatCard label="Comptes créés" value={String(activationCohort.accounts)} sublabel="Même cohorte pour tous les indicateurs" />
+            <StatCard label="Avec programme" value={String(activationCohort.programmes)} sublabel="Statut validé ou généré" />
+            <StatCard label="Séance guidée enregistrée" value={String(activationCohort.workouts)} sublabel={activationCohort.accounts ? `${(100 * activationCohort.workouts / activationCohort.accounts).toFixed(1)} % des inscrits` : "Aucun inscrit sur la période"} highlight />
+            <StatCard label="RepCount utilisé" value={String(activationCohort.repcount)} sublabel="Au moins une saisie directe enregistrée" />
+            <StatCard label="Bilan de séance renseigné" value={String(activationCohort.checkins)} sublabel="Au moins un ressenti sur une séance guidée" />
+          </div>
+          <p className="text-xs text-graphite-500">Indicateurs indépendants : RepCount peut être utilisé sans abonnement ni séance guidée. Les nouveaux inscrits n’ont pas tous le même recul. Aucun traceur tiers requis pour ces totaux.</p>
         </section>
 
         <CapacityPanel capacity={capacity} />

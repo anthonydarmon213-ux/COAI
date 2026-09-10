@@ -36,10 +36,18 @@ Ce contrôle n'est **pas** un pare-feu ni une protection intégrée à l'applica
 | Activation | Essai actif, bilan connecté puis génération socle locale réussis ; Full Body débutant 1/2 séances corrigé | Autres variantes, cohérence des illustrations et qualité globale |
 | Première séance | Deux séances synthétiques complètes enregistrées depuis le lecteur local, 12 séries chacune ; reprise après rechargement et bilan facultatif vérifiés | Équivalence production, autres variantes, reprise réseau dégradé avec check-in |
 | RepCount | Historique PROGRAMME retrouvé après rechargement ; planche 2×30 s, courbe 60 s et saisie en maintien | Parcours complet mobile au-delà de cet écran, toutes les variantes |
-| Mesure | Ouverture du lecteur distinguée de première séance enregistrée | Réception effective des événements ; agrégation du tunnel |
+| Mesure | Agrégats de premiers usages par cohorte de comptes, requêtes réelles testées sur SQL local ; sources séparées et déduplication par membre | Rendu administrateur connecté, réception effective des événements externes, consentement traceurs, attribution complète avant compte |
 | Relances | Test de cadence et 32 assertions du registre réussis sur SQL local (doublons, délai, rollback, statut incertain) | Concurrence distribuée, schéma effectivement déployé, exécution des crons et réception fournisseur non vérifiés ; aucun email envoyé dans cet audit |
 
 ## Sémantique des événements
+
+### Mesure des premiers usages — audit du 10 septembre
+
+`trackServerEvent` écrit seulement dans les logs serveur ; il ne constitue pas un collecteur persistant. L'événement navigateur de première séance terminée n'est pas émis. La présence de `GoogleAnalytics` directement dans le layout, sans contrôle de consentement trouvé dans les composants inspectés, empêche de considérer la mesure publicitaire comme validée. Aucun nouveau traceur ni envoi GA4 n'a été ajouté dans ce lot ; consentement et réception externe restent à traiter avant certification du tunnel.
+
+Le tableau administrateur ajoute une lecture des données métier : cohorte de comptes créés depuis 30 jours, membres avec programme validé/généré, séance source PROGRAMME, saisie source REPCOUNT et bilan de séance renseigné. Les requêtes comptent les utilisateurs avec une relation `some`, jamais les clics ni le nombre de logs. RepCount est un indicateur indépendant (possible avant abonnement), pas une étape obligatoirement postérieure à la séance. Aucun statut d'abonnement n'est présenté comme paiement encaissé dans ce nouveau bloc. Accès dans la page existante après contrôle administrateur ; pas de nouvelle API ni migration.
+
+`node scripts/test-activation-cohort.cjs --local` : requêtes réelles sur la base loopback, compte fictif avec deux séances PROGRAMME → 1 membre actif, 1 utilisateur RepCount, 1 bilan. Cohorte locale : 1 compte / 1 programme / 1 séance / 1 RepCount / 1 bilan. Tests supplémentaires des fenêtres temporelles, sources et propagation des erreurs (pas de zéro inventé). Le rendu du nouveau bloc dans une session administrateur et les statistiques de production restent à vérifier.
 
 ### Mise à jour E2E du 10 septembre — navigateur isolé
 
