@@ -10,7 +10,7 @@ import { getGenerationQuotaState, GENERATION_QUOTA_WINDOW_MS } from "@/lib/subsc
 import { socleEntrainement, socleNutrition, socleRecuperation, socleAcceptable } from "@/lib/programmes-socles";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { buildContexteFeminin } from "@/lib/cycle/phase";
-import type { Pilier } from "@prisma/client";
+import type { Pilier, StatutProgramme } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
 // max_tokens élevé) : ça peut dépasser la limite par défaut des fonctions
@@ -22,7 +22,7 @@ export const maxDuration = 60;
 
 // Sert les 3 piliers. Pour Pass IA, le catalogue COAI déterministe évite les
 // appels payants ; les profils hors socle conservent la génération sur mesure.
-export async function POST() {
+export async function POST(request: Request) {
   const authUser = await getCurrentUser();
   if (!authUser) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
@@ -46,6 +46,22 @@ export async function POST() {
       { error: "Choisis ton accompagnement COAI Essentiel, Premium Remote ou VIP Présentiel pour générer et faire évoluer ton programme." },
       { status: 403 }
     );
+  }
+
+  const onboarding = new URL(request.url).searchParams.get("mode") === "onboarding";
+  const tousLesPiliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
+  // Un retour sur /bienvenue reprend l'existant, y compris une vraie attente
+  // de validation. Ne jamais exposer le contenu privé d'un programme ici.
+  const existants: { id: string; pilier: Pilier; statut: StatutProgramme }[] = onboarding
+    ? (await Promise.all(tousLesPiliers.map(pilier => prisma.programmeGenerated.findFirst({
+        where: { userId: user.id, pilier },
+        orderBy: [{ generatedAt: "desc" }, { id: "desc" }],
+        select: { id: true, pilier: true, statut: true },
+      })))).filter((programme): programme is NonNullable<typeof programme> => programme !== null)
+    : [];
+  const piliers = tousLesPiliers.filter(pilier => !existants.some(programme => programme.pilier === pilier));
+  if (piliers.length === 0) {
+    return NextResponse.json({ programmes: existants, echecs: 0, reused: true }, { status: 201 });
   }
 
   // Profil minimum requis (Phase 5.1, 11/08/2026) : garde-fou serveur en
@@ -141,8 +157,6 @@ export async function POST() {
     observationsPosture: user.profile?.observationsPosture,
     contexteFeminin: buildContexteFeminin(user.profile ?? {}),
   };
-
-  const piliers: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
 
   // Programme socle pour Pass IA (24/08/2026, décision Anthony :
   // "des génériques pour le full IA, plus personnalisé pour l'ultimus").
@@ -287,5 +301,5 @@ export async function POST() {
     );
   }
 
-  return NextResponse.json({ programmes, echecs: echecs.length }, { status: 201 });
+  return NextResponse.json({ programmes: [...existants, ...programmes], echecs: echecs.length }, { status: 201 });
 }

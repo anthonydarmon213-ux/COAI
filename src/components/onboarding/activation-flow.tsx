@@ -105,10 +105,11 @@ export function ActivationFlow({
       for (let tentative = 0; tentative < RETRIES_GENERATION && dernierStatut !== 201; tentative++) {
         if (tentative > 0) await sleep(DELAI_RETRY_MS);
         if (annule) return;
-        const res = await fetch("/api/programmes/generate", { method: "POST" });
+        const res = await fetch("/api/programmes/generate?mode=onboarding", { method: "POST" });
         dernierStatut = res.status;
         if (res.status === 201) {
           const result = await res.json();
+          if (result?.echecs > 0) throw new Error("Programme partiellement préparé");
           const programmes = result?.programmes;
           if (!Array.isArray(programmes) || programmes.length === 0 || programmes.some(
             (programme: { statut?: string } | null) => !programme || !["GENERE_IA", "VALIDE", "EN_ATTENTE"].includes(programme.statut ?? "")

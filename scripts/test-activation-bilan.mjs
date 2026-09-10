@@ -5,10 +5,11 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 const source=fs.readFileSync('src/components/onboarding/activation-flow.tsx','utf8');
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-for (const [programmes, expected] of [
+for (const [programmes, expected, echecs = 0] of [
  [[{statut:'GENERE_IA'}],false], [[{statut:'VALIDE'}],false],
  [[{statut:'GENERE_IA'},{statut:'EN_ATTENTE'}],true],
  [[],null], [[{statut:'UNKNOWN'}],null], [null,null],
+ [[{statut:'GENERE_IA'}],null,1],
 ]) {
  const values=[],effects=[]; let cursor=0;
  const element=(type,props)=>({type,props});
@@ -23,7 +24,7 @@ for (const [programmes, expected] of [
   '@/lib/checkout/intended-plan-cookie':{},
  };
  const box={exports:{},require:n=>{assert.ok(n in imports,n);return imports[n];},fetch:async url=>{
-  assert.equal(url,'/api/programmes/generate');return {status:201,json:async()=>({programmes})};
+  assert.equal(url,'/api/programmes/generate?mode=onboarding');return {status:201,json:async()=>({programmes,echecs})};
  }};
  vm.runInNewContext(compiled,box);
  const props={coachValidationRequise:expected!==true,profilInitial:{},declencherGenerationAuto:true};
@@ -114,7 +115,7 @@ for (const statuses of [[201], [403,201], [403,403,403,403,403,403], [429], [502
   '@/lib/checkout/intended-plan-cookie':{readIntendedPlanCookie:()=>null},
  };
  const box={exports:{},require:n=>{assert.ok(n in imports,n);return imports[n];},setTimeout:fn=>{fn();return 0;},
-  fetch:async url=>{assert.equal(url,'/api/programmes/generate'); return {status:statuses[Math.min(calls++,statuses.length-1)],json:async()=>({programmes:[{statut:'GENERE_IA'}]})};}};
+  fetch:async url=>{assert.equal(url,'/api/programmes/generate?mode=onboarding'); return {status:statuses[Math.min(calls++,statuses.length-1)],json:async()=>({programmes:[{statut:'GENERE_IA'}]})};}};
  vm.runInNewContext(compiled,box);
  box.exports.ActivationFlow({coachValidationRequise:false,profilInitial:{},declencherGenerationAuto:true});
  effects[0](); await new Promise(resolve=>setImmediate(resolve));

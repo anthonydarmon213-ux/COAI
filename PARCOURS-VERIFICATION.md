@@ -2,6 +2,14 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Rechargement de l'activation — 10 septembre
+
+- L'accueil post-essai appelait systématiquement la génération, même avec les trois piliers déjà présents. Base locale du compte fictif `08440874-5d8a-4577-9bf7-7756a84696b3` : 18 lignes après les reprises précédentes, avec certaines versions concurrentes identiques. Aucun appel IA payant dans cet environnement.
+- Nouveau mode explicite `?mode=onboarding` utilisé par les deux sorties d'onboarding : après vérification de l'identité et des droits, reprend les métadonnées des derniers piliers ; aucune exposition du contenu en attente de relecture. Si le lot est incomplet, seuls les piliers manquants sont préparés. Une régénération manuelle conserve son fonctionnement et ses quotas. Les réponses partielles ne sont plus annoncées complètes à l'accueil.
+- Navigateur connecté, deux rechargements successifs de `/bienvenue?plan=PASS_IA` : bouton de première séance conservé et nombre de lignes stable, 18 → 18 → 18, contrôlé avec Prisma sur `127.0.0.1:54322` uniquement.
+- `test-onboarding-programme-reuse.cjs` : véritable route avec persistance simulée ; mêmes identifiants après trois reprises, aucun contrôle de quota supplémentaire pour la réutilisation, pas de contenu retourné, statut EN_ATTENTE conservé, pilier manquant seulement, régénération explicite, refus 401/403. `test-activation-bilan.mjs` inclut l'échec partiel.
+- Limite explicite : deux premières requêtes réellement concurrentes peuvent encore constater ensemble un pilier manquant. La protection distribuée de la création/version et la reprise d'un processus interrompu restent à réaliser ; ce lot ne prétend pas les résoudre.
+
 ## Choix annuel et connexion — 10 septembre
 
 - Reproduction navigateur local : choix annuel sur la tarification anonyme → inscription avec `plan=PASS_IA&billing=ANNUAL` → lien « Se connecter » → connexion du compte fictif. Avant correction : `/bienvenue`, sans reprise de l'offre. Le lien imposait cette destination et court-circuitait la reprise du cookie d'intention.

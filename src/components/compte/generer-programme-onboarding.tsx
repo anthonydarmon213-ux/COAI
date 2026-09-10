@@ -21,8 +21,10 @@ export function GenererProgrammeOnboarding() {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 90_000);
     try {
-      const res = await fetch("/api/programmes/generate", { method: "POST", signal: controller.signal });
+      const res = await fetch("/api/programmes/generate?mode=onboarding", { method: "POST", signal: controller.signal });
       if (!res.ok) throw new Error("generation");
+      const result = await res.json();
+      if (result?.echecs > 0) throw new Error("generation partielle");
       trackFunnelEvent("first_programme_viewed");
       router.push("/programme/entrainement");
     } catch {
