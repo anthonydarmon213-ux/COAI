@@ -5,6 +5,7 @@
 // tout ressaisir. localStorage plutôt qu'un cookie/la base : donnée jetable,
 // anonyme, jamais utile après le premier remplissage du profil.
 const STORAGE_KEY = "coai_diagnostic_pre_signup";
+const EMAIL_KEY = "coai_diagnostic_signup_email";
 
 export type DiagnosticAnswers = {
   niveau?: string;
@@ -33,12 +34,28 @@ export type DiagnosticAnswers = {
   coachPreference?: "FULL_IA" | "HYBRIDE" | "VIP_PRESENTIEL";
 };
 
-export function storeDiagnosticAnswers(answers: DiagnosticAnswers): void {
+export function storeDiagnosticAnswers(answers: DiagnosticAnswers, email?: string): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
   } catch {
     // Stockage indisponible (navigation privée stricte, quota...) : le quiz
     // reste utilisable, seul le pré-remplissage post-inscription est perdu.
+  }
+  if (email) {
+    try {
+      // Préremplissage dans le même onglet uniquement, pas dans le profil
+      // sportif ni dans les paramètres du paiement ou de l'analytique.
+      window.sessionStorage.setItem(EMAIL_KEY, email.trim());
+    } catch { /* Le formulaire reste utilisable sans stockage. */ }
+  }
+}
+
+export function readDiagnosticSignupEmail(): string | null {
+  try {
+    const email = window.sessionStorage.getItem(EMAIL_KEY);
+    return email && email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+  } catch {
+    return null;
   }
 }
 
@@ -57,4 +74,5 @@ export function clearDiagnosticAnswers(): void {
   } catch {
     // rien à faire
   }
+  try { window.sessionStorage.removeItem(EMAIL_KEY); } catch { /* rien à faire */ }
 }

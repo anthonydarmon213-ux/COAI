@@ -18,6 +18,7 @@ import {
 } from "@/lib/checkout/intended-plan-cookie";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
+import { readDiagnosticSignupEmail } from "@/lib/diagnostic/storage";
 
 // L'inscription reste gratuite et ne déclenche aucun paiement. Le choix
 // Pass IA, Coaching Hybride ou VIP est conservé jusqu'au checkout Stripe,
@@ -85,6 +86,11 @@ export default function SignUpPage() {
   // Pré-rempli si on vient du diagnostic public (/diagnostic), qui capture
   // déjà l'email juste avant de rediriger ici — évite de le ressaisir.
   const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
+  useEffect(() => {
+    if (!searchParams.get("email")) {
+      setEmail((current) => current || readDiagnosticSignupEmail() || "");
+    }
+  }, [searchParams]);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

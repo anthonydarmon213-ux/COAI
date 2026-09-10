@@ -1357,7 +1357,7 @@ export function DiagnosticQuiz({
   }
 
   function handleCreerCompte() {
-    storeDiagnosticAnswers(reponsesEnProfil());
+    storeDiagnosticAnswers(reponsesEnProfil(), email);
     window.localStorage.setItem("coai_dashboard_intro_pending", "1");
   }
 
@@ -1410,6 +1410,9 @@ export function DiagnosticQuiz({
   // quel souci réseau/serveur ne doit jamais empêcher la personne de voir
   // son diagnostic, elle a déjà répondu à 10 questions pour ça.
   async function submitLeadAndReveal() {
+    // Toutes les sorties du résultat (essai, détail, comparaison, compte)
+    // doivent retrouver le bilan, pas seulement le bouton gratuit.
+    storeDiagnosticAnswers(reponsesEnProfil(), email);
     setLeadEnvoi("loading");
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);

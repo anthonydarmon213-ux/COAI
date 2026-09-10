@@ -11,6 +11,15 @@ Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve
 
 ## Préparation du test isolé — 10 septembre
 
+### Bilan anonyme mobile → inscription depuis l'essai
+
+- Navigateur isolé, 390 × 844, traceurs refusés, fixture féminine 42 ans / 168 cm / 65 kg, débutante, reprise, salle, 45 min, 2 séances/semaine. Rechargement à l'étape alimentation : « Continuer mon diagnostic » reprend cette étape ; résultat obtenu avant création de compte.
+- Blocage reproduit : le CTA principal « Commencer mes 7 jours d'essai » dirigeait vers l'inscription avec email vide et sans clé `coai_diagnostic_pre_signup`. Seuls les liens de création gratuite déclenchaient ce pont de sauvegarde.
+- Correction : sauvegarde du profil avant la révélation du résultat pour couvrir toutes ses sorties ; email de préremplissage séparé dans sessionStorage (même onglet), lu après montage du formulaire sans écraser la saisie ou le paramètre email explicite. Aucun appel IA ni changement de tarifs.
+- Nouveau parcours réel complet jusqu'au même CTA : email prérempli et réponses 42 ans / Femme / 45 min / 2 fois par semaine conservées sur l'inscription, largeur document = largeur écran 390 px. La création/confirmation du compte de cette fixture et l'application effective de ces réponses au profil restent à vérifier ensuite.
+- `test-diagnostic-signup-storage.cjs` : stockage/relecture, séparation email/profil, portée onglet, nettoyage, SSR et stockage bloqué. Tests de confirmation et d'activation existants réussis. Stockage indisponible : pas de blocage technique, mais conservation non garantie.
+- Points relevés, non corrigés par ce lot : auto-avance sur certains choix uniques malgré bouton Continuer ; consentement email regroupant bilan et informations commerciales requis pour afficher le résultat.
+
 Supabase local tourne désormais dans Colima `coai-test`, réseau `coai-e2e-loopback` limité à `127.0.0.1` (ports 54321/54322/54324 vérifiés avec lsof). CLI épinglé à 2.117.0 ; configuration temporaire `/tmp/coai-e2e-supabase-sloAPQ`. Les 81 migrations ont été appliquées uniquement à cette base locale vide. Le serveur Next local utilise le port 3050, sans clés de génération ou notifications externes. Stripe utilise désormais la clé de test existante, chargée en mémoire par un lanceur local, sans copie dans le dépôt.
 
 Test navigateur réel : inscription fictive, réception dans Mailpit, identité confirmée en base, connexion par mot de passe réussie. **Bug corrigé** : identité Auth sans ligne `users` → dashboard vide. Redirection vérifiée vers `completer-inscription`, prénom conservé et consentements initialement non cochés. Finalisation du compte fictif ensuite réussie. La réouverture du lien déjà consommé affiche la connexion sans expliquer `otp_expired` : friction encore à traiter.
