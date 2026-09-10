@@ -46,3 +46,35 @@ export async function sendFirstValueReminder(request: {
   });
   return result === "SENT";
 }
+
+// Relance commerciale : accord explicite, même cadence de 48 h que les
+// autres relances marketing, événement distinct pour chaque intention.
+export async function sendCheckoutReminder(request: {
+  userId: string;
+  startedAt: Date;
+  email: string;
+  eligible: () => Promise<boolean>;
+  subject: string;
+  text: string;
+}): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) return false;
+  const normalized = request.email.trim().toLowerCase();
+  const recipientKey = createHash("sha256").update(normalized).digest("hex");
+  const eventKey = createHash("sha256").update(`${request.userId}:${request.startedAt.toISOString()}`).digest("hex");
+  const outcome = await deliverOnce(registryDatabase, {
+    recipientKey,
+    deliveryKey: `checkout:${eventKey}`,
+    kind: "checkout-abandoned",
+    eligible: async () => {
+      if (await hasDiagnosticOptOut(normalized)) return false;
+      const consent = await prisma.diagnosticLead.findFirst({
+        where: { email: { equals: normalized, mode: "insensitive" }, optedOutAt: null,
+          reponses: { path: ["marketingConsent"], equals: true } },
+        select: { id: true },
+      });
+      return Boolean(consent) && await request.eligible();
+    },
+    send: () => sendEmail(normalized, request.subject, request.text),
+  });
+  return outcome === "SENT";
+}

@@ -2,6 +2,15 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Relance d'inscription abandonnée — 10 septembre
+
+- Le cron utilisait un envoi direct suivi d'un marqueur, sans réservation concurrente ni accord marketing explicite. Il affirmait aussi « Aucun paiement n'a été enregistré » à partir du seul état applicatif.
+- La relance passe désormais par le registre existant : clé d'événement utilisateur + date de l'intention, hachée ; même délai destinataire de 48 h que les autres relances marketing. Aucun ajout de table ni migration. L'envoi reste hors transaction SQL.
+- Après réservation : relecture d'un accord `marketingConsent: true` dans un bilan, absence de tout désabonnement pour l'adresse, intention toujours identique (date/offre/périodicité), absence d'abonnement actif et de déblocage payant. Sans preuve explicite d'accord, y compris anciens bilans sans champ, aucun envoi. Lien de désabonnement obligatoire ; pas de réservation si le fournisseur est absent.
+- Message sans affirmation de paiement ni promesse d'essai non vérifiée. Le lien `/pricing?selected=…&billing=…` conserve le choix de l'offre. Le marqueur final ne peut pas écraser une nouvelle intention commencée pendant l'envoi.
+- `test-checkout-reminder.cjs` : véritable fonction cron, helper, requêtes Prisma et registre PostgreSQL loopback à deux connexions ; comptes/bilans fictifs aléatoires supprimés après test, fournisseur simulé. Cas : envoi concurrent, absence d'accord, ancien bilan sans accord explicite, désabonnement après sélection, abonnement activé, nouvelle intention avant/après envoi, fournisseur absent, lien absent, délai marketing actif, réponse incertaine, timeout, panne du marqueur et reprise sans doublon.
+- Limites : état Stripe externe, exécution du cron de production et réception en boîte mail non vérifiés. Les réservations incertaines nécessitent une réconciliation, pas une répétition automatique. Les relances historiques d'inactivité et alertes coach ne sont pas couvertes par ce correctif.
+
 ## Connexion sans obstacle de consentement — 10 septembre
 
 - Défaut reproduit à 1280 × 720 : bouton de connexion à y=487–533, panneau fixe à y=462–708 ; le centre du bouton touchait le titre du panneau, pas le bouton.

@@ -8,7 +8,7 @@ import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
 import { hasDiagnosticOptOut, isDiagnosticReminderDue } from "@/lib/email/diagnostic-suppression";
 import { stripe } from "@/lib/stripe/client";
-import { sendDiagnosticReminder, sendFirstValueReminder } from "@/lib/email/send-diagnostic-reminder";
+import { sendCheckoutReminder, sendDiagnosticReminder, sendFirstValueReminder } from "@/lib/email/send-diagnostic-reminder";
 
 // Relance automatique des abonnés inactifs (09/08/2026, étendu à
 // Coaching Hybride/Premium le 11/08/2026). À l'origine réservé au palier
@@ -595,6 +595,7 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
         lte: new Date(maintenant - RELANCE_CHECKOUT_APRES_MS),
       },
       checkoutReminderSentAt: null,
+      programmeUnlockedAt: null,
       OR: [
         { subscription: null },
         { subscription: { status: { in: ["INCOMPLETE", "CANCELED"] } } },
@@ -605,12 +606,16 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
       email: true,
       prenom: true,
       checkoutPlan: true,
-      subscription: { select: { trialEnd: true } },
+      checkoutStartedAt: true,
+      checkoutBillingInterval: true,
     },
   });
 
   let relancesCheckout = 0;
   for (const user of candidats) {
+    if (!user.checkoutStartedAt) continue;
+    const unsubscribe = buildUnsubscribeLink(appUrl, user.email);
+    if (!unsubscribe) continue;
     // checkoutPlan === "STANDARD" ne peut plus etre ecrit pour un nouvel
     // abandon (src/app/api/stripe/checkout/route.ts rejette STANDARD et
     // PREMIUM en 400 avant meme d'ecrire checkoutPlan, depuis que ces deux
@@ -620,22 +625,33 @@ async function relancerCheckoutsAbandonnes(appUrl: string): Promise<number> {
     // plus (pack 3 mois minimum, sur devis, pas d'abonnement mensuel).
     const plan = user.checkoutPlan === "STANDARD" ? "Premium Remote" : "COAI Essentiel";
     const nom = user.prenom ? ` ${user.prenom}` : "";
-    const reprise = user.subscription?.trialEnd
-      ? "Tu peux reprendre ton inscription ici"
-      : "Tu peux reprendre ton inscription et profiter de tes 7 jours d'essai ici";
-    const envoye = await sendEmail(
-      user.email,
-      "Tu peux reprendre ton inscription COAI",
-      `Bonjour${nom},\n\n` +
-        `Ton inscription à l'accompagnement ${plan} n'a pas été finalisée. ` +
-        `Aucun paiement n'a été enregistré.\n\n` +
-        `${reprise} : ${appUrl}/pricing\n\n` +
+    const reprise = `${appUrl}/pricing?selected=${encodeURIComponent(user.checkoutPlan ?? "PASS_IA")}&billing=${encodeURIComponent(user.checkoutBillingInterval ?? "MONTHLY")}`;
+    const envoye = await sendCheckoutReminder({
+      userId: user.id, startedAt: user.checkoutStartedAt, email: user.email,
+      eligible: async () => Boolean(await prisma.user.findFirst({
+        where: {
+          id: user.id, email: { equals: user.email, mode: "insensitive" },
+          checkoutStartedAt: { equals: user.checkoutStartedAt,
+            gte: new Date(Date.now() - RELANCE_CHECKOUT_FENETRE_MS),
+            lte: new Date(Date.now() - RELANCE_CHECKOUT_APRES_MS) },
+          checkoutPlan: user.checkoutPlan, checkoutBillingInterval: user.checkoutBillingInterval,
+          checkoutReminderSentAt: null, programmeUnlockedAt: null,
+          OR: [{ subscription: null }, { subscription: { status: { in: ["INCOMPLETE", "CANCELED"] } } }],
+        }, select: { id: true },
+      })),
+      subject: "Tu peux reprendre ton inscription COAI",
+      text: `Bonjour${nom},\n\n` +
+        `Tu avais commencé une inscription à l'accompagnement ${plan}. ` +
+        `Si tu souhaites la poursuivre, retrouve l'offre et ses modalités ici : ${reprise}\n\n` +
+        `Si tu as déjà finalisé ton inscription, tu peux ignorer ce message.\n\n` +
         `Si tu as rencontré un problème, réponds simplement à cet email.\n\n` +
-        `À bientôt,\nL'équipe COAI`
-    );
+        `À bientôt,\nL'équipe COAI\n\nNe plus recevoir ces emails : ${unsubscribe}`,
+    });
     if (!envoye) continue;
-    await prisma.user.update({
-      where: { id: user.id },
+    await prisma.user.updateMany({
+      where: { id: user.id, checkoutStartedAt: user.checkoutStartedAt,
+        checkoutPlan: user.checkoutPlan, checkoutBillingInterval: user.checkoutBillingInterval,
+        checkoutReminderSentAt: null },
       data: { checkoutReminderSentAt: new Date() },
     });
     relancesCheckout++;
