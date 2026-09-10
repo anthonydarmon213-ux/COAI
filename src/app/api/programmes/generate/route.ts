@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
 import { genererPilier } from "@/lib/programmes/generer";
-import { prochaineVersion } from "@/lib/programmes/version";
+import { saveGeneratedProgramme } from "@/lib/programmes/save-generated";
 import { prisma } from "@/lib/db/client";
 import { sendAdminNotification } from "@/lib/email/client";
 import { buildProgrammeAValiderEmailHtml } from "@/lib/email/coach-notification";
@@ -10,7 +10,7 @@ import { getGenerationQuotaState, GENERATION_QUOTA_WINDOW_MS } from "@/lib/subsc
 import { socleEntrainement, socleNutrition, socleRecuperation, socleAcceptable } from "@/lib/programmes-socles";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { buildContexteFeminin } from "@/lib/cycle/phase";
-import type { Pilier, StatutProgramme } from "@prisma/client";
+import type { Pilier, Prisma, StatutProgramme } from "@prisma/client";
 
 // Les piliers sont générés en parallèle par l'IA (appels Claude avec un
 // max_tokens élevé) : ça peut dépasser la limite par défaut des fonctions
@@ -219,12 +219,10 @@ export async function POST(request: Request) {
     piliers.map(async (pilier) => {
       const contenuSocle = socles?.[pilier] ?? null;
 
-      const [contenu, version] = await Promise.all([
-        contenuSocle ?? genererPilier(pilier, profil, user.id),
-        prochaineVersion(user.id, pilier),
-      ]);
-      return prisma.programmeGenerated.create({
-        data: { userId: user.id, pilier, contenu: contenu as object, statut: statutInitial, version },
+      const contenu = contenuSocle ?? await genererPilier(pilier, profil, user.id);
+      return saveGeneratedProgramme({
+        userId: user.id, pilier, contenu: contenu as Prisma.InputJsonValue,
+        statut: statutInitial, onboarding,
       });
     })
   );
@@ -277,11 +275,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const programmes = resultats
-    .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof prisma.programmeGenerated.create>>> => r.status === "fulfilled")
+  const sauvegardes = resultats
+    .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof saveGeneratedProgramme>>> => r.status === "fulfilled")
     .map((r) => r.value);
+  const programmes = sauvegardes.map(r => r.programme);
+  const nouveaux = sauvegardes.filter(r => r.created).map(r => r.programme);
 
-  if (programmes.length > 0 && statutInitial === "EN_ATTENTE") {
+  if (nouveaux.length > 0 && statutInitial === "EN_ATTENTE") {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     // Lien direct vers la fiche de CE client (11/08/2026, amélioration
     // workflow coach) plutôt que /admin/programmes (liste générale) — le
@@ -291,11 +291,11 @@ export async function POST(request: Request) {
     const utilisateur = user.prenom ?? user.email;
     await sendAdminNotification(
       "Nouveau programme à valider",
-      `${utilisateur} vient de générer ${programmes.length} pilier(s) de programme, en attente de ta validation.\n\n${lienValidation}`,
+      `${utilisateur} vient de générer ${nouveaux.length} pilier(s) de programme, en attente de ta validation.\n\n${lienValidation}`,
       buildProgrammeAValiderEmailHtml({
         utilisateur,
-        piliers: programmes.map((p) => p.pilier),
-        generatedAt: programmes[0]?.generatedAt ?? new Date(),
+        piliers: nouveaux.map((p) => p.pilier),
+        generatedAt: nouveaux[0]?.generatedAt ?? new Date(),
         href: lienValidation,
       })
     );

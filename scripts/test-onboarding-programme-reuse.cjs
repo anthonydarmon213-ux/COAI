@@ -3,6 +3,9 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const ts = require('typescript');
+assert.ok(fs.readFileSync('src/components/marketing/diagnostic-quiz.tsx','utf8')
+ .includes('fetch("/api/programmes/generate?mode=onboarding"'),
+ 'First generation after applying a diagnostic must use the resumable activation mode');
 const compiled = ts.transpileModule(fs.readFileSync('src/app/api/programmes/generate/route.ts','utf8'), {
   compilerOptions: {module:ts.ModuleKind.CommonJS},
 }).outputText;
@@ -24,7 +27,11 @@ const imports={
  'next/server':{NextResponse:{json:(body,options)=>({body,status:options?.status??200})}},
  '@/lib/auth/server':{getCurrentUser:async()=>authorized?{id:'auth-fixture'}:null},
  '@/lib/programmes/generer':{genererPilier:()=>assert.fail('No paid generation expected')},
- '@/lib/programmes/version':{prochaineVersion:async()=>records.length+1},
+ '@/lib/programmes/save-generated':{saveGeneratedProgramme:async({onboarding,...data})=>{
+   const record=await prisma.programmeGenerated.create({data:{...data,version:records.length+1}});
+   const {contenu,...programme}=record;
+   return {programme,created:true};
+ }},
  '@/lib/db/client':{prisma},
  '@/lib/email/client':{sendAdminNotification:async()=>notifications++},
  '@/lib/email/coach-notification':{},

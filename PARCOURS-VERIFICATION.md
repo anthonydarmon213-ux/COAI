@@ -2,6 +2,14 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Écriture concurrente des programmes — tables existantes
+
+- La route de génération enregistre chaque pilier dans une transaction courte avec verrou sur la ligne utilisateur existante. En onboarding, elle relit le programme après verrouillage et reprend son identifiant plutôt que créer un doublon. La version d'une génération explicite est calculée sous le même verrou. Aucun appel IA/email dans la transaction, aucune migration.
+- La première génération depuis un diagnostic appliqué à un compte utilise elle aussi le mode onboarding, comme les écrans d'activation. Le bouton explicite de régénération conserve son action de nouvelle version.
+- La réponse contient uniquement id/pilier/statut/date, y compris pour la première création EN_ATTENTE. Seuls les piliers nouvellement créés alimentent la notification coach ; une reprise ne produit pas une seconde notification pour ces mêmes piliers.
+- `test-programme-save-concurrency.cjs` exécute la vraie route et le vrai helper avec deux connexions PostgreSQL locales : quatre activations simultanées donnent trois lignes et les mêmes trois identifiants. Deux régénérations explicites donnent les versions 2 et 3, puis une panne avant commit est annulée et la reprise crée la version 4. Auth/profil/socles simulés, aucun appel IA ou email réel ; fixture locale supprimée par identifiant exact.
+- Limites importantes : cette protection empêche les doublons d'écriture de la route, pas les appels IA déjà partis avant le verrou. Une réservation durable pour génération payante/interruption reste nécessaire et l'autorisation de migration n'est pas acquise. Les autres auteurs de versions (adaptation/reprise) ne sont pas encore coordonnés par ce verrou. Ce n'est pas une preuve de génération distribuée entièrement résolue.
+
 ## Rappel de fin d'essai — vérification avant annonce
 
 - Registre de service par abonnement et date de fin d'essai : deux exécutions concurrentes ne peuvent plus envoyer deux rappels. Après réservation, relecture de l'état local ACTIVE, absence d'annulation, même abonnement Stripe/date et échéance dans les 72 h, rappel non traité.

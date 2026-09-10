@@ -1386,7 +1386,7 @@ export function DiagnosticQuiz({
         return;
       }
       setApplyStatus("generation");
-      const genRes = await fetch("/api/programmes/generate", { method: "POST" });
+      const genRes = await fetch("/api/programmes/generate?mode=onboarding", { method: "POST" });
       if (!genRes.ok) {
         // Bug corrigé (21/08/2026, signalé par Anthony : "un souci" affiché
         // alors que la vraie raison — pas de formule active — était déjà
