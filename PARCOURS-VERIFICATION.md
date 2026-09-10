@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Résultat du bilan indépendant du marketing
+
+- La case marketing reste décochée et devient facultative. L'email valide suffit à continuer ; la requête transmet explicitement `marketingConsent`. Le téléphone demeure une demande de contact séparée.
+- API : absence de champ = refus, type non booléen rejeté. Choix/version/date conservés dans le JSON existant, sans migration. Refus stocké via `optedOutAt`, déjà vérifié par adresse avant les relances diagnostic/première valeur, y compris en présence de bilans plus anciens. Un ancien désabonnement n'est jamais annulé par le formulaire public.
+- Email de résultat conservé ; pas de synchronisation CRM ni de notification prospect sans opt-in. Une demande téléphonique reste notifiée en texte avec la restriction email explicite. Les contacts déjà présents dans un CRM externe et les campagnes externes ne sont pas modifiés : leur suppression doit être vérifiée séparément.
+- `test-diagnostic-marketing-consent.cjs` : véritable condition d'activation du bouton et véritable route/suppression sur PostgreSQL local ; refus/absence/acceptation/ancien refus/téléphone/type invalide et consentement JSON forgé. Envois et CRM simulés, fixtures locales supprimées. Tests première valeur et registre concurrent relancés. Pas de preuve d'email délivré en production, ni de réinscription marketing vérifiée (non proposée).
+
 ## Navigation explicite du bilan
 
 - Contrôle production mobile 390 px : les choix niveau/lieu/durée/fréquence/alimentation/sommeil avançaient automatiquement malgré le bouton Continuer ; l'activité quotidienne attendait une validation. Dernière étape sans débordement horizontal, mais consentement diagnostic/promotion encore couplé (non corrigé dans ce lot). Aucun email ni paiement envoyé.

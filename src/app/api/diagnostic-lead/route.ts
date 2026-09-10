@@ -7,6 +7,7 @@ import { buildNouveauLeadEmailHtml, buildWhatsAppLinkVersLead } from "@/lib/emai
 import { buildMiniDiagnostic, miniDiagnosticEnTexte, type ReponsesDiagnostic } from "@/lib/diagnostic/mini-diagnostic";
 import { trackServerEvent } from "@/lib/analytics/product-events";
 import { synchroniserLeadHubSpot } from "@/lib/hubspot/contact";
+import { hasDiagnosticOptOut } from "@/lib/email/diagnostic-suppression";
 
 const FENETRE_ANTI_DOUBLON_MS = 5 * 60 * 1000;
 
@@ -42,6 +43,7 @@ async function resoudreCta(email: string): Promise<{ label: string; href: string
 
 const bodySchema = z.object({
   email: z.string().email().max(320),
+  marketingConsent: z.boolean().default(false),
   // Format international requis (16/08/2026, demande Anthony : pouvoir
   // contacter le lead par téléphone/WhatsApp), même règle que le formulaire
   // côté client — cf. isValidTelephone dans diagnostic-quiz.tsx.
@@ -65,11 +67,17 @@ export async function POST(request: Request) {
   }
 
   const emailNormalise = parsed.data.email.trim().toLowerCase();
+  // Un ancien désabonnement n'est jamais effacé par un formulaire public.
+  const marketingAllowed = parsed.data.marketingConsent && !(await hasDiagnosticOptOut(emailNormalise));
   const lead = await prisma.diagnosticLead.create({
     data: {
       email: emailNormalise,
       telephone: parsed.data.telephone,
-      reponses: parsed.data.reponses as Prisma.InputJsonValue,
+      reponses: { ...parsed.data.reponses, marketingConsent: parsed.data.marketingConsent,
+        marketingConsentVersion: "diagnostic-optional-v1", marketingConsentRecordedAt: new Date().toISOString() } as Prisma.InputJsonValue,
+      // Réutilise la suppression existante, vérifiée par adresse avant les
+      // relances : protège aussi les anciens bilans de cette adresse.
+      optedOutAt: marketingAllowed ? null : new Date(),
       utmSource: parsed.data.utmSource,
       utmMedium: parsed.data.utmMedium,
       utmCampaign: parsed.data.utmCampaign,
@@ -157,10 +165,10 @@ export async function POST(request: Request) {
     // Copie le prospect dans le CRM sans rendre le diagnostic dépendant de
     // HubSpot. La base COAI reste la source de vérité et conserve le lead si
     // le CRM est momentanément indisponible ou pas encore configuré.
-    synchroniserLeadHubSpot({
+    (marketingAllowed ? synchroniserLeadHubSpot({
       email: emailNormalise,
       telephone: parsed.data.telephone,
-    }).catch((err) => console.error("[diagnostic-lead] synchronisation HubSpot :", err)),
+    }) : Promise.resolve()).catch((err) => console.error("[diagnostic-lead] synchronisation HubSpot :", err)),
 
     // Notifie Anthony à chaque lead capturé sur le diagnostic public — ce
     // trou existait depuis la création du quiz (09/08/2026), jusqu'ici
@@ -169,10 +177,11 @@ export async function POST(request: Request) {
     // niveau, source publicitaire, lien WhatsApp direct) — le lead ne se
     // limitait jusqu'ici qu'à une adresse email, insuffisant pour un vrai
     // suivi commercial.
-    sendAdminNotification(
+    // Pas de suivi commercial demandé : ne pas envoyer de fiche prospect.
+    (marketingAllowed || parsed.data.telephone ? sendAdminNotification(
       "Nouveau lead — diagnostic COAI",
-      notifText,
-      diagnostic
+      `${marketingAllowed ? "Emails promotionnels : autorisés" : "Emails promotionnels : refusés — demande de contact téléphonique uniquement"}\n${notifText}`,
+      diagnostic && marketingAllowed
         ? buildNouveauLeadEmailHtml({
             email: emailNormalise,
             telephone: parsed.data.telephone ?? null,
@@ -194,7 +203,7 @@ export async function POST(request: Request) {
             offreRecommandee,
           })
         : undefined
-    ).catch((err) => console.error("[diagnostic-lead] admin notification :", err)),
+    ) : Promise.resolve()).catch((err) => console.error("[diagnostic-lead] admin notification :", err)),
 
     // Envoie aussi le diagnostic à la personne elle-même — CTA final adapté
     // à son statut réel (prospect / abonné profil incomplet / abonné avec

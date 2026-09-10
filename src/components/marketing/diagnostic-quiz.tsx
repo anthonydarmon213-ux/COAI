@@ -1121,7 +1121,7 @@ export function DiagnosticQuiz({
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
     if (step === "email") {
-      return isValidEmail(email) && (!telephone.trim() || isValidTelephone(telephone)) && consentEmail;
+      return isValidEmail(email) && (!telephone.trim() || isValidTelephone(telephone));
     }
     return true;
     // persona / mobiliteRepere / cardioRepere / forceRepere / mouvementRepere
@@ -1152,7 +1152,6 @@ export function DiagnosticQuiz({
     qualiteSommeil,
     email,
     telephone,
-    consentEmail,
   ]);
 
   // Même logique que l'email envoyé au lead (/api/diagnostic-lead) — extraite
@@ -1421,6 +1420,7 @@ export function DiagnosticQuiz({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
+          marketingConsent: consentEmail,
           telephone: normalizeTelephone(telephone) || undefined,
           ...utm,
           reponses: {
@@ -1481,7 +1481,7 @@ export function DiagnosticQuiz({
   }
 
   // Dernière question avant le résultat : capture le lead pour un visiteur
-  // anonyme (email + consentement déjà validés par canContinue), ou avance
+  // anonyme (email validé ; consentement marketing indépendant), ou avance
   // directement pour un visiteur connecté (parcours D — pas d'email à
   // capturer, ce n'est pas un lead, c'est déjà un client). Anthony veut
   // malgré tout être notifié dans les deux cas (14/08/2026) — best-effort,
@@ -2141,7 +2141,7 @@ export function DiagnosticQuiz({
                   onChange={(e) => setConsentEmail(e.target.checked)}
                   className="mt-0.5"
                 />
-                J&apos;accepte de recevoir mon diagnostic et des informations sur COAI par email.
+                Je souhaite aussi recevoir les conseils et offres COAI par email (facultatif).
                 Désinscription possible à tout moment.
               </label>
             </div>
