@@ -58,6 +58,7 @@ const dependencies = {
   './google-analytics': { GoogleAnalytics: () => React.createElement('script', { src: 'google-tracker' }) },
   './meta-pixel': { MetaPixel: () => React.createElement('script', { src: 'meta-tracker' }) },
   '@/lib/analytics/consent': consent, '@/lib/attribution/utm-cookie': utm,
+  '@/lib/analytics/production-origin': load('src/lib/analytics/production-origin.ts'),
 };
 const component = load('src/components/analytics/privacy-controls.tsx', dependencies, {});
 const html = require('react-dom/server').renderToStaticMarkup(React.createElement(component.PrivacyControls));
@@ -80,4 +81,26 @@ for (const route of ['/sign-in', '/sign-up', '/mot-de-passe-oublie', '/reinitial
   assert.ok(!markup.includes('<script') && !markup.includes('<img'), route + ' fails closed');
 }
 assert.ok(!fs.readFileSync(path.join(root, 'src/app/layout.tsx'), 'utf8').includes('MicrosoftClarity'));
+// Even with full consent and configured trackers, local/preview visits must
+// never pollute the production analytics. Render the actual mounting boundary.
+for (const [hostname, protocol, expected] of [
+  ['coai.fr', 'https:', true], ['www.coai.fr', 'https:', true],
+  ['coai.fr', 'http:', false], ['localhost', 'http:', false],
+  ['127.0.0.1', 'http:', false], ['lab-coach.vercel.app', 'https:', false],
+  ['coai.fr.example.com', 'https:', false], ['example.com', 'https:', false],
+]) {
+  const origin = load('src/lib/analytics/production-origin.ts', {}, { window: { location: { hostname, protocol } } });
+  assert.equal(origin.isProductionAnalyticsOrigin(), expected, hostname + protocol);
+  let stateIndex = 0;
+  const mounted = load('src/components/analytics/privacy-controls.tsx', {
+    ...dependencies,
+    '@/lib/analytics/production-origin': origin,
+    react: { ...React, useState: initial => [stateIndex++ === 0 ? { audience: true, marketing: true } : initial, () => {}] },
+  }, {});
+  const markup = require('react-dom/server').renderToStaticMarkup(React.createElement(mounted.PrivacyControls));
+  for (const tracker of ['google-tracker', 'meta-tracker', 'vercel-tracker']) {
+    assert.equal(markup.includes(tracker), expected, hostname + ': ' + tracker);
+  }
+}
+assert.equal(load('src/lib/analytics/production-origin.ts', {}, {}).isProductionAnalyticsOrigin(), false);
 console.log('PASS privacy: SSR, purpose separation, refusal, expiry, malformed/blocked storage, UTM gating, no Clarity mount');

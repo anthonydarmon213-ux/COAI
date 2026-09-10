@@ -2,6 +2,15 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Mesure et livraison — tableaux de bord réels, 10 septembre
+
+- Resend, lecture seule : domaine `coai.fr` Verified ; emails historiques diagnostic/bilan/reprise d'inscription Delivered. Certaines adresses de test Suppressed, aucune suppression levée. Cela ne prouve pas la livraison du dernier code ni le placement en boîte principale.
+- GA4 propriété COAI `549058461` : 73 utilisateurs actifs et 933 événements sur les 7 derniers jours. Administration : seul `purchase` est événement clé, sans flux détecté sur 28 jours. `lead_diagnostic`, `compte_cree`, `first_repcount_saved` reçus mais non marqués ; accord demandé avant changement des paramètres. Aucun événement synthétique envoyé.
+- Meta dataset `921687973761982`, 13 août–9 septembre : Lead 38, Complete registration 24 ; trafic également reçu de previews Vercel et domaines tiers. Ces chiffres ne prouvent pas des conversions uniques de production.
+- Correction de la frontière client : chargement Google/Meta/Vercel Analytics seulement sur `https://coai.fr` et `https://www.coai.fr`, toujours après consentement distinct. Vérification de l'origine à l'exécution, pas seulement de l'environnement de compilation. SSR et hydratation initiale restent sans traceur (choix initial nul).
+- `test-privacy-consent.cjs` rend la vraie frontière avec consentement complet sur domaines autorisés, localhost, boucle locale, preview, domaine tiers et suffixe trompeur. Tests de séparation/refus/expiration et livraison tardive inchangés passent.
+- Limites : ne supprime pas les données historiques, ne bloque pas un tiers copiant l'identifiant du pixel et ne configure pas une liste d'autorisation chez Meta. La réception de bout en bout après ce correctif reste à vérifier.
+
 ## Factures Stripe — état actuel et incidents, 10 septembre
 
 - Bug reproduit sur webhook signé et PostgreSQL local : un ancien événement d'échec rouvrait `paymentFailedAt` après règlement. Le paiement d'une ancienne facture pouvait inversement effacer un incident plus récent.

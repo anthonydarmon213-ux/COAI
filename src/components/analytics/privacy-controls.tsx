@@ -7,6 +7,7 @@ import { GoogleAnalytics } from "./google-analytics";
 import { MetaPixel } from "./meta-pixel";
 import { CONSENT_EVENT, CONSENT_KEY, PrivacyChoices, REFUSE_ALL, readConsent, saveConsent } from "@/lib/analytics/consent";
 import { captureUtmFromLocation, clearUtmCookie } from "@/lib/attribution/utm-cookie";
+import { isProductionAnalyticsOrigin } from "@/lib/analytics/production-origin";
 
 // No optional script during SSR or before a stored, unexpired choice is read.
 // Clarity is deliberately not mounted: session replay needs a separate review
@@ -68,8 +69,8 @@ export function PrivacyControls() {
   }
 
   return <>
-    {choices?.audience && <><GoogleAnalytics /><Analytics /></>}
-    {choices?.marketing && <MetaPixel />}
+    {choices?.audience && isProductionAnalyticsOrigin() && <><GoogleAnalytics /><Analytics /></>}
+    {choices?.marketing && isProductionAnalyticsOrigin() && <MetaPixel />}
     {open ? <section aria-label="Préférences de confidentialité" className={`${inline ? "relative mx-3 mb-6 sm:mx-auto" : "fixed inset-x-3 bottom-3 z-[100] mx-auto max-h-[75dvh] overflow-y-auto"} max-w-xl rounded-2xl border border-white/20 bg-[#101b23] p-5 text-white shadow-2xl`}>
       <h2 className="text-lg font-semibold">Tes choix de confidentialité</h2>
       <p className="mt-2 text-sm text-slate-300">Autoriser la mesure d’audience (Google, Vercel) et l’attribution publicitaire (Meta, COAI) ? Le bilan et les séances restent accessibles si tu refuses.</p>
