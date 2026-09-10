@@ -76,6 +76,7 @@ export function ActivationFlow({
   const [etat, setEtat] = useState<Etat>("verification");
   const [completion, setCompletion] = useState<CompletionProfil | null>(null);
   const [repriseOffre, setRepriseOffre] = useState<{ href: string; label: string } | null>(null);
+  const [validationRequise, setValidationRequise] = useState(coachValidationRequise);
 
   useEffect(() => {
     let annule = false;
@@ -106,6 +107,17 @@ export function ActivationFlow({
         if (annule) return;
         const res = await fetch("/api/programmes/generate", { method: "POST" });
         dernierStatut = res.status;
+        if (res.status === 201) {
+          const result = await res.json();
+          const programmes = result?.programmes;
+          if (!Array.isArray(programmes) || programmes.length === 0 || programmes.some(
+            (programme: { statut?: string } | null) => !programme || !["GENERE_IA", "VALIDE", "EN_ATTENTE"].includes(programme.statut ?? "")
+          )) throw new Error("Programme reçu sans statut exploitable");
+          if (annule) return;
+          // Le statut livré par le serveur fait foi, pas l'accès au suivi
+          // (également inclus dans Essentiel). Conserver toute vraie relecture.
+          setValidationRequise(programmes.some((programme: { statut: string }) => programme.statut === "EN_ATTENTE"));
+        }
         // Seul le retard de synchronisation des droits justifie une
         // nouvelle tentative. Une erreur fournisseur ou un quota ne doit
         // pas déclencher une rafale de générations potentiellement payantes.
@@ -296,7 +308,7 @@ export function ActivationFlow({
     // coach (statut EN_ATTENTE existant, cf. StatutProgramme) — jamais
     // présentée comme définitive avant sa validation. Pass IA : 100% IA,
     // disponible immédiatement, rien à valider.
-    if (coachValidationRequise) {
+    if (validationRequise) {
       return (
         <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
           <SectionLabel>À valider par ton coach</SectionLabel>
