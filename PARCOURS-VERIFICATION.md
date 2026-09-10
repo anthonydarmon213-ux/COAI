@@ -2,6 +2,14 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Abonnement Stripe — événements désordonnés, 10 septembre
+
+- Bug reproduit sur le véritable webhook signé et PostgreSQL local : suppression d'abonnement puis ancien événement `customer.subscription.updated` actif → retour incorrect à ACTIVE.
+- Les handlers updated/deleted relisent désormais l'abonnement dans Stripe avant de synchroniser. En cas d'échec de cette lecture, aucune écriture d'abonnement ; réservation d'événement retirée pour permettre une nouvelle livraison. Un webhook d'un ancien identifiant ne peut pas remplacer l'abonnement courant du même client. Les événements précédant le Checkout restent sans effet tant que la ligne n'existe pas, puis Checkout relit l'état Stripe actuel.
+- Les notifications de résiliation programmée utilisent l'état relu : pas de message si la demande a été retirée ou si l'abonnement est déjà terminé. La véritable résiliation programmée conserve ses notifications.
+- `test-stripe-subscription-order.cjs --local` : signatures réelles SDK, fixtures PostgreSQL aléatoires nettoyées, Stripe et notifications simulés. Avant correction : ACTIVE au lieu de CANCELED ; après : état résilié conservé, annulation retirée non annoncée, annulation effective annoncée, panne de lecture et reprise, protection de l'abonnement de remplacement. `test-stripe-webhook-retry.cjs --local` vérifie toujours la reprise après écritures partielles.
+- Limites : réception depuis Stripe en production, événements de factures dans le désordre, changement simultané de l'état distant entre lecture et écriture, ancien Checkout livré après un nouveau, crash brutal pendant réservation et reprise des notifications restent à vérifier. Ce correctif ne constitue pas une garantie générale d'ordre ou d'exactly-once.
+
 ## Relance d'inscription abandonnée — 10 septembre
 
 - Le cron utilisait un envoi direct suivi d'un marqueur, sans réservation concurrente ni accord marketing explicite. Il affirmait aussi « Aucun paiement n'a été enregistré » à partir du seul état applicatif.

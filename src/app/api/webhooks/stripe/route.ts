@@ -175,7 +175,7 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
       update: data,
       create: { userId, stripeCustomerId: customerId, ...data },
     });
-    return;
+    return true;
   }
 
   // customer.subscription.updated/deleted ne porte pas de userId. Stripe ne
@@ -183,7 +183,14 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
   // checkout.session.completed, la ligne n'existe pas encore — on l'ignore
   // silencieusement (pas d'erreur, updateMany ne matche simplement rien) et
   // checkout.session.completed créera la ligne avec le statut déjà à jour.
-  await prisma.subscription.updateMany({ where: { stripeCustomerId: customerId }, data });
+  // Un ancien abonnement du même client ne doit pas écraser celui qui l'a
+  // remplacé. Le nouveau Checkout installe explicitement le nouvel identifiant.
+  const changed = await prisma.subscription.updateMany({
+    where: { stripeCustomerId: customerId,
+      OR: [{ stripeSubscriptionId: subscription.id }, { stripeSubscriptionId: null }] },
+    data,
+  });
+  return changed.count > 0;
 }
 
 async function recordBillingEvent(event: Stripe.Event, invoice: Stripe.Invoice, kind: "PAID" | "FAILED") {
@@ -317,13 +324,16 @@ export async function POST(request: Request) {
       break;
     }
     case "customer.subscription.updated": {
-      const subscription = event.data.object as Stripe.Subscription;
+      const snapshot = event.data.object as Stripe.Subscription;
+      // Les événements ne sont pas ordonnés : relire l'objet actuel plutôt
+      // que rétablir un état ancien. Une panne laisse l'événement réessayable.
+      const subscription = await stripe.subscriptions.retrieve(snapshot.id);
       const statutPrecedent = (event.data.previous_attributes as { status?: string } | undefined)
         ?.status;
-      await upsertFromSubscription(subscription);
+      if (!(await upsertFromSubscription(subscription))) break;
       await appliquerRecompenseParrainageSiEligible(subscription, statutPrecedent);
       const previousCancelAtPeriodEnd = (event.data.previous_attributes as { cancel_at_period_end?: boolean } | undefined)?.cancel_at_period_end;
-      if (subscription.cancel_at_period_end && previousCancelAtPeriodEnd === false) {
+      if (subscription.status !== "canceled" && subscription.cancel_at_period_end && previousCancelAtPeriodEnd === false) {
         const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
         const contact = await getCustomerContact(customerId);
         await sendAdminNotification(
@@ -351,8 +361,9 @@ export async function POST(request: Request) {
       break;
     }
     case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      await upsertFromSubscription(subscription);
+      const snapshot = event.data.object as Stripe.Subscription;
+      const subscription = await stripe.subscriptions.retrieve(snapshot.id);
+      if (!(await upsertFromSubscription(subscription)) || subscription.status !== "canceled") break;
       const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
       await sendAdminNotification(
         "Abonnement COAI terminé",
