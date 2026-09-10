@@ -67,6 +67,15 @@ Les logs serveur ne constituent pas à eux seuls un tableau de conversion. Les �
 
 ## Reproduire le test des relances
 
+### Contrôle du suivi facultatif — 10 septembre
+
+- Le layout ne monte plus directement GA4, Meta, Vercel Analytics ou Clarity. Une frontière client lit un choix versionné, valable 180 jours, sans traceur au rendu serveur. Audience et marketing sont séparés ; refus/acceptation au même niveau, personnalisation et réouverture disponibles. Pas de blocage du bilan.
+- Clarity est désactivé, y compris sur les écrans privés : pas de réactivation tant que la capture des écrans de santé n'a pas fait l'objet d'une revue spécifique. Ce lot ne constitue pas une certification RGPD.
+- Les helpers GA4/Meta et la lecture/écriture du cookie UTM vérifient l'accord. Pas de rattrapage des événements antérieurs au consentement. Le refus d'attribution supprime le cookie COAI. Un retrait d'accord recharge la page pour ne pas laisser tourner une bibliothèque déjà chargée (également lors d'un retrait dans un autre onglet ou d'une expiration détectée).
+- `node scripts/test-privacy-consent.cjs` : absence de scripts au SSR, finalités indépendantes, refus, expiration, stockage invalide/bloqué, attribution conditionnelle. TypeScript, lint et compilation vérifiés.
+- Chromium isolé, 390×844, application locale compilée, aucune clé de suivi réelle : pas de script optionnel ni cookie UTM avant choix ; refus → démarrage et reprise du diagnostic possibles après rechargement ; accord marketing seul → cookie UTM présent ; retrait → nouvelle navigation et cookie supprimé. Pas de débordement horizontal. Panneau initial compacté, recompilé et inspecté visuellement ; personnalisation ouvre les deux cases non cochées. Le bouton de réouverture est dans le flux de page et ne recouvre pas la navigation mobile.
+- Réception réelle GA4/Meta, consentement fournisseur chargé, comportement inter-onglets en navigateur, collecte des premières séances et attribution externe restent à prouver. Aucun nouvel événement de séance ni appel IA payant ajouté. Les modifications tierces préexistantes du worktree sont exclues du commit.
+
 `node scripts/test-delivery-registry.cjs /chemin/vers/@electric-sql/pglite/dist/index.js`
 
 Le 9 septembre, le module existant `/tmp/coai-local-db-P9se0u/node_modules/@electric-sql/pglite/dist/index.js` a permis d'exécuter le test. Ce chemin temporaire n'est pas une dépendance durable. Le test crée une base en mémoire et simule le fournisseur ; il ne se connecte pas à la base de production.

@@ -1,3 +1,5 @@
+import { hasConsent } from "./analytics/consent";
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -8,8 +10,8 @@ declare global {
 }
 
 export function trackEvent(name: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !window.gtag) return;
-  window.gtag("event", name, params);
+  if (!hasConsent("audience") || !window.gtag) return false;
+  try { window.gtag("event", name, params); return true; } catch { return false; }
 }
 
 // Événements de conversion Meta (Facebook/Instagram Ads) — jusqu'au
@@ -23,6 +25,6 @@ export function trackEvent(name: string, params?: Record<string, unknown>) {
 // de l'optimisation algorithmique — un nom personnalisé fonctionne aussi
 // mais avec moins de signal côté Meta.
 export function trackMetaEvent(name: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !window.fbq) return;
-  window.fbq("track", name, params);
+  if (!hasConsent("marketing") || !window.fbq) return false;
+  try { window.fbq("track", name, params); return true; } catch { return false; }
 }

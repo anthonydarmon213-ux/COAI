@@ -7,6 +7,8 @@
 // First-touch : on n'écrase jamais un attribut déjà capturé par une visite
 // ultérieure sans UTM (sinon une visite organique après un clic pub ferait
 // perdre l'attribution d'origine).
+import { hasConsent } from "../analytics/consent";
+
 const COOKIE_NAME = "coai_utm";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 jours
 
@@ -29,7 +31,7 @@ const PARAM_KEYS: Record<keyof UtmParams, string> = {
 // Lit les utm_* présents dans l'URL courante — ne fait rien si aucun n'est
 // présent (ne jamais casser une URL sans UTM, ni écraser un cookie existant).
 export function captureUtmFromLocation(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !hasConsent("marketing")) return;
   if (readUtmCookie()) return; // déjà capturé (first-touch)
 
   const search = new URLSearchParams(window.location.search);
@@ -46,12 +48,12 @@ export function captureUtmFromLocation(): void {
 }
 
 export function storeUtmCookie(params: UtmParams): void {
-  if (typeof document === "undefined") return;
+  if (typeof document === "undefined" || !hasConsent("marketing")) return;
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(params))}; path=/; max-age=${MAX_AGE_SECONDS}; SameSite=Lax`;
 }
 
 export function readUtmCookie(): UtmParams | null {
-  if (typeof document === "undefined") return null;
+  if (typeof document === "undefined" || !hasConsent("marketing")) return null;
   const match = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_NAME}=([^;]*)`));
   if (!match?.[1]) return null;
   try {

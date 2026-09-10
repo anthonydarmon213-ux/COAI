@@ -1,11 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Inter, IBM_Plex_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import "../../sentry.client.config";
 import "./globals.css";
-import { GoogleAnalytics } from "@/components/analytics/google-analytics";
-import { MetaPixel } from "@/components/analytics/meta-pixel";
-import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
+import { PrivacyControls } from "@/components/analytics/privacy-controls";
 import { ServiceWorkerRegistrar } from "@/components/pwa/service-worker-registrar";
 
 const manrope = Manrope({
@@ -83,10 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <ServiceWorkerRegistrar />
-        <GoogleAnalytics />
-        <MetaPixel />
-        <MicrosoftClarity />
-        <Analytics />
+        <PrivacyControls />
       </body>
     </html>
   );

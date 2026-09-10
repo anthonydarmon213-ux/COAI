@@ -109,10 +109,18 @@ export default function ConfidentialitePage() {
       <section>
         <h2>8. Cookies</h2>
         <p>
-          COAI utilise des cookies techniques nécessaires à l&apos;authentification et des outils
-          de mesure d&apos;audience, dont Microsoft Clarity, afin de comprendre l&apos;utilisation du
-          site et d&apos;améliorer l&apos;expérience. Clarity masque par défaut le contenu sensible des
-          pages. Tu peux limiter ou supprimer ces cookies depuis les réglages de ton navigateur.
+          Les outils nécessaires à la connexion restent actifs. Les outils facultatifs ne
+          démarrent qu&apos;après ton accord : Google Analytics et Vercel pour la mesure
+          d&apos;audience ; Meta et le cookie d&apos;attribution COAI pour mesurer les campagnes
+          publicitaires. Tu peux accepter ou refuser chaque finalité, sans perdre l&apos;accès
+          au bilan ou aux séances. L&apos;enregistrement de visites Microsoft Clarity est désactivé.
+        </p>
+        <p>
+          Ton choix est conservé pendant 6 mois dans ce navigateur. Le cookie d&apos;attribution,
+          lorsqu&apos;il est autorisé, expire après 30 jours. Le bouton « Confidentialité » permet
+          de modifier tes choix à tout moment. Retirer un accord recharge la page pour arrêter
+          les outils déjà chargés. Les cookies déjà déposés par des tiers peuvent également
+          être supprimés depuis les réglages de ton navigateur.
         </p>
       </section>
     </LegalPage>
