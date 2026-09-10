@@ -2,11 +2,17 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Confirmation et rejet des adaptations — concurrence
+
+- Confirmation : appel fournisseur hors transaction, puis relecture de la décision sous verrou utilisateur partagé avec génération/reprise. Création de la version et mise à jour de l'adaptation atomiques ; décision déjà traitée = aucune nouvelle version. Calcul du numéro sous verrou. Rejet utilise le même verrou et relit le statut avant écriture.
+- `test-adaptation-confirm-concurrency.cjs` exécute les deux véritables fonctions avec deux clients PostgreSQL loopback : quatre confirmations donnent une seule nouvelle version/événement ; rejet pendant génération empêche la publication ; deux rejets donnent un seul effet ; rollback ne laisse ni programme ni lien ; reprise valide ; deux adaptations distinctes obtiennent des versions distinctes ; autre utilisateur refusé avant génération. Fournisseur, construction du profil, plan et notifications simulés, fixtures exactes supprimées.
+- Limites : ce verrou protège les écritures, pas les appels IA concurrents effectués avant lui. La réservation durable payante reste soumise à approbation de migration. Pas de test de relecture coach, de notification réellement délivrée ou de pertinence médicale du contenu. Deux propositions distinctes peuvent encore reposer sur un ancien programme : le versionnement ne prouve pas la fraîcheur de leurs recommandations. Aucune génération payante ni migration dans ce lot.
+
 ## Reprise du programme habituel — écriture atomique
 
 - Relecture sous verrou utilisateur partagé avec la génération, copie du programme et historique FIN_VOYAGE dans une même transaction courte. Version calculée sous verrou, aucune IA/email dans la transaction. Nouvelle vérification utilisateur/pilier de la source historique avant copie.
 - `test-programme-resume-concurrency.cjs` exécute la vraie fonction sur deux clients PostgreSQL locaux : quatre reprises simultanées créent une seule version 3, une entrée d'historique et un événement. Panne avant commit : aucune écriture ; reprise suivante valide ; nouvel appel sans voyage ne crée rien. Référence vers un autre utilisateur refusée. Fixtures exactes supprimées.
-- Limite : la confirmation d'une adaptation IA reste un auteur de versions à coordonner ; les appels IA concurrents avant sauvegarde ne sont pas couverts. Aucune migration ni requête de génération payante.
+- La confirmation d'une adaptation IA partage désormais le verrou (lot ci-dessus) ; les appels IA concurrents avant sauvegarde ne sont pas couverts. Aucune migration ni requête de génération payante.
 
 ## Accès direct au résultat complet
 

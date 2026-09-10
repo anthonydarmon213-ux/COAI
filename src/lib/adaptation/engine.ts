@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db/client";
 import { generateWithAI, type ProfilUtilisateur } from "@/lib/ai/client";
 import { genererPilier } from "@/lib/programmes/generer";
-import { prochaineVersion } from "@/lib/programmes/version";
 import { sendAdminNotification } from "@/lib/email/client";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import {
@@ -304,10 +303,7 @@ export async function confirmerAdaptation(
   const temporaire = Boolean(contexte._temporaire);
   const finPrevue = typeof contexte._finPrevue === "string" ? new Date(contexte._finPrevue) : null;
 
-  const [contenu, version] = await Promise.all([
-    genererPilier(adaptation.pilier, profilAdaptation, userId),
-    prochaineVersion(userId, adaptation.pilier),
-  ]);
+  const contenu = await genererPilier(adaptation.pilier, profilAdaptation, userId);
 
   const plan = getEffectivePlan(user.subscription);
   // Même garde-fou qu'à la génération initiale (route.ts) : jamais de
@@ -315,23 +311,35 @@ export async function confirmerAdaptation(
   // que soit le palier.
   const enceinteOuPostPartum =
     user.profile?.statutMaternite === "ENCEINTE" || user.profile?.statutMaternite === "POST_PARTUM";
-  const nouveauProgramme = await prisma.programmeGenerated.create({
-    data: {
-      userId,
-      pilier: adaptation.pilier,
-      contenu: contenu as object,
-      statut: plan === "PASS_IA" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE",
-      version,
-      temporaire,
-      finPrevue,
-    },
-  });
-
   const statutFinal = plan === "PASS_IA" && !enceinteOuPostPartum ? "APPLIQUEE" : "EN_ATTENTE";
-  await prisma.programmeAdaptation.update({
-    where: { id: adaptationId },
-    data: { programmeSuivantId: nouveauProgramme.id, statut: statutFinal },
+  const nouveauProgramme = await prisma.$transaction(async tx => {
+    // Le fournisseur reste hors transaction. Relire la décision sous le même
+    // verrou utilisateur que génération/reprise empêche une double écriture
+    // ou l'application d'une adaptation rejetée pendant la génération.
+    await tx.$queryRaw`SELECT id FROM users WHERE id=${userId} FOR UPDATE`;
+    const actuelle = await tx.programmeAdaptation.findUnique({ where: { id: adaptationId } });
+    if (!actuelle || actuelle.userId !== userId || actuelle.statut !== "PROPOSEE") return null;
+    const derniereVersion = await tx.programmeGenerated.findFirst({
+      where: { userId, pilier: adaptation.pilier }, orderBy: { version: "desc" }, select: { version: true },
+    });
+    const programme = await tx.programmeGenerated.create({
+      data: {
+        userId,
+        pilier: adaptation.pilier,
+        contenu: contenu as object,
+        statut: plan === "PASS_IA" && !enceinteOuPostPartum ? "GENERE_IA" : "EN_ATTENTE",
+        version: (derniereVersion?.version ?? 0) + 1,
+        temporaire,
+        finPrevue,
+      },
+    });
+    await tx.programmeAdaptation.update({
+      where: { id: adaptationId },
+      data: { programmeSuivantId: programme.id, statut: statutFinal },
+    });
+    return programme;
   });
+  if (!nouveauProgramme) return { error: "Cette adaptation a déjà été traitée." };
 
   trackServerEvent("adaptation_accepted", userId, { pilier: adaptation.pilier });
   if (temporaire) {
@@ -360,16 +368,16 @@ export async function rejeterAdaptation(
   userId: string,
   adaptationId: string
 ): Promise<{ ok: true } | { error: string }> {
-  const adaptation = await prisma.programmeAdaptation.findUnique({ where: { id: adaptationId } });
-  if (!adaptation || adaptation.userId !== userId) {
-    return { error: "Adaptation introuvable." };
-  }
-  if (adaptation.statut !== "PROPOSEE") {
-    return { error: "Cette adaptation a déjà été traitée." };
-  }
-
-  await prisma.programmeAdaptation.update({ where: { id: adaptationId }, data: { statut: "REJETEE" } });
-  trackServerEvent("adaptation_rejected", userId, { pilier: adaptation.pilier });
+  const resultat = await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM users WHERE id=${userId} FOR UPDATE`;
+    const adaptation = await tx.programmeAdaptation.findUnique({ where: { id: adaptationId } });
+    if (!adaptation || adaptation.userId !== userId) return { error: "Adaptation introuvable." };
+    if (adaptation.statut !== "PROPOSEE") return { error: "Cette adaptation a déjà été traitée." };
+    await tx.programmeAdaptation.update({ where: { id: adaptationId }, data: { statut: "REJETEE" } });
+    return { pilier: adaptation.pilier };
+  });
+  if ("error" in resultat) return { error: resultat.error! };
+  trackServerEvent("adaptation_rejected", userId, { pilier: resultat.pilier });
 
   return { ok: true };
 }

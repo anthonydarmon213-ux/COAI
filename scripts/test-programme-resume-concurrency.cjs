@@ -46,7 +46,7 @@ function resume(db){
   assert.equal(await db.programmeGenerated.count({where:{userId}}),3);
   assert.ok(link.id);
   console.log('PASS actual resume/local PostgreSQL: four callers → one version/history/event; rollback atomic; retry no-op; cross-user source rejected');
-  console.log('LIMIT: confirmation of paid adaptations still uses a separate writer; no paid provider, production writes or emails');
+  console.log('LIMIT: this test covers resume only, not paid generation or provider concurrency; no production writes or emails');
  }finally{
   for(const id of ids)await clients[0].user.deleteMany({where:{id,email:`resume-${id}@example.test`}});
   await Promise.all(clients.map(db=>db.$disconnect()));
