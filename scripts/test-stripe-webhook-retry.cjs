@@ -14,11 +14,14 @@ const sdk = new Stripe('sk_test_local_signature_only');
 const secret = 'whsec_local_retry_fixture_only';
 const id = `evt_coai_local_retry_${randomUUID()}`;
 const paidId = `${id}_paid`;
+const userId = randomUUID();
+const email = `webhook-retry-${userId}@example.test`;
 const event = { id, object: 'event', type: 'invoice.payment_failed', created: Math.floor(Date.now() / 1000), livemode: false,
-  data: { object: { id: `in_${id}`, customer: `cus_${id}`, subscription: null, amount_due: 1999, currency: 'eur' } } };
+  data: { object: { id: `in_${id}`, customer: `cus_${id}`, subscription: `sub_${id}`, amount_due: 1999, currency: 'eur' } } };
 let notifications = 0;
 let failNotification = true;
 let failSubscriptionUpdate = false;
+let invoicePaid = false;
 const handlerPrisma = new Proxy(prisma, { get(target, key) {
   if (key !== 'subscription') return target[key];
   return new Proxy(target.subscription, { get(delegate, method) {
@@ -31,12 +34,16 @@ const handlerPrisma = new Proxy(prisma, { get(target, key) {
 } });
 const deps = {
   'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
-  '@/lib/stripe/client': { stripe: { webhooks: sdk.webhooks } },
+  '@/lib/stripe/client': { stripe: { webhooks: sdk.webhooks,
+    subscriptions: { retrieve: async () => ({ id: `sub_${id}`, customer: `cus_${id}`, status: 'past_due', latest_invoice: `in_${id}` }) },
+    invoices: { retrieve: async () => ({ ...event.data.object, status: invoicePaid ? 'paid' : 'open',
+      amount_remaining: invoicePaid ? 0 : 1999 }) },
+  } },
   '@/lib/db/client': { prisma: handlerPrisma },
   '@/lib/parrainage/reward': { appliquerRecompenseParrainageSiEligible: async () => { throw Error('Unexpected referral side effect'); } },
   '@/lib/email/client': {
     sendAdminNotification: async () => { notifications++; if (failNotification) throw Error('Simulated notification outage'); },
-    sendEmail: async () => { throw Error('No customer email expected for this standalone fixture'); },
+    sendEmail: async to => { assert.equal(to, email); return true; },
   },
   '@/lib/programmes-prets/catalogue': { PROGRAMMES_PRETS: [] },
 };
@@ -53,6 +60,8 @@ const request = (sig, input = event) => {
 };
 async function main() {
   try {
+    await prisma.user.create({ data: { id: userId, supabaseAuthId: userId, email } });
+    await prisma.subscription.create({ data: { userId, stripeCustomerId: `cus_${id}`, stripeSubscriptionId: `sub_${id}`, status: 'PAST_DUE', plan: 'PASS_IA' } });
     assert.equal((await box.exports.POST(request('invalid'))).status, 400);
     assert.equal(await prisma.stripeWebhookEvent.count({ where: { id } }), 0);
     await assert.rejects(box.exports.POST(request()), /Simulated notification outage/);
@@ -70,6 +79,7 @@ async function main() {
     assert.equal(record.amountCents, 1999);
     assert.equal(record.kind, 'FAILED');
     const paid = { ...event, id: paidId, type: 'invoice.payment_succeeded', data: { object: { ...event.data.object, amount_paid: 1999 } } };
+    invoicePaid = true;
     failSubscriptionUpdate = true;
     await assert.rejects(box.exports.POST(request(undefined, paid)), /Simulated subscription write outage/);
     assert.equal(await prisma.billingEvent.count({ where: { id: paidId } }), 1);
@@ -81,9 +91,10 @@ async function main() {
     assert.equal(notifications, 2);
     console.log('PASS real local SQL: signature rejection, notification/DB failures after ledger writes, identical FAILED/PAID event retries, unique financial entries, duplicates acknowledged without effects');
   } finally {
-    // Exact random IDs created by this run only. No user/account deletion.
+    // Exact random fixture identities created by this run only.
     await prisma.stripeWebhookEvent.deleteMany({ where: { id: { in: [id, paidId] } } });
     await prisma.billingEvent.deleteMany({ where: { id: { in: [id, paidId] } } });
+    await prisma.user.deleteMany({ where: { id: userId, email } });
     await prisma.$disconnect();
   }
 }

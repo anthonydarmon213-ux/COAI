@@ -2,6 +2,14 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Factures Stripe — état actuel et incidents, 10 septembre
+
+- Bug reproduit sur webhook signé et PostgreSQL local : un ancien événement d'échec rouvrait `paymentFailedAt` après règlement. Le paiement d'une ancienne facture pouvait inversement effacer un incident plus récent.
+- L'événement historique reste inscrit une seule fois dans `billing_events`. Avant de modifier l'incident ou notifier : correspondance de l'abonnement local par identifiant Stripe, lecture de l'abonnement Stripe, vérification de sa dernière facture, lecture de cette facture et vérification client/abonnement. Une facture déjà payée efface l'incident sans notifier d'échec ; un échec encore dû sur la facture courante conserve les notifications. Factures sans abonnement et anciens abonnements : journal seulement, pas d'incident ni de notification trompeuse.
+- Les appels réseau sont hors transaction. Mise à jour conditionnelle sur `updatedAt` et identifiant d'abonnement : si une écriture locale a changé la ligne, nouvelle lecture Stripe, trois essais maximum. Conflit persistant ou panne fournisseur : webhook réessayable, journal conservé. Aucun ajout de schéma ni migration.
+- `test-stripe-invoice-order.cjs --local` : véritable handler/signature et PostgreSQL, Stripe/notifications simulés ; ancien échec après paiement, ancien paiement après nouvel incident, échec courant puis règlement, doublon, format récent `parent.subscription_details.subscription`, panne après écriture du journal, conflit local provoqué, remplacement d'abonnement et facture indépendante. Fixtures aléatoires nettoyées. `test-stripe-webhook-retry.cjs --local` utilise désormais un abonnement fictif réel pour conserver ses scénarios de panne notification/SQL ; le test d'ordre des abonnements passe aussi.
+- Limites : aucune réception réelle de facture en production prouvée. Une modification distante après lecture sans modification locale reste possible ; `updatedAt` n'est pas un compteur de version strict. Notifications partiellement envoyées, événement reçu avant création de la ligne d'abonnement, crash brutal pendant réservation webhook et réconciliation complète restent à traiter/vérifier.
+
 ## Abonnement Stripe — événements désordonnés, 10 septembre
 
 - Bug reproduit sur le véritable webhook signé et PostgreSQL local : suppression d'abonnement puis ancien événement `customer.subscription.updated` actif → retour incorrect à ACTIVE.

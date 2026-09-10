@@ -193,11 +193,55 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
   return changed.count > 0;
 }
 
+function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  // Les événements peuvent suivre une version d'API plus récente que le SDK.
+  const parent = (invoice as unknown as { parent?: { subscription_details?: {
+    subscription?: string | { id: string } | null;
+  } } | null }).parent;
+  const value = invoice.subscription ?? parent?.subscription_details?.subscription;
+  return typeof value === "string" ? value : value?.id ?? null;
+}
+
+// Le journal conserve l'événement historique, mais les relances doivent
+// refléter la dernière facture de l'abonnement actuel, pas un ancien payload.
+// Lectures réseau hors transaction ; updatedAt protège contre une écriture
+// locale concurrente. En cas de conflit, relire Stripe avant de réessayer.
+async function syncInvoicePaymentState(event: Stripe.Event, invoice: Stripe.Invoice): Promise<Stripe.Invoice | null> {
+  const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+  const subscriptionId = invoiceSubscriptionId(invoice);
+  if (!customerId || !subscriptionId) return null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const local = await prisma.subscription.findFirst({
+      where: { stripeCustomerId: customerId, stripeSubscriptionId: subscriptionId },
+      select: { id: true, updatedAt: true },
+    });
+    if (!local) return null;
+    const currentSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const latest = currentSubscription.latest_invoice;
+    const latestId = typeof latest === "string" ? latest : latest?.id;
+    if (latestId !== invoice.id) return null;
+    const current = await stripe.invoices.retrieve(invoice.id);
+    const currentCustomer = typeof current.customer === "string" ? current.customer : current.customer?.id;
+    if (currentCustomer !== customerId || invoiceSubscriptionId(current) !== subscriptionId) {
+      throw new Error("Invoice/subscription identity mismatch");
+    }
+    const paid = current.status === "paid";
+    const failed = event.type === "invoice.payment_failed" && currentSubscription.status !== "canceled" &&
+      (current.status === "open" || current.status === "uncollectible") && current.amount_remaining > 0;
+    if (!paid && !failed) return null;
+    const changed = await prisma.subscription.updateMany({
+      where: { id: local.id, updatedAt: local.updatedAt, stripeSubscriptionId: subscriptionId },
+      data: { paymentFailedAt: paid ? null : new Date(event.created * 1000), paymentRecoveryReminderSentAt: null },
+    });
+    if (changed.count > 0) return failed ? current : null;
+  }
+  throw new Error("Concurrent invoice synchronization; retry required");
+}
+
 async function recordBillingEvent(event: Stripe.Event, invoice: Stripe.Invoice, kind: "PAID" | "FAILED") {
   const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
   if (!customerId) return;
-  const subscriptionId =
-    typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id;
+  const subscriptionId = invoiceSubscriptionId(invoice);
 
   // The ledger may already have been written by an attempt that failed
   // afterwards (subscription update or notification). Preserve that entry
@@ -374,27 +418,16 @@ export async function POST(request: Request) {
     case "invoice.payment_succeeded": {
       const invoice = event.data.object as Stripe.Invoice;
       await recordBillingEvent(event, invoice, "PAID");
-      const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
-      if (customerId) {
-        await prisma.subscription.updateMany({
-          where: { stripeCustomerId: customerId },
-          data: { paymentFailedAt: null, paymentRecoveryReminderSentAt: null },
-        });
-      }
+      await syncInvoicePaymentState(event, invoice);
       break;
     }
     case "invoice.payment_failed": {
-      const invoice = event.data.object as Stripe.Invoice;
-      await recordBillingEvent(event, invoice, "FAILED");
+      const snapshot = event.data.object as Stripe.Invoice;
+      await recordBillingEvent(event, snapshot, "FAILED");
+      const invoice = await syncInvoicePaymentState(event, snapshot);
+      if (!invoice) break;
       const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
       if (customerId) {
-        await prisma.subscription.updateMany({
-          where: { stripeCustomerId: customerId },
-          data: {
-            paymentFailedAt: new Date(event.created * 1000),
-            paymentRecoveryReminderSentAt: null,
-          },
-        });
         const contact = await getCustomerContact(customerId);
         await sendAdminNotification(
           "Paiement COAI échoué",
