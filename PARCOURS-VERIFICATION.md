@@ -2,6 +2,18 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Même compte : bilan → essai → séance → RepCount — 10 septembre, reprise de midi
+
+Cette reprise complète les preuves antérieures du bilan anonyme mobile pour **la même fixture** `bilan-mobile-10sept@example.test`, membre local `cb914eff-d115-4f6f-8f70-343d4d9ef76c`. Aucun compte client, email externe ou paiement réel. Application locale sur le commit `d012e1b`, avec les modifications tierces préexistantes du worktree ; ce n'est pas une certification du parcours en production.
+
+- Reconnexion au compte après perte de la session du navigateur de test : bilan conservé, `/bienvenue` accessible, écran 390×844 sans débordement. Puis choix explicite Essentiel mensuel depuis la tarification.
+- Checkout affiche « Environnement de test », 7 jours gratuits puis 19,99 €/mois. Carte fictive de refus `4000…0002` : message de refus visible, abonnement local toujours absent et zéro programme. La déclaration d'agent a été cochée ; Link CLI est proposé mais facultatif, aucune installation ni donnée bancaire réelle utilisée.
+- Remplacement par la carte fictive de succès `4242…4242` dans le même formulaire : retour « Tes 7 jours d'essai commencent », bouton « Commencer ma première séance ». Lecture Stripe TEST : session `cs_test_a1AlR4yv1l90zfc8ucME0FKeVUpcycH9jz4I3mi5G0lWh1wKZXVml2MQX0` COMPLETE, montant 0, `livemode=false` ; abonnement `sub_1UE6eXAPYODLq9KTZWFAtMEs` TRIALING. Base locale ACTIVE/PASS_IA/MONTHLY, fin d'essai au 17 septembre. « paid » sur cette session à zéro ne signifie pas revenu encaissé.
+- Trois piliers seulement, version 1, statut GENERE_IA ; aucune clé IA payante dans le lanceur local. Le CTA ouvre `/programme/entrainement` et six contrôles vidéo. Presse réellement lue (`currentTime > 0`, `paused=false`, aucune erreur média), puis mise en pause.
+- Échauffement, 12 séries fictives, retour au calme et bilan facultatif parcourus par les contrôles du lecteur. Repos passés explicitement pour accélérer le test : aucune durée sportive réelle ni prescription validée par ce test. Séance PROGRAMME `3b9af963-35f7-4bda-ae18-b6a0e7d42c4e` : six exercices × deux séries, difficulté 3, énergie 4, douleur AUCUNE. Superman et planche ont chacun deux maintiens de 30 s ; pas de répétitions ou de charge inventées pour ces maintiens.
+- Le lien planche du récapitulatif ouvre RepCount, retrouve 2×30 s et préremplit le mode isométrique. Ajout d'une série fictive de 30 s via « Valider la série » puis « Enregistrer l'exercice » : ligne REPCOUNT `020b123e-bc50-4714-9c50-bbbd1143173c`. Rechargement : dernière saisie 30 s, historique de deux séances, mode maintien conservé, aucun débordement horizontal. Valeurs contrôlées en lecture seule dans PostgreSQL local.
+- Reste hors de cette preuve : génération simultanée/interrompue, réception GA4/Meta, relances réelles, adaptation mensuelle, variantes de profils/médias et parcours complet de production. Les limites historiques ci-dessous restent datées ; « carte refusée » et « même fixture jusqu'à la première séance » sont désormais vérifiés localement.
+
 ## Conversions et chargement tardif — 10 septembre
 
 - `TrackConversion` ne faisait qu'une tentative au montage : événement perdu si le SDK n'était pas encore initialisé, ou si le consentement était choisi ensuite sur la même page. Le composant écoute maintenant l'initialisation des scripts et le changement de consentement, puis retire ses écouteurs au démontage. Refus/absence de consentement restent bloquants par finalité.
