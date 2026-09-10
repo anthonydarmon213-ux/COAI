@@ -21,12 +21,23 @@ const compiled = ts.transpileModule(source + '\nexport { relancerEssaisNonActive
           assert.ok(query.where.user.programmes.none);
           return [{ id: 'fictional-sub', plan: 'PASS_IA', user: { email: 'test@example.test', prenom: 'Test' } }];
         },
+        findFirst: async query => {
+          assert.equal(query.where.id, 'fictional-sub');
+          assert.equal(query.where.status, 'ACTIVE');
+          assert.ok(query.where.user.programmes.none);
+          return { id: 'fictional-sub' };
+        },
         update: async query => updates.push(query),
       } } },
       '@/lib/email/client': { sendEmail: async (...args) => { emails.push(args); return sent; } },
       '@/lib/cron/auth': {}, '@/lib/admin/flags': {}, '@/lib/email/unsubscribe': {},
       '@/lib/email/diagnostic-suppression': {}, '@/lib/stripe/client': {},
       '@/lib/email/send-diagnostic-reminder': {},
+      '@/lib/email/send-essential-reminder': { sendEssentialReminder: async request => {
+        assert.equal(request.kind, 'trial-activation');
+        assert.equal(request.eventId, 'fictional-sub');
+        return await request.eligible() ? request.send() : false;
+      } },
     };
     const box = { exports: {}, Date, require: name => { assert.ok(name in imports, name); return imports[name]; } };
     vm.runInNewContext(compiled, box);

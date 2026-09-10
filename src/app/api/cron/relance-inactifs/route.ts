@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { SubscriptionPlan } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { sendEmail, sendAdminNotification } from "@/lib/email/client";
+import { sendEssentialReminder } from "@/lib/email/send-essential-reminder";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
 import { detecterBaisseMotivation, buildWhatsAppContactLink } from "@/lib/admin/flags";
 import { buildUnsubscribeLink } from "@/lib/email/unsubscribe";
@@ -471,7 +472,19 @@ async function relancerEssaisNonActives(appUrl: string): Promise<number> {
   let relancesActivation = 0;
   for (const subscription of candidats) {
     const nom = subscription.user.prenom ? ` ${subscription.user.prenom}` : "";
-    const envoye = await sendEmail(
+    const envoye = await sendEssentialReminder({
+      kind: "trial-activation",
+      eventId: subscription.id,
+      eligible: async () => Boolean(await prisma.subscription.findFirst({
+        where: {
+          id: subscription.id, status: "ACTIVE", cancelAtPeriodEnd: false,
+          trialEnd: { gt: new Date() }, trialActivationReminderSentAt: null,
+          createdAt: { lte: new Date(Date.now() - RELANCE_ACTIVATION_APRES_MS) },
+          user: { programmes: { none: {} } },
+        },
+        select: { id: true },
+      })),
+      send: () => sendEmail(
       subscription.user.email,
       "Ton programme COAI n'attend plus que toi",
       `Bonjour${nom},\n\n` +
@@ -482,7 +495,8 @@ async function relancerEssaisNonActives(appUrl: string): Promise<number> {
         `Terminer mon activation : ${appUrl}/bienvenue?plan=${encodeURIComponent(subscription.plan)}\n\n` +
         `Retrouve la date de fin de ton essai et les modalités de ton abonnement dans ton espace : ${appUrl}/compte/abonnement\n\n` +
         `À bientôt,\nL'équipe COAI`
-    );
+      ),
+    });
     if (!envoye) continue;
     await prisma.subscription.update({
       where: { id: subscription.id },
@@ -629,19 +643,33 @@ async function relancerPaiementsEnRetard(appUrl: string): Promise<number> {
 
   let relancesPaiement = 0;
   for (const subscription of candidats) {
+    if (!subscription.paymentFailedAt) continue;
     const nom = subscription.user.prenom ? ` ${subscription.user.prenom}` : "";
-    const envoye = await sendEmail(
+    const envoye = await sendEssentialReminder({
+      kind: "payment-recovery",
+      eventId: `${subscription.id}:${subscription.paymentFailedAt.toISOString()}`,
+      eligible: async () => Boolean(await prisma.subscription.findFirst({
+        where: {
+          id: subscription.id, status: "PAST_DUE", cancelAtPeriodEnd: false,
+          paymentFailedAt: subscription.paymentFailedAt,
+          paymentRecoveryReminderSentAt: null,
+        },
+        select: { id: true },
+      })),
+      send: () => sendEmail(
       subscription.user.email,
       "Ton abonnement COAI attend ta régularisation",
       `Bonjour${nom},\n\n` +
         `Ton dernier paiement n'a toujours pas pu être régularisé. Tu peux mettre à jour ton moyen de paiement en toute sécurité depuis le portail Stripe : ${appUrl}/compte/abonnement\n\n` +
         `COAI ne stocke aucune donnée bancaire. Si tu as déjà effectué la mise à jour, tu peux ignorer ce message.\n\n` +
         `Besoin d'aide ? Réponds simplement à cet email.\n\nL'équipe COAI`
-    );
+      ),
+    });
     if (!envoye) continue;
 
-    await prisma.subscription.update({
-      where: { id: subscription.id },
+    // Ne pas marquer un nouvel incident survenu pendant l'envoi comme traité.
+    await prisma.subscription.updateMany({
+      where: { id: subscription.id, paymentFailedAt: subscription.paymentFailedAt, status: "PAST_DUE" },
       data: { paymentRecoveryReminderSentAt: maintenant },
     });
     relancesPaiement++;
