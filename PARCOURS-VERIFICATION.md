@@ -1,14 +1,22 @@
-# Parcours COAI — état des preuves au 9 septembre 2026
+# Parcours COAI — état des preuves au 10 septembre 2026
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
 ## Préparation du test isolé — 10 septembre
 
-Supabase local tourne désormais dans Colima `coai-test`, réseau `coai-e2e-loopback` limité à `127.0.0.1` (ports 54321/54322/54324 vérifiés avec lsof). CLI épinglé à 2.117.0 ; configuration temporaire `/tmp/coai-e2e-supabase-sloAPQ`. Les 81 migrations ont été appliquées uniquement à cette base locale vide. Le serveur Next local utilise le port 3050, sans clés de génération ou notifications externes ; Stripe y reste une valeur factice, donc le paiement n'est pas encore testable.
+Supabase local tourne désormais dans Colima `coai-test`, réseau `coai-e2e-loopback` limité à `127.0.0.1` (ports 54321/54322/54324 vérifiés avec lsof). CLI épinglé à 2.117.0 ; configuration temporaire `/tmp/coai-e2e-supabase-sloAPQ`. Les 81 migrations ont été appliquées uniquement à cette base locale vide. Le serveur Next local utilise le port 3050, sans clés de génération ou notifications externes. Stripe utilise désormais la clé de test existante, chargée en mémoire par un lanceur local, sans copie dans le dépôt.
 
-Test navigateur réel : inscription fictive, réception dans Mailpit, identité confirmée en base, connexion par mot de passe réussie. **Bug reproduit** : identité Auth sans ligne `users` → dashboard vide. Correctif vérifié par rechargement : redirection vers `completer-inscription`, prénom conservé et consentements non cochés. Aucun compte applicatif créé, aucun consentement accepté. La réouverture du lien déjà consommé affiche la connexion sans expliquer `otp_expired` : friction encore à traiter. Ce test ne couvre pas encore le bilan, le paiement ou RepCount.
+Test navigateur réel : inscription fictive, réception dans Mailpit, identité confirmée en base, connexion par mot de passe réussie. **Bug corrigé** : identité Auth sans ligne `users` → dashboard vide. Redirection vérifiée vers `completer-inscription`, prénom conservé et consentements initialement non cochés. Finalisation du compte fictif ensuite réussie. La réouverture du lien déjà consommé affiche la connexion sans expliquer `otp_expired` : friction encore à traiter.
 
-Le client Stripe local est déjà authentifié avec un accès **test** à COAI. La liste des prix actifs en mode test est vide. Aucun paiement, prix ou client n'a été créé lors de cette vérification. L'absence de clé Stripe de test n'est donc pas le blocage ; il reste à préparer une base et une authentification de test isolées.
+Checkout réellement ouvert depuis le bouton mensuel : carte fictive Stripe, session `cs_test_a1nVAScDdbhXDQqcCE8MWs05VoyAllFCiEjWW23b3EXWMySo8C2Ik3Ipe9`, `livemode=false`, `status=complete`, `amount_total=0`. Webhooks `checkout.session.completed` et `invoice.payment_succeeded` reçus et traités en HTTP 200 par le serveur local. Retour navigateur « Essai activé ». Base locale : une souscription ACTIVE/PASS_IA/MONTHLY, 1999 centimes EUR récurrents, fin d'essai au 17 septembre. Aucun débit réel. Les prix sont créés inline par Checkout : le catalogue vide n'était pas un obstacle.
+
+RepCount : presse à cuisses, 10 répétitions à 20 kg, enregistrées via le navigateur. Rechargement puis recherche de l'exercice : historique retrouvé. Ligne `seances_log`, source REPCOUNT, contrôlée en SQL local. Ce n'est pas une séance PROGRAMME terminée.
+
+Bilan connecté : les 11 questions ont été parcourues (homme fictif, 40 ans, débutant, reprise, salle, 45 minutes, 2 séances/semaine, aucune contrainte). Résultat Full Body x2 ; mise à jour du profil et création effective des trois piliers via le socle local sans API IA payante. Accès à un programme et à ses contrôles vidéo obtenu, mais lecture vidéo et fin de séance restent à vérifier.
+
+**Défaut de contenu majeur reproduit** : le catalogue déterministe `src/lib/programmes-socles/catalogue.ts` sert encore squat barre, TRX et deadlift roumain aux débutants. La méthode du gainage reste « Série classique », les repos sont en secondes et la durée de 45 minutes n'est pas intégrée au choix du socle. Les nouvelles fiches locales n'ont donc pas remplacé ce moteur. Ne pas présenter ce programme comme conforme aux dernières règles d'Anthony ; correction du socle et non simple retouche visuelle requise.
+
+**Friction corrigée dans ce lot** : le résultat du bilan d'un abonné actif ne repropose plus un nouvel essai. L'état ACTIVE vient de la page serveur, distinct du simple état connecté, et oriente vers l'action existante d'application du bilan. Six statuts testés avec Auth/Prisma simulés (`test-diagnostic-abonnement.cjs`). Les autres offres et les contrôles serveur d'accès restent inchangés. Les intermèdes du bilan et l'absence d'explication du lien expiré restent à traiter.
 
 `node scripts/check-local-test-env.mjs` contrôle uniquement les variables du processus, sans lire de fichier `.env`, sans appel réseau et sans afficher de secret. Il refuse les adresses non locales, les clés Stripe réelles et les intégrations externes de génération, notification et suivi. Tests : `node scripts/test-local-test-env.mjs`.
 
@@ -17,11 +25,11 @@ Ce contrôle n'est **pas** un pare-feu ni une protection intégrée à l'applica
 | Étape | Preuve obtenue | À vérifier encore |
 | --- | --- | --- |
 | Bilan / recommandation | Tests locaux de cadence et de recommandation réussis | Parcours mobile complet, résultat et reprise |
-| Création de compte | Code présent, pas de test réel dans cet audit | Confirmation email et conservation du bilan |
-| Paiement / essai | Tests simulés de confirmation Stripe : authentification, propriété de session, statuts et entrées invalides | Checkout en mode test, webhook et retour navigateur |
-| Activation | Tests simulés : transfert du bilan et conservation des réponses en cas d'échec | Activation avec compte de test |
+| Création de compte | Compte fictif local créé et confirmé via Mailpit | Ordre bilan avant inscription et conservation des réponses |
+| Paiement / essai | Checkout Stripe test, webhook HTTP 200, souscription locale et retour navigateur vérifiés | Cas refus, annulation et redélivrance réelle du même événement |
+| Activation | Essai actif, bilan connecté puis génération socle locale réussis | Corriger le contenu débutant avant validation qualité |
 | Première séance | Navigation actualisée vue en production ; tests locaux des remplacements et du suivi | Compte connecté actuellement en attente de validation coach ; lecture, reprise et fin réelles non vérifiées |
-| RepCount | Pas de nouvelle preuve de bout en bout | Sauvegarde puis relecture sur compte de test |
+| RepCount | Série enregistrée, historique retrouvé après rechargement, persistance SQL vérifiée | Enregistrement depuis une séance PROGRAMME complète |
 | Mesure | Ouverture du lecteur distinguée de première séance enregistrée | Réception effective des événements ; agrégation du tunnel |
 | Relances | Test de cadence et 32 assertions du registre réussis sur SQL local (doublons, délai, rollback, statut incertain) | Concurrence distribuée, schéma effectivement déployé, exécution des crons et réception fournisseur non vérifiés ; aucun email envoyé dans cet audit |
 

@@ -75,7 +75,7 @@ export default async function DiagnosticPage({
         </Card>
       )}
       <div className="relative z-10 w-full">
-        <DiagnosticQuiz connecte={!!user} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
+        <DiagnosticQuiz connecte={!!user} abonnementActif={user?.subscription?.status === "ACTIVE"} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
       </div>
     </main>
   );

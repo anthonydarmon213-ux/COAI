@@ -596,9 +596,10 @@ const PILIER_PHOTOS_VIDE: PilierPhotos = {
 
 export function DiagnosticQuiz({
   connecte = false,
+  abonnementActif = false,
   aDejaUnProgramme = false,
   pilierPhotos = PILIER_PHOTOS_VIDE,
-}: { connecte?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
+}: { connecte?: boolean; abonnementActif?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
 
   // Remonte en haut à chaque changement d'étape (01/09/2026, Anthony : « on
@@ -2385,7 +2386,17 @@ export function DiagnosticQuiz({
 
               {/* Après avoir montré le fonctionnement concret, le bilan
                   débouche sur une seule formule expliquée par les réponses. */}
-              <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
+              {abonnementActif ? (
+                <section className="w-full rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6 text-center" aria-label="La suite de ton bilan">
+                  <SectionLabel>Ton accompagnement est déjà actif</SectionLabel>
+                  <p className="mt-3 text-sm text-graphite-300">Pas besoin de souscrire à nouveau. Utilise ce bilan dans ton espace COAI.</p>
+                  <a href="#appliquer-mon-bilan" className="mt-4 inline-flex rounded-xl bg-laiton-300 px-6 py-3 font-semibold text-[#111216]">
+                    {applyStatus === "pret" ? "Accéder à ma première séance" : aDejaUnProgramme ? "Mettre à jour mon profil" : "Préparer ma première séance"} →
+                  </a>
+                </section>
+              ) : (
+                <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
+              )}
 
               {!connecte && (
                 <div className="flex w-full flex-col items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.025] px-5 py-5 text-center sm:flex-row sm:text-left">
@@ -2567,7 +2578,7 @@ export function DiagnosticQuiz({
                 // sur la génération et "Ton programme est prêt" — avec un
                 // programme déjà en place, reste au geste explicite habituel
                 // (jamais de régénération silencieuse).
-                <div className="coai-result-entry flex w-full flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-7 text-center sm:py-9">
+                <div id="appliquer-mon-bilan" className="coai-result-entry flex w-full scroll-mt-24 flex-col items-center gap-3 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-7 text-center sm:py-9">
                   {applyStatus === "pret" ? (
                     <>
                       <SectionLabel>Ton programme est prêt</SectionLabel>
