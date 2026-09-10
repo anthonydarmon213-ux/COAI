@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { trackEvent, trackMetaEvent } from "@/lib/analytics";
-import { hasConsent } from "@/lib/analytics/consent";
+import { useEffect, useRef } from "react";
+import { CONSENT_EVENT } from "@/lib/analytics/consent";
+import { ANALYTICS_READY_EVENT, createConversionTracker } from "@/lib/analytics/conversion-delivery";
 
 // Déclenche un événement de conversion GA4 (et, depuis le 11/08/2026, son
 // équivalent Meta Pixel) une fois, côté client — utilisé sur les pages de
@@ -25,17 +25,21 @@ export function TrackConversion({
   metaParams?: Record<string, unknown>;
   onceKey?: string;
 }) {
+  const tracker = useRef<{ identity: string; attempt: () => void } | null>(null);
+  const identity = JSON.stringify([name, onceKey, metaEvent]);
+  if (tracker.current?.identity !== identity) {
+    tracker.current = { identity, attempt: createConversionTracker({ name, params, metaEvent, metaParams, onceKey }) };
+  }
+  const attempt = tracker.current.attempt;
   useEffect(() => {
-    if (!hasConsent("audience") && !hasConsent("marketing")) return;
-    try {
-    const storageKey = onceKey ? `coai_conversion_${name}_${onceKey}` : null;
-    if (storageKey && window.localStorage.getItem(storageKey)) return;
-    const audienceSent = trackEvent(name, params);
-    const marketingSent = metaEvent ? trackMetaEvent(metaEvent, metaParams) : false;
-    if (storageKey && (audienceSent || marketingSent)) window.localStorage.setItem(storageKey, "1");
-    } catch { /* Optional tracking must never interrupt the customer journey. */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    window.addEventListener(CONSENT_EVENT, attempt);
+    window.addEventListener(ANALYTICS_READY_EVENT, attempt);
+    attempt();
+    return () => {
+      window.removeEventListener(CONSENT_EVENT, attempt);
+      window.removeEventListener(ANALYTICS_READY_EVENT, attempt);
+    };
+  }, [attempt]);
 
   return null;
 }

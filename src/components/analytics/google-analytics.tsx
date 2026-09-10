@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { ANALYTICS_READY_EVENT } from "@/lib/analytics/conversion-delivery";
 
 // GA4 gère nativement les paramètres UTM (utm_source, utm_medium,
 // utm_campaign...) sur la première page vue — aucun code custom requis
@@ -18,6 +19,7 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${id}');
+          window.dispatchEvent(new Event('${ANALYTICS_READY_EVENT}'));
         `}
       </Script>
     </>

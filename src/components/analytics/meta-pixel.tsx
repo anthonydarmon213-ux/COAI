@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { ANALYTICS_READY_EVENT } from "@/lib/analytics/conversion-delivery";
 
 // Pixel Meta (Facebook/Instagram Ads) — permet à Meta de mesurer les
 // conversions réelles depuis les campagnes payantes (pas juste les clics)
@@ -22,6 +23,7 @@ export function MetaPixel() {
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${id}');
           fbq('track', 'PageView');
+          window.dispatchEvent(new Event('${ANALYTICS_READY_EVENT}'));
         `}
       </Script>
       <noscript>

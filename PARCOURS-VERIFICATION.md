@@ -2,6 +2,13 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Conversions et chargement tardif — 10 septembre
+
+- `TrackConversion` ne faisait qu'une tentative au montage : événement perdu si le SDK n'était pas encore initialisé, ou si le consentement était choisi ensuite sur la même page. Le composant écoute maintenant l'initialisation des scripts et le changement de consentement, puis retire ses écouteurs au démontage. Refus/absence de consentement restent bloquants par finalité.
+- Marqueurs de conversion distincts pour audience et marketing : un envoi Google ne bloque plus un envoi Meta consenti ultérieurement. L'ancien marqueur commun est respecté pour ne pas rejouer des conversions historiques ambiguës. Sans `onceKey`, une vue compte une fois par instance montée, pas une fois par événement de disponibilité.
+- `test-conversion-delivery.cjs` utilise les vrais helpers de consentement/mesure et le vrai composant, avec hooks et SDK simulés : SDK absent puis prêt, consentement tardif, canaux distincts, rechargement, anciens marqueurs, démontage, refus et pannes SDK/stockage. `test-privacy-consent.cjs` conserve les contrôles SSR et de séparation des finalités.
+- Limite : « transmis au SDK » n'est pas un accusé de réception GA4/Meta. Aucun événement de test envoyé à ces fournisseurs ; la réception et l'attribution externes restent non prouvées. Pas de nouveau tracker, service ni changement de campagne.
+
 ## Enregistrement concurrent de séance — 10 septembre
 
 - `POST /api/seances` faisait recherche, comptage et insertion sans transaction : deux requêtes pouvaient toutes deux ne rien trouver, insérer deux lignes et annoncer deux premières séances. Transaction courte, verrou de la ligne membre existante, recherche/comptage/insertion atomiques ; événements serveur émis seulement après une nouvelle écriture validée. Pas de migration ni appel externe dans la transaction.
