@@ -4,6 +4,10 @@ Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve
 
 ## Préparation du test isolé — 10 septembre
 
+Supabase local tourne désormais dans Colima `coai-test`, réseau `coai-e2e-loopback` limité à `127.0.0.1` (ports 54321/54322/54324 vérifiés avec lsof). CLI épinglé à 2.117.0 ; configuration temporaire `/tmp/coai-e2e-supabase-sloAPQ`. Les 81 migrations ont été appliquées uniquement à cette base locale vide. Le serveur Next local utilise le port 3050, sans clés de génération ou notifications externes ; Stripe y reste une valeur factice, donc le paiement n'est pas encore testable.
+
+Test navigateur réel : inscription fictive, réception dans Mailpit, identité confirmée en base, connexion par mot de passe réussie. **Bug reproduit** : identité Auth sans ligne `users` → dashboard vide. Correctif vérifié par rechargement : redirection vers `completer-inscription`, prénom conservé et consentements non cochés. Aucun compte applicatif créé, aucun consentement accepté. La réouverture du lien déjà consommé affiche la connexion sans expliquer `otp_expired` : friction encore à traiter. Ce test ne couvre pas encore le bilan, le paiement ou RepCount.
+
 Le client Stripe local est déjà authentifié avec un accès **test** à COAI. La liste des prix actifs en mode test est vide. Aucun paiement, prix ou client n'a été créé lors de cette vérification. L'absence de clé Stripe de test n'est donc pas le blocage ; il reste à préparer une base et une authentification de test isolées.
 
 `node scripts/check-local-test-env.mjs` contrôle uniquement les variables du processus, sans lire de fichier `.env`, sans appel réseau et sans afficher de secret. Il refuse les adresses non locales, les clés Stripe réelles et les intégrations externes de génération, notification et suivi. Tests : `node scripts/test-local-test-env.mjs`.

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { DailyExperience } from "@/components/daily/daily-experience";
@@ -42,7 +43,10 @@ function today() {
 
 export default async function DashboardPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  // Une identité Auth confirmée n'est pas encore un compte COAI : les
+  // consentements restent à recueillir après une connexion par mot de passe.
+  // Ne jamais laisser ce cas sur un tableau de bord vide.
+  if (!user) redirect("/completer-inscription?redirect_to=%2Fdashboard");
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
