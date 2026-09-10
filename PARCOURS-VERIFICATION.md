@@ -67,6 +67,14 @@ Les logs serveur ne constituent pas à eux seuls un tableau de conversion. Les �
 
 ## Reproduire le test des relances
 
+### Reprise Stripe après un traitement partiel — 10 septembre
+
+- Blocage reproduit sur le véritable handler et PostgreSQL local : `invoice.payment_failed` écrit dans `billing_events`, puis la notification simulée échoue. La réservation webhook est retirée, mais la ligne financière reste. Une nouvelle livraison du même événement échouait alors en `P2002` avant de pouvoir reprendre.
+- Correction : écriture financière idempotente par `event.id`, sans modification de la ligne déjà enregistrée. Les autres étapes peuvent reprendre. Le registre webhook conserve son contrôle des événements déjà terminés.
+- `node scripts/test-stripe-webhook-retry.cjs --local` : signature réellement vérifiée par le SDK Stripe, signature invalide rejetée, erreur de notification après une facture échouée, erreur d'écriture d'abonnement après une facture payée, reprise du même payload signé, un seul événement financier, puis doublon acquitté sans nouvel effet. Avant correction : `P2002` ; après : succès des deux scénarios.
+- Base exclusivement `127.0.0.1:54322`, identifiants aléatoires de test supprimés à la fin. Aucun compte client touché, aucune connexion au compte Stripe, aucun email externe, aucune migration. Les défaillances sont injectées dans les dépendances du test, pas via un mode caché en production.
+- Portée : tests du handler et de la persistance, pas une redélivrance depuis Stripe vers l'URL de production. Restent à vérifier : processus interrompu brutalement pendant réservation, concurrence distribuée, ordre des événements, reprise de notifications partiellement envoyées, refus de carte et annulation depuis Checkout dans le navigateur. Le parcours complet reste ouvert.
+
 ### Contrôle du suivi facultatif — 10 septembre
 
 - Le layout ne monte plus directement GA4, Meta, Vercel Analytics ou Clarity. Une frontière client lit un choix versionné, valable 180 jours, sans traceur au rendu serveur. Audience et marketing sont séparés ; refus/acceptation au même niveau, personnalisation et réouverture disponibles. Pas de blocage du bilan.

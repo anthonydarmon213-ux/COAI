@@ -192,8 +192,13 @@ async function recordBillingEvent(event: Stripe.Event, invoice: Stripe.Invoice, 
   const subscriptionId =
     typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id;
 
-  await prisma.billingEvent.create({
-    data: {
+  // The ledger may already have been written by an attempt that failed
+  // afterwards (subscription update or notification). Preserve that entry
+  // and let the rest of this delivery resume; never count it twice.
+  await prisma.billingEvent.upsert({
+    where: { id: event.id },
+    update: {},
+    create: {
       id: event.id,
       invoiceId: invoice.id,
       stripeCustomerId: customerId,
