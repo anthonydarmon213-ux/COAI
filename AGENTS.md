@@ -98,6 +98,13 @@ La réactivation de la génération payante demande une nouvelle autorisation.
 
 ## État au 01/09/2026
 
+### Autorisation confirmée — reprise Stripe, 11/09/2026
+
+Anthony a autorisé la migration de production pour distinguer les traitements
+Stripe en cours, terminés et à reprendre, après tests locaux. Périmètre limité
+au suivi des webhooks ; aucun achat, changement d'offre ou rejeu automatique des
+anciens événements ambigus n'est autorisé par cet accord.
+
 - 77 fiches exercices, 59 avec vidéo, 54 entièrement filmées
 - 164 recettes, 163 visuels
 - 12 programmes, dont 10 enrichis (progression, nutrition, récupération)

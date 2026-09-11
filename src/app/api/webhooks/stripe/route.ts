@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/db/client";
@@ -6,6 +7,10 @@ import { appliquerRecompenseParrainageSiEligible } from "@/lib/parrainage/reward
 import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
+
+// The deployment must terminate an invocation before its five-minute lease can
+// be reclaimed. No provider request is made inside a SQL transaction.
+export const maxDuration = 60;
 
 // Noms affiches uniquement dans la notification interne "Nouvelle
 // inscription COAI" envoyee a Anthony — corriges le 04/09/2026 pour
@@ -297,22 +302,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Signature invalide" }, { status: 400 });
   }
 
-  // Stripe garantit l'unicité de event.id mais peut renvoyer le même
-  // événement. On le réserve avant tout effet de bord. En cas d'échec réel,
-  // la réservation est retirée afin que la prochaine tentative puisse le
-  // retraiter.
-  try {
-    await prisma.stripeWebhookEvent.create({ data: { id: event.id, type: event.type } });
-  } catch (error) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002"
-    ) {
+  const leaseToken = randomUUID();
+  const claimed = await prisma.$queryRaw<Array<{ id: string }>>`
+    INSERT INTO public.stripe_webhook_events
+      (id, type, state, "leaseToken", "leaseUntil", attempts)
+    VALUES (${event.id}, ${event.type}, 'PROCESSING', ${leaseToken},
+      clock_timestamp() + interval '5 minutes', 1)
+    ON CONFLICT (id) DO UPDATE SET state = 'PROCESSING',
+      "leaseToken" = EXCLUDED."leaseToken", "leaseUntil" = EXCLUDED."leaseUntil",
+      attempts = stripe_webhook_events.attempts + 1
+    WHERE stripe_webhook_events.type = EXCLUDED.type AND
+      (stripe_webhook_events.state = 'FAILED' OR
+       (stripe_webhook_events.state = 'PROCESSING' AND
+        stripe_webhook_events."leaseUntil" <= clock_timestamp()))
+    RETURNING id
+  `;
+  if (claimed.length === 0) {
+    const existing = await prisma.stripeWebhookEvent.findUnique({ where: { id: event.id } });
+    if (existing?.type === event.type && ["COMPLETED", "LEGACY"].includes(existing.state)) {
       return NextResponse.json({ received: true, duplicate: true });
     }
-    throw error;
+    // A concurrent or interrupted handler is not a completed delivery. Stripe
+    // must retain its retry, including when the previous invocation was killed.
+    return NextResponse.json({ error: "Traitement en cours, réessayer" }, { status: 503 });
   }
 
   try {
@@ -468,8 +480,16 @@ export async function POST(request: Request) {
       default:
         break;
     }
+    const completed = await prisma.stripeWebhookEvent.updateMany({
+      where: { id: event.id, state: "PROCESSING", leaseToken },
+      data: { state: "COMPLETED", completedAt: new Date(), leaseToken: null, leaseUntil: null },
+    });
+    if (completed.count !== 1) throw new Error("Stripe webhook lease lost");
   } catch (error) {
-    await prisma.stripeWebhookEvent.delete({ where: { id: event.id } }).catch(() => undefined);
+    await prisma.stripeWebhookEvent.updateMany({
+      where: { id: event.id, state: "PROCESSING", leaseToken },
+      data: { state: "FAILED", leaseToken: null, leaseUntil: null },
+    }).catch(() => undefined);
     throw error;
   }
 

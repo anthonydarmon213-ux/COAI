@@ -367,8 +367,14 @@ model StripeWebhookEvent {
   id          String   @id
   type        String
   processedAt DateTime @default(now())
+  state       String   @default("LEGACY")
+  leaseToken  String?
+  leaseUntil  DateTime? @db.Timestamptz(6)
+  completedAt DateTime? @db.Timestamptz(6)
+  attempts    Int      @default(0)
 
   @@index([processedAt])
+  @@index([state, leaseUntil], map: "stripe_webhook_recovery_idx")
   @@map("stripe_webhook_events")
 }
 

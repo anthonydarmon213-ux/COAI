@@ -24,6 +24,7 @@ const prisma = new Proxy(db, { get(target, key) {
   } });
 } });
 const deps = {
+  'node:crypto': { randomUUID },
   'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
   '@/lib/db/client': { prisma },
   '@/lib/stripe/client': { stripe: { webhooks: sdk.webhooks,
@@ -99,7 +100,7 @@ const read = () => db.subscription.findUniqueOrThrow({ where: { userId: id } });
     outage = true;
     const retry = event('invoice.payment_failed');
     await assert.rejects(deliver(retry), /fixture Stripe unavailable/);
-    assert.equal(await db.stripeWebhookEvent.count({ where: { id: retry.id } }), 0);
+    assert.equal((await db.stripeWebhookEvent.findUniqueOrThrow({ where: { id: retry.id } })).state, 'FAILED');
     assert.equal(await db.billingEvent.count({ where: { id: retry.id } }), 1);
     outage = false; await deliver(retry);
     assert.equal((await read()).paymentFailedAt, null);
@@ -117,7 +118,7 @@ const read = () => db.subscription.findUniqueOrThrow({ where: { userId: id } });
     collision = true;
     const busy = event('invoice.payment_succeeded');
     await assert.rejects(deliver(busy), /concurrent/i);
-    assert.equal(await db.stripeWebhookEvent.count({ where: { id: busy.id } }), 0);
+    assert.equal((await db.stripeWebhookEvent.findUniqueOrThrow({ where: { id: busy.id } })).state, 'FAILED');
     collision = false;
     console.log('PASS concurrent local write forces fresh Stripe read; persistent contention stays retryable');
 

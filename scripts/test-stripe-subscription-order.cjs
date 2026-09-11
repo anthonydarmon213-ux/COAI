@@ -22,6 +22,7 @@ let current = {
   items: { data: [{ price: { id: 'price_fixture', unit_amount: 11900, currency: 'eur', recurring: { interval: 'year', interval_count: 1 } } }] },
 };
 const deps = {
+  'node:crypto': { randomUUID },
   'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
   '@/lib/stripe/client': { stripe: { webhooks: sdk.webhooks, subscriptions: {
     retrieve: async requested => {
@@ -90,7 +91,7 @@ const local = () => prisma.subscription.findUniqueOrThrow({ where: { userId: id 
     const retry = makeEvent('customer.subscription.updated', { status: 'past_due' });
     await assert.rejects(deliver(retry), /fixture Stripe unavailable/);
     assert.equal((await local()).status, 'ACTIVE');
-    assert.equal(await prisma.stripeWebhookEvent.count({ where: { id: retry.id } }), 0);
+    assert.equal((await prisma.stripeWebhookEvent.findUniqueOrThrow({ where: { id: retry.id } })).state, 'FAILED');
     unavailable = false; current.status = 'past_due';
     assert.equal((await deliver(retry)).status, 200);
     assert.equal((await local()).status, 'PAST_DUE');

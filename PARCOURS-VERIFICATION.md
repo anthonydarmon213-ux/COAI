@@ -289,6 +289,16 @@ Les logs serveur ne constituent pas à eux seuls un tableau de conversion. Les �
 
 ## Reproduire le test des relances
 
+### Reprise Stripe après interruption — 11 septembre
+
+Anthony a autorisé cette migration de production. Le lot ajoute un état explicite, un jeton de possession, une échéance et un compteur de tentatives au registre existant. Les anciennes lignes restent `LEGACY` et ne sont pas rejouées automatiquement : leurs effets historiques ne sont pas déterminables par ce registre.
+
+Une réservation active renvoie 503 ; une nouvelle livraison peut reprendre une réservation expirée après cinq minutes ou un traitement `FAILED`. La prise de possession est atomique en SQL. Seul le détenteur du jeton peut terminer ou marquer l'échec. La fonction Vercel est plafonnée à 60 secondes (manifest de compilation vérifié), bien avant l'expiration ; un autre hébergeur doit conserver cette borne.
+
+Tests PostgreSQL local et handler signé : réservation interrompue, deux reprises concurrentes, un seul événement financier, doublon terminé, historique conservé, ancien détenteur incapable d'écraser le nouveau. Tests des erreurs partielles et de l'ordre des factures/abonnements réussis. TypeScript, lint, compilation et audit des médias réussis. Fournisseurs simulés, aucun achat ni email externe.
+
+La reprise dépend d'une nouvelle livraison Stripe : aucun ordonnanceur de rejeu n'est ajouté. Les notifications externes partiellement envoyées ne bénéficient pas d'une garantie exactement-une-fois ; `COMPLETED` ne prouve pas leur réception. Les anciens événements ambigus nécessitent une réconciliation séparée. Au moment de ce commit, déploiement et migration de production restent à vérifier.
+
 ### Reprise Stripe après un traitement partiel — 10 septembre
 
 - Blocage reproduit sur le véritable handler et PostgreSQL local : `invoice.payment_failed` écrit dans `billing_events`, puis la notification simulée échoue. La réservation webhook est retirée, mais la ligne financière reste. Une nouvelle livraison du même événement échouait alors en `P2002` avant de pouvoir reprendre.

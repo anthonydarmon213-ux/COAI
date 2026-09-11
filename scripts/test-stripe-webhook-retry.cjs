@@ -22,7 +22,18 @@ let notifications = 0;
 let failNotification = true;
 let failSubscriptionUpdate = false;
 let invoicePaid = false;
+let stealCompletion = false;
 const handlerPrisma = new Proxy(prisma, { get(target, key) {
+  if (key === 'stripeWebhookEvent') return new Proxy(target[key], { get(delegate, method) {
+    if (method !== 'updateMany') return delegate[method];
+    return async args => {
+      if (stealCompletion && args.data.state === 'COMPLETED') {
+        stealCompletion = false;
+        await delegate.update({where:{id:args.where.id},data:{leaseToken:'new-owner-fixture'}});
+      }
+      return delegate.updateMany(args);
+    };
+  } });
   if (key !== 'subscription') return target[key];
   return new Proxy(target.subscription, { get(delegate, method) {
     if (method !== 'updateMany') return delegate[method];
@@ -33,6 +44,7 @@ const handlerPrisma = new Proxy(prisma, { get(target, key) {
   } });
 } });
 const deps = {
+  'node:crypto': { randomUUID },
   'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
   '@/lib/stripe/client': { stripe: { webhooks: sdk.webhooks,
     subscriptions: { retrieve: async () => ({ id: `sub_${id}`, customer: `cus_${id}`, status: 'past_due', latest_invoice: `in_${id}` }) },
@@ -67,7 +79,9 @@ async function main() {
     if (process.argv.includes('--probe-interrupted-reservation')) {
       // Persisted state left when a process stops after reserving the event,
       // before entering its business handler. Do not kill a shared process.
-      await prisma.stripeWebhookEvent.create({ data: { id, type: event.type } });
+      await prisma.stripeWebhookEvent.create({ data: { id, type: event.type,
+        state: 'PROCESSING', leaseToken: 'interrupted-fixture',
+        leaseUntil: new Date(Date.now()+300000), attempts: 1 } });
       failNotification = false;
       const resumed = await box.exports.POST(request());
       const ledgerCount = await prisma.billingEvent.count({ where: { id } });
@@ -75,11 +89,37 @@ async function main() {
         duplicate: resumed.body.duplicate === true, ledgerCount, notifications }));
       if (ledgerCount === 0) assert.notEqual(resumed.status, 200,
         'BLOCKER: interrupted reservation acknowledged although processing never ran');
+      assert.equal(resumed.status,503);
+      await prisma.stripeWebhookEvent.update({where:{id},data:{leaseUntil:new Date(Date.now()-1000)}});
+      const recovered = await Promise.all([box.exports.POST(request()),box.exports.POST(request())]);
+      assert.ok(recovered.some(r=>r.status===200));
+      assert.ok(recovered.every(r=>r.status===200 || r.status===503));
+      assert.equal(await prisma.billingEvent.count({where:{id}}),1);
+      assert.equal(notifications,1);
+      const finished = await prisma.stripeWebhookEvent.findUniqueOrThrow({where:{id}});
+      assert.equal(finished.state,'COMPLETED');
+      assert.equal(finished.attempts,2);
+      assert.equal(finished.leaseToken,null);
+      assert.ok(finished.completedAt);
+      assert.equal((await box.exports.POST(request())).body.duplicate,true);
+      assert.equal(notifications,1);
+      await prisma.stripeWebhookEvent.create({data:{id:paidId,type:event.type}});
+      assert.equal((await box.exports.POST(request(undefined,{...event,id:paidId}))).body.duplicate,true);
+      assert.equal(notifications,1,'Historical ambiguous rows must not be replayed');
+      await prisma.stripeWebhookEvent.delete({where:{id:paidId}});
+      stealCompletion = true;
+      await assert.rejects(box.exports.POST(request(undefined,{...event,id:paidId})), /lease lost/);
+      const protectedOwner = await prisma.stripeWebhookEvent.findUniqueOrThrow({where:{id:paidId}});
+      assert.equal(protectedOwner.state,'PROCESSING');
+      assert.equal(protectedOwner.leaseToken,'new-owner-fixture');
+      assert.equal(protectedOwner.completedAt,null);
+      console.log('PASS stale completion and failure cannot overwrite a newer lease owner');
+      console.log('PASS: active lease returns 503; expired interruption reclaimed by one caller; completed and historical events not replayed');
       return;
     }
     await assert.rejects(box.exports.POST(request()), /Simulated notification outage/);
     assert.equal(await prisma.billingEvent.count({ where: { id } }), 1, 'Financial entry survives notification failure');
-    assert.equal(await prisma.stripeWebhookEvent.count({ where: { id } }), 0, 'Failed delivery remains retryable');
+    assert.equal((await prisma.stripeWebhookEvent.findUniqueOrThrow({ where: { id } })).state, 'FAILED', 'Failed delivery remains retryable');
     failNotification = false;
     const retried = await box.exports.POST(request());
     assert.equal(retried.status, 200, 'Same signed event must recover after partial processing');
