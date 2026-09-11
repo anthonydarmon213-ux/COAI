@@ -1,5 +1,9 @@
 # COAI — prototype SwiftUI
 
+Un projet Xcode de pilote connecté est maintenant préparé dans `../ios/`.
+Voir `../ios/README.md` pour son état réel et ses limites. Ce fichier conserve
+les instructions du prototype isolé historique, non inclus dans la cible iOS.
+
 Source de prototype, pas une application compilée ou distribuable. iOS 16 minimum.
 
 ## Ouvrir
