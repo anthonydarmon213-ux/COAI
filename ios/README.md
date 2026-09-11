@@ -62,8 +62,11 @@ bash scripts/check-ios.sh --simulator
 swift test --package-path ios  # nécessite XCTest fourni avec Xcode
 ```
 
-Le premier script vérifie la logique Foundation, la syntaxe Swift et les fichiers
-de projet, **pas les types UIKit/SwiftUI/WebKit ni le rendu**. `--simulator`
+Le premier script vérifie la logique Foundation, la syntaxe Swift, les fichiers
+de projet et la compilation réelle des règles par WebKit macOS, sans charger
+d'URL. Ce dernier contrôle détecte les expressions que NSRegularExpression
+accepte mais que WebKit refuse (notamment les alternatives `|`). Il ne teste
+**pas le rendu iOS ni l'efficacité réseau des règles dans l'app**. `--simulator`
 échoue explicitement si Xcode complet manque. Le projet n'ajoute aucune dépendance
 payante et ne contient pas de SDK publicitaire natif.
 
@@ -98,13 +101,19 @@ payante et ne contient pas de SDK publicitaire natif.
 - Compte Apple individuel d'Anthony, bundle enregistré, signature, archive,
   fiche App Store, compte de démonstration pour Apple, TestFlight puis revue.
 
-## État vérifié le 10 septembre 2026
+## État vérifié le 11 septembre 2026
 
-35 contrôles exécutables Foundation réussis (navigation, achats connus, minuteur).
-Syntaxe Swift, plist, fichier projet et XML du schéma vérifiables sans Xcode.
-`swift test` ne peut pas lancer XCTest avec les seuls Command Line Tools.
-Installation de Xcode interrompue par le verrouillage du Mac : aucune compilation
-iOS, capture native, installation iPhone, utilisation de compte réel ni soumission.
+- Xcode 26.6 (17F113) installé et initialisé ; licence acceptée par l'utilisateur.
+- 38 contrôles Foundation réussis et 5 tests XCTest réussis via `swift test`.
+- Compilation des règles par le vrai moteur WebKit macOS réussie après correction
+  d'une alternative regex non prise en charge. Aucun chargement réseau dans ce test.
+- Vérification des types des cinq sources Swift avec le SDK iPhone Simulator 26.5
+  réussie (`swiftc -typecheck`, cible arm64 iOS 16).
+- Compilation Next.js, TypeScript, lint et audit des médias réussis ; avertissements
+  préexistants img/OTel/Edge, sans erreur bloquante.
+- `xcodebuild` reste bloqué par l'absence du composant iOS 26.5. Téléchargement du
+  runtime simulateur arm64 lancé (8,52 Go). Aucun binaire installé ou rendu iPhone
+  validé à ce stade ; aucune utilisation de compte réel ni soumission Apple.
 
 Références :
 - https://developer.apple.com/documentation/webkit/wkwebview/

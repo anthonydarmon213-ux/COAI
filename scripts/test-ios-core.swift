@@ -30,10 +30,10 @@ struct IOSCoreChecks {
         func blockedResource(_ value: String) -> Bool {
             expressions.contains { $0.firstMatch(in: value, range: NSRange(value.startIndex..., in: value)) != nil }
         }
-        for value in ["https://coai.fr/api/stripe/checkout", "https://www.coai.fr/api/stripe/checkout-programme", "https://coai.fr/api/stripe/portal", "https://checkout.stripe.com/c/pay/test", "https://js.stripe.com/v3/"] {
+        for value in ["https://coai.fr/api/stripe", "https://coai.fr/api/stripe?test=1", "https://coai.fr/api/stripe/checkout", "https://www.coai.fr/api/stripe/checkout-programme", "https://coai.fr/api/stripe/portal", "https://checkout.stripe.com/c/pay/test", "https://js.stripe.com/v3/"] {
             check(blockedResource(value), "payment resource regex")
         }
-        for value in ["https://coai.fr/api/programmes", "https://coai.fr/api/compte/delete", "https://coai.fr/videos/crunch.mp4"] {
+        for value in ["https://coai.fr/api/striped-shirt", "https://coai.fr/api/programmes", "https://coai.fr/api/compte/delete", "https://coai.fr/videos/crunch.mp4"] {
             check(!blockedResource(value), "non-payment resources remain accessible")
         }
         let now = Date(timeIntervalSince1970: 1000)
