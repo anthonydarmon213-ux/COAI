@@ -1,6 +1,7 @@
 # COAI — pilote iPhone connecté (préparation technique)
 
-**Pas encore compilé pour iOS, ni testé sur iPhone, ni prêt pour TestFlight/App Store.**
+**Compilé et lancé sur simulateur iPhone ; pas encore testé sur iPhone physique,
+ni prêt pour TestFlight/App Store.**
 Le projet remplace la manipulation manuelle décrite dans `ios-prototype/README.md`.
 Le prototype historique reste conservé mais n'est pas inclus dans la cible iOS.
 
@@ -89,7 +90,7 @@ payante et ne contient pas de SDK publicitaire natif.
 
 ## Ce qui manque à une soumission Apple
 
-- Compilation Xcode, tests simulateur/appareil et corrections issues de ces tests.
+- Tests interactifs simulateur/appareil et corrections issues de ces tests.
 - Icône App Store 1024, catalogue d'assets et captures d'écran réelles de l'app.
 - Audit des données réellement collectées via les pages web, manifestes de
   confidentialité (dont UserDefaults), déclarations App Privacy, tracking/ATT
@@ -111,9 +112,17 @@ payante et ne contient pas de SDK publicitaire natif.
   réussie (`swiftc -typecheck`, cible arm64 iOS 16).
 - Compilation Next.js, TypeScript, lint et audit des médias réussis ; avertissements
   préexistants img/OTel/Edge, sans erreur bloquante.
-- `xcodebuild` reste bloqué par l'absence du composant iOS 26.5. Téléchargement du
-  runtime simulateur arm64 lancé (8,52 Go). Aucun binaire installé ou rendu iPhone
-  validé à ce stade ; aucune utilisation de compte réel ni soumission Apple.
+- Runtime iOS 26.5 (23F77) arm64 installé (8,52 Go). La commande
+  `bash scripts/check-ios.sh --simulator` termine avec `BUILD SUCCEEDED`.
+- Binaire `ios/DerivedData/Build/Products/Debug-iphonesimulator/COAI.app` installé
+  et lancé avec `simctl` sur iPhone 17 Pro, identifiant
+  `2F58C22F-970F-4E9E-AD75-ABEE1D53A158`. Démarrage de `fr.coai.mobile` réussi.
+- Capture réelle du simulateur inspectée : page de connexion COAI chargée,
+  barre native Séance / RepCount / Repos / Compte visible, pas d'erreur affichée.
+  Preuve locale : `/tmp/coai-ios-first-launch-20260911.png` (fichier temporaire).
+- Les interactions, le parcours connecté, les vidéos et le minuteur dans l'UI
+  restent à tester : contrôle de l'interface bloqué par le verrouillage du Mac.
+  Aucun compte réel utilisé, achat, installation physique ou envoi Apple effectué.
 
 Références :
 - https://developer.apple.com/documentation/webkit/wkwebview/
