@@ -64,6 +64,19 @@ async function main() {
     await prisma.subscription.create({ data: { userId, stripeCustomerId: `cus_${id}`, stripeSubscriptionId: `sub_${id}`, status: 'PAST_DUE', plan: 'PASS_IA' } });
     assert.equal((await box.exports.POST(request('invalid'))).status, 400);
     assert.equal(await prisma.stripeWebhookEvent.count({ where: { id } }), 0);
+    if (process.argv.includes('--probe-interrupted-reservation')) {
+      // Persisted state left when a process stops after reserving the event,
+      // before entering its business handler. Do not kill a shared process.
+      await prisma.stripeWebhookEvent.create({ data: { id, type: event.type } });
+      failNotification = false;
+      const resumed = await box.exports.POST(request());
+      const ledgerCount = await prisma.billingEvent.count({ where: { id } });
+      console.log(JSON.stringify({ probe: 'interrupted-reservation', status: resumed.status,
+        duplicate: resumed.body.duplicate === true, ledgerCount, notifications }));
+      if (ledgerCount === 0) assert.notEqual(resumed.status, 200,
+        'BLOCKER: interrupted reservation acknowledged although processing never ran');
+      return;
+    }
     await assert.rejects(box.exports.POST(request()), /Simulated notification outage/);
     assert.equal(await prisma.billingEvent.count({ where: { id } }), 1, 'Financial entry survives notification failure');
     assert.equal(await prisma.stripeWebhookEvent.count({ where: { id } }), 0, 'Failed delivery remains retryable');
@@ -98,4 +111,4 @@ async function main() {
     await prisma.$disconnect();
   }
 }
-main().catch(error => { console.error(error.code ?? error.message); process.exitCode = 1; });
+main().catch(error => { console.error(error.code ?? 'ERROR', error.message); process.exitCode = 1; });

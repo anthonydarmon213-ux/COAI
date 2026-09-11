@@ -2,6 +2,25 @@
 
 Le parcours complet n'est pas encore validé. Une compilation réussie ne prouve ni un paiement, ni une activation, ni une séance réelle.
 
+## Reprise après interruption brutale — 11 septembre, blocage reproduit
+
+- Sonde explicite : `node scripts/test-stripe-webhook-retry.cjs --local --probe-interrupted-reservation`.
+  Elle utilise le vrai handler signé et PostgreSQL loopback ; une réservation
+  fictive précréée représente l'état persistant laissé avant le traitement métier.
+  Aucun processus partagé n'est interrompu, aucun appel Stripe/email réel effectué.
+- Résultat actuel : HTTP 200, `duplicate: true`, zéro écriture financière et zéro
+  notification. La sonde échoue volontairement sur cette preuve, ce n'est pas un
+  contrôle vert. Les fixtures aléatoires sont nettoyées dans `finally`.
+- La table actuelle ne distingue pas réservation en cours et traitement terminé.
+  Supprimer arbitrairement les anciennes lignes risquerait de rejouer des effets
+  déjà effectués. Aucun nettoyage ou changement de données de production réalisé.
+- Autorisation de migration de production demandée à Anthony : état explicite,
+  réservation bornée/reprise, puis traitement des effets partiels et concurrence.
+  Le correctif et sa réception réelle restent non livrés/non prouvés.
+- Relances essentielles, Checkout abandonné, première valeur et essai : les quatre
+  scripts existants repassent le 11 septembre. Les fournisseurs restent simulés ;
+  cela ne prouve ni l'exécution des crons en production ni la réception en boîte mail.
+
 ## Bibliothèque et coût des programmes — décision confirmée, 10 septembre
 
 - Accord explicite d'Anthony : bibliothèque pour toutes les offres, aucune génération IA payante automatique, relecture sur demande ou pour les situations hors cadre, anciennes attentes conservées. Décision inscrite dans AGENTS.md.
