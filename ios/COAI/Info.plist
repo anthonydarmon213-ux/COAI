@@ -11,6 +11,10 @@
     <key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
     <key>LSRequiresIPhoneOS</key><true/>
+    <key>CFBundleURLTypes</key><array><dict>
+        <key>CFBundleURLName</key><string>fr.coai.mobile.auth</string>
+        <key>CFBundleURLSchemes</key><array><string>fr.coai.mobile</string></array>
+    </dict></array>
     <key>NSCameraUsageDescription</key><string>COAI utilise l’appareil photo lorsque tu choisis de prendre une photo ou une vidéo pour ton suivi.</string>
     <key>NSPhotoLibraryUsageDescription</key><string>COAI accède aux photos que tu choisis d’ajouter à ton profil ou à ton suivi.</string>
     <key>NSMicrophoneUsageDescription</key><string>Le microphone peut être utilisé lorsque tu choisis d’enregistrer une vidéo avec du son pour ton suivi.</string>

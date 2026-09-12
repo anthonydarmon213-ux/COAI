@@ -1,8 +1,9 @@
 import SwiftUI
 import WebKit
+import AuthenticationServices
 
 @MainActor
-final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
+final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate, ASWebAuthenticationPresentationContextProviding {
     @Published private(set) var webView: WKWebView
     @Published private(set) var sessionViewID = UUID()
     @Published var isLoading = false
@@ -14,6 +15,46 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     var alertResponse: (() -> Void)?
     @Published var externalURL: URL?
     private var starting = false
+    private var authenticationSession: ASWebAuthenticationSession?
+    private var authenticationAttempt: UUID?
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        webView.window ?? ASPresentationAnchor()
+    }
+
+    private func cancelAuthentication() {
+        authenticationAttempt = nil
+        authenticationSession?.cancel()
+        authenticationSession = nil
+    }
+
+    private func authenticate(_ request: (authorize: URL, exchange: URL)) {
+        guard authenticationSession == nil, webView.window != nil else { return }
+        let attempt = UUID()
+        authenticationAttempt = attempt
+        let session = ASWebAuthenticationSession(url: request.authorize, callbackURLScheme: NativeOAuth.callback.scheme) { [weak self] returned, error in
+            Task { @MainActor in
+                guard let self, self.authenticationAttempt == attempt else { return }
+                self.authenticationAttempt = nil
+                self.authenticationSession = nil
+                if error == nil, let returned,
+                   let exchange = NativeOAuth.exchangeURL(returned, original: request.exchange) {
+                    // Exchange happens in the original cookie store, using its PKCE verifier.
+                    self.load(exchange)
+                } else {
+                    self.open(path: "/sign-in")
+                    self.notice = "Connexion Google interrompue. Tu peux réessayer."
+                }
+            }
+        }
+        session.presentationContextProvider = self
+        authenticationSession = session
+        if !session.start() {
+            cancelAuthentication()
+            open(path: "/sign-in")
+            notice = "La connexion Google n’a pas pu démarrer. Réessaie."
+        }
+    }
     private var installedRules: WKContentRuleList?
     private var lastRequestedURL = NavigationPolicy.baseURL.appendingPathComponent("programme/entrainement")
 
@@ -66,6 +107,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     func open(path: String) {
+        cancelAuthentication()
         guard isReady, let url = URL(string: path, relativeTo: NavigationPolicy.baseURL)?.absoluteURL,
               NavigationPolicy.decide(url) == .inside else { return }
         load(url)
@@ -79,6 +121,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     func retry() {
+        cancelAuthentication()
         if !isReady { Task { await start() }; return }
         // Never replay a POST on an error/reload. Reopen only a normal page with GET.
         let current = webView.url
@@ -97,6 +140,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     func clearLocalSession() {
+        cancelAuthentication()
         guard isReady else { return }
         isReady = false
         isLoading = true
@@ -129,6 +173,16 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         guard let url = action.request.url else { decisionHandler(.cancel); return }
         // Media embeds are not top-level navigation. Remote payment resources are blocked by content rules.
         if action.targetFrame?.isMainFrame == false { decisionHandler(.allow); return }
+        if url.host == NativeOAuth.authHost {
+            decisionHandler(.cancel)
+            isLoading = false
+            if action.sourceFrame.isMainFrame,
+               action.sourceFrame.securityOrigin.protocol == "https",
+               ["coai.fr", "www.coai.fr"].contains(action.sourceFrame.securityOrigin.host),
+               let request = NativeOAuth.request(url) { authenticate(request) }
+            else { notice = "Ce lien de connexion n’est pas reconnu. Reviens à la connexion et réessaie." }
+            return
+        }
         switch NavigationPolicy.decide(url) {
         case .inside:
             if action.targetFrame == nil {

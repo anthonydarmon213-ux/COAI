@@ -2,6 +2,27 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testNativeGooglePKCE() {
+        var parts = URLComponents(string: "https://fczkfddfgooocqqkqsqw.supabase.co/auth/v1/authorize")!
+        parts.queryItems = [URLQueryItem(name: "provider", value: "google"),
+            URLQueryItem(name: "code_challenge_method", value: "s256"),
+            URLQueryItem(name: "code_challenge", value: String(repeating: "a", count: 43)),
+            URLQueryItem(name: "redirect_to", value: "https://coai.fr/auth/callback?redirect_to=%2Fsuivi%2Frepcount")]
+        let request = NativeOAuth.request(parts.url!)!
+        XCTAssertTrue(request.authorize.absoluteString.contains("fr.coai.mobile"))
+        let result = NativeOAuth.exchangeURL(URL(string: "fr.coai.mobile://auth/callback?code=one-use-code")!, original: request.exchange)!
+        XCTAssertEqual(URLComponents(url: result, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "/suivi/repcount")
+        for invalid in ["fr.coai.mobile://evil/callback?code=a", "fr.coai.mobile://auth/callback?code=a&code=b", "fr.coai.mobile://auth/callback#access_token=x", "fr.coai.mobile://auth/callback?error=denied", "https://coai.fr/auth/callback?code=a"] {
+            XCTAssertNil(NativeOAuth.exchangeURL(URL(string: invalid)!, original: request.exchange))
+        }
+        parts.host = "evil.example"
+        XCTAssertNil(NativeOAuth.request(parts.url!))
+        parts.host = NativeOAuth.authHost
+        parts.queryItems?.append(URLQueryItem(name: "provider", value: "google"))
+        XCTAssertNil(NativeOAuth.request(parts.url!))
+        parts.queryItems = [URLQueryItem(name: "provider", value: "google")]
+        XCTAssertNil(NativeOAuth.request(parts.url!))
+    }
     func testCOAIRoutes() {
         for path in ["/login", "/programme/entrainement", "/suivi/repcount", "/compte/parametres", "/auth/callback?code=test"] {
             XCTAssertEqual(NavigationPolicy.decide(URL(string: "https://coai.fr" + path)!), .inside)

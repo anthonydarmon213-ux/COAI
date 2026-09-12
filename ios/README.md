@@ -71,6 +71,29 @@ accepte mais que WebKit refuse (notamment les alternatives `|`). Il ne teste
 échoue explicitement si Xcode complet manque. Le projet n'ajoute aucune dépendance
 payante et ne contient pas de SDK publicitaire natif.
 
+## Retour Google — correctif du 12 septembre 2026
+
+Le pilote intercepte uniquement la navigation Google PKCE S256 initiée par la
+page principale COAI vers son projet Supabase. `ASWebAuthenticationSession`
+remplace l'ouverture générique de Safari. Le retour attendu est exactement
+`fr.coai.mobile://auth/callback` : ajouter cette URL à la liste des redirections
+Supabase, sans wildcard ni remplacement des URL web. Anthony a autorisé cette
+configuration le 12 septembre ; elle a été enregistrée et relue dans le tableau
+de bord : trois URL autorisées, les deux URL web et Site URL inchangées.
+
+Le code à usage unique revient dans le WKWebView d'origine vers `/auth/callback`.
+Le vérificateur PKCE reste dans ses cookies ; aucun jeton de session n'est lu,
+copié depuis Safari ou injecté par Swift. La route web existante échange le code
+et vérifie l'utilisateur. Annulation ou retour invalide réouvre la connexion ;
+une réponse d'une tentative annulée est ignorée. Ce mécanisme ne traite pas
+encore les liens email ni Sign in with Apple. Un changement de projet Supabase
+demande une mise à jour de l'hôte explicitement autorisé dans le pilote.
+
+Tests Foundation : URL Google valide, destination conservée, hôte usurpé,
+absence de PKCE, paramètres dupliqués, erreur, fragment/token et mauvais schéma
+rejetés. Compilation simulateur réussie. L'aller-retour réel Google, annulation
+dans l'interface et session après relance restent à vérifier avant distribution.
+
 ## Tests manuels bloquants avant TestFlight
 
 - Compte de test expressément autorisé : connexion email/mot de passe, relance
