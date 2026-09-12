@@ -16,7 +16,8 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     @Published var externalURL: URL?
     private var starting = false
     private var authenticationSession: ASWebAuthenticationSession?
-    private var authenticationAttempt: UUID?
+    private var authenticationAttempt: OAuthAttempt?
+    private var authenticationTimeout: Task<Void, Never>?
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         webView.window ?? ASPresentationAnchor()
@@ -24,18 +25,32 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
 
     private func cancelAuthentication() {
         authenticationAttempt = nil
+        authenticationTimeout?.cancel()
+        authenticationTimeout = nil
         authenticationSession?.cancel()
         authenticationSession = nil
     }
 
+    private func expireAuthentication(_ attempt: OAuthAttempt) {
+        guard authenticationAttempt == attempt else { return }
+        // Invalidate before cancelling: the old session callback must not reset a new attempt.
+        cancelAuthentication()
+        open(path: "/sign-in")
+        notice = "Cette tentative de connexion a dépassé 9 minutes. Relance « Continuer avec Google » pour obtenir un nouveau lien sécurisé."
+    }
+
     private func authenticate(_ request: (authorize: URL, exchange: URL)) {
         guard authenticationSession == nil, webView.window != nil else { return }
-        let attempt = UUID()
+        let attempt = OAuthAttempt()
         authenticationAttempt = attempt
         let session = ASWebAuthenticationSession(url: request.authorize, callbackURLScheme: NativeOAuth.callback.scheme) { [weak self] returned, error in
             Task { @MainActor in
                 guard let self, self.authenticationAttempt == attempt else { return }
+                // Also check the deadline after background suspension, before exchanging a code.
+                guard !attempt.expired() else { self.expireAuthentication(attempt); return }
                 self.authenticationAttempt = nil
+                self.authenticationTimeout?.cancel()
+                self.authenticationTimeout = nil
                 self.authenticationSession = nil
                 if error == nil, let returned,
                    let exchange = NativeOAuth.exchangeURL(returned, original: request.exchange) {
@@ -53,6 +68,13 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             cancelAuthentication()
             open(path: "/sign-in")
             notice = "La connexion Google n’a pas pu démarrer. Réessaie."
+        } else {
+            authenticationTimeout = Task { @MainActor [weak self] in
+                do { try await Task.sleep(nanoseconds: UInt64(OAuthAttempt.duration * 1_000_000_000)) }
+                catch { return }
+                guard !Task.isCancelled else { return }
+                self?.expireAuthentication(attempt)
+            }
         }
     }
     private var installedRules: WKContentRuleList?

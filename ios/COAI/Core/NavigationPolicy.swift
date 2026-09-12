@@ -1,5 +1,15 @@
 import Foundation
 
+/// Local UX deadline, not a change to Supabase's token/state expiry policy.
+struct OAuthAttempt: Equatable {
+    static let duration: TimeInterval = 9 * 60
+    let id = UUID()
+    let deadline: Date
+
+    init(now: Date = Date()) { deadline = now.addingTimeInterval(Self.duration) }
+    func expired(at now: Date = Date()) -> Bool { now >= deadline }
+}
+
 /// Only the COAI Supabase Google PKCE flow may enter the system auth browser.
 /// The verifier remains in WKWebView cookies; native code never reads session tokens.
 enum NativeOAuth {

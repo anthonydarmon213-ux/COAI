@@ -96,11 +96,21 @@ dans l'interface et session après relance restent à vérifier avant distributi
 
 ## Tests manuels bloquants avant TestFlight
 
+Diagnostic du 12 septembre : les logs Auth confirment `OAuth state has expired`
+à 08:42:16 Paris, après un départ à 08:31:54. Le callback natif était bien stocké,
+mais aucun code n'a été émis. Un garde-fou local de 9 minutes annule désormais
+la fenêtre système et réouvre la connexion avec une explication, sans relancer
+Google automatiquement. Le callback vérifie aussi l'échéance après suspension.
+Chaque tentative possède son identifiant ; annulation/réussite annule le délai
+et les réponses tardives sont ignorées. Aucune durée serveur ni protection PKCE
+n'est modifiée. Tests unitaires de borne, reprise tardive et isolation ajoutés.
+L'expiration réelle dans l'UI et une connexion Google réussie restent à vérifier.
+
 - Compte de test expressément autorisé : connexion email/mot de passe, relance
   à froid, déconnexion, sessions expirées. Aucun vrai paiement pour tester.
-- OAuth Google/Apple et liens email : pas de retour universel configuré dans
-  ce lot. Ne pas les déclarer pris en charge ; implémenter et tester le mécanisme
-  d'authentification système, les callbacks et Sign in with Apple si requis.
+- OAuth Google : mécanisme système et callback PKCE implémentés ; succès réel,
+  annulation, expiration et relance à vérifier. Apple et liens email restent
+  à implémenter/tester ; aucun retour universel configuré dans ce lot.
 - Séance : bon utilisateur, programme autorisé, médias exacts, vidéo jouable,
   PDF/partage/téléchargement et formulaires clavier. Export PDF natif non implémenté.
 - RepCount : enregistrement unique et relecture serveur, pas seulement affichage.

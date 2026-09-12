@@ -2,6 +2,17 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testOAuthAttemptDeadlineAndIsolation() {
+        let start = Date(timeIntervalSince1970: 1000)
+        let attempt = OAuthAttempt(now: start)
+        XCTAssertFalse(attempt.expired(at: start))
+        XCTAssertFalse(attempt.expired(at: start.addingTimeInterval(539.999)))
+        XCTAssertTrue(attempt.expired(at: start.addingTimeInterval(540)))
+        XCTAssertTrue(attempt.expired(at: start.addingTimeInterval(3600)))
+        XCTAssertNotEqual(attempt, OAuthAttempt(now: start))
+        let next = OAuthAttempt(now: start.addingTimeInterval(540))
+        XCTAssertFalse(next.expired(at: start.addingTimeInterval(540)))
+    }
     func testNativeGooglePKCE() {
         var parts = URLComponents(string: "https://fczkfddfgooocqqkqsqw.supabase.co/auth/v1/authorize")!
         parts.queryItems = [URLQueryItem(name: "provider", value: "google"),
