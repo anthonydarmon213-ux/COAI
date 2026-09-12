@@ -1,110 +1,59 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { urlPosterVideoCoai, urlVideoCoai, videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 
 export function ExerciceVideo({ nom, className = "" }: { nom: string; className?: string }) {
-  const conteneurRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [procheEcran, setProcheEcran] = useState(false);
-  // Safari peut refuser la lecture automatique sans jamais lever d'erreur ni
-  // emettre canplay : on surveille donc l'avancee reelle de currentTime plutot
-  // que de faire confiance aux evenements.
-  const [bloquee, setBloquee] = useState(false);
   const video = videoCoaiPourNom(nom);
-
-  useEffect(() => {
-    const element = conteneurRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entree]) => {
-        if (entree?.isIntersecting) {
-          setProcheEcran(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "300px" }
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  const lancer = useCallback(() => {
-    const element = videoRef.current;
-    if (!element) return;
-    const promesse = element.play();
-    if (promesse) promesse.then(() => setBloquee(false)).catch(() => setBloquee(true));
-  }, []);
-
-  // Chien de garde : si l'image n'a pas avance, la lecture n'a pas demarre.
-  useEffect(() => {
-    if (!procheEcran) return;
-    lancer();
-    const element = videoRef.current;
-    if (!element) return;
-    const depart = element.currentTime;
-    const minuteur = window.setTimeout(() => {
-      if (element.paused || element.currentTime === depart) setBloquee(true);
-    }, 1200);
-    return () => window.clearTimeout(minuteur);
-  }, [procheEcran, lancer]);
-
-  const basculer = useCallback(() => {
-    const element = videoRef.current;
-    if (!element) return;
-    if (element.paused) lancer();
-    else element.pause();
-  }, [lancer]);
-
   if (!video) return null;
+  return <LecteurVideo key={video.fichier} video={video} className={className} />;
+}
+
+function LecteurVideo({ video, className }: {
+  video: NonNullable<ReturnType<typeof videoCoaiPourNom>>;
+  className: string;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [erreur, setErreur] = useState(false);
+
+  function reessayer() {
+    const element = videoRef.current;
+    if (!element) return;
+    setErreur(false);
+    element.load();
+    // Keep play() inside the user gesture required by WKWebView.
+    void element.play().catch(() => setErreur(true));
+  }
 
   return (
-    <figure ref={conteneurRef} className={`overflow-hidden rounded-lg border border-cyan-300/20 bg-black ${className}`}>
-      <div className="relative">
-        {procheEcran ? (
+    <figure className={`overflow-hidden rounded-lg border border-cyan-300/20 bg-black ${className}`}>
+      {/* Native controls work without IntersectionObserver or hydration.
+          No overlay intercepts taps; the catalogue does not autoplay videos. */}
           <video
             ref={videoRef}
             className="h-44 w-full bg-black object-contain"
             src={urlVideoCoai(video.fichier)}
             poster={urlPosterVideoCoai(video.fichier)}
-            preload="auto"
-            autoPlay
-            muted
-            loop
+            preload="none"
+            controls
             playsInline
-            onLoadedData={lancer}
-            onCanPlay={lancer}
-            onPlaying={() => setBloquee(false)}
+            onError={() => setErreur(true)}
+            onPlaying={() => setErreur(false)}
             aria-label={`Démonstration réelle : ${video.description}`}
-          />
-        ) : (
-          <img
-            className="h-44 w-full bg-black object-contain"
-            src={urlPosterVideoCoai(video.fichier)}
-            alt={`Démonstration COAI : ${video.description}`}
-            loading="lazy"
-          />
-        )}
-        <button
-          type="button"
-          onClick={basculer}
-          className={`absolute inset-0 flex items-center justify-center transition ${
-            bloquee ? "bg-black/35 hover:bg-black/20" : "bg-transparent"
-          }`}
-          aria-label={`Lire ou mettre en pause : ${video.description}`}
-        >
-          {bloquee ? (
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-cyan-300/60 bg-black/70 pl-1 text-cyan-200">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </span>
-          ) : null}
-        </button>
-      </div>
+          >
+            <a href={urlVideoCoai(video.fichier)}>Ouvrir la vidéo de démonstration</a>
+          </video>
+      {erreur && (
+        <div role="status" className="space-y-2 px-3 py-3 text-sm text-graphite-200">
+          <p>La vidéo n’a pas pu démarrer. Vérifie ta connexion puis réessaie.</p>
+          <button type="button" onClick={reessayer} className="rounded-lg border border-cyan-300/40 px-3 py-2 text-cyan-200">
+            Réessayer la vidéo
+          </button>
+        </div>
+      )}
       <figcaption className="border-t border-white/[0.06] px-2.5 py-1.5 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-cyan-200/80">
         Démonstration COAI · {video.description}
+        <span className="mt-1 block normal-case tracking-normal">Appuie sur lecture pour voir le mouvement.</span>
       </figcaption>
     </figure>
   );
