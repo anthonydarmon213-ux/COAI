@@ -16,11 +16,13 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function SeanceDuJourHero({
+  userId,
   contenu,
   photosParExercice,
   dureeProfil,
   premiereSeance = false,
 }: {
+  userId?: string;
   contenu: unknown;
   photosParExercice?: Record<string, string | null>;
   dureeProfil?: number | null;
@@ -81,6 +83,7 @@ export function SeanceDuJourHero({
 
         <div className="mt-4">
           <DemarrerSeanceButton
+            userId={userId}
             nomSeance={nom}
             echauffement={echauffement}
             exercices={exercices}

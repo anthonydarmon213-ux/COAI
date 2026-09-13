@@ -4,17 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { SeanceRunner } from "@/components/programme/seance-runner";
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
+import { sessionDraftKey } from "@/lib/programmes/draft-key";
 
 // Bouton client isolé (21/08/2026) : entrainement-view.tsx reste un
 // composant serveur, seul ce déclencheur + le lecteur plein écran ont
 // besoin d'état côté client — évite de convertir toute la vue.
 export function DemarrerSeanceButton({
+  userId,
   nomSeance,
   echauffement,
   exercices,
   retourAuCalme,
   photosParExercice,
 }: {
+  userId?: string;
   nomSeance: string;
   echauffement?: string;
   exercices: unknown[];
@@ -24,6 +27,7 @@ export function DemarrerSeanceButton({
   const [ouvert, setOuvert] = useState(false);
   const [monte, setMonte] = useState(false);
   const lecteurRef = useRef<HTMLDivElement>(null);
+  const cleBrouillon = sessionDraftKey(userId, nomSeance, exercices, echauffement, retourAuCalme);
 
   useEffect(() => setMonte(true), []);
   useEffect(() => {
@@ -77,6 +81,8 @@ export function DemarrerSeanceButton({
       {ouvert && monte && createPortal(
         <div ref={lecteurRef} tabIndex={-1}>
         <SeanceRunner
+          key={cleBrouillon ?? nomSeance}
+          cleBrouillon={cleBrouillon}
           nomSeance={nomSeance}
           echauffement={echauffement}
           exercices={exercices}

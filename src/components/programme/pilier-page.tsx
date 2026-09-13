@@ -420,7 +420,7 @@ export async function PilierPage({
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                if (pilier === "ENTRAINEMENT") return <EntrainementView data={contenu} photosParExercice={photosParPilier[i]} dureeProfil={user.profile?.dureeSeanceMinutes} premiereSeance={premiereSeance} />;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView userId={user.id} data={contenu} photosParExercice={photosParPilier[i]} dureeProfil={user.profile?.dureeSeanceMinutes} premiereSeance={premiereSeance} />;
                 if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParPilier[i]} />;
                 if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParPilier[i]} sexe={user.profile?.sexe} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;

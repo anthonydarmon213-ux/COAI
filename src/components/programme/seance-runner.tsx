@@ -221,7 +221,6 @@ type Substitutions = Record<string, { variante: string; consigne: string }>;
 // localStorage plutôt qu'une écriture serveur : la sauvegarde doit survivre
 // à une coupure réseau en salle, et une séance en cours n'a aucune valeur
 // pour un autre appareil.
-const CLE_SEANCE = "coai:seance-en-cours";
 const EXPIRATION_H = 8; // au-delà, ce n'est plus une séance mais un oubli
 
 type SeanceSauvegardee = {
@@ -234,10 +233,10 @@ type SeanceSauvegardee = {
   nomsRealises?: Record<string, string>;
 };
 
-function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
-  if (typeof window === "undefined") return null;
+function lireSauvegarde(nomSeance: string, cle: string | null): SeanceSauvegardee | null {
+  if (typeof window === "undefined" || !cle) return null;
   try {
-    const brut = window.localStorage.getItem(CLE_SEANCE);
+    const brut = window.localStorage.getItem(cle);
     if (!brut) return null;
     const d = JSON.parse(brut) as SeanceSauvegardee;
     // On ne reprend que LA MÊME séance : restaurer la position d'une autre
@@ -250,7 +249,7 @@ function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
     if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
     if (d.nomsRealises !== undefined && (!isPlainObject(d.nomsRealises) || !Object.values(d.nomsRealises).every((v) => typeof v === "string"))) return null;
     if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
-      window.localStorage.removeItem(CLE_SEANCE);
+      window.localStorage.removeItem(cle);
       return null;
     }
     return d;
@@ -259,9 +258,10 @@ function lireSauvegarde(nomSeance: string): SeanceSauvegardee | null {
   }
 }
 
-function effacerSauvegarde() {
+function effacerSauvegarde(cle: string | null) {
+  if (!cle) return;
   try {
-    window.localStorage.removeItem(CLE_SEANCE);
+    window.localStorage.removeItem(cle);
   } catch {
     // localStorage indisponible (navigation privée, quota) : sans gravité,
     // la séance reste simplement non reprise.
@@ -269,6 +269,7 @@ function effacerSauvegarde() {
 }
 
 export function SeanceRunner({
+  cleBrouillon = null,
   nomSeance,
   echauffement,
   exercices,
@@ -276,6 +277,7 @@ export function SeanceRunner({
   photosParExercice,
   onClose,
 }: {
+  cleBrouillon?: string | null;
   nomSeance: string;
   echauffement?: string;
   exercices: unknown[];
@@ -285,7 +287,7 @@ export function SeanceRunner({
 }) {
   // Restaurer les ajustements avant de reconstruire les étapes : l'index
   // d'une séance courte ne désigne pas la même série dans la séance complète.
-  const [sauvegarde] = useState(() => lireSauvegarde(nomSeance));
+  const [sauvegarde] = useState(() => lireSauvegarde(nomSeance, cleBrouillon));
   // Ajustements en direct (22/08/2026, demande Anthony) — appliqués
   // uniquement à la séance en cours, jamais écrits dans le programme
   // généré : c'est un dépannage du jour, pas une modification du plan.
@@ -355,17 +357,17 @@ export function SeanceRunner({
   // chaque frappe serait inutilement coûteux, mais index et séries changent
   // rarement — quelques fois par minute au plus.
   useEffect(() => {
-    if (termine) return;
+    if (termine || !cleBrouillon) return;
     try {
       window.localStorage.setItem(
-        CLE_SEANCE,
+        cleBrouillon,
         JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee, nomsRealises } satisfies SeanceSauvegardee)
       );
     } catch {
       // Quota dépassé ou navigation privée : la séance continue normalement,
       // elle ne sera simplement pas reprenable.
     }
-  }, [termine, nomSeance, index, realise, substitutions, seanceCondensee, nomsRealises]);
+  }, [termine, cleBrouillon, nomSeance, index, realise, substitutions, seanceCondensee, nomsRealises]);
   const bip = useBip();
 
   const step = steps[index];
@@ -485,7 +487,7 @@ export function SeanceRunner({
       if (firstId) setPremiereSeanceId(firstId);
       // La séance est confirmée côté serveur : la reprise locale peut
       // maintenant être supprimée sans risque de perdre l'effort saisi.
-      effacerSauvegarde();
+      effacerSauvegarde(cleBrouillon);
     } catch {
       // Le bilan reste visible, mais la reprise locale est conservée et une
       // nouvelle tentative est proposée. Jamais annoncer une sauvegarde

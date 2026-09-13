@@ -88,6 +88,7 @@ export default async function SeanceDuJourPage({ searchParams }: { searchParams?
       {programme?.statut === "EN_ATTENTE" && <p className="text-sm text-amber-200">Programme non relu par le coach. La fiche est accessible ; cela ne vaut pas validation humaine.</p>}
       <div className="fiche-actions">
         <DemarrerSeanceButton
+          userId={user.id}
           key={`${nom}-${index}`}
           nomSeance={nom}
           echauffement={texte(s.echauffement) ?? undefined}
