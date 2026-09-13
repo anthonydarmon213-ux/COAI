@@ -48,12 +48,18 @@ const context = {
   drawImage: (image) => assert.equal(image.src, '/brand/coai-mark.svg'),
 };
 const { storySeance, renderStory } = load('src/lib/programmes/story-seance.ts', {
+  require: (name) => { assert.equal(name, './repos'); return load('src/lib/programmes/repos.ts'); },
   Image: class { async decode() {} },
   document: { createElement: () => (canvas = { getContext: () => context, toBlob: (callback, type) => callback({ type }) }) },
 });
 (async () => {
   const input = Array.from({ length: 7 }, (_, i) => ({ nom: `Exercice ${i}`, series: 3, repetitions: '8–12 répétitions', repos: '1 min 15 s', methode: 'Classique', charge: 'SECRET', email: 'SECRET', note: 'SECRET' }));
   const data = storySeance([...input, null, []], 'Mobilité', 'Marche lente');
+  for (const [repos, expected] of [['100 sec', '1 min 40 s'], ['75 sec', '1 min 15 s'], ['45 sec', '45 s'], ['120 s', '2 min'], ['1 min 15 s', '1 min 15 s']]) {
+    drawn = [];
+    await renderStory(storySeance([{ ...input[0], repos }], '', ''), 0);
+    assert(drawn.includes(`Repos ${expected} · Classique`), expected);
+  }
   assert.equal(data.exercices.length, 7);
   assert(!JSON.stringify(data).includes('SECRET'));
   for (let page = 0; page < 3; page++) {

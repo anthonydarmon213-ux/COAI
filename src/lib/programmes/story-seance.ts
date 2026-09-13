@@ -1,3 +1,5 @@
+import { formatRepos } from "./repos";
+
 export type StoryExercise = { nom: string; series: string; repetitions: string; repos: string; methode: string; photo?: string | null };
 export type StorySeance = { exercices: StoryExercise[]; echauffement: string; retourAuCalme: string; echauffementPhoto?: string | null; retourAuCalmePhoto?: string | null };
 
@@ -69,7 +71,7 @@ export async function renderStory(data: StorySeance, page: number): Promise<Blob
     if (!ex.photo) lines("Visuel COAI à compléter", 110, y + 95, 250, 24, "#99c6d9", 2);
     lines(`${String(page * 3 + i + 1).padStart(2, "0")}  ${ex.nom}`, 410, y + 47, 570, 32, "#ffffff", 2);
     lines([ex.series && `${ex.series}${/^\d+$/.test(ex.series) ? " séries" : ""}`, ex.repetitions].filter(Boolean).join(" · "), 410, y + 138, 570, 27, "#e1c66c", 1);
-    lines([ex.repos && `Repos ${ex.repos}`, ex.methode].filter(Boolean).join(" · "), 410, y + 178, 570, 25, "#99c6d9", 2);
+    lines([ex.repos && `Repos ${formatRepos(ex.repos)}`, ex.methode].filter(Boolean).join(" · "), 410, y + 178, 570, 25, "#99c6d9", 2);
   });
   lines("03 / RETOUR AU CALME", 88, 1435, 900, 27, "#e1c66c");
   photo(data.retourAuCalmePhoto, 88, 1460, 220, 110);
