@@ -17,6 +17,7 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { assemblerSeance, payloadSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
 import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
+import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper";
 
 const REPOS_DEFAUT = 90;
 
@@ -547,50 +548,6 @@ export function RepCount({
     await sauvegarder([maintien ? { reps: 0, charge: 0, dureeSecondes } : { reps, charge }]);
   }, [sauvegarder, reps, charge, maintien, dureeSecondes]);
 
-  const Stepper = ({
-    label,
-    valeur,
-    setValeur,
-    pas,
-    unite,
-    minimum = 0,
-  }: {
-    label: string;
-    valeur: number;
-    setValeur: (v: number) => void;
-    pas: number;
-    unite: string;
-    minimum?: number;
-  }) => (
-    <div className="flex-1">
-      <p className="text-center font-mono text-[10px] uppercase tracking-[0.16em] text-graphite-400">
-        {label}
-      </p>
-      <div className="mt-1.5 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setValeur(Math.max(minimum, +(valeur - pas).toFixed(1)))}
-          aria-label={`Diminuer ${label}`}
-          className="h-12 w-12 shrink-0 rounded-xl border border-white/12 bg-white/[0.04] text-xl font-bold text-white active:bg-white/10"
-        >
-          −
-        </button>
-        <span className="flex-1 text-center font-display text-3xl font-semibold tabular-nums text-white">
-          {valeur}
-          <span className="ml-1 text-sm font-normal text-graphite-400">{unite}</span>
-        </span>
-        <button
-          type="button"
-          onClick={() => setValeur(+(valeur + pas).toFixed(1))}
-          aria-label={`Augmenter ${label}`}
-          className="h-12 w-12 shrink-0 rounded-xl border border-white/12 bg-white/[0.04] text-xl font-bold text-white active:bg-white/10"
-        >
-          +
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <fieldset disabled={enregistrementEnCours || Boolean(userId && !draftReady)} className="flex min-w-0 flex-col gap-5">
       {premierRepereId && <TrackConversion name="first_repcount_saved" onceKey={premierRepereId} />}
@@ -718,8 +675,8 @@ export function RepCount({
       </label>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        {maintien ? <Stepper label="Maintien" valeur={dureeSecondes} setValeur={v => setDureeSecondes(Math.min(3600, v))} pas={5} unite="s" minimum={1} /> : <>
-          <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} />
+        {maintien ? <Stepper label="Maintien" valeur={dureeSecondes} setValeur={setDureeSecondes} pas={5} unite="s" minimum={1} maximum={3600} entier /> : <>
+          <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} entier />
           <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
         </>}
       </div>

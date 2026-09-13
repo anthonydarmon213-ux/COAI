@@ -37,6 +37,8 @@ assert.equal(historiqueParMesure(mixte,true)[0].meilleureSerie.dureeSecondes,30)
 // Rendu serveur du composant réel avec données fictives injectées dans ses
 // états. Complète les tests purs, sans prétendre tester les clics navigateur.
 const React = require('react');
+const stepper = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/suivi/repcount-stepper.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:stepper,require});
 const {renderToStaticMarkup} = require('react-dom/server');
 const ui = {};
 let stateIndex = 0;
@@ -49,6 +51,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
     if(name === '@/lib/suivi/historique-exercice') return exportsModule;
     if(name === '@/lib/suivi/repcount-session') return {};
     if(name === '@/lib/suivi/repcount-draft') return {};
+    if(name === '@/components/suivi/repcount-stepper') return stepper;
     if(name === '@/components/analytics/track-conversion') return {TrackConversion:()=>null};
     if(name === '@/lib/analytics/first-saved-conversion') return {firstSavedConversionId:async()=>null};
     if(name === '@/components/suivi/chandeliers-charges') return {ChandeliersCharges:()=>React.createElement('p',null,'CHARGE_CHART')};
