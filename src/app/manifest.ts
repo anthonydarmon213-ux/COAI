@@ -21,8 +21,9 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "fr",
     categories: ["health", "fitness", "lifestyle"],
     icons: [
-      { src: "/icon-coai.png", sizes: "800x800", type: "image/png", purpose: "any" },
-      { src: "/icon-coai.png", sizes: "800x800", type: "image/png", purpose: "maskable" },
+      { src: "/brand/coai-app-premium-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/brand/coai-app-premium-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/brand/coai-app-premium-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

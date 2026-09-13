@@ -54,8 +54,8 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: "/icon-coai.png",
-    apple: "/icon-coai.png",
+    icon: "/brand/coai-app-premium-32.png",
+    apple: "/brand/coai-app-premium-180.png",
   },
 };
 
