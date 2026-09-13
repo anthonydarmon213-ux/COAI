@@ -47,6 +47,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
       log('2026-09-03',[{reps:0,charge:0,dureeSecondes:20}])
     ]])[stateIndex++] ?? initial)};
     if(name === '@/lib/suivi/historique-exercice') return exportsModule;
+    if(name === '@/lib/suivi/repcount-session') return {};
     if(name === '@/components/analytics/track-conversion') return {TrackConversion:()=>null};
     if(name === '@/lib/analytics/first-saved-conversion') return {firstSavedConversionId:async()=>null};
     if(name === '@/components/suivi/chandeliers-charges') return {ChandeliersCharges:()=>React.createElement('p',null,'CHARGE_CHART')};

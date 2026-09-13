@@ -15,6 +15,7 @@ import {
 } from "@/lib/suivi/historique-exercice";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
+import { assemblerSeance, payloadSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
 
 const REPOS_DEFAUT = 90;
 
@@ -370,6 +371,9 @@ export function RepCount({
   const [dureeSecondes, setDureeSecondes] = useState(30);
   const [sets, setSets] = useState<SetSaisi[]>([]);
   const [seances, setSeances] = useState<{ date: string; exercices: unknown }[]>([]);
+  const [exercicesSeance, setExercicesSeance] = useState<ExerciceRepCount[]>([]);
+  const [notes, setNotes] = useState("");
+  const [historiqueErreur, setHistoriqueErreur] = useState(false);
   const [repos, setRepos] = useState<number | null>(null);
   const [dureeRepos, setDureeRepos] = useState(REPOS_DEFAUT);
   const [finRepos, setFinRepos] = useState<number | null>(null);
@@ -382,8 +386,14 @@ export function RepCount({
   const requeteEnCoursRef = useRef(false);
 
   const charger = useCallback(async () => {
-    const r = await fetch("/api/seances");
-    if (r.ok) setSeances(await r.json());
+    try {
+      const r = await fetch("/api/seances");
+      if (!r.ok) throw new Error("historique_indisponible");
+      const donnees = await r.json();
+      if (!Array.isArray(donnees)) throw new Error("historique_invalide");
+      setSeances(donnees);
+      setHistoriqueErreur(false);
+    } catch { setHistoriqueErreur(true); }
   }, []);
 
   useEffect(() => {
@@ -433,8 +443,10 @@ export function RepCount({
   }, [reps, charge, maintien, dureeSecondes, dureeRepos]);
 
   const sauvegarder = useCallback(async (seriesAEnregistrer: SetSaisi[]) => {
-    if (!nom.trim() || seriesAEnregistrer.length === 0 || requeteEnCoursRef.current) return;
-    const signature = JSON.stringify({ nom: nom.trim(), series: seriesAEnregistrer });
+    if (requeteEnCoursRef.current) return;
+    const exercicesComplets = assemblerSeance(exercicesSeance, nom, seriesAEnregistrer);
+    if (!exercicesComplets.length) return;
+    const signature = JSON.stringify({ exercices: exercicesComplets, notes });
     if (sauvegardeRef.current?.signature !== signature) {
       sauvegardeRef.current = { signature, date: new Date().toISOString() };
     }
@@ -448,12 +460,8 @@ export function RepCount({
         body: JSON.stringify({
           date: sauvegardeRef.current.date,
           source: "REPCOUNT",
-          exercices: [
-            {
-              nom: nom.trim(),
-              sets: seriesAEnregistrer.map((s, i) => ({ ...s, set: i + 1 })),
-            },
-          ],
+          exercices: payloadSeance(exercicesComplets),
+          notes: notes.trim() || undefined,
         }),
       });
       if (!r.ok) throw new Error("enregistrement_refuse");
@@ -461,6 +469,8 @@ export function RepCount({
       if (firstId) setPremierRepereId(firstId);
       sauvegardeRef.current = null;
       setSets([]);
+      setExercicesSeance([]);
+      setNotes("");
       setFinRepos(null);
       setEnregistre(true);
       void charger();
@@ -470,7 +480,21 @@ export function RepCount({
       requeteEnCoursRef.current = false;
       setEnregistrementEnCours(false);
     }
-  }, [nom, charger]);
+  }, [nom, charger, exercicesSeance, notes]);
+
+  function exerciceSuivant() {
+    if (!nom.trim() || !sets.length || enregistrementEnCours) return;
+    setExercicesSeance(assemblerSeance(exercicesSeance, nom, sets));
+    setSets([]);
+    setNom("");
+    setCharge(0);
+    setReps(10);
+    setMaintien(false);
+    setFinRepos(null);
+    prefillRef.current = null;
+    setEnregistre(false);
+    document.getElementById("repcount-exercice")?.focus();
+  }
 
   const enregistrer = useCallback(async () => {
     await sauvegarder(sets);
@@ -525,8 +549,26 @@ export function RepCount({
   );
 
   return (
-    <div className="flex flex-col gap-5">
+    <fieldset disabled={enregistrementEnCours} className="flex min-w-0 flex-col gap-5">
       {premierRepereId && <TrackConversion name="first_repcount_saved" onceKey={premierRepereId} />}
+      <section className="rounded-2xl border border-laiton-300/25 bg-gradient-to-br from-laiton-300/10 to-cyan-300/5 p-4">
+        <p className="text-sm font-semibold text-laiton-200">Ma séance RepCount</p>
+        <p className="mt-1 text-sm text-white">{exercicesSeance.length + (sets.length && !exercicesSeance.some(ex => ex.nom === nom.trim()) ? 1 : 0)} exercices · {exercicesSeance.reduce((total, ex) => total + ex.sets.length, sets.length)} séries validées</p>
+        <p className="mt-2 text-xs leading-5 text-graphite-300">Valide tes séries, passe à l’exercice suivant, puis enregistre la séance complète. Les séries restent ici tant que tu ne quittes pas cette page ; elles ne sont sauvegardées qu’à l’enregistrement.</p>
+        {exercicesSeance.length > 0 && <ul className="mt-3 space-y-2">
+          {exercicesSeance.map((exercice, index) => <li key={exercice.nom} className="rounded-xl border border-white/10 bg-black/20 p-3">
+            <p className="text-sm text-white">{exercice.nom}</p>
+            <p className="mt-1 text-xs text-graphite-300">{exercice.sets.map(formatSerie).join(" · ")}</p>
+            <button type="button" disabled={sets.length > 0 || enregistrementEnCours} className="mt-1 min-h-11 text-xs text-cyan-200 underline disabled:opacity-40" onClick={() => {
+              setNom(exercice.nom); setSets(exercice.sets.map(serie => ({ ...serie })));
+              setMaintien(exercice.sets[0]?.dureeSecondes != null);
+              setExercicesSeance(liste => liste.filter((_, i) => i !== index));
+              setFinRepos(null);
+            }}>Reprendre cet exercice</button>
+          </li>)}
+        </ul>}
+      </section>
+      {historiqueErreur && <p role="status" className="text-sm text-amber-200">Historique indisponible. Tes séries en cours sont conservées. <button type="button" onClick={() => void charger()} className="min-h-11 underline">Réessayer</button></p>}
       {onboarding && historique.length === 0 && !enregistre && (
         <section className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_90%_0%,rgba(34,211,238,.15),transparent_15rem),rgba(255,255,255,.025)] p-4">
           <div aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full border border-laiton-300/15" />
@@ -634,7 +676,7 @@ export function RepCount({
         </>}
       </div>
 
-      {onboarding && sets.length === 0 && historique.length === 0 ? (
+      {onboarding && sets.length === 0 && exercicesSeance.length === 0 && historique.length === 0 ? (
         <div className="flex flex-col gap-2">
           <button
             type="button"
@@ -718,21 +760,20 @@ export function RepCount({
             setSets(liste => [...liste, { ...liste[liste.length - 1]! }]);
             setFinRepos(Date.now() + dureeRepos * 1000);
           }} className="mt-3 min-h-11 w-full rounded-xl border border-cyan-300/25 text-sm text-cyan-200 disabled:opacity-40">Valider une série identique à la dernière</button>
-          <button
-            type="button"
-            onClick={enregistrer}
-            disabled={enregistrementEnCours}
-            className="mt-4 w-full rounded-full border border-laiton-300/40 bg-laiton-300/10 py-3 text-sm font-bold text-laiton-200 disabled:cursor-wait disabled:opacity-60"
-          >
-            {enregistrementEnCours ? "Enregistrement…" : "Enregistrer l'exercice"}
-          </button>
+          <button type="button" onClick={exerciceSuivant} disabled={enregistrementEnCours} className="mt-3 min-h-12 w-full rounded-full border border-cyan-300/30 py-3 text-sm font-bold text-cyan-200 disabled:opacity-40">Ajouter un autre exercice →</button>
         </div>
       )}
+
+      {(sets.length > 0 || exercicesSeance.length > 0) && <section className="rounded-2xl border border-laiton-300/25 bg-laiton-300/5 p-4">
+        <label htmlFor="repcount-notes" className="text-sm text-graphite-300">Notes de séance (facultatif)</label>
+        <textarea id="repcount-notes" value={notes} maxLength={2000} disabled={enregistrementEnCours} onChange={e => setNotes(e.target.value)} placeholder="Sensations, réglages de machine…" className="mt-2 min-h-20 w-full rounded-xl border border-white/15 bg-slate-950 p-3 text-sm text-white" />
+        <button type="button" onClick={enregistrer} disabled={enregistrementEnCours} className="mt-3 min-h-12 w-full rounded-full bg-laiton-300 px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{enregistrementEnCours ? "Enregistrement…" : "Terminer et enregistrer la séance"}</button>
+      </section>}
 
       {erreur && <p className="text-sm text-rose-300">{erreur}</p>}
       {enregistre && (
         <div className="rounded-xl border border-emerald-300/25 bg-emerald-300/[0.06] px-4 py-3" role="status">
-          <p className="text-sm font-semibold text-emerald-300">{onboarding ? "Premier repère posé ✓" : "Exercice enregistré ✓"}</p>
+          <p className="text-sm font-semibold text-emerald-300">{onboarding ? "Premier repère posé ✓" : "Séance enregistrée ✓"}</p>
           <p className="mt-1 text-xs text-graphite-300">
             {onboarding
               ? "Ta progression commence maintenant. La prochaine séance donnera à COAI un premier point de comparaison."
@@ -775,6 +816,6 @@ export function RepCount({
           </ul>
         </details>
       )}
-    </div>
+    </fieldset>
   );
 }
