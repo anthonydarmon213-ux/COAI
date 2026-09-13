@@ -4,6 +4,9 @@ import { photoCoaiGenreStrict, type GenreVisuel } from "@/lib/exercices/photos-c
 const normalise = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[’']/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
 // Exact movement aliases. These pairs are the sources of Anthony's supplied PDF.
 const references = [
+  // Inspected pair: both show rear foot elevated on bench, dumbbells in hand.
+  // Keep exact aliases so bodyweight and barbell variants do not inherit it.
+  { noms: ["Fentes bulgares haltères", "Fente bulgare haltères", "Fentes bulgares avec haltères"], homme: "/exercices/fentes-bulgares-homme-coai.jpg", femme: "/exercices/fentes-bulgares-femme-coai.jpg" },
   { noms: ["Presse à cuisses", "Presse à cuisses machine"], homme: "/fiche-seance/presse-a-cuisses-machine-homme.png", femme: "/exercices/presse-a-cuisses-machine.jpg" },
   { noms: ["Développé couché haltères"], homme: "/exercices/developpe-couche-halteres.jpg", femme: "/fiche-seance/developpe-couche-halteres-femme.png" },
   { noms: ["Tirage horizontal machine"], homme: "/fiche-seance/tirage-horizontal-machine-homme.png", femme: "/exercices/tirage-horizontal-machine.jpg" },

@@ -11,6 +11,14 @@ const { accessibleTraining } = load('src/lib/programmes/access.ts');
 const cataloguePhotos = load('src/lib/exercices/photos-coai.ts');
 const { illustrerStory } = load('src/lib/programmes/story-photos.ts', { require: () => cataloguePhotos });
 for (const genre of ['homme', 'femme']) {
+  for (const nom of ['Fentes bulgares haltères', 'Fente bulgare haltères', 'Fentes bulgares avec haltères']) {
+    const photo = illustrerStory({ exercices: [{ nom }], echauffement: '', retourAuCalme: '' }, genre).exercices[0].photo;
+    assert.equal(photo, `/exercices/fentes-bulgares-${genre}-coai.jpg`);
+    assert(fs.existsSync(`public${photo}`));
+  }
+  for (const nom of ['Fentes bulgares barre', 'Fentes bulgares sans charge', 'Fentes bulgares sautées']) {
+    assert.equal(illustrerStory({ exercices: [{ nom }], echauffement: '', retourAuCalme: '' }, genre).exercices[0].photo, null);
+  }
   const story = illustrerStory({ exercices: ['Presse à cuisses', 'Développé couché haltères', 'Tirage horizontal machine', 'Superman au sol', 'Gainage planche', 'Crunch au sol'].map(nom => ({ nom })), echauffement: 'Mobilité des hanches', retourAuCalme: 'Respiration calme' }, genre);
   for (const src of [...story.exercices.map(ex => ex.photo), story.echauffementPhoto, story.retourAuCalmePhoto]) assert(src && fs.existsSync(`public${src}`), src);
   for (const nom of ['Développé couché barre', 'Tirage horizontal élastique', 'Presse épaules']) assert.equal(illustrerStory({ exercices: [{ nom }], echauffement: '', retourAuCalme: '' }, genre).exercices[0].photo, null);
