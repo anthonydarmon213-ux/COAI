@@ -14,8 +14,6 @@ import { ChurnFeedbackForm } from "@/components/compte/churn-feedback-form";
 import { TIER_BY_SERVICE, VIP_MESSAGE, vipReservationHref } from "@/lib/pricing/tiers";
 import { ScrollToHash } from "@/components/compte/scroll-to-hash";
 
-const PRIX_MENSUELS = { PASS_IA: 49, STANDARD: 89, PREMIUM: 199 } as const;
-
 const STATUT_LABELS: Record<string, string> = {
   ACTIVE: "Actif",
   PAST_DUE: "Paiement en retard",
@@ -36,7 +34,8 @@ export default async function AbonnementPage() {
 
   const statut = user.subscription?.status;
   const plan = getEffectivePlan(user.subscription);
-  const finProgrammee = user.subscription?.cancelAtPeriodEnd && user.subscription.currentPeriodEnd;
+  const finProgrammee = statut === "ACTIVE" && user.subscription?.cancelAtPeriodEnd
+    && user.subscription.currentPeriodEnd && user.subscription.currentPeriodEnd > new Date();
   const enEssai = isInTrial(user.subscription);
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
@@ -49,7 +48,7 @@ export default async function AbonnementPage() {
           <span>Compte</span>
         </div>
         <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">
-          Votre coach humain.
+          Mon abonnement.
         </h1>
       </div>
 
@@ -166,7 +165,9 @@ export default async function AbonnementPage() {
               month: "long",
               year: "numeric",
             })}{" "}
-            — passage automatique à {PRIX_MENSUELS[plan]}€/mois sauf résiliation avant cette date.
+            — la facturation commence ensuite au tarif confirmé lors de ta souscription,
+            sauf résiliation avant cette date. Retrouve le montant et les échéances
+            dans « Gérer mon abonnement ».
           </p>
         )}
         {statut && !finProgrammee && statut !== "PAST_DUE" ? (
@@ -178,7 +179,7 @@ export default async function AbonnementPage() {
           </div>
         ) : !statut ? (
           <a href="/pricing" className="text-laiton-400 underline">
-            Voir les offres — à partir de 19,99€/mois
+            Voir les offres et les tarifs
           </a>
         ) : null}
       </Card>
