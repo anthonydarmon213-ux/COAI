@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/client";
 import { getWorkoutForDate } from "@/lib/daily/session";
 import { FicheSeance } from "@/components/programme/fiche-seance";
 import { FicheActions } from "@/components/programme/fiche-actions";
+import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { storySeance } from "@/lib/programmes/story-seance";
 import { accessibleTraining } from "@/lib/programmes/access";
 import { illustrerStory } from "@/lib/programmes/story-photos";
@@ -85,6 +86,15 @@ export default async function SeanceDuJourPage({ searchParams }: { searchParams?
         <FicheActions key={`${nom}-${genre}`} nomSeance={nom} story={story} />
       </div>
       {programme?.statut === "EN_ATTENTE" && <p className="text-sm text-amber-200">Programme non relu par le coach. La fiche est accessible ; cela ne vaut pas validation humaine.</p>}
+      <div className="fiche-actions">
+        <DemarrerSeanceButton
+          key={`${nom}-${index}`}
+          nomSeance={nom}
+          echauffement={texte(s.echauffement) ?? undefined}
+          exercices={exercices}
+          retourAuCalme={texte(s.retourAuCalme) ?? undefined}
+        />
+      </div>
 
       <FicheSeance
         nomSeance={nom}
