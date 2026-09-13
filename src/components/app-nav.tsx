@@ -153,7 +153,10 @@ function isActive(pathname: string | null, onglet: (typeof ONGLETS)[number]) {
 export function AppNav() {
   const pathname = usePathname();
 
-  const ongletActif = ONGLETS.find((onglet) => isActive(pathname, onglet));
+  // Prefer an exact destination before broad /suivi or /programme groups.
+  const ongletActif = ONGLETS.find(onglet => onglet.href === pathname)
+    ?? ONGLETS.find(onglet => onglet.sous?.some(lien => lien.href === pathname))
+    ?? ONGLETS.find((onglet) => isActive(pathname, onglet));
 
   return (
     <aside className="coai-app-nav z-20 shrink-0 border-b px-5 py-4 backdrop-blur-xl md:sticky md:top-0 md:flex md:h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:px-5 md:py-7">
@@ -163,14 +166,38 @@ export function AppNav() {
             <CoaiMark size={26} />
             <span className="font-display text-xl font-extrabold tracking-[0.16em] text-graphite-50">COAI</span>
           </div>
-          <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300">Ton coach personnel, toujours avec toi</span>
+          <span className="hidden text-[0.6rem] font-bold uppercase tracking-[0.08em] text-graphite-300 md:block">Ton coach personnel, toujours avec toi</span>
         </Link>
         <SignOutButton variant="icon" />
       </div>
 
-      <nav aria-label="Navigation principale" className="coai-app-nav-scroll mt-6 flex gap-2 overflow-x-auto pb-1 text-sm md:mt-8 md:min-h-0 md:flex-1 md:flex-col md:gap-1.5 md:overflow-x-hidden md:overflow-y-auto md:pr-1">
+      <div className="mt-4 md:hidden">
+        <nav aria-label="Accès rapides" className="grid grid-cols-3 gap-2">
+          {([
+            ["/dashboard", "Aujourd’hui", CalendarDays],
+            ["/programme/entrainement", "Programme", Dumbbell],
+            ["/suivi/repcount", "RepCount", Timer],
+          ] as const).map(([href, label, Icon]) => <Link key={href} href={href}
+            aria-current={pathname === href ? "page" : undefined}
+            className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl border px-1 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-200 ${ongletActif?.href === href ? "border-laiton-300/40 bg-laiton-300/10 text-laiton-200" : "border-white/10 text-graphite-200"}`}>
+            <Icon size={18} aria-hidden="true" />{label}
+          </Link>)}
+        </nav>
+        <details key={pathname} className="mt-2 rounded-xl border border-white/10 bg-white/[0.025]">
+          <summary className="min-h-11 cursor-pointer px-3 py-3 text-sm text-graphite-200">Explorer <span className="text-xs text-graphite-400">· {ongletActif?.label ?? "Mon compte"}</span></summary>
+          <nav aria-label="Toutes les rubriques" className="grid grid-cols-2 gap-1 px-2 pb-2">
+            {ONGLETS.map(onglet => <Link key={onglet.href} href={onglet.href}
+              aria-current={pathname === onglet.href ? "page" : undefined}
+              className={`flex min-h-11 items-center rounded-lg px-2 py-2 text-sm ${onglet === ongletActif ? "bg-laiton-300/10 text-laiton-200" : "text-graphite-200 hover:bg-white/5"}`}>{onglet.label}</Link>)}
+            <Link href="/compte/profil" className="flex min-h-11 items-center px-2 text-sm text-graphite-200">Mon compte</Link>
+            <Link href="/compte/parametres" className="flex min-h-11 items-center px-2 text-sm text-graphite-200">Réglages</Link>
+          </nav>
+        </details>
+      </div>
+
+      <nav aria-label="Navigation principale" className="coai-app-nav-scroll hidden text-sm md:mt-8 md:flex md:min-h-0 md:flex-1 md:flex-col md:gap-1.5 md:overflow-x-hidden md:overflow-y-auto md:pr-1">
         {ONGLETS.map((onglet) => {
-          const active = isActive(pathname, onglet);
+          const active = onglet === ongletActif;
           const Icon = onglet.icon;
           return (
             <div key={onglet.href} className="contents md:block">
@@ -226,7 +253,7 @@ export function AppNav() {
       {ongletActif?.sous && (
         <nav
           aria-label={`Sous-navigation ${ongletActif.label}`}
-          className="coai-app-nav-scroll mt-2 flex gap-2 overflow-x-auto pb-1 md:hidden"
+          className="mt-2 grid grid-cols-2 gap-2 md:hidden"
         >
           {ongletActif.sous.map((sl) => {
             const sousActif = pathname === sl.href;
@@ -235,7 +262,7 @@ export function AppNav() {
                 key={sl.href}
                 href={sl.href}
                 aria-current={sousActif ? "page" : undefined}
-                className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-[12.5px] font-medium transition ${
+                className={`flex min-h-11 items-center rounded-lg border px-3 py-2 text-xs font-medium transition ${
                   sousActif
                     ? "border-laiton-400/40 bg-laiton-400/10 text-laiton-200"
                     : "border-white/10 text-graphite-300"
