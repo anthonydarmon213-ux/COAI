@@ -31,6 +31,7 @@ export default function SignInPage() {
   const returnTo = sanitizeReturnTo(searchParams.get("redirect_to"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [linkIssue, setLinkIssue] = useState<AuthLinkIssue | null>(null);
@@ -75,7 +76,7 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="coai-access-page flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+    <main className="coai-access-page flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-8">
       <Link
         href="/"
         className="font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"
@@ -101,6 +102,8 @@ export default function SignInPage() {
             <Input
               type="email"
               autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -108,14 +111,22 @@ export default function SignInPage() {
           </Field>
           <Field label="Mot de passe">
             <Input
-              type="password"
+              type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </Field>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          <button
+            type="button"
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword((visible) => !visible)}
+            className="min-h-11 self-end rounded px-2 text-sm text-graphite-300 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400"
+          >
+            {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+          </button>
+          {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading}>
             {loading ? "Connexion…" : "Se connecter"}
           </Button>
