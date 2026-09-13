@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { accessibleTraining } from "@/lib/programmes/access";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
@@ -27,11 +28,11 @@ async function activeTrainingProgramme(userId: string) {
       orderBy: { generatedAt: "desc" },
     }),
     prisma.programmeGenerated.findFirst({
-      where: { userId, pilier: "ENTRAINEMENT", statut: "GENERE_IA" },
+      where: { userId, pilier: "ENTRAINEMENT" },
       orderBy: { generatedAt: "desc" },
     }),
   ]);
-  return validated ?? latest;
+  return accessibleTraining(validated, latest);
 }
 
 const requestSchema = z.discriminatedUnion("action", [

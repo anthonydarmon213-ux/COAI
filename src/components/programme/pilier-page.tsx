@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { accessibleTraining } from "@/lib/programmes/access";
 import Image from "next/image";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
@@ -126,7 +127,7 @@ export async function PilierPage({
   const peutGenerer = hasProgrammeAccess(user, user.subscription);
   const indexPilierActif = PILIERS.indexOf(pilierActif);
   const dernierActif = derniers[indexPilierActif];
-  const aUnContenu = Boolean(valides[indexPilierActif] || dernierActif?.statut === "GENERE_IA");
+  const aUnContenu = Boolean(valides[indexPilierActif] || dernierActif?.statut === "GENERE_IA" || (pilierActif === "ENTRAINEMENT" && accessibleTraining(null, dernierActif ?? null)));
   const enValidation = !aUnContenu && dernierActif?.statut === "EN_ATTENTE";
 
   // Score sommeil (19/08/2026, demande Anthony) — requête limitée au pilier
@@ -147,7 +148,7 @@ export async function PilierPage({
   // que l'IA génère elle-même dans le contenu (cf. extractPhotoQueries).
   const contenusAffiches = PILIERS.map((_, index) =>
     valides[index]?.contenu ??
-    (derniers[index]?.statut === "GENERE_IA" ? derniers[index]?.contenu : null)
+    (PILIERS[index] === "ENTRAINEMENT" ? accessibleTraining(null, derniers[index] ?? null)?.contenu : derniers[index]?.statut === "GENERE_IA" ? derniers[index]?.contenu : null)
   );
   const photosParPilier = await Promise.all(
     contenusAffiches.map((contenu, index) =>
@@ -317,7 +318,7 @@ export async function PilierPage({
         const dernier = derniers[i];
         const enAttente = dernier && dernier.statut === "EN_ATTENTE";
         const genereIA = dernier && dernier.statut === "GENERE_IA";
-        const affiche: ProgrammeGenerated | null = valide ? valide : genereIA ? dernier : null;
+        const affiche: ProgrammeGenerated | null = pilier === "ENTRAINEMENT" ? accessibleTraining(valide ?? null, dernier ?? null) : valide ? valide : genereIA ? dernier : null;
 
         if (!affiche && enAttente) {
           return (
@@ -360,6 +361,7 @@ export async function PilierPage({
             <Card className="coai-programme-card flex flex-col gap-5 p-5 sm:p-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
+                  {affiche?.statut === "EN_ATTENTE" && <Badge tone="warning">Non relu par le coach · accessible</Badge>}
                   {valide && (
                     <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
                   )}

@@ -260,3 +260,10 @@ export function photoCoaiPourNom(nom: string, genre?: GenreVisuel): string | nul
   const entree = TABLE.find((e) => correspond(e, normalise));
   return entree ? `/exercices/${entree.fichier}.jpg` : null;
 }
+
+/** Story: exact name, explicit model variant, no video still or mixed fallback. */
+export function photoCoaiGenreStrict(nom: string, genre: GenreVisuel): string | null {
+  const variante = VARIANTES.find(e => e.motifs.some(m => normaliser(m) === normaliser(nom)));
+  const fichier = variante?.[genre];
+  return fichier && !fichier.startsWith("trx-") ? `/exercices/${fichier}.jpg` : null;
+}

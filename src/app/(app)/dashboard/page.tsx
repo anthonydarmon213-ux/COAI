@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { accessibleTraining } from "@/lib/programmes/access";
 import { redirect } from "next/navigation";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
@@ -105,9 +106,7 @@ export default async function DashboardPage() {
   const ageCoai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies: diesRecents });
   const capitalPhysique = construireCapitalPhysique(testsPhysiques, user.profile);
 
-  // Un programme EN_ATTENTE reste invisible tant qu'Anthony ne l'a pas
-  // validé. GENERE_IA est le seul statut non validé publiable.
-  const programme = validated ?? (latest?.statut === "GENERE_IA" ? latest : null);
+  const programme = accessibleTraining(validated, latest);
   const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
@@ -132,12 +131,6 @@ export default async function DashboardPage() {
         href: "/compte/profil?onboarding=1",
         cta: "Compléter mon profil →",
       }
-    : pendingCoach
-      ? {
-          kicker: "Validation en cours",
-          title: "Ton coach relit ton programme.",
-          description: "Ton programme reste privé jusqu'à sa validation. Tu seras guidé dès qu'il sera prêt.",
-        }
     : !programme
       ? hasAccess
         ? {
@@ -230,12 +223,6 @@ export default async function DashboardPage() {
               <h2 className="mt-2 text-2xl text-white">COAI a besoin de quelques repères essentiels.</h2>
               <p className="mt-2 text-sm leading-6 text-graphite-300">Il manque : {completion.champsEssentielsManquants.join(", ")}.</p>
               <Link href="/compte/profil?onboarding=1" className="mt-5 inline-flex rounded-full bg-laiton-400 px-6 py-3 text-sm font-semibold text-graphite-950">Compléter mon profil</Link>
-            </section>
-          ) : pendingCoach ? (
-            <section className="coai-glass flex flex-col gap-3 p-6 text-center">
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Validation en cours</p>
-              <h2 className="text-2xl text-white">Ton coach relit ton programme.</h2>
-              <p className="text-sm leading-6 text-graphite-300">Son contenu reste privé jusqu&apos;à sa validation.</p>
             </section>
           ) : !programme ? (
             !hasAccess ? (

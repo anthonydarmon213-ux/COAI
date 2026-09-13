@@ -98,6 +98,17 @@ La réactivation de la génération payante demande une nouvelle autorisation.
 
 ## État au 01/09/2026
 
+### Décision mise à jour — accès entraînement et partage, 13/09/2026
+
+Anthony demande explicitement d'accéder au programme d'entraînement et à sa
+fiche, et de commencer même avant validation. Cette demande remplace le verrou
+EN_ATTENTE du 10/09 pour l'entraînement : statut conservé, mention « non relu
+par le coach », aucun faux VALIDE. Préserver authentification, droits existants,
+exclusion des programmes rejetés et contrôles de sécurité distincts.
+Partager la fiche en images Story verticales, logo COAI en bas à droite,
+aperçu et geste explicite de partage. Ne pas exporter le profil, les données de
+santé ou les charges personnelles. Aucun achat/API payante pour ce partage.
+
 ### Autorisation confirmée — reprise Stripe, 11/09/2026
 
 Anthony a autorisé la migration de production pour distinguer les traitements

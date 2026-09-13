@@ -66,6 +66,7 @@ export function FicheSeance({
   exercices,
   retourAuCalme,
   prenom,
+  photos,
 }: {
   nomSeance: string;
   dureeMinutes?: number | null;
@@ -73,6 +74,7 @@ export function FicheSeance({
   exercices: unknown[];
   retourAuCalme?: string | null;
   prenom?: string | null;
+  photos?: (string | null)[];
 }) {
   const valides = exercices.filter(isObj);
 
@@ -141,7 +143,7 @@ export function FicheSeance({
       {/* Exercices */}
       {valides.map((ex, i) => {
         const nom = texte(ex.nom) ?? `Exercice ${i + 1}`;
-        const photo = photoCoaiPourNom(nom);
+        const photo = photos ? photos[i] ?? null : photoCoaiPourNom(nom);
         const cible = musclesPourExercice(nom);
         const variante = variantesPourExercice(nom)[0];
         const methode = texte(ex.methode);
