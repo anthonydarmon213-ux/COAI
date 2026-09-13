@@ -39,6 +39,13 @@ const deps = {
   },
   '@/lib/programmes-prets/catalogue': { PROGRAMMES_PRETS: [] },
 };
+const syncBox = { exports: {}, Date, process: { env: {} }, require: name => {
+  assert.ok(name in deps, name); return deps[name];
+} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/stripe/subscription-sync.ts', 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS },
+}).outputText, syncBox);
+deps['@/lib/stripe/subscription-sync'] = syncBox.exports;
 const box = { exports: {}, Date, Map, process: { env: { STRIPE_WEBHOOK_SECRET: secret } }, require: name => {
   assert.ok(name in deps, name); return deps[name];
 } };

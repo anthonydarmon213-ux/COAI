@@ -7,6 +7,7 @@ import { appliquerRecompenseParrainageSiEligible } from "@/lib/parrainage/reward
 import { sendAdminNotification, sendEmail } from "@/lib/email/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
+import { upsertStripeSubscription } from "@/lib/stripe/subscription-sync";
 
 // The deployment must terminate an invocation before its five-minute lease can
 // be reclaimed. No provider request is made inside a SQL transaction.
@@ -175,12 +176,7 @@ async function upsertFromSubscription(subscription: Stripe.Subscription, userId?
   };
 
   if (userId) {
-    await prisma.subscription.upsert({
-      where: { stripeCustomerId: customerId },
-      update: data,
-      create: { userId, stripeCustomerId: customerId, ...data },
-    });
-    return true;
+    return upsertStripeSubscription(subscription, userId);
   }
 
   // customer.subscription.updated/deleted ne porte pas de userId. Stripe ne
@@ -350,7 +346,7 @@ export async function POST(request: Request) {
         const subscriptionId =
           typeof session.subscription === "string" ? session.subscription : session.subscription.id;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        await upsertFromSubscription(subscription, userId);
+        if (!(await upsertFromSubscription(subscription, userId))) break;
         await prisma.user.update({
           where: { id: userId },
           data: { checkoutReminderSentAt: new Date() },

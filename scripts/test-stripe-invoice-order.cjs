@@ -45,6 +45,13 @@ const deps = {
     sendEmail: async (to, subject) => { assert.equal(to, email); notices.push(subject); return true; },
   },
 };
+const syncBox = { exports: {}, Date, process: { env: {} }, require: name => {
+  assert.ok(name in deps, name); return deps[name];
+} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/stripe/subscription-sync.ts', 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS },
+}).outputText, syncBox);
+deps['@/lib/stripe/subscription-sync'] = syncBox.exports;
 const box = { exports: {}, Date, Map, process: { env: { STRIPE_WEBHOOK_SECRET: secret } }, require: key => {
   assert.ok(key in deps, key); return deps[key];
 } };

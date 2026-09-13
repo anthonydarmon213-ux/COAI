@@ -13,8 +13,8 @@ function load(file, imports) {
 let writes=[], auth={id:'auth-A'}, user={id:'user-A'}, retrieved=0;
 const sub={id:'sub_test',customer:'cus_test',status:'trialing',metadata:{plan:'PASS_IA'},items:{data:[{price:{id:'price_test',unit_amount:1999,currency:'eur',recurring:{interval:'month',interval_count:1}}}]},trial_end:1800000000,cancel_at_period_end:false};
 let session;
-const prisma={subscription:{upsert:async x=>writes.push(x)},user:{findUnique:async()=>user,update:async x=>writes.push(x)}};
-const sync=load('src/lib/stripe/subscription-sync.ts',{'@/lib/db/client':{prisma}});
+const prisma={subscription:{findUnique:async()=>null,create:async x=>writes.push({create:x.data})},user:{findUnique:async()=>user,update:async x=>writes.push(x)}};
+const sync=load('src/lib/stripe/subscription-sync.ts',{'@/lib/db/client':{prisma},'@/lib/stripe/client':{stripe:{}}});
 const {POST}=load('src/app/api/stripe/confirm-session/route.ts',{
  'next/server':{NextResponse:{json:(body,options)=>({body,status:options?.status??200})}},
  '@/lib/auth/server':{getCurrentUser:async()=>auth},

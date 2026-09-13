@@ -34,7 +34,9 @@ export async function POST(request: Request) {
     ? await stripe.subscriptions.retrieve(session.subscription)
     : session.subscription;
 
-  await upsertStripeSubscription(subscription, user.id);
+  if (!(await upsertStripeSubscription(subscription, user.id))) {
+    return NextResponse.json({ error: "Ce lien correspond à un ancien abonnement. Retrouve ton abonnement actuel dans ton compte." }, { status: 409 });
+  }
   await prisma.user.update({
     where: { id: user.id },
     data: { checkoutReminderSentAt: new Date() },
