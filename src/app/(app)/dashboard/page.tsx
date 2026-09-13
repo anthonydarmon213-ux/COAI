@@ -188,7 +188,6 @@ export default async function DashboardPage() {
        Aucun composant n'est supprimé du code : ils restent disponibles
        pour /progression ou /compte, seul le dashboard est allégé. */
     <div className="coai-dashboard flex flex-col gap-8">
-      <DashboardIntroVideo />
 
       {/* BLOC 1 — Accueil personnel */}
       <header className="coai-dashboard-hero animate-reveal flex flex-col gap-6 px-6 py-7 sm:px-8 sm:py-9">
@@ -208,17 +207,15 @@ export default async function DashboardPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link href="/suivi/repcount?onboarding=1" className="inline-flex min-h-12 items-center rounded-full bg-cyan-200 px-5 py-3 text-sm font-bold text-[#111216]">
-            Enregistrer une série →
+          <Link href={mission.href ?? "/suivi/repcount"} className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-cyan-200 px-5 py-3 text-sm font-bold text-[#111216] sm:w-auto">
+            {mission.cta ?? "Ouvrir mon carnet RepCount →"}
           </Link>
-          <Link href="/fonctionnalites" className="text-sm font-semibold text-white underline underline-offset-4">Découvrir mes fonctions gratuites</Link>
-          <p className="w-full text-sm text-graphite-300">Note tes répétitions et ta charge. Retrouve ton repère à la prochaine séance.</p>
+          <p className="w-full text-sm leading-6 text-graphite-300">{mission.description}</p>
         </div>
-        <DashboardCommandRail
-          profil={completion.pourcentage}
-          readiness={readiness.disponible ? readiness.score : null}
-          seances={seancesDuMoisCount}
-        />
+        <details className="border-t border-white/10 pt-2">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm text-graphite-300">Mes repères · {seancesDuMoisCount} séance{seancesDuMoisCount > 1 ? "s" : ""} sur 30 jours</summary>
+          <DashboardCommandRail profil={completion.pourcentage} readiness={readiness.disponible ? readiness.score : null} seances={seancesDuMoisCount} />
+        </details>
       </header>
 
       {/* BLOC 2 — L'action principale vient immédiatement après l'accueil.
@@ -300,6 +297,7 @@ export default async function DashboardPage() {
       </div>
 
       <ReperesDuJour habitudeHydratation={user.profile?.hydratation} />
+      <DashboardIntroVideo />
 
       {/* Les formules ne sont proposées qu'ici, une fois le produit vu
           (01/09/2026) : l'inscription renvoyait auparavant vers /pricing,

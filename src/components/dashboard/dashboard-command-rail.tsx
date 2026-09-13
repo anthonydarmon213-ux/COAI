@@ -10,18 +10,18 @@ export function DashboardCommandRail({
   seances: number;
 }) {
   const signaux = [
-    { label: "Profil compris", valeur: `${profil}%`, Icone: ScanLine, couleur: "cyan" },
-    { label: "Signal du jour", valeur: readiness === null ? "À capter" : `${readiness}%`, Icone: Activity, couleur: "gold" },
-    { label: "Mémoire 30 jours", valeur: `${seances} séance${seances > 1 ? "s" : ""}`, Icone: Database, couleur: "violet" },
+    { label: "Profil complété", valeur: `${profil}%`, Icone: ScanLine, couleur: "cyan" },
+    { label: "Forme estimée", valeur: readiness === null ? "À renseigner" : `${readiness}%`, Icone: Activity, couleur: "gold" },
+    { label: "Sur 30 jours", valeur: `${seances} séance${seances > 1 ? "s" : ""}`, Icone: Database, couleur: "violet" },
   ] as const;
 
   return (
-    <section className="coai-command-rail" aria-label="État de synchronisation COAI">
+    <section className="coai-command-rail" aria-label="Mes repères COAI">
       <div className="coai-command-scan" aria-hidden="true" />
       <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-2.5 sm:px-5">
         <p className="flex items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-emerald-200">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,.85)]" />
-          COAI OS · synchronisé
+          Mes repères COAI
         </p>
         <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-graphite-500">Une seule prochaine action utile</p>
       </div>
