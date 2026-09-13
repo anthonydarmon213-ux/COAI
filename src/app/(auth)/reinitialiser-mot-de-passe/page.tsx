@@ -94,7 +94,7 @@ function ResetForm() {
           <h1 className="text-xl font-semibold text-graphite-50">Nouveau mot de passe</h1>
         </div>
         {checkingSession ? (
-          <p className="text-sm text-graphite-200">Vérification du lien sécurisé…</p>
+          <p role="status" className="text-sm text-graphite-200">Vérification du lien sécurisé…</p>
         ) : sessionReady ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field label="Nouveau mot de passe">
@@ -115,15 +115,15 @@ function ResetForm() {
                 onChange={(e) => setConfirmation(e.target.value)}
               />
             </Field>
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
             <Button type="submit" disabled={loading}>
               {loading ? "Mise à jour…" : "Mettre à jour le mot de passe"}
             </Button>
           </form>
         ) : (
           <div className="flex flex-col gap-3">
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            <a href={recoveryHref("/mot-de-passe-oublie", returnTo)} className="text-sm text-laiton-400 underline">
+            {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+            <a href={recoveryHref("/mot-de-passe-oublie", returnTo)} className="flex min-h-11 items-center rounded-lg text-sm text-laiton-400 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-laiton-400">
               Demander un nouveau lien
             </a>
           </div>
