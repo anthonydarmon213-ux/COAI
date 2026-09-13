@@ -25,7 +25,7 @@ export async function GET() {
   ).size;
 
   return new ImageResponse(
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 86, background: "radial-gradient(circle at 18% 12%, rgba(201,162,98,0.24), transparent 48%), radial-gradient(circle at 88% 88%, rgba(58,90,107,0.2), transparent 52%), #090a0b", fontFamily: "system-ui, sans-serif", color: "#f5f6f7" }}>
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 86, backgroundColor: "#090a0b", backgroundImage: "radial-gradient(circle at 18% 12%, rgba(201,162,98,0.24), transparent 48%), radial-gradient(circle at 88% 88%, rgba(58,90,107,0.2), transparent 52%)", fontFamily: "system-ui, sans-serif", color: "#f5f6f7" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <span style={{ fontSize: 24, letterSpacing: 7, color: "#c9a262" }}>MON BILAN COAI</span>
         <span style={{ fontSize: 26, color: "#9aa0a8" }}>30 derniers jours</span>
