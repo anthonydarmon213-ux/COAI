@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import colors from "tailwindcss/colors";
 
 // Palette de marque : graphite / laiton — ton "labo de performance"
 const config: Config = {
@@ -64,7 +65,9 @@ const config: Config = {
         // explicite. Ces deux teintes servent les surfaces techniques :
         // jauges biométriques, cartographie musculaire, métriques live.
         or: "#D4AF37",
-        cyan: "#38BDF8",
+        // Keep the brand's unnumbered cyan and the numbered shades used by
+        // action backgrounds/text. A string here removes Tailwind's scale.
+        cyan: { ...colors.cyan, DEFAULT: "#38BDF8" },
         // Fond profond de la charte, très proche du graphite-950 existant
         // (#0d0e10) : conservé distinct pour les écrans immersifs
         // (lecteur de séance) sans toucher au fond global de l'app.
