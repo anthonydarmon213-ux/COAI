@@ -167,8 +167,8 @@ export default async function DashboardPage() {
             kicker: "Ta mission du jour",
             title: "Aujourd'hui, jour de récupération.",
             description: "La récupération fait partie du programme. Marche légère ou mobilité seulement si tu te sens bien.",
-            href: "/programme/recuperation",
-            cta: "Voir ma récupération →",
+            href: programmeRecuperation ? "/programme/recuperation" : "#check-in-du-jour",
+            cta: programmeRecuperation ? "Voir ma récupération →" : "Voir mon bilan de repos →",
           };
 
   return (
