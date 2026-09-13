@@ -69,7 +69,7 @@ export function MotionCheck({ nomExercice }: { nomExercice: string }) {
       <button
         type="button"
         onClick={() => setOuvert(true)}
-        className="rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
+        className="min-h-11 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-graphite-300 transition hover:border-laiton-400/40 hover:text-white"
       >
         📹 Vérifier ma posture
       </button>

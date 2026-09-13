@@ -610,7 +610,7 @@ export function SeanceRunner({
       ) : (
         <>
           <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-            <button type="button" onClick={() => window.confirm("Quitter la séance ? Elle reste reprenable pendant 8 heures, mais elle n'est pas encore enregistrée dans ton suivi.") && onClose()} aria-label="Fermer" className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-white/10 text-graphite-300">
+            <button type="button" onClick={() => window.confirm("Quitter la séance ? Elle reste reprenable pendant 8 heures, mais elle n'est pas encore enregistrée dans ton suivi.") && onClose()} aria-label="Fermer" className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-white/10 text-graphite-300">
               ✕
             </button>
             <div className="min-w-0 flex-1">
@@ -628,8 +628,9 @@ export function SeanceRunner({
                         if (suivant) parler("Voice coach activé");
                       }}
                       aria-pressed={voixActive}
+                      aria-label={voixActive ? "Couper la voix du coach" : "Activer la voix du coach"}
                       title={voixActive ? "Couper la voix du coach" : "Activer la voix du coach"}
-                      className={`flex-none rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
+                      className={`min-h-11 min-w-11 flex-none rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
                         voixActive
                           ? "border-laiton-400 bg-laiton-400/20 text-laiton-100"
                           : "border-white/15 bg-white/[0.04] text-graphite-400 hover:text-white"
@@ -641,7 +642,7 @@ export function SeanceRunner({
                   <button
                     type="button"
                     onClick={() => setAjustementOuvert(true)}
-                    className="flex-none rounded-full border border-laiton-400/30 bg-laiton-400/10 px-2.5 py-1 text-[10px] font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+                    className="min-h-11 flex-none rounded-full border border-laiton-400/30 bg-laiton-400/10 px-2.5 py-1 text-[10px] font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
                   >
                     ⚡️ Ajuster
                   </button>
@@ -762,7 +763,7 @@ export function SeanceRunner({
                     <button
                       type="button"
                       onClick={() => setConsigneOuverte(true)}
-                      className="rounded-full border border-laiton-400/30 bg-laiton-400/10 px-4 py-2 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
+                      className="min-h-11 rounded-full border border-laiton-400/30 bg-laiton-400/10 px-4 py-2 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
                     >
                       💡 Consigne du coach
                     </button>
@@ -795,7 +796,7 @@ export function SeanceRunner({
                         reco.start();
                       }}
                       disabled={dicteeActive}
-                      className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                      className={`min-h-11 rounded-full border px-4 py-2 text-xs font-semibold transition ${
                         dicteeActive
                           ? "border-laiton-400 bg-laiton-400/20 text-laiton-100"
                           : "border-white/15 bg-white/[0.04] text-graphite-300 hover:border-laiton-400/40 hover:text-white"
@@ -876,7 +877,7 @@ export function SeanceRunner({
                 type="button"
                 onClick={poserQuestionAuCoach}
                 disabled={questionEnCours}
-                className={`w-full rounded-full border py-2.5 text-xs font-semibold transition ${
+                className={`min-h-11 w-full rounded-full border py-2.5 text-xs font-semibold transition ${
                   questionEnCours
                     ? "border-laiton-400 bg-laiton-400/20 text-laiton-100"
                     : "border-white/15 bg-white/[0.04] text-graphite-300 hover:border-laiton-400/40 hover:text-white"
