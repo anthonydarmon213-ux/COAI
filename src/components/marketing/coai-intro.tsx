@@ -34,6 +34,18 @@ export function CoaiIntro() {
           COAI Wellness Club
         </p>
 
+        <div className="relative -mb-4 mt-3 w-full max-w-[380px] sm:max-w-[440px]">
+          <Image
+            src="/brand/coai-sculpture-3d.png"
+            alt="Emblème COAI en trois dimensions : anneau doré et œil bleu"
+            width={1000}
+            height={700}
+            priority
+            sizes="(max-width: 640px) 85vw, 440px"
+            className="h-auto w-full drop-shadow-[0_20px_28px_rgba(0,0,0,0.35)] motion-safe:transition-transform motion-safe:duration-700 motion-safe:hover:scale-[1.025]"
+          />
+        </div>
+
         <h1 className="mt-7 font-display text-[2.65rem] font-medium leading-[1.06] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
           Un corps fort.
           {/* Couleur pleine volontaire : le couple bg-clip-text /
