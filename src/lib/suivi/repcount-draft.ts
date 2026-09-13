@@ -13,6 +13,7 @@ const draft = z.object({
   exercicesSeance: z.array(z.object({ nom: z.string().max(200), sets: z.array(serie).max(200) })).max(100),
   notes: z.string().max(2000), dureeRepos: z.number().min(0).max(3600),
   finRepos: z.number().finite().nullable(),
+  routine: z.array(z.string().min(1).max(200)).max(100).default([]),
   sauvegarde: z.object({ signature: z.string().max(500000), date: z.string().datetime() }).nullable(),
 });
 export type RepCountDraft = z.infer<typeof draft>;

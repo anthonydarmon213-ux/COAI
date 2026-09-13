@@ -38,6 +38,8 @@ assert.equal(historiqueParMesure(mixte,true)[0].meilleureSerie.dureeSecondes,30)
 // états. Complète les tests purs, sans prétendre tester les clics navigateur.
 const React = require('react');
 const stepper = {};
+const session = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/lib/suivi/repcount-session.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports:session,require});
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/suivi/repcount-stepper.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:stepper,require});
 const {renderToStaticMarkup} = require('react-dom/server');
 const ui = {};
@@ -49,7 +51,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
       log('2026-09-03',[{reps:0,charge:0,dureeSecondes:20}])
     ]])[stateIndex++] ?? initial)};
     if(name === '@/lib/suivi/historique-exercice') return exportsModule;
-    if(name === '@/lib/suivi/repcount-session') return {};
+    if(name === '@/lib/suivi/repcount-session') return session;
     if(name === '@/lib/suivi/repcount-draft') return {};
     if(name === '@/components/suivi/repcount-stepper') return stepper;
     if(name === '@/components/analytics/track-conversion') return {TrackConversion:()=>null};

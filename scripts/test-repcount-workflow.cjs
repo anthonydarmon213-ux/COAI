@@ -59,6 +59,8 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   assert.ok(text(render()).includes("L'enregistrement a échoué"));
   const raw = storage.get(draft.draftKey('test-user'));
   assert.ok(draft.parseDraft(raw));
+  const ancien=JSON.parse(raw); delete ancien.routine;
+  assert.equal(draft.parseDraft(JSON.stringify(ancien)).routine.length,0,'Existing drafts remain readable');
   assert.equal(draft.parseDraft('{broken'),null);
   assert.equal(draft.parseDraft(raw,Date.now()+8*86400000),null);
   assert.equal(storage.get(draft.draftKey('other-user')),undefined);
@@ -77,5 +79,27 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   assert.equal(button('Terminer et enregistrer la séance'),undefined);
   effects[1]();
   assert.equal(storage.has(draft.draftKey('test-user')),false);
-  console.log('PASS RepCount workflow: two exercises, restore after remount, account isolation, expiry, invalid data, storage failure, identical retry, success clears draft');
+  // Reuse the sequence, not logged sets or notes. Never write until save.
+  states[6]=[{date:requests[0].date,exercices:requests[0].exercices}];
+  button('Reprendre ces exercices').props.onClick();
+  assert.equal(states[0],'Presse à cuisses');
+  assert.equal(states[5].length,0);
+  assert.equal(states[7].length,0);
+  assert.equal(states[8],'');
+  assert.equal(button('Terminer et enregistrer la séance'),undefined);
+  assert.equal(button('Reprendre ces exercices').props.disabled,true);
+  render(); effects[1]();
+  assert.equal(draft.parseDraft(storage.get(draft.draftKey('test-user'))).routine.length,2);
+  states.length=0; refs.length=0; render(); effects[0](); render();
+  assert.equal(states[20].length,2,'Planned sequence survives remount');
+  button('Valider la série').props.onClick();
+  button('Ajouter un autre exercice →').props.onClick();
+  assert.equal(states[0],'Tirage horizontal');
+  assert.equal(states[5].length,0,'Next exercise is not already performed');
+  assert.equal(states[7].length,1);
+  assert.equal(requests.length,2,'Starting a routine must not create history');
+  button('Continuer en séance libre').props.onClick();
+  assert.equal(states[7].length,1,'Leaving the sequence preserves completed work');
+  assert.equal(states[20].length,0);
+  console.log('PASS RepCount workflow: restore, account isolation, old drafts, failed save retry, reuse sequence without logging past sets, resume next movement, preserve work');
 })().catch(error=>{console.error(error);process.exitCode=1;});

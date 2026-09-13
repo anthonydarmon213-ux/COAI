@@ -15,7 +15,7 @@ import {
 } from "@/lib/suivi/historique-exercice";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
-import { assemblerSeance, payloadSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
+import { assemblerSeance, payloadSeance, nomsSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
 import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
 import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper";
 
@@ -391,6 +391,7 @@ export function RepCount({
   const [draftReady, setDraftReady] = useState(false);
   const [draftError, setDraftError] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
+  const [routine, setRoutine] = useState<string[]>([]);
 
   useEffect(() => {
     if (userId) {
@@ -401,6 +402,7 @@ export function RepCount({
           setMaintien(restored.maintien); setDureeSecondes(restored.dureeSecondes);
           setSets(restored.sets); setExercicesSeance(restored.exercicesSeance);
           setNotes(restored.notes); setDureeRepos(restored.dureeRepos); setFinRepos(restored.finRepos);
+          setRoutine(restored.routine);
           sauvegardeRef.current = restored.sauvegarde;
           prefillRef.current = restored.nom.trim().toLocaleLowerCase("fr-FR");
           setDraftRestored(true);
@@ -413,17 +415,17 @@ export function RepCount({
   const persistDraft = useCallback((currentSets: SetSaisi[] = sets) => {
     if (!userId) return;
     try {
-      if (!currentSets.length && !exercicesSeance.length && !notes.trim()) {
+      if (!currentSets.length && !exercicesSeance.length && !notes.trim() && !routine.length) {
         window.localStorage.removeItem(draftKey(userId));
       } else {
         const value: RepCountDraft = { version: 1, updatedAt: Date.now(), nom, reps, charge,
-          maintien, dureeSecondes, sets: currentSets, exercicesSeance, notes, dureeRepos, finRepos,
+          maintien, dureeSecondes, sets: currentSets, exercicesSeance, notes, dureeRepos, finRepos, routine,
           sauvegarde: sauvegardeRef.current };
         window.localStorage.setItem(draftKey(userId), JSON.stringify(value));
       }
       setDraftError(false);
     } catch { setDraftError(true); }
-  }, [userId, sets, exercicesSeance, notes, nom, reps, charge, maintien, dureeSecondes, dureeRepos, finRepos]);
+  }, [userId, sets, exercicesSeance, notes, nom, reps, charge, maintien, dureeSecondes, dureeRepos, finRepos, routine]);
 
   useEffect(() => { if (draftReady) persistDraft(); }, [draftReady, persistDraft]);
 
@@ -514,6 +516,7 @@ export function RepCount({
       setDraftRestored(false);
       setSets([]);
       setExercicesSeance([]);
+      setRoutine([]);
       setNotes("");
       setFinRepos(null);
       setEnregistre(true);
@@ -530,7 +533,9 @@ export function RepCount({
     if (!nom.trim() || !sets.length || enregistrementEnCours) return;
     setExercicesSeance(assemblerSeance(exercicesSeance, nom, sets));
     setSets([]);
-    setNom("");
+    const suite = routine[0] === nom.trim() ? routine.slice(1) : routine;
+    setRoutine(suite);
+    setNom(suite[0] ?? "");
     setCharge(0);
     setReps(10);
     setMaintien(false);
@@ -547,6 +552,12 @@ export function RepCount({
   const enregistrerPremierRepere = useCallback(async () => {
     await sauvegarder([maintien ? { reps: 0, charge: 0, dureeSecondes } : { reps, charge }]);
   }, [sauvegarder, reps, charge, maintien, dureeSecondes]);
+
+  const seancesReutilisables = useMemo(() => seances
+    .filter(seance => Number.isFinite(new Date(seance.date).getTime()))
+    .map(seance => ({ date: seance.date, noms: nomsSeance(seance.exercices) }))
+    .filter(seance => seance.noms.length > 0).slice(0, 5), [seances]);
+  const brouillonEnCours = sets.length > 0 || exercicesSeance.length > 0 || notes.trim().length > 0 || routine.length > 0;
 
   return (
     <fieldset disabled={enregistrementEnCours || Boolean(userId && !draftReady)} className="flex min-w-0 flex-col gap-5">
@@ -573,6 +584,33 @@ export function RepCount({
           </li>)}
         </ul>}
       </section>
+      {routine.length > 0 && <section className="rounded-2xl border border-cyan-300/20 bg-cyan-300/5 p-4">
+        <p className="text-sm font-semibold text-cyan-200">Exercices à réaliser</p>
+        <ol className="mt-2 list-inside list-decimal space-y-1 text-sm text-graphite-300">
+          {routine.map(exercice => <li key={exercice}>{exercice}{exercice === nom.trim() ? " · en cours" : ""}</li>)}
+        </ol>
+        <p className="mt-2 text-xs text-graphite-300">Les anciennes séries ne sont pas recopiées. Valide uniquement celles que tu réalises aujourd’hui.</p>
+        <button type="button" onClick={() => setRoutine([])} className="mt-2 min-h-11 text-xs text-cyan-200 underline">Continuer en séance libre</button>
+      </section>}
+      {seancesReutilisables.length > 0 && <details className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+        <summary className="min-h-11 cursor-pointer text-sm font-semibold text-white">Reprendre une séance passée</summary>
+        <p className="mb-3 text-xs leading-5 text-graphite-300">Retrouve les exercices dans le même ordre. Adapte tes charges à ta forme du jour.</p>
+        {brouillonEnCours && <p className="mb-3 text-xs text-amber-200">Termine ta séance en cours avant d’en reprendre une autre.</p>}
+        <ul className="space-y-3">{seancesReutilisables.map((seance, index) => <li key={`${seance.date}-${index}`} className="rounded-xl border border-white/10 p-3">
+          <p className="text-sm font-semibold text-white">Séance du {formatDate(new Date(seance.date))}</p>
+          <p className="mt-1 text-xs leading-5 text-graphite-300">{seance.noms.join(" · ")}</p>
+          <button type="button" disabled={brouillonEnCours} onClick={() => {
+            const premier = seance.noms[0];
+            if (brouillonEnCours || !premier) return;
+            const repere = historiquePourExercice(seances, premier)[0]?.meilleureSerie;
+            setRoutine(seance.noms); setNom(premier);
+            setReps(repere?.reps || 10); setCharge(repere?.charge ?? 0);
+            setMaintien(repere?.dureeSecondes != null); setDureeSecondes(repere?.dureeSecondes ?? 30);
+            prefillRef.current = null; setEnregistre(false); setErreur(null);
+            document.getElementById("repcount-exercice")?.focus();
+          }} className="mt-2 min-h-11 rounded-lg border border-laiton-300/30 px-3 text-sm text-laiton-200 disabled:opacity-40">Reprendre ces exercices</button>
+        </li>)}</ul>
+      </details>}
       {historiqueErreur && <p role="status" className="text-sm text-amber-200">Historique indisponible. Tes séries en cours sont conservées. <button type="button" onClick={() => void charger()} className="min-h-11 underline">Réessayer</button></p>}
       {onboarding && historique.length === 0 && !enregistre && (
         <section className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_90%_0%,rgba(34,211,238,.15),transparent_15rem),rgba(255,255,255,.025)] p-4">

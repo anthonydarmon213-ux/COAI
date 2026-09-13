@@ -6,6 +6,8 @@ const path = require('node:path');
 const api = {};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/lib/suivi/repcount-session.ts'), 'utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText, {exports:api});
 const plain = value => JSON.parse(JSON.stringify(value));
+assert.deepEqual(plain(api.nomsSeance(null)),[]);
+assert.deepEqual(plain(api.nomsSeance([null,{}, {nom:' '}, {nom:'Presse'}, {nom:'Presse'}, {nom:'Presse inclinée'}])),['Presse','Presse inclinée']);
 const presse = {nom:'Presse à cuisses', sets:[{reps:12,charge:40}]};
 const original = JSON.stringify(presse);
 const deux = api.assemblerSeance([presse], 'Gainage planche', [{reps:0,charge:0,dureeSecondes:30}]);
