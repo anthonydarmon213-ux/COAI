@@ -11,8 +11,10 @@ export function BackLink() {
 
   return (
     <button
+      type="button"
+      aria-label="Retour à la page précédente"
       onClick={() => router.back()}
-      className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"
+      className="flex min-h-11 min-w-11 items-center gap-1.5 rounded px-2 font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400"
     >
       ← Retour
     </button>

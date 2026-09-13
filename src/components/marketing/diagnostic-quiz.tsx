@@ -2722,7 +2722,8 @@ export function DiagnosticQuiz({
             <button
               type="button"
               onClick={goBack}
-              className="font-mono text-xs uppercase tracking-[0.12em] text-graphite-500 transition hover:text-white"
+              aria-label="Retour à l’étape précédente"
+              className="min-h-11 min-w-11 rounded px-2 font-mono text-xs uppercase tracking-[0.12em] text-graphite-400 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400"
             >
               ← Retour
             </button>
