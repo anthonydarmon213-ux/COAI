@@ -346,7 +346,10 @@ export function SeanceRunner({
   const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
   const [nomsRealises, setNomsRealises] = useState<Record<string, string>>(() => sauvegarde?.nomsRealises ?? {});
   const debutRef = useRef(sauvegarde?.debut ?? Date.now());
-  const finRef = useRef<string | null>(null);
+  // La date identifie la séance côté serveur. Son début est déjà conservé
+  // dans le brouillon : réouvrir après une réponse perdue doit réutiliser
+  // cette même clé, pas fabriquer une deuxième séance avec l'heure du retry.
+  const dateSauvegardeRef = useRef(new Date(debutRef.current).toISOString());
 
   // Sauvegarde continue tant que la séance n'est pas terminée. Écrire à
   // chaque frappe serait inutilement coûteux, mais index et séries changent
@@ -420,7 +423,6 @@ export function SeanceRunner({
     envoiRef.current = true;
     setEnvoiEnCours(true);
     setErreurSauvegarde(false);
-    finRef.current ??= new Date().toISOString();
     const dureeMinutes = Math.max(1, Math.round((Date.now() - debutRef.current) / 60000));
     type SetDetail = { set: number; reps: number; charge: number; dureeSecondes?: number };
     const parExercice = new Map<string, { nom: string; series: number; chargeKg?: number; sets: SetDetail[] }>();
@@ -470,7 +472,7 @@ export function SeanceRunner({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: finRef.current,
+          date: dateSauvegardeRef.current,
           source: "PROGRAMME",
           exercices: [...parExercice.values()],
           dureeMinutes,
