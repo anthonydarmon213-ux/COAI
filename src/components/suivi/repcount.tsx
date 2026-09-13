@@ -16,6 +16,7 @@ import {
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { assemblerSeance, payloadSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
+import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
 
 const REPOS_DEFAUT = 90;
 
@@ -358,11 +359,13 @@ export function RepCount({
   exerciceInitial = "",
   hasAccess = false,
   onboarding = false,
+  userId,
 }: {
   exercices: string[];
   exerciceInitial?: string;
   hasAccess?: boolean;
   onboarding?: boolean;
+  userId?: string;
 }) {
   const [nom, setNom] = useState(exerciceInitial);
   const [reps, setReps] = useState(10);
@@ -384,6 +387,44 @@ export function RepCount({
   const prefillRef = useRef<string | null>(null);
   const sauvegardeRef = useRef<{ signature: string; date: string } | null>(null);
   const requeteEnCoursRef = useRef(false);
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftError, setDraftError] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      try {
+        const restored = parseDraft(window.localStorage.getItem(draftKey(userId)));
+        if (restored) {
+          setNom(restored.nom); setReps(restored.reps); setCharge(restored.charge);
+          setMaintien(restored.maintien); setDureeSecondes(restored.dureeSecondes);
+          setSets(restored.sets); setExercicesSeance(restored.exercicesSeance);
+          setNotes(restored.notes); setDureeRepos(restored.dureeRepos); setFinRepos(restored.finRepos);
+          sauvegardeRef.current = restored.sauvegarde;
+          prefillRef.current = restored.nom.trim().toLocaleLowerCase("fr-FR");
+          setDraftRestored(true);
+        }
+      } catch { setDraftError(true); }
+    }
+    setDraftReady(true);
+  }, [userId]);
+
+  const persistDraft = useCallback((currentSets: SetSaisi[] = sets) => {
+    if (!userId) return;
+    try {
+      if (!currentSets.length && !exercicesSeance.length && !notes.trim()) {
+        window.localStorage.removeItem(draftKey(userId));
+      } else {
+        const value: RepCountDraft = { version: 1, updatedAt: Date.now(), nom, reps, charge,
+          maintien, dureeSecondes, sets: currentSets, exercicesSeance, notes, dureeRepos, finRepos,
+          sauvegarde: sauvegardeRef.current };
+        window.localStorage.setItem(draftKey(userId), JSON.stringify(value));
+      }
+      setDraftError(false);
+    } catch { setDraftError(true); }
+  }, [userId, sets, exercicesSeance, notes, nom, reps, charge, maintien, dureeSecondes, dureeRepos, finRepos]);
+
+  useEffect(() => { if (draftReady) persistDraft(); }, [draftReady, persistDraft]);
 
   const charger = useCallback(async () => {
     try {
@@ -451,6 +492,7 @@ export function RepCount({
       sauvegardeRef.current = { signature, date: new Date().toISOString() };
     }
     requeteEnCoursRef.current = true;
+    persistDraft(seriesAEnregistrer);
     setErreur(null);
     setEnregistrementEnCours(true);
     try {
@@ -468,6 +510,7 @@ export function RepCount({
       const firstId = await firstSavedConversionId(r, "REPCOUNT");
       if (firstId) setPremierRepereId(firstId);
       sauvegardeRef.current = null;
+      setDraftRestored(false);
       setSets([]);
       setExercicesSeance([]);
       setNotes("");
@@ -480,7 +523,7 @@ export function RepCount({
       requeteEnCoursRef.current = false;
       setEnregistrementEnCours(false);
     }
-  }, [nom, charger, exercicesSeance, notes]);
+  }, [nom, charger, exercicesSeance, notes, persistDraft]);
 
   function exerciceSuivant() {
     if (!nom.trim() || !sets.length || enregistrementEnCours) return;
@@ -549,12 +592,17 @@ export function RepCount({
   );
 
   return (
-    <fieldset disabled={enregistrementEnCours} className="flex min-w-0 flex-col gap-5">
+    <fieldset disabled={enregistrementEnCours || Boolean(userId && !draftReady)} className="flex min-w-0 flex-col gap-5">
       {premierRepereId && <TrackConversion name="first_repcount_saved" onceKey={premierRepereId} />}
       <section className="rounded-2xl border border-laiton-300/25 bg-gradient-to-br from-laiton-300/10 to-cyan-300/5 p-4">
         <p className="text-sm font-semibold text-laiton-200">Ma séance RepCount</p>
         <p className="mt-1 text-sm text-white">{exercicesSeance.length + (sets.length && !exercicesSeance.some(ex => ex.nom === nom.trim()) ? 1 : 0)} exercices · {exercicesSeance.reduce((total, ex) => total + ex.sets.length, sets.length)} séries validées</p>
-        <p className="mt-2 text-xs leading-5 text-graphite-300">Valide tes séries, passe à l’exercice suivant, puis enregistre la séance complète. Les séries restent ici tant que tu ne quittes pas cette page ; elles ne sont sauvegardées qu’à l’enregistrement.</p>
+        <p className="mt-2 text-xs leading-5 text-graphite-300">Valide tes séries, passe à l’exercice suivant, puis enregistre la séance complète pour l’ajouter à ton historique.</p>
+        {userId && <p role="status" className="mt-2 text-xs leading-5 text-graphite-300">
+          {draftError ? "Brouillon non conservé sur cet appareil. Ne ferme pas cette page avant d’enregistrer ta séance."
+            : draftRestored ? "Brouillon retrouvé. Tu peux reprendre ta séance."
+              : "Brouillon conservé sur cet appareil pendant 7 jours, pour ce compte uniquement. Il n’est pas synchronisé entre appareils."}
+        </p>}
         {exercicesSeance.length > 0 && <ul className="mt-3 space-y-2">
           {exercicesSeance.map((exercice, index) => <li key={exercice.nom} className="rounded-xl border border-white/10 bg-black/20 p-3">
             <p className="text-sm text-white">{exercice.nom}</p>

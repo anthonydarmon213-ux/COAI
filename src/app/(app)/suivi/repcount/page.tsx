@@ -56,6 +56,8 @@ export default async function RepCountPage({
       </header>
 
       <RepCount
+        key={user?.id ?? "anonymous"}
+        userId={user?.id}
         exercices={EXERCICES.map((e) => e.nom)}
         exerciceInitial={exerciceInitial}
         hasAccess={hasAccess}
