@@ -10,7 +10,7 @@ import { getEffectivePlan } from "@/lib/subscription/plan";
 import { Card } from "@/components/ui/card";
 import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
 import { Gauge } from "@/components/ui/gauge";
-import { computeProfilCompletion } from "@/lib/profil/completion";
+import { calculerAgeCoai, AGE_COAI_DISCLAIMER } from "@/lib/insight/age-coai";
 
 type Metrique = {
   label: string;
@@ -38,7 +38,9 @@ export default async function ProgressionPage() {
   const user = await getCurrentAppUser();
   if (!user) return null;
 
-  const [mesures, seances] = await Promise.all([
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  const [mesures, seances, dailies] = await Promise.all([
     prisma.mesure.findMany({
       where: { userId: user.id },
       orderBy: { date: "asc" },
@@ -46,6 +48,10 @@ export default async function ProgressionPage() {
     prisma.seanceLog.findMany({
       where: { userId: user.id },
       orderBy: { date: "asc" },
+    }),
+    prisma.dailySession.findMany({
+      where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
+      select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },
     }),
   ]);
 
@@ -105,14 +111,6 @@ export default async function ProgressionPage() {
   const frequenceHebdo = Number(user.profile?.frequenceEntrainement?.match(/\d+/)?.[0] ?? 2);
   const objectifMensuel = Math.max(4, frequenceHebdo * 4);
   const regularite = Math.min(100, Math.round((seancesDuMois / objectifMensuel) * 100));
-  const profil = computeProfilCompletion(user.profile);
-  const derniereMesure = mesures.at(-1);
-  const champsMesures = derniereMesure
-    ? [derniereMesure.poidsKg, derniereMesure.tourTailleCm, derniereMesure.masseGrassePourcent, derniereMesure.masseMusculaireKg, derniereMesure.frequenceCardiaqueReposBpm]
-    : [];
-  const suiviCorporel = champsMesures.length
-    ? Math.round((champsMesures.filter((valeur) => valeur !== null).length / champsMesures.length) * 100)
-    : 0;
   const recuperation = (() => {
     const sommeil = user.profile?.qualiteSommeil?.toLowerCase() ?? "";
     if (sommeil.includes("excellente")) return 95;
@@ -137,8 +135,11 @@ export default async function ProgressionPage() {
     user.profile?.sommeilMoyenHeures,
   ];
   const precisionRecuperation = Math.round((recuperationFields.filter((value) => value !== null && value !== "").length / recuperationFields.length) * 100);
-  const scoreCoai = Math.round((regularite + alimentation + recuperation + profil.pourcentage) / 4);
-  const historiqueSuffisantPourAge = seancesDuMois >= 8 && mesures.length >= 3 && Boolean(user.profile?.hrv && user.profile?.frequenceCardiaqueRepos);
+  // Même moteur et même fenêtre de suivi que l'accueil, sans score parallèle.
+  const coai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies });
+  const age = coai.disponible ? coai.age : null;
+  const ageEtat = age?.disponible ? "indicateur relatif"
+    : age?.raison === "AGE_MANQUANT" ? "âge à renseigner" : "suivi à compléter";
 
   return (
     <div className="flex flex-col gap-8">
@@ -178,27 +179,27 @@ export default async function ProgressionPage() {
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#4cc9f0]">COAI Intelligence · Aujourd’hui</p>
               <h2 className="mt-2 font-display text-2xl text-white">Tes signaux essentiels.</h2>
-              <p className="mt-1 max-w-xl text-sm font-medium leading-6 text-[#9ba3a8]">Comprendre ton état en un regard, puis savoir exactement quoi améliorer.</p>
+              <p className="mt-1 max-w-xl text-sm font-medium leading-6 text-[#9ba3a8]">Retrouve ta régularité, tes ressentis et les informations de ton profil.</p>
             </div>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#aeb5ba]">Analyse personnalisée · 30 jours</span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#aeb5ba]">Suivi & profil</span>
           </div>
           <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
             <Gauge label="Entraînement" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} sublabelColor="#9ba3a8" size={126} color="#ff8a3d" />
             <Gauge label="Alimentation" percent={alimentation} sublabel="profil nutrition" sublabelColor="#9ba3a8" size={126} color="#ffd84d" />
-            <Gauge label="Récupération" percent={precisionRecuperation} sublabel="précision du signal" sublabelColor="#9ba3a8" size={126} color="#39e67b" />
+            <Gauge label="Récupération" percent={precisionRecuperation} sublabel="champs renseignés" sublabelColor="#9ba3a8" size={126} color="#39e67b" />
             <Gauge label="Sommeil" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} sublabelColor="#9ba3a8" size={126} color="#4cc9f0" />
-            <Gauge label="Score COAI" percent={scoreCoai} sublabel="synthèse actuelle" sublabelColor="#9ba3a8" size={126} color="#c56cff" />
-            <Gauge label="Âge COAI" percent={historiqueSuffisantPourAge ? suiviCorporel : 0} displayValue={historiqueSuffisantPourAge ? "Calcul" : "—"} sublabel={historiqueSuffisantPourAge ? "analyse en cours" : "21 jours de données"} sublabelColor="#9ba3a8" size={126} color="#f56fae" />
+            <Gauge label="Score COAI" percent={coai.disponible ? coai.score : 0} displayValue={coai.disponible ? `${coai.score}/100` : "—"} sublabel={coai.disponible ? "suivi déclaré · 90 j" : "bilans à compléter"} sublabelColor="#9ba3a8" size={126} color="#c56cff" />
+            <Gauge label="Âge COAI" percent={0} displayValue={age?.disponible ? `${age.ageCoai} ans` : "—"} sublabel={ageEtat} sublabelColor="#9ba3a8" size={126} color="#f56fae" />
           </div>
           <div className="mt-7 grid gap-2 border-t border-white/[0.08] pt-5 text-[11px] font-medium leading-5 text-[#9ba3a8] sm:grid-cols-2 lg:grid-cols-3">
             <p><strong className="text-white">Entraînement</strong> · séances réalisées par rapport à ton rythme mensuel.</p>
             <p><strong className="text-white">Alimentation</strong> · informations nutritionnelles disponibles pour personnaliser le plan.</p>
             <p><strong className="text-white">Récupération</strong> · quantité de signaux disponibles : sommeil, HRV et fréquence cardiaque.</p>
-            <p><strong className="text-white">Sommeil</strong> · qualité déclarée, puis données de l’app Santé ou du bracelet.</p>
-            <p><strong className="text-white">Score COAI</strong> · synthèse de tes quatre piliers actuels.</p>
-            <p><strong className="text-white">Âge COAI</strong> · débloqué uniquement après un historique suffisamment fiable.</p>
+            <p><strong className="text-white">Sommeil</strong> · qualité déclarée dans ton profil.</p>
+            <p><strong className="text-white">Score COAI</strong> · régularité, récupération et effort déclarés sur les 90 derniers jours, comme sur l’accueil.</p>
+            <p><strong className="text-white">Âge COAI</strong> · indicateur relatif issu du même suivi, disponible avec suffisamment de bilans et ton âge renseigné.</p>
           </div>
-          <p className="mt-5 text-center text-[10px] font-medium leading-5 text-[#7f898f]">Les scores indiquent ton niveau actuel et la précision des données disponibles. Ils ne constituent pas un diagnostic médical.</p>
+          <p className="mt-5 text-center text-[10px] font-medium leading-5 text-[#7f898f]">Les pourcentages de profil indiquent des informations renseignées, pas une performance mesurée. {AGE_COAI_DISCLAIMER}</p>
         </div>
       </Card>
 
