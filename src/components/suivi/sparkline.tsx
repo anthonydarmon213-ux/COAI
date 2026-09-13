@@ -29,7 +29,7 @@ export function Sparkline({
       <div className="mb-2 flex items-baseline justify-between">
         <SectionLabel>{label}</SectionLabel>
         <span className="font-mono text-sm text-graphite-200">
-          {dernier} {unite}
+          {points.length ? `${dernier} ${unite}` : "—"}
         </span>
       </div>
       {points.length > 1 ? (
@@ -45,7 +45,11 @@ export function Sparkline({
           />
         </svg>
       ) : (
-        <p className="text-sm text-graphite-400">Première charge enregistrée. La courbe apparaîtra dès la prochaine séance.</p>
+        <p className="text-sm text-graphite-400">
+          {points.length
+            ? "Premier relevé enregistré. Un prochain relevé permettra d’afficher la tendance."
+            : "Aucun relevé pour le moment. Ajoute une première mesure pour commencer ton suivi."}
+        </p>
       )}
     </Card>
   );
