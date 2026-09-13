@@ -429,6 +429,7 @@ export default function LandingPage() {
         aria-labelledby="coaching-anthony-title"
       >
         <SectionLabel>Premium Remote · VIP Présentiel</SectionLabel>
+        <p className="text-sm tracking-wide text-laiton-200">VIP · Santé &amp; longévité pour entrepreneurs</p>
         <h2
           id="coaching-anthony-title"
           className="max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-white sm:text-5xl"

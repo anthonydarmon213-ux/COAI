@@ -25,29 +25,23 @@ import { LeadCtaLink } from "@/components/marketing/lead-cta";
 // aucune note n'est affichée : un chiffre inventé se verrait et se paierait.
 export function CoaiIntro() {
   return (
-    <section className="coai-future-hero coai-landing-hero relative overflow-hidden px-6 pb-0 pt-28 sm:px-10 sm:pt-36">
+    <section className="relative overflow-hidden bg-[#0b1316] px-6 pb-12 pt-28 sm:px-10 sm:pt-36">
       {/* Halo laiton derrière l'accroche — remplace la photo de fond, qui
           descend maintenant sous le hero. */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute left-1/2 top-0 h-[620px] w-[1100px] max-w-[160vw] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(56,189,248,.15),rgba(212,175,55,.08)_42%,transparent_72%)] blur-2xl" />
-        <div className="absolute left-1/2 top-20 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full border border-cyan-300/[0.09] shadow-[0_0_100px_rgba(56,189,248,.06)]" />
-        <div className="absolute left-1/2 top-28 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full border border-dashed border-laiton-300/[0.12]" />
-      </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center">
-        <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.055] px-4 py-2 text-[11px] font-bold uppercase leading-4 tracking-[0.2em] text-cyan-200 sm:text-xs">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(56,189,248,.9)]" />
-          Pour dirigeants &amp; entrepreneurs de 35 ans et plus
+        <p className="text-xs font-medium uppercase leading-5 tracking-[0.32em] text-laiton-200">
+          COAI Wellness Club
         </p>
 
-        <h1 className="mt-5 font-display text-[2.15rem] font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
-          Retrouve un corps fort et ton énergie,
+        <h1 className="mt-7 font-display text-[2.65rem] font-medium leading-[1.06] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
+          Un corps fort.
           {/* Couleur pleine volontaire : le couple bg-clip-text /
               text-transparent disparaissait dans certains WebViews Chromium,
               laissant visuellement un grand trou au milieu du hero alors que
               la phrase restait présente dans l'arbre d'accessibilité. */}
-          <span className="mt-2 block text-laiton-200 drop-shadow-[0_0_28px_rgba(212,175,55,.22)]">
-            sans sacrifier ton agenda.
+          <span className="mt-2 block text-laiton-200">
+            Une énergie durable.
           </span>
         </h1>
 
@@ -59,16 +53,16 @@ export function CoaiIntro() {
             relie proprement le diplome a l'experience, et le prenom cree un
             lien direct avec la photo d'Anthony juste en dessous. */}
         <p className="mt-6 max-w-2xl text-base leading-7 text-graphite-300 sm:text-lg sm:leading-8">
-          La Méthode COAI Adapt transforme ton bilan en plan quotidien qui évolue avec
-          ton sommeil, ton énergie, tes déplacements et tes progrès.
+          Entraînement, nutrition, récupération. Un accompagnement adapté à ton
+          niveau et à ton quotidien, avec l’expertise d’un coach diplômé.
         </p>
 
         <div className="mt-8">
           {/* coai-cta-glow : halo laiton qui respire autour du bouton
               (cf. globals.css) — reprend l'effet de charlesdenis.fr. */}
-          <span className="coai-cta-glow">
+          <span>
             <LeadCtaLink placement="hero" className="px-10 py-5 text-sm font-extrabold sm:text-base">
-              Faire mon bilan de forme offert →
+              Faire mon bilan · 3 min →
             </LeadCtaLink>
           </span>
           {/* Ligne de reassurance retiree le 04/09/2026 (Anthony : « enleve »). */}
@@ -107,6 +101,13 @@ export function CoaiIntro() {
           on n'en voyait qu'un filet. En portrait plein cadre ici, elle est
           enfin lisible, et c'est elle qui porte la confiance — un visage réel
           plutôt qu'un visuel généré. */}
+      <figure className="relative z-10 mx-auto mt-12 w-full max-w-4xl overflow-hidden rounded-2xl bg-black sm:mt-16">
+        <video controls playsInline preload="none" poster="/videos/exercices/posters/tirage-horizontal.jpg" className="aspect-video w-full object-contain" aria-label="Démonstration COAI : tirage horizontal à la poulie">
+          <source src="/videos/exercices/tirage-horizontal.mp4" type="video/mp4" />
+          Ton navigateur ne peut pas lire cette vidéo.
+        </video>
+        <figcaption className="bg-[#142126] px-6 py-5 text-sm leading-6 text-white/70">Le mouvement, pas à pas. Découvre une vraie démonstration de notre bibliothèque.</figcaption>
+      </figure>
       <div className="relative z-10 mx-auto mt-12 w-full max-w-lg sm:mt-16">
         <div className="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] border-x border-t border-cyan-300/20 shadow-[0_-30px_120px_-40px_rgba(56,189,248,.34)]">
           {/* Recadrage : la photo source est un portrait haut dont le tiers
