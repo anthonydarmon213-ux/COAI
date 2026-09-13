@@ -56,7 +56,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const body = await request.json().catch(() => ({}));
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "Demande de paiement invalide. Reviens aux offres pour choisir ta formule." }, { status: 400 });
+  }
   // Une demande PREMIUM ou STANDARD est refusee plutot que rabattue
   // silencieusement sur une autre formule : mieux vaut une erreur explicite
   // qu'un client facture pour un plan qu'il n'a pas choisi.
@@ -73,16 +76,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const plan: Plan = "PASS_IA";
+  if (body.plan !== "PASS_IA") {
+    return NextResponse.json({ error: "Formule non reconnue. Reviens aux offres pour choisir ta formule." }, { status: 400 });
+  }
+  if (body.billing !== "MONTHLY" && body.billing !== "QUARTERLY" && body.billing !== "ANNUAL") {
+    return NextResponse.json({ error: "Choisis une facturation mensuelle, trimestrielle ou annuelle depuis les offres." }, { status: 400 });
+  }
+
+  const plan: Plan = body.plan;
   const planConfig = offresParPlan()[plan];
-  // Seul Pass IA propose réellement les deux rythmes ; pour les autres, les
-  // deux entrées pointent sur le même tarif mensuel, donc un "ANNUAL"
-  // envoyé par erreur ne peut pas facturer un montant inattendu.
-  // Seul Pass IA propose reellement les trois rythmes ; pour les autres les
-  // trois entrees pointent sur le meme tarif mensuel, donc une valeur
-  // inattendue ne peut pas facturer un montant surprise.
-  const billing: "MONTHLY" | "QUARTERLY" | "ANNUAL" =
-    body.billing === "ANNUAL" ? "ANNUAL" : body.billing === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
+  // Ne jamais remplacer une fréquence invalide par une autre facturation.
+  const billing: "MONTHLY" | "QUARTERLY" | "ANNUAL" = body.billing;
   const tarif = planConfig[billing];
   const offer = { name: planConfig.name, trialDays: planConfig.trialDays, ...tarif };
 
