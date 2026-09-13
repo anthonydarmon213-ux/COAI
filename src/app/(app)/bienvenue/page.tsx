@@ -93,6 +93,32 @@ export default async function BienvenuePage({
       console.error("Impossible de vérifier la session Stripe de bienvenue", error);
     }
   }
+  // Un retour non vérifié n'est ni un nouvel achat, ni une inscription
+  // gratuite. Ne pas lancer l'activation ou inviter à payer une deuxième fois.
+  if (searchParams.session_id !== undefined && !sessionVerifiee) {
+    return (
+      <section className="mx-auto flex max-w-xl flex-col gap-5 py-10" aria-labelledby="confirmation-title">
+        <SectionLabel>Confirmation à vérifier</SectionLabel>
+        <h1 id="confirmation-title" className="font-display text-3xl font-semibold text-white">
+          Nous ne pouvons pas encore confirmer ce paiement.
+        </h1>
+        <p className="text-sm leading-6 text-graphite-300">
+          Le lien peut être incomplet ou la vérification momentanément indisponible.
+          Si tu viens de payer, ne recommence pas le paiement : vérifie d&apos;abord ton abonnement.
+        </p>
+        <a href={`/bienvenue?session_id=${encodeURIComponent(searchParams.session_id)}`}
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-laiton-400 px-5 py-3 font-semibold text-black">
+          Réessayer la vérification
+        </a>
+        <Link href="/compte/abonnement" className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/20 px-5 py-3 text-white">
+          Voir mon abonnement
+        </Link>
+        <Link href="/dashboard" className="inline-flex min-h-[44px] items-center justify-center text-sm text-graphite-300 underline">
+          Revenir à mon espace
+        </Link>
+      </section>
+    );
+  }
   // Compatibilité avec les retours créés avant l'ajout de session_id : un
   // paramètre seul ne suffit jamais, il faut aussi un abonnement actif déjà
   // synchronisé par le webhook.
