@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { recoveryHref, recoveryError } from "@/lib/auth/recovery-navigation";
 import { createSupabaseRecoveryClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,11 @@ import { SectionLabel } from "@/components/ui/section-label";
 // Le lien reçu par email (via /mot-de-passe-oublie) ouvre cette page avec une
 // session temporaire déjà établie par le client Supabase (détectée dans l'URL).
 export default function ReinitialiserMotDePassePage() {
+  return <Suspense fallback={<p>Chargement…</p>}><ResetForm /></Suspense>;
+}
+
+function ResetForm() {
+  const returnTo = useSearchParams().get("redirect_to");
   const router = useRouter();
   const [supabase] = useState(() => createSupabaseRecoveryClient());
   const [password, setPassword] = useState("");
@@ -44,6 +50,10 @@ export default function ReinitialiserMotDePassePage() {
 
       setSessionReady(true);
       setError(null);
+    }).catch(() => {
+      if (!active) return;
+      setCheckingSession(false);
+      setError("Impossible de vérifier ce lien. Vérifie ta connexion et réessaie.");
     });
 
     return () => {
@@ -67,15 +77,10 @@ export default function ReinitialiserMotDePassePage() {
       if (updateError) throw updateError;
 
       await supabase.auth.signOut();
-      router.push("/sign-in?password_reset=success");
+      router.push(recoveryHref("/sign-in", returnTo, true));
       router.refresh();
     } catch (err) {
-      console.error("[reinitialiser-mot-de-passe]", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de mettre à jour le mot de passe. Le lien a peut-être expiré."
-      );
+      setError(recoveryError(err, true));
     } finally {
       setLoading(false);
     }
@@ -118,7 +123,7 @@ export default function ReinitialiserMotDePassePage() {
         ) : (
           <div className="flex flex-col gap-3">
             {error && <p className="text-sm text-red-400">{error}</p>}
-            <a href="/mot-de-passe-oublie" className="text-sm text-laiton-400 underline">
+            <a href={recoveryHref("/mot-de-passe-oublie", returnTo)} className="text-sm text-laiton-400 underline">
               Demander un nouveau lien
             </a>
           </div>

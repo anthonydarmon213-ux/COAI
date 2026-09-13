@@ -11,6 +11,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { sanitizeReturnTo, signupHrefForReturnTo } from "@/lib/auth/safe-redirect";
 import { ConfirmationEmail } from "@/components/auth/confirmation-email";
+import { recoveryHref } from "@/lib/auth/recovery-navigation";
 import { authLinkIssue, type AuthLinkIssue } from "@/lib/auth/confirmation";
 import {
   readIntendedBillingCookie,
@@ -92,6 +93,9 @@ export default function SignInPage() {
           {linkIssue === "oauth" ? "La connexion n’a pas abouti. Réessaie avec Google ou ton email." : "Ce lien a expiré, a déjà été utilisé ou ne peut pas être ouvert ici. Si ton compte est confirmé, connecte-toi. Sinon, demande un nouveau lien ci-dessous."}
         </p>}
         <GoogleSignInButton redirectTo={returnTo} />
+        {searchParams.get("password_reset") === "success" && (
+          <p role="status" className="text-sm text-graphite-200">Mot de passe mis à jour. Connecte-toi avec ton nouveau mot de passe.</p>
+        )}
         <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
           <div className="h-px flex-1 bg-graphite-800" />
           ou
@@ -132,7 +136,7 @@ export default function SignInPage() {
           </Button>
         </form>
         {linkIssue && linkIssue !== "oauth" && <ConfirmationEmail initialEmail={email} returnTo={returnTo} />}
-        <Link href="/mot-de-passe-oublie" className="text-sm text-graphite-400 underline">
+        <Link href={recoveryHref("/mot-de-passe-oublie", returnTo)} className="text-sm text-graphite-400 underline">
           Mot de passe oublié ?
         </Link>
         <p className="text-sm text-graphite-400">

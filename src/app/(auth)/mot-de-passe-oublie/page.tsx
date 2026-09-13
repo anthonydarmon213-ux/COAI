@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { recoveryHref, recoveryError } from "@/lib/auth/recovery-navigation";
 import { createSupabaseRecoveryClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +12,11 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 
 export default function MotDePasseOubliePage() {
+  return <Suspense fallback={<p>Chargement…</p>}><RecoveryForm /></Suspense>;
+}
+
+function RecoveryForm() {
+  const returnTo = useSearchParams().get("redirect_to");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -21,13 +29,12 @@ export default function MotDePasseOubliePage() {
     try {
       const supabase = createSupabaseRecoveryClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reinitialiser-mot-de-passe`,
+        redirectTo: window.location.origin + recoveryHref("/reinitialiser-mot-de-passe", returnTo),
       });
       if (resetError) throw resetError;
       setSent(true);
     } catch (err) {
-      console.error("[mot-de-passe-oublie]", err);
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+      setError(recoveryError(err));
     } finally {
       setLoading(false);
     }
@@ -42,7 +49,7 @@ export default function MotDePasseOubliePage() {
         </div>
 
         {sent ? (
-          <p className="text-sm text-graphite-200">
+          <p role="status" className="text-sm text-graphite-200">
             Si un compte existe avec cette adresse, un email vient d&apos;être envoyé avec un
             lien pour choisir un nouveau mot de passe.
           </p>
@@ -51,17 +58,21 @@ export default function MotDePasseOubliePage() {
             <Field label="Email">
               <Input
                 type="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Field>
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
             <Button type="submit" disabled={loading}>
               {loading ? "Envoi…" : "Envoyer le lien de réinitialisation"}
             </Button>
           </form>
         )}
+        <Link href={recoveryHref("/sign-in", returnTo)} className="flex min-h-11 items-center text-sm text-graphite-300 underline">Retour à la connexion</Link>
       </Card>
     </main>
   );
