@@ -24,7 +24,9 @@ const TABLE: Entree[] = [
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split squat"], video: { fichier: "fentes-bulgares", description: "Fentes bulgares aux haltères" } },
   { motifs: ["mollets unilateral haltere", "mollet unilateral haltere"], video: { fichier: "mollets-unilateral-haltere", description: "Mollets unilatéral avec haltère" } },
   { motifs: ["rowing elastique", "rowing a l'elastique"], video: { fichier: "rowing-elastique", description: "Rowing penché à l'élastique" } },
-  { motifs: ["face pull elastique", "face pull"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
+  // Le clip montre un élastique, jamais une poulie. « face pull » seul
+  // capturait aussi les prescriptions à la poulie basse/haute.
+  { motifs: ["face pull elastique", "face pull a l'elastique", "face pull avec elastique"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
   { motifs: ["kickback triceps a l'elastique", "kickback triceps elastique"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
   { motifs: ["developpe incline (machine)", "developpe incline machine", "developpe incline a la machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
   // Lot fonctionnel réel du 25/08/2026. Les variantes précises restent

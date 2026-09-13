@@ -15,4 +15,10 @@ for (const nom of ['Kickback élastique', 'Kickback fessier élastique', 'Kickba
 assert.equal(video('Kickback triceps à l’élastique').fichier, 'kickback-elastique');
 assert.equal(video('Traction (barre fixe)').fichier, 'traction');
 assert.equal(video('Traction supination').fichier, 'chin-up');
-console.log('PASS: 9 correspondances vidéo sans confusion fessiers/triceps ou traction libre/assistée');
+for (const nom of ['Face pull', 'Face pull à la poulie basse', 'Face pull poulie haute', 'Face pull câble']) {
+  assert.equal(video(nom), null, nom);
+}
+for (const nom of ['Face pull élastique', 'Face pull à l’élastique', 'Face pull avec élastique']) {
+  assert.equal(video(nom).fichier, 'face-pull-elastique', nom);
+}
+console.log('PASS: 16 correspondances vidéo, dont face pull sans confusion poulie/élastique');
