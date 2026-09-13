@@ -11,10 +11,11 @@ function load(file, requireModule) {
 const engine = load('src/lib/insight/age-coai.ts');
 let dailies = [];
 let ageChronologique = 40;
+let profileOverride;
 function Gauge() {}
 const page = load('src/app/(app)/suivi/progression/page.tsx', name => {
   if (name === 'react/jsx-runtime') return require(name);
-  if (name.endsWith('/auth/server')) return { getCurrentAppUser: async () => ({ id: 'test-only', profile: { age: ageChronologique } }) };
+  if (name.endsWith('/auth/server')) return { getCurrentAppUser: async () => ({ id: 'test-only', profile: profileOverride === undefined ? { age: ageChronologique } : profileOverride }) };
   if (name.endsWith('/db/client')) return { prisma: {
     mesure: { findMany: async () => [] }, seanceLog: { findMany: async () => [] },
     dailySession: { findMany: async args => { assert.equal(args.where.userId, 'test-only'); assert(args.where.date.gte); return dailies; } },
@@ -45,5 +46,15 @@ function gauges(node, result = []) {
       assert(!result.some(g => g.sublabel === 'analyse en cours'));
     }
   }
-  console.log('PASS: progression uses existing score engine across 8 availability scenarios');
+  for (const [profile, nutrition, recovery] of [
+    [null, 0, 0], [{}, 0, 0],
+    [{ habitudesAlimentaires: null, hydratation: '', qualiteSommeil: '   ' }, 0, 0],
+    [{ consommationCafe: 0, qualiteSommeil: 'bonne' }, 17, 25],
+  ]) {
+    profileOverride = profile;
+    const result = gauges(await page());
+    assert.equal(result.find(g => g.label === 'Alimentation').percent, nutrition);
+    assert.equal(result.find(g => g.label === 'Récupération').percent, recovery);
+  }
+  console.log('PASS: 8 score availability scenarios and 4 missing/partial profile scenarios');
 })().catch(error => { console.error(error); process.exitCode = 1; });

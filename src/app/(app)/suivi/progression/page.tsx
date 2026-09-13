@@ -127,14 +127,15 @@ export default async function ProgressionPage() {
     user.profile?.consommationCafe,
     user.profile?.consommationAlcool,
   ];
-  const alimentation = Math.round((alimentationFields.filter((value) => value !== null && value !== "").length / alimentationFields.length) * 100);
+  const estRenseigne = (value: unknown) => value != null && (typeof value !== "string" || value.trim() !== "");
+  const alimentation = Math.round((alimentationFields.filter(estRenseigne).length / alimentationFields.length) * 100);
   const recuperationFields = [
     user.profile?.qualiteSommeil,
     user.profile?.hrv,
     user.profile?.frequenceCardiaqueRepos,
     user.profile?.sommeilMoyenHeures,
   ];
-  const precisionRecuperation = Math.round((recuperationFields.filter((value) => value !== null && value !== "").length / recuperationFields.length) * 100);
+  const precisionRecuperation = Math.round((recuperationFields.filter(estRenseigne).length / recuperationFields.length) * 100);
   // Même moteur et même fenêtre de suivi que l'accueil, sans score parallèle.
   const coai = calculerAgeCoai({ ageChronologique: user.profile?.age ?? null, dailies });
   const age = coai.disponible ? coai.age : null;
