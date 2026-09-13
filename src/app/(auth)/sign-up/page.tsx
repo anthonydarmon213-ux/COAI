@@ -169,37 +169,10 @@ export default function SignUpPage() {
         ← Retour à l&apos;accueil
       </Link>
       <div className="coai-access-shell grid w-full max-w-4xl overflow-hidden rounded-[2rem] lg:grid-cols-[1.05fr_.95fr]">
-        <section className="coai-access-intro flex flex-col justify-between gap-10 px-7 py-8 sm:px-10 sm:py-10">
-          <div>
-            <div className="coai-diagnostic-kicker">
-              <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
-              <span>
-                {arriveDepuisInstagram ? "Création du compte, puis paiement" : "Après ton bilan · création du compte"}
-              </span>
-            </div>
-            <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
-              {arriveDepuisInstagram ? "Retrouve ton offre dans COAI." : "Entre dans ton espace COAI."}
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
-              {arriveDepuisInstagram
-                ? "Crée ton compte ou connecte-toi. Tu retrouveras ensuite ton offre et ses conditions avant de confirmer ton choix."
-                : "Ton résultat personnalisé est conservé. Tu entres d'abord dans ton espace et poses ton premier repère RepCount, sans carte bancaire."}
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {(arriveDepuisInstagram
-              ? ["Ton offre conservée", "Connexion sécurisée", "Aucun débit aujourd'hui"]
-              : ["Ton résultat conservé", "Premier repère RepCount", "Aucun paiement automatique"]
-            ).map((item) => (
-              <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
-            ))}
-          </div>
-        </section>
-
         <Card className="coai-access-card flex w-full flex-col gap-5 rounded-none border-0">
           <div className="flex flex-col gap-1">
             <SectionLabel>Accès personnel</SectionLabel>
-            <h2 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h2>
+            <h1 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h1>
             <p className="text-sm leading-6 text-graphite-400">Une minute suffit pour retrouver ton analyse.</p>
           </div>
           <GoogleSignInButton redirectTo={destinationApresInscription} />
@@ -252,6 +225,32 @@ export default function SignUpPage() {
             </Link>
           </p>
         </Card>
+        <section className="coai-access-intro flex flex-col justify-between gap-10 px-7 py-8 sm:px-10 sm:py-10">
+          <div>
+            <div className="coai-diagnostic-kicker">
+              <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
+              <span>
+                {arriveDepuisInstagram ? "Création du compte, puis paiement" : "Après ton bilan · création du compte"}
+              </span>
+            </div>
+            <h2 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
+              {arriveDepuisInstagram ? "Retrouve ton offre dans COAI." : "Entre dans ton espace COAI."}
+            </h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
+              {arriveDepuisInstagram
+                ? "Crée ton compte ou connecte-toi. Tu retrouveras ensuite ton offre et ses conditions avant de confirmer ton choix."
+                : "Ton résultat personnalisé est conservé. Tu entres d'abord dans ton espace et poses ton premier repère RepCount, sans carte bancaire."}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            {(arriveDepuisInstagram
+              ? ["Ton offre conservée", "Connexion sécurisée", "Aucun débit aujourd'hui"]
+              : ["Ton résultat conservé", "Premier repère RepCount", "Aucun paiement automatique"]
+            ).map((item) => (
+              <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );
