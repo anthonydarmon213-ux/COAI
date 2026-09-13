@@ -104,6 +104,8 @@ export default async function SeanceDuJourPage({ searchParams }: { searchParams?
         retourAuCalme={texte(s.retourAuCalme)}
         prenom={user.prenom}
         photos={story.exercices.map(ex => ex.photo ?? null)}
+        echauffementPhoto={story.echauffementPhoto}
+        retourAuCalmePhoto={story.retourAuCalmePhoto}
       />
     </div>
   );

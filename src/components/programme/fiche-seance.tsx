@@ -68,6 +68,8 @@ export function FicheSeance({
   retourAuCalme,
   prenom,
   photos,
+  echauffementPhoto,
+  retourAuCalmePhoto,
 }: {
   nomSeance: string;
   dureeMinutes?: number | null;
@@ -76,6 +78,8 @@ export function FicheSeance({
   retourAuCalme?: string | null;
   prenom?: string | null;
   photos?: (string | null)[];
+  echauffementPhoto?: string | null;
+  retourAuCalmePhoto?: string | null;
 }) {
   const valides = exercices.filter(isObj);
 
@@ -117,6 +121,11 @@ export function FicheSeance({
             <p className="font-display text-[11px] font-extrabold uppercase tracking-wide text-white">
               Échauffement
             </p>
+            {echauffementPhoto && <div className="relative my-3 overflow-hidden rounded-lg bg-black">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local illustration, printable */}
+              <img src={echauffementPhoto} alt="Illustration de la mobilité à l’échauffement" className="max-h-52 w-full object-contain" />
+              <CoaiImageMark className="bottom-2 right-2" />
+            </div>}
             <p className="mt-0.5 text-[11.5px] leading-relaxed text-graphite-400">
               {echauffement ??
                 "5 à 10 min de cardio léger, puis mobilité ciblée sur les articulations de la séance. Gamme montante sur le premier exercice lourd."}
@@ -226,6 +235,11 @@ export function FicheSeance({
           <h3 className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-laiton-400">
             Retour au calme
           </h3>
+          {retourAuCalmePhoto && <div className="relative my-3 overflow-hidden rounded-lg bg-black">
+            {/* eslint-disable-next-line @next/next/no-img-element -- local illustration, printable */}
+            <img src={retourAuCalmePhoto} alt="Illustration du retour au calme" className="max-h-52 w-full object-contain" />
+            <CoaiImageMark className="bottom-2 right-2" />
+          </div>}
           <p className="mt-2 text-[11.5px] leading-relaxed text-graphite-400">
             {retourAuCalme ??
               "Étirements légers des groupes travaillés, 5 à 10 min. Respiration lente pour faire redescendre le rythme cardiaque."}

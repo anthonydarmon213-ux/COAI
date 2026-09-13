@@ -11,6 +11,12 @@ const { accessibleTraining } = load('src/lib/programmes/access.ts');
 const cataloguePhotos = load('src/lib/exercices/photos-coai.ts');
 const { illustrerStory } = load('src/lib/programmes/story-photos.ts', { require: () => cataloguePhotos });
 for (const genre of ['homme', 'femme']) {
+  for (const retourAuCalme of ["Posture de l'enfant", "Posture de l’enfant puis respiration calme"]) {
+    const photo = illustrerStory({ exercices: [], echauffement: '', retourAuCalme }, genre).retourAuCalmePhoto;
+    assert.equal(photo, genre === 'homme' ? '/fiche-seance/mobilite-posture-enfant-homme-v2.png' : '/exercices/mobilite-posture-enfant.jpg');
+    assert(fs.existsSync(`public${photo}`));
+  }
+  assert.equal(illustrerStory({ exercices: [], echauffement: '', retourAuCalme: 'Marche lente' }, genre).retourAuCalmePhoto, null);
   for (const nom of ['Fentes bulgares haltères', 'Fente bulgare haltères', 'Fentes bulgares avec haltères']) {
     const photo = illustrerStory({ exercices: [{ nom }], echauffement: '', retourAuCalme: '' }, genre).exercices[0].photo;
     assert.equal(photo, `/exercices/fentes-bulgares-${genre}-coai.jpg`);

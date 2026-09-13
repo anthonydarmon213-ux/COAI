@@ -22,7 +22,9 @@ export function illustrerStory(story: StorySeance, genre: GenreVisuel): StorySea
     // Illustrate only the action actually present in the instructions.
     echauffementPhoto: /mobilit[eé].*(hanche)|ouverture.*hanche/i.test(story.echauffement)
       ? genre === "homme" ? "/fiche-seance/mobilite-etirement-psoas-fente-homme.png" : "/exercices/mobilite-etirement-psoas-fente.jpg" : null,
-    retourAuCalmePhoto: /respiration/i.test(story.retourAuCalme)
+    retourAuCalmePhoto: /posture de l[’']enfant/i.test(story.retourAuCalme)
+      ? genre === "homme" ? "/fiche-seance/mobilite-posture-enfant-homme-v2.png" : "/exercices/mobilite-posture-enfant.jpg"
+      : /respiration/i.test(story.retourAuCalme)
       ? genre === "homme" ? "/programmes/recuperation/respiration-diaphragmatique-homme-v1.png" : "/programmes/recuperation/respiration-diaphragmatique-femme-v1.png" : null,
   };
 }
