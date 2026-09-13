@@ -92,6 +92,7 @@ export default function SignUpPage() {
     }
   }, [searchParams]);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [emailEnvoye, setEmailEnvoye] = useState(false);
@@ -130,7 +131,12 @@ export default function SignUpPage() {
       window.location.href = `/completer-inscription?redirect_to=${encodeURIComponent(destinationApresInscription)}`;
     } catch (err) {
       console.error("[sign-up]", err);
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+      const code = typeof err === "object" && err !== null && "code" in err ? String(err.code) : "";
+      setError(code === "weak_password"
+        ? "Choisis un mot de passe plus robuste : au moins 8 caractères, et évite les mots de passe courants."
+        : code === "over_email_send_rate_limit" || code === "over_request_rate_limit"
+          ? "Trop de tentatives rapprochées. Patiente quelques minutes avant de réessayer."
+          : "La création du compte n’a pas abouti. Vérifie ta connexion et réessaie. Si tu as déjà un compte, utilise « Se connecter ».");
       setLoading(false);
     }
   }
@@ -172,11 +178,11 @@ export default function SignUpPage() {
               </span>
             </div>
             <h1 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
-              {arriveDepuisInstagram ? "Crée ton accès avant Stripe." : "Entre dans ton espace COAI."}
+              {arriveDepuisInstagram ? "Retrouve ton offre dans COAI." : "Entre dans ton espace COAI."}
             </h1>
             <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
               {arriveDepuisInstagram
-                ? "Instagram utilise une connexion séparée de Safari. Ton offre est conservée : crée ton accès ou connecte-toi, puis tu reviendras la confirmer avant Stripe."
+                ? "Crée ton compte ou connecte-toi. Tu retrouveras ensuite ton offre et ses conditions avant de confirmer ton choix."
                 : "Ton résultat personnalisé est conservé. Tu entres d'abord dans ton espace et poses ton premier repère RepCount, sans carte bancaire."}
             </p>
           </div>
@@ -204,12 +210,15 @@ export default function SignUpPage() {
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field label="Prénom">
-              <Input className="coai-access-input" type="text" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
+              <Input className="coai-access-input" type="text" autoComplete="given-name" value={prenom} onChange={(e) => setPrenom(e.target.value)} />
             </Field>
             <Field label="Email">
               <Input
                 className="coai-access-input"
                 type="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -218,14 +227,20 @@ export default function SignUpPage() {
             <Field label="Mot de passe">
               <Input
                 className="coai-access-input"
-                type="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                aria-describedby="signup-password-help"
                 required
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Field>
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            <div className="flex items-center justify-between gap-3">
+              <p id="signup-password-help" className="text-sm text-graphite-300">8 caractères minimum.</p>
+              <button type="button" aria-pressed={showPassword} className="min-h-11 px-3 text-sm text-laiton-200 underline" onClick={() => setShowPassword(value => !value)}>{showPassword ? "Masquer" : "Afficher"} le mot de passe</button>
+            </div>
+            {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
             <Button type="submit" disabled={loading}>
               {loading ? "Création de ton espace…" : "Créer mon compte gratuit →"}
             </Button>
