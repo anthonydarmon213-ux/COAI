@@ -55,7 +55,9 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedRoute && !user) {
     const redirectUrl = new URL("/sign-in", request.url);
-    redirectUrl.searchParams.set("redirect_to", request.nextUrl.pathname);
+    // Conserver la séance choisie et le retour Stripe si la session a expiré.
+    // La destination reste relative et est validée à nouveau après connexion.
+    redirectUrl.searchParams.set("redirect_to", request.nextUrl.pathname + request.nextUrl.search);
     return NextResponse.redirect(redirectUrl);
   }
 
