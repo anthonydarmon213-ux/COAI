@@ -2,6 +2,7 @@ import { MUSCLE_LABEL, musclesPourExercice } from "@/lib/exercices/muscles";
 import { variantesPourExercice } from "@/lib/exercices/variantes";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
+import { formatRepos } from "@/lib/programmes/repos";
 
 // Fiche de séance partageable (23/08/2026, format validé par Anthony sur
 // maquette) — pensée pour être imprimée en PDF et postée en story.
@@ -206,7 +207,7 @@ export function FicheSeance({
               )}
               {texte(ex.repos) && (
                 <div className="text-center font-mono text-[9px] uppercase tracking-[0.07em] text-graphite-500">
-                  Repos {texte(ex.repos)}
+                  Repos {formatRepos(texte(ex.repos)!)}
                 </div>
               )}
               {methode && (

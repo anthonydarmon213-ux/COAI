@@ -2,6 +2,15 @@
  * Les fourchettes retiennent leur borne haute. Format incompréhensible : 60 s.
  * Les bornes de sécurité historiques du lecteur (10 s à 10 min) sont conservées.
  */
+export function formatRepos(value: string): string {
+  // Affichage seulement : ne jamais borner ni inventer une durée prescrite.
+  return value.replace(/^\s*(\d+)\s*(?:secondes?|sec|s)\s*$/i, (_original, digits: string) => {
+    const seconds = Number(digits);
+    if (seconds < 60) return `${seconds} s`;
+    return `${Math.floor(seconds / 60)} min${seconds % 60 ? ` ${seconds % 60} s` : ""}`;
+  });
+}
+
 export function parseReposSeconds(value: unknown): number {
   if (typeof value !== "string") return 60;
   const texte = value.trim().toLowerCase().replace(/,/g, ".");
