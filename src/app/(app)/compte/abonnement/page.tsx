@@ -52,6 +52,69 @@ export default async function AbonnementPage() {
         </h1>
       </div>
 
+      <Card className="flex flex-col items-start gap-4">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
+          {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
+          {user.subscription?.billingInterval === "ANNUAL" && <Badge tone="success">Facturation annuelle</Badge>}
+        </div>
+        <ul className="flex flex-col gap-1.5">
+          {PLAN_FEATURES[plan].map((feature) => (
+            <li key={feature} className="flex items-start gap-2 text-sm text-graphite-300">
+              <span className="mt-0.5 text-laiton-400">✓</span>
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+        {finProgrammee && (
+          <div className="flex flex-col items-start gap-2 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.06] p-3">
+            <p className="text-sm text-laiton-300">
+              Résiliation programmée — ton accès se termine le{" "}
+              {user.subscription!.currentPeriodEnd!.toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}.
+            </p>
+            <p className="text-xs text-graphite-400">Tu peux annuler la résiliation depuis le portail tant que cette date n’est pas passée.</p>
+            <PortalButton label="Conserver mon abonnement" />
+            <ChurnFeedbackForm />
+          </div>
+        )}
+        {statut === "PAST_DUE" && (
+          <div className="flex flex-col items-start gap-2 rounded-lg border border-red-400/25 bg-red-400/[0.06] p-3">
+            <p className="text-sm text-red-300">Ton dernier paiement n’a pas abouti.</p>
+            <p className="text-xs text-graphite-400">Mets à jour ton moyen de paiement pour éviter une interruption de ton accompagnement.</p>
+            <PortalButton label="Mettre à jour mon paiement" />
+          </div>
+        )}
+        {!finProgrammee && enEssai && (
+          <p className="text-sm text-graphite-400">
+            Tes 7 jours d&apos;essai se terminent le{" "}
+            {user.subscription!.trialEnd!.toLocaleDateString("fr-FR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            — la facturation commence ensuite au tarif confirmé lors de ta souscription,
+            sauf résiliation avant cette date. Retrouve le montant et les échéances
+            dans « Gérer mon abonnement ».
+          </p>
+        )}
+        {statut && !finProgrammee && statut !== "PAST_DUE" ? (
+          <div className="flex flex-wrap items-center gap-4">
+            <PortalButton />
+            <a href="/pricing" className="text-sm text-laiton-400 underline">
+              Voir les accompagnements et les prix
+            </a>
+          </div>
+        ) : !statut ? (
+          <a href="/pricing" className="text-laiton-400 underline">
+            Voir les offres et les tarifs
+          </a>
+        ) : null}
+      </Card>
+
       <div className="flex flex-col gap-3">
         <SectionLabel>Mon histoire</SectionLabel>
         <Card className="flex flex-col gap-5 sm:flex-row sm:items-start">
@@ -120,69 +183,6 @@ export default async function AbonnementPage() {
           </div>
         </Card>
       </div>
-
-      <Card className="flex flex-col items-start gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
-          {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
-          {user.subscription?.billingInterval === "ANNUAL" && <Badge tone="success">Facturation annuelle</Badge>}
-        </div>
-        <ul className="flex flex-col gap-1.5">
-          {PLAN_FEATURES[plan].map((feature) => (
-            <li key={feature} className="flex items-start gap-2 text-sm text-graphite-300">
-              <span className="mt-0.5 text-laiton-400">✓</span>
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-        {finProgrammee && (
-          <div className="flex flex-col items-start gap-2 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.06] p-3">
-            <p className="text-sm text-laiton-300">
-              Résiliation programmée — ton accès se termine le{" "}
-              {user.subscription!.currentPeriodEnd!.toLocaleDateString("fr-FR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}.
-            </p>
-            <p className="text-xs text-graphite-400">Tu peux annuler la résiliation depuis le portail tant que cette date n’est pas passée.</p>
-            <PortalButton label="Conserver mon abonnement" />
-            <ChurnFeedbackForm />
-          </div>
-        )}
-        {statut === "PAST_DUE" && (
-          <div className="flex flex-col items-start gap-2 rounded-lg border border-red-400/25 bg-red-400/[0.06] p-3">
-            <p className="text-sm text-red-300">Ton dernier paiement n’a pas abouti.</p>
-            <p className="text-xs text-graphite-400">Mets à jour ton moyen de paiement pour éviter une interruption de ton accompagnement.</p>
-            <PortalButton label="Mettre à jour mon paiement" />
-          </div>
-        )}
-        {!finProgrammee && enEssai && (
-          <p className="text-sm text-graphite-400">
-            Tes 7 jours d&apos;essai se terminent le{" "}
-            {user.subscription!.trialEnd!.toLocaleDateString("fr-FR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}{" "}
-            — la facturation commence ensuite au tarif confirmé lors de ta souscription,
-            sauf résiliation avant cette date. Retrouve le montant et les échéances
-            dans « Gérer mon abonnement ».
-          </p>
-        )}
-        {statut && !finProgrammee && statut !== "PAST_DUE" ? (
-          <div className="flex flex-wrap items-center gap-4">
-            <PortalButton />
-            <a href="/pricing" className="text-sm text-laiton-400 underline">
-              Voir les accompagnements et les prix
-            </a>
-          </div>
-        ) : !statut ? (
-          <a href="/pricing" className="text-laiton-400 underline">
-            Voir les offres et les tarifs
-          </a>
-        ) : null}
-      </Card>
 
       <ParrainageCard />
 
