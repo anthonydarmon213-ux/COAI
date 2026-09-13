@@ -371,11 +371,12 @@ export function RepCount({
   const [sets, setSets] = useState<SetSaisi[]>([]);
   const [seances, setSeances] = useState<{ date: string; exercices: unknown }[]>([]);
   const [repos, setRepos] = useState<number | null>(null);
+  const [dureeRepos, setDureeRepos] = useState(REPOS_DEFAUT);
+  const [finRepos, setFinRepos] = useState<number | null>(null);
   const [enregistre, setEnregistre] = useState(false);
   const [enregistrementEnCours, setEnregistrementEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [premierRepereId, setPremierRepereId] = useState<string | null>(null);
-  const timerRef = useRef<number | null>(null);
   const prefillRef = useRef<string | null>(null);
   const sauvegardeRef = useRef<{ signature: string; date: string } | null>(null);
   const requeteEnCoursRef = useRef(false);
@@ -389,18 +390,18 @@ export function RepCount({
     void charger();
   }, [charger]);
 
-  // Minuteur de repos : décrémente jusqu'à zéro puis s'arrête de lui-même.
+  // Une échéance réelle reste correcte quand iOS suspend les minuteurs.
   useEffect(() => {
-    if (repos === null) return;
-    if (repos <= 0) {
-      setRepos(null);
-      return;
-    }
-    timerRef.current = window.setTimeout(() => setRepos((r) => (r === null ? null : r - 1)), 1000);
+    if (finRepos === null) { setRepos(null); return; }
+    const actualiser = () => setRepos(Math.max(0, Math.ceil((finRepos - Date.now()) / 1000)));
+    actualiser();
+    const timer = window.setInterval(actualiser, 1000);
+    document.addEventListener("visibilitychange", actualiser);
     return () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", actualiser);
     };
-  }, [repos]);
+  }, [finRepos]);
 
   const historique = useMemo(
     () => (nom.trim() ? historiquePourExercice(seances, nom) : []),
@@ -427,9 +428,9 @@ export function RepCount({
 
   const ajouterSerie = useCallback(() => {
     setSets((s) => [...s, maintien ? { reps: 0, charge: 0, dureeSecondes } : { reps, charge }]);
-    setRepos(REPOS_DEFAUT);
+    setFinRepos(Date.now() + dureeRepos * 1000);
     setEnregistre(false);
-  }, [reps, charge, maintien, dureeSecondes]);
+  }, [reps, charge, maintien, dureeSecondes, dureeRepos]);
 
   const sauvegarder = useCallback(async (seriesAEnregistrer: SetSaisi[]) => {
     if (!nom.trim() || seriesAEnregistrer.length === 0 || requeteEnCoursRef.current) return;
@@ -460,7 +461,7 @@ export function RepCount({
       if (firstId) setPremierRepereId(firstId);
       sauvegardeRef.current = null;
       setSets([]);
-      setRepos(null);
+      setFinRepos(null);
       setEnregistre(true);
       void charger();
     } catch {
@@ -607,8 +608,17 @@ export function RepCount({
         </div>
       )}
 
-      {historiqueMesure.length > 0 && <CourbeProgression historique={historiqueMesure} maintien={maintien} />}
-      {!maintien && historiqueMesure.length > 0 && <ChandeliersCharges key={nom.trim()} historique={historiqueMesure} />}
+      {historiqueMesure.length > 0 && <details className="rounded-xl border border-cyan-300/20 p-4">
+        <summary className="min-h-11 cursor-pointer text-sm font-semibold text-cyan-200">Voir ma progression · {historiqueMesure.length} séances</summary>
+        <CourbeProgression historique={historiqueMesure} maintien={maintien} />
+        {!maintien && <ChandeliersCharges key={nom.trim()} historique={historiqueMesure} />}
+      </details>}
+
+      <label className="text-sm text-graphite-300">Repos entre les séries
+        <select value={dureeRepos} onChange={e => setDureeRepos(Number(e.target.value))} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white">
+          {[30, 60, 90, 120, 180].map(secondes => <option key={secondes} value={secondes}>{Math.floor(secondes / 60)} min{secondes % 60 ? ` ${secondes % 60} s` : ""}</option>)}
+        </select>
+      </label>
 
       <label className="text-sm text-graphite-300">Mesure de la série
         <select value={maintien ? "maintien" : "repetitions"} disabled={sets.length > 0} onChange={e => setMaintien(e.target.value === "maintien")} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white disabled:opacity-50">
@@ -617,7 +627,7 @@ export function RepCount({
         </select>
       </label>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         {maintien ? <Stepper label="Maintien" valeur={dureeSecondes} setValeur={v => setDureeSecondes(Math.min(3600, v))} pas={5} unite="s" minimum={1} /> : <>
           <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} />
           <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
@@ -642,7 +652,7 @@ export function RepCount({
         <button
           type="button"
           onClick={ajouterSerie}
-          disabled={!nom.trim()}
+          disabled={!nom.trim() || enregistrementEnCours}
           className="rounded-full bg-cyan-300 py-4 text-base font-bold text-[#04121a] transition disabled:opacity-40"
         >
           Valider la série
@@ -651,16 +661,16 @@ export function RepCount({
 
       {repos !== null && (
         <div className="rounded-xl border border-cyan-300/25 bg-cyan-300/[0.06] px-4 py-3 text-center" role="status">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan-200">Repos</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan-200">{repos === 0 ? "Repos terminé" : "Repos"}</p>
           <p className="mt-1 font-display text-3xl font-semibold tabular-nums text-white">
             {Math.floor(repos / 60)}:{String(repos % 60).padStart(2, "0")}
           </p>
           <button
             type="button"
-            onClick={() => setRepos(null)}
+            onClick={() => setFinRepos(null)}
             className="mt-1 text-xs text-graphite-400 underline"
           >
-            Passer
+            Fermer le minuteur
           </button>
         </div>
       )}
@@ -680,16 +690,34 @@ export function RepCount({
                 <span>
                   Série {i + 1} — {formatSerie(s)}
                 </span>
+                <div className="flex gap-2">
+                <details>
+                  <summary className="min-h-11 cursor-pointer py-3 text-xs text-cyan-200">Corriger</summary>
+                  {(s.dureeSecondes != null ? ["dureeSecondes"] as const : ["reps", "charge"] as const).map(champ => <label key={champ} className="block text-xs">
+                    {champ === "reps" ? "Répétitions" : champ === "charge" ? "Charge (kg)" : "Maintien (s)"}
+                    <input type="number" aria-label={`Série ${i + 1} ${champ}`} disabled={enregistrementEnCours} value={s[champ] ?? 0} min={champ === "charge" ? 0 : 1} step={champ === "charge" ? 0.5 : 1} className="mb-2 min-h-11 w-24 rounded border border-white/20 bg-slate-950 px-2" onChange={e => {
+                      const valeur = Number(e.target.value);
+                      if (!Number.isFinite(valeur) || valeur < (champ === "charge" ? 0 : 1) || (champ !== "charge" && !Number.isInteger(valeur)) || (champ === "dureeSecondes" && valeur > 3600)) return;
+                      setSets(liste => liste.map((serie, j) => j === i ? { ...serie, [champ]: valeur } : serie));
+                    }} />
+                  </label>)}
+                </details>
                 <button
                   type="button"
+                  disabled={enregistrementEnCours}
                   onClick={() => setSets((liste) => liste.filter((_, j) => j !== i))}
-                  className="text-xs text-graphite-400 underline"
+                  className="min-h-11 text-xs text-graphite-400 underline disabled:opacity-40"
                 >
                   retirer
                 </button>
+                </div>
               </li>
             ))}
           </ul>
+          <button type="button" disabled={enregistrementEnCours} onClick={() => {
+            setSets(liste => [...liste, { ...liste[liste.length - 1]! }]);
+            setFinRepos(Date.now() + dureeRepos * 1000);
+          }} className="mt-3 min-h-11 w-full rounded-xl border border-cyan-300/25 text-sm text-cyan-200 disabled:opacity-40">Valider une série identique à la dernière</button>
           <button
             type="button"
             onClick={enregistrer}
@@ -704,7 +732,7 @@ export function RepCount({
       {erreur && <p className="text-sm text-rose-300">{erreur}</p>}
       {enregistre && (
         <div className="rounded-xl border border-emerald-300/25 bg-emerald-300/[0.06] px-4 py-3" role="status">
-          <p className="text-sm font-semibold text-emerald-300">{onboarding ? "Premier repère posé ✓" : "Séance enregistrée ✓"}</p>
+          <p className="text-sm font-semibold text-emerald-300">{onboarding ? "Premier repère posé ✓" : "Exercice enregistré ✓"}</p>
           <p className="mt-1 text-xs text-graphite-300">
             {onboarding
               ? "Ta progression commence maintenant. La prochaine séance donnera à COAI un premier point de comparaison."
