@@ -332,12 +332,13 @@ export function ActivationFlow({
     if (validationRequise) {
       return (
         <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] px-6 py-9 text-center">
-          <SectionLabel>À valider par ton coach</SectionLabel>
+          <SectionLabel>Entraînement accessible · non relu</SectionLabel>
           <p className="max-w-sm text-sm leading-6 text-graphite-300">
-            Ton programme attend une relecture avant d’être accessible.
+            Tu peux consulter ton entraînement et ta fiche séance. Le programme n&apos;a pas encore
+            été relu par le coach : cet accès ne vaut pas validation humaine.
           </p>
           <Link href="/programme/entrainement">
-            <Button className="px-8 py-3">Voir le statut de mon programme</Button>
+            <Button className="px-8 py-3">Accéder à mon entraînement</Button>
           </Link>
           <CoachReviewLink />
         </div>

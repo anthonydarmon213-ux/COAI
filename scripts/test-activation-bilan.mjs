@@ -32,7 +32,11 @@ for (const [programmes, expected, echecs = 0] of [
  box.exports.ActivationFlow(props); effects[0]();await new Promise(resolve=>setImmediate(resolve));
  cursor=0; const rendered=JSON.stringify(box.exports.ActivationFlow(props));
  assert.equal(values[0],expected===null?'erreur':'pret');
- if(expected===true)assert.ok(rendered.includes('À valider par ton coach'));
+ if(expected===true){
+  assert.ok(rendered.includes('Entraînement accessible · non relu'));
+  assert.ok(rendered.includes('Accéder à mon entraînement'));
+  assert.ok(!rendered.includes('avant d’être accessible'));
+ }
  if(expected===false){assert.ok(rendered.includes('Commencer ma première séance'));assert.ok(!rendered.includes('À valider par ton coach'));}
  console.log(`PASS server programme status: ${JSON.stringify(programmes)}, review=${expected}`);
 }
