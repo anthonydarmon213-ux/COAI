@@ -4,21 +4,24 @@ import { NextResponse, type NextRequest } from "next/server";
 // Protège les routes (app)/* : redirige vers /sign-in si non authentifié,
 // et pourra vérifier l'abonnement actif avant d'accéder à l'espace membre.
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next({ request });
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+        getAll() {
+          return request.cookies.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          response.cookies.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          response.cookies.set({ name, value: "", ...options });
+        setAll(updates: { name: string; value: string; options: CookieOptions }[]) {
+          // Both the current server render and the browser need the new
+          // session. Updating only the response leaves this render expired.
+          updates.forEach(({ name, value }) => request.cookies.set(name, value));
+          const previous = response.cookies.getAll();
+          response = NextResponse.next({ request });
+          previous.forEach(cookie => response.cookies.set(cookie));
+          updates.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
     }
@@ -58,7 +61,9 @@ export async function middleware(request: NextRequest) {
     // Conserver la séance choisie et le retour Stripe si la session a expiré.
     // La destination reste relative et est validée à nouveau après connexion.
     redirectUrl.searchParams.set("redirect_to", request.nextUrl.pathname + request.nextUrl.search);
-    return NextResponse.redirect(redirectUrl);
+    const redirect = NextResponse.redirect(redirectUrl);
+    response.cookies.getAll().forEach(cookie => redirect.cookies.set(cookie));
+    return redirect;
   }
 
   return response;
