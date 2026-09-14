@@ -173,7 +173,7 @@ export default function SignUpPage() {
           <div className="flex flex-col gap-1">
             <SectionLabel>Accès personnel</SectionLabel>
             <h1 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h1>
-            <p className="text-sm leading-6 text-graphite-400">Une minute suffit pour retrouver ton analyse.</p>
+            <p className="text-sm leading-6 text-graphite-400">Retrouve ton programme et suis tes progrès au même endroit.</p>
           </div>
           <GoogleSignInButton redirectTo={destinationApresInscription} />
           <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
@@ -230,7 +230,7 @@ export default function SignUpPage() {
             <div className="coai-diagnostic-kicker">
               <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
               <span>
-                {arriveDepuisInstagram ? "Création du compte, puis paiement" : "Après ton bilan · création du compte"}
+                {arriveDepuisInstagram ? "Retrouve ton offre" : "Ton espace personnel"}
               </span>
             </div>
             <h2 className="mt-6 max-w-md font-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-graphite-50 sm:text-5xl">
@@ -239,13 +239,13 @@ export default function SignUpPage() {
             <p className="mt-5 max-w-md text-base leading-7 text-graphite-400">
               {arriveDepuisInstagram
                 ? "Crée ton compte ou connecte-toi. Tu retrouveras ensuite ton offre et ses conditions avant de confirmer ton choix."
-                : "Ton résultat personnalisé est conservé. Tu entres d'abord dans ton espace et poses ton premier repère RepCount, sans carte bancaire."}
+                : "Accède à ton espace pour préparer tes séances et suivre tes progrès. Si tu as déjà fait ton bilan sur cet appareil, tu pourras le retrouver à l’accueil."}
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {(arriveDepuisInstagram
-              ? ["Ton offre conservée", "Connexion sécurisée", "Aucun débit aujourd'hui"]
-              : ["Ton résultat conservé", "Premier repère RepCount", "Aucun paiement automatique"]
+              ? ["Ton offre conservée", "Connexion sécurisée", "Conditions avant confirmation"]
+              : ["Tes séances", "Ton suivi RepCount", "Tes progrès"]
             ).map((item) => (
               <div key={item} className="coai-access-proof"><span aria-hidden="true">✓</span>{item}</div>
             ))}
