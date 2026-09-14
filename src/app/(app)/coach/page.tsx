@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { WeeklyCheckinButton } from "@/components/dashboard/weekly-checkin-card";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { AskCoach } from "@/components/coach/ask-coach";
@@ -105,12 +105,7 @@ export default async function CoachPage() {
                 <p className="mt-1.5 text-xs leading-5 text-graphite-400">
                   60 secondes : sommeil, énergie, séances réalisées. C&apos;est ce qui permet d&apos;ajuster la semaine suivante.
                 </p>
-                <Link
-                  href="/dashboard#check-in-du-jour"
-                  className="mt-3 inline-flex rounded-full border border-laiton-400/35 bg-laiton-400/10 px-4 py-2 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
-                >
-                  Faire mon bilan →
-                </Link>
+                <WeeklyCheckinButton />
               </>
             )}
           </section>

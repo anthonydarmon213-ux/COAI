@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,23 @@ export function WeeklyCheckinCard() {
   );
 }
 
+export function WeeklyCheckinButton() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  return <>
+    <Button className="mt-3 min-h-11" onClick={() => setOpen(true)}>Faire mon bilan →</Button>
+    {open && <WeeklyCheckinModal onClose={() => setOpen(false)} onDone={() => { setOpen(false); router.refresh(); }} />}
+  </>;
+}
+
 function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => { dialog?.close(); };
+  }, []);
   const [sommeil, setSommeil] = useState("");
   const [energie, setEnergie] = useState<number | null>(null);
   const [stress, setStress] = useState<number | null>(null);
@@ -102,17 +118,17 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-6">
-      <div className="flex max-h-[90vh] w-full flex-col gap-5 overflow-y-auto rounded-t-3xl border border-white/[0.08] bg-[#111518] p-6 text-white shadow-2xl sm:max-w-md sm:rounded-3xl sm:p-8">
+    <dialog ref={dialogRef} aria-labelledby={titleId} onCancel={onClose} className="m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-3xl border border-white/[0.08] bg-[#111518] p-0 text-white shadow-2xl backdrop:bg-black/70">
+      <div className="flex flex-col gap-5 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:p-8">
         <div className="flex items-start justify-between">
           <div>
             <SectionLabel>Bilan de la semaine</SectionLabel>
-            <h2 className="mt-1 text-xl font-bold">Ton bilan de la semaine</h2>
+            <h2 id={titleId} className="mt-1 text-xl font-bold">Ton bilan de la semaine</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-2xl leading-none text-graphite-400 transition hover:text-white"
+            className="min-h-11 min-w-11 shrink-0 text-2xl leading-none text-graphite-400 transition hover:text-white"
             aria-label="Fermer"
           >
             ×
@@ -218,11 +234,11 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
           />
         </Field>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
         <Button onClick={handleSubmit} disabled={loading}>
           {loading ? "Envoi…" : "Envoyer mon bilan"}
         </Button>
       </div>
-    </div>
+    </dialog>
   );
 }
