@@ -18,6 +18,7 @@ import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { assemblerSeance, payloadSeance, nomsSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
 import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
 import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper";
+import { RestDuration } from "@/components/suivi/rest-duration";
 
 const REPOS_DEFAUT = 90;
 
@@ -699,11 +700,7 @@ export function RepCount({
         {!maintien && <ChandeliersCharges key={nom.trim()} historique={historiqueMesure} />}
       </details>}
 
-      <label className="text-sm text-graphite-300">Repos entre les séries
-        <select value={dureeRepos} onChange={e => setDureeRepos(Number(e.target.value))} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white">
-          {[30, 60, 90, 120, 180].map(secondes => <option key={secondes} value={secondes}>{Math.floor(secondes / 60)} min{secondes % 60 ? ` ${secondes % 60} s` : ""}</option>)}
-        </select>
-      </label>
+      <RestDuration value={dureeRepos} onChange={setDureeRepos} />
 
       <label className="text-sm text-graphite-300">Mesure de la série
         <select value={maintien ? "maintien" : "repetitions"} disabled={sets.length > 0} onChange={e => setMaintien(e.target.value === "maintien")} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white disabled:opacity-50">
@@ -753,7 +750,7 @@ export function RepCount({
           <button
             type="button"
             onClick={() => setFinRepos(null)}
-            className="mt-1 text-xs text-graphite-400 underline"
+            className="mt-1 min-h-11 px-4 text-sm text-graphite-200 underline"
           >
             Fermer le minuteur
           </button>
