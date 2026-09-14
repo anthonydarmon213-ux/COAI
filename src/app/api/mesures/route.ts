@@ -1,19 +1,8 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { mesureBodySchema, mesureValidationErrors } from "@/lib/suivi/mesure-validation";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { isOwnedProgressPhotoPath } from "@/lib/storage/progress-photos";
-
-const bodySchema = z.object({
-  date: z.coerce.date(),
-  poidsKg: z.number().positive().max(500).optional(),
-  tourTailleCm: z.number().positive().max(300).optional(),
-  masseGrassePourcent: z.number().min(0).max(100).optional(),
-  masseMusculaireKg: z.number().positive().max(200).optional(),
-  frequenceCardiaqueReposBpm: z.number().int().min(20).max(220).optional(),
-  notes: z.string().max(2000).optional(),
-  photoPath: z.string().max(500).optional(),
-});
 
 export async function GET() {
   const authUser = await getCurrentUser();
@@ -35,9 +24,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const parsed = bodySchema.safeParse(await request.json());
+  const parsed = mesureBodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    const validation = mesureValidationErrors(parsed.error);
+    return NextResponse.json({ error: validation.message, fieldErrors: validation.fields }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
