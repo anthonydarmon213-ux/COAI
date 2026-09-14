@@ -196,7 +196,8 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
                 <button
                   type="button"
                   onClick={() => removeExercice(exIdx)}
-                  className="absolute right-2 top-2 text-xs text-graphite-500 hover:text-red-400"
+                  aria-label={`Supprimer l’exercice ${exIdx + 1}`}
+                  className="self-end flex h-11 w-11 items-center justify-center rounded-lg text-graphite-400 hover:text-red-400"
                 >
                   ✕
                 </button>
@@ -205,6 +206,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
                 type="text"
                 list="coai-exercices"
                 autoComplete="off"
+                aria-label={`Nom de l’exercice ${exIdx + 1}`}
                 placeholder="Nom de l'exercice — commence à taper"
                 value={ex.nom}
                 onChange={(e) => updateExercice(exIdx, { nom: e.target.value })}
@@ -219,24 +221,29 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
                       type="number"
                       min="0"
                       placeholder="Reps"
+                      aria-label={`Répétitions — exercice ${exIdx + 1}, série ${setIdx + 1}`}
+                      inputMode="numeric"
                       value={s.reps}
                       onChange={(e) => updateSet(exIdx, setIdx, { reps: e.target.value })}
-                      className="flex-1"
+                      className="min-w-0 flex-1"
                     />
                     <Input
                       type="number"
                       min="0"
                       step="0.5"
                       placeholder="kg"
+                      aria-label={`Charge en kg — exercice ${exIdx + 1}, série ${setIdx + 1}`}
+                      inputMode="decimal"
                       value={s.charge}
                       onChange={(e) => updateSet(exIdx, setIdx, { charge: e.target.value })}
-                      className="flex-1"
+                      className="min-w-0 flex-1"
                     />
                     {ex.sets.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeSet(exIdx, setIdx)}
-                        className="text-xs text-graphite-500 hover:text-red-400"
+                        aria-label={`Supprimer la série ${setIdx + 1} de l’exercice ${exIdx + 1}`}
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-graphite-400 hover:text-red-400"
                       >
                         ✕
                       </button>
@@ -246,7 +253,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
                 <button
                   type="button"
                   onClick={() => addSet(exIdx)}
-                  className="self-start rounded-lg border border-dashed border-graphite-700 px-3 py-1.5 text-[11px] text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
+                  className="min-h-11 self-start rounded-lg border border-dashed border-graphite-700 px-3 py-1.5 text-sm text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
                 >
                   + Série
                 </button>
@@ -256,7 +263,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
           <button
             type="button"
             onClick={addExercice}
-            className="self-start rounded-lg border border-dashed border-graphite-700 px-4 py-2 text-xs text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
+            className="min-h-11 self-start rounded-lg border border-dashed border-graphite-700 px-4 py-2 text-sm text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
           >
             + Exercice
           </button>
@@ -266,7 +273,8 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
           <Input
             type="number"
             min="0"
-            step="5"
+            step="1"
+            inputMode="numeric"
             placeholder="ex: 50"
             value={duree}
             onChange={(e) => setDuree(e.target.value)}
