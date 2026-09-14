@@ -48,7 +48,8 @@ export default async function SeanceDuJourPage({ searchParams }: { searchParams?
   const selected = searchParams?.seance;
   const index = selected && /^\d+$/.test(selected) ? Number(selected) : -1;
   const seance = liste[index] ?? (programme ? getWorkoutForDate(programme.contenu, today()) : null);
-  const choix = liste.length > 0 ? <nav aria-label="Choisir une fiche séance" className="fiche-actions flex flex-wrap gap-2">{liste.map((s, i) => <Link key={i} href={`/programme/seance-du-jour?seance=${i}`} className="rounded-xl border border-laiton-400/30 px-4 py-3 text-sm text-laiton-200">{texte(s.nom) ?? `Séance ${i + 1}`}</Link>)}</nav> : null;
+  const genre = searchParams?.visuels === "femme" || searchParams?.visuels === "homme" ? searchParams.visuels : user.profile?.sexe?.toLowerCase() === "femme" ? "femme" : "homme";
+  const choix = liste.length > 0 ? <nav aria-label="Choisir une fiche séance" className="fiche-actions flex flex-wrap gap-2">{liste.map((s, i) => <Link key={i} href={`/programme/seance-du-jour?seance=${i}&visuels=${genre}`} className="rounded-xl border border-laiton-400/30 px-4 py-3 text-sm text-laiton-200">{texte(s.nom) ?? `Séance ${i + 1}`}</Link>)}</nav> : null;
 
   if (!seance) {
     return (
@@ -72,7 +73,6 @@ export default async function SeanceDuJourPage({ searchParams }: { searchParams?
   const s = seance as Record<string, unknown>;
   const nom = texte(s.nom) ?? "Séance du jour";
   const exercices = Array.isArray(s.exercices) ? s.exercices : [];
-  const genre = searchParams?.visuels === "femme" || searchParams?.visuels === "homme" ? searchParams.visuels : user.profile?.sexe?.toLowerCase() === "femme" ? "femme" : "homme";
   const story = illustrerStory(storySeance(exercices, s.echauffement, s.retourAuCalme), genre);
 
   return (
