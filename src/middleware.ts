@@ -4,6 +4,14 @@ import { NextResponse, type NextRequest } from "next/server";
 // Protège les routes (app)/* : redirige vers /sign-in si non authentifié,
 // et pourra vérifier l'abonnement actif avant d'accéder à l'espace membre.
 export async function middleware(request: NextRequest) {
+  // Ces fichiers sont servis depuis public/videos. Les reconnaître AVANT
+  // de créer le client Auth : chaque poster/segment vidéo ne doit pas
+  // revalider la session. Ne pas exclure toute URL contenant une extension
+  // (une route privée dynamique peut aussi contenir un point).
+  const publicMedia = /^\/videos\/(?:coai-post-diagnostic\.mp4|exercices\/(?:[a-z0-9-]+\.mp4|posters\/[a-z0-9-]+\.jpg))$/.test(request.nextUrl.pathname);
+  if ((request.method === "GET" || request.method === "HEAD") && publicMedia) {
+    return NextResponse.next({ request });
+  }
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -30,20 +38,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  // Les fichiers statiques ne passent JAMAIS par l'authentification
-  // (01/09/2026). Le motif "/videos/:path*" visait la page des vidéos
-  // exclusives, mais il attrapait aussi /videos/exercices/*.mp4 : les 79
-  // vidéos de démonstration étaient redirigées vers /sign-in et
-  // s'affichaient en noir dans les fiches d'exercice. Elles n'avaient
-  // jamais fonctionné en production.
-  //
-  // Un <video> ne suit pas une redirection HTML : il reçoit du texte là où
-  // il attend un flux, et échoue en silence — d'où l'absence de message
-  // d'erreur qui rendait le défaut si difficile à voir.
-  if (/\.[a-z0-9]{2,5}$/i.test(request.nextUrl.pathname)) {
-    return response;
-  }
 
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/programme") ||
