@@ -43,6 +43,8 @@ struct IOSCoreChecks {
         check(clock.remaining(at: now.addingTimeInterval(95)) == 0, "expired countdown")
         check(RestClock(end: clock.end).remaining(at: now.addingTimeInterval(80)) == 10, "restored countdown")
         check(RestClock.label(seconds: 75) == "1 min 15 s", "minutes formatting")
+        check(RestClock.label(seconds: 100) == "1 min 40 s", "exact prescribed rest formatting")
+        check(RestClock(seconds: 100, now: now).remaining(at: now) == 100, "exact prescribed rest is not rounded")
         check(RestClock.label(seconds: 30) == "0 min 30 s", "short rest")
         check(RestClock.label(seconds: -1) == "0 min 00 s", "negative formatting")
         check(RestClock(seconds: -5, now: now).remaining(at: now) == 0, "negative duration")

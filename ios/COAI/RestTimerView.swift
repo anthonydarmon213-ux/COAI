@@ -3,7 +3,9 @@ import SwiftUI
 struct RestTimerView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("coai.rest.endsAt") private var endsAt: Double = 0
-    @State private var duration = 90
+    @State private var minutes = 1
+    @State private var seconds = 30
+    private var duration: Int { minutes * 60 + seconds }
 
     var body: some View {
         NavigationStack {
@@ -21,14 +23,25 @@ struct RestTimerView: View {
                         }
                         Button("Arrêter et réinitialiser", role: .destructive) { endsAt = 0 }
                     }
-                    Picker("Durée du repos", selection: $duration) {
-                        ForEach([30, 45, 60, 75, 90, 120, 150, 180], id: \.self) { value in
-                            Text(RestClock.label(seconds: value)).tag(value)
-                        }
-                    }.pickerStyle(.wheel)
+                    HStack {
+                        Picker("Minutes", selection: $minutes) {
+                            ForEach(0..<60, id: \.self) { value in
+                                Text("\(value) min").tag(value)
+                            }
+                        }.pickerStyle(.wheel).accessibilityLabel("Minutes de repos")
+                        Picker("Secondes", selection: $seconds) {
+                            ForEach(0..<60, id: \.self) { value in
+                                Text("\(value) s").tag(value)
+                            }
+                        }.pickerStyle(.wheel).accessibilityLabel("Secondes de repos")
+                    }
+                    if duration == 0 {
+                        Text("Choisis une durée supérieure à zéro.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
                     Button(endsAt > 0 ? "Relancer le minuteur" : "Démarrer le repos") {
                         endsAt = RestClock(seconds: duration).end.timeIntervalSince1970
-                    }.buttonStyle(.borderedProminent).controlSize(.large)
+                    }.buttonStyle(.borderedProminent).controlSize(.large).disabled(duration == 0)
                     Text("Le décompte est conservé si tu changes d’écran ou quittes l’app. Cette première version n’émet pas de notification ni de son en arrière-plan.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }.padding(24)
