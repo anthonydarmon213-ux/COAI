@@ -193,9 +193,9 @@ export function RoutinesPanel({
           <button
             type="button"
             onClick={() => setLignes((prev) => [...prev, { nom: "", series: 3 }])}
-            className="self-start rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-graphite-300 hover:text-white"
+            className="min-h-11 self-start rounded-full border border-white/15 px-3 py-1.5 text-sm font-semibold text-graphite-300 hover:text-white"
           >
-            + Exercice
+            + Exercice dans la routine
           </button>
           {erreur && <p role="alert" className="text-xs text-red-400">{erreur}</p>}
           <Button type="button" onClick={creer} disabled={envoi}>

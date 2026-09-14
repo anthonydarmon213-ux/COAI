@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import Link from "next/link";
 import { AccessRecovery } from "@/components/auth/access-recovery";
 import { SyntheseCorporelle } from "@/components/suivi/synthese-corporelle";
 import { volumeParMuscle } from "@/lib/suivi/volume-musculaire";
@@ -152,6 +153,10 @@ export default async function ProgressionPage() {
         </p>
       </div>
 
+      <nav aria-label="Accès rapides au suivi" className="flex flex-wrap gap-3">
+        <Link href="/suivi/mesures" className="inline-flex min-h-11 items-center rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold">Mes mesures →</Link>
+        <Link href="/suivi/seances#historique-seances" className="inline-flex min-h-11 items-center rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold">Mes séances →</Link>
+      </nav>
       <SyntheseCorporelle
         intensites={carteMusculaire.intensites}
         volumes={carteMusculaire.volumes}

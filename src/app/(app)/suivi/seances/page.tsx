@@ -54,8 +54,17 @@ export default async function SeancesPage() {
           Enregistre l’essentiel après ta séance. COAI transforme ensuite tes retours en ajustements utiles.
         </p>
       </div>
+      <nav aria-label="Accès rapides au journal" className="flex flex-wrap gap-3">
+        <a href="#saisir-seance" className="inline-flex min-h-11 items-center rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold">Saisir une séance</a>
+        <a href="#historique-seances" className="inline-flex min-h-11 items-center rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold">Voir mon historique</a>
+      </nav>
+      <section aria-labelledby="saisir-seance">
+      <h2 id="saisir-seance" tabIndex={-1} className="mb-4 scroll-mt-24 text-xl font-semibold">Saisir une séance</h2>
       <SeanceForm exercicesConnus={EXERCICES.filter((e) => exerciceAvecMediasCoai(e.nom)).map((e) => e.nom).sort((a, b) => a.localeCompare(b))} />
-      <div className="flex flex-col gap-3">
+      </section>
+      <section aria-labelledby="historique-seances" className="flex flex-col gap-3">
+        <h2 id="historique-seances" tabIndex={-1} className="scroll-mt-24 text-xl font-semibold">Mon historique</h2>
+        <p className="text-sm text-graphite-400">Tes 30 dernières séances enregistrées, de la plus récente à la plus ancienne.</p>
         {seances.map((s) => {
           const exercices = Array.isArray(s.exercices)
             ? (s.exercices as ExerciceData[])
@@ -140,7 +149,7 @@ export default async function SeancesPage() {
           );
         })}
         {seances.length === 0 && <div className="coai-empty-state">Ta première séance terminée apparaîtra ici.</div>}
-      </div>
+      </section>
     </div>
   );
 }

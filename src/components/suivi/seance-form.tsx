@@ -265,7 +265,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
             onClick={addExercice}
             className="min-h-11 self-start rounded-lg border border-dashed border-graphite-700 px-4 py-2 text-sm text-graphite-400 hover:border-laiton-400/40 hover:text-laiton-300"
           >
-            + Exercice
+            + Exercice dans la séance
           </button>
         </div>
 
