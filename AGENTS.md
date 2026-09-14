@@ -98,6 +98,16 @@ La réactivation de la génération payante demande une nouvelle autorisation.
 
 ## État au 01/09/2026
 
+### Décision confirmée — COAI Club, 14/09/2026
+
+Offre autonome au quotidien et direct collectif d’une heure par mois avec
+Anthony, questions proposées en amont. Aucun replay ni promesse de réponse
+individuelle à toutes les questions. Le VIP individuel reste distinct.
+Ne pas inventer de date, de lien de réunion ou d’inscription confirmée.
+Tarifs inchangés. Tant que le calendrier n’est pas fourni, afficher le premier
+rendez-vous en préparation. Le contact WhatsApp prépare un message à envoyer
+explicitement par le membre ; ce n’est pas un dépôt automatique dans l’app.
+
 ### Décision mise à jour — accès entraînement et partage, 13/09/2026
 
 Anthony demande explicitement d'accéder au programme d'entraînement et à sa
