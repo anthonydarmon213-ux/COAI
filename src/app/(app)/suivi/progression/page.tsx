@@ -245,7 +245,7 @@ export default async function ProgressionPage() {
           {graphiques.length > 0 && (
             <>
               <div className="flex flex-col gap-3">
-                <SectionLabel>Aujourd&apos;hui</SectionLabel>
+                <SectionLabel>Derniers relevés enregistrés</SectionLabel>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   {graphiques.map((g) => {
                     const points = g.points;
