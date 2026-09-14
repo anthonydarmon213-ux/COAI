@@ -3,8 +3,8 @@ import SwiftUI
 struct RestTimerView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("coai.rest.endsAt") private var endsAt: Double = 0
-    @State private var minutes = 1
-    @State private var seconds = 30
+    @AppStorage("coai.rest.minutes") private var minutes = 1
+    @AppStorage("coai.rest.seconds") private var seconds = 30
     private var duration: Int { minutes * 60 + seconds }
 
     var body: some View {
