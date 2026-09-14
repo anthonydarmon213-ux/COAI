@@ -13,6 +13,14 @@ import { createPortal } from "react-dom";
 
 type Option = { value: string; label: string; disabled?: boolean };
 
+function optionText(children: ReactNode): string {
+  return Children.toArray(children).map((child) => {
+    if (typeof child === "string" || typeof child === "number") return String(child);
+    if (isValidElement<{ children?: ReactNode }>(child)) return optionText(child.props.children);
+    return "";
+  }).join("");
+}
+
 function extractOptions(children: ReactNode): Option[] {
   const options: Option[] = [];
   Children.forEach(children, (child) => {
@@ -20,7 +28,7 @@ function extractOptions(children: ReactNode): Option[] {
     const props = child.props as { value?: string; children?: ReactNode; disabled?: boolean };
     options.push({
       value: String(props.value ?? ""),
-      label: typeof props.children === "string" ? props.children : String(props.value ?? ""),
+      label: optionText(props.children) || String(props.value ?? ""),
       disabled: props.disabled,
     });
   });
