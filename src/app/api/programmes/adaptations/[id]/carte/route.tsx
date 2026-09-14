@@ -17,7 +17,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   if (!adaptation) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
 
   return new ImageResponse(
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 86, background: "radial-gradient(circle at 15% 10%, rgba(201,162,98,0.22), transparent 48%), radial-gradient(circle at 90% 90%, rgba(58,90,107,0.2), transparent 50%), #090a0b", fontFamily: "system-ui, sans-serif", color: "#f5f6f7" }}>
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 86, backgroundColor: "#090a0b", backgroundImage: "radial-gradient(circle at 15% 10%, rgba(201,162,98,0.22), transparent 48%), radial-gradient(circle at 90% 90%, rgba(58,90,107,0.2), transparent 50%)", fontFamily: "system-ui, sans-serif", color: "#f5f6f7" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         <span style={{ fontSize: 24, letterSpacing: 7, color: "#c9a262" }}>MON COACHING ÉVOLUE</span>
         <span style={{ fontSize: 22, letterSpacing: 4, color: "#9aa0a8" }}>{PILIERS[adaptation.pilier]}</span>
