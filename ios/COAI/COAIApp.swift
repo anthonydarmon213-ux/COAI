@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 @main
 struct COAIApp: App {
@@ -11,6 +12,7 @@ struct COAIRootView: View {
     @StateObject private var browser = COAIWebModel()
     @State private var showTimer = false
     @State private var showLocalReset = false
+    @State private var keyboardVisible = false
     private let gold = Color(red: 0.88, green: 0.73, blue: 0.31)
 
     var body: some View {
@@ -28,7 +30,8 @@ struct COAIRootView: View {
                         if browser.isLoading { ProgressView().padding(10).background(.ultraThinMaterial, in: Capsule()) }
                     }
                 }
-                HStack(spacing: 0) {
+                if !keyboardVisible {
+                  HStack(spacing: 0) {
                     destination("Séance", icon: "figure.strengthtraining.traditional", path: "/programme/entrainement")
                     destination("RepCount", icon: "chart.bar", path: "/suivi/repcount")
                     Button { showTimer = true } label: {
@@ -37,6 +40,7 @@ struct COAIRootView: View {
                     }
                     destination("Compte", icon: "person.crop.circle", path: "/compte/parametres")
                 }.padding(.horizontal, 8).background(.ultraThinMaterial)
+                }
             }
             .background(Color(red: 0.04, green: 0.07, blue: 0.09))
             .navigationTitle("COAI · test iPhone")
@@ -57,6 +61,12 @@ struct COAIRootView: View {
             }
         }
         .tint(gold)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            keyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardVisible = false
+        }
         .task { await browser.start() }
         .sheet(isPresented: $showTimer) { RestTimerView() }
         // Buttons resolve the WebKit callback exactly once; a binding dismissal must not
