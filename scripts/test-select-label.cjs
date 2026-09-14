@@ -8,7 +8,10 @@ for (const [children, expected] of [
   ['Simple', 'Simple'], [['Force', ' — ', 'Développé couché'], 'Force — Développé couché'],
   [['Durée : ', 45, ' min'], 'Durée : 45 min'], [null, 'VALUE'],
 ]) {
-  const html = renderToStaticMarkup(React.createElement(box.exports.Select, { value: 'VALUE' }, React.createElement('option', { value: 'VALUE' }, children)));
+  const html = renderToStaticMarkup(React.createElement(box.exports.Select, { value: 'VALUE', onChange: () => {}, name: 'test', required: true }, React.createElement('option', { value: 'VALUE' }, children)));
   assert(html.includes(expected), html);
+  assert(html.startsWith('<select'), html);
+  assert(html.includes('name="test"') && html.includes('required=""'), html);
+  assert(html.includes('selected=""'), html);
 }
-console.log('PASS: simple, composite and numeric option labels plus empty fallback');
+console.log('PASS: native select, composite labels, selected value and form attributes');
