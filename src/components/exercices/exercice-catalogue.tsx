@@ -17,6 +17,7 @@ import {
 import { photoCoaiPourNom, type GenreVisuel } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
+import { matchesExerciseSearch } from "@/lib/exercices/search";
 
 const GROUPES = Object.keys(GROUPE_PRINCIPAL_LABEL) as GroupePrincipal[];
 const MATERIELS = Object.keys(MATERIEL_LABEL) as Materiel[];
@@ -48,7 +49,8 @@ function FilterGroup<T extends string>({
             key={o}
             type="button"
             onClick={() => onToggle(o)}
-            className={`rounded-full border px-3 py-1.5 text-xs transition ${
+            aria-pressed={actifs.includes(o)}
+            className={`min-h-11 rounded-full border px-3 py-1.5 text-xs transition ${
               actifs.includes(o)
                 ? "border-laiton-400/50 bg-laiton-400/15 text-laiton-200"
                 : "border-graphite-800 text-graphite-400 hover:text-white"
@@ -72,6 +74,7 @@ function FilterGroup<T extends string>({
 // Les anciennes photos externes ont été retirées : une fiche montre
 // uniquement un média COAI validé pour le mouvement exact.
 export function ExerciceCatalogue() {
+  const [query, setQuery] = useState("");
   const [groupes, setGroupes] = useState<GroupePrincipal[]>([]);
   const [materiels, setMateriels] = useState<Materiel[]>([]);
   const [types, setTypes] = useState<TypeExercice[]>([]);
@@ -79,18 +82,24 @@ export function ExerciceCatalogue() {
 
   const filtres = useMemo(() => {
     return EXERCICES.filter((ex) => {
+      if (!matchesExerciseSearch([ex.nom, GROUPE_PRINCIPAL_LABEL[ex.groupePrincipal], ...ex.materiel.map(m => MATERIEL_LABEL[m]), TYPE_LABEL[ex.type]].join(" "), query)) return false;
       if (groupes.length > 0 && !groupes.includes(ex.groupePrincipal)) return false;
       if (materiels.length > 0 && !ex.materiel.some((m) => materiels.includes(m))) return false;
       if (types.length > 0 && !types.includes(ex.type)) return false;
       return true;
     });
-  }, [groupes, materiels, types]);
+  }, [groupes, materiels, types, query]);
 
-  const aucunFiltre = groupes.length === 0 && materiels.length === 0 && types.length === 0;
+  const aucunFiltre = groupes.length === 0 && materiels.length === 0 && types.length === 0 && !query.trim();
+  const reset = () => { setQuery(""); setGroupes([]); setMateriels([]); setTypes([]); };
 
   return (
     <div className="flex flex-col gap-6">
       <Card className="flex flex-col gap-4">
+        <label className="text-sm font-semibold text-white">Rechercher un exercice
+          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. : presse, développé, haltères…" className="mt-2 min-h-11 w-full rounded-xl border border-white/20 bg-slate-950 px-4 py-3 text-base font-normal text-white" />
+        </label>
+        {query && <button type="button" onClick={() => setQuery("")} className="min-h-11 self-start px-2 text-sm text-laiton-200 underline">Effacer la recherche</button>}
         <FilterGroup titre="Groupe musculaire" options={GROUPES} labels={GROUPE_PRINCIPAL_LABEL} actifs={groupes} onToggle={(v) => setGroupes((prev) => toggle(prev, v))} />
         <FilterGroup titre="Matériel" options={MATERIELS} labels={MATERIEL_LABEL} actifs={materiels} onToggle={(v) => setMateriels((prev) => toggle(prev, v))} />
         <FilterGroup titre="Type" options={TYPES} labels={TYPE_LABEL} actifs={types} onToggle={(v) => setTypes((prev) => toggle(prev, v))} />
@@ -103,7 +112,7 @@ export function ExerciceCatalogue() {
                 type="button"
                 onClick={() => setGenreVisuel(genre)}
                 aria-pressed={genreVisuel === genre}
-                className={`rounded-full border px-4 py-2 text-xs font-semibold capitalize transition ${
+                className={`min-h-11 rounded-full border px-4 py-2 text-xs font-semibold capitalize transition ${
                   genreVisuel === genre
                     ? "border-laiton-400/50 bg-laiton-400/15 text-laiton-200"
                     : "border-graphite-800 text-graphite-400 hover:text-white"
@@ -118,15 +127,15 @@ export function ExerciceCatalogue() {
         {!aucunFiltre && (
           <button
             type="button"
-            onClick={() => { setGroupes([]); setMateriels([]); setTypes([]); }}
-            className="self-start font-mono text-[10px] uppercase tracking-[0.12em] text-graphite-500 transition hover:text-white"
+            onClick={reset}
+            className="min-h-11 self-start px-2 text-sm text-graphite-300 underline transition hover:text-white"
           >
-            Réinitialiser les filtres
+            Tout réinitialiser
           </button>
         )}
       </Card>
 
-      <p className="text-xs text-graphite-500">
+      <p role="status" className="text-sm text-graphite-300">
         {filtres.length} exercice{filtres.length > 1 ? "s" : ""}
         {aucunFiltre ? "" : " correspondant" + (filtres.length > 1 ? "s" : "")}.
       </p>
@@ -181,7 +190,10 @@ export function ExerciceCatalogue() {
       </div>
 
       {filtres.length === 0 && (
-        <p className="text-sm text-graphite-400">Aucun exercice ne correspond à cette combinaison de filtres.</p>
+        <div className="rounded-xl border border-white/15 p-5">
+          <p className="text-sm text-graphite-300">Aucun exercice trouvé. Essaie un autre nom ou retire des filtres.</p>
+          <button type="button" onClick={reset} className="mt-3 min-h-11 px-2 text-sm text-laiton-200 underline">Voir tous les exercices</button>
+        </div>
       )}
     </div>
   );
