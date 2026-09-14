@@ -45,6 +45,10 @@ export function RoutinesPanel({
       setErreur("Donne un nom à ta routine et au moins un exercice.");
       return;
     }
+    if (propres.some((l) => l.series !== undefined && (!Number.isInteger(l.series) || l.series < 1 || l.series > 20))) {
+      setErreur("Choisis un nombre entier de séries entre 1 et 20 pour chaque exercice.");
+      return;
+    }
     setEnvoi(true);
     setErreur(null);
     try {
@@ -139,6 +143,7 @@ export function RoutinesPanel({
           <Input
             type="text"
             placeholder="Nom de la routine — ex : Full body, Push, Jambes"
+            aria-label="Nom de la routine"
             value={nom}
             onChange={(e) => setNom(e.target.value)}
             maxLength={60}
@@ -150,6 +155,8 @@ export function RoutinesPanel({
                 list="coai-exercices"
                 autoComplete="off"
                 placeholder="Exercice"
+                aria-label={`Exercice ${i + 1} de la routine`}
+                maxLength={80}
                 value={l.nom}
                 onChange={(e) =>
                   setLignes((prev) => prev.map((x, j) => (j === i ? { ...x, nom: e.target.value } : x)))
@@ -159,12 +166,15 @@ export function RoutinesPanel({
                 type="number"
                 min="1"
                 max="20"
+                step="1"
+                inputMode="numeric"
+                aria-label={`Nombre de séries — exercice ${i + 1} de la routine`}
                 className="w-20 flex-none"
                 placeholder="Séries"
                 value={l.series ?? ""}
                 onChange={(e) =>
                   setLignes((prev) =>
-                    prev.map((x, j) => (j === i ? { ...x, series: Number(e.target.value) || undefined } : x))
+                    prev.map((x, j) => (j === i ? { ...x, series: e.target.value === "" ? undefined : Number(e.target.value) } : x))
                   )
                 }
               />
@@ -187,7 +197,7 @@ export function RoutinesPanel({
           >
             + Exercice
           </button>
-          {erreur && <p className="text-xs text-red-400">{erreur}</p>}
+          {erreur && <p role="alert" className="text-xs text-red-400">{erreur}</p>}
           <Button type="button" onClick={creer} disabled={envoi}>
             {envoi ? "Enregistrement…" : "Enregistrer la routine"}
           </Button>
