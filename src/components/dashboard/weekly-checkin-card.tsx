@@ -88,6 +88,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit() {
+    if (loading) return;
     setLoading(true);
     setError(null);
     try {
@@ -108,10 +109,14 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
           commentaire: commentaire || undefined,
         }),
       });
-      if (!res.ok) throw new Error("Échec de l'envoi.");
+      if (!res.ok) throw new Error(res.status === 401
+        ? "Ta connexion a expiré. Reconnecte-toi à COAI avant de réessayer."
+        : "Ton bilan n’a pas pu être enregistré. Vérifie tes réponses puis réessaie : ta saisie est conservée.");
       onDone();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+      setError(err instanceof TypeError
+        ? "Connexion interrompue. Vérifie ton réseau puis réessaie : ta saisie est conservée."
+        : err instanceof Error ? err.message : "Envoi impossible. Réessaie dans un instant.");
     } finally {
       setLoading(false);
     }
@@ -119,7 +124,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
   return (
     <dialog ref={dialogRef} aria-labelledby={titleId} onCancel={onClose} className="m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-3xl border border-white/[0.08] bg-[#111518] p-0 text-white shadow-2xl backdrop:bg-black/70">
-      <div className="flex flex-col gap-5 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:p-8">
+      <form onSubmit={(event) => { event.preventDefault(); void handleSubmit(); }} className="flex flex-col gap-5 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:p-8">
         <div className="flex items-start justify-between">
           <div>
             <SectionLabel>Bilan de la semaine</SectionLabel>
@@ -169,7 +174,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
         <Field label="Poids (kg, facultatif)">
           <Input
             type="number"
-            min="0"
+            min="0.1"
             step="0.1"
             placeholder="ex: 78.5"
             value={poidsKg}
@@ -228,6 +233,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
         <Field label="Comment s'est passée ta semaine ? (facultatif)">
           <Input
             type="text"
+            maxLength={1000}
             placeholder="ex: semaine chargée au travail…"
             value={commentaire}
             onChange={(e) => setCommentaire(e.target.value)}
@@ -235,10 +241,10 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
         </Field>
 
         {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
-        <Button onClick={handleSubmit} disabled={loading}>
+        <Button type="submit" disabled={loading}>
           {loading ? "Envoi…" : "Envoyer mon bilan"}
         </Button>
-      </div>
+      </form>
     </dialog>
   );
 }

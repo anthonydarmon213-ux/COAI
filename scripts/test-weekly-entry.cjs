@@ -24,11 +24,13 @@ function entry() { cursor = 0; return nodes(box.exports.WeeklyCheckinButton()); 
   states = [];
   function form() { cursor = 0; return nodes(modal.type(modal.props)); }
   assert.equal(form().find(n => n.type === 'dialog').props['aria-labelledby'], 'weekly-title');
-  await form().find(n => n.type === 'Button').props.onClick();
+  form().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} });
+  await new Promise(resolve => setImmediate(resolve));
   assert(form().some(n => n.props.role === 'alert'));
   assert.equal(refreshes, 0);
   ok = true;
-  await form().find(n => n.type === 'Button').props.onClick();
+  form().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} });
+  await new Promise(resolve => setImmediate(resolve));
   assert.equal(refreshes, 1); assert.equal(requests, 2);
   const coach = fs.readFileSync('src/app/(app)/coach/page.tsx', 'utf8');
   assert(coach.includes('<WeeklyCheckinButton />'));
