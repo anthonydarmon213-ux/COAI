@@ -46,13 +46,18 @@ export async function getCurrentUser() {
   if (authHeader?.startsWith("Bearer ")) {
     const {
       data: { user },
+      error,
     } = await supabase.auth.getUser(authHeader.slice(7));
+    if (error) console.warn("[auth] User lookup failed", { status: error.status, code: error.code });
     return user;
   }
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+  // Never log tokens, cookies, email addresses or provider error messages.
+  if (error) console.warn("[auth] User lookup failed", { status: error.status, code: error.code });
   return user;
 }
 

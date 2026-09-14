@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { SyntheseCorporelle } from "@/components/suivi/synthese-corporelle";
 import { volumeParMuscle } from "@/lib/suivi/volume-musculaire";
 import { prisma } from "@/lib/db/client";
@@ -36,7 +37,7 @@ const METRIQUES: Metrique[] = [
 
 export default async function ProgressionPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const date = new Date();
   date.setHours(0, 0, 0, 0);

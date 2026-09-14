@@ -1,10 +1,11 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { AvisForm } from "@/components/compte/avis-form";
 import { SectionLabel } from "@/components/ui/section-label";
 
 export default async function AvisPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   return (
     <div className="flex flex-col gap-6">

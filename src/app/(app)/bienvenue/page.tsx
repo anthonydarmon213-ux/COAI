@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { TrackConversion } from "@/components/analytics/track-conversion";
@@ -67,7 +68,7 @@ export default async function BienvenuePage({
   searchParams: { plan?: string; billing?: string; essai?: string; unlock?: string; session_id?: string };
 }) {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   // Le vrai statut de l'API fait foi, jamais le niveau d'abonnement.
   const coachValidationRequise = false;

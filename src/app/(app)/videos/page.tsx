@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { hasStreamingAccess } from "@/lib/subscription/plan";
 import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 
 export default async function VideosPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const aAcces = hasStreamingAccess(user, user.subscription);
 

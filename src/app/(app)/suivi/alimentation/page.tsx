@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { RepasForm } from "@/components/suivi/repas-form";
 import { CompteurCalories } from "@/components/suivi/compteur-calories";
@@ -15,7 +16,7 @@ const STATUT_LABELS: Record<StatutRepas, { label: string; tone: "success" | "war
 
 export default async function AlimentationSuiviPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   // Bornes du jour côté serveur : filtrer en JS obligerait à charger tout
   // l'historique pour n'en garder qu'une journée.

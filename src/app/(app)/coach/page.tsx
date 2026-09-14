@@ -1,5 +1,6 @@
 import { WeeklyCheckinButton } from "@/components/dashboard/weekly-checkin-card";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { getEffectivePlan } from "@/lib/subscription/plan";
 import { AskCoach } from "@/components/coach/ask-coach";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,7 @@ function debutDeSemaine(date: Date): Date {
 
 export default async function CoachPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const plan = getEffectivePlan(user.subscription);
   const [intelligence, debrief, checkinSemaine] = await Promise.all([

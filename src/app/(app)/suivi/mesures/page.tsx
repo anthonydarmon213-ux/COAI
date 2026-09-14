@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { MesureForm } from "@/components/suivi/mesure-form";
 import { Card } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { getSignedProgressPhotoUrl } from "@/lib/storage/progress-photos";
 
 export default async function MesuresPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const mesures = await prisma.mesure.findMany({
     where: { userId: user.id },

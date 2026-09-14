@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { TestMaxiForm } from "@/components/suivi/test-maxi-form";
 import { Sparkline } from "@/components/suivi/sparkline";
@@ -15,7 +16,7 @@ import {
 
 export default async function TestsMaxiPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const testsMaxi = await prisma.testMaxi.findMany({
     where: { userId: user.id },

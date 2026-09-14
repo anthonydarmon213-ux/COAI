@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +44,7 @@ type Changement = { cible: string; avant: string | number | null; apres: string 
 // sur chaque page de pilier.
 export default async function EvolutionPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const [adaptations, versionsParPilier, profilIntelligence, timeline] = await Promise.all([
     prisma.programmeAdaptation.findMany({

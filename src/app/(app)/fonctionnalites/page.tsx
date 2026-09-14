@@ -1,10 +1,11 @@
 import { FonctionnalitesMenu } from "@/components/fonctionnalites/fonctionnalites-menu";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { getMembershipLabel, hasPaidSubscription } from "@/lib/subscription/plan";
 
 export default async function FonctionnalitesPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
   const abonne = hasPaidSubscription(user.subscription);
 
   return (

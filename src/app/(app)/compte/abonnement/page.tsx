@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { getEffectivePlan, isInTrial, PLAN_LABELS } from "@/lib/subscription/plan";
 import { PLAN_FEATURES } from "@/lib/subscription/plan-features";
 import { PortalButton } from "@/components/compte/portal-button";
@@ -30,7 +31,7 @@ const STATUT_TONES: Record<string, "success" | "warning" | "danger" | "neutral">
 
 export default async function AbonnementPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const statut = user.subscription?.status;
   const plan = getEffectivePlan(user.subscription);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { getWorkoutForDate } from "@/lib/daily/session";
 import { FicheSeance } from "@/components/programme/fiche-seance";
@@ -34,7 +35,7 @@ function texte(v: unknown): string | null {
 
 export default async function SeanceDuJourPage({ searchParams }: { searchParams?: { seance?: string; visuels?: string } }) {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const [validated, latest] = await Promise.all([
     prisma.programmeGenerated.findFirst({ where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" }, orderBy: { generatedAt: "desc" }, select: { contenu: true, statut: true } }),

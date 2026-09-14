@@ -4,10 +4,12 @@ const fs = require('node:fs'), vm = require('node:vm'), ts = require('typescript
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
 let session = null, fail = false, paid = false;
+let accountMissing = false;
 const deps = {
   'react/jsx-runtime': require('react/jsx-runtime'),
   'next/link': { default: ({ children, ...props }) => React.createElement('a', props, children) },
-  '@/lib/auth/server': { getCurrentAppUser: async () => ({ id: 'owner', prenom: 'Test', subscription: null }) },
+  '@/lib/auth/server': { getCurrentAppUser: async () => accountMissing ? null : ({ id: 'owner', prenom: 'Test', subscription: null }) },
+  '@/components/auth/access-recovery': { AccessRecovery: () => React.createElement('h1', null, 'REPRISE') },
   '@/components/ui/section-label': { SectionLabel: ({children}) => React.createElement('span', null, children) },
   '@/components/ui/button': { Button: () => null },
   '@/components/analytics/track-conversion': { TrackConversion: () => React.createElement('span', null, 'CONVERSION') },
@@ -26,6 +28,9 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/app/(app)/bienvenue/p
 }).outputText, box);
 const render = async searchParams => renderToStaticMarkup(await box.exports.default({searchParams}));
 (async () => {
+  accountMissing = true;
+  assert((await render({})).includes('REPRISE'));
+  accountMissing = false;
   for (const fixture of [null, {status:'open'}, {status:'expired'}, {status:'complete', mode:'payment'},
     {status:'complete', mode:'subscription', client_reference_id:'other'}]) {
     session = fixture;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { ProfilForm } from "@/components/compte/profil-form";
 import { ScanMorphoPosture } from "@/components/compte/scan-morpho-posture";
@@ -18,7 +19,7 @@ export default async function ProfilPage({
   searchParams: { onboarding?: string };
 }) {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const completion = computeProfilCompletion(user.profile);
 

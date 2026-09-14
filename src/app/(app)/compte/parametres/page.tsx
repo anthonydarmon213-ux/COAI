@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { RgpdActions } from "@/components/compte/rgpd-actions";
 import { WhatsappPhoneForm } from "@/components/compte/whatsapp-phone-form";
 import { PrenomForm } from "@/components/compte/prenom-form";
@@ -8,7 +9,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 
 export default async function ParametresPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   return (
     <div className="flex flex-col gap-6">

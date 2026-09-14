@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { prisma } from "@/lib/db/client";
 import { SeanceForm } from "@/components/suivi/seance-form";
 import { EXERCICES } from "@/lib/exercices/catalogue";
@@ -33,7 +34,7 @@ function tonnageExercice(ex: ExerciceData): number {
 
 export default async function SeancesPage() {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
   const seances = await prisma.seanceLog.findMany({
     where: { userId: user.id },
