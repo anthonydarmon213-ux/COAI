@@ -8,6 +8,7 @@ import { variantesPourExercice, MATERIEL_LABEL, type Variante } from "@/lib/exer
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
+import { formatRepos } from "@/lib/programmes/repos";
 
 // Carte visuelle pour un exercice généré (au lieu d'une liste plate
 // clé/valeur) : repères façon "readout" HUD, mise en page dense mais aérée.
@@ -222,7 +223,7 @@ export function ExerciceCard({
         {CHAMPS.map(({ cle, label }) => {
           const valeur = exercice[cle];
           if (valeur === undefined || valeur === null || valeur === "") return null;
-          const texte = String(valeur);
+          const texte = cle === "repos" ? formatRepos(String(valeur)) : String(valeur);
           // Les repères de charge générés par l'IA sont des phrases
           // entières ("charge permettant de sentir les 2 dernières
           // répétitions difficiles…"), pas des valeurs courtes comme les
