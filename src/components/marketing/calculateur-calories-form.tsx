@@ -46,11 +46,12 @@ export function CalculateurCaloriesForm() {
     const a = Number(age);
     const t = Number(tailleCm);
     const p = Number(poidsKg);
-    if (!a || !t || !p) return null;
+    if (![a, t, p].every((value) => Number.isFinite(value) && value > 0)) return null;
 
     const bmr = sexe === "Homme" ? 10 * p + 6.25 * t - 5 * a + 5 : 10 * p + 6.25 * t - 5 * a - 161;
     const tdee = bmr * Number(activite);
     const objectifCalories = Math.round(tdee * (1 + Number(objectif)));
+    if (![bmr, tdee, objectifCalories].every((value) => Number.isFinite(value) && value > 0)) return null;
 
     const proteinesG = Math.round(p * PROTEINES_PAR_KG);
     const proteinesKcal = proteinesG * 4;
@@ -73,7 +74,7 @@ export function CalculateurCaloriesForm() {
     setCalcule(true);
     // Événement dédié, hors vocabulaire du funnel diagnostic (funnel-events.ts)
     // — cet outil est un aimant à trafic autonome, pas une étape du parcours.
-    trackEvent("calories_calculator_used");
+    if (resultat) trackEvent("calories_calculator_used");
   }
 
   return (
@@ -119,6 +120,7 @@ export function CalculateurCaloriesForm() {
         <Button onClick={handleCalculer} className="mt-1">
           Calculer mes besoins
         </Button>
+        {calcule && !resultat && <p role="alert" className="text-sm text-red-400">Vérifie ton âge, ta taille et ton poids : indique des nombres positifs et cohérents pour obtenir une estimation.</p>}
       </Card>
 
       {calcule && resultat && (
