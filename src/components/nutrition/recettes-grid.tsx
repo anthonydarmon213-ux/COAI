@@ -55,6 +55,15 @@ export function RecettesGrid({ items }: { items: Item[] }) {
         />
       </div>
 
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p role="status" className="text-sm text-graphite-400">{filtrees.length} recette{filtrees.length === 1 ? "" : "s"} affichée{filtrees.length === 1 ? "" : "s"}</p>
+        {(typeRepas || objectif || regime) && (
+          <button type="button" className="min-h-11 rounded-full border border-white/20 px-4 py-2 text-sm text-laiton-200" onClick={() => { setTypeRepas(null); setObjectif(null); setRegime(null); }}>
+            Réinitialiser les filtres
+          </button>
+        )}
+      </div>
+
       {filtrees.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center text-sm text-graphite-400">
           Aucune recette ne correspond à cette combinaison de filtres. Essaie d&apos;en retirer un.
@@ -82,12 +91,13 @@ function FilterRow<T extends string>({
   options: [T, string][];
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div role="group" aria-label={label} className="flex flex-wrap items-center gap-1.5">
       <span className="mr-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-graphite-500">{label} :</span>
       <button
         type="button"
+        aria-pressed={value === null}
         onClick={() => onChange(null)}
-        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+        className={`min-h-11 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
           value === null ? "border-laiton-300/60 bg-laiton-400/15 text-laiton-200" : "border-white/10 text-graphite-400 hover:text-white"
         }`}
       >
@@ -97,8 +107,9 @@ function FilterRow<T extends string>({
         <button
           key={key}
           type="button"
+          aria-pressed={value === key}
           onClick={() => onChange(value === key ? null : key)}
-          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+          className={`min-h-11 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
             value === key ? "border-laiton-300/60 bg-laiton-400/15 text-laiton-200" : "border-white/10 text-graphite-400 hover:text-white"
           }`}
         >
