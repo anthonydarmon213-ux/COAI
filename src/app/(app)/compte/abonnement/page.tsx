@@ -1,13 +1,13 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { AccessRecovery } from "@/components/auth/access-recovery";
-import { getEffectivePlan, isInTrial, PLAN_LABELS } from "@/lib/subscription/plan";
+import { getEffectivePlan, isInTrial } from "@/lib/subscription/plan";
+import { subscriptionDisplay } from "@/lib/subscription/display";
 import { PLAN_FEATURES } from "@/lib/subscription/plan-features";
 import { PortalButton } from "@/components/compte/portal-button";
 import { ParrainageCard } from "@/components/compte/parrainage-card";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SectionLabel } from "@/components/ui/section-label";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import Image from "next/image";
@@ -38,6 +38,7 @@ export default async function AbonnementPage() {
   const finProgrammee = statut === "ACTIVE" && user.subscription?.cancelAtPeriodEnd
     && user.subscription.currentPeriodEnd && user.subscription.currentPeriodEnd > new Date();
   const enEssai = isInTrial(user.subscription);
+  const display = subscriptionDisplay(user.subscription);
   const vipHref = buildWhatsAppLink(VIP_MESSAGE);
 
   return (
@@ -54,19 +55,15 @@ export default async function AbonnementPage() {
       </div>
 
       <Card className="flex flex-col items-start gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-graphite-50">{PLAN_LABELS[plan]}</span>
-          {statut && <Badge tone={STATUT_TONES[statut]}>{STATUT_LABELS[statut]}</Badge>}
-          {user.subscription?.billingInterval === "ANNUAL" && <Badge tone="success">Facturation annuelle</Badge>}
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-lg font-semibold text-graphite-50">{display.name}</span>
+          {statut && <Badge tone={STATUT_TONES[statut]}>{enEssai ? "En essai" : STATUT_LABELS[statut]}</Badge>}
         </div>
-        <ul className="flex flex-col gap-1.5">
-          {PLAN_FEATURES[plan].map((feature) => (
-            <li key={feature} className="flex items-start gap-2 text-sm text-graphite-300">
-              <span className="mt-0.5 text-laiton-400">✓</span>
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
+        <p className="text-sm leading-6 text-graphite-300">{display.description}</p>
+        {display.amount && <p className="text-sm text-graphite-200">Tarif récurrent enregistré : {display.amount}. Les remises et taxes éventuelles figurent sur tes factures.</p>}
+        {statut === "ACTIVE" && !enEssai && !finProgrammee && user.subscription?.currentPeriodEnd && (
+          <p className="text-sm text-graphite-300">Fin de la période en cours : {user.subscription.currentPeriodEnd.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Paris" })}.</p>
+        )}
         {finProgrammee && (
           <div className="flex flex-col items-start gap-2 rounded-lg border border-laiton-400/25 bg-laiton-400/[0.06] p-3">
             <p className="text-sm text-laiton-300">
@@ -114,10 +111,16 @@ export default async function AbonnementPage() {
             Voir les offres et les tarifs
           </a>
         ) : null}
+        {statut && <p className="text-xs leading-5 text-graphite-300">Le portail permet de consulter tes factures et de gérer ton moyen de paiement ou ta résiliation. L’ouvrir ne modifie pas ton abonnement.</p>}
+        <a href={buildWhatsAppLink("Bonjour Anthony, j’ai une question sur mon abonnement COAI.") ?? "/contact"} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-sm text-laiton-300 underline">Besoin d’aide avec mon abonnement</a>
+        {statut === "ACTIVE" && <details className="w-full border-t border-white/10 pt-2">
+          <summary className="flex min-h-11 cursor-pointer items-center text-sm text-graphite-200">Ce que comprend mon accès</summary>
+          <ul className="mt-2 flex flex-col gap-1.5">{PLAN_FEATURES[plan].map((feature) => <li key={feature} className="text-sm text-graphite-300">✓ {feature}</li>)}</ul>
+        </details>}
       </Card>
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Mon histoire</SectionLabel>
+      <details className="rounded-xl border border-white/10 p-4">
+        <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-graphite-200">Découvrir Anthony, le fondateur de COAI</summary>
         <Card className="flex flex-col gap-5 sm:flex-row sm:items-start">
           <div className="flex shrink-0 flex-col items-center gap-3 sm:items-stretch">
             <Image
@@ -183,7 +186,7 @@ export default async function AbonnementPage() {
             </p>
           </div>
         </Card>
-      </div>
+      </details>
 
       <ParrainageCard />
 
