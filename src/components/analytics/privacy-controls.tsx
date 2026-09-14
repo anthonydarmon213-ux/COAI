@@ -72,7 +72,14 @@ export function PrivacyControls() {
     {choices?.audience && isProductionAnalyticsOrigin() && <><GoogleAnalytics /><Analytics /></>}
     {choices?.marketing && isProductionAnalyticsOrigin() && <MetaPixel />}
     {open ? <section aria-label="Préférences de confidentialité" className={`${inline ? "relative mx-3 mb-6 sm:mx-auto" : "fixed inset-x-3 bottom-3 z-[100] mx-auto max-h-[65dvh] overflow-y-auto"} max-w-xl rounded-2xl border border-white/20 bg-[#101b23] p-3 text-white shadow-2xl sm:p-4`}>
-      <h2 className="text-sm font-semibold">Confidentialité · à toi de choisir</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-sm font-semibold">Confidentialité · à toi de choisir</h2>
+        {choices && <button type="button" className="min-h-11 rounded-lg px-3 text-xs underline" onClick={() => {
+          setDraft(choices);
+          setError(false);
+          setOpen(false);
+        }}>Fermer</button>}
+      </div>
       <p className="mt-1 text-xs leading-5 text-slate-300">Mesure d’audience (Google, Vercel) et publicité (Meta, COAI) : facultatives. Refuser ne limite pas l’app.</p>
       {details && <><label className="mt-3 flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={draft.audience} onChange={event => setDraft({ ...draft, audience: event.target.checked })} />Mesure d’audience — Google Analytics et Vercel</label>
       <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={draft.marketing} onChange={event => setDraft({ ...draft, marketing: event.target.checked })} />Publicité et attribution des campagnes — Meta et COAI</label>

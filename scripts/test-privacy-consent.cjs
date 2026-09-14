@@ -61,6 +61,25 @@ const dependencies = {
   '@/lib/analytics/production-origin': load('src/lib/analytics/production-origin.ts'),
 };
 const component = load('src/components/analytics/privacy-controls.tsx', dependencies, {});
+// Closing an existing preference panel must discard draft changes, not save consent.
+const storedChoice = { audience: false, marketing: false };
+let closeState = [storedChoice, { audience: true, marketing: true }, true, true, false];
+let closeIndex = 0, savedByClose = 0;
+const closeComponent = load('src/components/analytics/privacy-controls.tsx', {
+  ...dependencies,
+  react: { ...React, useEffect: () => {}, useRef: initial => ({ current: initial }),
+    useState: () => { const i = closeIndex++; return [closeState[i], value => { closeState[i] = value; }]; } },
+  '@/lib/analytics/consent': { ...consent, saveConsent: () => { savedByClose++; } },
+}, {});
+function findClose(node) {
+  if (!node || typeof node !== 'object') return null;
+  if (node.type === 'button' && node.props.children === 'Fermer') return node;
+  return React.Children.toArray(node.props?.children).map(findClose).find(Boolean);
+}
+findClose(closeComponent.PrivacyControls()).props.onClick();
+assert.equal(closeState[2], false);
+assert.equal(closeState[1], storedChoice);
+assert.equal(savedByClose, 0);
 const html = require('react-dom/server').renderToStaticMarkup(React.createElement(component.PrivacyControls));
 assert.ok(!html.includes('<script') && !html.includes('<img'));
 // Render the actual open panel with no choice. Only its placement changes;
