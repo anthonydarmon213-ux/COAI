@@ -2,6 +2,7 @@ import { getCurrentAppUser } from "@/lib/auth/server";
 import { AccessRecovery } from "@/components/auth/access-recovery";
 import { SyntheseCorporelle } from "@/components/suivi/synthese-corporelle";
 import { volumeParMuscle } from "@/lib/suivi/volume-musculaire";
+import { progressionForce } from "@/lib/suivi/progression-force";
 import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Sparkline } from "@/components/suivi/sparkline";
@@ -68,7 +69,7 @@ export default async function ProgressionPage() {
   type SetDetail = { reps?: number; charge?: number };
   type ExData = { nom?: string; chargeKg?: number; series?: number; repetitions?: number; sets?: SetDetail[] };
 
-  const chargesParExercice = new Map<string, number[]>();
+  const chargesParExercice = progressionForce(seances);
   const tonnageParExercice = new Map<string, number[]>();
   const tonnageParSeance: number[] = [];
 
@@ -80,11 +81,6 @@ export default async function ProgressionPage() {
     for (const ex of exercices) {
       if (!ex.nom) continue;
       const nom = ex.nom.trim();
-      if (typeof ex.chargeKg === "number") {
-        const liste = chargesParExercice.get(nom) ?? [];
-        liste.push(ex.chargeKg);
-        chargesParExercice.set(nom, liste);
-      }
       let vol = 0;
       if (ex.sets && ex.sets.length > 0) {
         vol = ex.sets.reduce((s, set) => s + (set.reps ?? 0) * (set.charge ?? 0), 0);
@@ -223,7 +219,8 @@ export default async function ProgressionPage() {
 
           {graphiquesForce.length > 0 && (
             <div id="charges" className="scroll-mt-8 flex flex-col gap-3">
-              <SectionLabel>Force · charge max</SectionLabel>
+              <SectionLabel>Force · charge maximale par séance</SectionLabel>
+              <p className="text-sm text-graphite-400">Chaque point correspond à la charge la plus lourde enregistrée pour cet exercice dans une séance. Le chiffre affiché est celui de la dernière séance renseignée, pas ton record historique.</p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {graphiquesForce.map((g) => (
                   <Sparkline key={g.nom} label={g.nom} unite="kg" points={g.points} />
