@@ -87,7 +87,7 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
           <Image src="/coach-ia-anthony.png" alt="" fill sizes="2.5rem" className="object-cover object-[50%_22%]" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-white">Coach COAI · Anthony</p>
+          <p className="truncate text-sm font-semibold text-white">Assistant IA COAI</p>
           <p className="text-[11px] text-cyan-200/70">{loading ? "analyse ton contexte…" : "prêt à t’accompagner"}</p>
         </div>
         {quotaRemaining !== null && (

@@ -25,9 +25,9 @@ const OFFRES = [
     nom: "COAI Essentiel",
     prix: "19,99 €",
     unite: "/mois",
-    note: "ou 119 €/an, soit 9,99 €/mois",
-    pour: "Tu veux un programme qui s'adapte tout seul",
-    inclus: ["Programme généré et adapté chaque semaine", "Analyse de tes repas par photo", "Catalogue complet de programmes"],
+    note: "ou 119 €/an, soit environ 9,92 €/mois",
+    pour: "Tu veux un programme et des repères pour progresser",
+    inclus: ["Programmes issus de la bibliothèque COAI", "Suivi de tes séances et de ta progression", "Catalogue complet de programmes"],
     href: "/pricing#pass-ia",
   },
   {

@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   if (!authUser) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   const adaptation = await prisma.programmeAdaptation.findFirst({
     where: { id: params.id, user: { supabaseAuthId: authUser.id } },
-    select: { pilier: true, decision: true, resume: true, createdAt: true },
+    select: { pilier: true, decision: true, createdAt: true },
   });
   if (!adaptation) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
 
@@ -24,7 +24,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 34 }}>
         <span style={{ fontSize: 72, lineHeight: 1.05, fontWeight: 700, letterSpacing: -2 }}>{DECISIONS[adaptation.decision]}</span>
-        <span style={{ fontSize: 34, lineHeight: 1.35, color: "#d6d8db", maxWidth: 850 }}>{adaptation.resume.slice(0, 210)}</span>
+        <span style={{ fontSize: 34, lineHeight: 1.35, color: "#d6d8db", maxWidth: 850 }}>Mon parcours, à mon rythme.</span>
       </div>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
         <span style={{ fontSize: 22, color: "#9aa0a8" }}>{adaptation.createdAt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
