@@ -41,7 +41,7 @@ type InitialDaily = { sleep: string | null; energy: string | null; pain: boolean
 export function RestDayCheckin({ initialDaily }: { initialDaily: InitialDaily }) {
   const [sleep, setSleep] = useState(initialDaily?.sleep ?? "");
   const [energy, setEnergy] = useState(initialDaily?.energy ?? "");
-  const [pain, setPain] = useState(initialDaily?.pain ?? false);
+  const [pain, setPain] = useState<boolean | null>(initialDaily?.pain ?? null);
   const [painArea, setPainArea] = useState(initialDaily?.painArea ?? "");
   const [done, setDone] = useState(Boolean(initialDaily?.sleep));
   const [loading, setLoading] = useState(false);
@@ -49,6 +49,7 @@ export function RestDayCheckin({ initialDaily }: { initialDaily: InitialDaily })
 
   async function submit() {
     if (!sleep || !energy) return setError("Réponds aux deux repères pour que COAI garde ta régularité à jour.");
+    if (pain === null) return setError("Indique si tu ressens une douleur ou une gêne.");
     if (pain && !painArea) return setError("Indique simplement la zone gênée.");
     setLoading(true);
     setError("");
@@ -100,8 +101,8 @@ export function RestDayCheckin({ initialDaily }: { initialDaily: InitialDaily })
       <div>
         <p className="mb-2 text-xs font-semibold text-graphite-300">Une douleur ou une gêne ?</p>
         <div className="flex gap-2">
-          <Chip active={!pain} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip>
-          <Chip active={pain} onClick={() => setPain(true)}>Oui</Chip>
+          <Chip active={pain === false} onClick={() => { setPain(false); setPainArea(""); }}>Non, tout va bien</Chip>
+          <Chip active={pain === true} onClick={() => setPain(true)}>Oui</Chip>
         </div>
         {pain && (
           <div className="mt-3 flex flex-wrap gap-2">
@@ -111,7 +112,7 @@ export function RestDayCheckin({ initialDaily }: { initialDaily: InitialDaily })
           </div>
         )}
       </div>
-      {error && <p className="text-sm text-red-300">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
       <button
         type="button"
         onClick={submit}
