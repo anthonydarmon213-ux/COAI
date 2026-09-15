@@ -26,7 +26,7 @@ const GRATUITES: Fonction[] = [
   { titre: "Records et tests maxi", description: "Garde la trace de tes maxima et vois tes records tomber.", href: "/suivi/tests-maxi", icon: Trophy },
   { titre: "Mesures corporelles", description: "Poids, tours de taille et de hanches, suivis dans le temps.", href: "/suivi/mesures", icon: Ruler },
   { titre: "Bibliothèque d’exercices", description: "77 exercices avec photos et vidéos de démonstration filmées par COAI.", href: "/programme/exercices", icon: BookOpen },
-  { titre: "3 recettes offertes", description: "Goûte la bibliothèque : macros, étapes et visuels. Les 161 autres arrivent avec l’abonnement.", href: "/programme/recettes", icon: Salad },
+  { titre: "3 recettes offertes", description: "Découvre trois recettes avec macros, étapes et visuels. Le catalogue complet est accessible avec l’abonnement.", href: "/programme/recettes", icon: Salad },
   { titre: "Suivi des macros", description: "Journal de repas et repères nutritionnels du jour.", href: "/suivi/alimentation", icon: Apple },
   { titre: "Plan de récupération", description: "Mobilité, étirements, respiration et sommeil pour encaisser la charge.", href: "/programme/recuperation", icon: Moon },
   { titre: "Bilan quotidien", description: "Forme, sommeil, douleurs : deux minutes pour ajuster ta journée.", href: "/dashboard", icon: HeartPulse },
@@ -34,15 +34,15 @@ const GRATUITES: Fonction[] = [
 ];
 
 const PAYANTES: Fonction[] = [
-  { titre: "Programme généré par l’IA", description: "Ton programme d’entraînement construit sur ton profil, puis adapté chaque semaine selon tes retours.", href: "/programme/entrainement", icon: Brain },
+  { titre: "Programme COAI", description: "Un programme issu de la bibliothèque COAI, avec tes séances et tes repères de progression.", href: "/programme/entrainement", icon: Brain },
   { titre: "Analyse d’un plat par photo", description: "Photographie ton assiette : COAI estime les portions et les macros.", href: "/programme/alimentation", icon: Camera },
   { titre: "Menu restaurant", description: "Photographie une carte : COAI te dit quoi commander selon ton objectif.", href: "/programme/alimentation", icon: UtensilsCrossed },
   { titre: "Catalogue complet de programmes", description: "Les 12 programmes prêts à l’emploi. Le programme Mobilité reste offert.", href: "/programme/programmes-prets", icon: Dumbbell },
-  { titre: "Coaching humain", description: "Échange avec Anthony : ajustements, questions technique, suivi personnalisé.", href: "/coach", icon: MessageSquare },
+  { titre: "Accompagnement humain", description: "Découvre les accompagnements avec Anthony et les prestations incluses dans chaque formule.", href: "/pricing", icon: MessageSquare },
   { titre: "Analyse de ta montre", description: "Envoie une capture de Whoop, Oura ou Garmin : COAI en extrait tes indicateurs. Lecture d’image, pas une synchronisation.", href: "/compte/profil", icon: Watch },
   { titre: "Vidéos exclusives", description: "Yoga, mobilité et récupération filmés par Anthony. Une séance de démonstration reste offerte.", href: "/videos", icon: Play },
   { titre: "Coach IA", description: "Pose tes questions technique, nutrition ou récupération : réponse immédiate, adaptée à ton profil.", href: "/coach", icon: Brain },
-  { titre: "Bibliothèque complète de recettes", description: "Les 164 recettes, avec portions, conservation et variantes par programme.", href: "/programme/recettes", icon: Salad },
+  { titre: "Bibliothèque complète de recettes", description: "Retrouve le catalogue et son nombre de recettes à jour, avec portions, conservation et variantes par programme.", href: "/programme/recettes", icon: Salad },
 ];
 
 function Bloc({ fonctions, verrouille }: { fonctions: Fonction[]; verrouille: boolean }) {
@@ -135,7 +135,7 @@ export function FonctionnalitesMenu({ abonne }: { abonne: boolean }) {
         <p className="max-w-2xl text-sm leading-6 text-graphite-300">
           {abonne
             ? "Ton abonnement est actif : ces fonctions sont débloquées."
-            : "Ce que l’abonnement ajoute : l’intelligence qui adapte ton programme et lit tes repas, et l’accès au coaching."}
+            : "Découvre les outils supplémentaires et les accompagnements proposés. Les prestations humaines dépendent de la formule choisie."}
         </p>
         <Bloc fonctions={PAYANTES} verrouille={!abonne} />
         {!abonne && (
