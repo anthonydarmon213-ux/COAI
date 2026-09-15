@@ -162,7 +162,7 @@ export function DailyExperience({
   const [error, setError] = useState("");
   const [feedbackOpen, setFeedbackOpen] = useState(Boolean(initialDaily?.completedAt && !initialDaily?.workoutRating));
   const [rating, setRating] = useState("");
-  const [feedbackPain, setFeedbackPain] = useState(false);
+  const [feedbackPain, setFeedbackPain] = useState<boolean | null>(null);
   const [comment, setComment] = useState("");
   const [started, setStarted] = useState(Boolean(initialDaily?.completedAt));
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(() => new Set());
@@ -242,6 +242,7 @@ export function DailyExperience({
 
   async function submitFeedback() {
     if (!rating) return setError("Choisis un ressenti pour terminer.");
+    if (feedbackPain === null) return setError("Indique si tu as ressenti une douleur ou une gêne.");
     if (await post({ action: "feedback", workoutRating: rating, feedbackPain, feedbackComment: comment || undefined })) {
       setFeedbackOpen(false);
       router.refresh();
@@ -405,9 +406,9 @@ export function DailyExperience({
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-laiton-400">Après la séance</p>
           <h2 className="mt-2 text-xl text-white">Comment était ta séance ?</h2>
           <div className="mt-4 flex flex-wrap gap-2">{FEEDBACK.map(([value, label]) => <Chip key={value} active={rating === value} onClick={() => setRating(value)}>{label}</Chip>)}</div>
-          <p className="mb-2 mt-5 text-xs text-graphite-400">Une douleur ou gêne ?</p><div className="flex gap-2"><Chip active={!feedbackPain} onClick={() => setFeedbackPain(false)}>Non</Chip><Chip active={feedbackPain} onClick={() => setFeedbackPain(true)}>Oui</Chip></div>
+          <p className="mb-2 mt-5 text-xs text-graphite-400">Une douleur ou gêne ?</p><div className="flex gap-2"><Chip active={feedbackPain === false} onClick={() => setFeedbackPain(false)}>Non</Chip><Chip active={feedbackPain === true} onClick={() => setFeedbackPain(true)}>Oui</Chip></div>
           <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Un commentaire ? (facultatif)" className="mt-4 min-h-20 w-full rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white outline-none focus:border-laiton-400/40" />
-          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+          {error && <p role="alert" className="mt-3 text-sm text-red-400">{error}</p>}
           <Button onClick={submitFeedback} disabled={loading} className="mt-4 w-full sm:w-auto">{loading ? "Enregistrement…" : "Enregistrer mon ressenti"}</Button>
         </section>
       )}
