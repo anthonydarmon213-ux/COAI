@@ -53,7 +53,7 @@ export default async function CoachPage() {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">COAI Intelligence</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-1 text-[10px] font-semibold text-emerald-200"><i className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-emerald-300" /> En ligne</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-1 text-[10px] font-semibold text-emerald-200">Assistant IA</span>
             </div>
             <h1 className="mt-5 max-w-2xl font-editorial text-4xl font-normal tracking-tight text-white sm:text-6xl">
               Ton coach augmenté.
@@ -61,13 +61,16 @@ export default async function CoachPage() {
             <p className="mt-3 max-w-xl text-sm leading-6 text-graphite-200 sm:text-base">
               Tes séances, tes charges et ta récupération analysées au même endroit. Une réponse claire, puis une décision utile.
             </p>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-graphite-300">
+              Le chat répond avec une IA, pas avec Anthony. L&apos;accompagnement humain est distinct et dépend de ta formule.
+            </p>
             <div className="mt-5 flex flex-wrap gap-2 font-mono text-[9px] uppercase tracking-[0.13em] text-graphite-300">
               <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Contexte mémorisé</span>
               <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Progression mesurée</span>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Supervision humaine</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Réponses générées par IA</span>
             </div>
           </div>
-          <div className="coai-core relative mx-auto h-52 w-52 sm:h-64 sm:w-64" aria-label="COAI Core actif">
+          <div className="coai-core relative mx-auto h-52 w-52 sm:h-64 sm:w-64" aria-hidden="true">
             <div className="coai-core-grid absolute inset-0" />
             <div className="coai-core-ring coai-core-ring-a absolute inset-[8%] rounded-full" />
             <div className="coai-core-ring coai-core-ring-b absolute inset-[20%] rounded-full" />
@@ -76,7 +79,7 @@ export default async function CoachPage() {
               <CoaiMark size={58} />
             </div>
             <span className="absolute bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-cyan-200/30 bg-black/80 px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-cyan-200 shadow-[0_0_24px_rgba(76,201,240,.18)] sm:bottom-2">
-              En direct
+              COAI IA
             </span>
           </div>
         </div>
