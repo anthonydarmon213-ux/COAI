@@ -31,6 +31,12 @@ export async function GET(_request: Request, { params }: { params: { id: string 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}><div style={{ display: "flex", alignItems: "center", gap: 14 }}><span style={{ fontSize: 32, fontWeight: 700 }}>COAI</span><span style={{ fontSize: 16, letterSpacing: 4, color: "#c9a262" }}>HI × AI™</span></div><span style={{ fontSize: 18, color: "#9aa0a8" }}>coai.fr/diagnostic</span></div>
       </div>
     </div>,
-    { width: 1080, height: 1080 }
+    {
+      width: 1080,
+      height: 1080,
+      // ImageResponse otherwise defaults to a public, year-long immutable cache.
+      // This authenticated card must not survive account changes or privacy fixes.
+      headers: { "Cache-Control": "private, no-store, max-age=0" },
+    }
   );
 }
