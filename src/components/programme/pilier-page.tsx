@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { accessibleTraining } from "@/lib/programmes/access";
 import Image from "next/image";
 import { getCurrentAppUser } from "@/lib/auth/server";
@@ -206,7 +207,7 @@ export async function PilierPage({
               </div>
               <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{heroParPilier[pilierActif].titre}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
-                {enValidation ? "Ton programme attend la validation de ton coach. En attendant, tu peux enregistrer tes exercices dans RepCount." : heroParPilier[pilierActif].texte}
+                {enValidation ? `Ton programme ${LABELS[pilierActif].toLowerCase()} attend une relecture par ton coach. Les autres rubriques restent accessibles selon tes droits.` : heroParPilier[pilierActif].texte}
               </p>
             </div>
             {/* La carte Story a laisse place au telechargement de la fiche
@@ -327,16 +328,18 @@ export async function PilierPage({
                 <Badge tone="warning">À valider par le coach</Badge>
                 <h2 className="text-2xl font-semibold text-white">Programme en attente de validation</h2>
                 <p className="text-sm leading-6 text-graphite-300">
-                  La séance n&apos;est pas encore accessible. Tu peux consulter les démonstrations des exercices en attendant.
+                  Ton programme {LABELS[pilier].toLowerCase()} attend une relecture. Tu peux contacter Anthony pour faire le point ; aucune demande n&apos;est envoyée automatiquement.
                 </p>
                 {pilier === "ENTRAINEMENT" && (
                   <Link href="/programme/exercices" className="coai-pillar-primary mx-auto inline-flex rounded-full px-5 py-3 text-sm font-bold">
                     Voir les exercices et leurs vidéos →
                   </Link>
                 )}
-                <Link href="/suivi/repcount" className="mx-auto inline-flex min-h-11 items-center text-sm underline underline-offset-4">
-                  Enregistrer mes exercices dans RepCount →
-                </Link>
+                {buildWhatsAppLink("Bonjour Anthony, je souhaite faire le point sur mon programme en attente de relecture.") && (
+                  <a href={buildWhatsAppLink("Bonjour Anthony, je souhaite faire le point sur mon programme en attente de relecture.")!} target="_blank" rel="noopener noreferrer" className="mx-auto inline-flex min-h-11 items-center text-sm underline underline-offset-4">
+                    Préparer un message à Anthony →
+                  </a>
+                )}
               </Card>
             </section>
           );
