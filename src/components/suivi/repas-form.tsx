@@ -69,6 +69,11 @@ export function RepasForm() {
       if (!res.ok) throw new Error(data.error ? JSON.stringify(data.error) : "Échec de l'ajout.");
       setStatut(null);
       setNotes("");
+      setLibelle("");
+      setCalories("");
+      setProteines("");
+      setGlucides("");
+      setLipides("");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -91,7 +96,8 @@ export function RepasForm() {
             </Field>
           </div>
         </div>
-        <Field label="Comment s'est passée ta journée nutrition ?">
+        <fieldset className="flex flex-col gap-1.5">
+          <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-graphite-400">Comment s&apos;est passée ta journée nutrition ?</legend>
           <div className="flex flex-wrap gap-2">
             {STATUTS.map((s) => (
               <button
@@ -109,7 +115,7 @@ export function RepasForm() {
               </button>
             ))}
           </div>
-        </Field>
+        </fieldset>
         <details className="coai-advanced-fields">
           <summary>Ajouter les aliments, macros ou une note</summary>
           <div className="mt-4 flex flex-col gap-4">
@@ -125,7 +131,7 @@ export function RepasForm() {
             <Field label="Note"><Textarea placeholder="ex : repas de famille le midi, sinon suivi le plan" value={notes} onChange={(e) => setNotes(e.target.value)} /></Field>
           </div>
         </details>
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={loading} className="sm:self-start">
           {loading ? "Ajout…" : "Ajouter mon bilan"}
         </Button>
