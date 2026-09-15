@@ -10,7 +10,8 @@ import { Card } from "@/components/ui/card";
 type Ligne = { calories: number | null; proteines: number | null; glucides: number | null; lipides: number | null };
 
 function somme(lignes: Ligne[], champ: keyof Ligne) {
-  return lignes.reduce((t, l) => t + (l[champ] ?? 0), 0);
+  const valeurs = lignes.flatMap((ligne) => ligne[champ] === null ? [] : [ligne[champ]!]);
+  return valeurs.length ? valeurs.reduce((total, valeur) => total + valeur, 0) : null;
 }
 
 function Barre({ valeur, objectif, couleur }: { valeur: number; objectif: number | null; couleur: string }) {
@@ -30,14 +31,14 @@ export function CompteurCalories({
   repasDuJour: Ligne[];
   objectifs: { calories?: number; proteines?: number; glucides?: number; lipides?: number } | null;
 }) {
-  const renseignes = repasDuJour.filter((r) => r.calories !== null || r.proteines !== null);
+  const renseignes = repasDuJour.filter((r) => Object.values(r).some((valeur) => valeur !== null));
   const kcal = somme(repasDuJour, "calories");
   const prot = somme(repasDuJour, "proteines");
   const gluc = somme(repasDuJour, "glucides");
   const lip = somme(repasDuJour, "lipides");
 
   const objKcal = objectifs?.calories ?? null;
-  const restant = objKcal ? objKcal - kcal : null;
+  const incomplet = repasDuJour.some((r) => Object.values(r).some((valeur) => valeur === null));
 
   return (
     <Card className="p-4">
@@ -53,19 +54,15 @@ export function CompteurCalories({
       </div>
 
       <p className="mt-1 font-display text-4xl font-extrabold tabular-nums text-[#fffdf8]">
-        {kcal.toLocaleString("fr-FR")}
+        {kcal === null ? "—" : kcal.toLocaleString("fr-FR")}
         <span className="ml-1.5 text-lg text-graphite-400">kcal</span>
         {objKcal && <span className="ml-2 text-sm font-semibold text-graphite-500">/ {objKcal.toLocaleString("fr-FR")}</span>}
       </p>
-      <Barre valeur={kcal} objectif={objKcal} couleur="linear-gradient(90deg,#34d399,#c9a262)" />
+      {kcal !== null && <Barre valeur={kcal} objectif={objKcal} couleur="linear-gradient(90deg,#34d399,#c9a262)" />}
 
-      {restant !== null && (
-        <p className="mt-2 text-xs text-graphite-300">
-          {restant > 0
-            ? `Il te reste ${restant.toLocaleString("fr-FR")} kcal aujourd’hui.`
-            : `Tu es à ${Math.abs(restant).toLocaleString("fr-FR")} kcal au-dessus de ton repère.`}
-        </p>
-      )}
+      <p className="mt-2 text-xs text-graphite-300">
+        {kcal === null ? "Calories non renseignées." : "Total des calories renseignées, pas nécessairement de toute ta journée."}
+      </p>
 
       <div className="mt-3 grid grid-cols-3 gap-2.5">
         {([
@@ -75,14 +72,20 @@ export function CompteurCalories({
         ] as const).map(([label, v, obj, couleur]) => (
           <div key={label} className="rounded-xl border border-white/10 bg-white/[0.03] px-2.5 py-2">
             <p className="font-display text-base font-bold text-[#fffdf8]">
-              {v}
+              {v === null ? "—" : v.toLocaleString("fr-FR")}
               <span className="text-[11px] text-graphite-400"> g{obj ? ` / ${obj}` : ""}</span>
             </p>
             <p className="text-[10px] uppercase tracking-wide text-graphite-400">{label}</p>
-            <Barre valeur={v} objectif={obj ?? null} couleur={couleur} />
+            {v === null ? <p className="mt-1 text-[11px] text-graphite-400">Non renseigné</p> : <Barre valeur={v} objectif={obj ?? null} couleur={couleur} />}
           </div>
         ))}
       </div>
+
+      {renseignes.length > 0 && incomplet && (
+        <p className="mt-3 text-xs leading-5 text-graphite-400">
+          Totaux partiels : certains champs sont vides. Ils ne sont pas comptés comme zéro.
+        </p>
+      )}
 
       {renseignes.length === 0 && (
         <p className="mt-3 text-xs leading-5 text-graphite-400">
