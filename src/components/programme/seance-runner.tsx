@@ -231,6 +231,7 @@ type SeanceSauvegardee = {
   substitutions?: Substitutions;
   seanceCondensee?: boolean;
   nomsRealises?: Record<string, string>;
+  repos?: { index: number; fin: number };
 };
 
 function lireSauvegarde(nomSeance: string, cle: string | null): SeanceSauvegardee | null {
@@ -248,6 +249,7 @@ function lireSauvegarde(nomSeance: string, cle: string | null): SeanceSauvegarde
     if (d.substitutions !== undefined && (!isPlainObject(d.substitutions) || !Object.values(d.substitutions).every((v) => isPlainObject(v) && typeof v.variante === "string" && typeof v.consigne === "string"))) return null;
     if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
     if (d.nomsRealises !== undefined && (!isPlainObject(d.nomsRealises) || !Object.values(d.nomsRealises).every((v) => typeof v === "string"))) return null;
+    if (d.repos !== undefined && (!isPlainObject(d.repos) || !Number.isInteger(d.repos.index) || typeof d.repos.fin !== "number" || !Number.isFinite(d.repos.fin))) return null;
     if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
       window.localStorage.removeItem(cle);
       return null;
@@ -331,6 +333,8 @@ export function SeanceRunner({
   const [reprise] = useState(() => sauvegarde !== null);
   const [index, setIndex] = useState(() => Math.min(sauvegarde?.index ?? 0, Math.max(0, steps.length - 1)));
   const [secondesRestantes, setSecondesRestantes] = useState(0);
+  const [repos, setRepos] = useState<SeanceSauvegardee["repos"]>(() => sauvegarde?.repos);
+  const reposSignale = useRef<number | null>(null);
   const [chronoGlobal, setChronoGlobal] = useState(0);
   const [termine, setTermine] = useState(false);
   // Bilan conservé pour l'écran de fin : les steps sont figés une fois la
@@ -361,13 +365,13 @@ export function SeanceRunner({
     try {
       window.localStorage.setItem(
         cleBrouillon,
-        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee, nomsRealises } satisfies SeanceSauvegardee)
+        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee, nomsRealises, repos } satisfies SeanceSauvegardee)
       );
     } catch {
       // Quota dépassé ou navigation privée : la séance continue normalement,
       // elle ne sera simplement pas reprenable.
     }
-  }, [termine, cleBrouillon, nomSeance, index, realise, substitutions, seanceCondensee, nomsRealises]);
+  }, [termine, cleBrouillon, nomSeance, index, realise, substitutions, seanceCondensee, nomsRealises, repos]);
   const bip = useBip();
 
   const step = steps[index];
@@ -383,7 +387,12 @@ export function SeanceRunner({
   }, [termine]);
 
   useEffect(() => {
-    if (step?.type === "repos") setSecondesRestantes(step.secondes);
+    if (step?.type === "repos") {
+      setRepos((actuel) => actuel?.index === index ? actuel : { index, fin: Date.now() + step.secondes * 1000 });
+    } else {
+      setRepos(undefined);
+      reposSignale.current = null;
+    }
   }, [index, step]);
 
   // Annonce vocale de l'étape en cours. Interrompt l'annonce précédente :
@@ -402,23 +411,41 @@ export function SeanceRunner({
 
   // Décompte de fin de repos : 3, 2, 1 puis "c'est parti".
   useEffect(() => {
-    if (!voixActive || step?.type !== "repos") return;
+    if (!voixActive || step?.type !== "repos" || repos?.index !== index || (secondesRestantes === 0 && repos.fin > Date.now())) return;
     if (secondesRestantes === 3 || secondesRestantes === 2 || secondesRestantes === 1) {
       parler(String(secondesRestantes));
     } else if (secondesRestantes === 0) {
       parler("C'est parti !", { interrompre: true });
     }
-  }, [secondesRestantes, step, voixActive]);
+  }, [secondesRestantes, step, voixActive, repos, index]);
 
   useEffect(() => {
-    if (step?.type !== "repos") return;
-    if (secondesRestantes <= 0) {
-      bip();
-      return;
-    }
-    const t = setTimeout(() => setSecondesRestantes((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [step, secondesRestantes, bip]);
+    if (step?.type !== "repos" || repos?.index !== index) return;
+    const actualiser = () => {
+      const restant = Math.max(0, Math.ceil((repos.fin - Date.now()) / 1000));
+      setSecondesRestantes(restant);
+      if (restant > 0) reposSignale.current = null;
+      else if (reposSignale.current !== repos.fin) {
+        reposSignale.current = repos.fin;
+        bip();
+      }
+    };
+    actualiser();
+    const t = setInterval(actualiser, 250);
+    document.addEventListener("visibilitychange", actualiser);
+    window.addEventListener("pageshow", actualiser);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", actualiser);
+      window.removeEventListener("pageshow", actualiser);
+    };
+  }, [step, repos, index, bip]);
+
+  function ajusterRepos(secondes: number) {
+    setRepos((actuel) => actuel?.index === index
+      ? { index, fin: Math.max(Date.now(), Math.max(Date.now(), actuel.fin) + secondes * 1000) }
+      : actuel);
+  }
 
   async function terminerSeance() {
     if (envoiRef.current) return;
@@ -838,8 +865,8 @@ export function SeanceRunner({
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">Repos</span>
                 <CercleMinuteur secondesRestantes={secondesRestantes} secondesTotal={step.secondes} />
                 <div className="flex gap-3">
-                  <button type="button" onClick={() => setSecondesRestantes((s) => Math.max(0, s - 15))} className="min-h-12 rounded-2xl border border-white/15 px-6 text-base font-semibold text-white transition active:scale-95">−15s</button>
-                  <button type="button" onClick={() => setSecondesRestantes((s) => s + 15)} className="min-h-12 rounded-2xl border border-white/15 px-6 text-base font-semibold text-white transition active:scale-95">+15s</button>
+                  <button type="button" onClick={() => ajusterRepos(-15)} className="min-h-12 rounded-2xl border border-white/15 px-6 text-base font-semibold text-white transition active:scale-95">−15s</button>
+                  <button type="button" onClick={() => ajusterRepos(15)} className="min-h-12 rounded-2xl border border-white/15 px-6 text-base font-semibold text-white transition active:scale-95">+15s</button>
                 </div>
                 <p className="text-xs text-graphite-500">Suivant : {step.prochainNom}</p>
               </>
