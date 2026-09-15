@@ -21,6 +21,10 @@ export function AvisForm() {
       setError("Choisis une note avant d'envoyer.");
       return;
     }
+    if (!commentaire.trim() || commentaire.length > 4000) {
+      setError("Ajoute un commentaire de 1 à 4 000 caractères.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -52,7 +56,8 @@ export function AvisForm() {
   return (
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Field label="Ta note sur ton expérience COAI">
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-graphite-400">Ta note sur ton expérience COAI</legend>
           <div className="flex gap-2">
             {NOTES.map((n) => (
               <button
@@ -70,16 +75,18 @@ export function AvisForm() {
               </button>
             ))}
           </div>
-        </Field>
-        <Field label="Qu'est-ce qui marche, qu'est-ce qui pourrait être mieux ?">
+        </fieldset>
+        <Field label="Ton commentaire (obligatoire)">
           <Textarea
+            required
+            maxLength={4000}
             placeholder="Sois honnête — c'est justement pour améliorer COAI."
             value={commentaire}
             onChange={(e) => setCommentaire(e.target.value)}
             rows={5}
           />
         </Field>
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={loading}>
           {loading ? "Envoi…" : "Envoyer mon avis"}
         </Button>
