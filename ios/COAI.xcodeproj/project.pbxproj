@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A00000000000000000000010 = {isa = PBXBuildFile; fileRef = B00000000000000000000010; };
+		A00000000000000000000011 = {isa = PBXBuildFile; fileRef = B00000000000000000000011; };
 		A00000000000000000000009 = {isa = PBXBuildFile; fileRef = B00000000000000000000009; };
 		A00000000000000000000008 = {isa = PBXBuildFile; fileRef = B00000000000000000000008; };
 		A00000000000000000000001 /* COAIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000001 /* COAIApp.swift */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B00000000000000000000010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePurchaseService.swift; sourceTree = "<group>"; };
+		B00000000000000000000011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseDelivery.swift; sourceTree = "<group>"; };
 		B00000000000000000000009 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		B00000000000000000000008 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B00000000000000000000001 /* COAIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COAIApp.swift; sourceTree = "<group>"; };
@@ -53,6 +57,7 @@
 				B00000000000000000000001 /* COAIApp.swift */,
 				B00000000000000000000002 /* COAIWebView.swift */,
 				B00000000000000000000003 /* RestTimerView.swift */,
+				B00000000000000000000010 /* ApplePurchaseService.swift */,
 				C00000000000000000000003 /* Core */,
 				B00000000000000000000006 /* Info.plist */,
 				B00000000000000000000008 /* Assets.xcassets */,
@@ -66,6 +71,7 @@
 			children = (
 				B00000000000000000000004 /* NavigationPolicy.swift */,
 				B00000000000000000000005 /* RestClock.swift */,
+				B00000000000000000000011 /* PurchaseDelivery.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -153,6 +159,8 @@
 				A00000000000000000000003 /* RestTimerView.swift in Sources */,
 				A00000000000000000000004 /* NavigationPolicy.swift in Sources */,
 				A00000000000000000000005 /* RestClock.swift in Sources */,
+				A00000000000000000000010 /* ApplePurchaseService.swift in Sources */,
+				A00000000000000000000011 /* PurchaseDelivery.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

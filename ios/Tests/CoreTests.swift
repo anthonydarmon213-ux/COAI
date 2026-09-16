@@ -2,6 +2,18 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testPurchaseRequiresPersistedMatchingServerAcknowledgement() {
+        let account = UUID()
+        XCTAssertTrue(PurchaseDelivery.mayFinish(transactionID: "42", accountToken: account,
+            acknowledgement: .init(transactionID: "42", accountToken: account, persisted: true)))
+        for ack in [PurchaseAcknowledgement(transactionID: "42", accountToken: account, persisted: false),
+                    .init(transactionID: "43", accountToken: account, persisted: true),
+                    .init(transactionID: "42", accountToken: UUID(), persisted: true)] {
+            XCTAssertFalse(PurchaseDelivery.mayFinish(transactionID: "42", accountToken: account, acknowledgement: ack))
+        }
+        XCTAssertFalse(PurchaseDelivery.mayFinish(transactionID: "", accountToken: account,
+            acknowledgement: .init(transactionID: "", accountToken: account, persisted: true)))
+    }
     func testOAuthAttemptDeadlineAndIsolation() {
         let start = Date(timeIntervalSince1970: 1000)
         let attempt = OAuthAttempt(now: start)

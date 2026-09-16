@@ -44,6 +44,50 @@ Le script de compilation vérifie sa présence et son contenu dans le bundle.
 Ce manifeste partiel ne déclare pas « aucune donnée collectée » : les données
 du compte et du site embarqué doivent encore être auditées avant soumission.
 
+## Préparation StoreKit — non activée
+
+`ApplePurchaseService.swift` prépare le chargement des produits, l'achat explicite,
+la restauration explicite, les transactions en attente de livraison et l'écoute
+des renouvellements. Il n'est pas instancié par l'app : les achats restent gelés.
+Aucun identifiant produit, prix, secret Apple ou abonnement n'a été inventé.
+
+Le service n'accepte que les abonnements autorenouvelables du catalogue fourni,
+vérifiés par StoreKit et liés au jeton du compte courant. Le JWS signé est remis
+à un adaptateur serveur qui reste à implémenter. `finish()` n'est appelé qu'après
+confirmation persistée correspondant à la transaction ET au compte. Le serveur
+doit gérer aussi expiration/remboursement : le nombre de transactions restaurées
+ne constitue pas un statut d'accès actif. Aucune donnée privée ne doit être loguée.
+
+Raccordements obligatoires avant activation :
+
+1. Confirmer les produits et tarifs dans App Store Connect. La connexion Apple
+   est ouverte le 16 septembre, mais un dialogue de conditions contractuelles
+   bloque encore l'accès : décision laissée à Anthony, aucun contrat accepté
+   par l'agent. Catalogue non vérifié.
+2. Adapter le stockage serveur : `Subscription.stripeCustomerId` est actuellement
+   obligatoire et un seul abonnement existe par utilisateur. Ne pas fabriquer
+   un identifiant Stripe pour Apple. Préparer une migration séparée, à autoriser
+   avant exécution en production, sans régression des abonnements Stripe.
+3. Vérifier les JWS côté serveur avec les certificats Apple, bundle, environnement,
+   produit et compte ; unicité de transaction et originalTransactionId, idempotence,
+   expiration/révocation et notifications serveur. Aucune confiance dans un plan
+   envoyé par le client. Un jeton de compte stable provient du serveur authentifié.
+4. Interface de prix et conditions Apple, achats/restauration avec messages utiles,
+   réconciliation au lancement et arrêt à la déconnexion. Ne pas proposer un
+   second abonnement sans traiter les droits existants.
+5. Tests StoreKit locaux puis sandbox Apple : annulation, attente, succès,
+   réponse serveur perdue, reprise, compte différent, restauration, renouvellement,
+   expiration et remboursement. Pas de vraie transaction pour les tests.
+
+Preuves actuelles : compilation Release iPhone réussie et 8 tests XCTest (dont
+confirmation de livraison persistée et liée au bon compte). Les tests unitaires
+ne simulent pas une transaction Apple, et aucun paiement n'a été effectué.
+
+Références d'intégration :
+- https://developer.apple.com/documentation/storekit/transaction
+- https://developer.apple.com/documentation/storekit/transaction/finish()
+- https://developer.apple.com/documentation/storekit/appstore/sync()
+
 Sources Apple vérifiées le 16 septembre 2026 :
 - https://developer.apple.com/app-store/review/guidelines/
 - https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons

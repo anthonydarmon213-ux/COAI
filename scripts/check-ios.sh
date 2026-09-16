@@ -13,7 +13,7 @@ swiftc ios/COAI/Core/NavigationPolicy.swift ios/COAI/Core/RestClock.swift script
 "$task_check_dir/checks"
 xcrun --sdk macosx swiftc -swift-version 5 ios/COAI/Core/NavigationPolicy.swift scripts/test-ios-webkit.swift -o "$task_check_dir/checks"
 "$task_check_dir/checks"
-swiftc -frontend -parse ios/COAI/COAIApp.swift ios/COAI/COAIWebView.swift ios/COAI/RestTimerView.swift
+swiftc -frontend -parse ios/COAI/COAIApp.swift ios/COAI/COAIWebView.swift ios/COAI/RestTimerView.swift ios/COAI/ApplePurchaseService.swift ios/COAI/Core/PurchaseDelivery.swift
 plutil -lint ios/COAI/Info.plist ios/COAI.xcodeproj/project.pbxproj
 plutil -lint ios/COAI/PrivacyInfo.xcprivacy
 xmllint --noout ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme
