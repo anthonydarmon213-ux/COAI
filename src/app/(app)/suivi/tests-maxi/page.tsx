@@ -101,8 +101,8 @@ export default async function TestsMaxiPage() {
             </div>
             <ShareProgressCardButton
               imageUrl={`/api/tests-maxi/${t.id}/carte?v=privacy-1`}
-              filename={`coai-record-${t.exercice.toLowerCase()}.png`}
-              title={`Mon record COAI — ${LABEL_PAR_EXERCICE[t.exercice]}`}
+              filename={`coai-resultat-${t.exercice.toLowerCase()}.png`}
+              title={`Mon résultat COAI — ${LABEL_PAR_EXERCICE[t.exercice]}`}
             />
           </Card>
         ))}
