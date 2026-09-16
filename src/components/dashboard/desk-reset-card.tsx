@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-// Desk Reset 3 min (22/08/2026, demande Anthony) — routine de mobilité
+// Desk Reset (22/08/2026, demande Anthony) — routine de mobilité
 // pour quelqu'un assis depuis des heures. AUCUN appel LLM : la routine est
 // tirée d'une liste fixe côté client, ce qui la rend instantanée et
 // gratuite. Un modèle n'apporterait rien ici, les mouvements de mobilité de
@@ -39,12 +39,14 @@ function formatDuree(secondes: number): string {
 
 export function DeskResetCard() {
   const [ouvert, setOuvert] = useState(false);
-  // Routine tirée au lancement : deux jours d'affilée ne donnent pas la
-  // même, sans avoir à stocker quoi que ce soit.
+  // Une nouvelle sélection exclut la routine actuellement affichée.
   const [routine, setRoutine] = useState<Mouvement[]>(() => ROUTINES[0]!);
 
   function lancer() {
-    setRoutine(ROUTINES[Math.floor(Math.random() * ROUTINES.length)]!);
+    setRoutine((actuelle) => {
+      const autres = ROUTINES.filter((candidate) => candidate !== actuelle);
+      return autres[Math.floor(Math.random() * autres.length)]!;
+    });
     setOuvert(true);
   }
 
@@ -53,7 +55,7 @@ export function DeskResetCard() {
   return (
     <section className="coai-glass p-5">
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Pause active</p>
-      <h2 className="mt-1.5 text-lg font-semibold text-white">💼 Desk Reset · 3 min</h2>
+      <h2 className="mt-1.5 text-lg font-semibold text-white">💼 Pause active · 2 min 30</h2>
       <p className="mt-1 text-xs leading-5 text-graphite-400">
         Trois mouvements sans matériel, debout ou assis — entre deux réunions, sans transpirer.
       </p>
@@ -64,7 +66,7 @@ export function DeskResetCard() {
           onClick={lancer}
           className="mt-3 w-full rounded-full border border-laiton-400/35 bg-laiton-400/10 py-2.5 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20"
         >
-          Lancer ma pause →
+          Voir les mouvements →
         </button>
       ) : (
         <div className="mt-4 flex flex-col gap-2.5">
@@ -85,15 +87,19 @@ export function DeskResetCard() {
           ))}
 
           <div className="flex items-center justify-between gap-3 pt-1">
-            <span className="font-mono text-[10px] text-graphite-500">Total ~{Math.round(total / 60)} min</span>
+            <span className="font-mono text-[10px] text-graphite-500">Total {Math.floor(total / 60)} min {total % 60} s</span>
             <button
               type="button"
               onClick={lancer}
-              className="rounded-full border border-white/15 px-3.5 py-1.5 text-[11px] font-semibold text-graphite-300 transition hover:text-white"
+              className="min-h-11 rounded-full border border-white/15 px-3.5 py-1.5 text-[11px] font-semibold text-graphite-300 transition hover:text-white"
             >
               Une autre routine
             </button>
           </div>
+
+          <button type="button" onClick={() => setOuvert(false)} className="min-h-11 self-start rounded-full border border-white/15 px-4 text-xs text-graphite-300">
+            Fermer les mouvements
+          </button>
 
           <p className="text-[10px] leading-4 text-graphite-500">
             Mouvements de mobilité générale. Arrête-toi si l&apos;un d&apos;eux réveille une douleur.

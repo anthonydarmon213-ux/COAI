@@ -51,7 +51,7 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount, testsPhysiques] = await Promise.all([
+  const [validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount, testsPhysiques, latestNutrition, latestRecovery] = await Promise.all([
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -82,6 +82,16 @@ export default async function DashboardPage() {
       where: { userId: user.id },
       orderBy: { date: "desc" },
       select: { exercice: true, valeur: true, unite: true, date: true },
+    }),
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "NUTRITION" },
+      orderBy: { generatedAt: "desc" },
+      select: { statut: true },
+    }),
+    prisma.programmeGenerated.findFirst({
+      where: { userId: user.id, pilier: "RECUPERATION" },
+      orderBy: { generatedAt: "desc" },
+      select: { statut: true },
     }),
   ]);
 
@@ -272,6 +282,9 @@ export default async function DashboardPage() {
         hasProgramme={Boolean(programme)}
         hasNutrition={Boolean(programmeNutrition)}
         hasRecovery={Boolean(programmeRecuperation)}
+        trainingNotReviewed={Boolean(programme && programme.statut !== "VALIDE")}
+        nutritionPending={!programmeNutrition && latestNutrition?.statut === "EN_ATTENTE"}
+        recoveryPending={!programmeRecuperation && latestRecovery?.statut === "EN_ATTENTE"}
         hasAccess={hasAccess}
         premiereSeanceFaite={seancesDuMoisCount > 0}
         seancesDuMois={seancesDuMoisCount}

@@ -53,6 +53,9 @@ export function ObjectifCheminCard({
   hasProgramme,
   hasNutrition,
   hasRecovery,
+  trainingNotReviewed = false,
+  nutritionPending = false,
+  recoveryPending = false,
   hasAccess,
   premiereSeanceFaite,
   seancesDuMois,
@@ -62,6 +65,9 @@ export function ObjectifCheminCard({
   hasProgramme: boolean;
   hasNutrition: boolean;
   hasRecovery: boolean;
+  trainingNotReviewed?: boolean;
+  nutritionPending?: boolean;
+  recoveryPending?: boolean;
   hasAccess: boolean;
   premiereSeanceFaite: boolean;
   seancesDuMois: number;
@@ -81,7 +87,7 @@ export function ObjectifCheminCard({
       numero: 2,
       titre: "Ton programme adapté",
       detail: hasProgramme
-        ? "Programme actif dans ton espace"
+        ? trainingNotReviewed ? "Programme disponible, non relu par le coach" : "Programme disponible dans ton espace"
         : hasAccess
           ? "Ton accès est prêt : génère maintenant ton programme"
           : "Choisis ton accompagnement pour le débloquer",
@@ -100,7 +106,7 @@ export function ObjectifCheminCard({
     {
       numero: 4,
       titre: "Installer ta régularité",
-      detail: seancesDuMois >= 4 ? "Ton rythme est lancé : continue à nourrir le suivi" : `${seancesDuMois}/4 séances réalisées ce mois`,
+      detail: seancesDuMois >= 4 ? "Ton rythme est lancé : continue à nourrir le suivi" : `${seancesDuMois}/4 séances sur les 30 derniers jours`,
       faite: seancesDuMois >= 4,
       href: "/suivi/seances",
       action: seancesDuMois >= 4 ? "Continuer" : "Avancer",
@@ -118,7 +124,7 @@ export function ObjectifCheminCard({
   }[] = [
     {
       titre: "Entraînement",
-      detail: hasProgramme ? "Plan actif" : "À construire",
+      detail: hasProgramme ? trainingNotReviewed ? "Disponible · non relu" : "Plan disponible" : "À construire",
       actif: hasProgramme,
       href: "/programme/entrainement",
       Icone: Dumbbell,
@@ -126,7 +132,7 @@ export function ObjectifCheminCard({
     },
     {
       titre: "Alimentation",
-      detail: hasNutrition ? "Repères actifs" : "À activer",
+      detail: hasNutrition ? "Repères disponibles" : nutritionPending ? "En attente de relecture" : "À activer",
       actif: hasNutrition,
       href: "/programme/alimentation",
       Icone: Apple,
@@ -134,7 +140,7 @@ export function ObjectifCheminCard({
     },
     {
       titre: "Récupération",
-      detail: hasRecovery ? "Protocole actif" : "À activer",
+      detail: hasRecovery ? "Protocole disponible" : recoveryPending ? "En attente de relecture" : "À activer",
       actif: hasRecovery,
       href: "/programme/recuperation",
       Icone: MoonStar,
@@ -142,7 +148,7 @@ export function ObjectifCheminCard({
     },
     {
       titre: "Régularité",
-      detail: `${seancesDuMois}/4 séances ce mois`,
+      detail: `${seancesDuMois}/4 séances sur 30 jours`,
       actif: seancesDuMois >= 4,
       href: "/suivi/seances",
       Icone: Repeat2,
@@ -201,7 +207,7 @@ export function ObjectifCheminCard({
                 <strong>{titre}</strong>
                 <small>{detail}</small>
               </div>
-              <i className={actif ? "is-active" : ""} aria-label={actif ? "Actif" : "À activer"} />
+              <i className={actif ? "is-active" : ""} aria-hidden="true" />
             </Link>
           ))}
         </div>
@@ -211,14 +217,14 @@ export function ObjectifCheminCard({
         {etapes.map((etape, index) => (
           <div key={etape.numero} className={`coai-path-step ${etape.faite ? "is-done" : index === prochaineEtape ? "is-next" : ""}`}>
             <span>{etape.faite ? "✓" : etape.numero}</span>
-            <small>{index === 0 ? "Profil" : index === 1 ? "Plan" : index === 2 ? "Séance" : "Adaptation"}</small>
+            <small>{index === 0 ? "Profil" : index === 1 ? "Plan" : index === 2 ? "Séance" : "Régularité"}</small>
           </div>
         ))}
       </div>
 
       <Link href={prochaine.href} className="coai-next-mission mt-4 flex items-center justify-between gap-4 rounded-2xl px-4 py-3.5 transition hover:-translate-y-0.5">
         <div>
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-200">Prochaine marche</p>
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-laiton-200">{prochaineEtape < 0 ? "Ton rythme" : "Prochaine marche"}</p>
           <p className="mt-1 text-sm font-semibold text-white">{prochaine.titre}</p>
           <p className="mt-0.5 text-xs text-graphite-400">{prochaine.detail}</p>
         </div>
