@@ -11,6 +11,7 @@ xcrun --sdk macosx swiftc -swift-version 5 ios/COAI/Core/NavigationPolicy.swift 
 "$task_check_dir/checks"
 swiftc -frontend -parse ios/COAI/COAIApp.swift ios/COAI/COAIWebView.swift ios/COAI/RestTimerView.swift
 plutil -lint ios/COAI/Info.plist ios/COAI.xcodeproj/project.pbxproj
+plutil -lint ios/COAI/PrivacyInfo.xcprivacy
 xmllint --noout ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme
 
 if [[ "${1:-}" == "--simulator" ]]; then
@@ -21,6 +22,8 @@ if [[ "${1:-}" == "--simulator" ]]; then
     xcodebuild -project ios/COAI.xcodeproj -scheme COAI -configuration Debug \
         -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
         -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=NO build
+    cmp ios/COAI/PrivacyInfo.xcprivacy ios/DerivedData/Build/Products/Debug-iphonesimulator/COAI.app/PrivacyInfo.xcprivacy
+    echo "PASS: privacy manifest included in simulator app; App Store privacy audit still required."
 else
     echo "Core et syntaxe vérifiés uniquement. Pour compiler l’interface : bash scripts/check-ios.sh --simulator"
 fi
