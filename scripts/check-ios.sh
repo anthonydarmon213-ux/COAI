@@ -6,6 +6,7 @@ case "${1:-}" in
     ""|--simulator|--device-release) ;;
     *) echo "Usage: bash scripts/check-ios.sh [--simulator|--device-release]" >&2; exit 2 ;;
 esac
+swift test --package-path ios
 task_check_dir="$(mktemp -d /tmp/coai-ios-checks.XXXXXX)"
 trap 'rm -f "$task_check_dir/checks"; rmdir "$task_check_dir"' EXIT
 

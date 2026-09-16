@@ -3,6 +3,9 @@
 Décision Anthony du 16 septembre 2026 : la préparation effective de l'app iOS
 à l'App Store prend la priorité sur les effets visuels et la croissance.
 Les autorisations de poursuivre restent valables, sans frais supplémentaires.
+Anthony confirme le 16 septembre ne pas encore avoir souscrit l'adhésion Apple
+Developer. Ne pas confondre connexion au portail et capacité de distribution.
+La préparation locale continue ; TestFlight et la soumission restent à débloquer.
 L'acceptation finale appartient à Apple et ne peut être garantie.
 
 ## Critères bloquants (non validés à ce jour)
@@ -60,9 +63,8 @@ ne constitue pas un statut d'accès actif. Aucune donnée privée ne doit être 
 
 Raccordements obligatoires avant activation :
 
-1. Confirmer les produits et tarifs dans App Store Connect. La connexion Apple
-   est ouverte le 16 septembre, mais un dialogue de conditions contractuelles
-   bloque encore l'accès : décision laissée à Anthony, aucun contrat accepté
+1. Adhésion Apple Developer à effectuer par Anthony, puis confirmer les produits
+   et tarifs dans App Store Connect. Aucun achat d'adhésion ni contrat accepté
    par l'agent. Catalogue non vérifié.
 2. Adapter le stockage serveur : `Subscription.stripeCustomerId` est actuellement
    obligatoire et un seul abonnement existe par utilisateur. Ne pas fabriquer
@@ -79,8 +81,13 @@ Raccordements obligatoires avant activation :
    réponse serveur perdue, reprise, compte différent, restauration, renouvellement,
    expiration et remboursement. Pas de vraie transaction pour les tests.
 
-Preuves actuelles : compilation Release iPhone réussie et 8 tests XCTest (dont
-confirmation de livraison persistée et liée au bon compte). Les tests unitaires
+Preuves actuelles : compilation Release iPhone réussie et 12 tests XCTest (dont
+confirmation de livraison persistée et liée au bon compte). La séquence commune
+au service est testée : confirmation avant finalisation, erreur réseau,
+confirmation incorrecte et interruption pendant la livraison. Le contrôle
+`check-ios.sh` exécute désormais ces tests systématiquement. Sans catalogue,
+la restauration est refusée avant de demander une connexion Apple.
+Les tests unitaires
 ne simulent pas une transaction Apple, et aucun paiement n'a été effectué.
 
 Références d'intégration :

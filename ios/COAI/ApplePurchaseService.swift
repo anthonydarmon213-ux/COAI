@@ -59,6 +59,7 @@ final class ApplePurchaseService {
     /// (refunds/expiry are reconciled by the server too).
     func restorePurchases() async throws -> Int {
         guard !busy else { throw Failure.busy }
+        guard !productIDs.isEmpty else { throw Failure.unavailable }
         busy = true
         defer { busy = false }
         try await AppStore.sync()
@@ -110,14 +111,13 @@ final class ApplePurchaseService {
             throw Failure.unknownProduct
         }
         guard transaction.appAccountToken == accountToken else { throw Failure.differentAccount }
-        try Task.checkCancellation()
         // Send the signed JWS, never client-provided plan/price/expiry claims.
-        let acknowledgement = try await deliver(result.jwsRepresentation)
-        guard PurchaseDelivery.mayFinish(transactionID: String(transaction.id), accountToken: accountToken,
-                                         acknowledgement: acknowledgement) else {
+        do {
+            try await PurchaseDelivery.complete(transactionID: String(transaction.id), accountToken: accountToken,
+                deliver: { try await self.deliver(result.jwsRepresentation) },
+                finish: { await transaction.finish() })
+        } catch PurchaseDelivery.Failure.serverNotConfirmed {
             throw Failure.serverNotConfirmed
         }
-        try Task.checkCancellation()
-        await transaction.finish()
     }
 }

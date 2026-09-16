@@ -2,6 +2,62 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    @MainActor
+    func testPurchaseFinishesOnlyAfterDelivery() async throws {
+        let account = UUID()
+        var events: [String] = []
+        try await PurchaseDelivery.complete(transactionID: "42", accountToken: account,
+            deliver: {
+                events.append("persisted")
+                return .init(transactionID: "42", accountToken: account, persisted: true)
+            }, finish: { events.append("finished") })
+        XCTAssertEqual(events, ["persisted", "finished"])
+    }
+
+    @MainActor
+    func testPurchaseRemainsRetryableAfterNetworkFailure() async {
+        var finished = false
+        do {
+            try await PurchaseDelivery.complete(transactionID: "42", accountToken: UUID(),
+                deliver: { throw URLError(.notConnectedToInternet) },
+                finish: { finished = true })
+            XCTFail("A delivery failure must propagate")
+        } catch { XCTAssertEqual((error as? URLError)?.code, .notConnectedToInternet) }
+        XCTAssertFalse(finished)
+    }
+
+    @MainActor
+    func testPurchaseNeverFinishesForWrongOrUnpersistedAcknowledgement() async {
+        let account = UUID()
+        for ack in [PurchaseAcknowledgement(transactionID: "42", accountToken: account, persisted: false),
+                    .init(transactionID: "43", accountToken: account, persisted: true),
+                    .init(transactionID: "42", accountToken: UUID(), persisted: true)] {
+            var finished = false
+            do {
+                try await PurchaseDelivery.complete(transactionID: "42", accountToken: account,
+                    deliver: { ack }, finish: { finished = true })
+                XCTFail("Invalid acknowledgement must fail")
+            } catch { XCTAssertTrue(error is PurchaseDelivery.Failure) }
+            XCTAssertFalse(finished)
+        }
+    }
+
+    @MainActor
+    func testCancellationDuringDeliveryPreventsFinish() async {
+        let account = UUID()
+        var finished = false
+        let task = Task { @MainActor in
+            try await PurchaseDelivery.complete(transactionID: "42", accountToken: account,
+                deliver: {
+                    withUnsafeCurrentTask { $0?.cancel() }
+                    return .init(transactionID: "42", accountToken: account, persisted: true)
+                }, finish: { finished = true })
+        }
+        do { try await task.value; XCTFail("Cancellation must propagate") }
+        catch { XCTAssertTrue(error is CancellationError) }
+        XCTAssertFalse(finished)
+    }
+
     func testPurchaseRequiresPersistedMatchingServerAcknowledgement() {
         let account = UUID()
         XCTAssertTrue(PurchaseDelivery.mayFinish(transactionID: "42", accountToken: account,
