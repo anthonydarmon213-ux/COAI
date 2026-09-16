@@ -60,6 +60,7 @@ Tests disponibles depuis la racine :
 ```sh
 bash scripts/check-ios.sh
 bash scripts/check-ios.sh --simulator
+bash scripts/check-ios.sh --device-release # vrai SDK iPhone, Release non signé
 swift test --package-path ios  # nécessite XCTest fourni avec Xcode
 ```
 

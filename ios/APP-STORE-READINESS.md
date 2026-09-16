@@ -23,7 +23,20 @@ L'acceptation finale appartient à Apple et ne peut être garantie.
 7. Fiche App Store : captures réelles, description exacte, classement d'âge,
    assistance, compte de revue fonctionnel et notes pour l'équipe Apple.
 
-## Premier ajout technique
+## Vérification Release et signature — 16 septembre 2026
+
+- Compilation Release avec le SDK iPhoneOS réussie, architecture arm64.
+- Une archive locale a été créée : `/tmp/COAI-readiness-20260916.xcarchive`.
+  `codesign --verify --deep --strict` réussit. Le manifeste est inclus.
+- Signature **Apple Development**, `get-task-allow = true` : il s'agit d'une
+  archive de développement, pas d'une preuve de distribution App Store.
+- L'iPhone physique connu de Xcode est hors ligne. Aucun test sur appareil,
+  export App Store, transfert TestFlight ni soumission Apple effectué.
+- Nouveau contrôle reproductible : `bash scripts/check-ios.sh --device-release`.
+  Il compile sans signature, vérifie iPhoneOS/arm64 et le manifeste embarqué ;
+  il ne contacte pas le portail pour créer des profils et ne publie rien.
+
+## Manifeste technique
 
 `PrivacyInfo.xcprivacy` déclare l'usage UserDefaults du minuteur (trois clés
 AppStorage propres à l'app), motif CA92.1. Il est intégré aux ressources Xcode.
