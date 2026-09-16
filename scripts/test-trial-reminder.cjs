@@ -64,7 +64,9 @@ const compiled = ts.transpileModule(source + '\nexport { relancerEssaisNonActive
         status, plan: 'PASS_IA', trialEnd: new Date(Date.now() + 86400000),
       } : null }) },
       '@/components/ui/section-label': {}, '@/components/ui/button': {},
+      '@/components/auth/access-recovery': { AccessRecovery: 'access-recovery' },
       '@/components/onboarding/activation-flow': { ActivationFlow: 'activation' },
+      '@/components/onboarding/checkout-access-gate': { CheckoutAccessGate: 'checkout-gate' },
       '@/components/analytics/track-conversion': { TrackConversion: 'conversion' },
       '@/lib/subscription/plan': planBox.exports,
       '@/lib/stripe/client': { stripe: { checkout: { sessions: { retrieve: async () => {

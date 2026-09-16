@@ -42,5 +42,11 @@ export async function POST(request: Request) {
     data: { checkoutReminderSentAt: new Date() },
   });
 
-  return NextResponse.json({ confirmed: true });
+  // Une ancienne session complète peut correspondre à un abonnement qui
+  // n'est plus actif. Confirmer la synchronisation ne promet pas des droits.
+  const saved = await prisma.subscription.findUnique({ where: { userId: user.id } });
+  return NextResponse.json({
+    confirmed: true,
+    accessActive: saved?.stripeSubscriptionId === subscription.id && saved.status === "ACTIVE",
+  }, { headers: { "Cache-Control": "private, no-store" } });
 }

@@ -5,6 +5,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { ActivationFlow } from "@/components/onboarding/activation-flow";
+import { CheckoutAccessGate } from "@/components/onboarding/checkout-access-gate";
 import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { stripe } from "@/lib/stripe/client";
 import type Stripe from "stripe";
@@ -262,7 +263,7 @@ export default async function BienvenuePage({
   const metaEventAchat = enEssai ? "StartTrial" : "Subscribe";
   const conversionKey = sessionVerifiee?.id ?? user.subscription?.stripeSubscriptionId ?? undefined;
 
-  return (
+  const welcome = (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 py-10 text-center sm:py-16">
       {/* Une reprise depuis un rappel n'est pas un nouvel achat. Seul un
           retour Checkout vérifié peut produire ces événements. */}
@@ -288,7 +289,6 @@ export default async function BienvenuePage({
       <ActivationFlow
         coachValidationRequise={coachValidationRequise}
         profilInitial={user.profile ?? null}
-        stripeSessionId={sessionVerifiee?.id}
       />
 
       {/* Carte d'embarquement COAI — écho volontaire au "salon privé avant
@@ -362,4 +362,9 @@ export default async function BienvenuePage({
       </Link>
     </div>
   );
+  return sessionVerifiee ? (
+    <CheckoutAccessGate key={sessionVerifiee.id} sessionId={sessionVerifiee.id}>
+      {welcome}
+    </CheckoutAccessGate>
+  ) : welcome;
 }

@@ -14,6 +14,7 @@ const deps = {
   '@/components/ui/button': { Button: () => null },
   '@/components/analytics/track-conversion': { TrackConversion: () => React.createElement('span', null, 'CONVERSION') },
   '@/components/onboarding/activation-flow': { ActivationFlow: () => React.createElement('span', null, 'ACTIVATION') },
+  '@/components/onboarding/checkout-access-gate': { CheckoutAccessGate: ({sessionId, children}) => React.createElement('section', {'data-checkout-session':sessionId}, children) },
   '@/lib/subscription/plan': { hasPaidSubscription: () => paid },
   '@/lib/stripe/client': { stripe: { checkout: { sessions: { retrieve: async () => {
     if (fail) throw Error('simulated outage');
@@ -53,5 +54,6 @@ const render = async searchParams => renderToStaticMarkup(await box.exports.defa
   session = {id:'cs_fixture', status:'complete', mode:'subscription', client_reference_id:'owner'};
   const valid = await render({session_id:'cs_fixture'});
   assert(valid.includes('ACTIVATION')); assert(valid.includes('CONVERSION'));
+  assert(valid.includes('data-checkout-session="cs_fixture"'), 'Verified Checkout must pass the independent access gate');
   console.log('PASS: unverified/malformed returns and Stripe failure get recovery actions, even for paid accounts; free and verified paths preserved. Simulated providers only.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
