@@ -36,7 +36,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       height: 1080,
       // ImageResponse otherwise defaults to a public, year-long immutable cache.
       // This authenticated card must not survive account changes or privacy fixes.
-      headers: { "Cache-Control": "private, no-store, max-age=0" },
+      headers: { "cache-control": "private, no-store, max-age=0" },
     }
   );
 }

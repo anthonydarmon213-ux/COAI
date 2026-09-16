@@ -223,7 +223,7 @@ export default async function EvolutionPage() {
               )}
               <div className="mt-1 flex justify-end border-t border-white/[0.06] pt-3">
                 <ShareProgressCardButton
-                  imageUrl={`/api/programmes/adaptations/${a.id}/carte?v=privacy-3`}
+                  imageUrl={`/api/programmes/adaptations/${a.id}/carte?v=privacy-4`}
                   filename={`coai-evolution-${a.pilier.toLowerCase()}.png`}
                   title="Mon coaching COAI évolue"
                 />

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db/client";
 import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
 
 // Carte de partage façon Strava — visuel carré téléchargeable, généré à la
-// demande (pas stocké), pour poster un nouveau record sur les réseaux.
+// demande (pas stocké), pour partager un résultat sans présumer d'un record.
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const authUser = await getCurrentUser();
   if (!authUser) {
@@ -49,7 +49,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
             color: "#c9a262",
           }}
         >
-          Nouveau record
+          Mon résultat
         </span>
         <span
           style={{
@@ -94,6 +94,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
         </div>
       </div>
     ),
-    { width: 1080, height: 1080 }
+    {
+      width: 1080,
+      height: 1080,
+      headers: { "cache-control": "private, no-store, max-age=0" },
+    }
   );
 }

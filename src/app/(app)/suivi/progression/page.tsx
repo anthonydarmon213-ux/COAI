@@ -171,7 +171,7 @@ export default async function ProgressionPage() {
               {seancesDuMois} séance{seancesDuMois > 1 ? "s" : ""} réalisée{seancesDuMois > 1 ? "s" : ""}. Transforme ta régularité en carte COAI.
             </p>
           </div>
-          <ShareProgressCardButton imageUrl="/api/suivi/bilan-mensuel/carte" filename="coai-bilan-30-jours.png" title="Mon bilan COAI" />
+          <ShareProgressCardButton imageUrl="/api/suivi/bilan-mensuel/carte?v=privacy-1" filename="coai-bilan-30-jours.png" title="Mon bilan COAI" />
         </Card>
       )}
 
