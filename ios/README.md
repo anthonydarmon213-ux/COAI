@@ -124,7 +124,8 @@ L'expiration réelle dans l'UI et une connexion Google réussie restent à véri
 ## Ce qui manque à une soumission Apple
 
 - Tests interactifs simulateur/appareil et corrections issues de ces tests.
-- Icône App Store 1024, catalogue d'assets et captures d'écran réelles de l'app.
+- Validation visuelle de l'icône App Store 1024 et captures d'écran réelles de
+  l'app. L'icône et son catalogue d'assets sont déjà présents dans le projet.
 - Audit des données réellement collectées via les pages web, manifestes de
   confidentialité (dont UserDefaults), déclarations App Privacy, tracking/ATT
   si applicable. Aucune déclaration « aucune donnée collectée » ne doit être faite.
@@ -135,7 +136,24 @@ L'expiration réelle dans l'UI et une connexion Google réussie restent à véri
 - Compte Apple individuel d'Anthony, bundle enregistré, signature, archive,
   fiche App Store, compte de démonstration pour Apple, TestFlight puis revue.
 
-## État vérifié le 11 septembre 2026
+## Contrôles du 16 septembre 2026
+
+- Compilation simulateur réussie, 40 contrôles Foundation et 7 tests XCTest
+  réussis ; ces tests ne valident pas le parcours connecté complet.
+- Sur iPhone 17 simulé (iOS 26.5), l'annulation du dialogue système Google
+  revient au formulaire sans fenêtre « Compris » supplémentaire. Les erreurs
+  autres qu'une annulation conservent leur message. Succès OAuth non testé.
+- La réinitialisation locale annonce désormais explicitement la perte des
+  séances et séries non synchronisées. Son intitulé ne la présente plus comme
+  une simple déconnexion. Alerte native avec « Annuler » visible, vérifiée puis
+  annulée dans le simulateur ; aucun effacement utilisateur effectué.
+- Cette amélioration avertit du risque, elle ne synchronise pas les brouillons
+  et ne remplace pas un parcours de déconnexion distinct.
+- Aucun achat, coût supplémentaire ou envoi App Store. Les corrections natives
+  restent à vérifier sur appareil et dans la version distribuée ; elles ne sont
+  pas déclarées terminées en production.
+
+## État historique vérifié le 11 septembre 2026
 
 - Xcode 26.6 (17F113) installé et initialisé ; licence acceptée par l'utilisateur.
 - 38 contrôles Foundation réussis et 5 tests XCTest réussis via `swift test`.

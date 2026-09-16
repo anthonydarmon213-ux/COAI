@@ -54,7 +54,7 @@ struct COAIRootView: View {
                     Menu {
                         Button { browser.retry() } label: { Label("Actualiser", systemImage: "arrow.clockwise") }
                         Button { browser.open(path: "/confidentialite") } label: { Label("Confidentialité", systemImage: "hand.raised") }
-                        Button("Effacer la connexion sur cet iPhone", role: .destructive) { showLocalReset = true }
+                        Button("Réinitialiser les données locales", role: .destructive) { showLocalReset = true }
                     } label: { Image(systemName: "ellipsis.circle") }
                     .accessibilityLabel("Options COAI")
                 }
@@ -85,10 +85,11 @@ struct COAIRootView: View {
         } message: {
             Text("Destination : \(browser.externalURL?.host ?? "application externe"). Ta session COAI n’est pas transférée à cette application.")
         }
-        .confirmationDialog("Effacer la connexion locale ?", isPresented: $showLocalReset, titleVisibility: .visible) {
-            Button("Effacer sur cet iPhone", role: .destructive) { browser.clearLocalSession() }
+        .alert("Effacer les données locales ?", isPresented: $showLocalReset) {
+            Button("Effacer les données et me déconnecter", role: .destructive) { browser.clearLocalSession() }
+            Button("Annuler", role: .cancel) {}
         } message: {
-            Text("Efface les cookies et le cache de cette app. Ton compte et tes programmes restent sur COAI. Pour supprimer le compte, utilise Compte → Paramètres.")
+            Text("Les séances et séries non synchronisées seront perdues sur cet iPhone. Annule et enregistre ta séance avant de continuer. Cette action efface aussi la connexion et le cache. Ton compte, tes programmes et les séances déjà enregistrées sur COAI ne sont pas supprimés.")
         }
     }
 

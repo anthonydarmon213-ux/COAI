@@ -58,7 +58,11 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
                     self.load(exchange)
                 } else {
                     self.open(path: "/sign-in")
-                    self.notice = "Connexion Google interrompue. Tu peux réessayer."
+                    // A deliberate cancellation is not an error and must not require
+                    // a second confirmation. Invalid callbacks still surface an error.
+                    if (error as? ASWebAuthenticationSessionError)?.code != .canceledLogin {
+                        self.notice = "La connexion Google n’a pas abouti. Tu peux réessayer."
+                    }
                 }
             }
         }
