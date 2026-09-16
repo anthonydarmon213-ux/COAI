@@ -226,6 +226,23 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         }
     }
 
+    func webView(_ webView: WKWebView, decidePolicyFor response: WKNavigationResponse,
+                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        // A server error is not a network failure: WebKit otherwise displays
+        // its HTML (sometimes empty) and calls didFinish as if loading succeeded.
+        // Do not replace the page for an iframe/media response.
+        if response.isForMainFrame,
+           let http = response.response as? HTTPURLResponse,
+           let message = NavigationPolicy.responseError(status: http.statusCode) {
+            isLoading = false
+            errorMessage = message
+            canGoBack = webView.canGoBack
+            decisionHandler(.cancel)
+            return
+        }
+        decisionHandler(.allow)
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         isLoading = true
         errorMessage = nil

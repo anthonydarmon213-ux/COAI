@@ -81,7 +81,7 @@ Raccordements obligatoires avant activation :
    réponse serveur perdue, reprise, compte différent, restauration, renouvellement,
    expiration et remboursement. Pas de vraie transaction pour les tests.
 
-Preuves actuelles : compilation Release iPhone réussie et 14 tests XCTest (dont
+Preuves actuelles : compilation Release iPhone réussie et 16 tests XCTest (dont
 confirmation de livraison persistée et liée au bon compte). La séquence commune
 au service est testée : confirmation avant finalisation, erreur réseau,
 confirmation incorrecte et interruption pendant la livraison. Le contrôle
@@ -99,6 +99,18 @@ de séance ordinaire conserve son numéro ; sans page sûre, retour à la connex
 Deux tests couvrent les liens sensibles, les variantes encodées, les liens
 externes et la conservation d'une fiche séance. Vérification locale seulement :
 le parcours Google interrompu sur iPhone physique reste à valider.
+
+## Erreurs HTTP — 16 septembre 2026
+
+Le navigateur natif traite maintenant les réponses principales HTTP 4xx/5xx
+avant affichage : reconnexion pour 401, droits pour 403, page absente pour
+404/410, attente pour 429, incident temporaire pour 5xx. Il ne remplace pas la
+page pour un échec de média ou d'iframe et ne relance pas automatiquement une
+requête. Les succès et redirections restent autorisés. Le panneau possède
+un titre accessible ; son icône ne prétend plus que toute erreur est réseau.
+Deux tests supplémentaires vérifient les statuts et messages. Compilation
+simulateur et iPhone effectuée, mais déclenchement contrôlé des réponses dans
+la version de production et validation sur appareil physique encore à faire.
 
 Références d'intégration :
 - https://developer.apple.com/documentation/storekit/transaction

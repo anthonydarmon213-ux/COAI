@@ -20,14 +20,15 @@ struct COAIRootView: View {
             VStack(spacing: 0) {
                 if let error = browser.errorMessage {
                     VStack(spacing: 12) {
-                        Image(systemName: "wifi.exclamationmark").font(.largeTitle)
+                        Image(systemName: "exclamationmark.circle").font(.largeTitle).accessibilityHidden(true)
+                        Text("Page indisponible").font(.title2.bold()).accessibilityAddTraits(.isHeader)
                         Text(error).multilineTextAlignment(.center)
                         Button("Réessayer") { browser.retry() }.buttonStyle(.borderedProminent)
                     }.padding().frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ZStack(alignment: .top) {
                         COAIWebView(model: browser).id(browser.sessionViewID)
-                        if browser.isLoading { ProgressView().padding(10).background(.ultraThinMaterial, in: Capsule()) }
+                        if browser.isLoading { ProgressView().accessibilityLabel("Chargement de COAI").padding(10).background(.ultraThinMaterial, in: Capsule()) }
                     }
                 }
                 if !keyboardVisible {

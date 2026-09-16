@@ -2,6 +2,22 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testHTTPFailuresHaveActionableMessages() {
+        for status in [400, 401, 403, 404, 410, 422, 429, 500, 502, 503, 504, 599] {
+            XCTAssertFalse(NavigationPolicy.responseError(status: status)?.isEmpty ?? true)
+        }
+        XCTAssertTrue(NavigationPolicy.responseError(status: 401)!.contains("reconnecter"))
+        XCTAssertTrue(NavigationPolicy.responseError(status: 429)!.contains("Patiente"))
+        XCTAssertTrue(NavigationPolicy.responseError(status: 503)!.contains("temporaire"))
+        XCTAssertNotEqual(NavigationPolicy.responseError(status: 403), NavigationPolicy.responseError(status: 401))
+    }
+
+    func testSuccessfulResponsesAndRedirectsAreNotErrors() {
+        for status in [200, 201, 204, 206, 301, 302, 303, 307, 308] {
+            XCTAssertNil(NavigationPolicy.responseError(status: status))
+        }
+    }
+
     func testRetryNeverReplaysCredentialsOrAPICallbacks() {
         let signIn = URL(string: "https://coai.fr/sign-in")!
         for value in ["https://coai.fr/auth/callback?code=used", "https://coai.fr/auth",

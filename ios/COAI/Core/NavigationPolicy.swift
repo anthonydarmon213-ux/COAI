@@ -63,6 +63,24 @@ enum NavigationPolicy {
     static let baseURL = URL(string: "https://coai.fr")!
     static let purchasePaths = ["/pricing", "/compte/abonnement", "/api/stripe", "/checkout"]
 
+    static func responseError(status: Int) -> String? {
+        switch status {
+        case 401:
+            return "Ta connexion n’est plus valide. Ouvre Compte pour te reconnecter. Le minuteur reste accessible."
+        case 403:
+            return "Cette page n’est pas accessible avec ton compte. Reviens à Séance ou Compte."
+        case 404, 410:
+            return "Cette page n’est plus disponible. Retrouve ton programme dans Séance."
+        case 429:
+            return "COAI reçoit trop de demandes. Patiente un peu avant de réessayer. Le minuteur reste accessible."
+        case 500...599:
+            return "COAI rencontre un problème temporaire. Réessaie dans un instant. Le minuteur reste accessible."
+        case 400...499:
+            return "Cette page n’a pas pu s’ouvrir. Réessaie ou reviens à Séance."
+        default: return nil
+        }
+    }
+
     /// A retry must never replay an authentication callback or an API operation.
     /// These URLs can contain single-use credentials even when requested by GET.
     static func retryURL(current: URL?, lastRequested: URL) -> URL {
