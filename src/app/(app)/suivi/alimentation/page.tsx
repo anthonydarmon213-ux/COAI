@@ -5,7 +5,8 @@ import { RepasForm } from "@/components/suivi/repas-form";
 import { CompteurCalories } from "@/components/suivi/compteur-calories";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SectionLabel } from "@/components/ui/section-label";
+import { NutritionLocalDay } from "@/components/suivi/nutrition-local-day";
+import { calendarDayBounds, isCalendarDay } from "@/lib/suivi/calendar-day";
 import type { StatutRepas } from "@prisma/client";
 
 const STATUT_LABELS: Record<StatutRepas, { label: string; tone: "success" | "warning" | "danger" }> = {
@@ -14,16 +15,15 @@ const STATUT_LABELS: Record<StatutRepas, { label: string; tone: "success" | "war
   GROS_ECART: { label: "Gros écart", tone: "danger" },
 };
 
-export default async function AlimentationSuiviPage() {
+export default async function AlimentationSuiviPage({ searchParams }: { searchParams: { jour?: string | string[] } }) {
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 
-  // Bornes du jour côté serveur : filtrer en JS obligerait à charger tout
-  // l'historique pour n'en garder qu'une journée.
-  const debutJour = new Date();
-  debutJour.setHours(0, 0, 0, 0);
-  const finJour = new Date(debutJour);
-  finJour.setDate(finJour.getDate() + 1);
+  // La date YYYY-MM-DD du formulaire est stockée à minuit UTC.
+  // Le navigateur précise son jour local ; les bornes restent indépendantes
+  // du fuseau de la machine serveur et des changements d'heure.
+  const day = isCalendarDay(searchParams.jour) ? searchParams.jour : new Date().toISOString().slice(0, 10);
+  const { start: debutJour, end: finJour } = calendarDayBounds(day);
 
   const [repasLogs, repasDuJour, programmeNutrition] = await Promise.all([
     prisma.repasLog.findMany({ where: { userId: user.id }, orderBy: { date: "desc" }, take: 20 }),
@@ -66,7 +66,9 @@ export default async function AlimentationSuiviPage() {
           Un bilan rapide par jour. COAI observe la régularité sans te demander de peser chaque aliment.
         </p>
       </div>
-      <CompteurCalories repasDuJour={repasDuJour} objectifs={objectifs} />
+      <NutritionLocalDay day={day}>
+        <CompteurCalories repasDuJour={repasDuJour} objectifs={objectifs} />
+      </NutritionLocalDay>
       <RepasForm />
       <div className="flex flex-col gap-2">
         {repasLogs.map((r) => {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { localCalendarDay } from "@/lib/suivi/calendar-day";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,22 @@ function entier(v: string): number | undefined {
 
 export function RepasForm() {
   const router = useRouter();
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState("");
+  const dateEdited = useRef(false);
+  useEffect(() => {
+    function syncDate() {
+      if (!dateEdited.current) setDate(localCalendarDay());
+    }
+    syncDate();
+    const interval = window.setInterval(syncDate, 60_000);
+    window.addEventListener("focus", syncDate);
+    document.addEventListener("visibilitychange", syncDate);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", syncDate);
+      document.removeEventListener("visibilitychange", syncDate);
+    };
+  }, []);
   const [statut, setStatut] = useState<(typeof STATUTS)[number]["value"] | null>(null);
   const [notes, setNotes] = useState("");
   // Macros facultatifs : chaînes en état, converties à l'envoi. Stocker des
@@ -92,7 +108,7 @@ export function RepasForm() {
           </div>
           <div className="w-full sm:w-44">
             <Field label="Date">
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input type="date" required value={date} onChange={(e) => { dateEdited.current = true; setDate(e.target.value); }} />
             </Field>
           </div>
         </div>
