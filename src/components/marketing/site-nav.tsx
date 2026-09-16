@@ -117,7 +117,7 @@ export function SiteNav({ connecte }: { connecte: boolean }) {
           aria-expanded={menuOuvert}
           aria-controls="navigation-mobile"
           onClick={() => setMenuOuvert((ouvert) => !ouvert)}
-          className="group flex items-center gap-3 rounded-full border border-laiton-300/25 bg-white/[0.035] px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] backdrop-blur-md transition hover:border-laiton-300/45 hover:bg-white/[0.06]"
+          className="group flex min-h-11 items-center gap-3 rounded-full border border-laiton-300/25 bg-white/[0.035] px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] backdrop-blur-md transition hover:border-laiton-300/45 hover:bg-white/[0.06]"
         >
           Explorer
           <span className="relative block h-3.5 w-5" aria-hidden="true">

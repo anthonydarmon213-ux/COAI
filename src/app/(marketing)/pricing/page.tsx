@@ -34,14 +34,14 @@ export default function PricingPage({ searchParams }: { searchParams?: { checkou
   const remote = TIER_BY_SERVICE.TRANSFORMATION;
   const vip = TIER_BY_SERVICE.VIP;
   return (
-    <main className="coai-landing-lux min-h-screen px-5 pb-20 pt-12 sm:px-8">
+    <main className="coai-landing-lux min-h-screen px-5 pb-20 pt-6 sm:px-8 sm:pt-12">
       <TrackConversion name="pricing_viewed" />
       <div className="mx-auto max-w-6xl">
         <BackLink />
-        <header className="mx-auto mb-10 mt-8 max-w-3xl text-center">
+        <header className="mx-auto mb-6 mt-5 max-w-3xl text-center sm:mb-10 sm:mt-8">
           <SectionLabel>Les accompagnements COAI</SectionLabel>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Ta meilleure forme.<br /><span className="text-cyan-200">À ton rythme, avec le bon suivi.</span></h1>
-          <p className="mt-5 text-base leading-7 text-slate-300">Entraînement, alimentation et récupération. Choisis ton programme en autonomie, un coach à distance ou des séances privées.</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:mt-4 sm:text-5xl">Ta meilleure forme.<br /><span className="text-cyan-200">Le suivi qui te convient.</span></h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300 sm:mt-5 sm:text-base sm:leading-7">En autonomie, avec un coach à distance ou en séances privées.</p>
         </header>
         {searchParams?.from === "signup" && <p className="mb-6 rounded-2xl border border-cyan-300/30 bg-cyan-300/5 p-4 text-center text-slate-200">Ton compte est prêt. Aucun paiement n’a encore été effectué. Ton choix de facturation COAI Essentiel est conservé ci-dessous.</p>}
         {searchParams?.checkout === "cancel" && <p className="mb-6 rounded-2xl border border-white/20 p-4 text-center text-slate-200">Tu as quitté le paiement. Tu peux revoir ton choix ci-dessous.</p>}
