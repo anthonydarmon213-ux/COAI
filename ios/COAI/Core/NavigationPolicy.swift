@@ -63,6 +63,22 @@ enum NavigationPolicy {
     static let baseURL = URL(string: "https://coai.fr")!
     static let purchasePaths = ["/pricing", "/compte/abonnement", "/api/stripe", "/checkout"]
 
+    /// A retry must never replay an authentication callback or an API operation.
+    /// These URLs can contain single-use credentials even when requested by GET.
+    static func retryURL(current: URL?, lastRequested: URL) -> URL {
+        func safe(_ url: URL) -> Bool {
+            guard decide(url) == .inside else { return false }
+            let path = (url.path.removingPercentEncoding ?? url.path).lowercased()
+            guard !["/auth", "/api"].contains(where: { path == $0 || path.hasPrefix($0 + "/") }),
+                  url.fragment == nil else { return false }
+            let keys = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+            return !keys.contains { ["code", "token", "token_hash", "access_token", "refresh_token"].contains($0.name.lowercased()) }
+        }
+        if let current, safe(current) { return current }
+        if safe(lastRequested) { return lastRequested }
+        return baseURL.appendingPathComponent("sign-in")
+    }
+
     static func decide(_ url: URL) -> NavigationDecision {
         guard url.user == nil, url.password == nil else { return .blocked }
         let scheme = url.scheme?.lowercased()

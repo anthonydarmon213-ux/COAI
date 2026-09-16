@@ -150,11 +150,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         cancelAuthentication()
         if !isReady { Task { await start() }; return }
         // Never replay a POST on an error/reload. Reopen only a normal page with GET.
-        let current = webView.url
-        if let current, NavigationPolicy.decide(current) == .inside,
-           !current.path.hasPrefix("/api/"), !current.path.hasPrefix("/auth/") {
-            load(current)
-        } else { load(lastRequestedURL) }
+        load(NavigationPolicy.retryURL(current: webView.url, lastRequested: lastRequestedURL))
     }
 
     func goBack() { if webView.canGoBack { webView.goBack() } }

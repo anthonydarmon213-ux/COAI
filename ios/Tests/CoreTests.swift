@@ -2,6 +2,27 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testRetryNeverReplaysCredentialsOrAPICallbacks() {
+        let signIn = URL(string: "https://coai.fr/sign-in")!
+        for value in ["https://coai.fr/auth/callback?code=used", "https://coai.fr/auth",
+                      "https://coai.fr/%61uth/callback?code=used", "https://coai.fr/api/action",
+                      "https://coai.fr/api", "https://coai.fr/reset?token_hash=used",
+                      "https://coai.fr/reset?CODE=used", "https://coai.fr/#access_token=used",
+                      "https://evil.example", "https://coai.fr/pricing"] {
+            let unsafe = URL(string: value)!
+            XCTAssertEqual(NavigationPolicy.retryURL(current: unsafe, lastRequested: unsafe), signIn)
+            XCTAssertEqual(NavigationPolicy.retryURL(current: nil, lastRequested: unsafe), signIn)
+        }
+    }
+
+    func testRetryPreservesNormalSessionPage() {
+        let session = URL(string: "https://coai.fr/programme/seance-du-jour?seance=0")!
+        let callback = URL(string: "https://coai.fr/auth/callback?code=used")!
+        XCTAssertEqual(NavigationPolicy.retryURL(current: session, lastRequested: callback), session)
+        XCTAssertEqual(NavigationPolicy.retryURL(current: callback, lastRequested: session), session)
+        XCTAssertEqual(NavigationPolicy.retryURL(current: nil, lastRequested: session), session)
+    }
+
     @MainActor
     func testPurchaseFinishesOnlyAfterDelivery() async throws {
         let account = UUID()

@@ -81,7 +81,7 @@ Raccordements obligatoires avant activation :
    réponse serveur perdue, reprise, compte différent, restauration, renouvellement,
    expiration et remboursement. Pas de vraie transaction pour les tests.
 
-Preuves actuelles : compilation Release iPhone réussie et 12 tests XCTest (dont
+Preuves actuelles : compilation Release iPhone réussie et 14 tests XCTest (dont
 confirmation de livraison persistée et liée au bon compte). La séquence commune
 au service est testée : confirmation avant finalisation, erreur réseau,
 confirmation incorrecte et interruption pendant la livraison. Le contrôle
@@ -89,6 +89,16 @@ confirmation incorrecte et interruption pendant la livraison. Le contrôle
 la restauration est refusée avant de demander une connexion Apple.
 Les tests unitaires
 ne simulent pas une transaction Apple, et aucun paiement n'a été effectué.
+
+## Reprise après erreur de connexion — 16 septembre 2026
+
+Le bouton Réessayer utilisait parfois le dernier lien demandé, y compris le
+retour Google contenant un code à usage unique. La reprise exclut désormais
+les routes auth/API, les paramètres de jeton/code et les fragments. Une page
+de séance ordinaire conserve son numéro ; sans page sûre, retour à la connexion.
+Deux tests couvrent les liens sensibles, les variantes encodées, les liens
+externes et la conservation d'une fiche séance. Vérification locale seulement :
+le parcours Google interrompu sur iPhone physique reste à valider.
 
 Références d'intégration :
 - https://developer.apple.com/documentation/storekit/transaction
