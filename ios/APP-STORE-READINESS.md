@@ -89,6 +89,13 @@ La couverture des données par la route serveur reste à compléter séparément
 
 ### Traceurs
 
+Rapports d'erreur : filtre commun navigateur/Node/Edge ajouté et testé avec le
+vrai SDK dans un transport mémoire. Voir l'inventaire PRIVACY-AUDIT. Les traces
+de performance restent désactivées pendant cet audit ; les rapports d'erreur
+gardent un sous-ensemble technique. Aucun échange réel Sentry validé ni nouvelle
+déclaration de conformité. La synchronisation GitHub attend toujours l'accord
+explicite demandé après le refus de la protection d'exécution.
+
 Inventaire et écarts précis : [PRIVACY-AUDIT.md](PRIVACY-AUDIT.md).
 Après compilation de la cible UI, trois scénarios hors réseau passent aussi
 (partage et ajout/refus Photos) : `/tmp/coai-native-privacy-offline-regression.xcresult`.

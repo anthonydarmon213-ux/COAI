@@ -16,7 +16,7 @@ Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
 | Fonctionnement natif | Durée, pause et échéance du repos conservées localement | RestTimerView et PrivacyInfo.xcprivacy ; UserDefaults déclaré. Notification locale générique et facultative |
 | Export de séance | PDF/PNG/JPEG temporaires choisis par l'utilisateur | COAIDownload et DownloadPolicy ; dossier local protégé, nettoyage, feuille de partage explicite. Test actuel : fichiers fictifs, pas séance réelle connectée |
 | Mesure facultative | Google Analytics, Meta, Vercel Analytics ; attribution UTM | Désactivés pour le pilote marqué COAIiOS ; règles WebKit complémentaires. Safari garde ses choix. Vérification réseau complète restant à faire |
-| Diagnostic technique | Erreurs et traces conditionnées par le DSN Sentry | `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` : pas de filtre applicatif beforeSend constaté. Inspecter les charges effectivement transmises avant de garantir l'absence de données sensibles |
+| Diagnostic technique | Erreurs conditionnées par le DSN Sentry | Filtre commun `src/lib/analytics/error-privacy.ts` ajouté : valeurs libres et pièces jointes retirées, liste explicite de champs techniques. Traces de performance désactivées pendant l'audit. Transport mémoire du vrai SDK testé ; déploiement et flux réels restent non vérifiés |
 | Événements internes | Nom d'événement, identifiant utilisateur et métadonnées | `src/lib/analytics/product-events.ts` journalise côté serveur. Ce flux n'est pas supprimé par le refus des traceurs du navigateur ; inventaire, minimisation et conservation à examiner |
 
 Ne pas déclarer « aucune donnée collectée ». Ne pas confondre absence de SDK
@@ -45,6 +45,28 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    vérifier sur appareil, puis soumettre à la validation du titulaire.
 
 ## Preuves et limites du lot traceurs
+
+### Réduction des rapports d'erreur (local seulement)
+
+Les trois configurations Sentry partagent maintenant un filtre avant envoi.
+Les messages, notes libres, cookies, requêtes, utilisateurs, contextes,
+breadcrumbs, variables, lignes de code et pièces jointes ne sont pas recopiés.
+Restent une classe d'erreur standard, un texte générique, un identifiant
+d'événement au format contrôlé, une date technique, une release SHA éventuelle
+et les positions dans les chemins de chunks web COAI autorisés, sans paramètres.
+Les chemins serveur et les noms de fonctions ne sont pas conservés.
+
+Compromis explicite : rapports moins détaillés et traces de performance
+désactivées tant que leur contenu n'est pas audité. Les erreurs restent
+collectables si un DSN est configuré ; les messages présentés aux utilisateurs
+et les erreurs d'origine ne sont pas modifiés. Aucune nouvelle dépendance.
+
+`scripts/test-error-privacy.cjs` vérifie les trois configurations, le cas sans
+DSN et l'enveloppe finale du vrai SDK Node via un transport uniquement en
+mémoire, avec notes/pièces jointes fictives. Aucun envoi Sentry effectué.
+Cela ne prouve pas l'ensemble des échanges du SDK navigateur, des autres
+intégrations, de l'infrastructure ou des logs serveur. La déclaration finale
+App Store et la validation en production restent ouvertes.
 
 Commit `8bd72c7` : tests de consentement/rendu réussis, compilation réelle des
 règles WebKit, 24 XCTest, builds Release iPhone non signé et UI, TypeScript,
