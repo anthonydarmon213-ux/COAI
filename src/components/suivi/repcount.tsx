@@ -17,6 +17,7 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { assemblerSeance, payloadSeance, nomsSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
 import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
+import { withRequestDeadline } from "@/lib/suivi/request-deadline";
 import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper";
 import { RestDuration } from "@/components/suivi/rest-duration";
 
@@ -432,9 +433,11 @@ export function RepCount({
 
   const charger = useCallback(async () => {
     try {
-      const r = await fetch("/api/seances");
-      if (!r.ok) throw new Error("historique_indisponible");
-      const donnees = await r.json();
+      const donnees = await withRequestDeadline(async signal => {
+        const r = await fetch("/api/seances", { signal });
+        if (!r.ok) throw new Error("historique_indisponible");
+        return r.json();
+      });
       if (!Array.isArray(donnees)) throw new Error("historique_invalide");
       setSeances(donnees);
       setHistoriqueErreur(false);
@@ -495,23 +498,27 @@ export function RepCount({
     if (sauvegardeRef.current?.signature !== signature) {
       sauvegardeRef.current = { signature, date: new Date().toISOString() };
     }
+    const dateSauvegarde = sauvegardeRef.current.date;
     requeteEnCoursRef.current = true;
     persistDraft(seriesAEnregistrer);
     setErreur(null);
     setEnregistrementEnCours(true);
     try {
-      const r = await fetch("/api/seances", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: sauvegardeRef.current.date,
-          source: "REPCOUNT",
-          exercices: payloadSeance(exercicesComplets),
-          notes: notes.trim() || undefined,
-        }),
+      const firstId = await withRequestDeadline(async signal => {
+        const r = await fetch("/api/seances", {
+          method: "POST",
+          signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: dateSauvegarde,
+            source: "REPCOUNT",
+            exercices: payloadSeance(exercicesComplets),
+            notes: notes.trim() || undefined,
+          }),
+        });
+        if (!r.ok) throw new Error(r.status === 401 ? "connexion_expiree" : "enregistrement_refuse");
+        return firstSavedConversionId(r, "REPCOUNT");
       });
-      if (!r.ok) throw new Error("enregistrement_refuse");
-      const firstId = await firstSavedConversionId(r, "REPCOUNT");
       if (firstId) setPremierRepereId(firstId);
       sauvegardeRef.current = null;
       setDraftRestored(false);
@@ -522,8 +529,10 @@ export function RepCount({
       setFinRepos(null);
       setEnregistre(true);
       void charger();
-    } catch {
-      setErreur("L'enregistrement a échoué. Réessaie.");
+    } catch (error) {
+      setErreur(error instanceof Error && error.message === "connexion_expiree"
+        ? "Ta connexion a expiré. Tes séries restent sur cette page. Reconnecte-toi avant de réessayer."
+        : "La sauvegarde n’a pas pu être confirmée. Tes séries restent sur cette page. Vérifie ta connexion puis réessaie sans modifier la séance.");
     } finally {
       requeteEnCoursRef.current = false;
       setEnregistrementEnCours(false);

@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
 const states = [], refs = [];
-let si=0, ri=0, fail=true;
+let si=0, ri=0, fail='timeout';
 const requests=[];
 const storage = new Map();
 let effects=[];
@@ -14,9 +14,11 @@ function load(file, resolver) {
   const exports={};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'..',file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText,{
     exports, require:resolver, window:{localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>{if(storageBlocked)throw new Error('quota');storage.set(k,v);},removeItem:k=>storage.delete(k)}}, document:{getElementById:()=>({focus(){}})},
+    AbortController, setTimeout, clearTimeout,
     fetch:async(url,options)=>{
-      if(!options) return {ok:true,json:async()=>[]};
+      if(!options?.method) return {ok:true,json:async()=>[]};
       requests.push(JSON.parse(options.body));
+      if(fail==='timeout') return new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>reject(new Error('request aborted'))));
       if(fail) throw new Error('connection lost');
       return {ok:true};
     }
@@ -26,6 +28,7 @@ function load(file, resolver) {
 const history=load('src/lib/suivi/historique-exercice.ts',require);
 const session=load('src/lib/suivi/repcount-session.ts',require);
 const draft=load('src/lib/suivi/repcount-draft.ts',require);
+const deadline=load('src/lib/suivi/request-deadline.ts',require);
 const component=load('src/components/suivi/repcount.tsx',name=>{
   if(name==='react') return {
     useState:initial=>{const index=si++; if(!(index in states))states[index]=initial; return [states[index],value=>states[index]=typeof value==='function'?value(states[index]):value];},
@@ -36,6 +39,7 @@ const component=load('src/components/suivi/repcount.tsx',name=>{
   if(name==='@/lib/suivi/historique-exercice') return history;
   if(name==='@/lib/suivi/repcount-session') return session;
   if(name==='@/lib/suivi/repcount-draft') return draft;
+  if(name==='@/lib/suivi/request-deadline') return {withRequestDeadline:operation=>deadline.withRequestDeadline(operation,10)};
   if(name==='@/lib/analytics/first-saved-conversion')return {firstSavedConversionId:async()=>null};
   return {};
 });
@@ -56,7 +60,7 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   assert.equal(requests[0].notes,'Réglage siège 3');
   assert.equal(requests[0].exercices[0].nom,'Presse à cuisses');
   assert.equal(requests[0].exercices[1].sets[0].set,1);
-  assert.ok(text(render()).includes("L'enregistrement a échoué"));
+  assert.ok(text(render()).includes("La sauvegarde n’a pas pu être confirmée"));
   const raw = storage.get(draft.draftKey('test-user'));
   assert.ok(draft.parseDraft(raw));
   const ancien=JSON.parse(raw); delete ancien.routine;
@@ -101,5 +105,5 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   button('Continuer en séance libre').props.onClick();
   assert.equal(states[7].length,1,'Leaving the sequence preserves completed work');
   assert.equal(states[20].length,0);
-  console.log('PASS RepCount workflow: restore, account isolation, old drafts, failed save retry, reuse sequence without logging past sets, resume next movement, preserve work');
+  console.log('PASS RepCount workflow: timed-out save unlocks and preserves draft, identical retry, restore, account isolation, old drafts, reuse sequence, preserve work');
 })().catch(error=>{console.error(error);process.exitCode=1;});
