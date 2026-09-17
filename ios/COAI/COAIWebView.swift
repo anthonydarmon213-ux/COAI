@@ -18,6 +18,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     private var authenticationSession: ASWebAuthenticationSession?
     private var authenticationAttempt: OAuthAttempt?
     private var authenticationTimeout: Task<Void, Never>?
+    private var historyObservation: NSKeyValueObservation?
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         webView.window ?? ASPresentationAnchor()
@@ -103,8 +104,16 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     private func attachDelegates() {
+        historyObservation?.invalidate()
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        // Same-document navigation changes history without a didFinish callback.
+        historyObservation = webView.observe(\.canGoBack, options: [.initial, .new]) { [weak self] view, _ in
+            Task { @MainActor [weak self, weak view] in
+                guard let self, let view, self.webView === view else { return }
+                self.canGoBack = view.canGoBack
+            }
+        }
         // No injected authentication, no native-JavaScript bridge, no TLS exceptions.
     }
 

@@ -44,6 +44,23 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Alerte de repos facultative — 17 septembre 2026
 
+### Navigation native : retour après récupération — 17 septembre 2026
+
+Un test réel dans le simulateur a reproduit une flèche retour désactivée après
+navigation vers « Mot de passe oublié ». Les changements d'historique sans
+rechargement complet n'appelaient pas `didFinish`. Le modèle observe désormais
+`canGoBack`, réinstalle l'observation à chaque remplacement du navigateur et
+ignore les callbacks d'une ancienne vue. Aucun script injecté.
+
+Après correction : **4 tests d'interface réussis**, dont retour vers connexion,
+accès à l'inscription et annulation de la demande système Google. Résultat :
+`/tmp/coai-ui-history-fixed.xcresult`. Capture d'inscription exportée et inspectée.
+Pages publiques de production chargées dans le simulateur iPhone 17 / iOS 26.5 ;
+aucun formulaire envoyé, compte créé ou paiement effectué. Cela ne valide pas
+une authentification réussie, une récupération email complète ou l'app distribuée.
+22 tests Swift, build Release iPhone non signé, TypeScript, lint, build web et
+audit des médias réussis. Le test sur appareil physique reste ouvert.
+
 Mise à jour de vérification : un vrai test XCUITest du minuteur passe désormais
 sur iPhone 17 simulé / iOS 26.5 : démarrage, pause, fermeture/réouverture,
 redémarrage du processus, reprise et arrêt. Capture finale exportée et inspectée.

@@ -2,6 +2,59 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testRegistrationAndPasswordRecoveryPagesAreReachable() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        XCTAssertTrue(web.buttons["Continuer avec Google"].waitForExistence(timeout: 30))
+        let forgot = web.links["Mot de passe oublié ?"]
+        reveal(forgot, in: app)
+        forgot.tap()
+        XCTAssertTrue(web.staticTexts["Mot de passe oublié"].waitForExistence(timeout: 15))
+        XCTAssertTrue(web.textFields.firstMatch.exists)
+        let back = app.buttons["Page précédente"]
+        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: back)
+        XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 5), .completed)
+        back.tap()
+        XCTAssertTrue(web.buttons["Continuer avec Google"].waitForExistence(timeout: 15))
+        let returned = XCTAttachment(screenshot: app.screenshot())
+        returned.name = "Retour depuis récupération"
+        returned.lifetime = .keepAlways
+        add(returned)
+        let signup = web.links["S'inscrire"]
+        reveal(signup, in: app)
+        signup.tap()
+        XCTAssertTrue(web.staticTexts["Créer mon compte gratuit"].waitForExistence(timeout: 15))
+        XCTAssertTrue(web.buttons["Continuer avec Google"].exists)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Inscription accessible depuis la connexion"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        // Read-only navigation: no signup or password-reset request submitted.
+    }
+
+    @MainActor
+    func testDecliningGoogleSystemPromptReturnsToUsableLogin() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let google = app.webViews.firstMatch.buttons["Continuer avec Google"]
+        XCTAssertTrue(google.waitForExistence(timeout: 30))
+        google.tap()
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let cancel = system.alerts.buttons.matching(NSPredicate(format: "label == %@ OR label == %@", "Annuler", "Cancel")).firstMatch
+        XCTAssertTrue(cancel.waitForExistence(timeout: 10))
+        cancel.tap()
+        XCTAssertTrue(google.waitForExistence(timeout: 15))
+        XCTAssertTrue(google.isEnabled)
+        XCTAssertFalse(app.alerts.firstMatch.exists)
+        XCTAssertTrue(app.buttons["Repos"].isHittable)
+    }
+
+    @MainActor
     func testPublicLoginLoadsInsideAppAndKeyboardHidesBottomBar() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

@@ -199,7 +199,11 @@ xcodebuild -project ios/COAI.xcodeproj -scheme COAI -configuration Debug \
   -derivedDataPath ios/DerivedDataUITests CODE_SIGNING_ALLOWED=NO test
 ```
 
-Résultat du 17 septembre : 2 tests d'interface réussis sur iPhone 17 / iOS 26.5.
+Résultat du 17 septembre : 4 tests d'interface réussis sur iPhone 17 / iOS 26.5.
+Deux tests supplémentaires couvrent l'annulation de la demande système Google
+et la navigation récupération → retour natif → inscription. Ce dernier a révélé
+une flèche retour désactivée lors des navigations sans rechargement : corrigée
+par observation de l'historique WebKit, puis test repassé avec succès.
 Le second charge la connexion publique réelle, ouvre le clavier (y compris la
 fermeture du conseil iOS de premier usage), attend ses touches et vérifie que
 la barre Repos disparaît tandis que le champ reste accessible. Aucun identifiant
