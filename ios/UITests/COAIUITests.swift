@@ -1,6 +1,34 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    // Run alone on a QA simulator while the COAI host is unreachable.
+    // No injected error: exercises the real WebKit navigation failure.
+    @MainActor
+    func testUnavailableNetworkKeepsRecoveryControlsAccessible() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let error = app.staticTexts["Page indisponible"]
+        XCTAssertTrue(error.waitForExistence(timeout: 30), "Une panne ne doit pas laisser un chargement pendant une minute.")
+        XCTAssertTrue(app.staticTexts["Impossible de charger COAI. Vérifie ta connexion, puis réessaie. Le minuteur reste accessible."].exists)
+        XCTAssertTrue(app.buttons["Réessayer"].isHittable)
+        XCTAssertGreaterThanOrEqual(app.buttons["Réessayer"].frame.height, 44)
+        XCTAssertTrue(app.buttons["Repos"].isHittable)
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Erreur réseau réelle et commandes de secours"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        app.buttons["Repos"].tap()
+        XCTAssertTrue(app.staticTexts["Ton temps de récupération"].waitForExistence(timeout: 5))
+        app.buttons["Fermer"].tap()
+        XCTAssertTrue(app.buttons["Réessayer"].isHittable)
+        app.buttons["Réessayer"].tap()
+        XCTAssertTrue(error.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Repos"].isHittable)
+        // Network restoration and successful retry remain separate checks.
+    }
+
     // Run alone on the dedicated alert QA device. Do not combine with the
     // refusal scenario: iOS remembers notification authorization per install.
     @MainActor

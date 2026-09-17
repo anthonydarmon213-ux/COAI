@@ -24,7 +24,9 @@ struct COAIRootView: View {
                         Image(systemName: "exclamationmark.circle").font(.largeTitle).accessibilityHidden(true)
                         Text("Page indisponible").font(.title2.bold()).accessibilityAddTraits(.isHeader)
                         Text(error).multilineTextAlignment(.center)
-                        Button("Réessayer") { browser.retry() }.buttonStyle(.borderedProminent)
+                        Button { browser.retry() } label: {
+                            Text("Réessayer").frame(minWidth: 120, minHeight: 44)
+                        }.buttonStyle(.borderedProminent).foregroundStyle(.black)
                     }.padding().frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ZStack(alignment: .top) {

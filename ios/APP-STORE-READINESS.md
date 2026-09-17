@@ -42,6 +42,28 @@ accessibilité/clavier/safe areas, captures App Store réelles, description exac
 compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
 
+## Panne réseau : reprise native
+
+Test réel pendant l'inaccessibilité de coai.fr depuis le Mac/simulateur QA,
+sans erreur injectée ni compte connecté. L'ouverture native attendait environ
+60 secondes avant d'afficher l'erreur. Les requêtes de page lancées par
+`load` utilisent maintenant un délai de 20 secondes. Les soumissions de
+formulaires et appels API web ne sont pas modifiés, ni rejoués automatiquement.
+`testUnavailableNetworkKeepsRecoveryControlsAccessible` vérifie l'erreur en
+moins de 30 secondes, ouvre/ferme Repos, puis relance le chargement par Réessayer.
+Preuve avant/après : `/tmp/coai-offline-error-ui.xcresult` et
+`/tmp/coai-offline-fast-error-ui.xcresult`, succès sur SE / iOS 26.5.
+La restauration du réseau, le succès après reprise, les pannes en cours de
+formulaire et l'appareil physique restent à tester. Ne pas confondre ce test
+de panne avec un parcours connecté réussi. Exécuter ce scénario seul, uniquement
+sur un simulateur QA dont la destination COAI est réellement inaccessible.
+
+Contrôle final : `/tmp/coai-offline-accessible-ui.xcresult` réussi. Capture
+inspectée, bouton Réessayer noir sur or et zone tactile d'au moins 44 points
+contrôlée par le test. 25 tests Swift, règles WebKit, Release arm64 sans signature,
+TypeScript, lint et build web réussis. Modification native locale uniquement,
+aucune version distribuée validée.
+
 ## Notification de repos — réception vérifiée sur simulateur
 
 Le test `testRestNotificationDeliveredInBackground` démarre un vrai repos de

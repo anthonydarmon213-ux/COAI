@@ -197,7 +197,10 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         lastRequestedURL = url
         errorMessage = nil
         isLoading = true
-        webView.load(URLRequest(url: url))
+        // Native entry/retry must not leave a blank spinner for the default
+        // minute when the host is unreachable. Does not replay form submissions
+        // or change timeout policy for the site's API requests.
+        webView.load(URLRequest(url: url, timeoutInterval: 20))
     }
 
     func retry() {

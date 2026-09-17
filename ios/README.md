@@ -226,6 +226,11 @@ Exécution (remplacer l'identifiant par un simulateur retourné par `simctl`).
 La réception et le refus d'alerte demandent des appareils QA distincts ; ne pas
 lancer tous les tests sans sélectionner leurs prérequis. Le contrôle de
 confidentialité web attend son déploiement.
+Le scénario `testUnavailableNetworkKeepsRecoveryControlsAccessible` exige une
+destination COAI inaccessible : l'exécuter séparément lors d'un test de panne
+réseau sur QA, jamais comme une vérification normale du site disponible.
+Il ne simule pas l'erreur : il contrôle l'échec WebKit réel, l'accès à Repos et
+le redémarrage du chargement. Il ne valide pas le retour effectif du réseau.
 
 ```sh
 xcrun simctl list devices available
