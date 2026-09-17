@@ -81,11 +81,30 @@ pagination, périmètre, erreurs et suppression silencieusement incomplète) et
 `node scripts/test-account-delete-billing.cjs` (le profil et l'identité sont
 conservés si Storage échoue). Validation production encore requise.
 
-Ce correctif ne clôt PAS le parcours 10 : il reste notamment à traiter l'erreur
-retournée par `auth.admin.deleteUser`, la reprise après suppression partielle du
-profil, la révocation des sessions et la concurrence avec de nouveaux uploads.
+Ce correctif ne clôt PAS le parcours 10 : il reste notamment la révocation des
+sessions et la concurrence avec de nouveaux uploads ou une recréation du profil.
 Ne pas annoncer une suppression sécurisée complète avant ces travaux et un test
 de bout en bout sur un compte jetable autorisé.
+
+### Reprise de suppression de l'identité — 17 septembre 2026
+
+La route contrôle désormais l'erreur retournée par `auth.admin.deleteUser` et
+l'identifiant de l'utilisateur confirmé supprimé. Échec réseau, erreur du service
+ou réponse incomplète : HTTP 503, jamais de faux succès. Une erreur Prisma avant
+cette étape est également signalée sans supprimer l'identité.
+
+Si le profil a déjà été supprimé lors d'une tentative précédente, l'utilisateur
+encore authentifié peut réessayer : nettoyage des photos puis suppression de sa
+propre identité, sans refaire une suppression Prisma impossible. Aucune identité
+fournie par le client n'est acceptée ; la cible provient de `getCurrentUser()`.
+Cela ne résout pas la concurrence avec une recréation de profil, ni le retour
+après une réponse perdue alors que l'identité a réellement été supprimée.
+
+Tests simulés étendus : erreur Auth retournée/levée, réponse sans utilisateur,
+mauvais identifiant, erreur Prisma, reprise sans profil et refus non authentifié.
+Les tests photos et interface RGPD passent également. Aucun effacement réel ni
+validation de bout en bout en production. Référence :
+https://supabase.com/docs/reference/javascript/auth-admin-deleteuser
 
 ## Critères bloquants (non validés à ce jour)
 

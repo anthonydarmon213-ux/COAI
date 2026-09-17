@@ -18,11 +18,9 @@ export async function POST() {
     include: { subscription: true },
   });
 
-  if (!user) {
-    return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
-  }
-
-  if (user.subscription?.stripeSubscriptionId) {
+  // Auth may still exist after a previous request removed the application
+  // profile but failed to remove the identity. Keep that request retryable.
+  if (user?.subscription?.stripeSubscriptionId) {
     try {
       const subscription = await stripe.subscriptions.retrieve(user.subscription.stripeSubscriptionId);
       const customerId = typeof subscription.customer === "string"
@@ -45,10 +43,21 @@ export async function POST() {
     return NextResponse.json({ error: "La suppression des photos n’a pas pu être confirmée. Ton compte n’a pas été supprimé. Certaines photos peuvent déjà avoir été effacées. Réessaie ou contacte l’assistance." }, { status: 503 });
   }
 
-  await prisma.user.delete({ where: { id: user.id } });
+  if (user) {
+    try {
+      await prisma.user.delete({ where: { id: user.id } });
+    } catch {
+      return NextResponse.json({ error: "La suppression du profil n’a pas pu être confirmée. Certaines données peuvent déjà avoir été effacées. Réessaie ou contacte l’assistance." }, { status: 503 });
+    }
+  }
 
-  const admin = createSupabaseAdminClient();
-  await admin.auth.admin.deleteUser(authUser.id);
+  try {
+    const admin = createSupabaseAdminClient();
+    const { data, error } = await admin.auth.admin.deleteUser(authUser.id);
+    if (error || data.user?.id !== authUser.id) throw new Error("identity_deletion_unconfirmed");
+  } catch {
+    return NextResponse.json({ error: "Tes données de profil ont été effacées, mais la suppression de ton accès n’a pas pu être confirmée. Réessaie pour terminer ou contacte l’assistance." }, { status: 503 });
+  }
 
   return NextResponse.json({ success: true });
 }
