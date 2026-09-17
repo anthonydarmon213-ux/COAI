@@ -82,6 +82,7 @@ export function ExerciceCatalogue() {
 
   const filtres = useMemo(() => {
     return EXERCICES.filter((ex) => {
+      if (!photoCoaiPourNom(ex.nom) || !videoCoaiPourNom(ex.nom)) return false;
       if (!matchesExerciseSearch([ex.nom, GROUPE_PRINCIPAL_LABEL[ex.groupePrincipal], ...ex.materiel.map(m => MATERIEL_LABEL[m]), TYPE_LABEL[ex.type]].join(" "), query)) return false;
       if (groupes.length > 0 && !groupes.includes(ex.groupePrincipal)) return false;
       if (materiels.length > 0 && !ex.materiel.some((m) => materiels.includes(m))) return false;

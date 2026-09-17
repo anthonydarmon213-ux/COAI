@@ -393,7 +393,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
         jour: "Jour 3",
         focus: "Full body — volume maîtrisé",
         contenu:
-          "Presse à cuisses, développé incliné, rowing, hip thrust et élévations latérales — 3 séries de 8 à 15 répétitions. Garde 1 à 3 répétitions en réserve.",
+          "Presse à cuisses, développé incliné, rowing et élévations latérales — 3 séries de 8 à 15 répétitions. Garde 1 à 3 répétitions en réserve.",
       },
       {
         jour: "Jour 4",
@@ -473,7 +473,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
       "Varier les angles de travail (extension, abduction, unilatéral)",
       "Progresser sans solliciter excessivement le bas du dos",
     ],
-    photoQuery: "glute bridge hip thrust workout",
+    photoQuery: "glute bridge workout",
     photoFemme: "/programmes/couvertures/fessiers-4-semaines-femme.png",
     photoHomme: "/programmes/couvertures/fessiers-4-semaines-homme.png",
     medias: [
@@ -488,7 +488,7 @@ const PROGRAMMES_BRUTS: ProgrammePret[] = [
         jour: "Jour 1",
         focus: "Force",
         contenu:
-          "Hip thrust ou pont fessier chargé, squat sumo, fentes bulgares — 4 séries de 10 à 12 répétitions, charge progressive semaine après semaine.",
+          "Squat sumo, fentes bulgares — 4 séries de 10 à 12 répétitions, charge progressive semaine après semaine.",
       },
       {
         jour: "Jour 2",

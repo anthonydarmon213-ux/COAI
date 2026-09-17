@@ -80,8 +80,6 @@ const TABLE: Entree[] = [
     motifs: ["soulevé de terre", "souleve de terre", "deadlift", "romanian", "hip thrust", "fessier"],
     variantes: [
       { materiel: "halteres", nom: "Soulevé de terre roumain haltères", consigne: "Jambes presque tendues, pousse les hanches vers l'arrière, dos plat." },
-      { materiel: "elastique", nom: "Hip thrust élastique", consigne: "Élastique sur les hanches, dos calé. Serre les fessiers en haut." },
-      { materiel: "poids_du_corps", nom: "Hip thrust une jambe", consigne: "Dos calé, une jambe tendue, pousse par le talon." },
     ],
   },
   {
