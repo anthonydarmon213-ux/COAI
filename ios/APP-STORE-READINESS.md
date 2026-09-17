@@ -66,6 +66,27 @@ Références Apple consultées :
 - https://developer.apple.com/documentation/usernotifications/asking-permission-to-use-notifications
 - https://developer.apple.com/documentation/usernotifications/scheduling-a-notification-locally-from-your-app
 
+## Suppression des photos du compte — 17 septembre 2026
+
+Le nettoyage ne se limite plus à la première page de 100 fichiers. Il liste les
+photos avant suppression, supprime par lots et vérifie que le dossier est vide.
+Les préfixes vides/invalides, entrées inattendues, erreurs Storage et suppressions
+non confirmées arrêtent l'opération avant suppression du profil. Le message
+explique qu'un nettoyage partiel a pu avoir lieu et permet une nouvelle tentative.
+Au-delà de 10 000 entrées, arrêt sûr nécessitant assistance plutôt qu'une boucle
+non bornée dans une requête serveur. Aucun compte réel supprimé pour les tests.
+
+Tests simulés : `node scripts/test-photo-cleanup.cjs` (0, 1, 100 et 205 fichiers,
+pagination, périmètre, erreurs et suppression silencieusement incomplète) et
+`node scripts/test-account-delete-billing.cjs` (le profil et l'identité sont
+conservés si Storage échoue). Validation production encore requise.
+
+Ce correctif ne clôt PAS le parcours 10 : il reste notamment à traiter l'erreur
+retournée par `auth.admin.deleteUser`, la reprise après suppression partielle du
+profil, la révocation des sessions et la concurrence avec de nouveaux uploads.
+Ne pas annoncer une suppression sécurisée complète avant ces travaux et un test
+de bout en bout sur un compte jetable autorisé.
+
 ## Critères bloquants (non validés à ce jour)
 
 1. Connexion réelle et persistante, récupération, déconnexion et suppression

@@ -39,7 +39,11 @@ export async function POST() {
     }
   }
 
-  await deleteAllProgressPhotos(authUser.id);
+  try {
+    await deleteAllProgressPhotos(authUser.id);
+  } catch {
+    return NextResponse.json({ error: "La suppression des photos n’a pas pu être confirmée. Ton compte n’a pas été supprimé. Certaines photos peuvent déjà avoir été effacées. Réessaie ou contacte l’assistance." }, { status: 503 });
+  }
 
   await prisma.user.delete({ where: { id: user.id } });
 

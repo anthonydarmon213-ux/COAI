@@ -4,7 +4,7 @@ const path=require('node:path');
 const vm=require('node:vm');
 const ts=require('typescript');
 const source=ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/app/api/compte/delete/route.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-async function scenario({status='active',customer='cus_owner',retrieveError=false,cancelError=false,cancelStatus='canceled',signedIn=true,hasSubscription=true}={}) {
+async function scenario({status='active',customer='cus_owner',retrieveError=false,cancelError=false,cancelStatus='canceled',signedIn=true,hasSubscription=true,photosError=false}={}) {
   const events=[],api={};
   vm.runInNewContext(source,{exports:api,require:name=>{
     const modules={
@@ -16,7 +16,7 @@ async function scenario({status='active',customer='cus_owner',retrieveError=fals
         cancel:async()=>{events.push('cancel');if(cancelError)throw new Error('network');return {status:cancelStatus};}
       }}},
       '@/lib/db/client':{prisma:{user:{findUnique:async()=>({id:'user_test',subscription:hasSubscription?{stripeSubscriptionId:'sub_test',stripeCustomerId:'cus_owner'}:null}),delete:async()=>events.push('profile')}}},
-      '@/lib/storage/progress-photos':{deleteAllProgressPhotos:async()=>events.push('photos')}
+      '@/lib/storage/progress-photos':{deleteAllProgressPhotos:async()=>{events.push('photos');if(photosError)throw new Error('storage');}}
     };
     if(!(name in modules))throw new Error(name);return modules[name];
   }});
@@ -36,5 +36,9 @@ async function scenario({status='active',customer='cus_owner',retrieveError=fals
   assert.deepEqual((await scenario()).events,['retrieve','cancel','photos','profile','identity']);
   assert.deepEqual((await scenario({hasSubscription:false})).events,['photos','profile','identity']);
   assert.equal((await scenario({signedIn:false})).response.status,401);
+  const failedPhotos=await scenario({photosError:true});
+  assert.equal(failedPhotos.response.status,503);
+  assert.deepEqual(failedPhotos.events,['retrieve','cancel','photos']);
+  assert.match(failedPhotos.response.body.error,/Certaines photos/);
   console.log('PASS deletion billing gate: unavailable Stripe, cancellation failure, wrong customer, unconfirmed status, already ended, no subscription, unauthenticated; mocked only');
 })().catch(error=>{console.error(error);process.exitCode=1;});
