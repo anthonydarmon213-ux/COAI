@@ -2,6 +2,22 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testRestPauseAndResumePreserveRemainingDuration() {
+        let start = Date(timeIntervalSince1970: 1000)
+        let paused = RestClock(seconds: 90, now: start).remaining(at: start.addingTimeInterval(25))
+        XCTAssertEqual(paused, 65)
+        let resumedAt = start.addingTimeInterval(600)
+        let resumed = RestClock(seconds: paused, now: resumedAt)
+        XCTAssertEqual(resumed.remaining(at: resumedAt), 65)
+        XCTAssertEqual(resumed.remaining(at: resumedAt.addingTimeInterval(65)), 0)
+    }
+
+    func testRestClockRejectsInvalidPersistedDeadline() {
+        let now = Date(timeIntervalSince1970: 1000)
+        XCTAssertEqual(RestClock(end: Date(timeIntervalSince1970: .infinity)).remaining(at: now), 0)
+        XCTAssertEqual(RestClock(end: Date(timeIntervalSince1970: .nan)).remaining(at: now), 0)
+        XCTAssertEqual(RestClock(end: now.addingTimeInterval(1e10)).remaining(at: now), 3600)
+    }
     func testHTTPFailuresHaveActionableMessages() {
         for status in [400, 401, 403, 404, 410, 422, 429, 500, 502, 503, 504, 599] {
             XCTAssertFalse(NavigationPolicy.responseError(status: status)?.isEmpty ?? true)

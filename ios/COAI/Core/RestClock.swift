@@ -10,7 +10,9 @@ struct RestClock {
     init(end: Date) { self.end = end }
 
     func remaining(at now: Date = Date()) -> Int {
-        max(0, Int(ceil(end.timeIntervalSince(now))))
+        let interval = end.timeIntervalSince(now)
+        guard interval.isFinite else { return 0 }
+        return Int(max(0, min(3600, ceil(interval))))
     }
 
     static func label(seconds: Int) -> String {

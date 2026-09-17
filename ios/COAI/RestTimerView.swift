@@ -5,6 +5,7 @@ struct RestTimerView: View {
     @AppStorage("coai.rest.endsAt") private var endsAt: Double = 0
     @AppStorage("coai.rest.minutes") private var minutes = 1
     @AppStorage("coai.rest.seconds") private var seconds = 30
+    @AppStorage("coai.rest.pausedSeconds") private var pausedSeconds = 0
     private var duration: Int { minutes * 60 + seconds }
 
     var body: some View {
@@ -20,8 +21,38 @@ struct RestTimerView: View {
                             Text(seconds == 0 ? "Temps écoulé" : RestClock.label(seconds: seconds))
                                 .font(.largeTitle.monospacedDigit().bold())
                                 .accessibilityLabel(seconds == 0 ? "Temps de récupération écoulé" : "Repos restant : " + RestClock.label(seconds: seconds))
+                            if seconds > 0 {
+                                Button("Mettre en pause") {
+                                    pausedSeconds = RestClock(end: Date(timeIntervalSince1970: endsAt)).remaining()
+                                    endsAt = 0
+                                }.buttonStyle(.bordered).controlSize(.large)
+                            }
                         }
-                        Button("Arrêter et réinitialiser", role: .destructive) { endsAt = 0 }
+                    } else if pausedSeconds > 0 {
+                        Text(RestClock.label(seconds: pausedSeconds)).font(.largeTitle.monospacedDigit().bold())
+                        Text("En pause").foregroundStyle(.secondary)
+                        Button("Reprendre le repos") {
+                            endsAt = RestClock(seconds: pausedSeconds).end.timeIntervalSince1970
+                            pausedSeconds = 0
+                        }.buttonStyle(.borderedProminent).controlSize(.large)
+                    }
+                    if endsAt > 0 || pausedSeconds > 0 {
+                        Button("Arrêter et réinitialiser", role: .destructive) {
+                            endsAt = 0
+                            pausedSeconds = 0
+                        }.frame(minHeight: 44)
+                    }
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Préparer la durée du prochain repos").font(.headline)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
+                            ForEach([30, 60, 90, 120], id: \.self) { value in
+                                Button(RestClock.label(seconds: value)) {
+                                    minutes = value / 60
+                                    seconds = value % 60
+                                }.buttonStyle(.bordered).frame(minHeight: 44)
+                                    .accessibilityLabel("Choisir " + RestClock.label(seconds: value))
+                            }
+                        }
                     }
                     HStack {
                         Picker("Minutes", selection: $minutes) {
@@ -39,10 +70,11 @@ struct RestTimerView: View {
                         Text("Choisis une durée supérieure à zéro.")
                             .font(.footnote).foregroundStyle(.secondary)
                     }
-                    Button(endsAt > 0 ? "Relancer le minuteur" : "Démarrer le repos") {
+                    Button(endsAt > 0 || pausedSeconds > 0 ? "Relancer avec la durée choisie" : "Démarrer le repos") {
                         endsAt = RestClock(seconds: duration).end.timeIntervalSince1970
+                        pausedSeconds = 0
                     }.buttonStyle(.borderedProminent).controlSize(.large).disabled(duration == 0)
-                    Text("Le décompte est conservé si tu changes d’écran ou quittes l’app. Cette première version n’émet pas de notification ni de son en arrière-plan.")
+                    Text("Le décompte et la pause sont conservés si tu changes d’écran ou quittes l’app. Cette première version n’émet pas de notification ni de son en arrière-plan.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }.padding(24)
             }

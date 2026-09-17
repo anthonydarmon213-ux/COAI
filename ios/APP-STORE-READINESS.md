@@ -41,7 +41,7 @@ L'acceptation finale appartient à Apple et ne peut être garantie.
 
 ## Manifeste technique
 
-`PrivacyInfo.xcprivacy` déclare l'usage UserDefaults du minuteur (trois clés
+`PrivacyInfo.xcprivacy` déclare l'usage UserDefaults du minuteur (quatre clés
 AppStorage propres à l'app), motif CA92.1. Il est intégré aux ressources Xcode.
 Le script de compilation vérifie sa présence et son contenu dans le bundle.
 Ce manifeste partiel ne déclare pas « aucune donnée collectée » : les données
@@ -81,7 +81,7 @@ Raccordements obligatoires avant activation :
    réponse serveur perdue, reprise, compte différent, restauration, renouvellement,
    expiration et remboursement. Pas de vraie transaction pour les tests.
 
-Preuves actuelles : compilation Release iPhone réussie et 16 tests XCTest (dont
+Preuves actuelles : compilation Release iPhone réussie et 18 tests XCTest (dont
 confirmation de livraison persistée et liée au bon compte). La séquence commune
 au service est testée : confirmation avant finalisation, erreur réseau,
 confirmation incorrecte et interruption pendant la livraison. Le contrôle
