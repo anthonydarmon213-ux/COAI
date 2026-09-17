@@ -8,6 +8,29 @@ Developer. Ne pas confondre connexion au portail et capacité de distribution.
 La préparation locale continue ; TestFlight et la soumission restent à débloquer.
 L'acceptation finale appartient à Apple et ne peut être garantie.
 
+## Barre native — retour iPhone du 17 septembre 2026
+
+Les captures fournies par Anthony montrent le formulaire de connexion puis
+l'écran Entraînement dans l'app physique. Il s'agit de preuves utilisateur,
+pas d'une validation complète de la connexion et de sa persistance par nos tests.
+
+Correction de la barre : quatre cellules verticales identiques, pictogrammes
+21 points dans un cadre 28 × 26, zones tactiles d'au moins 56 points de haut,
+teintes neutres et sélection champagne sur fond discret. Repos n'est plus
+horizontal. L'état sélectionné suit l'URL WebKit, y compris les changements
+de page sans rechargement ; aucun onglet n'est sélectionné sur la connexion.
+Masquage au clavier conservé. Navigation web supérieure en doublon encore
+à simplifier : cette livraison ne prétend pas refondre tout l'écran.
+
+Preuves : test UI sur simulateur SE réussi (alignement, largeur, zones tactiles,
+sélection Séance/Compte/Connexion et ouverture/fermeture Repos), capture inspectée
+dans `/tmp/coai-tabbar-alignment.xcresult`. 25 tests Swift et 54 contrôles noyau
+réussis, compilation Release iPhone et Debug signée réussies. TypeScript,
+lint, build web avec base factice, audit médias et diff vérifiés.
+Version installée sans désinstallation sur l'iPhone 17 Pro d'Anthony à 19:59,
+lancement confirmé à 20:00. Rendu physique après cette mise à jour encore à
+confirmer ; pas de publication web, TestFlight ou App Store.
+
 ## Checklist globale persistante — 17 septembre 2026
 
 « Testé localement » ne signifie ni testé en production ni prêt à publier.

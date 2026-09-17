@@ -35,15 +35,15 @@ struct COAIRootView: View {
                     }
                 }
                 if !keyboardVisible {
-                  HStack(spacing: 0) {
-                    destination("Séance", icon: "figure.strengthtraining.traditional", path: "/programme/entrainement")
+                  HStack(spacing: 4) {
+                    destination("Séance", icon: "dumbbell", path: "/programme/entrainement")
                     destination("RepCount", icon: "chart.bar", path: "/suivi/repcount")
-                    Button { showTimer = true } label: {
-                        Label("Repos", systemImage: "timer").labelStyle(.titleAndIcon)
-                            .font(.caption).frame(maxWidth: .infinity, minHeight: 50)
-                    }
+                    navigationItem("Repos", icon: "timer", selected: showTimer) { showTimer = true }
                     destination("Compte", icon: "person.crop.circle", path: "/compte/parametres")
-                }.padding(.horizontal, 8).background(.ultraThinMaterial)
+                  }
+                  .padding(.horizontal, 12).padding(.vertical, 8)
+                  .background(Color(red: 0.045, green: 0.065, blue: 0.075).ignoresSafeArea(edges: .bottom))
+                  .overlay(alignment: .top) { Rectangle().fill(.white.opacity(0.08)).frame(height: 0.5) }
                 }
             }
             .background(Color(red: 0.04, green: 0.07, blue: 0.09))
@@ -98,9 +98,29 @@ struct COAIRootView: View {
     }
 
     private func destination(_ title: String, icon: String, path: String) -> some View {
-        Button { browser.open(path: path) } label: {
-            VStack(spacing: 4) { Image(systemName: icon); Text(title) }
-                .font(.caption).frame(maxWidth: .infinity, minHeight: 50)
-        }.disabled(!browser.isReady)
+        let current = browser.currentURL?.path ?? ""
+        let prefix = path == "/programme/entrainement" ? "/programme" : path == "/compte/parametres" ? "/compte" : path
+        let selected = !showTimer && (current == prefix || current.hasPrefix(prefix + "/"))
+        return navigationItem(title, icon: icon, selected: selected) { browser.open(path: path) }
+            .disabled(!browser.isReady)
+    }
+
+    private func navigationItem(_ title: String, icon: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 21, weight: .medium))
+                    .frame(width: 28, height: 26)
+                Text(title).font(.caption2.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .foregroundStyle(selected ? Color(red: 0.88, green: 0.78, blue: 0.54) : Color(red: 0.65, green: 0.69, blue: 0.71))
+            .background(selected ? Color(red: 0.88, green: 0.78, blue: 0.54).opacity(0.10) : .clear, in: RoundedRectangle(cornerRadius: 16))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityIdentifier("native-tab-" + title)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

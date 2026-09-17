@@ -9,6 +9,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     @Published var isLoading = false
     @Published var isReady = false
     @Published var canGoBack = false
+    @Published private(set) var currentURL: URL?
     @Published var errorMessage: String?
     @Published var notice: String?
     var confirmResponse: ((Bool) -> Void)?
@@ -19,6 +20,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     private var authenticationAttempt: OAuthAttempt?
     private var authenticationTimeout: Task<Void, Never>?
     private var historyObservation: NSKeyValueObservation?
+    private var urlObservation: NSKeyValueObservation?
     let downloads = COAIDownload()
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -108,6 +110,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
 
     private func attachDelegates() {
         historyObservation?.invalidate()
+        urlObservation?.invalidate()
         webView.navigationDelegate = self
         webView.uiDelegate = self
         // Same-document navigation changes history without a didFinish callback.
@@ -115,6 +118,12 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             Task { @MainActor [weak self, weak view] in
                 guard let self, let view, self.webView === view else { return }
                 self.canGoBack = view.canGoBack
+            }
+        }
+        urlObservation = webView.observe(\.url, options: [.initial, .new]) { [weak self] view, _ in
+            Task { @MainActor [weak self, weak view] in
+                guard let self, let view, self.webView === view else { return }
+                self.currentURL = view.url
             }
         }
         // No injected authentication, no native-JavaScript bridge, no TLS exceptions.
@@ -162,6 +171,9 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
     <style>body{background:#101820;color:white;font:18px system-ui;padding:24px}button{display:block;padding:16px;margin:20px 0}</style>
     <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
+    <button onclick="history.pushState({}, '', '/programme/entrainement')">Simuler la page séance</button>
+    <button onclick="history.pushState({}, '', '/compte/parametres')">Simuler la page compte</button>
+    <button onclick="history.pushState({}, '', '/sign-in')">Simuler la connexion</button>
     <button onclick="save('png')">Ouvrir l’image de test</button>
     <button onclick="save('pdf')">Ouvrir le PDF de test</button>
     <button onclick="save('link')">Ouvrir l’image sans téléchargement</button>

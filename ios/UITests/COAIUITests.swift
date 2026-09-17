@@ -1,6 +1,46 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    @MainActor
+    func testNativeNavigationAlignmentAndActualPageSelection() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let titles = ["Séance", "RepCount", "Repos", "Compte"]
+        let tabs = titles.map { app.buttons["native-tab-" + $0] }
+        XCTAssertTrue(tabs[0].waitForExistence(timeout: 15))
+        for tab in tabs {
+            XCTAssertTrue(tab.isHittable)
+            XCTAssertGreaterThanOrEqual(tab.frame.height, 44)
+            XCTAssertGreaterThanOrEqual(tab.frame.width, 44)
+            XCTAssertEqual(tab.frame.minY, tabs[0].frame.minY, accuracy: 1)
+            XCTAssertEqual(tab.frame.width, tabs[0].frame.width, accuracy: 1)
+            XCTAssertFalse(tab.isSelected)
+        }
+        let session = app.webViews.buttons["Simuler la page séance"]
+        XCTAssertTrue(session.waitForExistence(timeout: 10))
+        session.tap()
+        let selected = NSPredicate(format: "selected == true")
+        expectation(for: selected, evaluatedWith: tabs[0])
+        waitForExpectations(timeout: 5)
+        let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        shot.name = "Barre native alignée — séance active — données fictives"
+        shot.lifetime = .keepAlways
+        add(shot)
+        app.webViews.buttons["Simuler la page compte"].tap()
+        expectation(for: selected, evaluatedWith: tabs[3])
+        waitForExpectations(timeout: 5)
+        XCTAssertFalse(tabs[0].isSelected)
+        app.webViews.buttons["Simuler la connexion"].tap()
+        expectation(for: NSPredicate(format: "selected == false"), evaluatedWith: tabs[3])
+        waitForExpectations(timeout: 5)
+        tabs[2].tap()
+        XCTAssertTrue(app.staticTexts["Ton temps de récupération"].waitForExistence(timeout: 5))
+        app.buttons["Fermer"].tap()
+        XCTAssertTrue(tabs[2].isHittable)
+    }
+
     // Run alone on a QA simulator while the COAI host is unreachable.
     // No injected error: exercises the real WebKit navigation failure.
     @MainActor
