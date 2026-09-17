@@ -19,7 +19,7 @@ Le prototype historique reste conservé mais n'est pas inclus dans la cible iOS.
 - Lecture vidéo inline configurée, démarrage par action utilisateur. Lecture,
   plein écran, reprise et verrouillage à vérifier sur l'appareil réel.
 - Durées de repos en minutes et secondes, échéance conservée sur cet appareil.
-  Pas de notification, alerte sonore en arrière-plan ni prescription de repos.
+  Alerte locale facultative après permission explicite, pas de prescription de repos.
 - Gestion de l'échec réseau et bouton de nouvelle tentative sans rejeu de POST.
 - Liens extérieurs soumis à confirmation. Pas de pont JavaScript natif, secret
   embarqué, dérogation TLS/ATS ou accès automatique aux capteurs.
@@ -199,7 +199,13 @@ xcodebuild -project ios/COAI.xcodeproj -scheme COAI -configuration Debug \
   -derivedDataPath ios/DerivedDataUITests CODE_SIGNING_ALLOWED=NO test
 ```
 
-Résultat du 17 septembre : 4 tests d'interface réussis sur iPhone 17 / iOS 26.5.
+Résultat du 17 septembre : 5 tests d'interface réussis sur iPhone 17 / iOS 26.5.
+Le scénario de notifications nécessite un simulateur avec permission vierge
+ou refusée et commutateur désactivé. Il refuse la demande si elle apparaît,
+vérifie le message et le lien Réglages puis utilise le minuteur sans notification.
+Le retour au premier plan effaçait ce message : les erreurs de permission sont
+maintenant indépendantes des messages de programmation. Ce test ne couvre pas
+la réception effective d'une alerte.
 Deux tests supplémentaires couvrent l'annulation de la demande système Google
 et la navigation récupération → retour natif → inscription. Ce dernier a révélé
 une flèche retour désactivée lors des navigations sans rechargement : corrigée

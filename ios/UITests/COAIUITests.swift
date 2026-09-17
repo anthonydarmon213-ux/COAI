@@ -2,6 +2,37 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testNotificationRefusalDoesNotBlockRestTimer() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Repos"].waitForExistence(timeout: 20))
+        app.buttons["Repos"].tap()
+        let toggle = app.switches["M’alerter à la fin du repos"]
+        reveal(toggle, in: app)
+        XCTAssertEqual(toggle.value as? String, "0", "Ce scénario nécessite des alertes désactivées.")
+        toggle.tap()
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let deny = system.alerts.buttons.matching(NSPredicate(format: "label IN %@", ["Refuser", "Ne pas autoriser", "Don’t Allow", "Don't Allow"])).firstMatch
+        // On subsequent runs iOS remembers the refusal and does not prompt again.
+        if deny.waitForExistence(timeout: 5) { deny.tap() }
+        XCTAssertTrue(app.buttons["Ouvrir les réglages de COAI"].waitForExistence(timeout: 10))
+        XCTAssertEqual(toggle.value as? String, "0")
+        app.buttons["Fermer"].tap()
+        app.buttons["Repos"].tap()
+        let stop = app.buttons["Arrêter et réinitialiser"]
+        if stop.exists { stop.tap() }
+        let start = app.buttons["Démarrer le repos"]
+        reveal(start, in: app)
+        start.tap()
+        let pause = app.buttons["Mettre en pause"]
+        reveal(pause, in: app, upward: false)
+        XCTAssertTrue(pause.isEnabled)
+        stop.tap()
+    }
+
+    @MainActor
     func testRegistrationAndPasswordRecoveryPagesAreReachable() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

@@ -44,6 +44,19 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Alerte de repos facultative — 17 septembre 2026
 
+### Refus de notification : message préservé
+
+Le cinquième test d'interface vérifie un refus de notification, le commutateur
+désactivé, le lien vers Réglages et le démarrage/arrêt du minuteur malgré ce refus.
+Il a détecté une disparition du message : la remise à jour de la programmation
+au retour au premier plan effaçait aussi l'information de permission. Les deux
+messages sont désormais séparés. Résultat après correction : **5 tests UI sans
+échec**, `/tmp/coai-ui-alert-message.xcresult`, 22 tests Swift et compilation
+Release iPhone non signée réussis. TypeScript, lint et build web passent aussi.
+Un premier refus système a été actionné lors du test précédent ; le dernier
+passage vérifie également le refus mémorisé par iOS. L'autorisation et la réception
+en arrière-plan restent non validées. Aucun compte ni paiement touché.
+
 ### Navigation native : retour après récupération — 17 septembre 2026
 
 Un test réel dans le simulateur a reproduit une flèche retour désactivée après

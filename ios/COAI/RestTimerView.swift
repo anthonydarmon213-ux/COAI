@@ -6,7 +6,9 @@ final class RestReminderService: ObservableObject {
     static let shared = RestReminderService()
     private static let identifier = "coai.rest.finished"
     private let center = UNUserNotificationCenter.current()
-    @Published var message: String?
+    @Published private var permissionMessage: String?
+    @Published private var schedulingMessage: String?
+    var message: String? { permissionMessage ?? schedulingMessage }
     @Published var requestingPermission = false
     private lazy var queue = RestReminderQueue(clear: { [weak self] in
         self?.center.removePendingNotificationRequests(withIdentifiers: [Self.identifier])
@@ -32,7 +34,7 @@ final class RestReminderService: ObservableObject {
         } catch {
             return "L’alerte n’a pas pu être programmée. Le minuteur continue dans l’app."
         }
-    }, report: { [weak self] in self?.message = $0 })
+    }, report: { [weak self] in self?.schedulingMessage = $0 })
 
     func update(enabled: Bool, endsAt: Double) {
         queue.update(end: enabled && endsAt.isFinite && endsAt > Date().timeIntervalSince1970
@@ -46,10 +48,10 @@ final class RestReminderService: ObservableObject {
         defer { requestingPermission = false }
         do {
             let allowed = try await center.requestAuthorization(options: [.alert, .sound])
-            message = allowed ? nil : "Tu peux autoriser les alertes dans les Réglages de l’iPhone. Le minuteur fonctionne aussi sans notification."
+            permissionMessage = allowed ? nil : "Tu peux autoriser les alertes dans les Réglages de l’iPhone. Le minuteur fonctionne aussi sans notification."
             return allowed
         } catch {
-            message = "Impossible d’activer les alertes pour le moment. Tu peux continuer sans notification."
+            permissionMessage = "Impossible d’activer les alertes pour le moment. Tu peux continuer sans notification."
             return false
         }
     }
