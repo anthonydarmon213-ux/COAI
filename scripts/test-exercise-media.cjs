@@ -13,6 +13,9 @@ const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+for (const nom of ['Goblet squat', 'Squat gobelet (kettlebell)', 'Rowing élastique', 'Rowing à l’élastique', 'Développé militaire haltères', 'Dumbbell shoulder press']) {
+  assert.equal(videoCoaiPourNom(nom), null, `Média non conforme : ${nom}`);
+}
 for (const nom of ['Tirage horizontal poitrine appuyée (chest supported row)', 'Rowing poitrine appuyée', 'Chest-supported row']) {
   assert.equal(photoCoaiPourNom(nom), null, nom);
   assert.equal(videoCoaiPourNom(nom), null, nom);

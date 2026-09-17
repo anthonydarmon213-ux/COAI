@@ -141,6 +141,9 @@ function normaliser(texte: string): string {
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {
   const normalise = normaliser(nom);
+  // Audit visuel : ces rushes ne correspondent pas aux fiches/photos actuelles.
+  // Goblet : sans charge ; rowing élastique : penché ; épaules : assis.
+  if (/goblet squat|squat gobelet|rowing elastique|rowing a l'elastique|developpe militaire halteres|developpe epaules halteres|dumbbell shoulder press/.test(normalise)) return null;
   // Une poulie ne démontre ni une machine à leviers ni un rowing poitrine appuyée.
   if (/poitrine appuyee|chest[ -]supported/.test(normalise)) return null;
   if (normalise.includes("tirage horizontal") && !["tirage horizontal", "tirage horizontal (machine)", "tirage horizontal poulie", "tirage horizontal a la poulie"].includes(normalise)) return null;
