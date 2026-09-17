@@ -222,14 +222,28 @@ modifie aucun compte ; seules les préférences locales du minuteur sont modifi�
 La page web de lancement utilise le site configuré normalement, sans compte de
 test injecté. Ce test ne prouve pas le fonctionnement du parcours connecté.
 
-Exécution (remplacer l'identifiant par un simulateur retourné par `simctl`) :
+Exécution (remplacer l'identifiant par un simulateur retourné par `simctl`).
+La réception et le refus d'alerte demandent des appareils QA distincts ; ne pas
+lancer tous les tests sans sélectionner leurs prérequis. Le test Fichiers reste
+en échec connu et le contrôle de confidentialité web attend son déploiement.
 
 ```sh
 xcrun simctl list devices available
 xcodebuild -project ios/COAI.xcodeproj -scheme COAI -configuration Debug \
   -destination 'platform=iOS Simulator,id=IDENTIFIANT_DU_SIMULATEUR' \
-  -derivedDataPath ios/DerivedDataUITests CODE_SIGNING_ALLOWED=NO test
+  -derivedDataPath ios/DerivedDataUITests \
+  -only-testing:COAIUITests/COAIUITests/testRestNotificationDeliveredInBackground \
+  CODE_SIGNING_ALLOWED=NO test
 ```
+
+Réception d'alerte (17 septembre) : test ci-dessus réussi seul sur le simulateur
+QA alertes iPhone SE / iOS 26.5, permission vierge ou acceptée. Il démarre
+30 secondes, revient à l'accueil iOS, vérifie titre visible et corps de la
+notification puis capture `XCUIScreen.main` (la capture de l'app Springboard
+seule peut omettre la bannière). Image inspectée : logo et message COAI présents.
+Preuve : `/tmp/coai-rest-delivery-visible.xcresult`. Fixture web Debug hors réseau,
+service d'alerte réel. Appareil physique, verrouillage, Concentration et arrêt
+forcé restent non vérifiés. Ne pas utiliser le simulateur de connexion personnelle.
 
 Résultat du 17 septembre : 5 tests d'interface réussis sur iPhone 17 / iOS 26.5.
 Le scénario de notifications nécessite un simulateur avec permission vierge

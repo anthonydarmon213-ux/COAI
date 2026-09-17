@@ -1,6 +1,45 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    // Run alone on the dedicated alert QA device. Do not combine with the
+    // refusal scenario: iOS remembers notification authorization per install.
+    @MainActor
+    func testRestNotificationDeliveredInBackground() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Repos"].waitForExistence(timeout: 15))
+        app.buttons["Repos"].tap()
+        let stop = app.buttons["Arrêter et réinitialiser"]
+        if stop.exists { stop.tap() }
+        app.buttons["Choisir 0 min 30 s"].tap()
+        let toggle = app.switches["M’alerter à la fin du repos"]
+        reveal(toggle, in: app)
+        if toggle.value as? String != "1" { toggle.tap() }
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let allow = system.alerts.buttons.matching(NSPredicate(format: "label IN %@", ["Autoriser", "Allow"])).firstMatch
+        if allow.waitForExistence(timeout: 5) { allow.tap() }
+        XCTAssertEqual(toggle.value as? String, "1", "Nécessite le simulateur dédié, avec alertes autorisées.")
+        let start = app.buttons["Démarrer le repos"]
+        reveal(start, in: app)
+        start.tap()
+        XCUIDevice.shared.press(.home)
+        let alert = system.staticTexts["Repos terminé"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 45), "Réception réelle attendue, pas seulement programmation.")
+        let visible = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: alert)
+        XCTAssertEqual(XCTWaiter.wait(for: [visible], timeout: 5), .completed)
+        XCTAssertTrue(system.staticTexts["Prêt pour la suite ? Retrouve ta séance dans COAI."].exists)
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Alerte COAI reçue hors de l'app"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        app.activate()
+        reveal(toggle, in: app)
+        if toggle.value as? String == "1" { toggle.tap() }
+        if stop.exists { stop.tap() }
+    }
+
     @MainActor
     func testJSONFileSavePicker() throws {
         continueAfterFailure = false

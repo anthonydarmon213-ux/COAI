@@ -25,7 +25,7 @@ pas encore une expérience native complète validée.
 | 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux. Partage natif PNG/PDF vérifié avec fichiers fictifs dans le simulateur ; vraie fiche connectée, séance complète, historique et appareil physique restent à vérifier. |
 | 7. Check-ins, adaptations et mémoire | Restant : validation iOS | Moteur et routes existants. Vérifier persistance, isolation des comptes, confirmations, cohérence des adaptations et absence d'appel payant. |
 | 8. Abonnements Apple | En cours + intervention humaine | Service StoreKit préparé mais non raccordé. Catalogue, droits serveur, achat, essai, restauration, expiration et résiliation restent à réaliser et tester. Tarifs/migration à valider. |
-| 9. Notifications et réengagement | En cours | Alerte locale facultative de repos ajoutée. Concurrence et refus de permission testés ; réception réelle en arrière-plan encore non vérifiée. Réengagement consenti non implémenté. |
+| 9. Notifications et réengagement | En cours | Concurrence, refus de permission et réception visible en arrière-plan testés sur simulateur. Appareil physique, écran verrouillé et réengagement consenti restent à vérifier/implémenter. |
 | 10. Suppression sécurisée | En cours | Résiliation Stripe, erreurs Auth/Storage et reprise après profil supprimé couvertes par tests avec doublures. Restent concurrence, révocation de sessions et test intégral sur compte jetable autorisé. |
 
 Terminé et testé **au niveau technique local seulement** : règles de navigation,
@@ -41,6 +41,22 @@ Restant transversal : audit confidentialité, sécurité et charge backend,
 accessibilité/clavier/safe areas, captures App Store réelles, description exacte,
 compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
+
+## Notification de repos — réception vérifiée sur simulateur
+
+Le test `testRestNotificationDeliveredInBackground` démarre un vrai repos de
+30 secondes, place l'app en arrière-plan et attend la notification système.
+Il vérifie son titre visible et son texte, puis capture l'écran complet.
+Capture inspectée : bannière « Repos terminé », logo COAI et message exact.
+Résultat réussi : `/tmp/coai-rest-delivery-visible.xcresult`, iPhone SE simulé,
+iOS 26.5, appareil QA distinct réservé aux autorisations acceptées.
+La page web est une fixture Debug hors réseau ; le minuteur et le service de
+notification sont ceux de l'app. Aucun compte ou service payant utilisé.
+
+Cela ne valide pas un iPhone physique, l'écran verrouillé, les modes Concentration,
+l'app arrêtée de force, TestFlight ou une notification de réengagement serveur.
+Les tests de refus doivent tourner sur un autre simulateur : la permission iOS
+persiste. Le test remet le minuteur à zéro et désactive son option d'alerte.
 
 ## Traceurs facultatifs dans le pilote iOS — 17 septembre 2026
 
