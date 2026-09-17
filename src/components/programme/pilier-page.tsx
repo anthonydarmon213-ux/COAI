@@ -153,7 +153,7 @@ export async function PilierPage({
   );
   const photosParPilier = await Promise.all(
     contenusAffiches.map((contenu, index) =>
-      index === indexPilierActif && contenu && !estSocleCoai(contenu)
+      PILIERS[index] !== "ENTRAINEMENT" && index === indexPilierActif && contenu && !estSocleCoai(contenu)
         ? getStockPhotos(extractPhotoQueries(contenu))
         : Promise.resolve(undefined)
     )

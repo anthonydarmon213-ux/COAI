@@ -104,7 +104,6 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["curl marteau", "hammer curl"], fichier: "curl-marteau-homme-blond" },
   { motifs: ["presse à cuisses", "presse a cuisses", "leg press"], fichier: "presse-a-cuisses-machine" },
   { motifs: ["hip thrust barre", "barbell hip thrust"], fichier: "hip-thrust-barre" },
-  { motifs: ["rowing poitrine appuyée", "rowing poitrine appuyee", "chest supported row"], fichier: "rowing-haltere-unilateral-homme-arabe" },
   { motifs: ["rowing haltère unilatéral", "rowing haltere unilateral", "one arm dumbbell row", "single arm dumbbell row"], fichier: "rowing-haltere-unilateral-homme-arabe" },
   { motifs: ["traction à la barre fixe", "traction a la barre fixe", "tractions barre fixe", "pull-up", "pull up"], fichier: "traction-barre-fixe-femme-blonde" },
   { motifs: ["rowing à l'élastique", "rowing a l'elastique", "rowing élastique", "rowing elastique", "resistance band row"], fichier: "rowing-elastique-homme-blond" },
@@ -142,7 +141,7 @@ const TABLE: EntreePhoto[] = [
   // compte autant que dans le premier lot : les motifs les plus
   // spécifiques passent avant les génériques qui les captureraient.
   { motifs: ["superman"], fichier: "superman-au-sol" },
-  { motifs: ["écarté", "ecarte", "chest fly", "pec deck", "butterfly"], fichier: "ecarte-halteres-banc-plat" },
+  { motifs: ["écarté haltères", "ecarte halteres", "dumbbell fly"], fichier: "ecarte-halteres-banc-plat" },
   // "dips sur banc" avant "dips" : le premier travaille les triceps, le
   // second les pectoraux — deux exercices et deux photos distinctes.
   { motifs: ["dips sur banc", "dips banc", "bench dips"], fichier: "dips-banc-triceps" },
@@ -254,6 +253,8 @@ function correspond(entree: EntreePhoto, normalise: string) {
 
 export function photoCoaiPourNom(nom: string, genre?: GenreVisuel): string | null {
   const normalise = normaliser(nom);
+  // Ces variantes n'ont pas de photo exacte validée : aucun repli voisin.
+  if (/poitrine appuyee|chest[ -]supported|etirement assis ecarte|pec deck|butterfly/.test(normalise)) return null;
   const variante = VARIANTES.find((e) => correspond(e, normalise));
   if (variante && genre && variante[genre]) return `/exercices/${variante[genre]}.jpg`;
   if (variante && !genre) return `/exercices/${variante.fichier}.jpg`;

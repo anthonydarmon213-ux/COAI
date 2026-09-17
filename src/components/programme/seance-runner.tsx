@@ -276,7 +276,6 @@ export function SeanceRunner({
   echauffement,
   exercices,
   retourAuCalme,
-  photosParExercice,
   onClose,
 }: {
   cleBrouillon?: string | null;
@@ -724,9 +723,8 @@ export function SeanceRunner({
             })()}
 
             {step.type === "set" && (() => {
-              const photoQuery = typeof step.exercice.photoQuery === "string" ? step.exercice.photoQuery : undefined;
               const nomActif = substitutions[step.nom]?.variante ?? step.nom;
-              const photoUrl = photoCoaiPourNom(nomActif) ?? (!substitutions[step.nom] && photoQuery ? photosParExercice?.[photoQuery] : null);
+              const photoUrl = photoCoaiPourNom(nomActif);
               const videoDisponible = Boolean(videoCoaiPourNom(nomActif));
               const cle = `${step.exerciceIndex}-${step.setIndex}`;
               const saisi = realise[cle] ?? { reps: "", charge: "" };
