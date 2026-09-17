@@ -123,6 +123,7 @@ enum NavigationPolicy {
     // Keep in sync with purchasePaths and test on-device before any distribution.
     static let contentRules = #"""
     [
+      {"trigger":{"url-filter":"^https://(www\\.)?coai\\.fr/","url-filter-is-case-sensitive":false},"action":{"type":"css-display-none","selector":"aside.coai-app-nav"}},
       {"trigger":{"url-filter":"^https://(www\\.)?coai\\.fr/api/stripe[/?]","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
       {"trigger":{"url-filter":"^https://(www\\.)?coai\\.fr/api/stripe$","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
       {"trigger":{"url-filter":"^https://([^/]+\\.)?stripe\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},

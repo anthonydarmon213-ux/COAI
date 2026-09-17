@@ -136,7 +136,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         do {
             let rules: WKContentRuleList = try await withCheckedThrowingContinuation { continuation in
                 WKContentRuleListStore.default().compileContentRuleList(
-                    forIdentifier: "coai-ios-pilot-no-purchases-or-trackers-v2",
+                    forIdentifier: "coai-ios-pilot-native-navigation-v3",
                     encodedContentRuleList: NavigationPolicy.contentRules
                 ) { rules, error in
                     if let rules { continuation.resume(returning: rules) }
@@ -170,6 +170,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         return """
     <!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
     <style>body{background:#101820;color:white;font:18px system-ui;padding:24px}button{display:block;padding:16px;margin:20px 0}</style>
+    <aside class="coai-app-nav"><nav><button>Ancienne navigation web</button></nav></aside>
     <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
     <button onclick="history.pushState({}, '', '/programme/entrainement')">Simuler la page séance</button>
     <button onclick="history.pushState({}, '', '/compte/parametres')">Simuler la page compte</button>
@@ -200,8 +201,13 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
 
     func open(path: String) {
         cancelAuthentication()
-        guard isReady, let url = URL(string: path, relativeTo: NavigationPolicy.baseURL)?.absoluteURL,
-              NavigationPolicy.decide(url) == .inside else { return }
+        guard isReady, let url = URL(string: path, relativeTo: NavigationPolicy.baseURL)?.absoluteURL else { return }
+        let decision = NavigationPolicy.decide(url)
+        if decision == .purchasesUnavailable {
+            notice = "Les achats et la gestion de l’abonnement ne sont pas activés dans ce pilote iPhone. Ce lien a été bloqué."
+            return
+        }
+        guard decision == .inside else { return }
         load(url)
     }
 

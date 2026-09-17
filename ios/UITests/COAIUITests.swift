@@ -2,6 +2,41 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testNativeExplorerReplacesWebSidebarWithoutHidingContent() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.webViews.buttons["Ancienne navigation web"].exists)
+        XCTAssertTrue(app.buttons["native-tab-Séance"].isHittable)
+        let explorer = app.buttons["Explorer COAI"]
+        XCTAssertTrue(explorer.isHittable)
+        explorer.tap()
+        for path in ["/dashboard", "/programme/entrainement", "/suivi/repcount", "/programme/alimentation", "/programme/recuperation", "/coach"] {
+            XCTAssertTrue(app.buttons["explore-" + path].waitForExistence(timeout: 5))
+        }
+        let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        shot.name = "Explorer natif — rubriques principales"
+        shot.lifetime = .keepAlways
+        add(shot)
+        let settings = app.buttons["explore-/compte/parametres"]
+        reveal(settings, in: app)
+        XCTAssertTrue(settings.isHittable, "La déconnexion reste accessible dans Réglages.")
+        app.buttons["Fermer"].tap()
+        XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].exists)
+        XCTAssertTrue(app.buttons["native-tab-Repos"].isHittable)
+        explorer.tap()
+        let subscription = app.buttons["explore-/compte/abonnement"]
+        reveal(subscription, in: app)
+        subscription.tap()
+        XCTAssertTrue(app.alerts["COAI"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.alerts.staticTexts["Les achats et la gestion de l’abonnement ne sont pas activés dans ce pilote iPhone. Ce lien a été bloqué."].exists)
+        app.alerts.buttons["Compris"].tap()
+        XCTAssertTrue(app.buttons["native-tab-Repos"].isHittable)
+    }
+
+    @MainActor
     func testNativeNavigationAlignmentAndActualPageSelection() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

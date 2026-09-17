@@ -23,9 +23,20 @@ struct IOSCoreChecks {
             check(NavigationPolicy.decide(URL(string: value)!) == .purchasesUnavailable, "payment navigation")
         }
         let rules = try JSONSerialization.jsonObject(with: Data(NavigationPolicy.contentRules.utf8)) as! [[String: Any]]
-        let expressions = try rules.map { rule in
+        let expressions = try rules.filter { ($0["action"] as? [String: Any])?["type"] as? String == "block" }.map { rule in
             let trigger = rule["trigger"] as! [String: Any]
             return try NSRegularExpression(pattern: trigger["url-filter"] as! String, options: [.caseInsensitive])
+        }
+        let cosmetic = rules.filter { ($0["action"] as? [String: Any])?["type"] as? String == "css-display-none" }
+        check(cosmetic.count == 1, "one scoped native navigation cosmetic rule")
+        check((cosmetic[0]["action"] as? [String: Any])?["selector"] as? String == "aside.coai-app-nav", "only duplicated sidebar hidden")
+        let cosmeticTrigger = cosmetic[0]["trigger"] as! [String: Any]
+        let cosmeticExpression = try NSRegularExpression(pattern: cosmeticTrigger["url-filter"] as! String, options: [.caseInsensitive])
+        for value in ["https://coai.fr/programme/entrainement", "https://www.coai.fr/compte/profil"] {
+            check(cosmeticExpression.firstMatch(in: value, range: NSRange(value.startIndex..., in: value)) != nil, "native sidebar hidden on COAI only")
+        }
+        for value in ["https://other.example/", "https://coai.fr.evil.example/", "https://accounts.google.com/"] {
+            check(cosmeticExpression.firstMatch(in: value, range: NSRange(value.startIndex..., in: value)) == nil, "external pages unchanged")
         }
         func blockedResource(_ value: String) -> Bool {
             expressions.contains { $0.firstMatch(in: value, range: NSRange(value.startIndex..., in: value)) != nil }

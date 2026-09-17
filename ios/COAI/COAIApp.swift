@@ -11,6 +11,8 @@ struct COAIApp: App {
 struct COAIRootView: View {
     @StateObject private var browser = COAIWebModel()
     @State private var showTimer = false
+    @State private var showExplorer = false
+    @State private var explorerDestination: String?
     @State private var showLocalReset = false
     @State private var keyboardVisible = false
     private let gold = Color(red: 0.88, green: 0.73, blue: 0.31)
@@ -47,12 +49,17 @@ struct COAIRootView: View {
                 }
             }
             .background(Color(red: 0.04, green: 0.07, blue: 0.09))
-            .navigationTitle("COAI · test iPhone")
+            .navigationTitle("COAI")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button { browser.goBack() } label: { Image(systemName: "chevron.left") }
                         .disabled(!browser.canGoBack).accessibilityLabel("Page précédente")
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button { showExplorer = true } label: { Image(systemName: "square.grid.2x2") }
+                        .accessibilityLabel("Explorer COAI")
+                        .disabled(!browser.isReady)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -73,6 +80,16 @@ struct COAIRootView: View {
         }
         .task { await browser.start() }
         .sheet(isPresented: $showTimer) { RestTimerView() }
+        .sheet(isPresented: $showExplorer, onDismiss: {
+            guard let path = explorerDestination else { return }
+            explorerDestination = nil
+            browser.open(path: path)
+        }) {
+            COAIExplorerView { path in
+                explorerDestination = path
+                showExplorer = false
+            }
+        }
         // Buttons resolve the WebKit callback exactly once; a binding dismissal must not
         // cancel a destructive confirmation before its button action has run.
         .alert("COAI", isPresented: Binding(get: { browser.notice != nil }, set: { _ in })) {
@@ -122,5 +139,83 @@ struct COAIRootView: View {
         .accessibilityLabel(title)
         .accessibilityIdentifier("native-tab-" + title)
         .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+/// All destinations removed with the web sidebar remain reachable here.
+/// This is navigation only; authentication and access rights stay on the server.
+private struct COAIExplorerView: View {
+    @Environment(\.dismiss) private var dismiss
+    let open: (String) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Au quotidien") {
+                    entry("Aujourd’hui", "sun.max", "/dashboard")
+                    entry("Mon entraînement", "dumbbell", "/programme/entrainement")
+                    entry("RepCount", "chart.bar", "/suivi/repcount")
+                    entry("Nutrition", "leaf", "/programme/alimentation")
+                    entry("Récupération", "moon", "/programme/recuperation")
+                    entry("Mon coach", "bubble.left", "/coach")
+                }
+                Section("Entraînement") {
+                    entry("Fiche du jour", "doc.text", "/programme/seance-du-jour")
+                    entry("Bibliothèque d’exercices", "figure.strengthtraining.traditional", "/programme/exercices")
+                    entry("Programmes prêts", "square.stack", "/programme/programmes-prets")
+                    entry("Correction de mouvement", "figure.flexibility", "/programme/correction-mouvement")
+                    entry("Historique des séances", "clock", "/suivi/seances")
+                    entry("Vidéos exclusives", "play.rectangle", "/videos")
+                }
+                Section("Nutrition et récupération") {
+                    entry("Recettes", "fork.knife", "/programme/recettes")
+                    entry("Suivi des macros", "chart.pie", "/suivi/alimentation")
+                    entry("Protocoles de récupération", "moon.stars", "/programme/programmes-prets?categorie=RECUPERATION")
+                }
+                Section("Mes progrès") {
+                    entry("Progression", "chart.xyaxis.line", "/suivi/progression")
+                    entry("Mes records", "trophy", "/suivi/tests-maxi")
+                    entry("Poids et mensurations", "ruler", "/suivi/mesures")
+                    entry("Activité quotidienne", "figure.walk", "/programme/evolution")
+                }
+                Section("Le club") {
+                    entry("COAI Club", "person.2", "/club")
+                    entry("Articles et conseils", "text.book.closed", "/conseils")
+                    entry("Fonctionnalités", "sparkles", "/fonctionnalites")
+                    entry("Donner mon avis", "star.bubble", "/avis")
+                }
+                Section {
+                    entry("Mon profil", "person", "/compte/profil")
+                    entry("Réglages et déconnexion", "gearshape", "/compte/parametres")
+                    // The existing pilot purchase guard still handles this route.
+                    entry("Abonnement", "creditcard", "/compte/abonnement")
+                } header: {
+                    Text("Mon compte")
+                } footer: {
+                    Text("Version de test iPhone")
+                }
+            }
+            .navigationTitle("Explorer")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Fermer") { dismiss() }
+                }
+            }
+        }
+        .presentationDragIndicator(.visible)
+    }
+
+    private func entry(_ title: String, _ icon: String, _ path: String) -> some View {
+        Button { open(path) } label: {
+            HStack(spacing: 14) {
+                Image(systemName: icon).frame(width: 24).foregroundStyle(Color(red: 0.88, green: 0.78, blue: 0.54))
+                Text(title).foregroundStyle(Color(white: 0.92))
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right").font(.caption).foregroundStyle(Color(white: 0.5))
+            }.frame(minHeight: 44).contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("explore-" + path)
     }
 }

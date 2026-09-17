@@ -8,6 +8,33 @@ Developer. Ne pas confondre connexion au portail et capacité de distribution.
 La préparation locale continue ; TestFlight et la soumission restent à débloquer.
 L'acceptation finale appartient à Apple et ne peut être garantie.
 
+## Navigation supérieure simplifiée — 17 septembre 2026
+
+À la demande d'Anthony, le doublon `aside.coai-app-nav` est masqué seulement
+dans le WebKit de l'app, via une règle cosmétique limitée à coai.fr/www.coai.fr.
+Pas de changement du site, du DOM d'authentification ni de pont JavaScript.
+Un explorateur SwiftUI restitue les 26 destinations du menu et des sous-menus,
+regroupées par usage ; leurs routes existent dans le dépôt. Réglages conserve
+la déconnexion. Les restrictions d'achat du pilote restent actives et un clic
+sur Abonnement affiche leur explication, sans ouverture de paiement.
+Titre natif raccourci à COAI ; mention de version de test dans l'explorateur.
+
+Tests : 25 Swift, 61 contrôles noyau et compilation effective des règles WebKit
+réussis ; deux tests UI sur SE réussis dans
+`/tmp/coai-explorer-hitarea.xcresult`. Ils vérifient le masquage du doublon sans
+masquer le contenu, les rubriques principales, l'accès à Réglages, la fermeture,
+le clic Abonnement et son message, puis l'alignement/la sélection des onglets.
+Un échec intermédiaire a révélé que les espaces vides des lignes n'étaient pas
+tactiles avec le style sobre : corrigé par une zone rectangulaire complète.
+Les destinations s'ouvrent après fermeture du menu pour éviter les présentations
+concurrentes. Captures finales inspectées. Release arm64, Debug signée,
+TypeScript, lint, build web sur base factice et audit médias réussis.
+
+Installation sans désinstallation confirmée sur l'iPhone 17 Pro à 20:36,
+lancement confirmé à 20:37. Rendu connecté sur l'appareil encore à confirmer :
+les tests UI utilisent des données fictives, pas le compte personnel. Aucun
+déploiement web, push GitHub, TestFlight ou envoi App Store effectué.
+
 ## Barre native — retour iPhone du 17 septembre 2026
 
 Les captures fournies par Anthony montrent le formulaire de connexion puis
