@@ -26,6 +26,8 @@ Le prototype historique reste conservé mais n'est pas inclus dans la cible iOS.
 - Téléchargements COAI PDF/PNG/JPEG (15 Mio maximum) vers la feuille de partage
   native, avec annulation et nettoyage temporaire. Vérifiés sur fichiers fictifs
   dans le simulateur ; vraies fiches connectées et iPhone physique à vérifier.
+- « Enregistrer l'image » demande uniquement l'ajout à Photos. Acceptation et
+  refus testés sur image fictive ; fichier enregistré comparé à sa source.
 
 **L'interface principale reste web dans ce pilote**, pas une réécriture native
 des séances. Ce lot sert à vérifier l'intégration et les limites WebKit avant
@@ -195,6 +197,13 @@ Il ne remplace aucun compte et n'appelle aucun service distant. La fixture est
 absente du binaire Release. Dernière régression : 6 tests UI sans échec sur
 iPhone SE / iOS 26.5, saisie d'inscription exclue de cette passe ; 24 tests Swift.
 Les résultats et limites sont détaillés dans `APP-STORE-READINESS.md`.
+
+Deux autres scénarios vérifient la sauvegarde Photos et son refus. Ils remettent
+à zéro uniquement la permission Photos de COAI dans le simulateur de test,
+et sauvegardent seulement le PNG fictif. Ne pas les lancer sur un appareil
+personnel ni sur le simulateur réservé à la connexion manuelle d'Anthony.
+Régression du 17 septembre : **8 scénarios sans échec**, saisie d'inscription
+exclue de cette passe ; aucun compte connecté ni paiement.
 
 La saisie d'inscription dispose aussi d'un scénario autonome :
 `testSignupFieldsAndPasswordVisibilityWithKeyboard`. Il entre uniquement des

@@ -17,6 +17,7 @@
     </dict></array>
     <key>NSCameraUsageDescription</key><string>COAI utilise l’appareil photo lorsque tu choisis de prendre une photo ou une vidéo pour ton suivi.</string>
     <key>NSPhotoLibraryUsageDescription</key><string>COAI accède aux photos que tu choisis d’ajouter à ton profil ou à ton suivi.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key><string>COAI ajoute l’image que tu choisis d’enregistrer dans Photos, sans accéder aux autres photos de ta bibliothèque.</string>
     <key>NSMicrophoneUsageDescription</key><string>Le microphone peut être utilisé lorsque tu choisis d’enregistrer une vidéo avec du son pour ton suivi.</string>
     <key>UILaunchScreen</key><dict/>
     <key>UIApplicationSceneManifest</key><dict><key>UIApplicationSupportsMultipleScenes</key><false/></dict>

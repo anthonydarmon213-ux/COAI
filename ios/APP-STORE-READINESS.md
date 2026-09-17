@@ -44,6 +44,30 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Téléchargements et partage natif — 17 septembre 2026
 
+### Sauvegarde Photos : permission minimale vérifiée
+
+Le test de l'action « Enregistrer l'image » a révélé une demande d'accès à
+**toute la photothèque**. L'ajout de `NSPhotoLibraryAddUsageDescription` fait
+désormais demander uniquement l'ajout du fichier. Dialogue système inspecté
+visuellement : aucune lecture des autres photos demandée par cette action.
+Le script de contrôle vérifie que cette déclaration reste présente.
+
+Deux scénarios supplémentaires passent : accepter l'ajout d'un PNG fictif,
+et refuser sans bloquer la page COAI. Le fichier créé dans Photos sur le
+simulateur de test a été comparé octet par octet au PNG fictif (68 octets) :
+identique. Aucune photo personnelle lue ou supprimée. Les tests remettent à
+zéro uniquement la permission Photos de COAI dans leur simulateur de test.
+
+Preuves : `/tmp/coai-photo-add-only.xcresult`,
+`/tmp/coai-photo-refusal.xcresult`. Régression finale : **8 tests UI sans échec**
+sur iPhone SE / iOS 26.5, `/tmp/coai-photo-regression.xcresult` ; seul le test de
+saisie d'inscription déjà validé auparavant est exclu. 24 tests Swift, Release
+iPhone non signée, TypeScript, lint et build web réussis. Les neuf scénarios
+existent dans la cible UI. Cela ne valide pas une Story réelle connectée,
+Instagram/TikTok, les autres versions d'iOS ou un appareil physique.
+
+Référence : https://developer.apple.com/documentation/bundleresources/information-property-list/nsphotolibraryaddusagedescription
+
 Les liens de fichiers temporaires `blob:` étaient refusés par la navigation du
 pilote. Le navigateur prend maintenant en charge les téléchargements WebKit et
 ouvre la feuille de partage iOS pour les PDF, PNG et JPEG autorisés. Aucun pont
@@ -70,7 +94,7 @@ Ce lot ne modifie ni le contenu, ni les visuels, ni la mise en page des fiches.
   et build web avec base factice réussis. Aucun achat ou compte modifié.
 
 **Non validé** : export d'une vraie fiche connectée, branche HTTP
-`Content-Disposition: attachment`, actions de sauvegarde Photos/Fichiers,
+`Content-Disposition: attachment`, sauvegarde dans Fichiers,
 publication Instagram/TikTok, iPhone physique et version distribuée. Ce lot ne
 branche pas `window.print()` sur l'impression native et ne démontre pas que tous
 les boutons de partage web utilisent ce nouveau chemin. Le parcours 6 reste ouvert.

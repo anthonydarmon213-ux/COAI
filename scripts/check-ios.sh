@@ -16,6 +16,8 @@ xcrun --sdk macosx swiftc -swift-version 5 ios/COAI/Core/NavigationPolicy.swift 
 "$task_check_dir/checks"
 swiftc -frontend -parse ios/COAI/COAIApp.swift ios/COAI/COAIWebView.swift ios/COAI/RestTimerView.swift ios/COAI/ApplePurchaseService.swift ios/COAI/Core/PurchaseDelivery.swift ios/COAI/COAIDownload.swift ios/COAI/Core/DownloadPolicy.swift
 plutil -lint ios/COAI/Info.plist ios/COAI.xcodeproj/project.pbxproj
+# A share-sheet image save must not fall back to asking for full-library access.
+test -n "$(/usr/libexec/PlistBuddy -c 'Print :NSPhotoLibraryAddUsageDescription' ios/COAI/Info.plist)"
 plutil -lint ios/COAI/PrivacyInfo.xcprivacy
 xmllint --noout ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme
 

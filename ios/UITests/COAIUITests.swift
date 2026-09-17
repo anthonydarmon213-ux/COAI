@@ -2,6 +2,61 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testSavingFictitiousImageToPhotosKeepsAppUsable() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.resetAuthorizationStatus(for: .photos)
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let link = app.webViews.buttons["Ouvrir l’image de test"]
+        XCTAssertTrue(link.waitForExistence(timeout: 10))
+        link.tap()
+        let save = app.cells["Enregistrer l’image"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let allow = system.alerts.buttons.matching(NSPredicate(format: "label IN %@", ["Autoriser l’ajout de photos", "Autoriser", "Allow Access to Add Photos", "Allow"])).firstMatch
+        XCTAssertTrue(allow.waitForExistence(timeout: 10))
+        XCTAssertTrue(system.alerts.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "sans accéder aux autres photos")).firstMatch.exists)
+        XCTAssertFalse(system.alerts.buttons["Autoriser l’accès complet"].exists)
+        let permission = XCTAttachment(screenshot: app.screenshot())
+        permission.name = "Autorisation d’ajout de la seule image fictive"
+        permission.lifetime = .keepAlways
+        add(permission)
+        allow.tap()
+        XCTAssertTrue(app.otherElements["LP.CaptionBar.TopCaption"].waitForNonExistence(timeout: 10))
+        XCTAssertEqual(app.state, .runningForeground)
+        XCTAssertTrue(link.isHittable)
+        // Only the fixed test PNG is saved. No existing image is read or removed.
+    }
+
+    @MainActor
+    func testRefusingPhotoSaveDoesNotBlockTheApp() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.resetAuthorizationStatus(for: .photos)
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let link = app.webViews.buttons["Ouvrir l’image de test"]
+        XCTAssertTrue(link.waitForExistence(timeout: 10))
+        link.tap()
+        let save = app.cells["Enregistrer l’image"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let deny = system.alerts.buttons["Ne pas autoriser"]
+        XCTAssertTrue(deny.waitForExistence(timeout: 10))
+        deny.tap()
+        XCTAssertTrue(app.otherElements["LP.CaptionBar.TopCaption"].waitForNonExistence(timeout: 10))
+        XCTAssertEqual(app.state, .runningForeground)
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Retour après refus de sauvegarde Photos"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        XCTAssertTrue(link.isHittable)
+    }
+
+    @MainActor
     func testFileDownloadOpensNativeShareAndKeepsPage() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
