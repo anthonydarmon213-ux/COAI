@@ -19,6 +19,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     private var authenticationAttempt: OAuthAttempt?
     private var authenticationTimeout: Task<Void, Never>?
     private var historyObservation: NSKeyValueObservation?
+    let downloads = COAIDownload()
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         webView.window ?? ASPresentationAnchor()
@@ -134,12 +135,50 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             webView.configuration.userContentController.add(rules)
             installedRules = rules
             isReady = true
+            #if DEBUG
+            // Fixed, offline UI fixture only. No arbitrary URL, account or auth bypass.
+            if ProcessInfo.processInfo.arguments.contains("-COAIDownloadFixture") {
+                webView.loadHTMLString(Self.downloadFixture, baseURL: NavigationPolicy.baseURL.appendingPathComponent("native-download-fixture"))
+                return
+            }
+            #endif
             load(lastRequestedURL)
         } catch {
             // Fail closed: never load the site if pilot purchase blocking failed to install.
             errorMessage = "La protection de cette version de test n’a pas pu démarrer. Réessaie."
         }
     }
+
+    #if DEBUG
+    private static let downloadFixture: String = {
+        let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 300, height: 200))
+        let pdf = renderer.pdfData { context in
+            context.beginPage()
+            ("Document fictif COAI — test local" as NSString).draw(at: CGPoint(x: 20, y: 30), withAttributes: nil)
+        }.base64EncodedString()
+        return """
+    <!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>body{background:#101820;color:white;font:18px system-ui;padding:24px}button{display:block;padding:16px;margin:20px 0}</style>
+    <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
+    <button onclick="save('png')">Ouvrir l’image de test</button>
+    <button onclick="save('pdf')">Ouvrir le PDF de test</button>
+    <button onclick="save('link')">Ouvrir l’image sans téléchargement</button>
+    <button onclick="save('invalid')">Tester le format refusé</button>
+    <script>
+    function save(kind) {
+      const invalid = kind === 'invalid';
+      const encoded = kind === 'pdf' ? '\(pdf)' : 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aCfoAAAAASUVORK5CYII=';
+      const bytes = invalid ? new TextEncoder().encode('<html>Non exportable</html>') : Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+      const blob = new Blob([bytes], {type:invalid?'text/html':kind==='pdf'?'application/pdf':'image/png'});
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+      if (kind === 'link') { link.target = '_blank'; } else { link.download = invalid?'../../unsafe.html':kind==='pdf'?'test.pdf':'test.png'; }
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+    }
+    </script>
+    """
+    }()
+    #endif
 
     func open(path: String) {
         cancelAuthentication()
@@ -171,6 +210,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     func clearLocalSession() {
+        downloads.cancel()
         cancelAuthentication()
         guard isReady else { return }
         isReady = false
@@ -202,6 +242,22 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard isReady else { decisionHandler(.cancel); return }
         guard let url = action.request.url else { decisionHandler(.cancel); return }
+        if action.shouldPerformDownload || url.scheme == "blob" {
+            let source = action.sourceFrame.securityOrigin
+            let trustedFrame = action.sourceFrame.isMainFrame && source.protocol == "https"
+                && ["coai.fr", "www.coai.fr"].contains(source.host) && [0, 443].contains(source.port)
+            if !downloads.isBusy, trustedFrame,
+               DownloadPolicy.permits(url: url, source: action.sourceFrame.request.url,
+                   mainFrame: action.targetFrame?.isMainFrame != false,
+                   method: action.request.httpMethod, downloadAttribute: action.shouldPerformDownload,
+                   linkActivated: action.navigationType == .linkActivated) {
+                decisionHandler(.download)
+            } else {
+                decisionHandler(.cancel)
+                notice = downloads.isBusy ? "Termine ou annule le partage en cours avant d’ouvrir un autre fichier." : "Ce téléchargement n’est pas autorisé depuis cette page."
+            }
+            return
+        }
         // Media embeds are not top-level navigation. Remote payment resources are blocked by content rules.
         if action.targetFrame?.isMainFrame == false { decisionHandler(.allow); return }
         if url.host == NativeOAuth.authHost {
@@ -249,6 +305,20 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             decisionHandler(.cancel)
             return
         }
+        if response.isForMainFrame {
+            let disposition = (response.response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Disposition") ?? ""
+            if disposition.lowercased().hasPrefix("attachment") || !response.canShowMIMEType {
+                guard !downloads.isBusy, let url = response.response.url, DownloadPolicy.trustedURL(url),
+                      DownloadPolicy.format(mime: response.response.mimeType, length: response.response.expectedContentLength) != nil else {
+                    decisionHandler(.cancel)
+                    isLoading = false
+                    notice = "Ce fichier ne peut pas être ouvert ici, ou un partage est déjà en cours."
+                    return
+                }
+                decisionHandler(.download)
+                return
+            }
+        }
         decisionHandler(.allow)
     }
 
@@ -260,6 +330,18 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         isLoading = false
         canGoBack = webView.canGoBack
+    }
+
+    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
+        guard self.webView === webView else { download.cancel(nil); return }
+        isLoading = false
+        downloads.begin(download)
+    }
+
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        guard self.webView === webView else { download.cancel(nil); return }
+        isLoading = false
+        downloads.begin(download)
     }
 
     func resolveDialog(_ confirmed: Bool) {

@@ -22,7 +22,7 @@ pas encore une expérience native complète validée.
 | 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
 | 5. Entraînement, nutrition, récupération | En cours | Routes existantes et minuteur natif. Vérifier droits, médias, fiches et navigation sur petits écrans avec données réelles de test. |
-| 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux : erreurs, brouillon et reprise. Séance complète, historique, export et partage natif à vérifier sur appareil. |
+| 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux. Partage natif PNG/PDF vérifié avec fichiers fictifs dans le simulateur ; vraie fiche connectée, séance complète, historique et appareil physique restent à vérifier. |
 | 7. Check-ins, adaptations et mémoire | Restant : validation iOS | Moteur et routes existants. Vérifier persistance, isolation des comptes, confirmations, cohérence des adaptations et absence d'appel payant. |
 | 8. Abonnements Apple | En cours + intervention humaine | Service StoreKit préparé mais non raccordé. Catalogue, droits serveur, achat, essai, restauration, expiration et résiliation restent à réaliser et tester. Tarifs/migration à valider. |
 | 9. Notifications et réengagement | En cours | Alerte locale facultative de repos ajoutée. Concurrence et refus de permission testés ; réception réelle en arrière-plan encore non vérifiée. Réengagement consenti non implémenté. |
@@ -30,7 +30,7 @@ pas encore une expérience native complète validée.
 
 Terminé et testé **au niveau technique local seulement** : règles de navigation,
 horloge/pause persistante, séquencement des livraisons d'achats et des alertes
-(22 XCTest), compilation simulateur et Release iPhone sans signature.
+(24 XCTest), compilation simulateur et Release iPhone sans signature.
 
 Blocages humains identifiés : adhésion Apple Developer (coût non autorisé),
 contrats/validation Apple, catalogue et conditions commerciales iOS, autorisation
@@ -41,6 +41,43 @@ Restant transversal : audit confidentialité, sécurité et charge backend,
 accessibilité/clavier/safe areas, captures App Store réelles, description exacte,
 compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
+
+## Téléchargements et partage natif — 17 septembre 2026
+
+Les liens de fichiers temporaires `blob:` étaient refusés par la navigation du
+pilote. Le navigateur prend maintenant en charge les téléchargements WebKit et
+ouvre la feuille de partage iOS pour les PDF, PNG et JPEG autorisés. Aucun pont
+JavaScript ni copie de cookies : le téléchargement reste géré par WebKit.
+Ce lot ne modifie ni le contenu, ni les visuels, ni la mise en page des fiches.
+
+- Origines COAI HTTPS uniquement, destinations de paiement toujours refusées,
+  contrôle des redirections et des types MIME, taille maximale de 15 Mio,
+  vérification de l'en-tête du fichier avant partage.
+- Un seul fichier à la fois ; annulation explicite et délai maximal de 60 s.
+  Nom local générique, répertoire temporaire UUID propre à l'app avec protection
+  de fichiers, nettoyage après fermeture et des restes au prochain démarrage.
+- La feuille iOS laisse choisir l'action à l'utilisateur : aucun destinataire
+  choisi, envoi, publication ou sauvegarde externe automatique.
+- Un septième scénario UI utilise une page **fictive hors réseau, Debug seulement** :
+  PNG, PDF, lien image sans attribut de téléchargement, refus d'un fichier HTML,
+  fermeture de la feuille et conservation de la page. Réussi et capture inspectée.
+  La fixture n'est pas présente dans le binaire Release (contrôle des chaînes).
+- Régression finale sur iPhone SE (3e génération), iOS 26.5 : **6 tests UI,
+  zéro échec**, `/tmp/coai-download-regression-ui.xcresult`. Le test de saisie
+  d'inscription, déjà passé plus tôt sur ce même modèle, n'a pas été relancé dans
+  ce lot à cause des longues attentes d'animation de XCUITest.
+- 24 tests Swift, compilation Release iPhone arm64 non signée, TypeScript, lint
+  et build web avec base factice réussis. Aucun achat ou compte modifié.
+
+**Non validé** : export d'une vraie fiche connectée, branche HTTP
+`Content-Disposition: attachment`, actions de sauvegarde Photos/Fichiers,
+publication Instagram/TikTok, iPhone physique et version distribuée. Ce lot ne
+branche pas `window.print()` sur l'impression native et ne démontre pas que tous
+les boutons de partage web utilisent ce nouveau chemin. Le parcours 6 reste ouvert.
+
+Références Apple consultées :
+- https://developer.apple.com/documentation/webkit/wkdownloaddelegate
+- https://developer.apple.com/documentation/webkit/wknavigationaction/shouldperformdownload
 
 ## Saisie d'inscription dans l'app — 17 septembre 2026
 

@@ -18,6 +18,7 @@ struct COAIRootView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                DownloadStatus(downloads: browser.downloads)
                 if let error = browser.errorMessage {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.circle").font(.largeTitle).accessibilityHidden(true)

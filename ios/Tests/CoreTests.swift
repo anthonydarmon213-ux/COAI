@@ -2,6 +2,46 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testDownloadOriginAndGesturePolicy() {
+        let source = URL(string: "https://coai.fr/programme/entrainement")!
+        func permits(_ value: String, source: URL? = source, main: Bool = true,
+                     method: String = "GET", attribute: Bool = true, clicked: Bool = false) -> Bool {
+            DownloadPolicy.permits(url: URL(string: value)!, source: source, mainFrame: main,
+                                   method: method, downloadAttribute: attribute, linkActivated: clicked)
+        }
+        XCTAssertTrue(permits("blob:https://coai.fr/123"))
+        XCTAssertTrue(permits("blob:https://coai.fr/123", attribute: false, clicked: true))
+        XCTAssertFalse(permits("blob:https://coai.fr/123", attribute: false))
+        XCTAssertTrue(permits("https://coai.fr/api/programmes/entrainement/pdf"))
+        for url in ["blob:null/123", "blob:https://coai.fr.evil.test/123", "blob:http://coai.fr/123",
+                    "data:image/png,aaa", "file:///tmp/a.png", "https://evil.test/a.pdf",
+                    "https://coai.fr:4000/a.pdf", "https://coai.fr/api/stripe/checkout",
+                    "https://coai.fr/checkout", "https://checkout.stripe.com/a.pdf"] {
+            XCTAssertFalse(permits(url), url)
+        }
+        XCTAssertFalse(permits("blob:https://coai.fr/123", source: URL(string: "https://evil.test/")))
+        XCTAssertFalse(permits("blob:https://coai.fr/123", source: nil))
+        XCTAssertFalse(permits("blob:https://coai.fr/123", main: false))
+        XCTAssertFalse(permits("https://coai.fr/a.pdf", method: "POST"))
+    }
+
+    func testDownloadFormatsSizeAndSignatures() {
+        XCTAssertEqual(DownloadPolicy.format(mime: "application/pdf", length: -1), .pdf)
+        XCTAssertEqual(DownloadPolicy.format(mime: "IMAGE/PNG", length: 8), .png)
+        XCTAssertEqual(DownloadPolicy.format(mime: "image/jpeg", length: DownloadPolicy.maximumBytes), .jpg)
+        XCTAssertNil(DownloadPolicy.format(mime: "image/png", length: DownloadPolicy.maximumBytes + 1))
+        XCTAssertNil(DownloadPolicy.format(mime: "application/pdf", length: 0))
+        for mime in ["text/html", "image/svg+xml", "application/octet-stream"] {
+            XCTAssertNil(DownloadPolicy.format(mime: mime, length: 300))
+        }
+        XCTAssertTrue(DownloadPolicy.validHeader(Data("%PDF-1.4".utf8), format: .pdf))
+        XCTAssertTrue(DownloadPolicy.validHeader(Data([137, 80, 78, 71, 13, 10, 26, 10]), format: .png))
+        XCTAssertTrue(DownloadPolicy.validHeader(Data([255, 216, 255, 224]), format: .jpg))
+        XCTAssertFalse(DownloadPolicy.validHeader(Data("<html>".utf8), format: .pdf))
+        XCTAssertFalse(DownloadPolicy.validHeader(Data(), format: .png))
+        XCTAssertFalse(DownloadPolicy.validHeader(Data("%PDF-1.4".utf8), format: .jpg))
+    }
+
     @MainActor
     func testReminderStopBeforeSchedulingPreventsAdd() async {
         let entered = expectation(description: "Permission lookup started")

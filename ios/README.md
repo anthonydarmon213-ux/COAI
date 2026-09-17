@@ -23,6 +23,9 @@ Le prototype historique reste conservé mais n'est pas inclus dans la cible iOS.
 - Gestion de l'échec réseau et bouton de nouvelle tentative sans rejeu de POST.
 - Liens extérieurs soumis à confirmation. Pas de pont JavaScript natif, secret
   embarqué, dérogation TLS/ATS ou accès automatique aux capteurs.
+- Téléchargements COAI PDF/PNG/JPEG (15 Mio maximum) vers la feuille de partage
+  native, avec annulation et nettoyage temporaire. Vérifiés sur fichiers fictifs
+  dans le simulateur ; vraies fiches connectées et iPhone physique à vérifier.
 
 **L'interface principale reste web dans ce pilote**, pas une réécriture native
 des séances. Ce lot sert à vérifier l'intégration et les limites WebKit avant
@@ -113,7 +116,8 @@ L'expiration réelle dans l'UI et une connexion Google réussie restent à véri
   annulation, expiration et relance à vérifier. Apple et liens email restent
   à implémenter/tester ; aucun retour universel configuré dans ce lot.
 - Séance : bon utilisateur, programme autorisé, médias exacts, vidéo jouable,
-  PDF/partage/téléchargement et formulaires clavier. Export PDF natif non implémenté.
+  PDF/partage/téléchargement et formulaires clavier. Téléchargements natifs ajoutés,
+  mais impression `window.print()` non raccordée et vrais exports non validés.
 - RepCount : enregistrement unique et relecture serveur, pas seulement affichage.
 - Suppression compte : annuler puis confirmer sur un compte jetable, vérifier
   serveur et déconnexion ; ne jamais tester en supprimant un client réel.
@@ -182,6 +186,15 @@ Références :
 - https://developer.apple.com/programs/enroll/
 
 ## Test d'interface reproductible — 17 septembre 2026
+
+Le scénario `testFileDownloadOpensNativeShareAndKeepsPage` lance une page locale
+fictive avec `-COAIDownloadFixture` (compilation Debug uniquement). Il vérifie
+PNG, PDF et lien `blob:` sans attribut de téléchargement dans la vraie feuille
+iOS, ferme celle-ci sans choisir de destinataire, puis vérifie le refus HTML.
+Il ne remplace aucun compte et n'appelle aucun service distant. La fixture est
+absente du binaire Release. Dernière régression : 6 tests UI sans échec sur
+iPhone SE / iOS 26.5, saisie d'inscription exclue de cette passe ; 24 tests Swift.
+Les résultats et limites sont détaillés dans `APP-STORE-READINESS.md`.
 
 La saisie d'inscription dispose aussi d'un scénario autonome :
 `testSignupFieldsAndPasswordVisibilityWithKeyboard`. Il entre uniquement des

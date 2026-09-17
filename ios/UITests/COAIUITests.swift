@@ -2,6 +2,44 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testFileDownloadOpensNativeShareAndKeepsPage() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let link = app.webViews.buttons["Ouvrir l’image de test"]
+        XCTAssertTrue(link.waitForExistence(timeout: 10))
+        link.tap()
+        let file = app.otherElements["LP.CaptionBar.TopCaption"]
+        XCTAssertTrue(file.waitForExistence(timeout: 10))
+        XCTAssertEqual(file.label, "COAI-document")
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Partage iOS d’un fichier local de test"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        // Close the system share sheet, never choose a recipient or publish.
+        let close = app.buttons.matching(NSPredicate(format: "label == %@ OR label == %@", "Fermer", "Close")).firstMatch
+        XCTAssertTrue(close.exists)
+        close.tap()
+        XCTAssertTrue(link.waitForExistence(timeout: 5))
+        app.webViews.buttons["Ouvrir le PDF de test"].tap()
+        XCTAssertTrue(file.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["LP.CaptionBar.BottomCaption"].label.contains("PDF"))
+        close.tap()
+        let imageLink = app.webViews.buttons["Ouvrir l’image sans téléchargement"]
+        reveal(imageLink, in: app)
+        imageLink.tap()
+        XCTAssertTrue(file.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["LP.CaptionBar.BottomCaption"].label.contains("PNG"))
+        close.tap()
+        reveal(app.webViews.buttons["Tester le format refusé"], in: app)
+        app.webViews.buttons["Tester le format refusé"].tap()
+        XCTAssertTrue(app.alerts["Fichier COAI"].waitForExistence(timeout: 5))
+        app.alerts.buttons["Compris"].tap()
+        XCTAssertTrue(app.webViews.buttons["Tester le format refusé"].isHittable)
+    }
+
+    @MainActor
     func testSignupFieldsAndPasswordVisibilityWithKeyboard() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
