@@ -46,6 +46,20 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ### Export de compte JSON — vérification native locale
 
+**Contrôle supplémentaire : échec d'intégration Fichiers à investiguer.**
+Le test `testJSONFileSavePicker` sélectionne réellement l'action « Enregistrer
+dans Fichiers », mais le sélecteur/son bouton d'annulation n'est pas observable
+sur le simulateur SE après 30 secondes. Résultats en échec conservés :
+`/tmp/coai-json-file-picker-v2.xcresult`, `/tmp/coai-json-file-picker-v3.xcresult`.
+Le processus Apple SaveToFiles est lancé ; ses logs montrent des erreurs
+FileProvider et un fournisseur iCloud non authentifié. Ce n'est pas une preuve
+que l'absence de connexion iCloud soit la cause unique. Aucun compte iCloud
+connecté, fichier réel enregistré ou réglage système modifié pour contourner.
+Le test reste volontairement rouge, sans masquer cet écart par un skip.
+Il faut isoler fournisseur local / présentation / interrogation XCUITest,
+puis tester une vraie sauvegarde et relire le fichier. Les réussites ci-dessous
+portent uniquement sur la validation du format et la feuille de partage.
+
 Le bouton web « Exporter mes données » fabrique un Blob `application/json` qui
 était refusé par le pilote. Le téléchargement accepte maintenant ce format et
 valide le document complet (objet JSON, limite 15 Mio), pas seulement son nom

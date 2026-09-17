@@ -2,6 +2,31 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testJSONFileSavePicker() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let export = app.webViews.buttons["Exporter les données fictives"]
+        XCTAssertTrue(export.waitForExistence(timeout: 10))
+        reveal(export, in: app)
+        export.tap()
+        let save = app.cells["Enregistrer dans Fichiers"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        let picker = XCUIApplication(bundleIdentifier: "com.apple.DocumentManagerUICore.SaveToFiles")
+        // Known open integration failure on the current SE simulator. Do not
+        // replace this assertion with a pass/skip: opening Share is not saving.
+        let cancel = picker.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
+        XCTAssertTrue(cancel.waitForExistence(timeout: 30))
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Destination de l'export JSON fictif"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        cancel.tap()
+    }
+
+    @MainActor
     func testJSONExportAndMalformedRejection() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
