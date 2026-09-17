@@ -6,6 +6,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const states = [], refs = [];
 let si=0, ri=0, fail='timeout';
+let onboarding=false;
 const requests=[];
 const storage = new Map();
 let effects=[];
@@ -43,7 +44,7 @@ const component=load('src/components/suivi/repcount.tsx',name=>{
   if(name==='@/lib/analytics/first-saved-conversion')return {firstSavedConversionId:async()=>null};
   return {};
 });
-function render(){si=0;ri=0;effects=[];return component.RepCount({exercices:[],hasAccess:true,userId:'test-user'});}
+function render(){si=0;ri=0;effects=[];return component.RepCount({exercices:[],hasAccess:true,userId:'test-user',onboarding});}
 function all(node){if(!node)return [];if(Array.isArray(node))return node.flatMap(all);if(typeof node!=='object')return [];return [node,...all(node.props?.children)];}
 function text(node){if(Array.isArray(node))return node.map(text).join('');if(typeof node==='object'&&node)return text(node.props?.children);return node??'';}
 function button(label){return all(render()).find(n=>n.type==='button'&&text(n)===label);}
@@ -105,5 +106,18 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   button('Continuer en séance libre').props.onClick();
   assert.equal(states[7].length,1,'Leaving the sequence preserves completed work');
   assert.equal(states[20].length,0);
-  console.log('PASS RepCount workflow: timed-out save unlocks and preserves draft, identical retry, restore, account isolation, old drafts, reuse sequence, preserve work');
+  // First-use shortcut must become a real editable series before any network wait.
+  states.length=0; refs.length=0; storage.clear(); onboarding=true; fail='timeout';
+  input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});
+  await button('Enregistrer mon premier repère →').props.onClick();
+  assert.equal(states[5].length,1,'Failed first save remains visible in editor');
+  render(); effects[0](); render(); effects[1]();
+  const firstDraft=draft.parseDraft(storage.get(draft.draftKey('test-user')));
+  assert.equal(firstDraft.sets.length,1,'Draft effect must not erase first series');
+  const previous=requests.at(-1);
+  fail=false;
+  await button('Terminer et enregistrer la séance').props.onClick();
+  assert.deepEqual(requests.at(-1),previous,'First-use retry keeps same transaction identity');
+  assert.ok(text(render()).includes('Premier repère posé ✓'));
+  console.log('PASS RepCount workflow: timed-out save and first-use shortcut preserve series and identical retry; restore, account isolation, sequence reuse');
 })().catch(error=>{console.error(error);process.exitCode=1;});

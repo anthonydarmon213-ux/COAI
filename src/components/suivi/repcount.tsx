@@ -500,6 +500,9 @@ export function RepCount({
     }
     const dateSauvegarde = sauvegardeRef.current.date;
     requeteEnCoursRef.current = true;
+    // The onboarding shortcut supplies a series not yet present in state.
+    // Keep it in the editor so a failed save cannot be erased by the draft effect.
+    setSets(seriesAEnregistrer);
     persistDraft(seriesAEnregistrer);
     setErreur(null);
     setEnregistrementEnCours(true);
