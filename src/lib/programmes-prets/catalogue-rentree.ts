@@ -137,7 +137,6 @@ export const PROGRAMMES_RENTREE: ProgrammePret[] = [
     visuels: [
       { nom: "Fentes bulgares", photoFemme: "/exercices/fentes-bulgares.jpg" },
       { nom: "Pont fessier", photoHomme: "/exercices/pont-fessier-homme-metis-v2.jpg" },
-      { nom: "Hip thrust barre", photoHomme: "/exercices/hip-thrust-barre.jpg" },
       { nom: "Kickback élastique", photoFemme: "/exercices/kickback-fessier-elastique.jpg" },
       { nom: "Abduction de hanche", photoFemme: "/exercices/abduction-hanche-elastique.jpg" },
     ],
@@ -148,7 +147,7 @@ export const PROGRAMMES_RENTREE: ProgrammePret[] = [
       { periode: "Semaines 5-6", titre: "Intensification", contenu: "4 séries sur le mouvement principal et une série longue contrôlée sur l'isolation, sans aller à l'échec technique." },
     ],
     jours: [
-      { jour: "Séance A", focus: "Extension lourde", contenu: "Hip thrust 4 x 8-10, goblet squat 3 x 10-12, fente arrière 3 x 10 par jambe et abduction élastique 3 x 18." },
+      { jour: "Séance A", focus: "Jambes et fessiers", contenu: "Goblet squat 3 x 10-12, fente arrière 3 x 10 par jambe et abduction élastique 3 x 18." },
       { jour: "Séance B", focus: "Unilatéral & stabilité", contenu: "Fente bulgare 4 x 8-10 par jambe, step-up 3 x 10, RDL unijambiste 3 x 10 et gainage latéral 3 x 25 s." },
       { jour: "Séance C", focus: "Volume & contrôle", contenu: "Soulevé de terre roumain 4 x 8-10, pont fessier 3 x 15, kickback 3 x 15 par côté et frog pumps 2 x 25." },
     ],
