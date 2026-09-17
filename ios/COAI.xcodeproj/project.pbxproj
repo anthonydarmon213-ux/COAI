@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A00000000000000000000020 = {isa = PBXBuildFile; fileRef = B00000000000000000000020; };
 		A00000000000000000000010 = {isa = PBXBuildFile; fileRef = B00000000000000000000010; };
 		A00000000000000000000011 = {isa = PBXBuildFile; fileRef = B00000000000000000000011; };
 		A00000000000000000000009 = {isa = PBXBuildFile; fileRef = B00000000000000000000009; };
@@ -19,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B00000000000000000000020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITests/COAIUITests.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000021 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = COAIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePurchaseService.swift; sourceTree = "<group>"; };
 		B00000000000000000000011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseDelivery.swift; sourceTree = "<group>"; };
 		B00000000000000000000009 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -48,6 +51,7 @@
 			children = (
 				C00000000000000000000002 /* COAI */,
 				C00000000000000000000004 /* Products */,
+				B00000000000000000000020,
 			);
 			sourceTree = "<group>";
 		};
@@ -80,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				B00000000000000000000007 /* COAI.app */,
+				B00000000000000000000021,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,6 +92,17 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E00000000000000000000020 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F00000000000000000000020;
+			buildPhases = (D00000000000000000000020,);
+			buildRules = ();
+			dependencies = (E00000000000000000000021,);
+			name = COAIUITests;
+			productName = COAIUITests;
+			productReference = B00000000000000000000021;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		E00000000000000000000001 /* COAI */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F00000000000000000000002 /* Build configuration list for PBXNativeTarget "COAI" */;
@@ -105,6 +121,8 @@
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
+		E00000000000000000000021 = {isa = PBXTargetDependency; target = E00000000000000000000001; targetProxy = E00000000000000000000022; };
+		E00000000000000000000022 = {isa = PBXContainerItemProxy; containerPortal = E00000000000000000000002; proxyType = 1; remoteGlobalIDString = E00000000000000000000001; remoteInfo = COAI; };
 
 /* Begin PBXProject section */
 		E00000000000000000000002 /* Project object */ = {
@@ -133,6 +151,7 @@
 			projectRoot = "";
 			targets = (
 				E00000000000000000000001 /* COAI */,
+				E00000000000000000000020,
 			);
 		};
 /* End PBXProject section */
@@ -150,6 +169,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D00000000000000000000020 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000020,); runOnlyForDeploymentPostprocessing = 0; };
 		D00000000000000000000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -167,6 +187,18 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		F20000000000000000000020 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = fr.coai.mobile.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = COAI;
+			};
+			name = Debug;
+		};
 		F10000000000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -232,6 +264,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F00000000000000000000020 = {isa = XCConfigurationList; buildConfigurations = (F20000000000000000000020,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
 		F00000000000000000000001 /* Build configuration list for PBXProject "COAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

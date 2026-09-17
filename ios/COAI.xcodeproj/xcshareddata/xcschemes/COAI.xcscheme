@@ -5,7 +5,11 @@
       <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E00000000000000000000001" BuildableName="COAI.app" BlueprintName="COAI" ReferencedContainer="container:COAI.xcodeproj"/>
     </BuildActionEntry></BuildActionEntries>
   </BuildAction>
-  <TestAction buildConfiguration="Debug" shouldUseLaunchSchemeArgsEnv="YES"/>
+  <TestAction buildConfiguration="Debug" shouldUseLaunchSchemeArgsEnv="YES">
+    <Testables><TestableReference skipped="NO">
+      <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E00000000000000000000020" BuildableName="COAIUITests.xctest" BlueprintName="COAIUITests" ReferencedContainer="container:COAI.xcodeproj"/>
+    </TestableReference></Testables>
+  </TestAction>
   <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" allowLocationSimulation="YES">
     <BuildableProductRunnable runnableDebuggingMode="0"><BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="E00000000000000000000001" BuildableName="COAI.app" BlueprintName="COAI" ReferencedContainer="container:COAI.xcodeproj"/></BuildableProductRunnable>
   </LaunchAction>

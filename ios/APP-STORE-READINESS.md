@@ -44,6 +44,18 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Alerte de repos facultative — 17 septembre 2026
 
+Mise à jour de vérification : un vrai test XCUITest du minuteur passe désormais
+sur iPhone 17 simulé / iOS 26.5 : démarrage, pause, fermeture/réouverture,
+redémarrage du processus, reprise et arrêt. Capture finale exportée et inspectée.
+Résultat final : `/tmp/coai-ui-smoke-final-20260917.xcresult`, 2 tests sans échec.
+Le second vérifie aussi la page publique de connexion chargée depuis COAI,
+l'ouverture des touches du clavier, le champ accessible et la barre native
+masquée. Aucun identifiant saisi et aucun formulaire envoyé. La capture initiale
+montrait les conseils du clavier iOS : le test attend désormais les vraies touches.
+La cible est conservée dans le dépôt et les instructions sont dans `ios/README.md`.
+Cela dépasse les tests du calcul, mais ne prouve ni la réception des notifications,
+ni le parcours connecté, ni un test sur iPhone physique ou en production.
+
 - Permission demandée uniquement après activation explicite du commutateur.
   Aucun abonnement, serveur de notifications ni appel payant ajouté.
 - Message local générique, sans données de santé ni identifiant de compte.

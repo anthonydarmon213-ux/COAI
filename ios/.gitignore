@@ -2,5 +2,6 @@
 .swiftpm/
 DerivedData/
 DerivedDataDevice/
+DerivedDataUITests/
 *.xcuserstate
 xcuserdata/

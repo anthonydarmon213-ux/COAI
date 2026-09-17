@@ -180,3 +180,31 @@ Références :
 - https://developer.apple.com/documentation/webkit/wkwebview/
 - https://developer.apple.com/app-store/review/guidelines/
 - https://developer.apple.com/programs/enroll/
+
+## Test d'interface reproductible — 17 septembre 2026
+
+Le schéma COAI contient désormais la cible `COAIUITests`. Le test ouvre la vraie
+app, utilise Repos, démarre deux minutes, met en pause, ferme/réouvre la fiche,
+termine puis relance le processus, reprend et arrête. Il n'achète rien et ne
+modifie aucun compte ; seules les préférences locales du minuteur sont modifiées.
+La page web de lancement utilise le site configuré normalement, sans compte de
+test injecté. Ce test ne prouve pas le fonctionnement du parcours connecté.
+
+Exécution (remplacer l'identifiant par un simulateur retourné par `simctl`) :
+
+```sh
+xcrun simctl list devices available
+xcodebuild -project ios/COAI.xcodeproj -scheme COAI -configuration Debug \
+  -destination 'platform=iOS Simulator,id=IDENTIFIANT_DU_SIMULATEUR' \
+  -derivedDataPath ios/DerivedDataUITests CODE_SIGNING_ALLOWED=NO test
+```
+
+Résultat du 17 septembre : 2 tests d'interface réussis sur iPhone 17 / iOS 26.5.
+Le second charge la connexion publique réelle, ouvre le clavier (y compris la
+fermeture du conseil iOS de premier usage), attend ses touches et vérifie que
+la barre Repos disparaît tandis que le champ reste accessible. Aucun identifiant
+saisi ni formulaire envoyé. Capture du minuteur inspectée ; captures de connexion
+conservées dans le résultat de test. En complément : 22 tests unitaires Swift.
+Restent les alertes système, les autres écrans, l'accessibilité étendue et
+l'appareil physique. Les anciens blocages de contrôle UI ci-dessus sont un
+historique, pas la situation de ce test XCUITest.
