@@ -17,7 +17,7 @@ pas encore une expérience native complète validée.
 
 | Parcours | État réel | Preuve / travail restant avant validation |
 | --- | --- | --- |
-| 1. Installation et ouverture | En cours | Builds simulateur, Release arm64 non signé et Debug iPhone signé réussis. Une ancienne COAI test est présente sur iPhone 17 Pro ; mise à jour du binaire actuel et tests physiques restent à effectuer. Archive de distribution et TestFlight non validés. |
+| 1. Installation et ouverture | En cours | Builds simulateur, Release arm64 non signé et Debug iPhone signé réussis. Mise à jour du binaire actuel installée sur iPhone 17 Pro après accord ; lancement refusé car appareil verrouillé. Tests physiques, archive de distribution et TestFlight non validés. |
 | 2. Compte et connexion | En cours | Connexion publique, annulation Google, retour de récupération et saisie d'inscription contrôlés dans l'app simulée. Connexion persistante réelle, confirmation/récupération email et option Apple encore à valider/compléter. |
 | 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
@@ -44,6 +44,16 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Accès appareil et signature réévalués — 17 septembre, 19 h 25
 
+Mise à jour 19 h 35 : Anthony a donné son accord. `devicectl device install app`
+a réussi sur l'iPhone 17 Pro avec le bundle existant `fr.coai.mobile`, sans
+désinstallation ni réinitialisation demandée. Résultat enregistré dans
+`/tmp/coai-iphone-update-result.json`. L'app installée provient du build signé
+contrôlé ci-dessous. Les données et sessions ne sont pas lues pour ce contrôle.
+Le lancement a échoué avec le motif système **Locked** (FBSOpenApplicationError
+7), pas une erreur applicative démontrée : `/tmp/coai-iphone-launch-result.json`.
+Déverrouillage personnel demandé. Ne pas présenter l'installation réussie comme
+un lancement ou un parcours connecté validé. Aucun achat ni publication Apple.
+
 `devicectl` détecte maintenant l'iPhone 17 Pro appairé, joignable, iOS 26.1,
 mode développeur activé. `fr.coai.mobile` (COAI test 0.1.0, build 1) y est déjà
 installé ; cela ne démontre pas qu'il s'agit du code actuel. L'iPhone 13 Pro
@@ -58,9 +68,9 @@ Le profil existant expire le 19 septembre 2026 à 21:22:02 UTC. C'est une signat
 de développement temporaire, pas une validation des droits App Store/TestFlight.
 L'ancienne mention « appareil hors ligne » ne décrit donc plus cet état.
 
-Demande explicite adressée à Anthony avant mise à jour de son app existante.
-Aucune installation, désinstallation, réinitialisation ou lecture des données
-personnelles effectuée. Parcours connecté, sauvegarde, paiements et lancement du
+À l'issue du premier contrôle, la mise à jour attendait l'accord d'Anthony ;
+l'installation ultérieure est consignée ci-dessus. Aucune désinstallation,
+réinitialisation ou lecture des données personnelles. Parcours connecté, sauvegarde, paiements et lancement du
 nouveau binaire sur cet appareil non validés. Adhésion Developer toujours non
 confirmée ; ne pas assimiler certificat de développement et droit de publication.
 
