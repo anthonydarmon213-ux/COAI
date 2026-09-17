@@ -60,6 +60,18 @@ Il faut isoler fournisseur local / présentation / interrogation XCUITest,
 puis tester une vraie sauvegarde et relire le fichier. Les réussites ci-dessous
 portent uniquement sur la validation du format et la feuille de partage.
 
+Investigation complémentaire : lancement de l'app système Fichiers puis accès
+à Explorer sur le simulateur QA. « Sur mon iPhone » est disponible et vide ;
+aucun document ouvert/créé et aucune connexion iCloud tentée. Refaire l'export
+après cette initialisation ne résout pas l'échec du sélecteur (30 s).
+Preuves : `/tmp/coai-files-initialization.xcresult` et
+`/tmp/coai-files-locations.xcresult`. L'initialisation manquante de Fichiers ne
+suffit donc pas à expliquer l'échec. Le code exploratoire qui journalisait
+l'arbre d'accessibilité de Fichiers n'est pas conservé dans les tests réguliers.
+Prochaine isolation : présentation UIKit / extension système, puis comparaison
+sur appareil. Ne pas activer le partage de tout le dossier Documents de l'app
+pour contourner cet échec : cela pourrait exposer des fichiers privés.
+
 Le bouton web « Exporter mes données » fabrique un Blob `application/json` qui
 était refusé par le pilote. Le téléchargement accepte maintenant ce format et
 valide le document complet (objet JSON, limite 15 Mio), pas seulement son nom
