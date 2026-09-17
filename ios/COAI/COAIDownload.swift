@@ -81,7 +81,7 @@ final class COAIDownload: NSObject, ObservableObject, WKDownloadDelegate {
               let type = DownloadPolicy.format(mime: response.mimeType, length: response.expectedContentLength),
               (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true else {
             completionHandler(nil)
-            if active === download { cancel(message: "Ce fichier n’est pas un PDF ou une image COAI pris en charge (15 Mo maximum).") }
+            if active === download { cancel(message: "Ce format n’est pas pris en charge. Utilise un PDF, une image ou un export JSON COAI (15 Mo maximum).") }
             return
         }
         do {
@@ -119,7 +119,13 @@ final class COAIDownload: NSObject, ObservableObject, WKDownloadDelegate {
             guard size > 0, size <= DownloadPolicy.maximumBytes else { throw CocoaError(.fileReadCorruptFile) }
             let handle = try FileHandle(forReadingFrom: file)
             defer { try? handle.close() }
-            guard DownloadPolicy.validHeader(try handle.read(upToCount: 8) ?? Data(), format: format) else {
+            let valid: Bool
+            if format == .json {
+                valid = DownloadPolicy.validJSONDocument(try handle.read(upToCount: Int(DownloadPolicy.maximumBytes) + 1) ?? Data())
+            } else {
+                valid = DownloadPolicy.validHeader(try handle.read(upToCount: 8) ?? Data(), format: format)
+            }
+            guard valid else {
                 throw CocoaError(.fileReadCorruptFile)
             }
             deadline?.cancel()
@@ -128,7 +134,7 @@ final class COAIDownload: NSObject, ObservableObject, WKDownloadDelegate {
             isDownloading = false
             readyFile = SharedFile(url: file)
         } catch {
-            cancel(message: "Le fichier reçu est vide, invalide ou trop volumineux. Réessaie depuis ta fiche.")
+            cancel(message: "Le fichier reçu est vide, invalide ou trop volumineux. Réessaie depuis la page COAI.")
         }
     }
 }

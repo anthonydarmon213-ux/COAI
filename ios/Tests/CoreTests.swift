@@ -2,6 +2,16 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testJSONExportRequiresCompleteObject() {
+        XCTAssertEqual(DownloadPolicy.format(mime: "application/json", length: 30), .json)
+        XCTAssertTrue(DownloadPolicy.validJSONDocument(Data("{\"test\":true,\"seances\":[]}".utf8)))
+        for invalid in ["", "{", "{\"test\":true} trailing", "<html>error</html>", "null", "[]", "42"] {
+            XCTAssertFalse(DownloadPolicy.validJSONDocument(Data(invalid.utf8)))
+        }
+        XCTAssertFalse(DownloadPolicy.validJSONDocument(Data(repeating: 32, count: Int(DownloadPolicy.maximumBytes) + 1)))
+        XCTAssertFalse(DownloadPolicy.validHeader(Data("{}".utf8), format: .json))
+    }
+
     func testDownloadOriginAndGesturePolicy() {
         let source = URL(string: "https://coai.fr/programme/entrainement")!
         func permits(_ value: String, source: URL? = source, main: Bool = true,

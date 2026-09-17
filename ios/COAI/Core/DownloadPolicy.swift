@@ -18,7 +18,7 @@ enum DownloadPolicy {
         return downloadAttribute || (url.scheme == "blob" && linkActivated)
     }
 
-    enum Format: String { case pdf, png, jpg }
+    enum Format: String { case pdf, png, jpg, json }
 
     static func format(mime: String?, length: Int64) -> Format? {
         guard length <= maximumBytes, length != 0 else { return nil }
@@ -26,6 +26,7 @@ enum DownloadPolicy {
         case "application/pdf": return .pdf
         case "image/png": return .png
         case "image/jpeg": return .jpg
+        case "application/json": return .json
         default: return nil
         }
     }
@@ -35,6 +36,14 @@ enum DownloadPolicy {
         case .pdf: return data.starts(with: Array("%PDF-".utf8))
         case .png: return data.starts(with: [137, 80, 78, 71, 13, 10, 26, 10])
         case .jpg: return data.starts(with: [255, 216, 255])
+        case .json: return false // JSON requires validation of the complete document.
         }
+    }
+
+    static func validJSONDocument(_ data: Data) -> Bool {
+        guard !data.isEmpty, data.count <= maximumBytes,
+              let value = try? JSONSerialization.jsonObject(with: data) else { return false }
+        // Account exports are objects, never executable text or a lone scalar.
+        return value is [String: Any]
     }
 }

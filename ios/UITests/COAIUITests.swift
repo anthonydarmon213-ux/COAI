@@ -2,6 +2,32 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testJSONExportAndMalformedRejection() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let export = app.webViews.buttons["Exporter les données fictives"]
+        XCTAssertTrue(export.waitForExistence(timeout: 10))
+        reveal(export, in: app)
+        export.tap()
+        let file = app.otherElements["LP.CaptionBar.TopCaption"]
+        XCTAssertTrue(file.waitForExistence(timeout: 10))
+        XCTAssertEqual(file.label, "COAI-document")
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Export JSON fictif dans la feuille iOS"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        app.buttons.matching(NSPredicate(format: "label IN %@", ["Fermer", "Close"])).firstMatch.tap()
+        let invalid = app.webViews.buttons["Tester le JSON invalide"]
+        reveal(invalid, in: app)
+        invalid.tap()
+        XCTAssertTrue(app.alerts["Fichier COAI"].waitForExistence(timeout: 5))
+        app.alerts.buttons["Compris"].tap()
+        XCTAssertTrue(invalid.isHittable)
+    }
+
+    @MainActor
     func testNativePrivacyKeepsOptionalTrackingOff() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

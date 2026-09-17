@@ -166,12 +166,16 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <button onclick="save('pdf')">Ouvrir le PDF de test</button>
     <button onclick="save('link')">Ouvrir l’image sans téléchargement</button>
     <button onclick="save('invalid')">Tester le format refusé</button>
+    <button onclick="save('json')">Exporter les données fictives</button>
+    <button onclick="save('invalidjson')">Tester le JSON invalide</button>
     <script>
     function save(kind) {
       const invalid = kind === 'invalid';
       const encoded = kind === 'pdf' ? '\(pdf)' : 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aCfoAAAAASUVORK5CYII=';
       const bytes = invalid ? new TextEncoder().encode('<html>Non exportable</html>') : Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-      const blob = new Blob([bytes], {type:invalid?'text/html':kind==='pdf'?'application/pdf':'image/png'});
+      const json = kind === 'json' || kind === 'invalidjson';
+      const content = json ? new TextEncoder().encode(kind === 'json' ? JSON.stringify({test:true,seances:[]}) : '{invalid') : bytes;
+      const blob = new Blob([content], {type:json?'application/json':invalid?'text/html':kind==='pdf'?'application/pdf':'image/png'});
       const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
       if (kind === 'link') { link.target = '_blank'; } else { link.download = invalid?'../../unsafe.html':kind==='pdf'?'test.pdf':'test.png'; }
       document.body.appendChild(link); link.click(); link.remove();

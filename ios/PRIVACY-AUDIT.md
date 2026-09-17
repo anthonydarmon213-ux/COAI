@@ -34,8 +34,10 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
 3. L'export de compte (`src/app/api/compte/export/route.ts`) n'inclut que profil,
    abonnement, programmes, séances, mesures et événements WhatsApp. Les
    check-ins et autres relations ne sont pas inclus explicitement : couverture
-   à compléter. Le téléchargement natif actuel refuse JSON ; tester et corriger
-   le parcours d'export de compte, sans le confondre avec les fiches PDF/Story.
+   à compléter. Le téléchargement natif JSON est désormais testé avec un objet
+   fictif et un fichier invalide (`/tmp/coai-json-export.xcresult`) ; le parcours
+   complet de compte connecté reste à valider, sans le confondre avec les fiches
+   PDF/Story ou avec le simple affichage de la feuille système.
 4. Vérifier les consentements des données sensibles, les destinataires réels,
    les durées de conservation et les régions des fournisseurs. Les affirmations
    de la page confidentialité doivent correspondre à ces preuves.

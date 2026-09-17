@@ -44,6 +44,25 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Traceurs facultatifs dans le pilote iOS — 17 septembre 2026
 
+### Export de compte JSON — vérification native locale
+
+Le bouton web « Exporter mes données » fabrique un Blob `application/json` qui
+était refusé par le pilote. Le téléchargement accepte maintenant ce format et
+valide le document complet (objet JSON, limite 15 Mio), pas seulement son nom
+ou un préfixe. HTML déguisé, JSON tronqué, valeurs seules et fichiers trop gros
+sont refusés. Les contrôles d'origine, de navigation et le nettoyage local restent
+actifs. Aucune donnée réelle utilisée dans ces tests.
+
+25 tests Swift réussis, Release arm64 sans signature, TypeScript, lint et build
+web réussis. Deux tests UI réussis dans le simulateur SE : export JSON fictif
+et refus d'un JSON invalide, plus non-régression PDF/PNG. Capture inspectée :
+« JSON · 26 octets », feuille système avec « Enregistrer dans Fichiers ».
+Preuve : `/tmp/coai-json-export.xcresult`. L'action d'enregistrement elle-même,
+l'export complet d'un compte connecté et l'app distribuée ne sont pas validés.
+La couverture des données par la route serveur reste à compléter séparément.
+
+### Traceurs
+
 Inventaire et écarts précis : [PRIVACY-AUDIT.md](PRIVACY-AUDIT.md).
 Après compilation de la cible UI, trois scénarios hors réseau passent aussi
 (partage et ajout/refus Photos) : `/tmp/coai-native-privacy-offline-regression.xcresult`.
