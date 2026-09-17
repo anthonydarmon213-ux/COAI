@@ -23,9 +23,20 @@ export async function POST() {
   }
 
   if (user.subscription?.stripeSubscriptionId) {
-    await stripe.subscriptions.cancel(user.subscription.stripeSubscriptionId).catch(() => {
-      // déjà résiliée côté Stripe : on continue la suppression du compte
-    });
+    try {
+      const subscription = await stripe.subscriptions.retrieve(user.subscription.stripeSubscriptionId);
+      const customerId = typeof subscription.customer === "string"
+        ? subscription.customer : subscription.customer.id;
+      if (customerId !== user.subscription.stripeCustomerId) throw new Error("customer_mismatch");
+      // A network error or a missing resource is NOT proof of cancellation.
+      // Retrieve first so an already-canceled subscription can safely be retried.
+      if (subscription.status !== "canceled" && subscription.status !== "incomplete_expired") {
+        const canceled = await stripe.subscriptions.cancel(subscription.id);
+        if (canceled.status !== "canceled") throw new Error("cancellation_unconfirmed");
+      }
+    } catch {
+      return NextResponse.json({ error: "La résiliation n’a pas pu être confirmée. Ton profil est conservé. Réessaie ou contacte l’assistance." }, { status: 503 });
+    }
   }
 
   await deleteAllProgressPhotos(authUser.id);
