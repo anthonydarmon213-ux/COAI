@@ -141,6 +141,9 @@ function normaliser(texte: string): string {
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {
   const normalise = normaliser(nom);
+  // Une poulie ne démontre ni une machine à leviers ni un rowing poitrine appuyée.
+  if (/poitrine appuyee|chest[ -]supported/.test(normalise)) return null;
+  if (normalise.includes("tirage horizontal") && !["tirage horizontal", "tirage horizontal (machine)", "tirage horizontal poulie", "tirage horizontal a la poulie"].includes(normalise)) return null;
   // La démonstration de traction libre ne montre pas le réglage ni
   // l'exécution sur une machine assistée. Ne jamais utiliser ce repli.
   if (/(traction|pull[ -]?up)/.test(normalise) && /(guide|assist|machine)/.test(normalise)) return null;

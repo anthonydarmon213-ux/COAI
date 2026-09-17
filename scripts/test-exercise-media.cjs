@@ -13,6 +13,15 @@ const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+for (const nom of ['Tirage horizontal poitrine appuyée (chest supported row)', 'Rowing poitrine appuyée', 'Chest-supported row']) {
+  assert.equal(photoCoaiPourNom(nom), null, nom);
+  assert.equal(videoCoaiPourNom(nom), null, nom);
+}
+for (const nom of ['Étirement assis écarté', 'Pec deck', 'Butterfly']) assert.equal(photoCoaiPourNom(nom), null, nom);
+assert(videoCoaiPourNom('Tirage horizontal (machine)'));
+assert.equal(videoCoaiPourNom('Tirage horizontal prise large machine à leviers'), null);
+assert(photoCoaiPourNom('Écarté haltères'));
+assert(videoCoaiPourNom('Tirage horizontal à la poulie'));
 assert(!EXERCICES.some(ex => /hip[ -]?thr?ust/i.test(ex.nom)));
 for (const ex of EXERCICES) {
   assert(!variantesPourExercice(ex.nom).some(v => /hip[ -]?thr?ust/i.test(v.nom)));
