@@ -8,6 +8,31 @@ Developer. Ne pas confondre connexion au portail et capacité de distribution.
 La préparation locale continue ; TestFlight et la soumission restent à débloquer.
 L'acceptation finale appartient à Apple et ne peut être garantie.
 
+## Export PDF — correctif local, 17 septembre 2026
+
+Bug reproduit : EN_ATTENTE visible dans l'entraînement mais exclu des deux
+exports PDF (réponse 404 sans génération). La sélection des exports suit
+maintenant l'accès de l'écran : entraînement en attente permis avec mention
+de relecture non effectuée, refus des statuts rejetés/inconnus, priorité au
+dernier validé. Nutrition/récupération en attente restent exclues. Aucun
+changement des statuts stockés ou des droits d'abonnement.
+
+Exports privés sans cache, erreurs 503 explicites sans détails techniques.
+Les affirmations systématiques de supervision/validation dans l'en-tête et
+le pied de page sont retirées. Aucun visuel validé ni PDF de référence modifié.
+36 tests de routes sur doublures Auth/DB/rendu passent ; génération réelle
+locale d'un PDF avec six exercices fictifs, sans images distantes, inspectée.
+TypeScript, lint, build sur base factice et audit médias réussis.
+
+Correctif NON publié : autorisation explicite de publication GitHub/coai.fr
+demandée. Téléchargement connecté en production et enregistrement sur iPhone
+restent à vérifier après publication. La présence de photos adaptées et le
+contenu complet du programme ne sont pas validés par ce test de rendu fictif.
+
+Coach : lecture du code confirme un chat et une route réservée aux abonnements
+actifs, utilisant un fournisseur IA payant. Aucun appel réel lancé ; disponibilité
+du fournisseur et conversation sur le compte d'Anthony non vérifiées.
+
 ## Navigation supérieure simplifiée — 17 septembre 2026
 
 À la demande d'Anthony, le doublon `aside.coai-app-nav` est masqué seulement
