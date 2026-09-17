@@ -17,7 +17,7 @@ pas encore une expérience native complète validée.
 
 | Parcours | État réel | Preuve / travail restant avant validation |
 | --- | --- | --- |
-| 1. Installation et ouverture | En cours | Builds simulateur et Release arm64 sans signature réussis. Installation physique, relance, archive de distribution et TestFlight à vérifier. |
+| 1. Installation et ouverture | En cours | Builds simulateur, Release arm64 non signé et Debug iPhone signé réussis. Une ancienne COAI test est présente sur iPhone 17 Pro ; mise à jour du binaire actuel et tests physiques restent à effectuer. Archive de distribution et TestFlight non validés. |
 | 2. Compte et connexion | En cours | Connexion publique, annulation Google, retour de récupération et saisie d'inscription contrôlés dans l'app simulée. Connexion persistante réelle, confirmation/récupération email et option Apple encore à valider/compléter. |
 | 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
@@ -41,6 +41,28 @@ Restant transversal : audit confidentialité, sécurité et charge backend,
 accessibilité/clavier/safe areas, captures App Store réelles, description exacte,
 compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
+
+## Accès appareil et signature réévalués — 17 septembre, 19 h 25
+
+`devicectl` détecte maintenant l'iPhone 17 Pro appairé, joignable, iOS 26.1,
+mode développeur activé. `fr.coai.mobile` (COAI test 0.1.0, build 1) y est déjà
+installé ; cela ne démontre pas qu'il s'agit du code actuel. L'iPhone 13 Pro
+apparaît aussi, mais Xcode le considère non appairé : pas de test tenté dessus.
+
+Compilation **Debug iPhone signée** réussie avec certificat et profil déjà
+présents, sans `-allowProvisioningUpdates`, création de certificat ni abonnement.
+`codesign --verify --deep --strict` réussi. Binaire local :
+`ios/DerivedDataSigned/Build/Products/Debug-iphoneos/COAI.app` ; artefacts ignorés
+par Git. Journal : `/tmp/coai-device-signed-build.log`.
+Le profil existant expire le 19 septembre 2026 à 21:22:02 UTC. C'est une signature
+de développement temporaire, pas une validation des droits App Store/TestFlight.
+L'ancienne mention « appareil hors ligne » ne décrit donc plus cet état.
+
+Demande explicite adressée à Anthony avant mise à jour de son app existante.
+Aucune installation, désinstallation, réinitialisation ou lecture des données
+personnelles effectuée. Parcours connecté, sauvegarde, paiements et lancement du
+nouveau binaire sur cet appareil non validés. Adhésion Developer toujours non
+confirmée ; ne pas assimiler certificat de développement et droit de publication.
 
 ## Panne réseau : reprise native
 
