@@ -89,9 +89,8 @@ export function EntrainementView({
           const premierNom = premierExercice && typeof premierExercice.nom === "string"
             ? premierExercice.nom
             : null;
-          const photoSeanceUrl =
-            (premierNom ? photoCoaiPourNom(premierNom) : null) ??
-            (typeof photoQuerySeance === "string" ? photosParExercice?.[photoQuerySeance] : null);
+          // Une absence de média COAI ne doit jamais afficher une photo stock.
+          const photoSeanceUrl = premierNom ? photoCoaiPourNom(premierNom) : null;
           return (
             <>
               <div className="rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-950/40 to-black p-4">
@@ -104,7 +103,7 @@ export function EntrainementView({
                 <p className="mt-3 text-xs leading-5 text-graphite-300">Découvre les mouvements ci-dessous, puis lance la séance guidée. Les charges se renseignent pendant la séance.</p>
               </div>
               {photoSeanceUrl && (
-                // eslint-disable-next-line @next/next/no-img-element -- source Pexels externe, next/image nécessiterait de whitelister le domaine pour un usage encore expérimental
+                // eslint-disable-next-line @next/next/no-img-element -- média local COAI, affichage décoratif de séance
                 <img src={photoSeanceUrl} alt="" className="h-36 w-full rounded-xl object-cover object-center" loading="lazy" />
               )}
               {Array.isArray(exercices) && exercices.length > 0 && (
