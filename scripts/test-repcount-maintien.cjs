@@ -38,6 +38,8 @@ assert.equal(historiqueParMesure(mixte,true)[0].meilleureSerie.dureeSecondes,30)
 // états. Complète les tests purs, sans prétendre tester les clics navigateur.
 const React = require('react');
 const stepper = {};
+const restDuration = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/suivi/rest-duration.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:restDuration,require});
 const session = {};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/lib/suivi/repcount-session.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports:session,require});
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/suivi/repcount-stepper.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:stepper,require});
@@ -53,7 +55,9 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
     if(name === '@/lib/suivi/historique-exercice') return exportsModule;
     if(name === '@/lib/suivi/repcount-session') return session;
     if(name === '@/lib/suivi/repcount-draft') return {};
+    if(name === '@/lib/suivi/request-deadline') return {withRequestDeadline:()=>{throw new Error('No network request during server render');}};
     if(name === '@/components/suivi/repcount-stepper') return stepper;
+    if(name === '@/components/suivi/rest-duration') return restDuration;
     if(name === '@/components/analytics/track-conversion') return {TrackConversion:()=>null};
     if(name === '@/lib/analytics/first-saved-conversion') return {firstSavedConversionId:async()=>null};
     if(name === '@/components/suivi/chandeliers-charges') return {ChandeliersCharges:()=>React.createElement('p',null,'CHARGE_CHART')};
