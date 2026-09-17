@@ -5,8 +5,11 @@ import { prisma } from "@/lib/db/client";
 import { ProgrammeCompletPdf, type PilierPdfEntree } from "@/lib/pdf/programme-pdf";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import type { Pilier } from "@prisma/client";
+import { accessibleProgrammePdf } from "@/lib/programmes/access";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+const privateHeaders = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -18,8 +21,13 @@ const ORDRE: Pilier[] = ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"];
 // seul PDF. Chacun avait déjà sa route, mais il fallait télécharger trois
 // fichiers et les rassembler soi-même — d'où le « 1 / 1 » en pied de page.
 export async function GET(request: Request) {
+  try { return await buildPdf(request); }
+  catch { return NextResponse.json({ error: "La fiche n’a pas pu être préparée. Réessaie dans un instant." }, { status: 503, headers: privateHeaders }); }
+}
+
+async function buildPdf(request: Request) {
   const user = await getCurrentAppUser();
-  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401, headers: privateHeaders });
 
   const heroPath: Record<Pilier, string> = {
     ENTRAINEMENT: "/exercices/back-squat-barre.jpg",
@@ -33,19 +41,18 @@ export async function GET(request: Request) {
   const entrees: PilierPdfEntree[] = [];
 
   for (const pilier of ORDRE) {
-    // Un programme en attente de validation humaine ne doit jamais être
-    // exporté. Le dernier validé prime, sinon un programme IA publiable.
+    // Same selection as the screen; waiting training is accessible, not validated.
     const [valide, dernier] = await Promise.all([
       prisma.programmeGenerated.findFirst({
         where: { userId: user.id, pilier, statut: "VALIDE" },
         orderBy: { generatedAt: "desc" },
       }),
       prisma.programmeGenerated.findFirst({
-        where: { userId: user.id, pilier, statut: "GENERE_IA" },
+        where: { userId: user.id, pilier },
         orderBy: { generatedAt: "desc" },
       }),
     ]);
-    const affiche = valide ?? dernier;
+    const affiche = accessibleProgrammePdf(pilier, valide, dernier);
     if (!affiche) continue;
 
     const exerciseImages: Record<string, string> = {};
@@ -62,6 +69,7 @@ export async function GET(request: Request) {
 
     entrees.push({
       pilier,
+      reviewPending: affiche.statut === "EN_ATTENTE",
       data: affiche.contenu,
       generatedAt: affiche.generatedAt,
       heroUrl: new URL(heroPath[pilier], request.url).toString(),
@@ -70,7 +78,7 @@ export async function GET(request: Request) {
   }
 
   if (entrees.length === 0) {
-    return NextResponse.json({ error: "Aucun programme généré" }, { status: 404 });
+    return NextResponse.json({ error: "Aucun programme accessible à exporter." }, { status: 404, headers: privateHeaders });
   }
 
   const buffer = await renderToBuffer(
@@ -79,6 +87,7 @@ export async function GET(request: Request) {
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
+      ...privateHeaders,
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="coai-ma-fiche.pdf"`,
     },

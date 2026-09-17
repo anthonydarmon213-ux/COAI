@@ -537,7 +537,7 @@ function HeaderFixed({ pilier, prenom, dateFormatee }: { pilier: Pilier; prenom?
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.brand}>COAI</Text>
-          <Text style={styles.brandSub}>L&apos;IA génère. Ton coach valide.</Text>
+          <Text style={styles.brandSub}>Ton programme COAI</Text>
         </View>
         <View style={styles.metaBlock}>
           <Text style={styles.metaEyebrow}>{PILIER_LABEL[pilier]}</Text>
@@ -573,7 +573,7 @@ function FooterFixed() {
         <View>
           <Text style={styles.footerBrand}>COAI</Text>
           <Text style={styles.footerText}>
-            Programme généré par IA et supervisé par un coach COAI — recommandation sportive, pas un
+            Programme COAI — recommandation sportive, pas un
             avis médical. Consulte ton médecin avant de démarrer un programme, notamment en cas
             d&apos;antécédent ou de doute sur ta condition physique. — coai.fr
           </Text>
@@ -585,6 +585,7 @@ function FooterFixed() {
 }
 
 export function ProgrammePdf({
+  reviewPending,
   pilier,
   data,
   prenom,
@@ -592,6 +593,7 @@ export function ProgrammePdf({
   heroUrl,
   exerciseImages,
 }: {
+  reviewPending?: boolean;
   pilier: Pilier;
   data: unknown;
   prenom?: string | null;
@@ -610,6 +612,7 @@ export function ProgrammePdf({
   return (
     <Document title={`COAI — Programme ${PILIER_LABEL[pilier]}`}>
       <PagePilier
+        reviewPending={reviewPending}
         pilier={pilier}
         contenu={contenu}
         titre={titre}
@@ -626,6 +629,7 @@ export function ProgrammePdf({
 // complète réunit les trois piliers en un seul fichier, plutôt que trois
 // téléchargements séparés qu'il faudrait ensuite rassembler à la main.
 function PagePilier({
+  reviewPending,
   pilier,
   contenu,
   titre,
@@ -634,6 +638,7 @@ function PagePilier({
   heroUrl,
   exerciseImages,
 }: {
+  reviewPending?: boolean;
   pilier: Pilier;
   contenu: Record<string, unknown>;
   titre: string;
@@ -649,6 +654,7 @@ function PagePilier({
       <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>
       <Text style={styles.h1}>{titre}</Text>
       <Text style={styles.genereLe}>Généré le {dateFormatee} par l&apos;IA COAI</Text>
+      {reviewPending && <Text style={{ fontSize: 8, color: C.textBody, marginBottom: 10 }}>Relecture individuelle non effectuée.</Text>}
       {heroUrl && <PdfImage src={heroUrl} style={styles.heroImage} />}
 
       {pilier === "ENTRAINEMENT" && <EntrainementBody data={contenu} exerciseImages={exerciseImages} />}
@@ -661,6 +667,7 @@ function PagePilier({
 }
 
 export type PilierPdfEntree = {
+  reviewPending?: boolean;
   pilier: Pilier;
   data: unknown;
   generatedAt: Date;
@@ -691,6 +698,7 @@ export function ProgrammeCompletPdf({
         return (
           <PagePilier
             key={entree.pilier}
+            reviewPending={entree.reviewPending}
             pilier={entree.pilier}
             contenu={contenu}
             titre={titre}
