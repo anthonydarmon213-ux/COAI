@@ -62,6 +62,22 @@ persiste. Le test remet le minuteur à zéro et désactive son option d'alerte.
 
 ### Export de compte JSON — vérification native locale
 
+Couverture serveur complétée localement : les 12 relations de suivi manquantes
+(repas, avis, tests maxi, check-ins, adaptations, activité, séances quotidiennes,
+récupération musculaire, achats de programmes, routines, corrections de mouvement,
+retour de résiliation) rejoignent les six relations déjà exportées.
+La recherche utilise uniquement l'identité authentifiée, jamais un ID demandé
+par le client. Pas de jointure vers les parrains/filleuls ou notes de travail
+privées du coach. Les erreurs ne renvoient ni détail technique ni export partiel.
+Réponses privées `no-store`, route explicitement dynamique.
+`scripts/test-account-export.cjs` réussi avec Auth/DB simulés et vraies réponses
+Next.js : deux identités, données absentes, absence de session, erreurs Auth/DB.
+TypeScript, lint et build web réussis. Aucun schéma ou réglage Supabase changé.
+Ce lot n'est pas encore publié : lecture en base réelle et export iOS connecté
+restent à valider. Ce n'est pas un export exhaustif de tous les prestataires :
+binaires des photos/vidéos, données non liées par userId, journaux techniques et
+éventuelles demandes d'accès aux notes demandent encore un traitement distinct.
+
 **Mise à jour : sauvegarde locale dans Fichiers vérifiée sur simulateur.**
 La capture de l'écran complet a montré que le sélecteur était bien ouvert,
 avec un bouton Retour, mais sans le bouton Annuler attendu par le test.
