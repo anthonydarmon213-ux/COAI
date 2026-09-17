@@ -8,6 +8,64 @@ Developer. Ne pas confondre connexion au portail et capacité de distribution.
 La préparation locale continue ; TestFlight et la soumission restent à débloquer.
 L'acceptation finale appartient à Apple et ne peut être garantie.
 
+## Checklist globale persistante — 17 septembre 2026
+
+« Testé localement » ne signifie ni testé en production ni prêt à publier.
+Aucun des dix parcours n'est encore déclaré terminé de bout en bout sur iPhone.
+L'app actuelle combine SwiftUI et des écrans web WKWebView ; elle ne constitue
+pas encore une expérience native complète validée.
+
+| Parcours | État réel | Preuve / travail restant avant validation |
+| --- | --- | --- |
+| 1. Installation et ouverture | En cours | Builds simulateur et Release arm64 sans signature réussis. Installation physique, relance, archive de distribution et TestFlight à vérifier. |
+| 2. Compte et connexion | En cours | PKCE Google, annulation et reprise protégée testés unitairement. Connexion persistante réelle, récupération et option Apple encore à valider/compléter. |
+| 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
+| 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
+| 5. Entraînement, nutrition, récupération | En cours | Routes existantes et minuteur natif. Vérifier droits, médias, fiches et navigation sur petits écrans avec données réelles de test. |
+| 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux : erreurs, brouillon et reprise. Séance complète, historique, export et partage natif à vérifier sur appareil. |
+| 7. Check-ins, adaptations et mémoire | Restant : validation iOS | Moteur et routes existants. Vérifier persistance, isolation des comptes, confirmations, cohérence des adaptations et absence d'appel payant. |
+| 8. Abonnements Apple | En cours + intervention humaine | Service StoreKit préparé mais non raccordé. Catalogue, droits serveur, achat, essai, restauration, expiration et résiliation restent à réaliser et tester. Tarifs/migration à valider. |
+| 9. Notifications et réengagement | En cours | Alerte locale facultative de repos ajoutée. Concurrence testée, affichage iOS réel encore non vérifié. Réengagement consenti non implémenté. |
+| 10. Suppression sécurisée | En cours | Vérification de résiliation Stripe et erreurs UI testées avec doublures. Restent erreurs de suppression Auth/Storage, reprise partielle et test intégral sur compte jetable autorisé. |
+
+Terminé et testé **au niveau technique local seulement** : règles de navigation,
+horloge/pause persistante, séquencement des livraisons d'achats et des alertes
+(22 XCTest), compilation simulateur et Release iPhone sans signature.
+
+Blocages humains identifiés : adhésion Apple Developer (coût non autorisé),
+contrats/validation Apple, catalogue et conditions commerciales iOS, autorisation
+d'une éventuelle migration de production. Ces blocages n'empêchent pas les autres
+travaux de développement et de test sans frais.
+
+Restant transversal : audit confidentialité, sécurité et charge backend,
+accessibilité/clavier/safe areas, captures App Store réelles, description exacte,
+compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
+peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
+
+## Alerte de repos facultative — 17 septembre 2026
+
+- Permission demandée uniquement après activation explicite du commutateur.
+  Aucun abonnement, serveur de notifications ni appel payant ajouté.
+- Message local générique, sans données de santé ni identifiant de compte.
+  Refus ou erreur ne bloque pas le minuteur ; lien vers les réglages proposé.
+- Un identifiant unique, annulation à la pause/arrêt/désactivation ; une relance
+  remplace l'ancienne alerte. Une réponse tardive est nettoyée avant la suivante.
+- Quatre tests déterministes : arrêt pendant la vérification d'autorisation,
+  pause pendant un ajout, relances rapides, erreur suivie d'une nouvelle tentative.
+- Vérifications : 22 XCTest sans échec, builds simulateur et Release arm64,
+  TypeScript, lint et build web avec base factice. Logs locaux temporaires :
+  `/tmp/coai-reminder-simulator.log`, `/tmp/coai-reminder-release.log`,
+  `/tmp/coai-reminder-webbuild.log`.
+- Le contrôle visuel Simulator a expiré sans réponse. Restent donc à vérifier
+  réellement : accepter/refuser, écran verrouillé, pause/relance, retour des
+  Réglages, mode Concentration et réouverture. Aucune validation production.
+- Pas de bannière forcée au premier plan : le décompte reste visible dans l'app.
+  Cette fonction ne remplace pas le travail restant sur le réengagement.
+
+Références Apple consultées :
+- https://developer.apple.com/documentation/usernotifications/asking-permission-to-use-notifications
+- https://developer.apple.com/documentation/usernotifications/scheduling-a-notification-locally-from-your-app
+
 ## Critères bloquants (non validés à ce jour)
 
 1. Connexion réelle et persistante, récupération, déconnexion et suppression
@@ -41,7 +99,7 @@ L'acceptation finale appartient à Apple et ne peut être garantie.
 
 ## Manifeste technique
 
-`PrivacyInfo.xcprivacy` déclare l'usage UserDefaults du minuteur (quatre clés
+`PrivacyInfo.xcprivacy` déclare l'usage UserDefaults du minuteur (cinq clés
 AppStorage propres à l'app), motif CA92.1. Il est intégré aux ressources Xcode.
 Le script de compilation vérifie sa présence et son contenu dans le bundle.
 Ce manifeste partiel ne déclare pas « aucune donnée collectée » : les données
@@ -81,7 +139,7 @@ Raccordements obligatoires avant activation :
    réponse serveur perdue, reprise, compte différent, restauration, renouvellement,
    expiration et remboursement. Pas de vraie transaction pour les tests.
 
-Preuves actuelles : compilation Release iPhone réussie et 18 tests XCTest (dont
+Preuves actuelles : compilation Release iPhone réussie et 22 tests XCTest (dont
 confirmation de livraison persistée et liée au bon compte). La séquence commune
 au service est testée : confirmation avant finalisation, erreur réseau,
 confirmation incorrecte et interruption pendant la livraison. Le contrôle

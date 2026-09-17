@@ -2,6 +2,88 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    @MainActor
+    func testReminderStopBeforeSchedulingPreventsAdd() async {
+        let entered = expectation(description: "Permission lookup started")
+        var permission: CheckedContinuation<Void, Never>?
+        var scheduled = false
+        let queue = RestReminderQueue(clear: {}, schedule: { _, isCurrent in
+            await withCheckedContinuation { permission = $0; entered.fulfill() }
+            if isCurrent() { scheduled = true }
+            return nil
+        })
+        queue.update(end: Date().addingTimeInterval(90))
+        await fulfillment(of: [entered], timeout: 2)
+        queue.update(end: nil)
+        permission?.resume()
+        await queue.waitUntilIdle()
+        XCTAssertFalse(scheduled)
+    }
+
+    @MainActor
+    func testReminderLateAddAfterPauseIsRemoved() async {
+        let entered = expectation(description: "Add started")
+        var add: CheckedContinuation<Void, Never>?
+        var pending = false
+        var messages: [String] = []
+        let queue = RestReminderQueue(clear: { pending = false }, schedule: { _, _ in
+            await withCheckedContinuation { add = $0; entered.fulfill() }
+            pending = true
+            return "Stale error"
+        }, report: { if let message = $0 { messages.append(message) } })
+        queue.update(end: Date().addingTimeInterval(90))
+        await fulfillment(of: [entered], timeout: 2)
+        queue.update(end: nil)
+        add?.resume()
+        await queue.waitUntilIdle()
+        XCTAssertFalse(pending)
+        XCTAssertTrue(messages.isEmpty)
+    }
+
+    @MainActor
+    func testReminderRapidRestartsKeepOnlyLatestDeadline() async {
+        let entered = expectation(description: "First add started")
+        let first = Date(timeIntervalSince1970: 1000)
+        let latest = first.addingTimeInterval(120)
+        var add: CheckedContinuation<Void, Never>?
+        var pending: Date?
+        var calls: [Date] = []
+        let queue = RestReminderQueue(clear: { pending = nil }, schedule: { end, _ in
+            calls.append(end)
+            if end == first {
+                await withCheckedContinuation { add = $0; entered.fulfill() }
+            }
+            pending = end
+            return nil
+        })
+        queue.update(end: first)
+        await fulfillment(of: [entered], timeout: 2)
+        queue.update(end: first.addingTimeInterval(60))
+        queue.update(end: latest)
+        add?.resume()
+        await queue.waitUntilIdle()
+        XCTAssertEqual(calls, [first, latest])
+        XCTAssertEqual(pending, latest)
+        queue.update(end: nil)
+        await queue.waitUntilIdle()
+        XCTAssertNil(pending)
+    }
+
+    @MainActor
+    func testReminderReportsFailureWithoutBlockingNextTimer() async {
+        var message: String?
+        var fail = true
+        let queue = RestReminderQueue(clear: {}, schedule: { _, _ in fail ? "Unavailable" : nil },
+            report: { message = $0 })
+        queue.update(end: Date())
+        await queue.waitUntilIdle()
+        XCTAssertEqual(message, "Unavailable")
+        fail = false
+        queue.update(end: Date())
+        await queue.waitUntilIdle()
+        XCTAssertNil(message)
+    }
+
     func testRestPauseAndResumePreserveRemainingDuration() {
         let start = Date(timeIntervalSince1970: 1000)
         let paused = RestClock(seconds: 90, now: start).remaining(at: start.addingTimeInterval(25))
