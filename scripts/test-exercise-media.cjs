@@ -13,6 +13,11 @@ const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+assert.equal(photoCoaiPourNom('Curl ischio TRX'), '/exercices/suspension-curl-ischio.jpg');
+assert.equal(photoCoaiPourNom('Ischio suspension'), '/exercices/suspension-curl-ischio.jpg');
+assert.equal(photoCoaiPourNom('Étirement ischio'), '/exercices/mobilite-etirement-ischio-debout-banc.jpg');
+assert.equal(photoCoaiPourNom('Ischio'), null);
+assert.equal(photoCoaiPourNom('Leg curl (machine)'), '/exercices/leg-curl-allonge.jpg');
 for (const nom of ['Goblet squat', 'Squat gobelet (kettlebell)', 'Rowing élastique', 'Rowing à l’élastique', 'Développé militaire haltères', 'Dumbbell shoulder press']) {
   assert.equal(videoCoaiPourNom(nom), null, `Média non conforme : ${nom}`);
 }

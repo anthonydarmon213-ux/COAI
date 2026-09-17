@@ -123,7 +123,8 @@ const TABLE: EntreePhoto[] = [
   { motifs: ["marche sur pointes", "walking on toes"], fichier: "marche-sur-pointes-femme-metisse-v2" },
 
   { motifs: ["fentes avant", "fente avant", "fentes haltères", "lunge"], fichier: "fentes-avant-halteres" },
-  { motifs: ["leg curl", "ischio"], fichier: "leg-curl-allonge" },
+  // « ischio » seul capture aussi les étirements et le curl en suspension.
+  { motifs: ["leg curl"], fichier: "leg-curl-allonge" },
   { motifs: ["fentes bulgares", "fente bulgare", "bulgarian split", "split squat"], fichier: "fentes-bulgares" },
   { motifs: ["kickback"], fichier: "kickback-fessier-elastique" },
   { motifs: ["abduction"], fichier: "abduction-hanche-elastique" },
