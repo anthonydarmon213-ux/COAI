@@ -612,3 +612,20 @@ Sources Apple vérifiées le 16 septembre 2026 :
 Ne pas acheter une adhésion, accepter un contrat, changer les tarifs, effectuer
 un paiement réel ni publier la version de test comme prête. Tout point non
 testé reste ouvert ; compilation réussie ne signifie pas validation production.
+# Navigation cinq rubriques — 17 septembre 2026
+
+Ordre validé par Anthony : Séance, Nutrition, Récupération, Coach, Explorer.
+RepCount et compte restent dans Explorer ; minuteur disponible dans Explorer
+et dans la barre supérieure. La sélection distingue recettes, récupération et
+entraînement, sans présenter toute URL `/programme` comme une séance.
+
+Vérifications : deux tests UI réussis sur le simulateur iPhone SE dédié,
+alignement et cibles >= 44 points, sélection sur changements d’URL fictifs,
+accès au minuteur via Explorer, accès aux réglages et garde des achats.
+Capture inspectée : `/tmp/coai-five-tabs-active.png` (contenu fictif).
+Contrôles Swift/core, TypeScript, lint, build web avec base factice, audit médias
+et build iPhone signé réussis. Logs `/tmp/coai-navigation-five-tabs.log` et
+`/tmp/coai-five-tabs-device.log`.
+
+Ces tests ne valident pas les contenus connectés ni une réponse IA réelle.
+Aucun appel IA payant réalisé. Publication App Store non effectuée.

@@ -39,9 +39,10 @@ struct COAIRootView: View {
                 if !keyboardVisible {
                   HStack(spacing: 4) {
                     destination("Séance", icon: "dumbbell", path: "/programme/entrainement")
-                    destination("RepCount", icon: "chart.bar", path: "/suivi/repcount")
-                    navigationItem("Repos", icon: "timer", selected: showTimer) { showTimer = true }
-                    destination("Compte", icon: "person.crop.circle", path: "/compte/parametres")
+                    destination("Nutrition", icon: "fork.knife", path: "/programme/alimentation")
+                    destination("Récupération", icon: "moon", path: "/programme/recuperation")
+                    destination("Coach", icon: "bubble.left.and.bubble.right", path: "/coach")
+                    navigationItem("Explorer", icon: "square.grid.2x2", selected: showExplorer) { showExplorer = true }
                   }
                   .padding(.horizontal, 12).padding(.vertical, 8)
                   .background(Color(red: 0.045, green: 0.065, blue: 0.075).ignoresSafeArea(edges: .bottom))
@@ -57,9 +58,8 @@ struct COAIRootView: View {
                         .disabled(!browser.canGoBack).accessibilityLabel("Page précédente")
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button { showExplorer = true } label: { Image(systemName: "square.grid.2x2") }
-                        .accessibilityLabel("Explorer COAI")
-                        .disabled(!browser.isReady)
+                    Button { showTimer = true } label: { Image(systemName: "timer") }
+                        .accessibilityLabel("Repos")
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -83,7 +83,8 @@ struct COAIRootView: View {
         .sheet(isPresented: $showExplorer, onDismiss: {
             guard let path = explorerDestination else { return }
             explorerDestination = nil
-            browser.open(path: path)
+            if path == "native:timer" { showTimer = true }
+            else { browser.open(path: path) }
         }) {
             COAIExplorerView { path in
                 explorerDestination = path
@@ -116,8 +117,13 @@ struct COAIRootView: View {
 
     private func destination(_ title: String, icon: String, path: String) -> some View {
         let current = browser.currentURL?.path ?? ""
-        let prefix = path == "/programme/entrainement" ? "/programme" : path == "/compte/parametres" ? "/compte" : path
-        let selected = !showTimer && (current == prefix || current.hasPrefix(prefix + "/"))
+        let related: [String]
+        switch path {
+        case "/programme/entrainement": related = [path, "/programme/seance-du-jour", "/programme/exercices", "/suivi/repcount"]
+        case "/programme/alimentation": related = [path, "/programme/recettes", "/suivi/alimentation"]
+        default: related = [path]
+        }
+        let selected = !showTimer && !showExplorer && related.contains { current == $0 || current.hasPrefix($0 + "/") }
         return navigationItem(title, icon: icon, selected: selected) { browser.open(path: path) }
             .disabled(!browser.isReady)
     }
@@ -155,6 +161,7 @@ private struct COAIExplorerView: View {
                     entry("Aujourd’hui", "sun.max", "/dashboard")
                     entry("Mon entraînement", "dumbbell", "/programme/entrainement")
                     entry("RepCount", "chart.bar", "/suivi/repcount")
+                    entry("Minuteur de repos", "timer", "native:timer")
                     entry("Nutrition", "leaf", "/programme/alimentation")
                     entry("Récupération", "moon", "/programme/recuperation")
                     entry("Mon coach", "bubble.left", "/coach")

@@ -174,6 +174,9 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
     <button onclick="history.pushState({}, '', '/programme/entrainement')">Simuler la page séance</button>
     <button onclick="history.pushState({}, '', '/compte/parametres')">Simuler la page compte</button>
+    <button onclick="history.pushState({}, '', '/programme/recettes')">Simuler les recettes</button>
+    <button onclick="history.pushState({}, '', '/programme/recuperation')">Simuler la récupération</button>
+    <button onclick="history.pushState({}, '', '/coach')">Simuler le coach</button>
     <button onclick="history.pushState({}, '', '/sign-in')">Simuler la connexion</button>
     <button onclick="save('png')">Ouvrir l’image de test</button>
     <button onclick="save('pdf')">Ouvrir le PDF de test</button>

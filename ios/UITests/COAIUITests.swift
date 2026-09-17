@@ -10,7 +10,7 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].waitForExistence(timeout: 15))
         XCTAssertFalse(app.webViews.buttons["Ancienne navigation web"].exists)
         XCTAssertTrue(app.buttons["native-tab-Séance"].isHittable)
-        let explorer = app.buttons["Explorer COAI"]
+        let explorer = app.buttons["native-tab-Explorer"]
         XCTAssertTrue(explorer.isHittable)
         explorer.tap()
         for path in ["/dashboard", "/programme/entrainement", "/suivi/repcount", "/programme/alimentation", "/programme/recuperation", "/coach"] {
@@ -25,7 +25,7 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(settings.isHittable, "La déconnexion reste accessible dans Réglages.")
         app.buttons["Fermer"].tap()
         XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].exists)
-        XCTAssertTrue(app.buttons["native-tab-Repos"].isHittable)
+        XCTAssertTrue(app.buttons["Repos"].isHittable)
         explorer.tap()
         let subscription = app.buttons["explore-/compte/abonnement"]
         reveal(subscription, in: app)
@@ -33,7 +33,7 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(app.alerts["COAI"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.alerts.staticTexts["Les achats et la gestion de l’abonnement ne sont pas activés dans ce pilote iPhone. Ce lien a été bloqué."].exists)
         app.alerts.buttons["Compris"].tap()
-        XCTAssertTrue(app.buttons["native-tab-Repos"].isHittable)
+        XCTAssertTrue(app.buttons["Repos"].isHittable)
     }
 
     @MainActor
@@ -42,7 +42,7 @@ final class COAIUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
         app.launch()
-        let titles = ["Séance", "RepCount", "Repos", "Compte"]
+        let titles = ["Séance", "Nutrition", "Récupération", "Coach", "Explorer"]
         let tabs = titles.map { app.buttons["native-tab-" + $0] }
         XCTAssertTrue(tabs[0].waitForExistence(timeout: 15))
         for tab in tabs {
@@ -63,14 +63,17 @@ final class COAIUITests: XCTestCase {
         shot.name = "Barre native alignée — séance active — données fictives"
         shot.lifetime = .keepAlways
         add(shot)
-        app.webViews.buttons["Simuler la page compte"].tap()
-        expectation(for: selected, evaluatedWith: tabs[3])
-        waitForExpectations(timeout: 5)
-        XCTAssertFalse(tabs[0].isSelected)
+        for (label, index) in [("Simuler les recettes", 1), ("Simuler la récupération", 2), ("Simuler le coach", 3)] {
+            app.webViews.buttons[label].tap()
+            expectation(for: selected, evaluatedWith: tabs[index])
+            waitForExpectations(timeout: 5)
+            for other in tabs.indices where other != index { XCTAssertFalse(tabs[other].isSelected) }
+        }
         app.webViews.buttons["Simuler la connexion"].tap()
         expectation(for: NSPredicate(format: "selected == false"), evaluatedWith: tabs[3])
         waitForExpectations(timeout: 5)
-        tabs[2].tap()
+        tabs[4].tap()
+        app.buttons["explore-native:timer"].tap()
         XCTAssertTrue(app.staticTexts["Ton temps de récupération"].waitForExistence(timeout: 5))
         app.buttons["Fermer"].tap()
         XCTAssertTrue(tabs[2].isHittable)
