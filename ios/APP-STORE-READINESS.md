@@ -17,7 +17,7 @@ pas encore une expérience native complète validée.
 
 | Parcours | État réel | Preuve / travail restant avant validation |
 | --- | --- | --- |
-| 1. Installation et ouverture | En cours | Builds simulateur, Release arm64 non signé et Debug iPhone signé réussis. Mise à jour du binaire actuel installée sur iPhone 17 Pro après accord ; lancement refusé car appareil verrouillé. Tests physiques, archive de distribution et TestFlight non validés. |
+| 1. Installation et ouverture | En cours | Binaire actuel signé installé puis lancé sur iPhone 17 Pro après déverrouillage ; processus présent une minute après. Contenu de l'écran et parcours connecté non vérifiés. Archive de distribution et TestFlight non validés. |
 | 2. Compte et connexion | En cours | Connexion publique, annulation Google, retour de récupération et saisie d'inscription contrôlés dans l'app simulée. Connexion persistante réelle, confirmation/récupération email et option Apple encore à valider/compléter. |
 | 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
@@ -43,6 +43,14 @@ compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
 
 ## Accès appareil et signature réévalués — 17 septembre, 19 h 25
+
+Mise à jour 19 h 42 : Anthony confirme le déverrouillage. Le lancement réel de
+`fr.coai.mobile` réussit (`/tmp/coai-iphone-unlocked-launch.json`). Le processus
+est toujours présent environ une minute après, contrôle ciblé par son PID
+(`/tmp/coai-iphone-process-check.json`). Aucun formulaire envoyé, préférence
+réinitialisée ni donnée de compte lue. Cela prouve le lancement du binaire sur
+appareil, pas le chargement du contenu web, la connexion ou la stabilité à long
+terme. Confirmation de l'écran affiché demandée à Anthony.
 
 Mise à jour 19 h 35 : Anthony a donné son accord. `devicectl device install app`
 a réussi sur l'iPhone 17 Pro avec le bundle existant `fr.coai.mobile`, sans

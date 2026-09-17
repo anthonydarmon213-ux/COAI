@@ -1,7 +1,8 @@
 # COAI — pilote iPhone connecté (préparation technique)
 
-**Compilé et lancé sur simulateur iPhone ; pas encore testé sur iPhone physique,
-ni prêt pour TestFlight/App Store.**
+**Compilé et testé sur simulateur ; binaire signé installé et lancé sur iPhone
+17 Pro le 17 septembre 2026. Parcours physiques non validés ; pas prêt pour
+TestFlight/App Store.** Voir `APP-STORE-READINESS.md` pour les preuves et limites.
 Le projet remplace la manipulation manuelle décrite dans `ios-prototype/README.md`.
 Le prototype historique reste conservé mais n'est pas inclus dans la cible iOS.
 
