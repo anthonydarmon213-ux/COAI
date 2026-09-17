@@ -36,6 +36,17 @@ struct IOSCoreChecks {
         for value in ["https://coai.fr/api/striped-shirt", "https://coai.fr/api/programmes", "https://coai.fr/api/compte/delete", "https://coai.fr/videos/crunch.mp4"] {
             check(!blockedResource(value), "non-payment resources remain accessible")
         }
+        for value in ["https://connect.facebook.net/en_US/fbevents.js", "https://www.facebook.com/tr/?id=1",
+                      "https://www.googletagmanager.com/gtag/js?id=test", "https://region1.google-analytics.com/g/collect",
+                      "https://stats.g.doubleclick.net/g/collect", "https://www.clarity.ms/tag/test",
+                      "https://vitals.vercel-insights.com/v1/view", "https://va.vercel-scripts.com/v1/script.js",
+                      "https://coai.fr/_vercel/insights/script.js", "https://www.coai.fr/_vercel/insights/view"] {
+            check(blockedResource(value), "optional native tracking blocked")
+        }
+        for value in ["https://accounts.google.com/o/oauth2/auth", "https://fczkfddfgooocqqkqsqw.supabase.co/auth/v1/authorize",
+                      "https://coai.fr/_next/static/main.js", "https://coai.fr/brand/coai-app-premium-180.png"] {
+            check(!blockedResource(value), "authentication and core resources preserved")
+        }
         let now = Date(timeIntervalSince1970: 1000)
         let clock = RestClock(seconds: 90, now: now)
         check(clock.remaining(at: now) == 90, "initial countdown")

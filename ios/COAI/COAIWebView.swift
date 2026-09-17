@@ -95,6 +95,8 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     private static func makeWebView() -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
+        // Non-identifying capability marker, never an authentication signal.
+        configuration.applicationNameForUserAgent = "COAIiOS/1"
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = .all
         let view = WKWebView(frame: .zero, configuration: configuration)
@@ -125,7 +127,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         do {
             let rules: WKContentRuleList = try await withCheckedThrowingContinuation { continuation in
                 WKContentRuleListStore.default().compileContentRuleList(
-                    forIdentifier: "coai-ios-pilot-no-purchases-v1",
+                    forIdentifier: "coai-ios-pilot-no-purchases-or-trackers-v2",
                     encodedContentRuleList: NavigationPolicy.contentRules
                 ) { rules, error in
                     if let rules { continuation.resume(returning: rules) }

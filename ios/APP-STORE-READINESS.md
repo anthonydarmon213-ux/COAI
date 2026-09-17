@@ -42,6 +42,29 @@ accessibilité/clavier/safe areas, captures App Store réelles, description exac
 compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
 
+## Traceurs facultatifs dans le pilote iOS — 17 septembre 2026
+
+Le pilote ne demande pas ATT : les traceurs facultatifs restent désactivés,
+même si un ancien accord aux cookies est enregistré. Marqueur de capacité
+`COAIiOS/1` dans le User-Agent, jamais utilisé pour authentifier ni ouvrir des
+droits. Le site Safari conserve ses choix habituels. Aucun consentement stocké
+n'est écrasé. Les composants Google Analytics, Meta et Vercel Analytics ne sont
+pas montés dans ce contexte ; les règles WebKit bloquent en complément leurs
+domaines connus, ainsi que Clarity. Ce n'est pas un audit exhaustif du réseau.
+
+Tests de consentement et rendu React réussis, notamment ancien accord positif,
+premier rendu, marqueurs invalides et navigateur ordinaire. Règles compilées
+par WebKit ; 24 XCTest, Release arm64 sans signature, TypeScript, lint et build
+web réussis (`/tmp/coai-native-privacy-release.log`). Un scénario UI dédié est
+ajouté mais **reste à exécuter contre le site déployé**. Le test complémentaire
+diagnostic/marketing n'a pas pu tourner : base locale 127.0.0.1:54322 arrêtée.
+
+Restent l'inventaire des données pour App Store Connect, les journaux techniques
+et Sentry, les transmissions backend et la vérification réseau sur appareil.
+Ne pas déclarer « aucune donnée collectée » : compte, coaching et services
+techniques existent. Référence :
+https://developer.apple.com/app-store/user-privacy-and-data-use/
+
 ## Téléchargements et partage natif — 17 septembre 2026
 
 ### Sauvegarde Photos : permission minimale vérifiée

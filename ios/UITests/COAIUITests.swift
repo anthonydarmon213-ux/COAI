@@ -2,6 +2,27 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testNativePrivacyKeepsOptionalTrackingOff() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        XCTAssertTrue(web.buttons["Continuer avec Google"].waitForExistence(timeout: 30))
+        let notice = web.staticTexts["Les outils publicitaires et de mesure d’audience facultatifs sont désactivés dans cette version iPhone."]
+        XCTAssertTrue(notice.waitForExistence(timeout: 15), "Nécessite la version web déployée avec la protection iOS.")
+        reveal(notice, in: app)
+        XCTAssertTrue(notice.isHittable)
+        XCTAssertFalse(web.buttons["Tout accepter"].exists)
+        XCTAssertFalse(web.buttons["Tout refuser"].exists)
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Confidentialité iOS sur la page publique COAI"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        // UI evidence only. Network blocking is checked separately.
+    }
+
+    @MainActor
     func testSavingFictitiousImageToPhotosKeepsAppUsable() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

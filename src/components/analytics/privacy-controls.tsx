@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "./google-analytics";
 import { MetaPixel } from "./meta-pixel";
-import { CONSENT_EVENT, CONSENT_KEY, PrivacyChoices, REFUSE_ALL, readConsent, saveConsent } from "@/lib/analytics/consent";
+import { CONSENT_EVENT, CONSENT_KEY, PrivacyChoices, REFUSE_ALL, isNativeIOSApp, readConsent, saveConsent } from "@/lib/analytics/consent";
 import { captureUtmFromLocation, clearUtmCookie } from "@/lib/attribution/utm-cookie";
 import { isProductionAnalyticsOrigin } from "@/lib/analytics/production-origin";
 
@@ -25,8 +25,11 @@ export function PrivacyControls() {
   const [error, setError] = useState(false);
   const active = useRef<PrivacyChoices | null>(null);
   const initialized = useRef(false);
+  const [nativeIOS, setNativeIOS] = useState(false);
 
   useEffect(() => {
+    // Resolve after hydration so the server and first client render agree.
+    setNativeIOS(isNativeIOSApp());
     const sync = () => {
       const next = readConsent();
       // Removing a script node does NOT stop its already running library.
@@ -68,9 +71,14 @@ export function PrivacyControls() {
     setOpen(false);
   }
 
+  if (nativeIOS) return <div className="px-4 pb-6 pt-3 text-center text-xs leading-5 text-slate-300">
+    <p>Les outils publicitaires et de mesure d’audience facultatifs sont désactivés dans cette version iPhone.</p>
+    <a href="/confidentialite" className="inline-flex min-h-11 items-center px-3 underline">Confidentialité</a>
+  </div>;
+
   return <>
-    {choices?.audience && isProductionAnalyticsOrigin() && <><GoogleAnalytics /><Analytics /></>}
-    {choices?.marketing && isProductionAnalyticsOrigin() && <MetaPixel />}
+    {!isNativeIOSApp() && choices?.audience && isProductionAnalyticsOrigin() && <><GoogleAnalytics /><Analytics /></>}
+    {!isNativeIOSApp() && choices?.marketing && isProductionAnalyticsOrigin() && <MetaPixel />}
     {open ? <section aria-label="Préférences de confidentialité" className={`${inline ? "relative mx-3 mb-6 sm:mx-auto" : "fixed inset-x-3 bottom-3 z-[100] mx-auto max-h-[65dvh] overflow-y-auto"} max-w-xl rounded-2xl border border-white/20 bg-[#101b23] p-3 text-white shadow-2xl sm:p-4`}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold">Confidentialité · à toi de choisir</h2>

@@ -122,4 +122,45 @@ for (const [hostname, protocol, expected] of [
   }
 }
 assert.equal(load('src/lib/analytics/production-origin.ts', {}, {}).isProductionAnalyticsOrigin(), false);
+// Native iOS never translates an old website cookie choice into ATT consent.
+window.localStorage.getItem = key => memory.get(key) ?? null;
+window.localStorage.setItem = (key, value) => memory.set(key, value);
+const accepted = JSON.stringify({ version: 1, audience: true, marketing: true, expiresAt: Date.now() + 100000 });
+memory.set(consent.CONSENT_KEY, accepted);
+for (const agent of ['Mozilla/5.0 Mobile COAIiOS/1', 'Mozilla/5.0 COAIiOS/22 Test']) {
+  window.navigator = { userAgent: agent };
+  assert.equal(consent.isNativeIOSApp(), true);
+  assert.equal(consent.hasConsent('audience'), false);
+  assert.equal(consent.hasConsent('marketing'), false);
+  assert.equal(analytics.trackEvent('native-test'), false);
+  assert.equal(analytics.trackMetaEvent('native-test'), false);
+  assert.equal(consent.saveConsent({ audience: true, marketing: true }), false);
+  assert.equal(memory.get(consent.CONSENT_KEY), accepted, 'Native must not overwrite website preferences');
+  document.cookie = '';
+  utm.captureUtmFromLocation(); assert.equal(document.cookie, '');
+  // Even a stale React state containing both acceptances cannot mount a tracker.
+  for (const nativeState of [false, true]) {
+    let index = 0;
+    const native = load('src/components/analytics/privacy-controls.tsx', {
+      ...dependencies,
+      '@/lib/analytics/production-origin': { isProductionAnalyticsOrigin: () => true },
+      react: { ...React, useState: initial => {
+        const i = index++;
+        return [i === 0 ? { audience: true, marketing: true } : i === 5 ? nativeState : initial, () => {}];
+      } },
+    }, {});
+    const markup = require('react-dom/server').renderToStaticMarkup(React.createElement(native.PrivacyControls));
+    assert.ok(!markup.includes('<script') && !markup.includes('<img'));
+    if (nativeState) {
+      assert.ok(markup.includes('désactivés dans cette version iPhone'));
+      assert.ok(!markup.includes('Tout accepter') && !markup.includes('Tout refuser'));
+    }
+  }
+}
+for (const agent of ['', 'Mozilla/5.0 iPhone Safari/604.1', 'notCOAIiOS/1', 'COAIiOS/1evil']) {
+  window.navigator = { userAgent: agent };
+  assert.equal(consent.isNativeIOSApp(), false);
+  assert.equal(consent.hasConsent('marketing'), true, 'Normal browser choices unchanged');
+}
 console.log('PASS privacy: SSR, purpose separation, refusal, expiry, malformed/blocked storage, UTM gating, no Clarity mount');
+console.log('PASS native privacy: no analytics, Meta or UTM despite stored acceptance; SSR and website unchanged');

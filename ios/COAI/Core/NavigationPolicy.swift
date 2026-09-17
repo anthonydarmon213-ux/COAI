@@ -116,13 +116,25 @@ enum NavigationPolicy {
         return .inside
     }
 
-    // Blocks subresource/XHR checkout requests too. No interception of API responses or credentials.
+    // Blocks checkout and known optional tracking resources in the native pilot.
+    // No ATT authorization is requested: web cookie consent cannot enable native tracking.
+    // Complements the web consent gate; not a complete privacy/network audit.
+    // No interception of API responses or credentials.
     // Keep in sync with purchasePaths and test on-device before any distribution.
     static let contentRules = #"""
     [
       {"trigger":{"url-filter":"^https://(www\\.)?coai\\.fr/api/stripe[/?]","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
       {"trigger":{"url-filter":"^https://(www\\.)?coai\\.fr/api/stripe$","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
-      {"trigger":{"url-filter":"^https://([^/]+\\.)?stripe\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}}
+      {"trigger":{"url-filter":"^https://([^/]+\\.)?stripe\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?facebook\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?facebook\\.net/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?google-analytics\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?googletagmanager\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?doubleclick\\.net/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?clarity\\.ms/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?vercel-insights\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https?://([^/]+\\.)?vercel-scripts\\.com/","url-filter-is-case-sensitive":false},"action":{"type":"block"}},
+      {"trigger":{"url-filter":"^https://(www\\.)?coai\\.fr/_vercel/insights/","url-filter-is-case-sensitive":false},"action":{"type":"block"}}
     ]
     """#
 }
