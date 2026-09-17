@@ -62,7 +62,19 @@ persiste. Le test remet le minuteur à zéro et désactive son option d'alerte.
 
 ### Export de compte JSON — vérification native locale
 
-**Contrôle supplémentaire : échec d'intégration Fichiers à investiguer.**
+**Mise à jour : sauvegarde locale dans Fichiers vérifiée sur simulateur.**
+La capture de l'écran complet a montré que le sélecteur était bien ouvert,
+avec un bouton Retour, mais sans le bouton Annuler attendu par le test.
+L'échec précédent provenait donc du sélecteur XCUITest pour ce parcours, pas
+d'une preuve de panne de l'app. Le test attend désormais le champ du nom,
+saisit un nom unique `COAI-QA-<UUID>`, enregistre et contrôle le retour à COAI.
+Réussi : `/tmp/coai-files-save-confirm.xcresult`, simulateur QA SE / iOS 26.5.
+Le JSON sauvegardé dans le fournisseur local a été relu séparément et comparé
+octet par octet : 26 octets identiques à `{"test":true,"seances":[]}`.
+Aucune donnée réelle, aucun remplacement de fichier existant et aucun iCloud.
+Ce succès ne valide ni l'export complet d'un vrai compte, ni l'appareil physique.
+
+**Historique de l'investigation (hypothèse d'intégration désormais levée ici).**
 Le test `testJSONFileSavePicker` sélectionne réellement l'action « Enregistrer
 dans Fichiers », mais le sélecteur/son bouton d'annulation n'est pas observable
 sur le simulateur SE après 30 secondes. Résultats en échec conservés :
@@ -71,10 +83,9 @@ Le processus Apple SaveToFiles est lancé ; ses logs montrent des erreurs
 FileProvider et un fournisseur iCloud non authentifié. Ce n'est pas une preuve
 que l'absence de connexion iCloud soit la cause unique. Aucun compte iCloud
 connecté, fichier réel enregistré ou réglage système modifié pour contourner.
-Le test reste volontairement rouge, sans masquer cet écart par un skip.
-Il faut isoler fournisseur local / présentation / interrogation XCUITest,
-puis tester une vraie sauvegarde et relire le fichier. Les réussites ci-dessous
-portent uniquement sur la validation du format et la feuille de partage.
+Le test est resté rouge jusqu'à l'identification du mauvais élément attendu.
+Les anciens résultats ci-dessous portent uniquement sur la validation du format
+et la feuille de partage ; la sauvegarde vérifiée est décrite ci-dessus.
 
 Investigation complémentaire : lancement de l'app système Fichiers puis accès
 à Explorer sur le simulateur QA. « Sur mon iPhone » est disponible et vide ;
@@ -84,8 +95,8 @@ Preuves : `/tmp/coai-files-initialization.xcresult` et
 `/tmp/coai-files-locations.xcresult`. L'initialisation manquante de Fichiers ne
 suffit donc pas à expliquer l'échec. Le code exploratoire qui journalisait
 l'arbre d'accessibilité de Fichiers n'est pas conservé dans les tests réguliers.
-Prochaine isolation : présentation UIKit / extension système, puis comparaison
-sur appareil. Ne pas activer le partage de tout le dossier Documents de l'app
+La capture complète a ensuite permis d'isoler l'interrogation XCUITest ; la
+comparaison sur appareil reste nécessaire. Ne pas activer le partage de tout le dossier Documents de l'app
 pour contourner cet échec : cela pourrait exposer des fichiers privés.
 
 Le bouton web « Exporter mes données » fabrique un Blob `application/json` qui
@@ -99,8 +110,9 @@ actifs. Aucune donnée réelle utilisée dans ces tests.
 web réussis. Deux tests UI réussis dans le simulateur SE : export JSON fictif
 et refus d'un JSON invalide, plus non-régression PDF/PNG. Capture inspectée :
 « JSON · 26 octets », feuille système avec « Enregistrer dans Fichiers ».
-Preuve : `/tmp/coai-json-export.xcresult`. L'action d'enregistrement elle-même,
-l'export complet d'un compte connecté et l'app distribuée ne sont pas validés.
+Preuve historique : `/tmp/coai-json-export.xcresult`. L'enregistrement local a
+été validé ensuite (voir ci-dessus) ; l'export complet d'un compte connecté et
+l'app distribuée ne sont pas validés.
 La couverture des données par la route serveur reste à compléter séparément.
 
 ### Traceurs

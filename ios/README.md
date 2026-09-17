@@ -224,8 +224,8 @@ test injecté. Ce test ne prouve pas le fonctionnement du parcours connecté.
 
 Exécution (remplacer l'identifiant par un simulateur retourné par `simctl`).
 La réception et le refus d'alerte demandent des appareils QA distincts ; ne pas
-lancer tous les tests sans sélectionner leurs prérequis. Le test Fichiers reste
-en échec connu et le contrôle de confidentialité web attend son déploiement.
+lancer tous les tests sans sélectionner leurs prérequis. Le contrôle de
+confidentialité web attend son déploiement.
 
 ```sh
 xcrun simctl list devices available
@@ -244,6 +244,16 @@ seule peut omettre la bannière). Image inspectée : logo et message COAI prése
 Preuve : `/tmp/coai-rest-delivery-visible.xcresult`. Fixture web Debug hors réseau,
 service d'alerte réel. Appareil physique, verrouillage, Concentration et arrêt
 forcé restent non vérifiés. Ne pas utiliser le simulateur de connexion personnelle.
+
+`testJSONFileSavePicker` enregistre désormais réellement le JSON fictif sous un
+nom unique `COAI-QA-<UUID>` dans Fichiers, puis vérifie le retour à COAI.
+Il attend le champ `DOCPicker.filenameTextField` : sur iOS 26.5 le sélecteur peut
+afficher Retour et non Annuler. Le précédent échec d'attente d'Annuler ne prouvait
+donc pas une panne de présentation. Capture écran complet conservée avant contrôle.
+Réussi : `/tmp/coai-files-save-confirm.xcresult`. Relecture indépendante du fichier
+dans le fournisseur local : 26 octets identiques à la fixture. Le test laisse
+ce petit fichier fictif sur le simulateur QA ; ne pas le lancer sur un appareil
+personnel ou une destination iCloud. L'export d'un vrai compte reste à vérifier.
 
 Résultat du 17 septembre : 5 tests d'interface réussis sur iPhone 17 / iOS 26.5.
 Le scénario de notifications nécessite un simulateur avec permission vierge

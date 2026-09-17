@@ -54,15 +54,25 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(save.waitForExistence(timeout: 10))
         save.tap()
         let picker = XCUIApplication(bundleIdentifier: "com.apple.DocumentManagerUICore.SaveToFiles")
-        // Known open integration failure on the current SE simulator. Do not
-        // replace this assertion with a pass/skip: opening Share is not saving.
-        let cancel = picker.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
-        XCTAssertTrue(cancel.waitForExistence(timeout: 30))
-        let attachment = XCTAttachment(screenshot: app.screenshot())
+        // iOS may show Back rather than Cancel when a local folder is selected.
+        let filename = picker.textFields["DOCPicker.filenameTextField"]
+        let pickerOpened = filename.waitForExistence(timeout: 30)
+        // Capture all system windows even when the extension cannot be queried.
+        // This fixture contains no account data.
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         attachment.name = "Destination de l'export JSON fictif"
         attachment.lifetime = .keepAlways
         add(attachment)
-        cancel.tap()
+        XCTAssertTrue(pickerOpened)
+        filename.tap()
+        filename.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "COAI-document".count))
+        filename.typeText("COAI-QA-" + UUID().uuidString)
+        let confirm = picker.buttons.matching(NSPredicate(format: "label IN %@", ["Enregistrer", "Save"])).firstMatch
+        XCTAssertTrue(confirm.isEnabled)
+        confirm.tap()
+        XCTAssertTrue(filename.waitForNonExistence(timeout: 15))
+        XCTAssertTrue(export.waitForExistence(timeout: 10))
+        XCTAssertTrue(export.isHittable)
     }
 
     @MainActor
