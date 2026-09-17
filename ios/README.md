@@ -183,6 +183,16 @@ Références :
 
 ## Test d'interface reproductible — 17 septembre 2026
 
+La saisie d'inscription dispose aussi d'un scénario autonome :
+`testSignupFieldsAndPasswordVisibilityWithKeyboard`. Il entre uniquement des
+valeurs fictives et ne soumet jamais le formulaire. Il vérifie les trois champs,
+le clavier, l'affichage/masquage du mot de passe et le bouton accessible.
+Réussi sur iPhone 17 / iOS 26.5, avec capture inspectée. Le parcours authentifié
+demande une connexion explicite dans le simulateur, distincte du navigateur Mac.
+Les six scénarios sont également passés sur iPhone SE (3e génération) / iOS 26.5.
+La saisie a entraîné de longues attentes d'animation XCUITest sur ce simulateur :
+ne pas interpréter ce succès fonctionnel comme une validation des performances.
+
 Le schéma COAI contient désormais la cible `COAIUITests`. Le test ouvre la vraie
 app, utilise Repos, démarre deux minutes, met en pause, ferme/réouvre la fiche,
 termine puis relance le processus, reprend et arrête. Il n'achète rien et ne

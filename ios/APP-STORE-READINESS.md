@@ -18,15 +18,15 @@ pas encore une expérience native complète validée.
 | Parcours | État réel | Preuve / travail restant avant validation |
 | --- | --- | --- |
 | 1. Installation et ouverture | En cours | Builds simulateur et Release arm64 sans signature réussis. Installation physique, relance, archive de distribution et TestFlight à vérifier. |
-| 2. Compte et connexion | En cours | PKCE Google, annulation et reprise protégée testés unitairement. Connexion persistante réelle, récupération et option Apple encore à valider/compléter. |
+| 2. Compte et connexion | En cours | Connexion publique, annulation Google, retour de récupération et saisie d'inscription contrôlés dans l'app simulée. Connexion persistante réelle, confirmation/récupération email et option Apple encore à valider/compléter. |
 | 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
 | 5. Entraînement, nutrition, récupération | En cours | Routes existantes et minuteur natif. Vérifier droits, médias, fiches et navigation sur petits écrans avec données réelles de test. |
 | 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux : erreurs, brouillon et reprise. Séance complète, historique, export et partage natif à vérifier sur appareil. |
 | 7. Check-ins, adaptations et mémoire | Restant : validation iOS | Moteur et routes existants. Vérifier persistance, isolation des comptes, confirmations, cohérence des adaptations et absence d'appel payant. |
 | 8. Abonnements Apple | En cours + intervention humaine | Service StoreKit préparé mais non raccordé. Catalogue, droits serveur, achat, essai, restauration, expiration et résiliation restent à réaliser et tester. Tarifs/migration à valider. |
-| 9. Notifications et réengagement | En cours | Alerte locale facultative de repos ajoutée. Concurrence testée, affichage iOS réel encore non vérifié. Réengagement consenti non implémenté. |
-| 10. Suppression sécurisée | En cours | Vérification de résiliation Stripe et erreurs UI testées avec doublures. Restent erreurs de suppression Auth/Storage, reprise partielle et test intégral sur compte jetable autorisé. |
+| 9. Notifications et réengagement | En cours | Alerte locale facultative de repos ajoutée. Concurrence et refus de permission testés ; réception réelle en arrière-plan encore non vérifiée. Réengagement consenti non implémenté. |
+| 10. Suppression sécurisée | En cours | Résiliation Stripe, erreurs Auth/Storage et reprise après profil supprimé couvertes par tests avec doublures. Restent concurrence, révocation de sessions et test intégral sur compte jetable autorisé. |
 
 Terminé et testé **au niveau technique local seulement** : règles de navigation,
 horloge/pause persistante, séquencement des livraisons d'achats et des alertes
@@ -41,6 +41,30 @@ Restant transversal : audit confidentialité, sécurité et charge backend,
 accessibilité/clavier/safe areas, captures App Store réelles, description exacte,
 compte de revue, tests physiques et TestFlight. Rentabilité et croissance ne
 peuvent pas être déduites d'un build : elles nécessitent des mesures réelles.
+
+## Saisie d'inscription dans l'app — 17 septembre 2026
+
+Un sixième scénario UI saisit des valeurs fictives dans Prénom, Email et Mot de
+passe, vérifie le clavier, la disparition de la barre native, l'affichage puis
+le masquage du mot de passe et l'accès au bouton de création. Il ne soumet jamais
+le formulaire et ne crée aucun compte. Test réussi sur iPhone 17 simulé :
+`/tmp/coai-signup-keyboard-20260917.xcresult`. Capture exportée et inspectée :
+les valeurs et le bouton sont lisibles, le mot de passe est masqué à la fin.
+Ce scénario ne démontre pas la création effective du compte ni l'email reçu.
+
+Les **6 scénarios passent aussi sur iPhone SE (3e génération), iOS 26.5**,
+375 × 667 points : `/tmp/coai-small-screen-20260917.xcresult`. Captures de
+connexion/clavier et d'inscription exportées et inspectées. Les champs, le
+masquage et le bouton sont accessibles par défilement. Réserve : le test de
+saisie a subi des attentes d'animation de 60 secondes répétées dans XCUITest
+(suite : environ 18 minutes). Les actions finissent et assertions passent,
+mais ces résultats ne prouvent pas la fluidité sur un iPhone physique. Ce point
+reste à investiguer sur appareil avant validation des performances.
+
+Une connexion réelle dans l'app est nécessaire pour tester ensuite diagnostic,
+programme, sauvegarde des séances et persistance entre relances. La connexion
+Google du navigateur de bureau n'est pas automatiquement transférée au pilote.
+Ne pas extraire ses cookies ou demander de mot de passe dans la conversation.
 
 ## Alerte de repos facultative — 17 septembre 2026
 

@@ -2,6 +2,47 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testSignupFieldsAndPasswordVisibilityWithKeyboard() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        XCTAssertTrue(web.buttons["Continuer avec Google"].waitForExistence(timeout: 30))
+        let signup = web.links["S'inscrire"]
+        reveal(signup, in: app)
+        signup.tap()
+        let name = web.textFields["PRÉNOM"]
+        XCTAssertTrue(name.waitForExistence(timeout: 15))
+        name.tap()
+        name.typeText("Test interface")
+        let email = web.textFields["EMAIL"]
+        reveal(email, in: app)
+        email.tap()
+        email.typeText("coai-ui@example.invalid")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Exemple-local-26")
+        XCTAssertTrue(app.keyboards.keys.firstMatch.exists)
+        XCTAssertTrue(app.buttons["Repos"].waitForNonExistence(timeout: 5))
+        let show = web.switches["Afficher le mot de passe"]
+        reveal(show, in: app)
+        show.tap()
+        XCTAssertEqual(web.textFields["MOT DE PASSE"].value as? String, "Exemple-local-26")
+        web.switches["Masquer le mot de passe"].tap()
+        XCTAssertTrue(password.exists)
+        let submit = web.buttons["Créer mon compte gratuit →"]
+        reveal(submit, in: app)
+        XCTAssertTrue(submit.isEnabled)
+        // Only local input. Never submit these fictional credentials to production.
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Inscription, saisie locale et bouton accessible"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    @MainActor
     func testNotificationRefusalDoesNotBlockRestTimer() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
