@@ -44,6 +44,13 @@ peuvent pas être déduites d'un build : elles nécessitent des mesures réelles
 
 ## Traceurs facultatifs dans le pilote iOS — 17 septembre 2026
 
+Inventaire et écarts précis : [PRIVACY-AUDIT.md](PRIVACY-AUDIT.md).
+Après compilation de la cible UI, trois scénarios hors réseau passent aussi
+(partage et ajout/refus Photos) : `/tmp/coai-native-privacy-offline-regression.xcresult`.
+Commit `8bd72c7` sauvegardé localement ; push en échec réseau. Vercel confirme
+que la production est encore sur `371edfb` : nouveau comportement public non
+déployé et non validé. Aucun succès production annoncé pour ce lot.
+
 Le pilote ne demande pas ATT : les traceurs facultatifs restent désactivés,
 même si un ancien accord aux cookies est enregistré. Marqueur de capacité
 `COAIiOS/1` dans le User-Agent, jamais utilisé pour authentifier ni ouvrir des
