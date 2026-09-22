@@ -602,6 +602,9 @@ export function DiagnosticQuiz({
   pilierPhotos = PILIER_PHOTOS_VIDE,
 }: { connecte?: boolean; abonnementActif?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
+  const [analyseIndex, setAnalyseIndex] = useState(0);
+  const [analyseProgress, setAnalyseProgress] = useState(0);
+  const [revealIndex, setRevealIndex] = useState(0);
 
   // Remonte en haut à chaque changement d'étape (01/09/2026, Anthony : « on
   // reste en bas, il faut scroller pour remonter, on perd en fluidité »).
@@ -784,6 +787,15 @@ export function DiagnosticQuiz({
   }
   STEP_ORDER.push("analyse", "reveal", "result");
 
+  function goToStep(target: Step) {
+    if (target === "analyse") {
+      setAnalyseIndex(0);
+      setAnalyseProgress(0);
+    }
+    if (target === "reveal") setRevealIndex(0);
+    setStep(target);
+  }
+
   function goNext() {
     // Événement funnel (section 15) : une vraie question vient d'être
     // répondue — jamais déclenché pour "intro"/"analyse" (pas de question).
@@ -792,7 +804,7 @@ export function DiagnosticQuiz({
     }
     const i = STEP_ORDER.indexOf(step);
     const target = STEP_ORDER[i + 1];
-    if (target) setStep(target);
+    if (target) goToStep(target);
   }
 
   function chooseSingle<T>(setter: (value: T) => void, value: T) {
@@ -803,12 +815,10 @@ export function DiagnosticQuiz({
   }
   function goBack() {
     const i = STEP_ORDER.indexOf(step);
-    // "analyse"/"reveal" ne sont pas de vraies étapes (rien à corriger) :
-    // "Retour" depuis "result" n'existe pas (pas de bouton nav sur ce step),
-    // et "analyse"/"reveal" enchaînent automatiquement l'un vers l'autre
-    // puis vers "result" sans jamais s'arrêter dessus.
+    // La révélation avance uniquement sur une action explicite. Si elle
+    // est revisitée, ses écrans repartent du premier élément.
     const target = STEP_ORDER[i - 1];
-    if (target) setStep(target);
+    if (target) goToStep(target);
   }
 
   // Reprise du diagnostic (Phase 5B, section 14, 11/08/2026) : au premier
@@ -1064,12 +1074,8 @@ export function DiagnosticQuiz({
   // volontaire avant la révélation — la personne vient de répondre à 14
   // questions, ce court passage matérialise le "travail" fait sur ses
   // réponses plutôt qu'un résultat qui apparaît instantanément.
-  const [analyseIndex, setAnalyseIndex] = useState(0);
-  const [analyseProgress, setAnalyseProgress] = useState(0);
   useEffect(() => {
     if (step !== "analyse") return;
-    setAnalyseIndex(0);
-    setAnalyseProgress(0);
     // 3 secondes au total (21/08/2026, demande Anthony) réparties sur les
     // messages, avec une jauge qui avance en continu — la personne voit un
     // vrai décompte plutôt qu'un simple arc qui tourne.
@@ -1082,13 +1088,15 @@ export function DiagnosticQuiz({
     const progressInterval = setInterval(() => {
       setAnalyseProgress(Math.min(100, Math.round(((Date.now() - debut) / dureeTotale) * 100)));
     }, 60);
-    const advance = setTimeout(goNext, dureeTotale + 250);
+    const advance = setTimeout(() => {
+      setRevealIndex(0);
+      setStep("reveal");
+    }, dureeTotale + 250);
     return () => {
       clearInterval(messageInterval);
       clearInterval(progressInterval);
       clearTimeout(advance);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   // Résultat atteint : plus rien à reprendre (efface la progression
@@ -1251,12 +1259,9 @@ export function DiagnosticQuiz({
   // le même correctif déjà appliqué à respire1/respire2 le 19/08/2026 pour
   // le même symptôme. N'avance plus que sur un vrai tap/clic.
   const revealScreenCount = (diagnostic?.pointsATravailler.length ?? 0) > 0 ? 4 : 3;
-  const [revealIndex, setRevealIndex] = useState(0);
   useEffect(() => {
     if (step !== "reveal") return;
-    setRevealIndex(0);
     trackFunnelEvent("diagnostic_reveal_started");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   function handleRevealTap() {

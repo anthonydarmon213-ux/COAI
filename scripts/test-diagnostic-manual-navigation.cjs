@@ -6,9 +6,12 @@ const source = fs.readFileSync('src/components/marketing/diagnostic-quiz.tsx', '
 const ast = ts.createSourceFile('quiz.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 let handler;
 let directResult;
+let transition, analysisEffect;
 function visit(node) {
   if (ts.isFunctionDeclaration(node) && node.name?.text === 'chooseSingle') handler = node;
   if (ts.isFunctionDeclaration(node) && node.name?.text === 'showCompleteResult') directResult = node;
+  if (ts.isFunctionDeclaration(node) && node.name?.text === 'goToStep') transition = node;
+  if (ts.isCallExpression(node) && node.expression.getText(ast) === 'useEffect' && node.arguments[0]?.getText(ast).includes('const dureeTotale = 3000')) analysisEffect = node.arguments[0];
   ts.forEachChild(node, visit);
 }
 visit(ast);
@@ -42,3 +45,29 @@ assert.doesNotMatch(source,/Touche l&apos;écran pour continuer/);
 console.log('PASS direct result: available after calculation only; real button and no click-anywhere instruction');
 console.log('PASS actual chooseSingle: selection and correction without timer/navigation; explicit Continue wired');
 console.log('LIMIT: isolated handler regression, not full browser journey');
+
+assert.ok(transition);assert.ok(analysisEffect);
+const changes=[];
+const transitionBox={setAnalyseIndex:v=>changes.push(['index',v]),setAnalyseProgress:v=>changes.push(['progress',v]),setRevealIndex:v=>changes.push(['reveal',v]),setStep:v=>changes.push(['step',v])};
+vm.runInNewContext(ts.transpileModule(transition.getText(ast),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,transitionBox);
+vm.runInNewContext('goToStep("analyse")',transitionBox);
+assert.deepEqual(changes,[['index',0],['progress',0],['step','analyse']]);
+changes.length=0;vm.runInNewContext('goToStep("reveal")',transitionBox);
+assert.deepEqual(changes,[['reveal',0],['step','reveal']]);
+changes.length=0;vm.runInNewContext('goToStep("niveau")',transitionBox);
+assert.deepEqual(changes,[['step','niveau']]);
+let counter=0;
+const timers=new Map();
+const timerBox={...transitionBox,step:'analyse',ANALYSE_MESSAGES:['A','B','C'],Date,
+  setInterval:(fn,delay)=>{timers.set(++counter,{fn,delay});return counter;},
+  setTimeout:(fn,delay)=>{timers.set(++counter,{fn,delay});return counter;},
+  clearInterval:id=>timers.delete(id),clearTimeout:id=>timers.delete(id)};
+const effect=vm.runInNewContext(ts.transpileModule(`(${analysisEffect.getText(ast)})`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,timerBox);
+changes.length=0;const cancel=effect();
+assert.equal(changes.length,0,'No synchronous resets inside effect');
+assert.equal(timers.size,3);
+const advance=[...timers.values()].find(timer=>timer.delay===3250);assert.ok(advance);
+advance.fn();assert.deepEqual(changes,[['reveal',0],['step','reveal']]);
+cancel();assert.equal(timers.size,0,'Leaving analysis cancels every timer');
+timerBox.step='niveau';assert.equal(effect(),undefined);assert.equal(timers.size,0);
+console.log('PASS diagnostic transitions: resets before navigation, scheduled reveal, no reset effect, timer cleanup. Clock/timers simulated.');
