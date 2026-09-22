@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ageCoaiDeclaratif, AGE_COAI_DECLARATIF_DISCLAIMER } from "@/lib/diagnostic/age-coai-declaratif";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import {
   clearDiagnosticProgress,
   readDiagnosticProgress,
   saveDiagnosticProgress,
+  subscribeDiagnosticProgress,
+  diagnosticProgressStep,
+  serverDiagnosticProgressStep,
 } from "@/lib/diagnostic/progress-storage";
 import { readUtmCookie } from "@/lib/attribution/utm-cookie";
 import { buildMiniDiagnostic, AUCUNE_DOULEUR_LABEL, RESULTATS_TIMELINE } from "@/lib/diagnostic/mini-diagnostic";
@@ -715,7 +718,8 @@ export function DiagnosticQuiz({
   const [applyErrorMessage, setApplyErrorMessage] = useState<string | null>(null);
   const [applyNeedsFormule, setApplyNeedsFormule] = useState(false);
   const [applyNeedsReview, setApplyNeedsReview] = useState(false);
-  const [resumable, setResumable] = useState(false);
+  const savedStep = useSyncExternalStore(subscribeDiagnosticProgress, diagnosticProgressStep, serverDiagnosticProgressStep);
+  const resumable = savedStep !== null && questionSteps.includes(savedStep as Step);
 
   const stepIndex = questionSteps.indexOf(step);
   const progressPct = stepIndex >= 0 ? Math.round((stepIndex / questionSteps.length) * 100) : 0;
@@ -820,19 +824,6 @@ export function DiagnosticQuiz({
     const target = STEP_ORDER[i - 1];
     if (target) goToStep(target);
   }
-
-  // Reprise du diagnostic (Phase 5B, section 14, 11/08/2026) : au premier
-  // rendu, on regarde si une progression a été laissée en cours — si oui,
-  // l'écran d'intro propose "Continuer mon diagnostic" plutôt que de
-  // recommencer à zéro. Ne s'applique qu'une fois, pas à chaque changement
-  // d'étape (sinon on écraserait resumable=false dès le premier goNext).
-  useEffect(() => {
-    const saved = readDiagnosticProgress<Record<string, unknown>>();
-    if (saved && typeof saved.step === "string" && saved.step !== "intro") {
-      setResumable(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Écrans respirants "respire1"/"respire2" (19/08/2026, corrigé le
   // 19/08/2026 suite au retour d'Anthony : l'auto-avance à 4,2s ne
@@ -1066,7 +1057,6 @@ export function DiagnosticQuiz({
 
   function restartDiagnostic() {
     clearDiagnosticProgress();
-    setResumable(false);
     startDiagnostic();
   }
 
