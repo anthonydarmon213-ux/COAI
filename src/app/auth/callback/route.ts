@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(authFailureDestination(origin, returnTo, searchParams.get("error_code") ?? undefined));
   }
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data.user) {
     return NextResponse.redirect(authFailureDestination(origin, returnTo, error?.code));
