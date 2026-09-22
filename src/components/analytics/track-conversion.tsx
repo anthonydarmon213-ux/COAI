@@ -27,11 +27,13 @@ export function TrackConversion({
 }) {
   const tracker = useRef<{ identity: string; attempt: () => void } | null>(null);
   const identity = JSON.stringify([name, onceKey, metaEvent]);
-  if (tracker.current?.identity !== identity) {
-    tracker.current = { identity, attempt: createConversionTracker({ name, params, metaEvent, metaParams, onceKey }) };
-  }
-  const attempt = tracker.current.attempt;
   useEffect(() => {
+    // Only committed renders may replace the delivery state. An abandoned
+    // render must not consume or reset a conversion's consent/receipt state.
+    if (tracker.current?.identity !== identity) {
+      tracker.current = { identity, attempt: createConversionTracker({ name, params, metaEvent, metaParams, onceKey }) };
+    }
+    const attempt = tracker.current.attempt;
     window.addEventListener(CONSENT_EVENT, attempt);
     window.addEventListener(ANALYTICS_READY_EVENT, attempt);
     attempt();
@@ -39,7 +41,7 @@ export function TrackConversion({
       window.removeEventListener(CONSENT_EVENT, attempt);
       window.removeEventListener(ANALYTICS_READY_EVENT, attempt);
     };
-  }, [attempt]);
+  }, [identity, name, params, metaEvent, metaParams, onceKey]);
 
   return null;
 }

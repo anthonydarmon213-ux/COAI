@@ -16,13 +16,16 @@ function load(file,deps={}) {
 const consent=load('src/lib/analytics/consent.ts');
 const analytics=load('src/lib/analytics.ts',{'./analytics/consent':consent});
 const delivery=load('src/lib/analytics/conversion-delivery.ts',{'@/lib/analytics':analytics,'./consent':consent});
-let cleanup;const ref={current:null};
+let cleanup;let effect;const ref={current:null};
 const component=load('src/components/analytics/track-conversion.tsx',{
-  react:{useRef:()=>ref,useEffect:fn=>{cleanup=fn();}},
+  react:{useRef:()=>ref,useEffect:fn=>{effect=fn;}},
   '@/lib/analytics/consent':consent,'@/lib/analytics/conversion-delivery':delivery,
 });
 const conversion={name:'checkout_completed',onceKey:'fictional-checkout',metaEvent:'StartTrial'};
 component.TrackConversion(conversion);
+assert.equal(ref.current,null,'Rendering alone must not create delivery state');
+assert.equal(listeners.size,0,'Rendering alone must not subscribe');
+cleanup=effect();
 assert.equal(calls.length,0);
 consent.saveConsent({audience:true,marketing:false});
 assert.equal(calls.length,0,'SDK absent must not consume the conversion');
@@ -37,8 +40,15 @@ assert.equal(calls.length,1,'No marketing consent');
 consent.saveConsent({audience:true,marketing:true});
 assert.equal(calls.length,2,'Google marker must not suppress Meta');
 assert.equal(storage.get('coai_conversion_checkout_completed_fictional-checkout_marketing'),'1');
+const committedTracker=ref.current;
+component.TrackConversion({...conversion,onceKey:'abandoned-render'});
+assert.equal(ref.current,committedTracker,'An abandoned render must not replace the committed tracker');
 cleanup();
 assert.ok([...listeners.values()].every(set=>set.size===0));
+component.TrackConversion(conversion);
+cleanup=effect();
+assert.equal(calls.length,2,'Effect replay preserves delivery receipts');
+cleanup();
 delivery.createConversionTracker(conversion)();
 assert.equal(calls.length,2,'Reload deduplicates both channels');
 consent.saveConsent({audience:false,marketing:false});

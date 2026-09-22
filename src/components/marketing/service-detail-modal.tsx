@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { SubscribeButton } from "@/components/compte/subscribe-button";
 import { MembreFondateurBadge } from "@/components/marketing/membre-fondateur-badge";
 import { TIER_BY_SERVICE, vipReservationHref, type ServiceKey } from "@/lib/pricing/tiers";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+
+const subscribeToClient = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
 
 // Modal plein écran (14/08/2026, simplifié le 16/08/2026 — demande Anthony :
 // "il faut mettre une seule formule et ce qu'elle propose exactement et à la
@@ -32,14 +36,14 @@ export function ServiceDetailModal({
   // comme économie, sans être imposé au prospect.
   const tier = TIER_BY_SERVICE[initialService];
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
   // Rendue via un portail (voir plus bas) : un ancêtre quelconque peut avoir
   // un backdrop-filter/transform (ex. .coai-diagnostic-card) qui casse
   // silencieusement position:fixed en le confinant dans son propre cadre —
   // d'où un "écran noir" au lieu d'une vraie modale plein écran. document
   // n'existe pas côté serveur, donc on ne monte le portail qu'après le
   // premier rendu client.
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(subscribeToClient, clientSnapshot, serverSnapshot);
 
   const close = useCallback(() => {
     if (window.history.state?.coaiServiceModal) window.history.back();
@@ -47,7 +51,6 @@ export function ServiceDetailModal({
   }, []);
 
   useEffect(() => {
-    setMounted(true);
     window.history.pushState({ ...window.history.state, coaiServiceModal: true }, "");
     const onPopState = () => onCloseRef.current();
     const onKeyDown = (e: KeyboardEvent) => {
