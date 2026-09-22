@@ -22,7 +22,14 @@ function fixture(provider) {
     require:name=>{assert(name in deps,name);return deps[name];},
   };
   vm.runInNewContext(source,box);
-  const render=(sessionId='cs_fixture')=>{cursor=0;return box.exports.CheckoutAccessGate({sessionId,children:React.createElement('div',null,'ESSAI ACTIVE ET BILAN')});};
+  let mountedKey;
+  const render=(sessionId='cs_fixture')=>{
+    const gate=box.exports.CheckoutAccessGate({sessionId,children:React.createElement('div',null,'ESSAI ACTIVE ET BILAN')});
+    assert.equal(gate.key,sessionId,'Session owns the React component key');
+    if(mountedKey!==gate.key){values.length=0;mountedKey=gate.key;}
+    cursor=0;
+    return gate.type(gate.props);
+  };
   return {render, effects, timers, calls, values};
 }
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
@@ -46,6 +53,7 @@ const response=(body,ok=true)=>({ok,json:async()=>body});
     assert.equal(html.includes('ESSAI ACTIVE'),expected==='active');
     if(expected==='error') {assert(html.includes('Réessayer'));assert(!html.includes('/pricing'));}
     assert(!renderToStaticMarkup(f.render('cs_another')).includes('ESSAI ACTIVE'),'Changing session must not reuse previous success');
+    assert(!renderToStaticMarkup(f.render('cs_fixture')).includes('ESSAI ACTIVE'),'Returning A→B→A must verify again');
     cleanup();
   }
   const network=fixture(()=>{throw Error('offline');});network.render();network.effects[0]();await flush();

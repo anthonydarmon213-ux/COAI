@@ -9,6 +9,11 @@ type Status = "checking" | "active" | "inactive" | "error";
 // Ne monter ni l'activation du programme ni la confirmation visuelle avant
 // que les droits aient été synchronisés, même si le bilan est absent.
 export function CheckoutAccessGate({ sessionId, children }: { sessionId: string; children: ReactNode }) {
+  // A different checkout owns a fresh verification lifecycle, including A→B→A.
+  return <CheckoutSessionAccess key={sessionId} sessionId={sessionId}>{children}</CheckoutSessionAccess>;
+}
+
+function CheckoutSessionAccess({ sessionId, children }: { sessionId: string; children: ReactNode }) {
   const [result, setResult] = useState<{ sessionId: string; status: Status }>({ sessionId, status: "checking" });
   const [attempt, setAttempt] = useState(0);
   const status = result.sessionId === sessionId ? result.status : "checking";
@@ -17,7 +22,6 @@ export function CheckoutAccessGate({ sessionId, children }: { sessionId: string;
     let disposed = false;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
-    setResult({ sessionId, status: "checking" });
 
     async function confirm() {
       try {
