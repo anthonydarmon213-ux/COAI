@@ -15,11 +15,12 @@ export const metadata = {
 // libre. Les données sont écrites dans SeanceLog via /api/seances, au même
 // format que le lecteur — elles alimentent donc les graphiques de
 // progression et le volume par muscle sans traitement supplémentaire.
-export default async function RepCountPage({
-  searchParams,
-}: {
-  searchParams?: { exercice?: string | string[]; onboarding?: string };
-}) {
+export default async function RepCountPage(
+  props: {
+    searchParams?: Promise<{ exercice?: string | string[]; onboarding?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   // Date rendue sur le serveur, forcee sur Europe/Paris : l'hebergeur tourne
   // en UTC et afficherait la veille en soiree. C'est bien ce jour-la que les
   // series seront enregistrees.

@@ -65,7 +65,8 @@ function BoutiqueProgrammesSkeleton() {
   );
 }
 
-export default function BoutiquePage({ searchParams }: { searchParams?: { achat?: string } }) {
+export default async function BoutiquePage(props: { searchParams?: Promise<{ achat?: string }> }) {
+  const searchParams = await props.searchParams;
 
   return (
     <main className="coai-landing-lux min-h-screen px-5 pb-24 pt-28 sm:px-8 sm:pt-32">

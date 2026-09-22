@@ -30,11 +30,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export default async function DiagnosticPage({
-  searchParams,
-}: {
-  searchParams?: { utm_source?: string; challenge_score?: string };
-}) {
+export default async function DiagnosticPage(
+  props: {
+    searchParams?: Promise<{ utm_source?: string; challenge_score?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   // Parcours D (Phase 5B, 11/08/2026) : un abonné déjà connecté qui refait
   // le diagnostic n'a pas besoin de créer un compte ni de ressaisir son
   // email — cf. DiagnosticQuiz (prop `connecte`).

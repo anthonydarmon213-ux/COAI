@@ -29,7 +29,10 @@ function Benefits({ included, excluded }: { included: string[]; excluded: string
   );
 }
 
-export default function PricingPage({ searchParams }: { searchParams?: { checkout?: string; from?: string; selected?: string; billing?: string; vipSessions?: string } }) {
+export default async function PricingPage(
+  props: { searchParams?: Promise<{ checkout?: string; from?: string; selected?: string; billing?: string; vipSessions?: string }> }
+) {
+  const searchParams = await props.searchParams;
   const billing = searchParams?.billing === "ANNUAL" ? "ANNUAL" : searchParams?.billing === "QUARTERLY" ? "QUARTERLY" : "MONTHLY";
   const remote = TIER_BY_SERVICE.TRANSFORMATION;
   const vip = TIER_BY_SERVICE.VIP;
