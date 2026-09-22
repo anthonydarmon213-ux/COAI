@@ -331,7 +331,13 @@ export function SeanceRunner({
   const [reprise] = useState(() => sauvegarde !== null);
   const [index, setIndex] = useState(() => Math.min(sauvegarde?.index ?? 0, Math.max(0, steps.length - 1)));
   const [secondesRestantes, setSecondesRestantes] = useState(0);
-  const [repos, setRepos] = useState<SeanceSauvegardee["repos"]>(() => sauvegarde?.repos);
+  const [repos, setRepos] = useState<SeanceSauvegardee["repos"]>(() => {
+    const initialStep = steps[index];
+    if (initialStep?.type !== "repos") return undefined;
+    return sauvegarde?.repos?.index === index
+      ? sauvegarde.repos
+      : { index, fin: Date.now() + initialStep.secondes * 1000 };
+  });
   const reposSignale = useRef<number | null>(null);
   const [chronoGlobal, setChronoGlobal] = useState(0);
   const [termine, setTermine] = useState(false);
@@ -383,15 +389,6 @@ export function SeanceRunner({
     const t = setInterval(() => setChronoGlobal(Math.round((Date.now() - debut) / 1000)), 1000);
     return () => clearInterval(t);
   }, [termine, debut]);
-
-  useEffect(() => {
-    if (step?.type === "repos") {
-      setRepos((actuel) => actuel?.index === index ? actuel : { index, fin: Date.now() + step.secondes * 1000 });
-    } else {
-      setRepos(undefined);
-      reposSignale.current = null;
-    }
-  }, [index, step]);
 
   // Annonce vocale de l'étape en cours. Interrompt l'annonce précédente :
   // enchaîner vite ne doit pas empiler les phrases.
@@ -600,7 +597,13 @@ export function SeanceRunner({
       terminerSeance();
       return;
     }
-    setIndex((i) => i + 1);
+    const nextIndex = index + 1;
+    const nextStep = steps[nextIndex];
+    setRepos(nextStep?.type === "repos"
+      ? { index: nextIndex, fin: Date.now() + nextStep.secondes * 1000 }
+      : undefined);
+    reposSignale.current = null;
+    setIndex(nextIndex);
   }
 
   // Garde double : au-delà de "steps vide", TypeScript ne peut pas déduire
@@ -976,6 +979,8 @@ export function SeanceRunner({
                     type="button"
                     onClick={() => {
                       setSeanceCondensee((v) => !v);
+                      setRepos(undefined);
+                      reposSignale.current = null;
                       setIndex(0);
                       setAjustementOuvert(false);
                     }}
