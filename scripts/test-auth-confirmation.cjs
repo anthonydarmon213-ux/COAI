@@ -49,7 +49,7 @@ for (const [query, expected] of [
 ]) {
   const React = require('react');
   const mocks = {
-    react: {...React, useState: value => [typeof value === 'function' ? value() : value, () => {}], useEffect: () => {}},
+    react: {...React, useState: value => [typeof value === 'function' ? value() : value, () => {}], useEffect: () => {}, useRef: value=>({current:value}), useSyncExternalStore: (_subscribe,_read,server)=>server()},
     'next/navigation': {useSearchParams: () => new URLSearchParams(query)},
     'next/link': {default: 'a'},
     '@/lib/auth/client': {createSupabaseBrowserClient: () => {throw Error('No auth call during render');}},

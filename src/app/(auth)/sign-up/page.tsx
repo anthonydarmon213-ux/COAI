@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,16 @@ import {
 import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import Link from "next/link";
 import { readDiagnosticSignupEmail } from "@/lib/diagnostic/storage";
+
+function subscribeDiagnosticEmail(refresh: () => void) {
+  window.addEventListener("storage", refresh);
+  window.addEventListener("pageshow", refresh);
+  return () => {
+    window.removeEventListener("storage", refresh);
+    window.removeEventListener("pageshow", refresh);
+  };
+}
+const serverDiagnosticEmail = () => null;
 
 // L'inscription reste gratuite et ne déclenche aucun paiement. Le choix
 // Pass IA, Coaching Hybride ou VIP est conservé jusqu'au checkout Stripe,
@@ -79,26 +89,25 @@ export default function SignUpPage() {
 
   useEffect(() => {
     trackFunnelEvent("signup_started", {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [prenom, setPrenom] = useState(() => searchParams.get("prenom") ?? "");
   // Pré-rempli si on vient du diagnostic public (/diagnostic), qui capture
   // déjà l'email juste avant de rediriger ici — évite de le ressaisir.
-  const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
-  useEffect(() => {
-    if (!searchParams.get("email")) {
-      setEmail((current) => current || readDiagnosticSignupEmail() || "");
-    }
-  }, [searchParams]);
+  const diagnosticEmail = useSyncExternalStore(subscribeDiagnosticEmail, readDiagnosticSignupEmail, serverDiagnosticEmail);
+  const [editedEmail, setEmail] = useState<string | null>(null);
+  const email = editedEmail ?? searchParams.get("email") ?? diagnosticEmail ?? "";
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [emailEnvoye, setEmailEnvoye] = useState(false);
+  const submitting = useRef(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setError(null);
     setLoading(true);
     try {
@@ -138,6 +147,7 @@ export default function SignUpPage() {
           ? "Trop de tentatives rapprochées. Patiente quelques minutes avant de réessayer."
           : "La création du compte n’a pas abouti. Vérifie ta connexion et réessaie. Si tu as déjà un compte, utilise « Se connecter ».");
       setLoading(false);
+      submitting.current = false;
     }
   }
 
