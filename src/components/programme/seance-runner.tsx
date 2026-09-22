@@ -301,16 +301,15 @@ export function SeanceRunner({
   // de reconnaissance orphelins.
   const [vocalDisponible] = useState(() => creerReconnaissance() !== null);
   // Voice Coach (22/08/2026) — opt-in, jamais activé d'office.
-  const [voixActive, setVoixActive] = useState(false);
+  // Le lecteur est monté uniquement après le clic client sur « Démarrer ».
+  const [voixActive, setVoixActive] = useState(() => lirePreferenceVoix());
   const [voixSupportee] = useState(() => voixDisponible());
   const [coachParle, setCoachParle] = useState(false);
   const [questionEnCours, setQuestionEnCours] = useState(false);
   const [reponseCoach, setReponseCoach] = useState<string | null>(null);
 
-  // La préférence n'est lue qu'au montage côté client : la lire pendant le
-  // rendu provoquerait une différence entre serveur et client.
+  // Interrompre la voix lorsque le lecteur est fermé.
   useEffect(() => {
-    setVoixActive(lirePreferenceVoix());
     return () => stopperVoix();
   }, []);
 
@@ -350,11 +349,11 @@ export function SeanceRunner({
   const [coches, setCoches] = useState<Record<string, boolean>>({});
   const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
   const [nomsRealises, setNomsRealises] = useState<Record<string, string>>(() => sauvegarde?.nomsRealises ?? {});
-  const debutRef = useRef(sauvegarde?.debut ?? Date.now());
+  const [debut] = useState(() => sauvegarde?.debut ?? Date.now());
   // La date identifie la séance côté serveur. Son début est déjà conservé
   // dans le brouillon : réouvrir après une réponse perdue doit réutiliser
   // cette même clé, pas fabriquer une deuxième séance avec l'heure du retry.
-  const dateSauvegardeRef = useRef(new Date(debutRef.current).toISOString());
+  const dateSauvegarde = new Date(debut).toISOString();
 
   // Sauvegarde continue tant que la séance n'est pas terminée. Écrire à
   // chaque frappe serait inutilement coûteux, mais index et séries changent
@@ -364,13 +363,13 @@ export function SeanceRunner({
     try {
       window.localStorage.setItem(
         cleBrouillon,
-        JSON.stringify({ nomSeance, debut: debutRef.current, index, realise, substitutions, seanceCondensee, nomsRealises, repos } satisfies SeanceSauvegardee)
+        JSON.stringify({ nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos } satisfies SeanceSauvegardee)
       );
     } catch {
       // Quota dépassé ou navigation privée : la séance continue normalement,
       // elle ne sera simplement pas reprenable.
     }
-  }, [termine, cleBrouillon, nomSeance, index, realise, substitutions, seanceCondensee, nomsRealises, repos]);
+  }, [termine, cleBrouillon, nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos]);
   const bip = useBip();
 
   const step = steps[index];
@@ -381,9 +380,9 @@ export function SeanceRunner({
   // à zéro par un changement d'étape.
   useEffect(() => {
     if (termine) return;
-    const t = setInterval(() => setChronoGlobal(Math.round((Date.now() - debutRef.current) / 1000)), 1000);
+    const t = setInterval(() => setChronoGlobal(Math.round((Date.now() - debut) / 1000)), 1000);
     return () => clearInterval(t);
-  }, [termine]);
+  }, [termine, debut]);
 
   useEffect(() => {
     if (step?.type === "repos") {
@@ -451,7 +450,7 @@ export function SeanceRunner({
     envoiRef.current = true;
     setEnvoiEnCours(true);
     setErreurSauvegarde(false);
-    const dureeMinutes = Math.max(1, Math.round((Date.now() - debutRef.current) / 60000));
+    const dureeMinutes = Math.max(1, Math.round((Date.now() - debut) / 60000));
     type SetDetail = { set: number; reps: number; charge: number; dureeSecondes?: number };
     const parExercice = new Map<string, { nom: string; series: number; chargeKg?: number; sets: SetDetail[] }>();
     steps.forEach((s, i) => {
@@ -500,7 +499,7 @@ export function SeanceRunner({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: dateSauvegardeRef.current,
+          date: dateSauvegarde,
           source: "PROGRAMME",
           exercices: [...parExercice.values()],
           dureeMinutes,

@@ -25,13 +25,11 @@ export function DemarrerSeanceButton({
   photosParExercice?: Record<string, string | null>;
 }) {
   const [ouvert, setOuvert] = useState(false);
-  const [monte, setMonte] = useState(false);
   const lecteurRef = useRef<HTMLDivElement>(null);
   const cleBrouillon = sessionDraftKey(userId, nomSeance, exercices, echauffement, retourAuCalme);
 
-  useEffect(() => setMonte(true), []);
   useEffect(() => {
-    if (!ouvert || !monte) return;
+    if (!ouvert) return;
     const precedentFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const lecteur = lecteurRef.current;
     if (!lecteur) return;
@@ -60,7 +58,7 @@ export function DemarrerSeanceButton({
       document.removeEventListener("keydown", garderFocus);
       if (precedentFocus?.isConnected) precedentFocus.focus();
     };
-  }, [ouvert, monte]);
+  }, [ouvert]);
 
   if (!Array.isArray(exercices) || exercices.length === 0) return null;
 
@@ -78,7 +76,7 @@ export function DemarrerSeanceButton({
       >
         ▶ Démarrer la séance
       </button>
-      {ouvert && monte && createPortal(
+      {ouvert && createPortal(
         <div ref={lecteurRef} tabIndex={-1}>
         <SeanceRunner
           key={cleBrouillon ?? nomSeance}

@@ -44,6 +44,8 @@ function harness(source, reply) {
     '@/lib/analytics/first-saved-conversion': parser,
     '@/lib/suivi/historique-exercice': load('src/lib/suivi/historique-exercice.ts'),
     '@/lib/programmes/repos': load('src/lib/programmes/repos.ts'),
+    '@/lib/suivi/repcount-session': load('src/lib/suivi/repcount-session.ts'),
+    '@/lib/suivi/request-deadline': load('src/lib/suivi/request-deadline.ts', {}, { AbortController, setTimeout, clearTimeout }),
   };
   const file = source === 'PROGRAMME' ? 'src/components/programme/seance-runner.tsx' : 'src/components/suivi/repcount.tsx';
   const exports = {};

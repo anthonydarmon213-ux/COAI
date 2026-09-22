@@ -22,7 +22,7 @@ assert.notEqual(a, b); assert.notEqual(a, other); assert.equal(key(undefined, 'T
 const draft = { nomSeance: 'Full body', debut: Date.now(), index: 2, realise: { '0': { reps: '10', charge: '20' } } };
 storage.set(a, JSON.stringify(draft));
 storage.set('coai:seance-en-cours', JSON.stringify(draft));
-Object.assign(context, { cleBrouillon: b, nomSeance: 'Full body', debutRef: { current: Date.now() }, index: 0, realise: {}, substitutions: {}, seanceCondensee: false, nomsRealises: {} });
+Object.assign(context, { cleBrouillon: b, nomSeance: 'Full body', debut: Date.now(), index: 0, realise: {}, substitutions: {}, seanceCondensee: false, nomsRealises: {}, repos: undefined });
 const write = source.match(/window\.localStorage\.setItem\(\s*cleBrouillon,[\s\S]*?\n      \);/);
 assert.ok(write, 'tester l’écriture réelle du lecteur');
 run(write[0]);
