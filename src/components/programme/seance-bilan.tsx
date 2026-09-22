@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useAnimatedNumber } from "@/components/ui/use-animated-number";
 import { Flame, Repeat, Timer, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { SeanceShareButton } from "@/components/programme/seance-share-button";
@@ -17,29 +17,6 @@ import { SeanceShareButton } from "@/components/programme/seance-share-button";
 // entraînement, qui donnerait le sentiment de n'avoir rien fait.
 
 export type BilanExercice = { nom: string; series: number; sets: { reps: number; charge: number; dureeSecondes?: number }[] };
-
-function useCompteur(cible: number, actif: boolean, duree = 1100) {
-  const [valeur, setValeur] = useState(0);
-  const rafRef = useRef<number | null>(null);
-  useEffect(() => {
-    if (!actif) return;
-    // prefers-reduced-motion : on affiche directement le résultat.
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      setValeur(cible);
-      return;
-    }
-    const debut = performance.now();
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - debut) / duree);
-      // easing sortant : le chiffre ralentit en arrivant, ça se lit mieux.
-      setValeur(Math.round(cible * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [cible, actif, duree]);
-  return valeur;
-}
 
 function Tuile({ icone: Icone, valeur, libelle }: { icone: typeof Flame; valeur: string; libelle: string }) {
   return (
@@ -77,7 +54,7 @@ export function SeanceBilan({
   const series = exercices.reduce((n, e) => n + e.series, 0);
   const repetitions = exercices.reduce((n, e) => n + e.sets.reduce((s, x) => s + x.reps, 0), 0);
 
-  const affiche = useCompteur(tonnage, true);
+  const affiche = useAnimatedNumber(tonnage);
   const ecart = tonnagePrecedent && tonnagePrecedent > 0
     ? Math.round(((tonnage - tonnagePrecedent) / tonnagePrecedent) * 100)
     : null;
