@@ -95,7 +95,7 @@ for (const [query, expected] of [
     const React=require('react');
     const component=load('src/components/auth/confirmation-email.tsx',{
       globals:{window:{location:{origin:'http://localhost:3050'}}},
-      react:{...React,useState:initial=>[initial,value=>updates.push(value)],useRef:initial=>({current:initial}),useEffect:()=>{}},
+      react:{...React,useState:initial=>[typeof initial==='function'?initial():initial,value=>updates.push(value)],useRef:initial=>({current:initial}),useEffect:()=>{}},
       '@/lib/auth/client':{createSupabaseBrowserClient:()=>({auth:{resend:args=>{count++;assert.equal(args.type,'signup');assert.equal(args.email,'synthetic@example.test');assert.equal(new URL(args.options.emailRedirectTo).searchParams.get('redirect_to'),'/bienvenue');return new Promise(resolve=>{resolveRequest=()=>resolve({error});});}}})},
       '@/components/ui/button':{Button:'button'},'@/components/ui/input':{Input:'input'}
     });
@@ -105,11 +105,63 @@ for (const [query, expected] of [
     await form.props.onSubmit({preventDefault(){}});
     assert.equal(count,1);
     resolveRequest();await first;
-    assert.ok(updates.includes(60),'Délai après une tentative');
+    assert.ok(updates.some(value=>value?.seconds===60),'Délai après une tentative');
     assert.ok(updates.some(value=>typeof value==='string'&&value.includes(error?'réessa':'Si cette adresse')));
     const blocked=component.ConfirmationEmail({initialEmail:'synthetic@example.test',initialCooldown:60});
     await blocked.props.onSubmit({preventDefault(){}});
     assert.equal(count,1);
+  }
+
+  // Horloge et cycle des hooks simulés : le temps passé en arrière-plan
+  // compte, et les listeners sont nettoyés. Aucun service ni navigateur réel.
+  {
+    let now=100_000, cursor=0, calls=0;
+    const slots=[], effects=[], listeners=new Map(), intervals=new Map();
+    let timerId=0;
+    const React=require('react');
+    const component=load('src/components/auth/confirmation-email.tsx',{
+      globals:{
+        Date:class extends Date { static now(){return now;} },
+        document:{addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)},
+        window:{location:{origin:'http://localhost:3050'},
+          setInterval:fn=>{intervals.set(++timerId,fn);return timerId;},clearInterval:id=>intervals.delete(id),
+          addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)},
+      },
+      react:{...React,
+        useState:initial=>{const i=cursor++;if(!(i in slots))slots[i]=typeof initial==='function'?initial():initial;
+          return [slots[i],value=>{slots[i]=typeof value==='function'?value(slots[i]):value;}];},
+        useRef:initial=>{const i=cursor++;if(!(i in slots))slots[i]={current:initial};return slots[i];},
+        useEffect:(run,deps)=>{const i=cursor++;const previous=slots[i];
+          if(!previous||deps.some((value,j)=>!Object.is(value,previous.deps[j]))) {
+            effects.push(()=>{previous?.cleanup?.();slots[i]={deps,cleanup:run()};});
+          }},
+      },
+      '@/lib/auth/client':{createSupabaseBrowserClient:()=>({auth:{resend:async()=>{calls++;return {error:null};}}})},
+      '@/components/ui/button':{Button:'button'},'@/components/ui/input':{Input:'input'},
+    });
+    const render=(initialEmail='first@example.test')=>{
+      cursor=0;const form=component.ConfirmationEmail({initialEmail,initialCooldown:60});
+      effects.splice(0).forEach(run=>run());return form;
+    };
+    let form=render();
+    assert.equal(intervals.size,1);
+    await form.props.onSubmit({preventDefault(){}});assert.equal(calls,0);
+    now+=15_000;intervals.values().next().value();form=render();
+    assert.equal(slots[2].seconds,45,'Une mise à jour après 15 secondes enlève 15 secondes');
+    now+=50_000;listeners.get('visibilitychange')();form=render();
+    assert.equal(slots[2].seconds,0,'Retour après expiration sans attente supplémentaire');
+    assert.equal(intervals.size,0);assert.equal(listeners.size,0);
+    await form.props.onSubmit({preventDefault(){}});assert.equal(calls,1);
+    // Même ancienne closure, avant le prochain rendu : pas de deuxième envoi.
+    await form.props.onSubmit({preventDefault(){}});assert.equal(calls,1);
+    form=render();assert.equal(slots[2].seconds,60);
+    const label=form.props.children.find(child=>child?.type==='label');
+    label.props.children.find(child=>child?.type==='input').props.onChange({target:{value:'edited@example.test'}});
+    form=render('parent-changed@example.test');
+    const nextLabel=form.props.children.find(child=>child?.type==='label');
+    assert.equal(nextLabel.props.children.find(child=>child?.type==='input').props.value,'edited@example.test');
+    now+=61_000;listeners.get('pageshow')();render();
+    assert.equal(slots[2].seconds,0);assert.equal(listeners.size,0);
   }
   console.log('PASS: codes URL/fragment, redirections internes, erreurs callback, renvoi manuel, double clic, temporisation, erreurs neutres. Aucun email externe.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

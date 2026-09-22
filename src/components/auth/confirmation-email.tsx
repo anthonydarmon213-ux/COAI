@@ -11,24 +11,39 @@ export function ConfirmationEmail({ initialEmail = "", returnTo, initialCooldown
   returnTo?: string | null;
   initialCooldown?: number;
 }) {
-  const [email, setEmail] = useState(initialEmail);
+  // Une adresse modifiée ici appartient à l'utilisateur, pas au formulaire parent.
+  const [editedEmail, setEmail] = useState<string | null>(null);
+  const email = editedEmail ?? initialEmail;
   const [loading, setLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(initialCooldown);
+  const [waiting, setWaiting] = useState(() => {
+    const seconds = Number.isFinite(initialCooldown) ? Math.max(0, Math.ceil(initialCooldown)) : 0;
+    return { until: Date.now() + seconds * 1000, seconds };
+  });
+  const cooldown = waiting.seconds;
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const sending = useRef(false);
+  const nextAllowedAt = useRef(waiting.until);
+  const waitingActive = cooldown > 0;
   useEffect(() => {
-    if (initialEmail) setEmail(initialEmail);
-  }, [initialEmail]);
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = window.setTimeout(() => setCooldown(c => Math.max(0, c - 1)), 1000);
-    return () => window.clearTimeout(timer);
-  }, [cooldown]);
+    if (!waitingActive) return;
+    const refresh = () => setWaiting(current => {
+      const seconds = Math.max(0, Math.ceil((current.until - Date.now()) / 1000));
+      return seconds === current.seconds ? current : { ...current, seconds };
+    });
+    const timer = window.setInterval(refresh, 1000);
+    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener("pageshow", refresh);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener("pageshow", refresh);
+    };
+  }, [waitingActive, waiting.until]);
 
   async function resend(event: FormEvent) {
     event.preventDefault();
-    if (sending.current || cooldown > 0) return;
+    if (sending.current || Date.now() < nextAllowedAt.current) return;
     sending.current = true;
     setLoading(true);
     setError(null);
@@ -46,7 +61,8 @@ export function ConfirmationEmail({ initialEmail = "", returnTo, initialCooldown
       setError(confirmationSendError(cause));
     } finally {
       // Garde-fou UX ; les limites réelles restent imposées par Supabase.
-      setCooldown(60);
+      nextAllowedAt.current = Date.now() + 60_000;
+      setWaiting({ until: nextAllowedAt.current, seconds: 60 });
       sending.current = false;
       setLoading(false);
     }
