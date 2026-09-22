@@ -50,6 +50,30 @@ function text(node){if(Array.isArray(node))return node.map(text).join('');if(typ
 function button(label){return all(render()).find(n=>n.type==='button'&&text(n)===label);}
 function input(id){return all(render()).find(n=>n.props?.id===id);}
 (async()=>{
+  // A delayed history result must not overwrite manual input or change its unit.
+  for (const action of ['untouched','focus','charge','reps','mode','duration']) {
+    states.length=0;refs.length=0;
+    input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});
+    if(action==='mode'||action==='duration') {
+      all(render()).find(n=>n.type==='select').props.onChange({target:{value:'maintien'}});
+    }
+    if(['focus','charge','reps','duration'].includes(action)) {
+      const label=action==='reps'?'Répétitions':action==='duration'?'Maintien':'Charge';
+      const stepper=all(render()).find(n=>n.props?.label===label);
+      stepper.props.onInteraction();
+      if(action!=='focus')stepper.props.setValeur(action==='reps'?7:action==='duration'?45:12.5);
+    }
+    states[6]=[{date:'2026-09-01T12:00:00Z',exercices:[{nom:'Presse à cuisses',sets:[{set:1,reps:15,charge:80}]}]}];
+    render();effects[4]();
+    if(action==='untouched') {assert.equal(states[1],15);assert.equal(states[2],80);}
+    else {
+      assert.equal(states[1],action==='reps'?7:10);
+      assert.equal(states[2],action==='charge'?12.5:20);
+      assert.equal(states[3],action==='mode'||action==='duration');
+      if(action==='duration')assert.equal(states[4],45);
+    }
+  }
+  states.length=0;refs.length=0;
   input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});
   button('Valider la série').props.onClick();
   button('Ajouter un autre exercice →').props.onClick();

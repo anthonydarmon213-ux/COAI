@@ -484,6 +484,12 @@ export function RepCount({
 
   const volumeCourant = sets.reduce((t, s) => t + s.reps * s.charge, 0);
 
+  // Un historique lent ne doit jamais écraser une saisie commencée, même
+  // lorsque le champ contient temporairement une valeur incomplète.
+  function protegerSaisie() {
+    prefillRef.current = nom.trim().toLocaleLowerCase("fr-FR");
+  }
+
   const ajouterSerie = useCallback(() => {
     setSets((s) => [...s, maintien ? { reps: 0, charge: 0, dureeSecondes } : { reps, charge }]);
     setFinRepos(Date.now() + dureeRepos * 1000);
@@ -701,7 +707,7 @@ export function RepCount({
             )}
           </p>
           <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.13em] text-laiton-200/80">
-            Repère repris automatiquement ↓
+            Repère précédent · ajuste selon ta forme du jour
           </p>
         </div>
       )}
@@ -715,16 +721,16 @@ export function RepCount({
       <RestDuration value={dureeRepos} onChange={setDureeRepos} />
 
       <label className="text-sm text-graphite-300">Mesure de la série
-        <select value={maintien ? "maintien" : "repetitions"} disabled={sets.length > 0} onChange={e => setMaintien(e.target.value === "maintien")} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white disabled:opacity-50">
+        <select value={maintien ? "maintien" : "repetitions"} disabled={sets.length > 0} onChange={e => { protegerSaisie(); setMaintien(e.target.value === "maintien"); }} className="mt-2 min-h-11 w-full rounded-xl border border-white/15 bg-slate-950 px-3 text-white disabled:opacity-50">
           <option value="repetitions">Répétitions et charge</option>
           <option value="maintien">Maintien isométrique (secondes)</option>
         </select>
       </label>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        {maintien ? <Stepper label="Maintien" valeur={dureeSecondes} setValeur={setDureeSecondes} pas={5} unite="s" minimum={1} maximum={3600} entier /> : <>
-          <Stepper label="Répétitions" valeur={reps} setValeur={setReps} pas={1} unite="" minimum={1} entier />
-          <Stepper label="Charge" valeur={charge} setValeur={setCharge} pas={2.5} unite="kg" />
+        {maintien ? <Stepper label="Maintien" valeur={dureeSecondes} setValeur={setDureeSecondes} onInteraction={protegerSaisie} pas={5} unite="s" minimum={1} maximum={3600} entier /> : <>
+          <Stepper label="Répétitions" valeur={reps} setValeur={setReps} onInteraction={protegerSaisie} pas={1} unite="" minimum={1} entier />
+          <Stepper label="Charge" valeur={charge} setValeur={setCharge} onInteraction={protegerSaisie} pas={2.5} unite="kg" />
         </>}
       </div>
 

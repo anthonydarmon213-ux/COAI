@@ -11,9 +11,10 @@ export function lireValeur(raw: string, minimum: number, maximum: number, entier
 
 // Stable component identity: the rest countdown must not remount the input.
 export function RepCountStepper({ label, valeur, setValeur, pas, unite, minimum = 0,
-  maximum = 10000, entier = false }: {
+  maximum = 10000, entier = false, onInteraction }: {
   label: string; valeur: number; setValeur: (v: number) => void;
   pas: number; unite: string; minimum?: number; maximum?: number; entier?: boolean;
+  onInteraction?: () => void;
 }) {
   const id = useId();
   const [saisie, setSaisie] = useState(String(valeur));
@@ -21,6 +22,7 @@ export function RepCountStepper({ label, valeur, setValeur, pas, unite, minimum 
   useEffect(() => { if (!editing.current) setSaisie(String(valeur)); }, [valeur]);
   const valid = lireValeur(saisie, minimum, maximum, entier) !== null;
   const ajuster = (delta: number) => {
+    onInteraction?.();
     const next = Math.min(maximum, Math.max(minimum, Math.round((valeur + delta) * 100) / 100));
     setSaisie(String(next)); setValeur(next);
   };
@@ -33,8 +35,9 @@ export function RepCountStepper({ label, valeur, setValeur, pas, unite, minimum 
         <input id={id} type="text" inputMode={entier ? "numeric" : "decimal"} value={saisie} maxLength={10}
           aria-invalid={!valid} aria-describedby={!valid ? `${id}-error` : undefined}
           className="h-12 w-full min-w-0 bg-transparent text-center font-display text-3xl font-semibold tabular-nums text-white outline-none"
-          onFocus={event => { editing.current = true; event.currentTarget.select(); }}
+          onFocus={event => { onInteraction?.(); editing.current = true; event.currentTarget.select(); }}
           onChange={event => {
+            onInteraction?.();
             setSaisie(event.target.value);
             const next = lireValeur(event.target.value, minimum, maximum, entier);
             if (next !== null) setValeur(next);

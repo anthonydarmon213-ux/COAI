@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
 const api = {};
-let value=20, state, effect;
+let value=20, state, effect, interactions=0;
 const focus={current:false};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/components/suivi/repcount-stepper.tsx','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}
@@ -18,10 +18,12 @@ for(const raw of ['', '-1', 'NaN', 'Infinity','1e3','2.345','2,4,5']) assert.equ
 assert.equal(parse('2.5',1,10000,true),null);
 assert.equal(parse('3601',1,3600,true),null);
 const all=n=>!n||typeof n!=='object'?[]:Array.isArray(n)?n.flatMap(all):[n,...all(n.props?.children)];
-const render=()=>api.RepCountStepper({label:'Charge',valeur:value,setValeur:v=>value=v,pas:2.5,unite:'kg'});
+const render=()=>api.RepCountStepper({label:'Charge',valeur:value,setValeur:v=>value=v,pas:2.5,unite:'kg',onInteraction:()=>interactions++});
 const input=()=>all(render()).find(n=>n.type==='input');
 input().props.onFocus({currentTarget:{select(){}}});
+assert.equal(interactions,1,'Focus protects input before a valid number is entered');
 input().props.onChange({target:{value:'12,'}});
+assert.equal(interactions,2,'Incomplete input is also an interaction');
 render(); effect(); // Simulates a parent update during the rest timer.
 assert.equal(input().props.value,'12,','Partial decimal must survive parent update');
 input().props.onChange({target:{value:'12,75'}});
@@ -29,6 +31,7 @@ assert.equal(value,12.75);
 input().props.onBlur();
 assert.equal(input().props.value,'12.75');
 all(render()).find(n=>n.props?.['aria-label']==='Augmenter Charge').props.onClick();
+assert.equal(interactions,4,'Stepper buttons protect user edits too');
 assert.equal(value,15.25,'Keep quarter-kilogram precision');
 input().props.onChange({target:{value:''}});
 assert.equal(input().props['aria-invalid'],true);
