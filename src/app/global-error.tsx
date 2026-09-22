@@ -20,8 +20,10 @@ export default function GlobalError({
       <body className="flex min-h-screen flex-col items-center justify-center gap-4 bg-graphite-950 px-6 text-center text-graphite-50">
         <h1 className="text-2xl font-semibold">Une erreur est survenue</h1>
         <p className="max-w-md text-graphite-400">
-          Anthony a été notifié. Réessaie dans quelques instants ou reviens à l&apos;accueil.
+          Réessaie dans quelques instants ou reviens à l&apos;accueil.
         </p>
+        {/* A full navigation must recover even when the client router has failed. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className="text-laiton-400 underline">
           Retour à l&apos;accueil
         </a>

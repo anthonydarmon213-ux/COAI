@@ -1,29 +1,11 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 type Echange = { question: string; reponse: string };
-
-// Progression simulée pendant l'attente de la réponse IA (pas de vraie
-// mesure d'avancement possible côté API) : monte vite au départ, ralentit,
-// plafonne à 92% jusqu'à la vraie réponse, puis complète à 100%.
-function useSimulatedProgress(active: boolean) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    if (!active) return;
-    setProgress(4);
-    const interval = setInterval(() => {
-      setProgress((p) => (p >= 92 ? p : p + Math.max(1, Math.round((92 - p) / 8))));
-    }, 220);
-    return () => clearInterval(interval);
-  }, [active]);
-
-  return [progress, setProgress] as const;
-}
 
 export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: number | null }) {
   const [question, setQuestion] = useState("");
@@ -32,7 +14,6 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
   const [quotaAtteint, setQuotaAtteint] = useState(false);
   const [historique, setHistorique] = useState<Echange[]>([]);
   const [quotaRemaining, setQuotaRemaining] = useState(initialQuotaRemaining);
-  const [progress, setProgress] = useSimulatedProgress(loading);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -54,10 +35,11 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
           setQuotaAtteint(true);
           setQuotaRemaining(0);
         }
-        throw new Error(data.error ?? "Impossible d'obtenir une réponse.");
+        throw new Error(data?.error ?? "Impossible d'obtenir une réponse.");
       }
-      setProgress(100);
-      await new Promise((resolve) => setTimeout(resolve, 350));
+      if (typeof data?.answer !== "string" || !data.answer.trim()) {
+        throw new Error("La réponse n’a pas abouti. Tu peux réessayer.");
+      }
       setHistorique((prev) => [...prev, { question: q, reponse: data.answer }]);
       if (typeof data.quotaRemaining === "number") setQuotaRemaining(data.quotaRemaining);
       setQuestion("");
@@ -125,7 +107,7 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
         {loading && (
           <div className="flex justify-start">
             <span className="rounded-2xl rounded-bl-sm border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-graphite-400">
-              <span className="inline-flex gap-1" aria-label="Le coach écrit">
+              <span role="status" className="inline-flex gap-1" aria-label="Réponse de l’assistant en cours">
                 <span className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-laiton-300" />
                 <span className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-laiton-300" style={{ animationDelay: "0.15s" }} />
                 <span className="h-1.5 w-1.5 animate-status-pulse rounded-full bg-laiton-300" style={{ animationDelay: "0.3s" }} />
@@ -161,11 +143,6 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
             {loading ? "…" : "Envoyer"}
           </Button>
         </form>
-        {loading && (
-          <div className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-white/10" aria-hidden="true">
-            <div className="h-full rounded-full bg-laiton-400 transition-all duration-200" style={{ width: `${progress}%` }} />
-          </div>
-        )}
         {error && (
           <div className="mt-3 flex flex-col items-center gap-2">
             <p className="text-sm text-red-400">{error}</p>
