@@ -7,7 +7,8 @@ const TRENTE_JOURS = 60 * 60 * 24 * 30;
 // valeur de COAI via le diagnostic gratuit. Le code reste disponible jusqu'à
 // l'inscription (email ou Google) sans apparaître dans toutes les URLs du
 // tunnel.
-export function GET(request: Request, { params }: { params: { code: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ code: string }> }) {
+  const params = await props.params;
   const code = params.code.toUpperCase();
   const invitation = new URL(request.url);
   const destination = new URL("/diagnostic", request.url);
@@ -15,8 +16,9 @@ export function GET(request: Request, { params }: { params: { code: string } }) 
   destination.searchParams.set("utm_medium", "partage_membre");
   destination.searchParams.set("utm_campaign", "score_challenge");
 
-  const score = Number(invitation.searchParams.get("score"));
-  if (Number.isInteger(score) && score >= 0 && score <= 100) {
+  const scoreBrut = invitation.searchParams.get("score");
+  const score = Number(scoreBrut);
+  if (scoreBrut !== null && scoreBrut.trim() !== "" && Number.isInteger(score) && score >= 0 && score <= 100) {
     destination.searchParams.set("challenge_score", String(score));
     destination.searchParams.set("utm_content", `score_${score}`);
   }
