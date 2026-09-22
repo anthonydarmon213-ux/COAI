@@ -39,9 +39,14 @@ assert.equal(utm.readUtmCookie().utmSource, 'test');
 consent.saveConsent(consent.REFUSE_ALL);
 assert.equal(utm.readUtmCookie(), null, 'Old attribution cannot be used after refusal');
 utm.clearUtmCookie(); assert.ok(document.cookie.includes('max-age=0'));
-for (const value of ['broken', JSON.stringify({ version: 1, audience: true, marketing: true, expiresAt: Date.now() - 1 }), JSON.stringify({ version: 1, audience: 'true', marketing: true, expiresAt: Date.now() + 10000 })]) {
+for (const value of ['broken', '{"version":1,"audience":true,"marketing":true,"expiresAt":1e309}', '{"version":1,"audience":true,"marketing":true,"expiresAt":-1e309}', JSON.stringify({ version: 1, audience: true, marketing: true, expiresAt: Date.now() - 1 }), JSON.stringify({ version: 1, audience: 'true', marketing: true, expiresAt: Date.now() + 10000 })]) {
   memory.set(consent.CONSENT_KEY, value);
   assert.equal(consent.readConsent(), null);
+  assert.equal(analytics.trackEvent('invalid-consent'), false);
+  assert.equal(analytics.trackMetaEvent('invalid-consent'), false);
+  document.cookie = '';
+  utm.captureUtmFromLocation();
+  assert.equal(document.cookie, '', 'Invalid consent must not enable campaign attribution');
 }
 window.localStorage.getItem = () => { throw Error('storage blocked'); };
 window.localStorage.setItem = () => { throw Error('storage blocked'); };

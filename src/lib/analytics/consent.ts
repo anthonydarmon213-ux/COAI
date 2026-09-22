@@ -14,7 +14,7 @@ export function readConsent(): PrivacyChoices | null {
   if (isNativeIOSApp()) return REFUSE_ALL;
   try {
     const value = JSON.parse(window.localStorage.getItem(CONSENT_KEY) ?? "null");
-    if (!value || value.version !== 1 || typeof value.expiresAt !== "number" || value.expiresAt <= Date.now()
+    if (!value || value.version !== 1 || typeof value.expiresAt !== "number" || !Number.isFinite(value.expiresAt) || value.expiresAt <= Date.now()
       || typeof value.audience !== "boolean" || typeof value.marketing !== "boolean") return null;
     return { audience: value.audience, marketing: value.marketing };
   } catch { return null; }
