@@ -5,7 +5,8 @@ import { prisma } from "@/lib/db/client";
 
 const schema = z.object({ content: z.string().trim().min(1).max(2000) });
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = await getCurrentUser();
   if (!auth) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   const admin = await prisma.user.findUnique({ where: { supabaseAuthId: auth.id }, select: { id: true, isAdmin: true } });

@@ -12,7 +12,8 @@ const SLUG_TO_PILIER: Record<string, Pilier> = {
 // "Ton voyage est terminé. Reprendre ton programme habituel ?" — revient au
 // contenu d'avant l'adaptation temporaire (mode voyage), sans le supprimer
 // de l'historique des versions.
-export async function POST(_request: Request, { params }: { params: { pilier: string } }) {
+export async function POST(_request: Request, props: { params: Promise<{ pilier: string }> }) {
+  const params = await props.params;
   const pilier = SLUG_TO_PILIER[params.pilier];
   if (!pilier) {
     return NextResponse.json({ error: "Pilier inconnu" }, { status: 400 });

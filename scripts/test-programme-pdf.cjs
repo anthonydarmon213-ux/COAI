@@ -35,7 +35,7 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
     '@react-pdf/renderer': { renderToBuffer: async element => { rendered = element.props; return Buffer.from('%PDF-fixture'); } },
   });
   const slug = { ENTRAINEMENT: 'entrainement', NUTRITION: 'alimentation', RECUPERATION: 'recuperation' }[pilier];
-  const response = await api.GET(new Request('https://coai.fr/api/programmes/fiche-complete?userId=other'), { params: { pilier: slug } });
+  const response = await api.GET(new Request('https://coai.fr/api/programmes/fiche-complete?userId=other'), { params: Promise.resolve({ pilier: slug }) });
   assert.equal(response.headers.get('cache-control'), 'private, no-store');
   assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
   assert.equal(latest.statut, status, 'Never change review status');

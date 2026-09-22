@@ -11,7 +11,11 @@ async function requireAdmin() {
   return prisma.user.findUnique({ where: { supabaseAuthId: auth.id }, select: { isAdmin: true } });
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string; noteId: string } }) {
+export async function PATCH(
+  request: Request,
+  props: { params: Promise<{ id: string; noteId: string }> }
+) {
+  const params = await props.params;
   const admin = await requireAdmin();
   if (!admin?.isAdmin) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   const parsed = schema.safeParse(await request.json());
@@ -21,7 +25,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json({ updated: true });
 }
 
-export async function DELETE(_request: Request, { params }: { params: { id: string; noteId: string } }) {
+export async function DELETE(
+  _request: Request,
+  props: { params: Promise<{ id: string; noteId: string }> }
+) {
+  const params = await props.params;
   const admin = await requireAdmin();
   if (!admin?.isAdmin) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   const result = await prisma.coachNote.deleteMany({ where: { id: params.noteId, clientId: params.id } });

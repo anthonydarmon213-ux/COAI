@@ -7,7 +7,8 @@ import type { DecisionAdaptation, Pilier } from "@prisma/client";
 const PILIERS: Record<Pilier, string> = { ENTRAINEMENT: "ENTRAÎNEMENT", NUTRITION: "ALIMENTATION", RECUPERATION: "RÉCUPÉRATION" };
 const DECISIONS: Record<DecisionAdaptation, string> = { GARDER: "PROGRAMME MAINTENU", PROGRESSER: "NOUVELLE PROGRESSION", REDUIRE: "VOLUME AJUSTÉ", MODIFIER: "PROGRAMME MODIFIÉ", ADAPTER: "SÉANCE ADAPTÉE" };
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getCurrentUser();
   if (!authUser) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   const adaptation = await prisma.programmeAdaptation.findFirst({

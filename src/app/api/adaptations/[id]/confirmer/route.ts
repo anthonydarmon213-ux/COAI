@@ -9,7 +9,8 @@ export const maxDuration = 60;
 
 // "Accepter" — l'utilisateur confirme l'adaptation proposée par COAI.
 // Régénère le contenu et crée la nouvelle version seulement maintenant.
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(_request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const user = await getCurrentAppUser();
   if (!user) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });

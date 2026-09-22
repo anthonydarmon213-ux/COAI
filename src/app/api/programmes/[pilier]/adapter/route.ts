@@ -37,7 +37,8 @@ const bodySchema = z.object({
 // et ne crée aucune version tant que l'utilisateur n'a pas confirmé (cf.
 // /api/adaptations/[id]/confirmer). Le déclenchement automatique après
 // chaque check-in reste prévu pour une phase ultérieure.
-export async function POST(request: Request, { params }: { params: { pilier: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ pilier: string }> }) {
+  const params = await props.params;
   const pilier = SLUG_TO_PILIER[params.pilier];
   if (!pilier) {
     return NextResponse.json({ error: "Pilier inconnu" }, { status: 400 });
