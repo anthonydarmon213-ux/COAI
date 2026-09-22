@@ -13,11 +13,12 @@ import { computeProfilCompletion } from "@/lib/profil/completion";
 import { hasSuiviAccess } from "@/lib/subscription/plan";
 import type { ServiceKey } from "@/lib/pricing/tiers";
 
-export default async function ProfilPage({
-  searchParams,
-}: {
-  searchParams: { onboarding?: string };
-}) {
+export default async function ProfilPage(
+  props: {
+    searchParams: Promise<{ onboarding?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 

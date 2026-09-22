@@ -31,7 +31,8 @@ const SOMMEIL_LABEL: Record<string, string> = {
 // historique, dernier programme par pilier, feedback récent, suggestion
 // COAI en attente. Boutons Valider/Modifier déjà fournis par
 // ValidateProgrammeCard (réutilisé tel quel) ; Contacter via WhatsApp.
-export default async function AdminClientPage({ params }: { params: { id: string } }) {
+export default async function AdminClientPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/sign-in");
 

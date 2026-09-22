@@ -10,7 +10,8 @@ import { computeFlags, getPriorityLabel } from "@/lib/admin/flags";
 
 type SearchParams = { q?: string; statut?: string };
 
-export default async function AdminClientsPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function AdminClientsPage(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
   const authUser = await getCurrentUser();
   if (!authUser) redirect("/sign-in");
 

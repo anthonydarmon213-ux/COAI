@@ -63,11 +63,12 @@ const CONTENU_PAR_PLAN: Record<
   },
 };
 
-export default async function BienvenuePage({
-  searchParams,
-}: {
-  searchParams: { plan?: string; billing?: string; essai?: string; unlock?: string; session_id?: string };
-}) {
+export default async function BienvenuePage(
+  props: {
+    searchParams: Promise<{ plan?: string; billing?: string; essai?: string; unlock?: string; session_id?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 
@@ -245,7 +246,7 @@ export default async function BienvenuePage({
   const enEssai = stripeSubscription
     ? Boolean(stripeSubscription.trial_end && stripeSubscription.trial_end * 1000 > Date.now())
     : Boolean(user.subscription?.trialEnd && user.subscription.trialEnd > new Date());
-    // Valeurs de pack pour STANDARD/PREMIUM (04/09/2026, repositionnement 3 offres) — ce
+  // Valeurs de pack pour STANDARD/PREMIUM (04/09/2026, repositionnement 3 offres) — ce
   // chemin (plan=STANDARD/PREMIUM) est en pratique mort depuis que checkout/route.ts
   // refuse ces deux plans en amont (sur devis WhatsApp uniquement), mais corrigé quand
   // même par précaution pour ne jamais faire remonter un faux montant a Meta si un
