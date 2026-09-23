@@ -1,6 +1,116 @@
 import SwiftUI
 import UIKit
 
+@MainActor
+struct COAIAppleSubscriptionView: View {
+    @ObservedObject var browser: COAIWebModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var service: ApplePurchaseService?
+    @State private var offers: [ApplePurchaseService.Offer] = []
+    @State private var purchasesEnabled = false
+    @State private var busy = false
+    @State private var message: String?
+    @State private var operation: Task<Void, Never>?
+    private let gold = Color(red: 0.88, green: 0.78, blue: 0.54)
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("COAI ESSENTIEL").font(.caption.weight(.semibold)).tracking(3).foregroundStyle(gold)
+                        Text("Un cap.\nChaque jour.").font(.largeTitle.weight(.semibold))
+                        Text("Entraînement, nutrition et récupération réunis dans ton espace COAI.")
+                            .foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }.padding(.vertical, 12)
+                    if busy { ProgressView("Vérification en cours…").frame(maxWidth: .infinity).accessibilityIdentifier("apple-loading") }
+                    if let message {
+                        Text(message).font(.callout).fixedSize(horizontal: false, vertical: true)
+                            .padding().frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+                            .accessibilityIdentifier("apple-status")
+                    }
+                    ForEach(offers) { offer in
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(offer.period == "P1M" ? "Mensuel" : "Annuel").font(.title3.weight(.semibold))
+                            Text("\(offer.displayPrice) / \(offer.period == "P1M" ? "mois" : "an")").font(.title2.weight(.bold))
+                            if offer.hasSevenDayTrial {
+                                Text("7 jours d’essai, puis \(offer.displayPrice) par \(offer.period == "P1M" ? "mois" : "an").")
+                                    .font(.callout).foregroundStyle(gold)
+                            }
+                            Button(offer.hasSevenDayTrial ? "Commencer mon essai" : "Choisir cette formule") {
+                                guard let service, purchasesEnabled else { return }
+                                run {
+                                    switch try await service.purchase(productID: offer.id) {
+                                    case .cancelled: return "Achat annulé. Aucun nouvel abonnement confirmé."
+                                    case .pending: return "Achat en attente de validation Apple."
+                                    case .delivered: return "Achat traité par COAI. Ton accès est vérifié côté serveur."
+                                    }
+                                }
+                            }.buttonStyle(.borderedProminent).tint(gold).foregroundStyle(.black)
+                                .frame(minHeight: 44).disabled(busy || !purchasesEnabled)
+                        }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 22))
+                            .overlay(RoundedRectangle(cornerRadius: 22).stroke(gold.opacity(0.3)))
+                    }
+                    if !purchasesEnabled {
+                        Text("Les nouveaux abonnements Apple ne sont pas encore disponibles dans cette version. Aucun achat ne sera lancé.")
+                            .font(.callout).foregroundStyle(.secondary)
+                    }
+                    if service == nil {
+                        Button("Réessayer") { operation = Task { await load() } }.frame(minHeight: 44).disabled(busy)
+                    }
+                    Button("Restaurer mes achats Apple") {
+                        guard let service else { return }
+                        run {
+                            let count = try await service.restorePurchases()
+                            return count == 0 ? "Aucun achat COAI à restaurer pour ce compte Apple." : "Restauration traitée. Les droits dépendent de la validité de tes abonnements."
+                        }
+                    }.frame(minHeight: 44).disabled(busy || service == nil)
+                    Link("Gérer ou résilier dans Apple", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
+                        .frame(minHeight: 44)
+                    Text("Renouvellement automatique au tarif et à la période affichés. Tu peux gérer le renouvellement dans les réglages de ton compte Apple.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    HStack {
+                        Button("Conditions") { browser.open(path: "/cgv"); dismiss() }
+                        Spacer()
+                        Button("Confidentialité") { browser.open(path: "/confidentialite"); dismiss() }
+                    }.font(.footnote).frame(minHeight: 44)
+                }.padding(24)
+            }.background(Color(red: 0.04, green: 0.065, blue: 0.075)).tint(gold)
+                .navigationTitle("Abonnement").navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fermer") { dismiss() }.disabled(busy) } }
+                .interactiveDismissDisabled(busy)
+        }.task { await load() }
+            .onDisappear { operation?.cancel(); service?.stopObserving() }
+    }
+
+    private func load() async {
+        guard !busy else { return }
+        busy = true; message = nil; offers = []; service?.stopObserving(); service = nil; purchasesEnabled = false
+        defer { busy = false }
+        do {
+            let prepared = try await browser.prepareApplePurchases()
+            let loaded = try await prepared.service.loadOffers(expectedPeriods: prepared.periods)
+            try Task.checkCancellation()
+            service = prepared.service; offers = loaded; purchasesEnabled = prepared.purchasesEnabled
+            if loaded.isEmpty { message = "Les offres Apple sont momentanément indisponibles. Tu peux réessayer plus tard." }
+        } catch {
+            if !Task.isCancelled { message = "Impossible de charger les offres. Vérifie ta connexion et connecte-toi à COAI, puis réessaie." }
+        }
+    }
+
+    private func run(_ action: @escaping @MainActor () async throws -> String) {
+        guard !busy else { return }
+        busy = true; message = nil
+        operation = Task {
+            defer { busy = false }
+            do { let result = try await action(); try Task.checkCancellation(); message = result }
+            catch { if !Task.isCancelled { message = "Opération non confirmée. Réessaie ou utilise Restaurer mes achats. Ne lance pas un second achat pour débloquer l’accès." } }
+        }
+    }
+}
+
 @main
 struct COAIApp: App {
     var body: some Scene {
@@ -12,6 +122,7 @@ struct COAIRootView: View {
     @StateObject private var browser = COAIWebModel()
     @State private var showTimer = false
     @State private var showExplorer = false
+    @State private var showSubscription = false
     @State private var explorerDestination: String?
     @State private var showLocalReset = false
     @State private var keyboardVisible = false
@@ -80,10 +191,12 @@ struct COAIRootView: View {
         }
         .task { await browser.start() }
         .sheet(isPresented: $showTimer) { RestTimerView() }
+        .sheet(isPresented: $showSubscription) { COAIAppleSubscriptionView(browser: browser) }
         .sheet(isPresented: $showExplorer, onDismiss: {
             guard let path = explorerDestination else { return }
             explorerDestination = nil
             if path == "native:timer" { showTimer = true }
+            else if path == "native:subscription" { showSubscription = true }
             else { browser.open(path: path) }
         }) {
             COAIExplorerView { path in
@@ -165,8 +278,7 @@ private struct COAIExplorerView: View {
                 Section("Mon compte") {
                     entry("Mon profil", "person", "/compte/profil")
                     entry("Réglages et déconnexion", "gearshape", "/compte/parametres")
-                    // The existing pilot purchase guard still handles this route.
-                    entry("Abonnement", "creditcard", "/compte/abonnement")
+                    entry("Abonnement", "creditcard", "native:subscription")
                 }
                 Section("Au quotidien") {
                     entry("Aujourd’hui", "sun.max", "/dashboard")

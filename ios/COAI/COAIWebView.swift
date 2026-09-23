@@ -16,7 +16,7 @@ extension COAIWebModel {
     }
 
     /// Preparation only. Does not buy, restore, or start a background listener.
-    func prepareApplePurchases() async throws -> (service: ApplePurchaseService, periods: [String: String]) {
+    func prepareApplePurchases() async throws -> (service: ApplePurchaseService, periods: [String: String], purchasesEnabled: Bool) {
         let generation = sessionViewID
         let accountData = try await appleRequest(path: "/api/ios/apple/account", method: "POST", body: [:])
         let account = try JSONDecoder().decode(AppleAccountResponse.self, from: accountData)
@@ -34,7 +34,7 @@ extension COAIWebModel {
             guard let self, self.sessionViewID == generation else { throw AppleAPIFailure.unavailable }
             return try await self.deliverAppleReceipt(receipt)
         }
-        return (service, periods)
+        return (service, periods, catalogue.purchasesEnabled == true)
     }
 
     private func appleRequest(path: String, method: String, body: [String: String]?) async throws -> Data {

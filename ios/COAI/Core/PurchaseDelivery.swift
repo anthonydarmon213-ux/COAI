@@ -9,6 +9,7 @@ struct AppleCatalogueResponse: Decodable {
     let version: Int
     let name: String
     let products: [Product]
+    var purchasesEnabled: Bool? = nil
 
     func validatedPeriods() throws -> [String: String] {
         let approved = ["fr.coai.mobile.essentiel.monthly": "P1M",

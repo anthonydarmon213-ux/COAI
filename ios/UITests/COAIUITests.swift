@@ -69,12 +69,21 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].exists)
         XCTAssertTrue(app.buttons["Repos"].isHittable)
         explorer.tap()
-        let subscription = app.buttons["explore-/compte/abonnement"]
+        let subscription = app.buttons["explore-native:subscription"]
         reveal(subscription, in: app)
         subscription.tap()
-        XCTAssertTrue(app.alerts["COAI"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.alerts.staticTexts["Les achats et la gestion de l’abonnement ne sont pas activés dans ce pilote iPhone. Ce lien a été bloqué."].exists)
-        app.alerts.buttons["Compris"].tap()
+        XCTAssertTrue(app.staticTexts["COAI ESSENTIEL"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["apple-status"].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.buttons["Choisir cette formule"].exists)
+        XCTAssertFalse(app.buttons["Commencer mon essai"].exists)
+        let restore = app.buttons["Restaurer mes achats Apple"]
+        reveal(restore, in: app)
+        XCTAssertFalse(restore.isEnabled)
+        let subscriptionShot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        subscriptionShot.name = "Abonnement natif — indisponibilité sans achat"
+        subscriptionShot.lifetime = .keepAlways
+        add(subscriptionShot)
+        app.buttons["Fermer"].tap()
         XCTAssertTrue(app.buttons["Repos"].isHittable)
     }
 
