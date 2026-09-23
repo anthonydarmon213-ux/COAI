@@ -21,6 +21,9 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
   const [secondes, setSecondes] = useState(60);
   const [respirationActive, setRespirationActive] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
+  const [erreurPas, setErreurPas] = useState<string | null>(null);
+  const sauvegardePas = useRef(false);
+  const revisionPas = useRef(0);
   const intervalle = useRef<ReturnType<typeof setInterval> | null>(null);
   const finRespiration = useRef<number | null>(null);
   const actualiserRespiration = useCallback(() => {
@@ -49,14 +52,21 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
   }, [actualiserRespiration]);
 
   useEffect(() => {
-    setVerres(Number(localStorage.getItem(cleEau()) ?? 0));
+    try {
+      const eau = Number(localStorage.getItem(cleEau()) ?? 0);
+      if (Number.isSafeInteger(eau) && eau >= 0) setVerres(eau);
+    } catch { /* Les pas restent accessibles sans stockage local. */ }
+    let active = true;
+    const revision = revisionPas.current;
     fetch("/api/activite-journaliere")
-      .then((reponse) => reponse.json())
+      .then((reponse) => { if (!reponse.ok) throw new Error("chargement"); return reponse.json(); })
       .then((donnees: ActiviteResume) => {
+        if (!active || revisionPas.current !== revision) return;
         setPas(donnees.entreeAujourdhui?.pas ?? null);
         setMoyennePas(donnees.signaux?.moyenne7j ?? null);
       })
       .catch(() => undefined);
+    return () => { active = false; };
   }, []);
 
   function ajouterUnVerre() {
@@ -74,22 +84,36 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
   }
 
   async function enregistrerPas() {
+    if (sauvegardePas.current) return;
     const valeur = Number(saisiePas);
-    if (!Number.isFinite(valeur) || valeur < 0) return;
+    if (!saisiePas.trim() || !Number.isInteger(valeur) || valeur < 0 || valeur > 100000) {
+      setErreurPas("Indique un nombre entier entre 0 et 100 000 pas.");
+      return;
+    }
+    sauvegardePas.current = true;
+    revisionPas.current += 1;
     setEnregistrement(true);
+    setErreurPas(null);
     try {
       const reponse = await fetch("/api/activite-journaliere", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pas: Math.round(valeur), source: "SAISIE_MANUELLE" }),
       });
-      if (reponse.ok) {
+      if (!reponse.ok) throw new Error(reponse.status === 401 ? "session" : "sauvegarde");
+      {
         const donnees = (await reponse.json()) as ActiviteResume;
-        setPas(donnees.entreeAujourdhui?.pas ?? Math.round(valeur));
+        if (donnees.entreeAujourdhui?.pas !== valeur) throw new Error("confirmation");
+        setPas(donnees.entreeAujourdhui.pas);
         setMoyennePas(donnees.signaux?.moyenne7j ?? null);
-        setSaisiePas("");
+        setSaisiePas((actuelle) => actuelle === saisiePas ? "" : actuelle);
       }
+    } catch (cause) {
+      setErreurPas(cause instanceof Error && cause.message === "session"
+        ? "Ta connexion a expiré. Reconnecte-toi pour enregistrer tes pas."
+        : "Enregistrement non confirmé. Ta saisie est conservée : réessaie.");
     } finally {
+      sauvegardePas.current = false;
       setEnregistrement(false);
     }
   }
@@ -126,6 +150,7 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
         <article className="relative overflow-hidden rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.05] p-4">
           <div aria-hidden="true" className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-laiton-400/15 blur-2xl" />
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-200">Nombre de pas</p>
+          {erreurPas && <p role="alert" className="mt-2 text-xs text-red-300">{erreurPas}</p>}
           <div className="mt-3 flex items-end gap-2"><strong className="text-3xl tabular-nums text-white">{pas?.toLocaleString("fr-FR") ?? "—"}</strong><span className="pb-1 text-xs text-graphite-400">aujourd’hui</span></div>
           <p className="mt-2 min-h-8 text-[11px] leading-4 text-graphite-400">{moyennePas ? `Ta référence personnelle : ${moyennePas.toLocaleString("fr-FR")} pas sur 7 jours.` : "Construis ta propre référence, sans objectif arbitraire."}</p>
           <div className="mt-3 flex gap-2">
