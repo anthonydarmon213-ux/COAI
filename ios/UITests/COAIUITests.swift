@@ -2,6 +2,42 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testSubscriptionSmallScreenLargeText() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        XCUIDevice.shared.orientation = .portrait
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        let subscription = app.buttons["explore-native:subscription"]
+        reveal(subscription, in: app)
+        subscription.tap()
+        XCTAssertTrue(app.staticTexts["apple-status"].waitForExistence(timeout: 30))
+        for title in ["Réessayer", "Conditions", "Confidentialité"] {
+            let button = app.buttons[title]
+            reveal(button, in: app)
+            XCTAssertTrue(button.isHittable, title)
+            XCTAssertGreaterThanOrEqual(button.frame.height, 44, title)
+            XCTAssertGreaterThanOrEqual(button.frame.minX, 0, title)
+            XCTAssertLessThanOrEqual(button.frame.maxX, app.frame.maxX, title)
+        }
+        XCTAssertGreaterThanOrEqual(app.buttons["Confidentialité"].frame.minY,
+                                    app.buttons["Conditions"].frame.maxY,
+                                    "Les liens doivent être empilés en taille d’accessibilité.")
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Abonnement petit écran texte XXXL"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        let close = app.buttons["Fermer"]
+        XCTAssertTrue(close.isHittable)
+        close.tap()
+        XCTAssertTrue(explorer.waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testNativeNavigationWithLargeTextAndRotation() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

@@ -5,10 +5,12 @@ import UIKit
 struct COAIAppleSubscriptionView: View {
     @ObservedObject var browser: COAIWebModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var service: ApplePurchaseService?
     @State private var offers: [ApplePurchaseService.Offer] = []
     @State private var purchasesEnabled = false
     @State private var busy = false
+    @State private var performingTransaction = false
     @State private var message: String?
     @State private var operation: Task<Void, Never>?
     private let gold = Color(red: 0.88, green: 0.78, blue: 0.54)
@@ -57,7 +59,7 @@ struct COAIAppleSubscriptionView: View {
                         Text("Les nouveaux abonnements Apple ne sont pas encore disponibles dans cette version. Aucun achat ne sera lancé.")
                             .font(.callout).foregroundStyle(.secondary)
                     }
-                    if service == nil {
+                    if service == nil || offers.isEmpty {
                         Button("Réessayer") { operation = Task { await load() } }.frame(minHeight: 44).disabled(busy)
                     }
                     Button("Restaurer mes achats Apple") {
@@ -71,16 +73,22 @@ struct COAIAppleSubscriptionView: View {
                         .frame(minHeight: 44)
                     Text("Renouvellement automatique au tarif et à la période affichés. Tu peux gérer le renouvellement dans les réglages de ton compte Apple.")
                         .font(.footnote).foregroundStyle(.secondary)
-                    HStack {
-                        Button("Conditions") { browser.open(path: "/cgv"); dismiss() }
-                        Spacer()
-                        Button("Confidentialité") { browser.open(path: "/confidentialite"); dismiss() }
-                    }.font(.footnote).frame(minHeight: 44)
+                    let legalLayout = dynamicTypeSize.isAccessibilitySize
+                        ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+                        : AnyLayout(HStackLayout(spacing: 16))
+                    legalLayout {
+                        Button { browser.open(path: "/cgv"); dismiss() } label: {
+                            Text("Conditions").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        }
+                        Button { browser.open(path: "/confidentialite"); dismiss() } label: {
+                            Text("Confidentialité").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        }
+                    }.font(.footnote)
                 }.padding(24)
             }.background(Color(red: 0.04, green: 0.065, blue: 0.075)).tint(gold)
                 .navigationTitle("Abonnement").navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fermer") { dismiss() }.disabled(busy) } }
-                .interactiveDismissDisabled(busy)
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fermer") { dismiss() }.disabled(performingTransaction) } }
+                .interactiveDismissDisabled(performingTransaction)
         }.task { await load() }
             .onDisappear { operation?.cancel(); service?.stopObserving() }
     }
@@ -103,8 +111,9 @@ struct COAIAppleSubscriptionView: View {
     private func run(_ action: @escaping @MainActor () async throws -> String) {
         guard !busy else { return }
         busy = true; message = nil
+        performingTransaction = true
         operation = Task {
-            defer { busy = false }
+            defer { busy = false; performingTransaction = false }
             do { let result = try await action(); try Task.checkCancellation(); message = result }
             catch { if !Task.isCancelled { message = "Opération non confirmée. Réessaie ou utilise Restaurer mes achats. Ne lance pas un second achat pour débloquer l’accès." } }
         }
