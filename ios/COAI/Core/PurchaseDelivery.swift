@@ -58,3 +58,35 @@ enum PurchaseDelivery {
         acknowledgement.accountToken == accountToken
     }
 }
+
+/// Recover independent receipts even when one is rejected or temporarily fails.
+/// Deduplicate only acknowledged deliveries; failed receipts remain retryable.
+@MainActor
+final class PurchaseRecoveryBatch {
+    private var delivered = Set<UInt64>()
+    private var errors: [UInt64: Error] = [:]
+    private var unidentifiedError: Error?
+
+    func attempt(id: UInt64?, process: () async throws -> UInt64?) async throws {
+        try Task.checkCancellation()
+        if let id, delivered.contains(id) { return }
+        do {
+            if let processed = try await process() {
+                delivered.insert(processed)
+                errors.removeValue(forKey: processed)
+            }
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            try Task.checkCancellation()
+            if let id { errors[id] = error }
+            else if unidentifiedError == nil { unidentifiedError = error }
+        }
+    }
+
+    func result() throws -> Int {
+        try Task.checkCancellation()
+        if let error = unidentifiedError ?? errors.values.first { throw error }
+        return delivered.count
+    }
+}

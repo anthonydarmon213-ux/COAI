@@ -99,6 +99,9 @@ struct COAIAppleSubscriptionView: View {
         defer { busy = false }
         do {
             let prepared = try await browser.prepareApplePurchases()
+            try Task.checkCancellation()
+            // Restoring an existing receipt must not depend on fetching prices.
+            service = prepared.service
             let loaded = try await prepared.service.loadOffers(expectedPeriods: prepared.periods)
             try Task.checkCancellation()
             service = prepared.service; offers = loaded; purchasesEnabled = prepared.purchasesEnabled

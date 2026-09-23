@@ -1,7 +1,7 @@
 import Foundation
 import StoreKit
 
-/// Prepared integration, deliberately not instantiated by COAIApp yet.
+/// Used by the native subscription screen; remote purchases remain gated.
 /// No products, prices or account token are invented locally. The authenticated
 /// backend must supply the approved catalogue and a stable account token.
 @MainActor
@@ -25,6 +25,7 @@ final class ApplePurchaseService {
     private let authorizeAccount: @MainActor () async throws -> Void
     private let products = OfferCache<Product>()
     private var busy = false
+    private var reconciling = false
     private var listener: Task<Void, Never>?
 
     init(productIDs: Set<String>, accountToken: UUID,
@@ -108,19 +109,25 @@ final class ApplePurchaseService {
 
     /// Invoke on authenticated startup/retry, never implies a new charge.
     func reconcile() async throws -> Int {
-        var seen = Set<UInt64>()
-        var count = 0
+        guard !reconciling else { throw Failure.busy }
+        reconciling = true
+        defer { reconciling = false }
+        try await authorizeAccount()
+        try Task.checkCancellation()
+        let batch = PurchaseRecoveryBatch()
         for await result in Transaction.unfinished {
-            if let id = try await processIfOwned(result), seen.insert(id).inserted { count += 1 }
+            try await recover(result, into: batch)
         }
         for await result in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = result else { throw Failure.unverifiedTransaction }
-            if !seen.contains(transaction.id), let id = try await processIfOwned(result) {
-                seen.insert(id)
-                count += 1
-            }
+            try await recover(result, into: batch)
         }
-        return count
+        return try batch.result()
+    }
+
+    private func recover(_ result: VerificationResult<Transaction>, into batch: PurchaseRecoveryBatch) async throws {
+        let id: UInt64?
+        if case .verified(let transaction) = result { id = transaction.id } else { id = nil }
+        try await batch.attempt(id: id) { try await self.processIfOwned(result) }
     }
 
     /// Retain the service for one authenticated account, stop on logout. Server
