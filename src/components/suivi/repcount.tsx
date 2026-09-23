@@ -16,7 +16,8 @@ import {
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { assemblerSeance, payloadSeance, nomsSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
-import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
+import { draftKey, type RepCountDraft } from "@/lib/suivi/repcount-draft";
+import { createInitialRepCountDraft } from "@/lib/suivi/initial-repcount-draft";
 import { withRequestDeadline } from "@/lib/suivi/request-deadline";
 import { createDraftStatus } from "@/lib/suivi/draft-status";
 import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper";
@@ -396,26 +397,34 @@ export function RepCount({
   const [draftRestored, setDraftRestored] = useState(false);
   const [routine, setRoutine] = useState<string[]>([]);
   const [prefillKey, setPrefillKey] = useState<string | null>(null);
+  const [initialDraftStore] = useState(() => createInitialRepCountDraft(userId));
+  const initialDraft = useSyncExternalStore(initialDraftStore.subscribe, initialDraftStore.snapshot, initialDraftStore.serverSnapshot);
   const historiqueRequest = useRef(0);
 
+  // Only mutable retry metadata is synchronized after commit. Form fields are
+  // restored before painting; the server snapshot remains empty for hydration.
   useEffect(() => {
-    if (userId) {
-      try {
-        const restored = parseDraft(window.localStorage.getItem(draftKey(userId)));
+    if (initialDraft) {
+      if (initialDraft.restored?.sauvegarde && sauvegardeRef.current === null) {
+        sauvegardeRef.current = initialDraft.restored.sauvegarde;
+      }
+      draftStatus.report(initialDraft.failed);
+    }
+  }, [initialDraft, draftStatus]);
+
+  if (initialDraft && !draftReady) {
+        const restored = initialDraft.restored;
         if (restored) {
           setNom(restored.nom); setReps(restored.reps); setCharge(restored.charge);
           setMaintien(restored.maintien); setDureeSecondes(restored.dureeSecondes);
           setSets(restored.sets); setExercicesSeance(restored.exercicesSeance);
           setNotes(restored.notes); setDureeRepos(restored.dureeRepos); setFinRepos(restored.finRepos);
           setRoutine(restored.routine);
-          sauvegardeRef.current = restored.sauvegarde;
           setPrefillKey(restored.nom.trim().toLocaleLowerCase("fr-FR"));
           setDraftRestored(true);
         }
-      } catch { draftStatus.report(true); }
-    }
     setDraftReady(true);
-  }, [userId, draftStatus]);
+  }
 
   const persistDraft = useCallback((currentSets: SetSaisi[] = sets) => {
     if (!userId) return;

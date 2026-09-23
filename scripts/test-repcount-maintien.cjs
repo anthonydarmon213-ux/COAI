@@ -58,6 +58,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
     if(name === '@/lib/suivi/repcount-session') return session;
     if(name === '@/lib/suivi/repcount-draft') return {};
     if(name === '@/lib/suivi/draft-status') return draftStatus;
+    if(name === '@/lib/suivi/initial-repcount-draft') return {createInitialRepCountDraft:()=>({subscribe:()=>()=>{},snapshot:()=>null,serverSnapshot:()=>null})};
     if(name === '@/lib/suivi/request-deadline') return {withRequestDeadline:()=>{throw new Error('No network request during server render');}};
     if(name === '@/components/suivi/repcount-stepper') return stepper;
     if(name === '@/components/suivi/rest-duration') return restDuration;

@@ -35,6 +35,7 @@ const session=load('src/lib/suivi/repcount-session.ts',require);
 const draft=load('src/lib/suivi/repcount-draft.ts',require);
 const deadline=load('src/lib/suivi/request-deadline.ts',require);
 const draftStatus=load('src/lib/suivi/draft-status.ts',require);
+const initialDraft=load('src/lib/suivi/initial-repcount-draft.ts',name=>name==='./repcount-draft'?draft:require(name));
 const component=load('src/components/suivi/repcount.tsx',name=>{
   if(name==='react') return {
     useState:initial=>{const index=si++; if(!(index in states))states[index]=typeof initial==='function'?initial():initial; return [states[index],value=>states[index]=typeof value==='function'?value(states[index]):value];},
@@ -46,6 +47,7 @@ const component=load('src/components/suivi/repcount.tsx',name=>{
   if(name==='@/lib/suivi/repcount-session') return session;
   if(name==='@/lib/suivi/repcount-draft') return draft;
   if(name==='@/lib/suivi/draft-status') return draftStatus;
+  if(name==='@/lib/suivi/initial-repcount-draft') return initialDraft;
   if(name==='@/lib/suivi/request-deadline') return {withRequestDeadline:operation=>deadline.withRequestDeadline(operation,10)};
   if(name==='@/lib/analytics/first-saved-conversion')return {firstSavedConversionId:async()=>null};
   return {};
