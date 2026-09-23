@@ -440,7 +440,10 @@ export function RepCount({
         if (!r.ok) throw new Error("historique_indisponible");
         return r.json();
       });
-      if (!Array.isArray(donnees)) throw new Error("historique_invalide");
+      if (!Array.isArray(donnees) || !donnees.every(seance =>
+        seance !== null && typeof seance === "object" && !Array.isArray(seance) &&
+        typeof seance.date === "string" && Number.isFinite(new Date(seance.date).getTime())
+      )) throw new Error("historique_invalide");
       if (request !== historiqueRequest.current) return;
       setSeances(donnees);
       setHistoriqueErreur(false);
