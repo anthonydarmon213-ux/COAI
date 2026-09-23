@@ -5,10 +5,13 @@
 // grammes. Un anneau qui se remplirait au fil de la journée laisserait
 // croire à un suivi qui n'existe pas — chaque anneau est donc plein et
 // libellé "objectif", ce qui reste vrai.
-function extraireNombre(valeur: unknown): { nombre: number | null; texte: string } {
-  const texte = String(valeur ?? "").trim();
-  const trouve = texte.match(/\d+([.,]\d+)?/);
-  return { nombre: trouve ? Number(trouve[0].replace(",", ".")) : null, texte };
+function afficherObjectif(valeur: unknown, unite: "g" | "kcal"): string {
+  if (typeof valeur === "number") return Number.isFinite(valeur) ? `${valeur} ${unite}` : "";
+  if (typeof valeur !== "string") return "";
+  const texte = valeur.trim();
+  // Ne pas extraire le premier chiffre : « ~2 000 à 2 500 kcal » est
+  // une fourchette, pas « 2 kcal ». Conserver aussi les approximations.
+  return /^\d+(?:[.,]\d+)?$/.test(texte) ? `${texte} ${unite}` : texte;
 }
 
 // Initiales typographiques plutôt qu'emojis alimentaires (23/08/2026,
@@ -39,7 +42,7 @@ function Anneau({ label, valeur, couleur, initiale }: { label: string; valeur: s
         </svg>
         <span className="absolute flex flex-col items-center">
           <span aria-hidden="true" className="font-mono text-[11px] font-bold leading-none tracking-[0.1em]" style={{ color: couleur }}>{initiale}</span>
-          <span className="mt-1 font-display text-lg font-bold tabular-nums text-white">{valeur}</span>
+          <span className="mt-1 max-w-24 text-center font-display text-sm font-bold leading-tight tabular-nums text-white">{valeur}</span>
         </span>
       </div>
       <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-graphite-400">{label}</span>
@@ -52,24 +55,24 @@ export function AnneauxMacros({ objectifsJournaliers }: { objectifsJournaliers: 
   const objectifs = objectifsJournaliers as Record<string, unknown>;
 
   const anneaux = CONFIG.map((c) => {
-    const { nombre, texte } = extraireNombre(objectifs[c.cle]);
-    if (!texte) return null;
-    return { ...c, valeur: nombre !== null ? `${nombre}g` : texte };
+    const valeur = afficherObjectif(objectifs[c.cle], "g");
+    if (!valeur) return null;
+    return { ...c, valeur };
   }).filter((a): a is NonNullable<typeof a> => a !== null);
 
   if (anneaux.length === 0) return null;
 
-  const { nombre: calories, texte: caloriesTexte } = extraireNombre(objectifs.calories);
+  const caloriesTexte = afficherObjectif(objectifs.calories, "kcal");
 
   return (
     <section className="coai-glass px-5 py-5" aria-labelledby="macros-titre">
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
         <p id="macros-titre" className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
           Tes objectifs du jour
         </p>
         {caloriesTexte && (
           <span className="font-display text-lg font-bold tabular-nums text-white">
-            {calories !== null ? `${calories} kcal` : caloriesTexte}
+            {caloriesTexte}
           </span>
         )}
       </div>
@@ -81,7 +84,7 @@ export function AnneauxMacros({ objectifsJournaliers }: { objectifsJournaliers: 
       </div>
 
       <p className="mt-4 border-t border-white/10 pt-3 text-[10px] leading-4 text-graphite-500">
-        Cibles calculées pour ton profil — COAI ne pèse pas tes repas, ces anneaux montrent l&apos;objectif, pas ta consommation du jour.
+        Repères de ton programme — COAI ne pèse pas tes repas, ces anneaux montrent l&apos;objectif, pas ta consommation du jour.
       </p>
     </section>
   );
