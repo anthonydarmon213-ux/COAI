@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,18 @@ import { trackFunnelEvent } from "@/lib/analytics/funnel-events";
 import type { NotificationAdaptation } from "@/lib/insight/derniere-adaptation";
 
 const STORAGE_PREFIX = "coai_adaptation_vue_";
+function subscribeSeenAdaptations(refresh: () => void) {
+  const storage = (event: StorageEvent) => {
+    if (event.key === null || event.key.startsWith(STORAGE_PREFIX)) refresh();
+  };
+  window.addEventListener("storage", storage);
+  window.addEventListener("pageshow", refresh);
+  return () => {
+    window.removeEventListener("storage", storage);
+    window.removeEventListener("pageshow", refresh);
+  };
+}
+const serverSeenSnapshot = () => true;
 
 // "COAI a une adaptation à te proposer" (Phase 2, point 10) — quand une
 // adaptation est PROPOSEE (pas encore appliquée, cf. src/lib/adaptation/
@@ -28,20 +40,23 @@ export function AdaptationNotificationCard(props: AdaptationNotificationProps) {
 
 function AdaptationNotificationContent({ notification, plan }: AdaptationNotificationProps) {
   const router = useRouter();
-  const [visible, setVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const readSeen = useCallback(() => {
+    try { return sessionStorage.getItem(STORAGE_PREFIX + notification.id) === "1"; }
+    catch { return false; }
+  }, [notification.id]);
+  const seen = useSyncExternalStore(subscribeSeenAdaptations, readSeen, serverSeenSnapshot);
+  const visible = !dismissed && !seen;
   const [etat, setEtat] = useState<"attente" | "accepte" | "rejete">("attente");
   const [loading, setLoading] = useState<"confirmer" | "rejeter" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const pending = useRef(false);
 
-  useEffect(() => {
-    const vue = sessionStorage.getItem(STORAGE_PREFIX + notification.id);
-    setVisible(!vue);
-  }, [notification.id]);
-
   function dismiss() {
-    sessionStorage.setItem(STORAGE_PREFIX + notification.id, "1");
-    setVisible(false);
+    // Closing the card must work even when the browser denies persistence.
+    setDismissed(true);
+    try { sessionStorage.setItem(STORAGE_PREFIX + notification.id, "1"); }
+    catch { /* Dismissed for this mounted card only. */ }
   }
 
   async function handleConfirmer() {
