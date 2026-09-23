@@ -22,14 +22,18 @@ final class ApplePurchaseService {
     private let productIDs: Set<String>
     private let accountToken: UUID
     private let deliver: Deliver
+    private let authorizeAccount: @MainActor () async throws -> Void
     private let products = OfferCache<Product>()
     private var busy = false
     private var listener: Task<Void, Never>?
 
-    init(productIDs: Set<String>, accountToken: UUID, deliver: @escaping Deliver) {
+    init(productIDs: Set<String>, accountToken: UUID,
+         authorizeAccount: @escaping @MainActor () async throws -> Void,
+         deliver: @escaping Deliver) {
         self.productIDs = productIDs
         self.accountToken = accountToken
         self.deliver = deliver
+        self.authorizeAccount = authorizeAccount
     }
 
     deinit { listener?.cancel() }
@@ -76,6 +80,8 @@ final class ApplePurchaseService {
         guard let product = products.values[productID] else { throw Failure.unknownProduct }
         busy = true
         defer { busy = false }
+        try await authorizeAccount()
+        try Task.checkCancellation()
         switch try await product.purchase(options: [.appAccountToken(accountToken)]) {
         case .userCancelled: return .cancelled
         case .pending: return .pending
@@ -94,6 +100,8 @@ final class ApplePurchaseService {
         guard !productIDs.isEmpty else { throw Failure.unavailable }
         busy = true
         defer { busy = false }
+        try await authorizeAccount()
+        try Task.checkCancellation()
         try await AppStore.sync()
         return try await reconcile()
     }

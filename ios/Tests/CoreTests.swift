@@ -2,6 +2,17 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testAppleCatalogueRejectsUnexpectedOrDuplicateProducts() throws {
+        let monthly = AppleCatalogueResponse.Product(id: "fr.coai.mobile.essentiel.monthly", period: "P1M")
+        let annual = AppleCatalogueResponse.Product(id: "fr.coai.mobile.essentiel.annual", period: "P1Y")
+        let valid = AppleCatalogueResponse(version: 1, name: "COAI", products: [monthly, annual])
+        XCTAssertEqual(try valid.validatedPeriods().count, 2)
+        for products in [[monthly], [monthly, monthly], [monthly, .init(id: annual.id, period: "P1M")], [monthly, .init(id: "unknown", period: "P1Y")]] {
+            XCTAssertThrowsError(try AppleCatalogueResponse(version: 1, name: "COAI", products: products).validatedPeriods())
+        }
+        XCTAssertThrowsError(try AppleCatalogueResponse(version: 2, name: "COAI", products: [monthly, annual]).validatedPeriods())
+    }
+
     func testServerPurchaseAcknowledgementDecoding() throws {
         let token = UUID()
         let payload = "{\"transactionID\":\"123\",\"accountToken\":\"\(token.uuidString)\",\"persisted\":true,\"access\":{\"subscribed\":false}}"

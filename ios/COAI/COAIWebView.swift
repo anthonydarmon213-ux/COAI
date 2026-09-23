@@ -9,7 +9,37 @@ extension COAIWebModel {
     /// extracted into JavaScript arguments, native storage, logs or URL query.
     /// Called by native purchase flow only; no script message handler is exposed.
     func deliverAppleReceipt(_ signedTransaction: String) async throws -> PurchaseAcknowledgement {
-        guard !signedTransaction.isEmpty, signedTransaction.utf8.count <= 65536,
+        guard !signedTransaction.isEmpty, signedTransaction.utf8.count <= 65536 else { throw AppleAPIFailure.unavailable }
+        let data = try await appleRequest(path: "/api/ios/apple/transactions", method: "POST",
+                                          body: ["signedTransaction": signedTransaction])
+        return try JSONDecoder().decode(PurchaseAcknowledgement.self, from: data)
+    }
+
+    /// Preparation only. Does not buy, restore, or start a background listener.
+    func prepareApplePurchases() async throws -> (service: ApplePurchaseService, periods: [String: String]) {
+        let generation = sessionViewID
+        let accountData = try await appleRequest(path: "/api/ios/apple/account", method: "POST", body: [:])
+        let account = try JSONDecoder().decode(AppleAccountResponse.self, from: accountData)
+        let catalogueData = try await appleRequest(path: "/api/ios/apple/catalogue", method: "GET", body: nil)
+        let catalogue = try JSONDecoder().decode(AppleCatalogueResponse.self, from: catalogueData)
+        let periods = try catalogue.validatedPeriods()
+        guard sessionViewID == generation else { throw AppleAPIFailure.unavailable }
+        let service = ApplePurchaseService(productIDs: Set(periods.keys), accountToken: account.appAccountToken,
+            authorizeAccount: { [weak self] in
+                guard let self, self.sessionViewID == generation else { throw AppleAPIFailure.unavailable }
+                let data = try await self.appleRequest(path: "/api/ios/apple/account", method: "POST", body: [:])
+                let current = try JSONDecoder().decode(AppleAccountResponse.self, from: data)
+                guard current.appAccountToken == account.appAccountToken else { throw ApplePurchaseService.Failure.differentAccount }
+            }) { [weak self] receipt in
+            guard let self, self.sessionViewID == generation else { throw AppleAPIFailure.unavailable }
+            return try await self.deliverAppleReceipt(receipt)
+        }
+        return (service, periods)
+    }
+
+    private func appleRequest(path: String, method: String, body: [String: String]?) async throws -> Data {
+        let approved = ["/api/ios/apple/account": "POST", "/api/ios/apple/catalogue": "GET", "/api/ios/apple/transactions": "POST"]
+        guard approved[path] == method,
               let url = webView.url, url.scheme == "https", url.host == "coai.fr",
               url.port == nil || url.port == 443 else { throw AppleAPIFailure.unavailable }
         let generation = sessionViewID
@@ -19,26 +49,26 @@ extension COAIWebModel {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 25000);
             try {
-                const response = await fetch('/api/ios/apple/transactions', {
-                    method: 'POST', credentials: 'same-origin', mode: 'same-origin',
+                const response = await fetch(endpoint, {
+                    method: verb, credentials: 'same-origin', mode: 'same-origin',
                     redirect: 'error', cache: 'no-store', signal: controller.signal,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ signedTransaction: receipt })
+                    body: verb === 'GET' ? undefined : payload
                 });
                 if (!response.ok) throw new Error('Purchase not confirmed');
                 const text = await response.text();
                 if (text.length > 16384) throw new Error('Invalid response');
                 return text;
             } finally { clearTimeout(timeout); }
-            """, arguments: ["receipt": signedTransaction], in: nil, contentWorld: .defaultClient)
+            """, arguments: ["endpoint": path, "verb": method,
+                              "payload": String(data: try JSONSerialization.data(withJSONObject: body ?? [:]), encoding: .utf8)!],
+            in: nil, contentWorld: .defaultClient)
         try Task.checkCancellation()
         guard generation == sessionViewID, view === webView,
               let text = result as? String, let data = text.data(using: .utf8) else {
             throw AppleAPIFailure.invalidResponse
         }
-        // PurchaseDelivery also compares account token and transaction ID with
-        // the verified StoreKit transaction before allowing finish().
-        return try JSONDecoder().decode(PurchaseAcknowledgement.self, from: data)
+        return data
     }
 }
 

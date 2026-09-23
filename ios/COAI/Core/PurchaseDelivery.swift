@@ -1,5 +1,27 @@
 import Foundation
 
+struct AppleAccountResponse: Decodable {
+    let appAccountToken: UUID
+}
+
+struct AppleCatalogueResponse: Decodable {
+    struct Product: Decodable { let id: String; let period: String }
+    let version: Int
+    let name: String
+    let products: [Product]
+
+    func validatedPeriods() throws -> [String: String] {
+        let approved = ["fr.coai.mobile.essentiel.monthly": "P1M",
+                        "fr.coai.mobile.essentiel.annual": "P1Y"]
+        guard version == 1, products.count == approved.count,
+              Set(products.map(\.id)).count == products.count,
+              products.allSatisfy({ approved[$0.id] == $0.period }) else {
+            throw PurchaseDelivery.Failure.serverNotConfirmed
+        }
+        return Dictionary(uniqueKeysWithValues: products.map { ($0.id, $0.period) })
+    }
+}
+
 /// Neither StoreKit success nor a restored receipt proves COAI delivered access.
 /// This acknowledgement must come from an authenticated server verifier, after
 /// persisting the Apple transaction and updating the user's effective access.
