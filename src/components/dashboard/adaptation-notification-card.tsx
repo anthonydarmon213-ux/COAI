@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -17,18 +17,22 @@ const STORAGE_PREFIX = "coai_adaptation_vue_";
 // cliqué Accepter. Pour une adaptation déjà traitée (appliquée ou en
 // attente du coach), la carte reste informative et simplement dismissible
 // (sessionStorage) — il n'y a plus rien à décider.
-export function AdaptationNotificationCard({
-  notification,
-  plan,
-}: {
+type AdaptationNotificationProps = {
   notification: NotificationAdaptation;
   plan: "PASS_IA" | "STANDARD" | "PREMIUM";
-}) {
+};
+
+export function AdaptationNotificationCard(props: AdaptationNotificationProps) {
+  return <AdaptationNotificationContent key={props.notification.id} {...props} />;
+}
+
+function AdaptationNotificationContent({ notification, plan }: AdaptationNotificationProps) {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [etat, setEtat] = useState<"attente" | "accepte" | "rejete">("attente");
   const [loading, setLoading] = useState<"confirmer" | "rejeter" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const pending = useRef(false);
 
   useEffect(() => {
     const vue = sessionStorage.getItem(STORAGE_PREFIX + notification.id);
@@ -41,15 +45,19 @@ export function AdaptationNotificationCard({
   }
 
   async function handleConfirmer() {
+    if (pending.current) return;
+    pending.current = true;
     setLoading("confirmer");
     setError(null);
     try {
       const res = await fetch(`/api/adaptations/${notification.id}/confirmer`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de la confirmation.");
+      if (!Number.isInteger(data.nouvelleVersion) || data.nouvelleVersion < 1) throw new Error("La confirmation n’a pas pu être vérifiée. Réessaie.");
       setEtat("accepte");
       router.refresh();
     } catch (err) {
+      pending.current = false;
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setLoading(null);
@@ -57,14 +65,18 @@ export function AdaptationNotificationCard({
   }
 
   async function handleRejeter() {
+    if (pending.current) return;
+    pending.current = true;
     setLoading("rejeter");
     setError(null);
     try {
       const res = await fetch(`/api/adaptations/${notification.id}/rejeter`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec.");
+      if (data.ok !== true) throw new Error("Ton choix n’a pas pu être confirmé. Réessaie.");
       setEtat("rejete");
     } catch (err) {
+      pending.current = false;
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setLoading(null);
@@ -84,7 +96,7 @@ export function AdaptationNotificationCard({
 
   const titre =
     etat === "accepte"
-      ? "Adaptation appliquée"
+      ? "Ta demande d’adaptation est confirmée"
       : etat === "rejete"
         ? "Programme inchangé"
         : notification.statut === "PROPOSEE"
@@ -97,11 +109,11 @@ export function AdaptationNotificationCard({
     <Card className="flex flex-col gap-3">
       <span className="font-mono text-xs uppercase tracking-wider text-laiton-400">{titre}</span>
       <p className="text-sm leading-6 text-graphite-200">{notification.resume}</p>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
 
       {enAttenteConfirmation ? (
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleConfirmer} disabled={loading !== null} className="px-4 py-2 text-xs">
+          <Button type="button" onClick={handleConfirmer} disabled={loading !== null} className="min-h-11 px-4 py-2 text-xs">
             {loading === "confirmer" ? "Application…" : "Accepter"}
           </Button>
           <button
