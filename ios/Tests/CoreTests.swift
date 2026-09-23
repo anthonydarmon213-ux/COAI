@@ -15,7 +15,7 @@ final class CoreTests: XCTestCase {
 
     func testServerPurchaseAcknowledgementDecoding() throws {
         let token = UUID()
-        let payload = "{\"transactionID\":\"123\",\"accountToken\":\"\(token.uuidString)\",\"persisted\":true,\"access\":{\"subscribed\":false}}"
+        let payload = "{\"transactionID\":\"123\",\"accountToken\":\"\(token.uuidString)\",\"persisted\":true,\"access\":{\"subscribed\":false,\"programme\":false,\"sources\":{\"stripe\":false,\"apple\":false}}}"
         let ack = try JSONDecoder().decode(PurchaseAcknowledgement.self, from: Data(payload.utf8))
         XCTAssertTrue(PurchaseDelivery.mayFinish(transactionID: "123", accountToken: token, acknowledgement: ack))
         XCTAssertFalse(PurchaseDelivery.mayFinish(transactionID: "124", accountToken: token, acknowledgement: ack))
@@ -271,7 +271,7 @@ final class CoreTests: XCTestCase {
                     return .init(transactionID: "42", accountToken: account, persisted: true)
                 }, finish: { finished = true })
         }
-        do { try await task.value; XCTFail("Cancellation must propagate") }
+        do { _ = try await task.value; XCTFail("Cancellation must propagate") }
         catch { XCTAssertTrue(error is CancellationError) }
         XCTAssertFalse(finished)
     }

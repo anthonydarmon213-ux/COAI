@@ -30,6 +30,27 @@ struct PurchaseAcknowledgement: Equatable, Decodable {
     let transactionID: String
     let accountToken: UUID
     let persisted: Bool
+    var access: PurchaseAccess? = nil
+}
+
+/// Display-only server snapshot. Never authorizes content locally.
+struct PurchaseAccess: Equatable, Decodable {
+    struct Sources: Equatable, Decodable { let stripe: Bool; let apple: Bool }
+    let subscribed: Bool
+    let programme: Bool
+    let sources: Sources
+
+    var isConsistent: Bool {
+        subscribed == (sources.stripe || sources.apple) && (!subscribed || programme)
+    }
+
+    var confirmation: String {
+        guard isConsistent else { return "Ton accès n’a pas pu être confirmé. Ne lance pas un nouvel achat." }
+        if sources.apple { return "Ton abonnement Apple est actif. Ton espace COAI est disponible." }
+        if sources.stripe { return "Ton accès COAI est actif via ton abonnement existant. Aucun abonnement Apple actif n’a été confirmé." }
+        if programme { return "Tes programmes déjà débloqués restent accessibles. Aucun abonnement actif n’a été confirmé." }
+        return "Aucun abonnement actif n’a été confirmé. Tu peux vérifier son état dans les réglages Apple ou contacter COAI, sans racheter immédiatement."
+    }
 }
 
 enum PurchaseDelivery {
@@ -38,9 +59,10 @@ enum PurchaseDelivery {
     /// Keep delivery and finish in one tested sequence. A network failure or
     /// cancellation must leave the transaction available for a later retry.
     @MainActor
+    @discardableResult
     static func complete(transactionID: String, accountToken: UUID,
                          deliver: () async throws -> PurchaseAcknowledgement,
-                         finish: () async -> Void) async throws {
+                         finish: () async -> Void) async throws -> PurchaseAcknowledgement {
         try Task.checkCancellation()
         let acknowledgement = try await deliver()
         guard mayFinish(transactionID: transactionID, accountToken: accountToken,
@@ -49,11 +71,13 @@ enum PurchaseDelivery {
         }
         try Task.checkCancellation()
         await finish()
+        return acknowledgement
     }
 
     static func mayFinish(transactionID: String, accountToken: UUID,
                           acknowledgement: PurchaseAcknowledgement) -> Bool {
         acknowledgement.persisted && !transactionID.isEmpty &&
+        (acknowledgement.access?.isConsistent ?? true) &&
         acknowledgement.transactionID == transactionID &&
         acknowledgement.accountToken == accountToken
     }

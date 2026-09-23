@@ -4,6 +4,58 @@ import XCTest
 final class PurchaseRecoveryTests: XCTestCase {
     enum Failure: Error { case offline }
 
+    func testAccessSnapshotConsistencyMatrix() {
+        for apple in [false, true] {
+            for stripe in [false, true] {
+                for subscribed in [false, true] {
+                    for programme in [false, true] {
+                        let access = PurchaseAccess(subscribed: subscribed, programme: programme,
+                                                    sources: .init(stripe: stripe, apple: apple))
+                        XCTAssertEqual(access.isConsistent, subscribed == (apple || stripe) && (!subscribed || programme))
+                    }
+                }
+            }
+        }
+    }
+
+    func testAccessMessagesDoNotConfuseOtherMembershipWithApple() {
+        let apple = PurchaseAccess(subscribed: true, programme: true, sources: .init(stripe: false, apple: true))
+        XCTAssertTrue(apple.confirmation.contains("Apple est actif"))
+        let stripe = PurchaseAccess(subscribed: true, programme: true, sources: .init(stripe: true, apple: false))
+        XCTAssertTrue(stripe.confirmation.contains("Aucun abonnement Apple actif"))
+        let historical = PurchaseAccess(subscribed: false, programme: true, sources: .init(stripe: false, apple: false))
+        XCTAssertTrue(historical.confirmation.contains("déjà débloqués"))
+        let expired = PurchaseAccess(subscribed: false, programme: false, sources: .init(stripe: false, apple: false))
+        XCTAssertTrue(expired.confirmation.contains("Aucun abonnement actif"))
+    }
+
+    @MainActor
+    func testInconsistentAccessNeverFinishesReceipt() async {
+        let token = UUID()
+        var finished = false
+        do {
+            _ = try await PurchaseDelivery.complete(transactionID: "1", accountToken: token,
+                deliver: {
+                    PurchaseAcknowledgement(transactionID: "1", accountToken: token, persisted: true,
+                        access: PurchaseAccess(subscribed: true, programme: false, sources: .init(stripe: false, apple: true)))
+                }, finish: { finished = true })
+            XCTFail("Inconsistent server snapshot must be rejected")
+        } catch {}
+        XCTAssertFalse(finished)
+    }
+
+    @MainActor
+    func testDeliveryReturnsConfirmedSnapshotAfterFinish() async throws {
+        let token = UUID()
+        let access = PurchaseAccess(subscribed: true, programme: true, sources: .init(stripe: false, apple: true))
+        var finished = false
+        let ack = try await PurchaseDelivery.complete(transactionID: "1", accountToken: token,
+            deliver: { PurchaseAcknowledgement(transactionID: "1", accountToken: token, persisted: true, access: access) },
+            finish: { finished = true })
+        XCTAssertTrue(finished)
+        XCTAssertEqual(ack.access, access)
+    }
+
     @MainActor
     func testSchedulerThrottlesPagesButNotExplicitEvents() async {
         let scheduler = PurchaseRecoveryScheduler()

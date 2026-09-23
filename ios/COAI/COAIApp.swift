@@ -12,6 +12,7 @@ struct COAIAppleSubscriptionView: View {
     @State private var busy = false
     @State private var performingTransaction = false
     @State private var message: String?
+    @State private var confirmedAccess: PurchaseAccess?
     @State private var operation: Task<Void, Never>?
     private let gold = Color(red: 0.88, green: 0.78, blue: 0.54)
 
@@ -35,6 +36,13 @@ struct COAIAppleSubscriptionView: View {
                     if let recoveryMessage = browser.appleRecoveryMessage {
                         Text(recoveryMessage).font(.callout).fixedSize(horizontal: false, vertical: true)
                     }
+                    if confirmedAccess?.programme == true {
+                        Button("Ouvrir mon espace COAI") {
+                            browser.open(path: "/dashboard")
+                            dismiss()
+                        }.buttonStyle(.borderedProminent).tint(gold).foregroundStyle(.black)
+                            .frame(minHeight: 44).disabled(busy)
+                    }
                     ForEach(offers) { offer in
                         VStack(alignment: .leading, spacing: 12) {
                             Text(offer.period == "P1M" ? "Mensuel" : "Annuel").font(.title3.weight(.semibold))
@@ -51,11 +59,12 @@ struct COAIAppleSubscriptionView: View {
                                     case .pending: return "Achat en attente de validation Apple."
                                     case .delivered:
                                         browser.appleRecoveryMessage = nil
-                                        return "Achat traité par COAI. Ton accès est vérifié côté serveur."
+                                        confirmedAccess = service.latestAccess
+                                        return service.latestAccess?.confirmation ?? "Achat traité, mais l’état de ton accès n’a pas été reçu. Ne lance pas un second achat."
                                     }
                                 }
                             }.buttonStyle(.borderedProminent).tint(gold).foregroundStyle(.black)
-                                .frame(minHeight: 44).disabled(busy || !purchasesEnabled)
+                                .frame(minHeight: 44).disabled(busy || !purchasesEnabled || confirmedAccess?.subscribed == true)
                         }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
                             .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 22))
                             .overlay(RoundedRectangle(cornerRadius: 22).stroke(gold.opacity(0.3)))
@@ -72,7 +81,8 @@ struct COAIAppleSubscriptionView: View {
                         run {
                             let count = try await service.restorePurchases()
                             browser.appleRecoveryMessage = nil
-                            return count == 0 ? "Aucun achat COAI à restaurer pour ce compte Apple." : "Restauration traitée. Les droits dépendent de la validité de tes abonnements."
+                            confirmedAccess = service.latestAccess
+                            return service.latestAccess?.confirmation ?? (count == 0 ? "Aucun achat COAI à restaurer pour ce compte Apple." : "Restauration traitée, mais l’état de ton accès n’a pas été reçu. Ne lance pas un second achat.")
                         }
                     }.frame(minHeight: 44).disabled(busy || service == nil)
                     Link("Gérer ou résilier dans Apple", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
@@ -101,7 +111,7 @@ struct COAIAppleSubscriptionView: View {
 
     private func load() async {
         guard !busy else { return }
-        busy = true; message = nil; offers = []; service?.stopObserving(); service = nil; purchasesEnabled = false
+        busy = true; message = nil; confirmedAccess = nil; offers = []; service?.stopObserving(); service = nil; purchasesEnabled = false
         defer { busy = false }
         do {
             let prepared = try await browser.prepareApplePurchases()
@@ -119,7 +129,7 @@ struct COAIAppleSubscriptionView: View {
 
     private func run(_ action: @escaping @MainActor () async throws -> String) {
         guard !busy else { return }
-        busy = true; message = nil
+        busy = true; message = nil; confirmedAccess = nil
         performingTransaction = true
         operation = Task {
             defer { busy = false; performingTransaction = false }

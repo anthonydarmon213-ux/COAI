@@ -26,6 +26,7 @@ final class ApplePurchaseService {
     private let products = OfferCache<Product>()
     private var busy = false
     private var reconciling = false
+    private(set) var latestAccess: PurchaseAccess?
     private var listener: Task<Void, Never>?
 
     init(productIDs: Set<String>, accountToken: UUID,
@@ -80,6 +81,7 @@ final class ApplePurchaseService {
         guard AppStore.canMakePayments else { throw Failure.unavailable }
         guard let product = products.values[productID] else { throw Failure.unknownProduct }
         busy = true
+        latestAccess = nil
         defer { busy = false }
         try await authorizeAccount()
         try Task.checkCancellation()
@@ -111,6 +113,7 @@ final class ApplePurchaseService {
     func reconcile(updates: [VerificationResult<Transaction>] = []) async throws -> Int {
         guard !reconciling else { throw Failure.busy }
         reconciling = true
+        latestAccess = nil
         defer { reconciling = false }
         try await authorizeAccount()
         try Task.checkCancellation()
@@ -161,9 +164,11 @@ final class ApplePurchaseService {
         guard transaction.appAccountToken == accountToken else { throw Failure.differentAccount }
         // Send the signed JWS, never client-provided plan/price/expiry claims.
         do {
-            try await PurchaseDelivery.complete(transactionID: String(transaction.id), accountToken: accountToken,
+            let acknowledgement = try await PurchaseDelivery.complete(transactionID: String(transaction.id), accountToken: accountToken,
                 deliver: { try await self.deliver(result.jwsRepresentation) },
                 finish: { await transaction.finish() })
+            try Task.checkCancellation()
+            latestAccess = acknowledgement.access
         } catch PurchaseDelivery.Failure.serverNotConfirmed {
             throw Failure.serverNotConfirmed
         }
