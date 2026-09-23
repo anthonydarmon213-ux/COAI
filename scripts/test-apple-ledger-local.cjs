@@ -39,6 +39,33 @@ async function main() {
   await save(db, id, { ...revoked, signedAt: 9500 });
   const next = await db.appleTransaction.findUnique({ where: { environment_transactionId: { environment: 'Sandbox', transactionId: renewal.transactionID } } });
   assert.equal(next.revokedAt, null, 'Refund of older transaction must not overwrite renewal');
+  // Force both real transactions to read the absent key before either writes.
+  // Different chain locks must not allow a shared transaction ID to be stolen.
+  let reads = 0, release;
+  const barrier = new Promise(resolve => { release = resolve; });
+  const concurrentDB = { $transaction: (callback, options) => db.$transaction(tx => callback({
+    $queryRaw: tx.$queryRaw.bind(tx), applePurchaseAccount: tx.applePurchaseAccount,
+    appleTransaction: {
+      findFirst: tx.appleTransaction.findFirst.bind(tx.appleTransaction),
+      findUnique: async args => {
+        const row = await tx.appleTransaction.findUnique(args);
+        if (++reads === 2) release();
+        await barrier;
+        return row;
+      },
+      create: tx.appleTransaction.create.bind(tx.appleTransaction),
+      update: tx.appleTransaction.update.bind(tx.appleTransaction),
+      upsert: tx.appleTransaction.upsert.bind(tx.appleTransaction),
+    },
+  }), options) };
+  const collision = { ...base, transactionID: `collision-${id}`, originalTransactionID: `collision-chain-a-${id}` };
+  const rival = { ...collision, originalTransactionID: `collision-chain-b-${id}`, accountToken: other.accountToken, expiresAt: 30000 };
+  const attempts = await Promise.allSettled([save(concurrentDB, id, collision), save(concurrentDB, other.userId, rival)]);
+  assert.equal(attempts.filter(x => x.status === 'fulfilled').length, 1, 'Only one owner may create the shared transaction ID');
+  const winner = attempts[0].status === 'fulfilled' ? collision : rival;
+  const stored = await db.appleTransaction.findUnique({ where: { environment_transactionId: { environment: 'Sandbox', transactionId: collision.transactionID } } });
+  assert.equal(stored.originalTransactionId, winner.originalTransactionID);
+  assert.equal(stored.expiresAt.getTime(), winner.expiresAt);
   const [security] = await db.$queryRaw`SELECT relrowsecurity FROM pg_class WHERE oid='public.apple_transactions'::regclass`;
   assert.equal(security.relrowsecurity, true);
   for (const role of ['anon', 'authenticated']) {

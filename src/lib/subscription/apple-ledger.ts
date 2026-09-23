@@ -38,11 +38,14 @@ export async function persistVerifiedAppleTransaction(
       }
       return previous;
     }
-    return tx.appleTransaction.upsert({ where,
-      create: { ...snapshot, environment: facts.environment, transactionId: facts.transactionID,
+    // Do not upsert here: a different chain can concurrently insert the same
+    // transaction ID after our read. A unique-key failure must roll back rather
+    // than silently update that other chain's snapshot without ownership checks.
+    if (previous) return tx.appleTransaction.update({ where, data: snapshot });
+    return tx.appleTransaction.create({
+      data: { ...snapshot, environment: facts.environment, transactionId: facts.transactionID,
         originalTransactionId: facts.originalTransactionID, userId, productId: facts.productID,
         purchasedAt: new Date(facts.purchasedAt) },
-      update: snapshot,
     });
   }, { isolationLevel: 'ReadCommitted', maxWait: 10000, timeout: 15000 });
 }
