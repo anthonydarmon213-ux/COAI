@@ -28,7 +28,7 @@ function setup() {
     '@/lib/checkout/intended-plan-cookie':{storeIntendedPlanCookie(){}},
     '@/lib/analytics/funnel-events':{trackFunnelEvent(){}},
   };
-  for(const [file,name] of [['ui/button','Button'],['ui/input','Input'],['ui/field','Field'],['ui/card','Card'],['ui/section-label','SectionLabel'],['auth/google-sign-in-button','GoogleSignInButton'],['auth/confirmation-email','ConfirmationEmail']])mocks[`@/components/${file}`]={[name]:name};
+  for(const [file,name] of [['ui/button','Button'],['ui/input','Input'],['ui/field','Field'],['ui/card','Card'],['ui/section-label','SectionLabel'],['auth/social-sign-in-buttons','SocialSignInButtons'],['auth/confirmation-email','ConfirmationEmail']])mocks[`@/components/${file}`]={[name]:name};
   const exports={};
   vm.runInNewContext(compiled,{exports,URL,console:{error(){}},window:{location,
     addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)},

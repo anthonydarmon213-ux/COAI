@@ -320,6 +320,26 @@ final class CoreTests: XCTestCase {
         parts.queryItems = [URLQueryItem(name: "provider", value: "google")]
         XCTAssertNil(NativeOAuth.request(parts.url!))
     }
+
+    func testNativeApplePKCEKeepsProviderAndStrictCallback() {
+        var parts = URLComponents(string: "https://fczkfddfgooocqqkqsqw.supabase.co/auth/v1/authorize")!
+        let approved = [URLQueryItem(name: "provider", value: "apple"),
+            URLQueryItem(name: "code_challenge_method", value: "s256"),
+            URLQueryItem(name: "code_challenge", value: String(repeating: "a", count: 43)),
+            URLQueryItem(name: "redirect_to", value: "https://coai.fr/auth/callback?redirect_to=%2Fdashboard")]
+        parts.queryItems = approved
+        let request = NativeOAuth.request(parts.url!)!
+        XCTAssertEqual(URLComponents(url: request.authorize, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "apple")
+        XCTAssertNotNil(NativeOAuth.exchangeURL(URL(string: "fr.coai.mobile://auth/callback?code=apple-code")!, original: request.exchange))
+        for provider in ["facebook", "APPLE", "apple&provider=google", ""] {
+            parts.queryItems = [URLQueryItem(name: "provider", value: provider)] + approved.dropFirst()
+            XCTAssertNil(NativeOAuth.request(parts.url!))
+        }
+        parts.queryItems = approved + [URLQueryItem(name: "provider", value: "google")]
+        XCTAssertNil(NativeOAuth.request(parts.url!))
+        parts.queryItems = approved.filter { $0.name != "redirect_to" } + [URLQueryItem(name: "redirect_to", value: "https://evil.example/auth/callback")]
+        XCTAssertNil(NativeOAuth.request(parts.url!))
+    }
     func testCOAIRoutes() {
         for path in ["/login", "/programme/entrainement", "/suivi/repcount", "/compte/parametres", "/auth/callback?code=test"] {
             XCTAssertEqual(NavigationPolicy.decide(URL(string: "https://coai.fr" + path)!), .inside)

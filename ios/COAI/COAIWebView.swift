@@ -117,7 +117,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         // Invalidate before cancelling: the old session callback must not reset a new attempt.
         cancelAuthentication()
         open(path: "/sign-in")
-        notice = "Cette tentative de connexion a dépassé 9 minutes. Relance « Continuer avec Google » pour obtenir un nouveau lien sécurisé."
+        notice = "Cette tentative de connexion a dépassé 9 minutes. Relance la connexion avec ton fournisseur pour obtenir un nouveau lien sécurisé."
     }
 
     private func authenticate(_ request: (authorize: URL, exchange: URL)) {
@@ -142,7 +142,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
                     // A deliberate cancellation is not an error and must not require
                     // a second confirmation. Invalid callbacks still surface an error.
                     if (error as? ASWebAuthenticationSessionError)?.code != .canceledLogin {
-                        self.notice = "La connexion Google n’a pas abouti. Tu peux réessayer."
+                        self.notice = "La connexion n’a pas abouti. Tu peux réessayer."
                     }
                 }
             }
@@ -152,7 +152,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         if !session.start() {
             cancelAuthentication()
             open(path: "/sign-in")
-            notice = "La connexion Google n’a pas pu démarrer. Réessaie."
+            notice = "La connexion n’a pas pu démarrer. Réessaie."
         } else {
             authenticationTimeout = Task { @MainActor [weak self] in
                 do { try await Task.sleep(nanoseconds: UInt64(OAuthAttempt.duration * 1_000_000_000)) }

@@ -56,7 +56,7 @@ for (const [query, expected] of [
     '@/lib/parrainage/cookie': {storeParrainageCookie() {}},
     '@/lib/analytics/funnel-events': {trackFunnelEvent() {}},
   };
-  for (const [file, name] of [['ui/button','Button'], ['ui/input','Input'], ['ui/field','Field'], ['ui/card','Card'], ['ui/section-label','SectionLabel'], ['auth/google-sign-in-button','GoogleSignInButton'], ['auth/confirmation-email','ConfirmationEmail']]) {
+  for (const [file, name] of [['ui/button','Button'], ['ui/input','Input'], ['ui/field','Field'], ['ui/card','Card'], ['ui/section-label','SectionLabel'], ['auth/social-sign-in-buttons','SocialSignInButtons'], ['auth/confirmation-email','ConfirmationEmail']]) {
     mocks[`@/components/${file}`] = {[name]: name};
   }
   const page = load('src/app/(auth)/sign-up/page.tsx', mocks).default();
@@ -93,7 +93,7 @@ for (const [query, expected] of [
       '@/lib/auth/client':{createSupabaseBrowserClient:()=>({auth:{signInWithPassword:async()=>({error:signInError})}})},
       '@/lib/checkout/intended-plan-cookie':{readIntendedPlanCookie:()=>null,readIntendedBillingCookie:()=>null},
     };
-    for(const [file,name] of [['ui/button','Button'],['ui/input','Input'],['ui/field','Field'],['ui/card','Card'],['ui/section-label','SectionLabel'],['auth/google-sign-in-button','GoogleSignInButton'],['auth/confirmation-email','ConfirmationEmail']]) mocks[`@/components/${file}`]={[name]:name};
+    for(const [file,name] of [['ui/button','Button'],['ui/input','Input'],['ui/field','Field'],['ui/card','Card'],['ui/section-label','SectionLabel'],['auth/social-sign-in-buttons','SocialSignInButtons'],['auth/confirmation-email','ConfirmationEmail']]) mocks[`@/components/${file}`]={[name]:name};
     const page=load('src/app/(auth)/sign-in/page.tsx',mocks).default();
     let submit;
     function visit(node){if(Array.isArray(node))return node.forEach(visit);if(!node?.props)return;if(node.type==='form')submit=node.props.onSubmit;visit(node.props.children);}

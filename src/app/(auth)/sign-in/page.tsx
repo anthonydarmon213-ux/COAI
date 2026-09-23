@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { sanitizeReturnTo, signupHrefForReturnTo } from "@/lib/auth/safe-redirect";
 import { ConfirmationEmail } from "@/components/auth/confirmation-email";
 import { recoveryHref } from "@/lib/auth/recovery-navigation";
@@ -95,7 +95,7 @@ export default function SignInPage() {
         {linkIssue && <p role="alert" className="text-sm leading-6 text-amber-200">
           {linkIssue === "oauth" ? "La connexion n’a pas abouti. Réessaie avec Google ou ton email." : "Ce lien a expiré, a déjà été utilisé ou ne peut pas être ouvert ici. Si ton compte est confirmé, connecte-toi. Sinon, demande un nouveau lien ci-dessous."}
         </p>}
-        <GoogleSignInButton redirectTo={returnTo} />
+        <SocialSignInButtons redirectTo={returnTo} />
         {searchParams.get("password_reset") === "success" && (
           <p role="status" className="text-sm text-graphite-200">Mot de passe mis à jour. Connecte-toi avec ton nouveau mot de passe.</p>
         )}

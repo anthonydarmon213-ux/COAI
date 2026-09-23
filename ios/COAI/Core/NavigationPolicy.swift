@@ -10,7 +10,7 @@ struct OAuthAttempt: Equatable {
     func expired(at now: Date = Date()) -> Bool { now >= deadline }
 }
 
-/// Only the COAI Supabase Google PKCE flow may enter the system auth browser.
+/// Only COAI Supabase Google/Apple PKCE flows may enter the system auth browser.
 /// The verifier remains in WKWebView cookies; native code never reads session tokens.
 enum NativeOAuth {
     static let authHost = "fczkfddfgooocqqkqsqw.supabase.co"
@@ -25,7 +25,8 @@ enum NativeOAuth {
             let values = items.filter { $0.name == key }
             return values.count == 1 ? values[0].value : nil
         }
-        guard one("provider") == "google", one("code_challenge_method")?.lowercased() == "s256",
+        guard let provider = one("provider"), ["google", "apple"].contains(provider),
+              one("code_challenge_method")?.lowercased() == "s256",
               let challenge = one("code_challenge"), challenge.count == 43,
               challenge.range(of: "^[A-Za-z0-9_-]+$", options: .regularExpression) != nil,
               let redirect = one("redirect_to"), let exchange = URL(string: redirect),

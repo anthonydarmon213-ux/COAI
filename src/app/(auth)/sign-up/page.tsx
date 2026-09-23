@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { ConfirmationEmail } from "@/components/auth/confirmation-email";
 import { storeParrainageCookie } from "@/lib/parrainage/cookie";
 import {
@@ -185,7 +185,7 @@ export default function SignUpPage() {
             <h1 className="font-display text-2xl font-semibold text-graphite-50">Créer mon compte gratuit</h1>
             <p className="text-sm leading-6 text-graphite-400">Retrouve ton programme et suis tes progrès au même endroit.</p>
           </div>
-          <GoogleSignInButton redirectTo={destinationApresInscription} />
+          <SocialSignInButtons redirectTo={destinationApresInscription} />
           <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-graphite-500">
             <div className="h-px flex-1 bg-graphite-800" />
             ou
