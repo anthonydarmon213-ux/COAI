@@ -1,6 +1,38 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
-## État courant — 23 septembre 2026
+## État courant — 24 septembre 2026
+
+Contrôle relancé sur le code après d872a25. Les anciens comptes rendus ci-dessous
+sont historiques et ne valident pas le binaire actuel en production.
+
+- `bash scripts/check-ios.sh --device-release` : 43 tests Swift, 65 contrôles
+  autonomes, compilation réelle des règles WebKit, plist/manifeste/schéma XML,
+  compilation Release arm64 et inclusion du manifeste réussis. Le contrôle
+  autonome des liens d’offres attendait encore l’ancienne alerte ; il vérifie
+  maintenant la feuille native, sans autoriser checkout/API Stripe.
+- Une identité Apple Development est disponible dans le trousseau ; aucune
+  identité Apple Distribution n’y est listée. Cela ne prouve pas à lui seul
+  l’état de l’adhésion du compte Apple.
+- iPhone 17 Pro déclaré indisponible. iPhone 13 Pro détecté par CoreDevice,
+  mais refusé par Xcode : appairage en cours / dialogue de confiance requis.
+  Aucun binaire installé ou remplacé pendant ce contrôle. Déverrouillage et
+  connexion de l’iPhone 17 Pro demandés à Anthony.
+- Abonnement natif : compte/catalogue, reçus, reprise au premier plan,
+  confirmation des droits et réception serveur des notifications raccordés
+  dans le code. Ventes, notifications distantes et droits Apple de production
+  non activés. Achat Apple réel, restauration et TestFlight toujours non prouvés.
+- Connexion Apple non trouvée dans les composants d’authentification inspectés
+  (Google et email présents). À traiter et confronter aux exigences de revue.
+- Manifeste présent : motif UserDefaults déclaré. Ce fichier seul ne valide
+  ni la collecte du site embarqué ni les réponses de confidentialité App Store.
+
+Prochaines validations prioritaires : connexion complète et persistante dans
+l’app physique ; parcours Apple sandbox avec backend dédié ; contrôle des
+dix parcours et des données/médias réels ; confidentialité et suppression.
+La distribution demeure distincte de la compilation unsigned, des tests simulés
+et de la sauvegarde GitHub. Ne pas acheter d’adhésion sans accord spécifique.
+
+## Historique — 23 septembre 2026
 
 Anthony confirme de poursuivre la préparation sans frais après vérification du
 portail Apple : connexion établie, mais invitation à rejoindre le Developer

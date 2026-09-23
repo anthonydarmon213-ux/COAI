@@ -19,7 +19,10 @@ struct IOSCoreChecks {
         for value in ["http://coai.fr", "javascript:alert(1)", "file:///tmp/a", "https://user:pass@coai.fr", "https://coai.fr:444/a"] {
             check(NavigationPolicy.decide(URL(string: value)!) == .blocked, "unsafe scheme or authority")
         }
-        for value in ["https://coai.fr/pricing", "https://coai.fr/compte/abonnement?plan=STANDARD", "https://coai.fr/api/stripe/checkout", "https://coai.fr/%70ricing", "https://checkout.stripe.com/c/pay/test"] {
+        for value in ["https://coai.fr/pricing", "https://coai.fr/compte/abonnement?plan=STANDARD", "https://coai.fr/%70ricing", "https://www.coai.fr/pricing/"] {
+            check(NavigationPolicy.decide(URL(string: value)!) == .subscription, "native subscription screen")
+        }
+        for value in ["https://coai.fr/api/stripe/checkout", "https://coai.fr/checkout", "https://coai.fr/pricing/checkout", "https://coai.fr/compte/abonnement/checkout", "https://checkout.stripe.com/c/pay/test"] {
             check(NavigationPolicy.decide(URL(string: value)!) == .purchasesUnavailable, "payment navigation")
         }
         let rules = try JSONSerialization.jsonObject(with: Data(NavigationPolicy.contentRules.utf8)) as! [[String: Any]]
