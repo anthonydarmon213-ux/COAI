@@ -345,7 +345,10 @@ final class COAIUITests: XCTestCase {
         password.tap()
         password.typeText("Exemple-local-26")
         XCTAssertTrue(app.keyboards.keys.firstMatch.exists)
-        XCTAssertTrue(app.buttons["Repos"].waitForNonExistence(timeout: 5))
+        for title in ["Séance", "Nutrition", "Récupération", "Coach", "Explorer"] {
+            XCTAssertTrue(app.buttons["native-tab-" + title].waitForNonExistence(timeout: 5))
+        }
+        XCTAssertLessThanOrEqual(password.frame.maxY, app.keyboards.firstMatch.frame.minY)
         let show = web.switches["Afficher le mot de passe"]
         reveal(show, in: app)
         show.tap()
