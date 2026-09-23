@@ -9,7 +9,7 @@ function load(file, mocks={}) {
   const exports = {};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{
     exports, URL, URLSearchParams, ...mocks.globals,
-    require:name => mocks[name] ?? (name.startsWith('@/') ? load(`src/${name.slice(2)}.ts`) : require(name))
+    require:name => mocks[name] ?? (name.startsWith('@/') ? load(`src/${name.slice(2)}.ts`) : name.startsWith('.') ? load(path.join(path.dirname(file), `${name}.ts`)) : require(name))
   });
   return exports;
 }
@@ -73,6 +73,38 @@ for (const [query, expected] of [
 }
 
 (async()=>{
+  // Connexion après confirmation expirée : ne jamais sauter la création
+  // du profil et ses consentements. Les comptes existants sont redirigés
+  // par cette même page serveur, sans formulaire supplémentaire.
+  for (const [query, signInError, expected] of [
+    ['', null, '/dashboard'],
+    ['redirect_to=%2Fbienvenue', null, '/bienvenue'],
+    ['redirect_to=%2Fsuivi%2Fprogression%3Fperiode%3Dmois', null, '/suivi/progression?periode=mois'],
+    ['redirect_to=https%3A%2F%2Fevil.test', null, '/dashboard'],
+    ['', {code:'email_not_confirmed'}, null],
+    ['', {code:'invalid_credentials'}, null],
+  ]) {
+    const destinations=[];
+    const React=require('react');
+    const mocks={
+      react:{...React,useState:initial=>[initial,()=>{}],useEffect:()=>{}},
+      'next/navigation':{useSearchParams:()=>new URLSearchParams(query),useRouter:()=>({push:value=>destinations.push(value),refresh(){}})},
+      'next/link':{default:'a'},
+      '@/lib/auth/client':{createSupabaseBrowserClient:()=>({auth:{signInWithPassword:async()=>({error:signInError})}})},
+      '@/lib/checkout/intended-plan-cookie':{readIntendedPlanCookie:()=>null,readIntendedBillingCookie:()=>null},
+    };
+    for(const [file,name] of [['ui/button','Button'],['ui/input','Input'],['ui/field','Field'],['ui/card','Card'],['ui/section-label','SectionLabel'],['auth/google-sign-in-button','GoogleSignInButton'],['auth/confirmation-email','ConfirmationEmail']]) mocks[`@/components/${file}`]={[name]:name};
+    const page=load('src/app/(auth)/sign-in/page.tsx',mocks).default();
+    let submit;
+    function visit(node){if(Array.isArray(node))return node.forEach(visit);if(!node?.props)return;if(node.type==='form')submit=node.props.onSubmit;visit(node.props.children);}
+    visit(page);assert.equal(typeof submit,'function');
+    await submit({preventDefault(){}});
+    if(expected===null){assert.equal(destinations.length,0);continue;}
+    assert.equal(destinations.length,1);
+    const destination=new URL(destinations[0],'http://localhost');
+    assert.equal(destination.pathname,'/completer-inscription');
+    assert.equal(destination.searchParams.get('redirect_to'),expected);
+  }
   let exchangeCalls=0;
   const callback = load('src/app/auth/callback/route.ts',{
     '@/lib/auth/server':{createSupabaseServerClient:()=>({auth:{exchangeCodeForSession:async()=>{exchangeCalls++;return {data:{user:null},error:{code:'flow_state_expired'}};}}})},

@@ -67,7 +67,10 @@ export default function SignInPage() {
         throw signInError;
       }
 
-      router.push(destinationApresConnexion());
+      // Une adresse confirmée n'implique pas encore un profil applicatif.
+      // Le serveur reprend les consentements manquants, ou laisse passer
+      // immédiatement un compte déjà finalisé vers sa destination initiale.
+      router.push(`/completer-inscription?redirect_to=${encodeURIComponent(destinationApresConnexion())}`);
       router.refresh();
     } catch (err) {
       setError("Connexion impossible. Vérifie ton email et ton mot de passe, puis réessaie.");
