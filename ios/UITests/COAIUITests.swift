@@ -462,8 +462,14 @@ final class COAIUITests: XCTestCase {
         let keyboardTip = app.buttons["Continue"]
         if keyboardTip.exists { keyboardTip.tap() }
         XCTAssertTrue(app.keyboards.keys.firstMatch.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Repos"].waitForNonExistence(timeout: 5))
+        // Repos is now in the top toolbar, not the bottom navigation.
+        // Check every actual bottom tab rather than the obsolete timer label.
+        for title in ["Séance", "Nutrition", "Récupération", "Coach", "Explorer"] {
+            XCTAssertTrue(app.buttons["native-tab-" + title].waitForNonExistence(timeout: 5))
+        }
         XCTAssertTrue(email.isHittable)
+        XCTAssertLessThanOrEqual(email.frame.maxY, app.keyboards.firstMatch.frame.minY,
+                                 "Le clavier ne doit pas recouvrir le champ email.")
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Connexion publique avec clavier iPhone"
         attachment.lifetime = .keepAlways
