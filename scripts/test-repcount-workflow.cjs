@@ -34,7 +34,7 @@ const component=load('src/components/suivi/repcount.tsx',name=>{
   if(name==='react') return {
     useState:initial=>{const index=si++; if(!(index in states))states[index]=initial; return [states[index],value=>states[index]=typeof value==='function'?value(states[index]):value];},
     useRef:initial=>refs[ri++]??(refs[ri-1]={current:initial}),
-    useEffect:f=>effects.push(f),useCallback:f=>f,useMemo:f=>f()
+    useEffect:f=>effects.push(f),useCallback:f=>f,useMemo:f=>f(),useSyncExternalStore:(_subscribe,snapshot)=>snapshot()
   };
   if(name==='react/jsx-runtime') return {jsx:(type,props)=>({type,props}),jsxs:(type,props)=>({type,props})};
   if(name==='@/lib/suivi/historique-exercice') return history;
@@ -64,7 +64,7 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
       if(action!=='focus')stepper.props.setValeur(action==='reps'?7:action==='duration'?45:12.5);
     }
     states[6]=[{date:'2026-09-01T12:00:00Z',exercices:[{nom:'Presse à cuisses',sets:[{set:1,reps:15,charge:80}]}]}];
-    render();effects[4]();
+    render();effects[3]();
     if(action==='untouched') {assert.equal(states[1],15);assert.equal(states[2],80);}
     else {
       assert.equal(states[1],action==='reps'?7:10);
@@ -120,7 +120,7 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   render(); effects[1]();
   assert.equal(draft.parseDraft(storage.get(draft.draftKey('test-user'))).routine.length,2);
   states.length=0; refs.length=0; render(); effects[0](); render();
-  assert.equal(states[20].length,2,'Planned sequence survives remount');
+  assert.equal(states[19].length,2,'Planned sequence survives remount');
   button('Valider la série').props.onClick();
   button('Ajouter un autre exercice →').props.onClick();
   assert.equal(states[0],'Tirage horizontal');
@@ -129,7 +129,7 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   assert.equal(requests.length,2,'Starting a routine must not create history');
   button('Continuer en séance libre').props.onClick();
   assert.equal(states[7].length,1,'Leaving the sequence preserves completed work');
-  assert.equal(states[20].length,0);
+  assert.equal(states[19].length,0);
   // First-use shortcut must become a real editable series before any network wait.
   states.length=0; refs.length=0; storage.clear(); onboarding=true; fail='timeout';
   input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});

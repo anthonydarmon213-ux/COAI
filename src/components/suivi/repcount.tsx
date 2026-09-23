@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Activity } from "lucide-react";
 import { ChandeliersCharges } from "@/components/suivi/chandeliers-charges";
@@ -22,6 +22,7 @@ import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper"
 import { RestDuration } from "@/components/suivi/rest-duration";
 
 const REPOS_DEFAUT = 90;
+const serverRestSnapshot = () => null;
 
 function formatDate(d: Date) {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
@@ -380,7 +381,6 @@ export function RepCount({
   const [exercicesSeance, setExercicesSeance] = useState<ExerciceRepCount[]>([]);
   const [notes, setNotes] = useState("");
   const [historiqueErreur, setHistoriqueErreur] = useState(false);
-  const [repos, setRepos] = useState<number | null>(null);
   const [dureeRepos, setDureeRepos] = useState(REPOS_DEFAUT);
   const [finRepos, setFinRepos] = useState<number | null>(null);
   const [enregistre, setEnregistre] = useState(false);
@@ -454,20 +454,20 @@ export function RepCount({
     return () => { historiqueRequest.current += 1; };
   }, [charger]);
 
-  // Une échéance réelle reste correcte quand iOS suspend les minuteurs.
-  useEffect(() => {
-    if (finRepos === null) { setRepos(null); return; }
-    const actualiser = () => setRepos(Math.max(0, Math.ceil((finRepos - Date.now()) / 1000)));
-    actualiser();
-    const timer = window.setInterval(actualiser, 1000);
-    document.addEventListener("visibilitychange", actualiser);
-    window.addEventListener("pageshow", actualiser);
+  // React lit directement l'échéance, sans conserver un décompte périmé.
+  const readRest = useCallback(() => finRepos === null ? null : Math.max(0, Math.ceil((finRepos - Date.now()) / 1000)), [finRepos]);
+  const subscribeRest = useCallback((refresh: () => void) => {
+    if (finRepos === null) return () => {};
+    const timer = window.setInterval(refresh, 1000);
+    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener("pageshow", refresh);
     return () => {
       window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", actualiser);
-      window.removeEventListener("pageshow", actualiser);
+      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener("pageshow", refresh);
     };
   }, [finRepos]);
+  const repos = useSyncExternalStore(subscribeRest, readRest, serverRestSnapshot);
 
   const historique = useMemo(
     () => (nom.trim() ? historiquePourExercice(seances, nom) : []),
