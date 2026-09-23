@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { trackEvent } from "@/lib/analytics";
-
-const STORAGE_KEY_PREFIX = "coai_defi_7_jours_v1_";
+import { challengeStore, completedDays, serverChallengeDay, serverChallengeDays } from "@/lib/suivi/challenge-store";
 
 const JOURS = [
   { titre: "Découvre ton programme ultra-personnalisé", texte: "Explore tes recommandations d’entraînement, d’alimentation et de récupération construites à partir de ton diagnostic.", action: "Voir mon programme", href: "/programme/entrainement" },
@@ -17,34 +16,18 @@ const JOURS = [
 ] as const;
 
 export function ImpulsionChallenge({ createdAt, userId }: { createdAt: string; userId: string }) {
-  const [completed, setCompleted] = useState<number[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const unlockedDay = useMemo(() => {
-    const elapsed = Date.now() - new Date(createdAt).getTime();
-    return Math.max(1, Math.min(7, Math.floor(elapsed / 86_400_000) + 1));
-  }, [createdAt]);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(`${STORAGE_KEY_PREFIX}${userId}`) ?? "[]");
-      if (Array.isArray(saved)) setCompleted(saved.filter((value): value is number => Number.isInteger(value) && value >= 1 && value <= 7));
-    } catch {
-      // Une valeur locale invalide ne doit jamais masquer le défi.
-    } finally {
-      setLoaded(true);
-    }
-  }, [userId]);
+  const store = useMemo(() => challengeStore(userId, createdAt), [userId, createdAt]);
+  const raw = useSyncExternalStore(store.subscribe, store.read, serverChallengeDays);
+  const unlockedDay = useSyncExternalStore(store.subscribe, store.day, serverChallengeDay);
+  const completed = useMemo(() => completedDays(raw), [raw]);
 
   function toggleDay(day: number) {
-    const next = completed.includes(day) ? completed.filter((value) => value !== day) : [...completed, day];
-    setCompleted(next);
-    localStorage.setItem(`${STORAGE_KEY_PREFIX}${userId}`, JSON.stringify(next));
-    if (!completed.includes(day)) {
+    if (store.toggle(day)) {
       trackEvent(day === 7 ? "challenge_completed" : "challenge_day_completed", { day, challenge: "coai_7_days" });
     }
   }
 
-  if (!loaded) return null;
+  if (unlockedDay === 0) return null;
 
   // Toujours proposer la première étape disponible non terminée. Sinon une
   // personne qui revient quatre jours après son inscription tombe directement
