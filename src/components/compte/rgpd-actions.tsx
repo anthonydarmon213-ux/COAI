@@ -44,7 +44,7 @@ export function RgpdActions() {
 
   async function handleDelete() {
     if (pending.current) return;
-    if (!confirm("Supprimer définitivement ton compte et toutes tes données ?")) return;
+    if (!confirm("Supprimer définitivement ton compte et toutes tes données ? Si tu as un abonnement Apple, sa facturation continuera tant que tu ne l’auras pas résilié auprès d’Apple. Tu peux annuler cette action pour le gérer d’abord, ou supprimer ton compte maintenant.")) return;
     pending.current = true;
     setError(null);
     setDeleting(true);
@@ -72,11 +72,19 @@ export function RgpdActions() {
       <Button type="button" onClick={handleExport} disabled={exporting || deleting} aria-busy={exporting}>
         {exporting ? "Préparation de l’export…" : "Exporter mes données"}
       </Button>
+      <div id="account-deletion-billing" className="max-w-prose text-sm leading-6 text-slate-300">
+        <p>Si tu as un abonnement Apple, supprimer ton compte COAI ne le résilie pas : sa facturation continue jusqu’à sa résiliation auprès d’Apple. Résilie-le avant de supprimer ton compte pour éviter un prochain prélèvement.</p>
+        <a href="https://apps.apple.com/account/subscriptions" className="inline-flex min-h-11 items-center underline underline-offset-4">
+          Gérer mes abonnements Apple
+        </a>
+        <p>Tu peux aussi supprimer ton compte immédiatement, sans attendre la fin de ton abonnement.</p>
+      </div>
       <button
         type="button"
         onClick={handleDelete}
         disabled={deleting || exporting}
         aria-busy={deleting}
+        aria-describedby="account-deletion-billing"
         className="min-h-11 text-sm text-red-400 underline disabled:opacity-50"
       >
         {deleting ? "Suppression…" : "Supprimer mon compte"}
