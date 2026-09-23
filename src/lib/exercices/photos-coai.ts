@@ -2,8 +2,8 @@
 //
 // Prioritaires sur Free Exercise DB et sur Pexels : ce sont les seules
 // photos tournées dans la charte de la marque (fond noir, tenue unie,
-// éclairage latéral), et la seule source dont l'exercice est garanti par
-// le nom du fichier plutôt que déduit par rapprochement de mots.
+// éclairage latéral). Le nom de fichier seul ne prouve pas le mouvement :
+// toute nouvelle association doit être contrôlée visuellement.
 //
 // Chaque photo a été ouverte et vérifiée une par une avant intégration —
 // notamment le crunch, où une flexion de hanche complète aurait fait
@@ -147,7 +147,9 @@ const TABLE: EntreePhoto[] = [
   // second les pectoraux — deux exercices et deux photos distinctes.
   { motifs: ["dips sur banc", "dips banc", "bench dips"], fichier: "dips-banc-triceps" },
   { motifs: ["dips"], fichier: "dips-pectoraux" },
-  { motifs: ["développé incliné", "developpe incline", "incline press"], fichier: "developpe-incline-machine" },
+  // Ne pas utiliser « développé incliné » seul : il capturait les variantes
+  // haltères et barre avant leurs entrées exactes plus bas dans la table.
+  { motifs: ["développé incliné (machine)", "développé incliné machine", "incline machine press", "incline chest press machine"], fichier: "developpe-incline-machine" },
   { motifs: ["développé arnold", "developpe arnold", "arnold press"], fichier: "developpe-arnold" },
   { motifs: ["développé militaire", "developpe militaire", "shoulder press", "overhead press"], fichier: "developpe-militaire-halteres" },
   { motifs: ["élévations latérales", "elevations laterales", "lateral raise"], fichier: "elevations-laterales" },
@@ -199,8 +201,8 @@ const TABLE: EntreePhoto[] = [
   // Développés — "décliné" et "incliné barre" avant "incliné" générique,
   // "couché haltères" avant "couché" seul.
   { motifs: ["développé décliné", "developpe decline", "decline press"], fichier: "developpe-decline-barre" },
-  { motifs: ["développé incliné barre", "developpe incline barre", "incline barbell"], fichier: "developpe-incline-barre" },
-  { motifs: ["développé incliné haltères", "developpe incline halteres", "incline dumbbell"], fichier: "developpe-incline-halteres" },
+  { motifs: ["développé incliné barre", "développé incliné (barre)", "incline barbell"], fichier: "developpe-incline-barre" },
+  { motifs: ["développé incliné haltères", "développé incliné (haltères)", "incline dumbbell"], fichier: "developpe-incline-halteres" },
   { motifs: ["développé couché haltères", "developpe couche halteres", "dumbbell bench"], fichier: "developpe-couche-halteres" },
   { motifs: ["développé couché", "developpe couche", "bench press"], fichier: "developpe-couche-barre" },
 

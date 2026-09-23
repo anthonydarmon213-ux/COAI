@@ -13,6 +13,15 @@ const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+for (const [names, file] of [
+  [['Développé incliné haltères', 'Développé incliné (haltères)', 'developpe incline halteres', 'Incline dumbbell press'], 'developpe-incline-halteres'],
+  [['Développé incliné barre', 'Développé incliné (barre)', 'Incline barbell press'], 'developpe-incline-barre'],
+  [['Développé incliné machine', 'Développé incliné (machine)', 'Incline chest press machine'], 'developpe-incline-machine'],
+]) {
+  for (const name of names) assert.equal(photoCoaiPourNom(name), `/exercices/${file}.jpg`, name);
+  assert(fs.existsSync(`public/exercices/${file}.jpg`));
+}
+for (const name of ['Développé incliné', 'Incline press']) assert.equal(photoCoaiPourNom(name), null, 'No equipment guess');
 assert.equal(photoCoaiPourNom('Curl ischio TRX'), '/exercices/suspension-curl-ischio.jpg');
 assert.equal(photoCoaiPourNom('Ischio suspension'), '/exercices/suspension-curl-ischio.jpg');
 assert.equal(photoCoaiPourNom('Étirement ischio'), '/exercices/mobilite-etirement-ischio-debout-banc.jpg');
