@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type ActiviteResume = {
   entreeAujourdhui: { pas: number | null } | null;
@@ -22,6 +22,31 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
   const [respirationActive, setRespirationActive] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
   const intervalle = useRef<ReturnType<typeof setInterval> | null>(null);
+  const finRespiration = useRef<number | null>(null);
+  const actualiserRespiration = useCallback(() => {
+    if (finRespiration.current === null) return;
+    const restant = Math.max(0, Math.min(60, Math.ceil((finRespiration.current - Date.now()) / 1000)));
+    setSecondes(restant);
+    if (restant === 0) {
+      if (intervalle.current) clearInterval(intervalle.current);
+      intervalle.current = null;
+      finRespiration.current = null;
+      setRespirationActive(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const retour = () => { if (document.visibilityState === "visible") actualiserRespiration(); };
+    document.addEventListener("visibilitychange", retour);
+    window.addEventListener("pageshow", actualiserRespiration);
+    return () => {
+      document.removeEventListener("visibilitychange", retour);
+      window.removeEventListener("pageshow", actualiserRespiration);
+      if (intervalle.current) clearInterval(intervalle.current);
+      intervalle.current = null;
+      finRespiration.current = null;
+    };
+  }, [actualiserRespiration]);
 
   useEffect(() => {
     setVerres(Number(localStorage.getItem(cleEau()) ?? 0));
@@ -32,9 +57,6 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
         setMoyennePas(donnees.signaux?.moyenne7j ?? null);
       })
       .catch(() => undefined);
-    return () => {
-      if (intervalle.current) clearInterval(intervalle.current);
-    };
   }, []);
 
   function ajouterUnVerre() {
@@ -44,20 +66,11 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
   }
 
   function lancerRespiration() {
-    if (respirationActive) return;
+    if (finRespiration.current !== null) return;
+    finRespiration.current = Date.now() + 60000;
     setSecondes(60);
     setRespirationActive(true);
-    intervalle.current = setInterval(() => {
-      setSecondes((valeur) => {
-        if (valeur <= 1) {
-          if (intervalle.current) clearInterval(intervalle.current);
-          intervalle.current = null;
-          setRespirationActive(false);
-          return 0;
-        }
-        return valeur - 1;
-      });
-    }, 1000);
+    intervalle.current = setInterval(actualiserRespiration, 250);
   }
 
   async function enregistrerPas() {
@@ -81,7 +94,7 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
     }
   }
 
-  const phaseRespiration = secondes % 10 >= 6 ? "Expire doucement" : "Inspire doucement";
+  const phaseRespiration = (60 - secondes) % 10 < 4 ? "Inspire doucement" : "Expire doucement";
 
   return (
     <section className="coai-glass overflow-hidden p-5 sm:p-6">
@@ -103,7 +116,7 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
         </article>
 
         <article className="relative overflow-hidden rounded-2xl border border-violet-300/20 bg-violet-300/[0.045] p-4">
-          <div aria-hidden="true" className={`absolute right-4 top-4 h-12 w-12 rounded-full border border-violet-300/30 bg-violet-300/10 ${respirationActive ? "animate-pulse" : ""}`} />
+          <div aria-hidden="true" className={`absolute right-4 top-4 h-12 w-12 rounded-full border border-violet-300/30 bg-violet-300/10 ${respirationActive ? "motion-safe:animate-pulse" : ""}`} />
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-violet-200">Respiration</p>
           <div className="mt-3 flex items-end gap-2"><strong className="text-3xl tabular-nums text-white">{secondes === 0 ? "✓" : respirationActive ? secondes : "1"}</strong><span className="pb-1 text-xs text-graphite-400">{respirationActive ? "secondes" : secondes === 0 ? "terminée" : "minute"}</span></div>
           <p className="mt-2 min-h-8 text-[11px] leading-4 text-graphite-400">{respirationActive ? phaseRespiration : secondes === 0 ? "Une minute pour revenir au calme." : "Inspire 4 secondes, expire 6 secondes."}</p>
