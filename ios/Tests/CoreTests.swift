@@ -336,10 +336,18 @@ final class CoreTests: XCTestCase {
     }
 
     func testPurchasesBlockedInPilot() {
-        for value in ["https://coai.fr/pricing", "https://coai.fr/compte/abonnement?plan=STANDARD", "https://coai.fr/api/stripe/checkout", "https://coai.fr/%70ricing", "https://checkout.stripe.com/c/pay/test"] {
+        for value in ["https://coai.fr/checkout", "https://coai.fr/compte/abonnement/checkout", "https://coai.fr/pricing/checkout", "https://coai.fr/api/stripe/checkout", "https://checkout.stripe.com/c/pay/test"] {
             XCTAssertEqual(NavigationPolicy.decide(URL(string: value)!), .purchasesUnavailable)
         }
         XCTAssertNoThrow(try JSONSerialization.jsonObject(with: Data(NavigationPolicy.contentRules.utf8)))
+    }
+
+    func testOfferLinksOpenNativeSubscriptionOnlyOnTrustedHost() {
+        for value in ["https://coai.fr/pricing", "https://coai.fr/%70ricing", "https://www.coai.fr/pricing/", "https://coai.fr/compte/abonnement?plan=STANDARD"] {
+            XCTAssertEqual(NavigationPolicy.decide(URL(string: value)!), .subscription)
+        }
+        XCTAssertEqual(NavigationPolicy.decide(URL(string: "https://evil.example/pricing")!), .external)
+        XCTAssertEqual(NavigationPolicy.decide(URL(string: "http://coai.fr/pricing")!), .blocked)
     }
 
     func testCountdownUsesDeadlineNotForegroundTicks() {

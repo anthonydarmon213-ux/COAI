@@ -82,6 +82,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     @Published private(set) var currentURL: URL?
     @Published var errorMessage: String?
     @Published var notice: String?
+    @Published var showSubscription = false
     var confirmResponse: ((Bool) -> Void)?
     var alertResponse: (() -> Void)?
     @Published var externalURL: URL?
@@ -242,6 +243,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <style>body{background:#101820;color:white;font:18px system-ui;padding:24px}button{display:block;padding:16px;margin:20px 0}</style>
     <aside class="coai-app-nav"><nav><button>Ancienne navigation web</button></nav></aside>
     <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
+    <a href="/pricing">Voir l’abonnement iOS</a>
     <button onclick="history.pushState({}, '', '/programme/entrainement')">Simuler la page séance</button>
     <button onclick="history.pushState({}, '', '/compte/parametres')">Simuler la page compte</button>
     <button onclick="history.pushState({}, '', '/programme/recettes')">Simuler les recettes</button>
@@ -276,6 +278,10 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         cancelAuthentication()
         guard isReady, let url = URL(string: path, relativeTo: NavigationPolicy.baseURL)?.absoluteURL else { return }
         let decision = NavigationPolicy.decide(url)
+        if decision == .subscription {
+            showSubscription = true
+            return
+        }
         if decision == .purchasesUnavailable {
             notice = "Les achats et la gestion de l’abonnement ne sont pas activés dans ce pilote iPhone. Ce lien a été bloqué."
             return
@@ -380,6 +386,10 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             decisionHandler(.cancel)
             isLoading = false
             externalURL = url
+        case .subscription:
+            decisionHandler(.cancel)
+            isLoading = false
+            showSubscription = true
         case .purchasesUnavailable:
             decisionHandler(.cancel)
             isLoading = false

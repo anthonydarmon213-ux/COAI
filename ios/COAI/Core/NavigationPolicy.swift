@@ -56,7 +56,7 @@ enum NativeOAuth {
 
 /// Internal iPhone pilot. Not an App Store payment-compliance certification.
 enum NavigationDecision: Equatable {
-    case inside, external, purchasesUnavailable, blocked
+    case inside, external, subscription, purchasesUnavailable, blocked
 }
 
 enum NavigationPolicy {
@@ -110,6 +110,11 @@ enum NavigationPolicy {
         }
         guard host == "coai.fr" || host == "www.coai.fr" else { return .external }
         let path = (url.path.removingPercentEncoding ?? url.path).lowercased()
+        // Offer/account screens open native StoreKit UI; checkout/API operations
+        // remain blocked, including nested paths under these screens.
+        if ["/pricing", "/pricing/", "/compte/abonnement", "/compte/abonnement/"].contains(path) {
+            return .subscription
+        }
         if purchasePaths.contains(where: { path == $0 || path.hasPrefix($0 + "/") }) {
             return .purchasesUnavailable
         }

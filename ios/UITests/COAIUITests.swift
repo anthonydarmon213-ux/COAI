@@ -2,6 +2,21 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testWebOfferLinkOpensNativeSubscription() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let link = app.links["Voir l’abonnement iOS"]
+        XCTAssertTrue(link.waitForExistence(timeout: 15))
+        link.tap()
+        XCTAssertTrue(app.staticTexts["apple-status"].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.alerts.firstMatch.exists)
+        app.buttons["Fermer"].tap()
+        XCTAssertTrue(link.waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testSubscriptionSmallScreenLargeText() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

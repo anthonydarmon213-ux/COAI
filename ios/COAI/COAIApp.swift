@@ -131,7 +131,6 @@ struct COAIRootView: View {
     @StateObject private var browser = COAIWebModel()
     @State private var showTimer = false
     @State private var showExplorer = false
-    @State private var showSubscription = false
     @State private var explorerDestination: String?
     @State private var showLocalReset = false
     @State private var keyboardVisible = false
@@ -200,12 +199,12 @@ struct COAIRootView: View {
         }
         .task { await browser.start() }
         .sheet(isPresented: $showTimer) { RestTimerView() }
-        .sheet(isPresented: $showSubscription) { COAIAppleSubscriptionView(browser: browser) }
+        .sheet(isPresented: $browser.showSubscription) { COAIAppleSubscriptionView(browser: browser) }
         .sheet(isPresented: $showExplorer, onDismiss: {
             guard let path = explorerDestination else { return }
             explorerDestination = nil
             if path == "native:timer" { showTimer = true }
-            else if path == "native:subscription" { showSubscription = true }
+            else if path == "native:subscription" { browser.showSubscription = true }
             else { browser.open(path: path) }
         }) {
             COAIExplorerView { path in
