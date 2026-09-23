@@ -27,13 +27,29 @@ export function WeeklyCheckinCard() {
   const [du, setDu] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
+    let active = true;
     fetch("/api/check-in-hebdo")
-      .then((res) => res.json())
-      .then((data) => setDu(Boolean(data.du)))
-      .finally(() => setLoaded(true));
-  }, []);
+      .then((res) => {
+        if (!res.ok) throw new Error("Check-in unavailable");
+        return res.json();
+      })
+      .then((data) => {
+        if (typeof data?.du !== "boolean") throw new Error("Invalid check-in response");
+        if (active) { setDu(data.du); setLoadError(false); }
+      })
+      .catch(() => { if (active) setLoadError(true); })
+      .finally(() => { if (active) setLoaded(true); });
+    return () => { active = false; };
+  }, [retry]);
+
+  if (loadError) return <Card className="flex flex-col gap-3">
+    <p role="status">Ton bilan hebdomadaire n’a pas pu être chargé. Tu peux réessayer sans perdre tes bilans enregistrés.</p>
+    <Button onClick={() => { setLoadError(false); setLoaded(false); setRetry(value => value + 1); }}>Réessayer</Button>
+  </Card>;
 
   if (!loaded || !du) return null;
 
