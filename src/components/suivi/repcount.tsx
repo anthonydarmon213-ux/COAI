@@ -394,6 +394,7 @@ export function RepCount({
   const [draftError, setDraftError] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
   const [routine, setRoutine] = useState<string[]>([]);
+  const historiqueRequest = useRef(0);
 
   useEffect(() => {
     if (userId) {
@@ -432,6 +433,7 @@ export function RepCount({
   useEffect(() => { if (draftReady) persistDraft(); }, [draftReady, persistDraft]);
 
   const charger = useCallback(async () => {
+    const request = ++historiqueRequest.current;
     try {
       const donnees = await withRequestDeadline(async signal => {
         const r = await fetch("/api/seances", { signal });
@@ -439,13 +441,17 @@ export function RepCount({
         return r.json();
       });
       if (!Array.isArray(donnees)) throw new Error("historique_invalide");
+      if (request !== historiqueRequest.current) return;
       setSeances(donnees);
       setHistoriqueErreur(false);
-    } catch { setHistoriqueErreur(true); }
+    } catch {
+      if (request === historiqueRequest.current) setHistoriqueErreur(true);
+    }
   }, []);
 
   useEffect(() => {
     void charger();
+    return () => { historiqueRequest.current += 1; };
   }, [charger]);
 
   // Une échéance réelle reste correcte quand iOS suspend les minuteurs.
@@ -455,9 +461,11 @@ export function RepCount({
     actualiser();
     const timer = window.setInterval(actualiser, 1000);
     document.addEventListener("visibilitychange", actualiser);
+    window.addEventListener("pageshow", actualiser);
     return () => {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", actualiser);
+      window.removeEventListener("pageshow", actualiser);
     };
   }, [finRepos]);
 
