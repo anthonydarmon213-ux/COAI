@@ -1,11 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { OFFRE_RENTREE_FIN, PRIX_APRES_OFFRE } from "@/lib/pricing/offre-rentree";
 
-function restant(fin: Date, maintenant: Date) {
-  const ms = fin.getTime() - maintenant.getTime();
-  if (ms <= 0) return null;
+function lireSecondes() {
+  return Math.max(0, Math.ceil((OFFRE_RENTREE_FIN.getTime() - Date.now()) / 1000));
+}
+
+function serveurSecondes(): number | null { return null; }
+
+function suivreHorloge(refresh: () => void) {
+  const timer = window.setInterval(refresh, 1000);
+  window.addEventListener("pageshow", refresh);
+  document.addEventListener("visibilitychange", refresh);
+  return () => {
+    window.clearInterval(timer);
+    window.removeEventListener("pageshow", refresh);
+    document.removeEventListener("visibilitychange", refresh);
+  };
+}
+
+function restant(secondes: number | null) {
+  if (secondes === null || secondes <= 0) return null;
+  const ms = secondes * 1000;
   return {
     jours: Math.floor(ms / 86400000),
     heures: Math.floor((ms % 86400000) / 3600000),
@@ -18,15 +35,8 @@ export function CompteAReboursRentree({ className = "" }: { className?: string }
   // Rendu serveur et premier rendu client doivent concorder : le décompte ne
   // démarre qu'après le montage, sinon l'heure du serveur et celle du
   // visiteur divergent et React signale une hydratation incohérente.
-  const [temps, setTemps] = useState<ReturnType<typeof restant>>(null);
-
-  useEffect(() => {
-    setTemps(restant(OFFRE_RENTREE_FIN, new Date()));
-    const id = window.setInterval(() => {
-      setTemps(restant(OFFRE_RENTREE_FIN, new Date()));
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, []);
+  const secondes = useSyncExternalStore(suivreHorloge, lireSecondes, serveurSecondes);
+  const temps = restant(secondes);
 
   // Le message promo est rendu cote serveur : le masquer entierement jusqu'au
   // montage le rendait invisible aux moteurs de recherche et aux connexions
