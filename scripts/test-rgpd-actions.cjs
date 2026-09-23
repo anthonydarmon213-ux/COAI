@@ -12,7 +12,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
   URL:{createObjectURL:()=> 'blob:test',revokeObjectURL:()=>{}},
   confirm:text=>{confirmationText=text;return confirmed;},
   document:{body:{appendChild:()=>{}},createElement:()=>({click:()=>downloads++,remove:()=>{}})},
-  fetch:async()=>{calls++; if(hold) await hold;if(networkFailure)throw new Error('network'); return {ok:status===200,status,json:async()=>{if(badJson)throw new Error('json');return responseBody;}};},
+  fetch:async(url,options)=>{if(url==='/api/compte/delete')assert.equal(options.headers['X-COAI-Delete-Confirmation'],'1');calls++; if(hold) await hold;if(networkFailure)throw new Error('network'); return {ok:status===200,status,json:async()=>{if(badJson)throw new Error('json');return responseBody;}};},
   require:name=>{
     if(name==='react') return {
       useState:initial=>{const i=si++;if(!(i in states))states[i]=initial;return [states[i],v=>states[i]=v];},

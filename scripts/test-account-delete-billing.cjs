@@ -4,12 +4,13 @@ const path=require('node:path');
 const vm=require('node:vm');
 const ts=require('typescript');
 const source=ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/app/api/compte/delete/route.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-async function scenario({status='active',customer='cus_owner',retrieveError=false,cancelError=false,cancelStatus='canceled',signedIn=true,hasSubscription=true,photosError=false,hasProfile=true,profileError=false,identityError=false,identityThrows=false,identityId='auth_test'}={}) {
+async function scenario({status='active',customer='cus_owner',retrieveError=false,cancelError=false,cancelStatus='canceled',signedIn=true,hasSubscription=true,photosError=false,hasProfile=true,profileError=false,identityError=false,identityThrows=false,identityId='auth_test',requestHeaders={},appURL='https://coai.fr'}={}) {
   const events=[],api={};
-  vm.runInNewContext(source,{exports:api,require:name=>{
+  let authCalls=0;
+  vm.runInNewContext(source,{exports:api,URL,process:{env:{NEXT_PUBLIC_APP_URL:appURL}},require:name=>{
     const modules={
       'next/server':{NextResponse:{json:(body,options)=>({body,status:options?.status??200})}},
-      '@/lib/auth/server':{getCurrentUser:async()=>signedIn?{id:'auth_test'}:null},
+      '@/lib/auth/server':{getCurrentUser:async()=>{authCalls++;return signedIn?{id:'auth_test'}:null;}},
       '@/lib/auth/admin':{createSupabaseAdminClient:()=>({auth:{admin:{deleteUser:async(id)=>{assert.equal(id,'auth_test');events.push('identity');if(identityThrows)throw new Error('network');return {data:{user:identityId?{id:identityId}:null},error:identityError?new Error('failed'):null};}}}})},
       '@/lib/stripe/client':{stripe:{subscriptions:{
         retrieve:async()=>{events.push('retrieve');if(retrieveError)throw new Error('network');return {id:'sub_test',customer,status};},
@@ -20,9 +21,33 @@ async function scenario({status='active',customer='cus_owner',retrieveError=fals
     };
     if(!(name in modules))throw new Error(name);return modules[name];
   }});
-  return {response:await api.POST(),events};
+  const headers=new Headers({'origin':appURL,'x-coai-delete-confirmation':'1'});
+  for(const [key,value] of Object.entries(requestHeaders)) {
+    if(value===null)headers.delete(key);else headers.set(key,value);
+  }
+  return {response:await api.POST(new Request('https://coai.fr/api/compte/delete',{method:'POST',headers})),events,authCalls};
 }
 (async()=>{
+  for(const requestHeaders of [
+    {'x-coai-delete-confirmation':null}, {'x-coai-delete-confirmation':'0'},
+    {origin:null}, {origin:'null'}, {origin:'https://evil.example'},
+    {origin:'https://coai.fr.evil.example'}, {origin:'http://coai.fr'},
+    {origin:'https://coai.fr:8443'}, {'sec-fetch-site':'cross-site'},
+    {origin:'https://evil.example',host:'evil.example','x-forwarded-host':'evil.example'},
+  ]) {
+    const result=await scenario({requestHeaders});
+    assert.equal(result.response.status,403);assert.equal(result.authCalls,0);assert.deepEqual(result.events,[]);
+  }
+  for(const appURL of ['', 'invalid', 'http://coai.fr', 'https://user:secret@coai.fr']) {
+    const result=await scenario({appURL});assert.equal(result.response.status,503);assert.deepEqual(result.events,[]);
+  }
+  for(const authorization of ['Basic token','Bearer ', 'Bearer token another']) {
+    const result=await scenario({requestHeaders:{authorization}});
+    assert.equal(result.response.status,401);assert.equal(result.authCalls,0);assert.deepEqual(result.events,[]);
+  }
+  assert.equal((await scenario({appURL:'http://localhost:3050'})).response.status,200);
+  assert.equal((await scenario({requestHeaders:{origin:null,authorization:'Bearer test-token'}})).response.status,200);
+  assert.equal((await scenario({signedIn:false,requestHeaders:{origin:null,authorization:'Bearer test-token'}})).response.status,401);
   for(const options of [{retrieveError:true},{cancelError:true},{customer:'cus_other'},{cancelStatus:'active'}]){
     const {response,events}=await scenario(options);
     assert.equal(response.status,503);

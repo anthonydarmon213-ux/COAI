@@ -2,6 +2,21 @@
 
 ## Vérifié localement
 
+- Protection de provenance : en-tête explicite requis, origine exacte de
+  NEXT_PUBLIC_APP_URL pour les sessions cookie, origine cross-site refusée,
+  authentification Bearer mal formée refusée sans repli sur les cookies.
+  Le marqueur n'est pas un secret et ne remplace jamais l'authentification.
+- Les scénarios refusés n'appellent ni Auth ni Stripe ni la base dans les tests
+  de route. Les origines nulles, absentes, trompeuses, HTTP non local et faux
+  Host/X-Forwarded-Host sont couverts ; configuration absente/invalide fermée.
+- Serveur compilé temporaire 127.0.0.1:3062 : quatre requêtes HTTP réelles,
+  sans session, refusées avec les statuts attendus 403/401. Serveur arrêté.
+  Les parcours autorisés restent testés avec services simulés, pas en production.
+- Déploiement futur : livrer ensemble le bouton et la route ; une ancienne page
+  ouverte sans le nouveau marqueur devra être rechargée. Vérifier que l'origine
+  canonique utilisée par l'app correspond à NEXT_PUBLIC_APP_URL. Ne pas ouvrir
+  CORS pour contourner cette protection.
+
 - `scripts/test-apple-account-deletion-local.cjs` exécute les fonctions réelles
   du registre Apple sur PostgreSQL local (127.0.0.1:54322 uniquement).
 - Suppression de deux utilisateurs synthétiques créés par ce test : les

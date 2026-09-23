@@ -49,7 +49,10 @@ export function RgpdActions() {
     setError(null);
     setDeleting(true);
     try {
-      const res = await fetch("/api/compte/delete", { method: "POST" });
+      const res = await fetch("/api/compte/delete", {
+        method: "POST",
+        headers: { "X-COAI-Delete-Confirmation": "1" },
+      });
       if (!res.ok) throw new Error(res.status === 401 ? "session" : "delete");
       const result: unknown = await res.json();
       if (!result || typeof result !== "object" || !("success" in result) || result.success !== true) {
