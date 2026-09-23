@@ -23,6 +23,9 @@ const ALIAS_NOMS: Record<string, string> = {
   "superman au sol": "Superman",
   "deadlift trap bar": "Soulevé de terre trap bar",
   "elevations laterales halteres": "Élévations latérales",
+  "face pull a l elastique": "Face pull élastique",
+  "abduction de hanche a l elastique": "Abduction de hanche élastique",
+  "dips aux barres paralleles": "Dips",
 };
 
 export function exerciceBibliothequePourNom(nom: string): Exercice | null {

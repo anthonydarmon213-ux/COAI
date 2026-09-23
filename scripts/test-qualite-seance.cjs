@@ -14,7 +14,19 @@ function load(file) {
 }
 const {verifierQualiteSeance: check} = load(path.join(root,'src/lib/programmes/qualite-seance.ts'));
 const {EXERCICES} = load(path.join(root,'src/lib/exercices/catalogue.ts'));
-const {exerciceAvecMediasCoai} = load(path.join(root,'src/lib/exercices/media-coai.ts'));
+const {exerciceAvecMediasCoai, exerciceBibliothequePourNom, filtrerExercicesAvecMedias} = load(path.join(root,'src/lib/exercices/media-coai.ts'));
+for (const [alias, canonical] of [
+  ['Face pull à l’élastique', 'Face pull élastique'],
+  ["Face pull à l'élastique", 'Face pull élastique'],
+  ['Abduction de hanche à l’élastique', 'Abduction de hanche élastique'],
+  ['Dips aux barres parallèles', 'Dips'],
+]) assert.equal(exerciceBibliothequePourNom(alias)?.nom, canonical);
+for (const name of ['Face pull à la poulie', 'Abduction de hanche machine', 'Dips sur anneaux']) {
+  assert.equal(exerciceBibliothequePourNom(name), null, 'No neighbouring equipment alias');
+}
+assert.equal(exerciceBibliothequePourNom('Dips sur banc (triceps)')?.nom, 'Dips sur banc (triceps)');
+assert.equal(exerciceAvecMediasCoai('Abduction de hanche à l’élastique'), false, 'Alias must not fabricate a missing video');
+assert.equal(filtrerExercicesAvecMedias([{nom:'Face pull à l’élastique',series:3}])[0]?.nom, 'Face pull élastique');
 const nom = EXERCICES.find(e => exerciceAvecMediasCoai(e.nom)).nom;
 const valid = () => ({nom:'Séance test',echauffement:'Mobilité douce',retourAuCalme:'Retour progressif',exercices:[{nom,series:3,repetitions:'8-10',repos:'60 sec',charge:'Effort modéré',methode:'Série classique'}]});
 assert.equal(check(valid()).erreurs.length,0);
