@@ -105,7 +105,7 @@ const TABLE: Entree[] = [
   // le motif les reprend, sans quoi la correspondance echoue.
   { motifs: ["extension triceps (poulie)", "triceps a la poulie", "triceps pushdown"], video: { fichier: "extension-triceps-poulie", description: "Extension des triceps à la poulie" } },
   { motifs: ["extension triceps haltere unilaterale", "extension triceps haltere"], video: { fichier: "extension-triceps-haltere-unilaterale", description: "Extension des triceps à l’haltère, un bras" } },
-  { motifs: ["leg curl", "ischio machine"], video: { fichier: "leg-curl-machine", description: "Leg curl à la machine" } },
+  { motifs: ["leg curl", "ischio machine"], video: { fichier: "leg-curl-machine", description: "Leg curl allongé à la machine" } },
   { motifs: ["pullover halteres", "pull over halteres", "dumbbell pullover"], video: { fichier: "pullover-halteres", description: "Pull-over aux haltères" } },
   { motifs: ["thruster halteres", "dumbbell thruster"], video: { fichier: "thruster-halteres", description: "Thruster aux haltères" } },
 
@@ -141,6 +141,8 @@ function normaliser(texte: string): string {
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {
   const normalise = normaliser(nom);
+  // Rush inspecté : exécution allongée à deux jambes uniquement.
+  if (normalise.includes("leg curl") && !["leg curl", "leg curl (machine)", "leg curl machine", "leg curl allonge", "leg curl allonge (machine)"].includes(normalise)) return null;
   // Audit visuel : ces rushes ne correspondent pas aux fiches/photos actuelles.
   // Goblet : sans charge ; rowing élastique : penché ; épaules : assis.
   if (/goblet squat|squat gobelet|rowing elastique|rowing a l'elastique|developpe militaire halteres|developpe epaules halteres|dumbbell shoulder press/.test(normalise)) return null;

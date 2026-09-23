@@ -27,6 +27,15 @@ assert.equal(photoCoaiPourNom('Ischio suspension'), '/exercices/suspension-curl-
 assert.equal(photoCoaiPourNom('Étirement ischio'), '/exercices/mobilite-etirement-ischio-debout-banc.jpg');
 assert.equal(photoCoaiPourNom('Ischio'), null);
 assert.equal(photoCoaiPourNom('Leg curl (machine)'), '/exercices/leg-curl-allonge.jpg');
+for (const name of ['Leg curl allongé', 'Leg curl allongé (machine)', 'Leg curl (machine)']) {
+  assert.equal(photoCoaiPourNom(name), '/exercices/leg-curl-allonge.jpg');
+  assert.equal(videoCoaiPourNom(name)?.fichier, 'leg-curl-machine');
+}
+for (const name of ['Leg curl assis', 'Seated leg curl', 'Leg curl debout', 'Leg curl unilatéral', 'Leg curl allongé unilatéral']) {
+  assert.equal(photoCoaiPourNom(name), null, name);
+  assert.equal(videoCoaiPourNom(name), null, name);
+}
+assert.equal(EXERCICES.find(ex => ex.id === 'leg-curl-machine').freeExerciseDbId, undefined, 'No seated external fallback for lying media');
 for (const nom of ['Goblet squat', 'Squat gobelet (kettlebell)', 'Rowing élastique', 'Rowing à l’élastique', 'Développé militaire haltères', 'Dumbbell shoulder press']) {
   assert.equal(videoCoaiPourNom(nom), null, `Média non conforme : ${nom}`);
 }

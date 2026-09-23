@@ -20,6 +20,7 @@ for (const [alias, canonical] of [
   ["Face pull à l'élastique", 'Face pull élastique'],
   ['Abduction de hanche à l’élastique', 'Abduction de hanche élastique'],
   ['Dips aux barres parallèles', 'Dips'],
+  ['Leg curl allongé', 'Leg curl (machine)'],
 ]) assert.equal(exerciceBibliothequePourNom(alias)?.nom, canonical);
 for (const name of ['Face pull à la poulie', 'Abduction de hanche machine', 'Dips sur anneaux']) {
   assert.equal(exerciceBibliothequePourNom(name), null, 'No neighbouring equipment alias');

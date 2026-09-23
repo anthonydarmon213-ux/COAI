@@ -256,6 +256,9 @@ function correspond(entree: EntreePhoto, normalise: string) {
 
 export function photoCoaiPourNom(nom: string, genre?: GenreVisuel): string | null {
   const normalise = normaliser(nom);
+  // Le seul leg curl machine photographié est allongé. Ne pas convertir
+  // une variante assise, debout ou unilatérale en cette démonstration.
+  if (normalise.includes("leg curl") && !["leg curl", "leg curl (machine)", "leg curl machine", "leg curl allonge", "leg curl allonge (machine)"].includes(normalise)) return null;
   // Ces variantes n'ont pas de photo exacte validée : aucun repli voisin.
   if (/poitrine appuyee|chest[ -]supported|etirement assis ecarte|pec deck|butterfly/.test(normalise)) return null;
   const variante = VARIANTES.find((e) => correspond(e, normalise));

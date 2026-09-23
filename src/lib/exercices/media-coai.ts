@@ -26,6 +26,8 @@ const ALIAS_NOMS: Record<string, string> = {
   "face pull a l elastique": "Face pull élastique",
   "abduction de hanche a l elastique": "Abduction de hanche élastique",
   "dips aux barres paralleles": "Dips",
+  // Photo et rush COAI inspectés : machine allongée, pas assise.
+  "leg curl allonge": "Leg curl (machine)",
 };
 
 export function exerciceBibliothequePourNom(nom: string): Exercice | null {
