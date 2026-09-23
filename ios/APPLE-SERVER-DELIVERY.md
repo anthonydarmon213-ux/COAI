@@ -1,6 +1,8 @@
 # Réception serveur Apple — préparation, non activée
 
-POST `/api/ios/apple/transactions` reçoit uniquement `{ "signedTransaction": "<JWS StoreKit>" }` avec une session COAI `Authorization: Bearer …`. Le compte Apple stable doit avoir été préparé par `/api/ios/apple/account`. Le serveur ignore les identités, offres et environnements proposés dans le corps.
+POST `/api/ios/apple/transactions` reçoit uniquement `{ "signedTransaction": "<JWS StoreKit>" }` avec une session COAI `Authorization: Bearer …`, ou la session cookie WebKit existante avec Origin strictement égal à NEXT_PUBLIC_APP_URL. Sans Bearer, une origine absente ou différente est refusée. Le compte Apple stable doit avoir été préparé par `/api/ios/apple/account`. Le serveur ignore les identités, offres et environnements proposés dans le corps.
+
+Le modèle natif expose deliverAppleReceipt, qui appelle ce point d'entrée via fetch dans le monde WebKit isolé, depuis https://coai.fr seulement, sans extraire les secrets de session. Redirections refusées, délai 25 secondes, réponse décodée strictement et génération de vue contrôlée. Ce transport n'est pas encore branché à un écran de vente : préparation du compte/catalogue et cycle de connexion restent à intégrer.
 
 La route vérifie la signature avec la bibliothèque officielle Apple, persiste les faits, relit les droits puis retourne `transactionID`, `accountToken`, `persisted` et `access`. Une erreur ne vaut jamais confirmation : StoreKit doit conserver la transaction pour réessayer. Une révocation/expiration correctement enregistrée peut être confirmée sans accès actif.
 

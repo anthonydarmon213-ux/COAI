@@ -2,6 +2,18 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testServerPurchaseAcknowledgementDecoding() throws {
+        let token = UUID()
+        let payload = "{\"transactionID\":\"123\",\"accountToken\":\"\(token.uuidString)\",\"persisted\":true,\"access\":{\"subscribed\":false}}"
+        let ack = try JSONDecoder().decode(PurchaseAcknowledgement.self, from: Data(payload.utf8))
+        XCTAssertTrue(PurchaseDelivery.mayFinish(transactionID: "123", accountToken: token, acknowledgement: ack))
+        XCTAssertFalse(PurchaseDelivery.mayFinish(transactionID: "124", accountToken: token, acknowledgement: ack))
+        XCTAssertFalse(PurchaseDelivery.mayFinish(transactionID: "123", accountToken: UUID(), acknowledgement: ack))
+        for invalid in ["{}", "{\"error\":\"Unavailable\"}", payload.replacingOccurrences(of: token.uuidString, with: "bad-token"), payload.replacingOccurrences(of: "true", with: "\"true\"")] {
+            XCTAssertThrowsError(try JSONDecoder().decode(PurchaseAcknowledgement.self, from: Data(invalid.utf8)))
+        }
+    }
+
     func testJSONExportRequiresCompleteObject() {
         XCTAssertEqual(DownloadPolicy.format(mime: "application/json", length: 30), .json)
         XCTAssertTrue(DownloadPolicy.validJSONDocument(Data("{\"test\":true,\"seances\":[]}".utf8)))

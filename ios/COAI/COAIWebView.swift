@@ -2,6 +2,46 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
+extension COAIWebModel {
+    enum AppleAPIFailure: Error { case unavailable, invalidResponse }
+
+    /// Uses the existing authenticated WebKit cookie store. No session token is
+    /// extracted into JavaScript arguments, native storage, logs or URL query.
+    /// Called by native purchase flow only; no script message handler is exposed.
+    func deliverAppleReceipt(_ signedTransaction: String) async throws -> PurchaseAcknowledgement {
+        guard !signedTransaction.isEmpty, signedTransaction.utf8.count <= 65536,
+              let url = webView.url, url.scheme == "https", url.host == "coai.fr",
+              url.port == nil || url.port == 443 else { throw AppleAPIFailure.unavailable }
+        let generation = sessionViewID
+        let view = webView
+        let result = try await view.callAsyncJavaScript("""
+            if (location.origin !== 'https://coai.fr') throw new Error('Unavailable');
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 25000);
+            try {
+                const response = await fetch('/api/ios/apple/transactions', {
+                    method: 'POST', credentials: 'same-origin', mode: 'same-origin',
+                    redirect: 'error', cache: 'no-store', signal: controller.signal,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ signedTransaction: receipt })
+                });
+                if (!response.ok) throw new Error('Purchase not confirmed');
+                const text = await response.text();
+                if (text.length > 16384) throw new Error('Invalid response');
+                return text;
+            } finally { clearTimeout(timeout); }
+            """, arguments: ["receipt": signedTransaction], in: nil, contentWorld: .defaultClient)
+        try Task.checkCancellation()
+        guard generation == sessionViewID, view === webView,
+              let text = result as? String, let data = text.data(using: .utf8) else {
+            throw AppleAPIFailure.invalidResponse
+        }
+        // PurchaseDelivery also compares account token and transaction ID with
+        // the verified StoreKit transaction before allowing finish().
+        return try JSONDecoder().decode(PurchaseAcknowledgement.self, from: data)
+    }
+}
+
 @MainActor
 final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate, ASWebAuthenticationPresentationContextProviding {
     @Published private(set) var webView: WKWebView

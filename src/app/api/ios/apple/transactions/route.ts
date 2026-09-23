@@ -9,15 +9,25 @@ import { readEffectiveAccess } from '@/lib/subscription/read-effective-access';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const json = (body: object, status = 200) => NextResponse.json(body, {
-  status, headers: { 'Cache-Control': 'private, no-store', Vary: 'Authorization' },
+  status, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie, Authorization' },
 });
 
-/** Native API: explicit bearer session required, never cookie-only fallback.
+/** Native API: bearer session or existing WebKit session with strict origin.
  * No client-chosen user/token/environment/plan participates in authorization.
  */
 export async function POST(request: Request) {
-  if (!/^Bearer \S+$/.test(request.headers.get('authorization') || '')) {
+  const authorization = request.headers.get('authorization');
+  if (authorization !== null && !/^Bearer \S+$/.test(authorization)) {
     return json({ error: 'Connexion requise' }, 401);
+  }
+  if (authorization === null) {
+    let expectedOrigin: string;
+    try {
+      const app = new URL(process.env.NEXT_PUBLIC_APP_URL || '');
+      if (app.protocol !== 'https:' && !(app.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(app.hostname))) throw Error();
+      expectedOrigin = app.origin;
+    } catch { return json({ error: 'Service indisponible' }, 503); }
+    if (request.headers.get('origin') !== expectedOrigin) return json({ error: 'Origine non autorisée' }, 403);
   }
   if (request.headers.get('content-type')?.split(';')[0]?.trim() !== 'application/json') {
     return json({ error: 'Requête JSON requise' }, 415);

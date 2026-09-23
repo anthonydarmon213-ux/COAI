@@ -35,9 +35,9 @@ async function run(options = {}) {
       assert.equal(database, db); assert.equal(id, 'server-user'); assert.equal(env, 'Sandbox'); calls.push('access');
     } },
   };
-  vm.runInNewContext(code, { exports, Buffer, require: name => { assert(Object.hasOwn(modules, name), name); return modules[name]; } });
+  vm.runInNewContext(code, { exports, Buffer, URL, process: { env: { NEXT_PUBLIC_APP_URL: options.appURL ?? 'https://coai.test' } }, require: name => { assert(Object.hasOwn(modules, name), name); return modules[name]; } });
   const response = await exports.POST(new Request('https://coai.test/api/ios/apple/transactions', {
-    method: 'POST', headers: { authorization: options.noBearer ? '' : 'Bearer test', 'content-type': options.badType ? 'text/plain' : 'application/json' },
+    method: 'POST', headers: { ...(options.cookieOnly ? {} : { authorization: options.noBearer ? '' : 'Bearer test' }), ...(options.origin ? { origin: options.origin } : {}), 'content-type': options.badType ? 'text/plain' : 'application/json' },
     body: options.body ?? JSON.stringify({ signedTransaction: 'jws', userId: 'attacker', accountToken: 'attacker', environment: 'Production', plan: 'PREMIUM' }),
   }));
   assert.equal(response.status, options.status ?? 200);
@@ -49,6 +49,12 @@ async function run(options = {}) {
 async function main() {
   assert.deepEqual(await run(), ['auth', 'deliver', 'persist', 'access']);
   assert.deepEqual(await run({ noBearer: true, status: 401 }), []);
+  assert.deepEqual(await run({ cookieOnly: true, origin: 'https://coai.test' }), ['auth', 'deliver', 'persist', 'access']);
+  for (const origin of [undefined, 'null', 'https://attacker.test', 'https://coai.test.attacker.test']) {
+    assert.deepEqual(await run({ cookieOnly: true, origin, status: 403 }), []);
+  }
+  await run({ cookieOnly: true, origin: 'https://coai.test', anonymous: true, status: 401 });
+  await run({ cookieOnly: true, appURL: 'http://coai.test', status: 503 });
   assert.deepEqual(await run({ badType: true, status: 415 }), []);
   await run({ anonymous: true, status: 401 });
   await run({ unconfigured: true, status: 503 });
