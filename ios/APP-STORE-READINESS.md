@@ -1,5 +1,19 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
+## État courant — 23 septembre 2026
+
+Anthony confirme de poursuivre la préparation sans frais après vérification du
+portail Apple : connexion établie, mais invitation à rejoindre le Developer
+Program sur le compte affiché. Ne lancer ni inscription payante ni souscription.
+Le dossier éditorial proposé est `ios/SOUMISSION-BROUILLON.md` ; non publié,
+à confronter aux parcours réellement livrés avant toute soumission.
+
+Code sauvegardé sur `codex/ios-release-candidate`, déploiement automatique de
+cette branche désactivé. Build web séparé des migrations, compilation locale
+réussie. Production toujours distincte : les anciens états ci-dessous sont
+historiques et ne prouvent pas une validation actuelle. TestFlight, achat Apple
+complet et validation des dix parcours restent ouverts.
+
 Décision Anthony du 16 septembre 2026 : la préparation effective de l'app iOS
 à l'App Store prend la priorité sur les effets visuels et la croissance.
 Les autorisations de poursuivre restent valables, sans frais supplémentaires.
