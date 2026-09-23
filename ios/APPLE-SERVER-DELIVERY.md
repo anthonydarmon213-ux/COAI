@@ -11,6 +11,9 @@ Configuration de déploiement nécessaire, non installée automatiquement :
 - `APPLE_STORE_ENVIRONMENT` : `Sandbox` ou `Production`, jamais choisi par le téléphone.
 - `APPLE_ROOT_CERTIFICATES_BASE64_JSON` : tableau JSON des certificats racines Apple PKI DER encodés en base64, obtenus et vérifiés côté exploitation. Jamais la chaîne envoyée par le client.
 - `APPLE_APP_ID` : identifiant numérique App Store, obligatoire en Production.
+- `APPLE_CONTENT_ACCESS_ENABLED=true` : lecture des droits Apple pour les contenus raccordés, seulement après migration et validation dédiée. Absent par défaut : aucun accès aux nouvelles tables depuis ces pages. Ce réglage n'active pas la vente native.
+
+Contenus actuellement raccordés : recettes, programmes prêts, RepCount et préparation des trois piliers depuis la bibliothèque. Les droits Stripe actifs et les déblocages historiques sont préservés ; une panne Apple est distinguée d'un refus d'accès. Aucun appel IA payant réactivé. Les autres contrôles d'accès doivent encore être audités et raccordés avant activation commerciale globale.
 
 Le bundle est fixé à `fr.coai.mobile`, les produits au catalogue Essentiel approuvé. Ne pas configurer Sandbox sur le backend de production pour débloquer les tests : utiliser un environnement et une base dédiés. Les tables Apple doivent être migrées avant activation ; aucune migration distante n'est autorisée par ce document.
 

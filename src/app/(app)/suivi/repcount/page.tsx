@@ -2,7 +2,7 @@ import { RepCount } from "@/components/suivi/repcount";
 import { EXERCICES } from "@/lib/exercices/catalogue";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { hasProgrammeAccess } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 
 export const metadata = {
   title: "RepCount | COAI",
@@ -34,7 +34,9 @@ export default async function RepCountPage(
     ? searchParams.exercice[0] ?? ""
     : searchParams?.exercice ?? "";
   const user = await getCurrentAppUser();
-  const hasAccess = Boolean(user && hasProgrammeAccess(user, user.subscription));
+  const access = user ? await contentAccessFor(user) : null;
+  if (access?.appleUnavailable && !access.programme) throw Error('Accès temporairement indisponible. Réessaie.');
+  const hasAccess = access?.programme ?? false;
   const onboarding = searchParams?.onboarding === "1";
 
   return (

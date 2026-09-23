@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
 import { saveGeneratedProgramme } from "@/lib/programmes/save-generated";
 import { prisma } from "@/lib/db/client";
-import { hasProgrammeAccess } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 import { socleEntrainement, socleNutrition, socleRecuperation, socleAcceptable } from "@/lib/programmes-socles";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import type { Pilier, Prisma } from "@prisma/client";
@@ -20,7 +20,11 @@ export async function POST(request: Request) {
     include: { profile: true, subscription: true },
   });
   if (!user) return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
-  if (!hasProgrammeAccess(user, user.subscription)) {
+  const access = await contentAccessFor(user);
+  if (access.appleUnavailable && !access.programme) {
+    return NextResponse.json({ error: "La vérification de ton accès est indisponible. Réessaie sans effectuer de nouvel achat." }, { status: 503 });
+  }
+  if (!access.programme) {
     return NextResponse.json({ error: "Choisis ton accompagnement COAI pour accéder à ton programme." }, { status: 403 });
   }
 

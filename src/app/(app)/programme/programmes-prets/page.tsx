@@ -2,7 +2,7 @@ import { ProgrammesPretsGrid } from "@/components/programme/programmes-prets-gri
 import { PROGRAMMES_PRETS } from "@/lib/programmes-prets/catalogue";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import { hasCatalogueAccess } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 import Link from "next/link";
 import { PROGRAMME_DECOUVERTE_GRATUIT_SLUG } from "@/lib/programmes-prets/experience";
 
@@ -17,16 +17,17 @@ export default async function ProgrammesPretsPage(
 ) {
   const searchParams = await props.searchParams;
   const user = await getCurrentAppUser();
-  const achats = user
-    ? await prisma.programmePurchase.findMany({
+  const [achats, access] = await Promise.all([user
+    ? prisma.programmePurchase.findMany({
         where: { userId: user.id },
         select: { programmePrincipal: true, programmeOffert: true },
       })
-    : [];
+    : [], user ? contentAccessFor(user) : null]);
   const programmesAchetes = new Set(
     achats.flatMap(({ programmePrincipal, programmeOffert }) => [programmePrincipal, programmeOffert])
   );
-  const accesComplet = user ? hasCatalogueAccess(user.subscription) : false;
+  if (access?.appleUnavailable && !access.catalogue) throw Error('Accès temporairement indisponible. Réessaie.');
+  const accesComplet = access?.catalogue ?? false;
 
   // Couvertures : alternance femme/homme d'une carte à l'autre (demande
   // Anthony), indépendamment du profil, pour représenter toute la communauté.

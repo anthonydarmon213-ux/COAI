@@ -2,7 +2,7 @@ import { RecettesGrid } from "@/components/nutrition/recettes-grid";
 import { RECETTES } from "@/lib/nutrition/recettes";
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { hasPaidSubscription } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 
 // Bibliothèque de recettes (19/08/2026, demande Anthony). Même gabarit que
 // /programme/exercices (kicker + titre + intro, bibliothèque indépendante du
@@ -16,7 +16,9 @@ const RECETTES_OFFERTES = 3;
 
 export default async function RecettesPage() {
   const user = await getCurrentAppUser();
-  const abonne = hasPaidSubscription(user?.subscription);
+  const access = user ? await contentAccessFor(user) : null;
+  if (access?.appleUnavailable && !access.catalogue) throw Error('Accès temporairement indisponible. Réessaie.');
+  const abonne = access?.catalogue ?? false;
   const visibles = abonne ? RECETTES : RECETTES.slice(0, RECETTES_OFFERTES);
   const items = visibles.map((recette) => ({
     recette,
