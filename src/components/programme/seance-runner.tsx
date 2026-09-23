@@ -243,14 +243,15 @@ function lireSauvegarde(nomSeance: string, cle: string | null): SeanceSauvegarde
     const d = JSON.parse(brut) as SeanceSauvegardee;
     // On ne reprend que LA MÊME séance : restaurer la position d'une autre
     // séance sur des exercices différents produirait un état incohérent.
-    if (d?.nomSeance !== nomSeance || typeof d.debut !== "number" || !Number.isFinite(d.debut)) return null;
+    if (d?.nomSeance !== nomSeance || typeof d.debut !== "number" ||
+        !Number.isSafeInteger(d.debut) || !Number.isFinite(new Date(d.debut).getTime())) return null;
     if (!Number.isInteger(d.index) || d.index < 0 || !isPlainObject(d.realise)) return null;
     if (!Object.values(d.realise).every((v) => isPlainObject(v) && typeof v.reps === "string" && typeof v.charge === "string")) return null;
     if (!Object.values(d.realise).every((v) => v.dureeSecondes === undefined || typeof v.dureeSecondes === "string")) return null;
     if (d.substitutions !== undefined && (!isPlainObject(d.substitutions) || !Object.values(d.substitutions).every((v) => isPlainObject(v) && typeof v.variante === "string" && typeof v.consigne === "string"))) return null;
     if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
     if (d.nomsRealises !== undefined && (!isPlainObject(d.nomsRealises) || !Object.values(d.nomsRealises).every((v) => typeof v === "string"))) return null;
-    if (d.repos !== undefined && (!isPlainObject(d.repos) || !Number.isInteger(d.repos.index) || typeof d.repos.fin !== "number" || !Number.isFinite(d.repos.fin))) return null;
+    if (d.repos !== undefined && (!isPlainObject(d.repos) || !Number.isInteger(d.repos.index) || d.repos.index < 0 || typeof d.repos.fin !== "number" || !Number.isSafeInteger(d.repos.fin) || !Number.isFinite(new Date(d.repos.fin).getTime()))) return null;
     if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
       window.localStorage.removeItem(cle);
       return null;

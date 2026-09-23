@@ -36,4 +36,30 @@ assert.ok(storage.has('coai:seance-en-cours'), 'ancien brouillon conservé sans 
 storage.set(b, JSON.stringify({ ...draft, debut: Date.now() - 9 * 3600000 }));
 assert.equal(run("lireSauvegarde('Full body', b)"), null);
 assert.ok(storage.has(a));
+// A finite number can still be outside JavaScript Date's range and crash
+// dateSauvegarde.toISOString() when the player opens.
+for (const invalid of [
+  null, [], 'wrong',
+  { ...draft, debut: 1e100 },
+  { ...draft, debut: 8640000000000001 },
+  { ...draft, debut: Date.now() + 0.5 },
+  { ...draft, index: -1 },
+  { ...draft, realise: [] },
+  { ...draft, realise: { '0': { reps: 10, charge: '20' } } },
+  { ...draft, repos: { index: -1, fin: Date.now() } },
+  { ...draft, repos: { index: 1, fin: 1e100 } },
+  { ...draft, repos: { index: 1, fin: 8640000000000001 } },
+]) {
+  storage.set(b, JSON.stringify(invalid));
+  assert.equal(run("lireSauvegarde('Full body', b)"), null);
+  assert.ok(storage.has(a),'Malformed draft must not delete another session');
+}
+storage.set(b, '{broken json');
+assert.equal(run("lireSauvegarde('Full body', b)"), null);
+storage.set(b, JSON.stringify({ ...draft, repos: { index: 1, fin: Date.now() + 90000 } }));
+assert.ok(run("lireSauvegarde('Full body', b).repos"));
+const originalRead = context.window.localStorage.getItem;
+context.window.localStorage.getItem = () => { throw new Error('storage denied'); };
+assert.equal(run("lireSauvegarde('Full body', b)"), null);
+context.window.localStorage.getItem = originalRead;
 console.log('PASS : isolation compte/prescription, reprise des charges, suppression ciblée, expiration, ancien brouillon préservé');
