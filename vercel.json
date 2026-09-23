@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "codex/ios-release-candidate": false
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/relance-inactifs",
