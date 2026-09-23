@@ -388,7 +388,6 @@ export function RepCount({
   const [enregistrementEnCours, setEnregistrementEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [premierRepereId, setPremierRepereId] = useState<string | null>(null);
-  const prefillRef = useRef<string | null>(null);
   const sauvegardeRef = useRef<{ signature: string; date: string } | null>(null);
   const requeteEnCoursRef = useRef(false);
   const [draftReady, setDraftReady] = useState(false);
@@ -396,6 +395,7 @@ export function RepCount({
   const draftError = useSyncExternalStore(draftStatus.subscribe, draftStatus.snapshot, draftStatus.serverSnapshot);
   const [draftRestored, setDraftRestored] = useState(false);
   const [routine, setRoutine] = useState<string[]>([]);
+  const [prefillKey, setPrefillKey] = useState<string | null>(null);
   const historiqueRequest = useRef(0);
 
   useEffect(() => {
@@ -409,7 +409,7 @@ export function RepCount({
           setNotes(restored.notes); setDureeRepos(restored.dureeRepos); setFinRepos(restored.finRepos);
           setRoutine(restored.routine);
           sauvegardeRef.current = restored.sauvegarde;
-          prefillRef.current = restored.nom.trim().toLocaleLowerCase("fr-FR");
+          setPrefillKey(restored.nom.trim().toLocaleLowerCase("fr-FR"));
           setDraftRestored(true);
         }
       } catch { draftStatus.report(true); }
@@ -483,23 +483,24 @@ export function RepCount({
   // À l'ouverture depuis un bilan de séance, reprend automatiquement la
   // meilleure série connue. L'utilisateur retrouve son repère sans le
   // mémoriser ni le recopier, mais garde la main sur les deux steppers.
-  useEffect(() => {
-    const cle = nom.trim().toLocaleLowerCase("fr-FR");
-    const derniereSerie = historique[0]?.meilleureSerie;
-    if (!cle || !derniereSerie || prefillRef.current === cle || sets.length > 0) return;
+  const clePrefill = nom.trim().toLocaleLowerCase("fr-FR");
+  const derniereSerie = historique[0]?.meilleureSerie;
+  // Ajustement conditionnel avant affichage, pas après peinture dans un effet.
+  // La clé est aussi verrouillée dès la première interaction de saisie.
+  if (clePrefill && derniereSerie && prefillKey !== clePrefill && sets.length === 0) {
+    setPrefillKey(clePrefill);
     setReps(derniereSerie.reps);
     setCharge(derniereSerie.charge);
     setMaintien(derniereSerie.dureeSecondes != null);
     if (derniereSerie.dureeSecondes != null) setDureeSecondes(derniereSerie.dureeSecondes);
-    prefillRef.current = cle;
-  }, [historique, nom, sets.length]);
+  }
 
   const volumeCourant = sets.reduce((t, s) => t + s.reps * s.charge, 0);
 
   // Un historique lent ne doit jamais écraser une saisie commencée, même
   // lorsque le champ contient temporairement une valeur incomplète.
   function protegerSaisie() {
-    prefillRef.current = nom.trim().toLocaleLowerCase("fr-FR");
+    setPrefillKey(nom.trim().toLocaleLowerCase("fr-FR"));
   }
 
   const ajouterSerie = useCallback(() => {
@@ -582,7 +583,7 @@ export function RepCount({
     setReps(10);
     setMaintien(false);
     setFinRepos(null);
-    prefillRef.current = null;
+    setPrefillKey(null);
     setEnregistre(false);
     document.getElementById("repcount-exercice")?.focus();
   }
@@ -648,7 +649,7 @@ export function RepCount({
             setRoutine(seance.noms); setNom(premier);
             setReps(repere?.reps || 10); setCharge(repere?.charge ?? 0);
             setMaintien(repere?.dureeSecondes != null); setDureeSecondes(repere?.dureeSecondes ?? 30);
-            prefillRef.current = null; setEnregistre(false); setErreur(null);
+            setPrefillKey(null); setEnregistre(false); setErreur(null);
             document.getElementById("repcount-exercice")?.focus();
           }} className="mt-2 min-h-11 rounded-lg border border-laiton-300/30 px-3 text-sm text-laiton-200 disabled:opacity-40">Reprendre ces exercices</button>
         </li>)}</ul>

@@ -70,7 +70,7 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
       if(action!=='focus')stepper.props.setValeur(action==='reps'?7:action==='duration'?45:12.5);
     }
     states[6]=[{date:'2026-09-01T12:00:00Z',exercices:[{nom:'Presse à cuisses',sets:[{set:1,reps:15,charge:80}]}]}];
-    render();effects[3]();
+    render();
     if(action==='untouched') {assert.equal(states[1],15);assert.equal(states[2],80);}
     else {
       assert.equal(states[1],action==='reps'?7:10);
@@ -78,6 +78,10 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
       assert.equal(states[3],action==='mode'||action==='duration');
       if(action==='duration')assert.equal(states[4],45);
     }
+    const before = [states[1],states[2],states[3],states[4]];
+    states[6]=[{date:'2026-09-02T12:00:00Z',exercices:[{nom:'Presse à cuisses',sets:[{set:1,reps:20,charge:100}]}]}];
+    render();render();
+    assert.deepEqual([states[1],states[2],states[3],states[4]],before,'Subsequent history must not repeatedly prefill the same exercise');
   }
   states.length=0;refs.length=0;
   input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});
