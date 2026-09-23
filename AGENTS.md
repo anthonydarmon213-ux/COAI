@@ -98,6 +98,15 @@ La réactivation de la génération payante demande une nouvelle autorisation.
 
 ## État au 01/09/2026
 
+### Décision confirmée — abonnement Apple, 23/09/2026
+
+Anthony a validé explicitement Essentiel iOS à 19,99 €/mois ou 119 €/an,
+avec sept jours d'essai pour les utilisateurs éligibles. Les offres Stripe
+restent inchangées. L'accord commercial ne vaut ni achat d'adhésion Developer,
+ni migration de production. Afficher le prix StoreKit réel et vérifier
+l'éligibilité Apple avant de promettre un essai ; ne pas confondre catalogue
+préparé localement et produits activés dans App Store Connect.
+
 ### Décision confirmée — COAI Club, 14/09/2026
 
 Offre autonome au quotidien et direct collectif d’une heure par mois avec

@@ -20,6 +20,9 @@ function privateResponse(response) {
   assert.match(response.headers.get('vary'), /Authorization/);
 }
 async function main() {
+  const catalogueURL = 'http://127.0.0.1:3050/api/ios/apple/catalogue';
+  const anonymousCatalogue = await fetch(catalogueURL);
+  assert.equal(anonymousCatalogue.status, 401); privateResponse(anonymousCatalogue);
   const anonymous = await post();
   assert.equal(anonymous.status, 401); privateResponse(anonymous);
   assert.equal((await post({ Authorization: 'Bearer invalid-local-token' })).status, 401);
@@ -28,6 +31,15 @@ async function main() {
   assert.equal((await fetch(endpoint)).status, 405);
   const { data, error } = await auth.auth.signInWithPassword({ email: 'coai-qa-20260923-1015@example.test', password: 'Coai-QA-local-2026!' });
   assert.equal(error, null); assert(data.session);
+  const catalogueResponse = await fetch(catalogueURL, { headers: { Authorization: `Bearer ${data.session.access_token}` } });
+  assert.equal(catalogueResponse.status, 200); privateResponse(catalogueResponse);
+  const catalogue = await catalogueResponse.json();
+  assert.deepEqual(catalogue.products, [
+    { id: 'fr.coai.mobile.essentiel.monthly', period: 'P1M' },
+    { id: 'fr.coai.mobile.essentiel.annual', period: 'P1Y' },
+  ]);
+  assert.deepEqual(catalogue.introductoryOffer, { mode: 'freeTrial', period: 'P7D', eligibility: 'storekit' });
+  assert(!JSON.stringify(catalogue).includes('Price'));
   const user = await database.user.findUnique({ where: { supabaseAuthId: data.user.id }, select: { id: true } });
   assert(user);
   const before = JSON.stringify(await database.subscription.findMany({ orderBy: { id: 'asc' } }));

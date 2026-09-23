@@ -11,6 +11,12 @@ final class ApplePurchaseService {
         case differentAccount, serverNotConfirmed
     }
     enum Outcome: Equatable { case cancelled, pending, delivered }
+    struct Offer: Identifiable {
+        let id: String
+        let displayPrice: String
+        let period: String
+        let hasSevenDayTrial: Bool
+    }
     typealias Deliver = @MainActor (String) async throws -> PurchaseAcknowledgement
 
     private let productIDs: Set<String>
@@ -34,6 +40,36 @@ final class ApplePurchaseService {
         let allowed = loaded.filter { productIDs.contains($0.id) && $0.type == .autoRenewable }
         products = Dictionary(uniqueKeysWithValues: allowed.map { ($0.id, $0) })
         return allowed.sorted { $0.id < $1.id }
+    }
+
+    /// Only pass periods from the authenticated COAI catalogue. StoreKit remains
+    /// authoritative for localized prices, configured offers and eligibility.
+    /// Missing products or mismatched periods must not become purchase buttons.
+    func loadOffers(expectedPeriods: [String: String]) async throws -> [Offer] {
+        guard Set(expectedPeriods.keys) == productIDs else { throw Failure.unknownProduct }
+        let loaded = try await loadProducts()
+        var offers: [Offer] = []
+        for product in loaded {
+            guard let subscription = product.subscription,
+                  let expected = expectedPeriods[product.id] else { continue }
+            let period = subscription.subscriptionPeriod
+            let matches = (expected == "P1M" && period.unit == .month && period.value == 1) ||
+                (expected == "P1Y" && period.unit == .year && period.value == 1)
+            guard matches else {
+                products.removeValue(forKey: product.id)
+                continue
+            }
+            let intro = subscription.introductoryOffer
+            let sevenDays = intro.map {
+                (($0.period.unit == .day && $0.period.value == 7) ||
+                 ($0.period.unit == .week && $0.period.value == 1)) && $0.periodCount == 1
+            } ?? false
+            let configuredTrial = intro?.paymentMode == .freeTrial && sevenDays
+            let eligible = configuredTrial ? await subscription.isEligibleForIntroOffer : false
+            offers.append(Offer(id: product.id, displayPrice: product.displayPrice,
+                                period: expected, hasSevenDayTrial: configuredTrial && eligible))
+        }
+        return offers.sorted { $0.period == "P1M" && $1.period != "P1M" }
     }
 
     /// Wire only to an explicit purchase button after displaying Apple's price,
