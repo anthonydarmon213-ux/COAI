@@ -72,7 +72,7 @@ let closeState = [storedChoice, { audience: true, marketing: true }, true, true,
 let closeIndex = 0, savedByClose = 0;
 const closeComponent = load('src/components/analytics/privacy-controls.tsx', {
   ...dependencies,
-  react: { ...React, useEffect: () => {}, useRef: initial => ({ current: initial }),
+  react: { ...React, useEffect: () => {}, useRef: initial => ({ current: initial }), useSyncExternalStore: () => false,
     useState: () => { const i = closeIndex++; return [closeState[i], value => { closeState[i] = value; }]; } },
   '@/lib/analytics/consent': { ...consent, saveConsent: () => { savedByClose++; } },
 }, {});
@@ -149,7 +149,7 @@ for (const agent of ['Mozilla/5.0 Mobile COAIiOS/1', 'Mozilla/5.0 COAIiOS/22 Tes
     const native = load('src/components/analytics/privacy-controls.tsx', {
       ...dependencies,
       '@/lib/analytics/production-origin': { isProductionAnalyticsOrigin: () => true },
-      react: { ...React, useState: initial => {
+      react: { ...React, useSyncExternalStore: () => nativeState, useState: initial => {
         const i = index++;
         return [i === 0 ? { audience: true, marketing: true } : i === 5 ? nativeState : initial, () => {}];
       } },

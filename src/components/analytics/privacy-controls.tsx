@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "./google-analytics";
@@ -8,6 +8,10 @@ import { MetaPixel } from "./meta-pixel";
 import { CONSENT_EVENT, CONSENT_KEY, PrivacyChoices, REFUSE_ALL, isNativeIOSApp, readConsent, saveConsent } from "@/lib/analytics/consent";
 import { captureUtmFromLocation, clearUtmCookie } from "@/lib/attribution/utm-cookie";
 import { isProductionAnalyticsOrigin } from "@/lib/analytics/production-origin";
+
+// The native user-agent marker is fixed for this document's lifetime.
+const subscribeNativeEnvironment = () => () => {};
+const serverNativeEnvironment = () => false;
 
 // No optional script during SSR or before a stored, unexpired choice is read.
 // Clarity is deliberately not mounted: session replay needs a separate review
@@ -25,11 +29,9 @@ export function PrivacyControls() {
   const [error, setError] = useState(false);
   const active = useRef<PrivacyChoices | null>(null);
   const initialized = useRef(false);
-  const [nativeIOS, setNativeIOS] = useState(false);
+  const nativeIOS = useSyncExternalStore(subscribeNativeEnvironment, isNativeIOSApp, serverNativeEnvironment);
 
   useEffect(() => {
-    // Resolve after hydration so the server and first client render agree.
-    setNativeIOS(isNativeIOSApp());
     const sync = () => {
       const next = readConsent();
       // Removing a script node does NOT stop its already running library.
