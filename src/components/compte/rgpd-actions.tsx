@@ -51,13 +51,16 @@ export function RgpdActions() {
     try {
       const res = await fetch("/api/compte/delete", { method: "POST" });
       if (!res.ok) throw new Error(res.status === 401 ? "session" : "delete");
-      router.push("/");
+      const result: unknown = await res.json();
+      if (!result || typeof result !== "object" || !("success" in result) || result.success !== true) {
+        throw new Error("delete_unconfirmed");
+      }
+      router.replace("/");
       router.refresh();
     } catch (cause) {
       setError(cause instanceof Error && cause.message === "session"
         ? "Ta connexion a expiré. Reconnecte-toi avant de demander la suppression."
         : "La suppression n’a pas pu être confirmée. Réessaie ou contacte l’assistance si le problème persiste.");
-    } finally {
       pending.current = false;
       setDeleting(false);
     }
@@ -66,12 +69,14 @@ export function RgpdActions() {
   return (
     <div className="flex flex-col items-start gap-3">
       {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
-      <Button onClick={handleExport} disabled={exporting || deleting}>
+      <Button type="button" onClick={handleExport} disabled={exporting || deleting} aria-busy={exporting}>
         {exporting ? "Préparation de l’export…" : "Exporter mes données"}
       </Button>
       <button
+        type="button"
         onClick={handleDelete}
         disabled={deleting || exporting}
+        aria-busy={deleting}
         className="min-h-11 text-sm text-red-400 underline disabled:opacity-50"
       >
         {deleting ? "Suppression…" : "Supprimer mon compte"}

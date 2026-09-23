@@ -5,20 +5,21 @@ const ts = require('typescript');
 const path = require('node:path');
 const api = {}, states = [], refs = [];
 let si=0, ri=0, status=500, confirmed=false, calls=0, downloads=0, pushes=0, hold;
+let responseBody={profile:{}}, badJson=false, networkFailure=false;
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/compte/rgpd-actions.tsx'),'utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}
 }).outputText, {exports:api, Error, Blob, setTimeout:fn=>fn(),
   URL:{createObjectURL:()=> 'blob:test',revokeObjectURL:()=>{}},
   confirm:()=>confirmed,
   document:{body:{appendChild:()=>{}},createElement:()=>({click:()=>downloads++,remove:()=>{}})},
-  fetch:async()=>{calls++; if(hold) await hold; return {ok:status===200,status,json:async()=>({profile:{}})};},
+  fetch:async()=>{calls++; if(hold) await hold;if(networkFailure)throw new Error('network'); return {ok:status===200,status,json:async()=>{if(badJson)throw new Error('json');return responseBody;}};},
   require:name=>{
     if(name==='react') return {
       useState:initial=>{const i=si++;if(!(i in states))states[i]=initial;return [states[i],v=>states[i]=v];},
       useRef:initial=>refs[ri++]??(refs[ri-1]={current:initial})
     };
     if(name==='react/jsx-runtime')return {jsx:(type,props)=>({type,props}),jsxs:(type,props)=>({type,props})};
-    if(name==='next/navigation')return {useRouter:()=>({push:()=>pushes++,refresh:()=>{}})};
+    if(name==='next/navigation')return {useRouter:()=>({replace:()=>pushes++,refresh:()=>{}})};
     if(name==='@/components/ui/button')return {Button:'button'};
     throw new Error(name);
   }
@@ -41,6 +42,19 @@ function button(text){return nodes(render()).find(x=>x.type==='button'&&label(x)
   const save=button('Exporter mes données').props.onClick();const count=calls;
   await button('Supprimer mon compte').props.onClick();assert.equal(calls,count,'No overlapping operation');
   release();await save;hold=null;assert.equal(downloads,1);
-  await button('Supprimer mon compte').props.onClick();assert.equal(pushes,1);
+  for(const value of [null, {}, {success:false}, {success:'true'}, []]) {
+    responseBody=value;
+    await button('Supprimer mon compte').props.onClick();assert.equal(pushes,0);
+    assert.equal(button('Supprimer mon compte').props.disabled,false);
+  }
+  responseBody={success:true};badJson=true;
+  await button('Supprimer mon compte').props.onClick();assert.equal(pushes,0);
+  badJson=false;networkFailure=true;
+  await button('Supprimer mon compte').props.onClick();assert.equal(pushes,0);
+  networkFailure=false;
+  const action=button('Supprimer mon compte').props.onClick;
+  await action();assert.equal(pushes,1);
+  assert.equal(button('Suppression…').props.disabled,true);
+  const afterSuccess=calls;await action();assert.equal(calls,afterSuccess,'No repeated deletion during navigation');
   console.log('PASS account actions: error messages, no fake export, cancellation, duplicate guard, recovery and success (mock API only)');
 })().catch(error=>{console.error(error);process.exitCode=1;});
