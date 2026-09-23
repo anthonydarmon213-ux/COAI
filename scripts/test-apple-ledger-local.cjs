@@ -13,6 +13,21 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/subscription/appl
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 }).outputText, { exports: out, Date });
 const save = out.persistVerifiedAppleTransaction;
+function loadModule(path, dependencies = {}) {
+  const exports = {};
+  vm.runInNewContext(ts.transpileModule(fs.readFileSync(path, 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText, { exports, Date, require: name => {
+    assert(Object.hasOwn(dependencies, name), name); return dependencies[name];
+  } });
+  return exports;
+}
+const catalogue = loadModule('src/lib/subscription/apple-catalogue.ts');
+const { readEffectiveAccess } = loadModule('src/lib/subscription/read-effective-access.ts', {
+  './effective-access': loadModule('src/lib/subscription/effective-access.ts'),
+  './apple-catalogue': catalogue,
+});
+const { deliverAppleTransaction } = loadModule('src/lib/subscription/apple-delivery.ts');
 async function main() {
   const before = JSON.stringify(await db.subscription.findMany({ orderBy: { id: 'asc' } }));
   const id = randomUUID();
@@ -22,9 +37,26 @@ async function main() {
   const base = { environment: 'Sandbox', transactionID: `qa-${id}`, originalTransactionID: `chain-${id}`,
     accountToken: user.applePurchaseAccount.accountToken, productID: 'test.monthly', purchasedAt: 1000,
     expiresAt: 10000, signedAt: 2000, revokedAt: null, upgraded: false, active: true };
+  const accessFacts = { ...base, transactionID: `access-${id}`, originalTransactionID: `access-chain-${id}`,
+    productID: catalogue.APPLE_ESSENTIEL_PRODUCT_IDS[0] };
+  const read = () => readEffectiveAccess(db, id, 'Sandbox', new Date(3000));
+  assert.equal((await read()).subscribed, false);
+  const deliver = facts => deliverAppleTransaction({ userId: id, accountToken: facts.accountToken, signedTransaction: 'synthetic-test-only' }, {
+    verify: async () => facts, // ONLY cryptographic verification mocked; ledger and rights use PostgreSQL.
+    persist: (userId, verified) => save(db, userId, verified),
+    readAccess: read,
+  });
+  const delivered = await deliver(accessFacts);
+  assert.equal(delivered.persisted, true); assert.equal(delivered.access.sources.apple, true);
+  assert.equal(delivered.access.plan, 'PASS_IA');
+  assert.equal((await readEffectiveAccess(db, id, 'Production', new Date(3000))).subscribed, false);
+  assert.equal((await readEffectiveAccess(db, id, 'Sandbox', new Date(10000))).subscribed, false);
+  await deliver({ ...accessFacts, signedAt: 4000, revokedAt: 3500 });
+  assert.equal((await deliver(accessFacts)).access.subscribed, false, 'Durable refund beats old verified receipt');
+  await assert.rejects(readEffectiveAccess(db, randomUUID(), 'Sandbox'), /ACCOUNT_NOT_FOUND/);
   const results = await Promise.all(Array.from({length: 12}, () => save(db, id, base)));
   assert.equal(results.length, 12);
-  assert.equal(await db.appleTransaction.count({ where: { userId: id } }), 1);
+  assert.equal(await db.appleTransaction.count({ where: { userId: id } }), 2);
   const revoked = { ...base, signedAt: 4000, revokedAt: 3500, active: false };
   await save(db, id, revoked);
   const stale = await save(db, id, base);
@@ -35,7 +67,7 @@ async function main() {
   await assert.rejects(save(db, other.userId, { ...base, transactionID: `other-${id}`, accountToken: other.accountToken }), /APPLE_CHAIN_ALREADY_BOUND/);
   const renewal = { ...base, transactionID: `renewal-${id}`, purchasedAt: 9000, expiresAt: 20000, signedAt: 9001 };
   await save(db, id, renewal);
-  assert.equal(await db.appleTransaction.count({ where: { userId: id } }), 2);
+  assert.equal(await db.appleTransaction.count({ where: { userId: id } }), 3);
   await save(db, id, { ...revoked, signedAt: 9500 });
   const next = await db.appleTransaction.findUnique({ where: { environment_transactionId: { environment: 'Sandbox', transactionId: renewal.transactionID } } });
   assert.equal(next.revokedAt, null, 'Refund of older transaction must not overwrite renewal');
@@ -73,6 +105,6 @@ async function main() {
     assert.equal(grants.allowed, false);
   }
   assert.equal(JSON.stringify(await db.subscription.findMany({ orderBy: { id: 'asc' } })), before);
-  console.log('PASS: real local ledger, 12 concurrent duplicates, stale replay, conflict/ownership guards, independent renewals, RLS/grants, Stripe unchanged. Synthetic facts only.');
+  console.log('PASS: PostgreSQL delivery/access, expiry/environment/refund/replay, missing account, 12 concurrent duplicates, ownership race, independent renewals, RLS/grants, Stripe unchanged. Apple verification mocked.');
 }
 main().catch(error => { console.error(error.message); process.exitCode=1; }).finally(() => db.$disconnect());
