@@ -1,5 +1,6 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import Link from "next/link";
+import { requestTime } from "@/lib/server/request-time";
 import { AccessRecovery } from "@/components/auth/access-recovery";
 import { SyntheseCorporelle } from "@/components/suivi/synthese-corporelle";
 import { volumeParMuscle } from "@/lib/suivi/volume-musculaire";
@@ -104,7 +105,7 @@ export default async function ProgressionPage() {
   const graphiquesTonnage = Array.from(tonnageParExercice.entries())
     .filter(([, points]) => points.length > 1)
     .map(([nom, points]) => ({ nom, points }));
-  const debutBilan = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const debutBilan = new Date(requestTime() - 30 * 24 * 60 * 60 * 1000);
   const seancesDuMois = seances.filter((seance) => seance.date >= debutBilan).length;
   const frequenceHebdo = Number(user.profile?.frequenceEntrainement?.match(/\d+/)?.[0] ?? 2);
   const objectifMensuel = Math.max(4, frequenceHebdo * 4);

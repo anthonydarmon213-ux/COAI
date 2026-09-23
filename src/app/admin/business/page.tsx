@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { requestTime } from "@/lib/server/request-time";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -67,7 +68,7 @@ export default async function AdminBusinessPage() {
       },
     }),
     prisma.diagnosticLead.findMany({
-      where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+      where: { createdAt: { gte: new Date(requestTime() - 30 * 24 * 60 * 60 * 1000) } },
       select: { email: true, utmSource: true, utmCampaign: true, utmContent: true, conversionReminderSentAt: true, createdAt: true },
       orderBy: { createdAt: "asc" },
     }),
@@ -95,7 +96,7 @@ export default async function AdminBusinessPage() {
   const emailAttentionWhere = {
     OR: [
       { state: "UNCERTAIN" },
-      { state: "RESERVED", updatedAt: { lt: new Date(Date.now() - 15 * 60 * 1000) } },
+      { state: "RESERVED", updatedAt: { lt: new Date(requestTime() - 15 * 60 * 1000) } },
     ],
   };
   const [emailAttentionCount, emailAttention] = await Promise.all([
@@ -108,8 +109,8 @@ export default async function AdminBusinessPage() {
     }),
   ]);
 
-  const maintenant = new Date();
-  const ilYA30Jours = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const maintenant = new Date(requestTime());
+  const ilYA30Jours = new Date(requestTime() - 30 * 24 * 60 * 60 * 1000);
   const activeSubs = subscriptions.filter((s) => s.status === "ACTIVE");
   const essaisActifs = activeSubs.filter((s) => s.trialEnd && s.trialEnd > maintenant);
   const abonnesPayants = activeSubs.filter((s) => !s.trialEnd || s.trialEnd <= maintenant);
@@ -265,7 +266,7 @@ export default async function AdminBusinessPage() {
   const campagnesTriees = [...campagnes.values()].sort((a, b) => b.diagnostics - a.diagnostics || b.payants - a.payants);
 
   const semaineMs = 7 * 24 * 60 * 60 * 1000;
-  const debut = new Date(Date.now() - (NB_SEMAINES - 1) * semaineMs);
+  const debut = new Date(requestTime() - (NB_SEMAINES - 1) * semaineMs);
   const croissance = Array.from({ length: NB_SEMAINES }, (_, i) => {
     const finSemaine = new Date(debut.getTime() + (i + 1) * semaineMs);
     const total = signupDates.filter((u) => u.createdAt < finSemaine).length;

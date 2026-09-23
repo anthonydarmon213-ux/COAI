@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requestTime } from "@/lib/server/request-time";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { AccessRecovery } from "@/components/auth/access-recovery";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -244,8 +245,8 @@ export default async function BienvenuePage(
   // alors que ce n'est pas un abonnement — corrigé en "Purchase", l'événement
   // Meta standard pour une transaction unique (14/08/2026, audit tracking).
   const enEssai = stripeSubscription
-    ? Boolean(stripeSubscription.trial_end && stripeSubscription.trial_end * 1000 > Date.now())
-    : Boolean(user.subscription?.trialEnd && user.subscription.trialEnd > new Date());
+    ? Boolean(stripeSubscription.trial_end && stripeSubscription.trial_end * 1000 > requestTime())
+    : Boolean(user.subscription?.trialEnd && user.subscription.trialEnd.getTime() > requestTime());
   // Valeurs de pack pour STANDARD/PREMIUM (04/09/2026, repositionnement 3 offres) — ce
   // chemin (plan=STANDARD/PREMIUM) est en pratique mort depuis que checkout/route.ts
   // refuse ces deux plans en amont (sur devis WhatsApp uniquement), mais corrigé quand
