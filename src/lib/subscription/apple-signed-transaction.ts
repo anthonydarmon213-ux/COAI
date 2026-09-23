@@ -5,13 +5,15 @@ import { evaluateAppleTransaction } from './apple-transaction-policy';
  * never taken from a request or the certificate chain in the submitted JWS.
  * No database acknowledgement is returned here: persistence is separate.
  */
-export function createAppleTransactionVerifier(config: {
+export type AppleVerifierConfig = {
   appleRootCertificates: Buffer[];
   bundleId: string;
   environment: 'Production' | 'Sandbox';
   appAppleId?: number;
   productIDs: readonly string[];
-}) {
+};
+
+export function createAppleSignedDataVerifier(config: AppleVerifierConfig) {
   if (!config.appleRootCertificates.length || !config.bundleId.trim() ||
       !config.productIDs.length || config.productIDs.some(id => !id.trim()) ||
       !['Production', 'Sandbox'].includes(config.environment)) {
@@ -21,7 +23,11 @@ export function createAppleTransactionVerifier(config: {
     throw new Error('APPLE_APP_ID_REQUIRED');
   }
   const environment = config.environment === 'Production' ? Environment.PRODUCTION : Environment.SANDBOX;
-  const verifier = new SignedDataVerifier(config.appleRootCertificates, true, environment, config.bundleId, config.appAppleId);
+  return new SignedDataVerifier(config.appleRootCertificates, true, environment, config.bundleId, config.appAppleId);
+}
+
+export function createAppleTransactionVerifier(config: AppleVerifierConfig) {
+  const verifier = createAppleSignedDataVerifier(config);
   const productIDs = [...config.productIDs];
   return async (signedTransaction: string, accountToken: string, now = Date.now()) => {
     if (typeof signedTransaction !== 'string' || !signedTransaction.length || signedTransaction.length > 65536) {

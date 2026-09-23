@@ -28,6 +28,10 @@ const { readEffectiveAccess } = loadModule('src/lib/subscription/read-effective-
   './apple-catalogue': catalogue,
 });
 const { deliverAppleTransaction } = loadModule('src/lib/subscription/apple-delivery.ts');
+const { receiveAppleNotification } = loadModule('src/lib/subscription/apple-notification.ts', {
+  './apple-signed-transaction': {},
+  './apple-transaction-policy': loadModule('src/lib/subscription/apple-transaction-policy.ts'),
+});
 async function main() {
   const before = JSON.stringify(await db.subscription.findMany({ orderBy: { id: 'asc' } }));
   const id = randomUUID();
@@ -98,6 +102,18 @@ async function main() {
   const stored = await db.appleTransaction.findUnique({ where: { environment_transactionId: { environment: 'Sandbox', transactionId: collision.transactionID } } });
   assert.equal(stored.originalTransactionId, winner.originalTransactionID);
   assert.equal(stored.expiresAt.getTime(), winner.expiresAt);
+  const notified = { ...accessFacts, transactionID: `notification-${id}`, originalTransactionID: `notification-chain-${id}` };
+  const notify = facts => receiveAppleNotification('synthetic-notification-only', {
+    verify: async () => ({ notificationID: id, facts }),
+    findOwner: async accountToken => (await db.applePurchaseAccount.findUnique({ where: { accountToken } }))?.userId ?? null,
+    persist: (userId, verified) => save(db, userId, verified),
+  });
+  await Promise.all([notify(notified), notify(notified)]);
+  assert.equal((await read()).sources.apple, true, 'Notification opens access through persisted facts');
+  await notify({ ...notified, signedAt: 4000, revokedAt: 3500 });
+  await notify(notified);
+  assert.equal((await read()).sources.apple, false, 'Replayed notification cannot undo refund');
+  await assert.rejects(notify({ ...notified, accountToken: randomUUID() }), /ACCOUNT_NOT_FOUND/);
   const [security] = await db.$queryRaw`SELECT relrowsecurity FROM pg_class WHERE oid='public.apple_transactions'::regclass`;
   assert.equal(security.relrowsecurity, true);
   for (const role of ['anon', 'authenticated']) {
