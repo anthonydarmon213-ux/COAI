@@ -7,7 +7,7 @@ import { DailyExperience } from "@/components/daily/daily-experience";
 import { GenererProgrammeOnboarding } from "@/components/compte/generer-programme-onboarding";
 import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
-import { hasProgrammeAccess, hasPaidSubscription } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 import { OffresCard } from "@/components/dashboard/offres-card";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
 import { recommanderServiceDepuisProfil } from "@/lib/dashboard/besoins-identifies";
@@ -51,7 +51,8 @@ export default async function DashboardPage() {
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);
-  const [validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount, testsPhysiques, latestNutrition, latestRecovery] = await Promise.all([
+  const [access, validated, latest, daily, diesRecents, programmeNutrition, programmeRecuperation, seancesDuMoisCount, testsPhysiques, latestNutrition, latestRecovery] = await Promise.all([
+    contentAccessFor(user),
     prisma.programmeGenerated.findFirst({
       where: { userId: user.id, pilier: "ENTRAINEMENT", statut: "VALIDE" },
       orderBy: { generatedAt: "desc" },
@@ -121,7 +122,8 @@ export default async function DashboardPage() {
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
   const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
-  const hasAccess = hasProgrammeAccess(user, user.subscription);
+  if (access.appleUnavailable && !access.programme) throw Error('Accès temporairement indisponible. Réessaie.');
+  const hasAccess = access.programme;
   const serviceRecommande = recommanderServiceDepuisProfil(user.profile);
   // Un ancien déblocage à vie conserve son programme, mais ne doit jamais
   // se voir revendre COAI Essentiel. S'il souhaite davantage d'accompagnement,
@@ -303,7 +305,7 @@ export default async function DashboardPage() {
           (01/09/2026) : l'inscription renvoyait auparavant vers /pricing,
           soit un prix avant même la première séance. Masquée dès qu'un
           abonnement est actif — inutile de vendre à qui a déjà acheté. */}
-      {!hasPaidSubscription(user.subscription) && <OffresCard serviceRecommande={serviceAProposer} />}
+      {!access.subscribed && !access.appleUnavailable && <OffresCard serviceRecommande={serviceAProposer} />}
 
       <div className="flex flex-wrap gap-3 border-t border-white/[0.07] pt-5 text-sm">
         <Link

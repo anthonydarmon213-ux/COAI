@@ -20,7 +20,8 @@ import { TrackConversion } from "@/components/analytics/track-conversion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/ui/section-label";
-import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
+import { AccessRecovery } from "@/components/auth/access-recovery";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
@@ -104,9 +105,10 @@ export async function PilierPage({
   premiereSeance?: boolean;
 }) {
   const user = await getCurrentAppUser();
-  if (!user) return null;
+  if (!user) return <AccessRecovery />;
 
-  const [valides, derniers] = await Promise.all([
+  const [access, valides, derniers] = await Promise.all([
+    contentAccessFor(user),
     Promise.all(
       PILIERS.map((pilier) =>
         prisma.programmeGenerated.findFirst({
@@ -125,8 +127,9 @@ export async function PilierPage({
     ),
   ]);
 
-  const plan = getEffectivePlan(user.subscription);
-  const peutGenerer = hasProgrammeAccess(user, user.subscription);
+  if (access.appleUnavailable && !access.programme) throw Error('Accès temporairement indisponible. Réessaie.');
+  const plan = access.plan;
+  const peutGenerer = access.programme;
   const indexPilierActif = PILIERS.indexOf(pilierActif);
   const dernierActif = derniers[indexPilierActif];
   const aUnContenu = Boolean(valides[indexPilierActif] || dernierActif?.statut === "GENERE_IA" || (pilierActif === "ENTRAINEMENT" && accessibleTraining(null, dernierActif ?? null)));

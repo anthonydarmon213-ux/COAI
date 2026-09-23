@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { AccessRecovery } from "@/components/auth/access-recovery";
-import { hasStreamingAccess } from "@/lib/subscription/plan";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 import { prisma } from "@/lib/db/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,9 @@ export default async function VideosPage() {
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 
-  const aAcces = hasStreamingAccess(user, user.subscription);
+  const access = await contentAccessFor(user);
+  if (access.appleUnavailable && !access.programme) throw Error('Accès temporairement indisponible. Réessaie.');
+  const aAcces = access.programme;
 
   // SÉCURITÉ (01/09/2026) : l'identifiant YouTube est visible dans le HTML
   // de la page. On ne le sélectionne donc même pas pour un non-abonné —
