@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requestTime } from "@/lib/server/request-time";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { accessibleTraining } from "@/lib/programmes/access";
 import Image from "next/image";
@@ -136,7 +137,7 @@ export async function PilierPage({
   const scoreSommeil = pilierActif === "RECUPERATION"
     ? calculerScoreSommeil(
         await prisma.dailySession.findMany({
-          where: { userId: user.id, date: { gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) } },
+          where: { userId: user.id, date: { gte: new Date(requestTime() - 60 * 24 * 60 * 60 * 1000) } },
           select: { sleep: true, date: true },
         }),
         user.profile?.qualiteSommeil
