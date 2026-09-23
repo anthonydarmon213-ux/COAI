@@ -49,15 +49,20 @@ export function PrivacyControls() {
       if (next?.marketing) captureUtmFromLocation();
     };
     const storage = (event: StorageEvent) => { if (!event.key || event.key === CONSENT_KEY) sync(); };
+    const visibility = () => { if (document.visibilityState === "visible") sync(); };
     sync();
     window.addEventListener(CONSENT_EVENT, sync);
     window.addEventListener("storage", storage);
     window.addEventListener("focus", sync);
+    window.addEventListener("pageshow", sync);
+    document.addEventListener("visibilitychange", visibility);
     const timer = window.setInterval(sync, 60000);
     return () => {
       window.removeEventListener(CONSENT_EVENT, sync);
       window.removeEventListener("storage", storage);
       window.removeEventListener("focus", sync);
+      window.removeEventListener("pageshow", sync);
+      document.removeEventListener("visibilitychange", visibility);
       window.clearInterval(timer);
     };
   }, []);
