@@ -18,6 +18,7 @@ import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { assemblerSeance, payloadSeance, nomsSeance, type ExerciceRepCount } from "@/lib/suivi/repcount-session";
 import { draftKey, parseDraft, type RepCountDraft } from "@/lib/suivi/repcount-draft";
 import { withRequestDeadline } from "@/lib/suivi/request-deadline";
+import { createDraftStatus } from "@/lib/suivi/draft-status";
 import { RepCountStepper as Stepper } from "@/components/suivi/repcount-stepper";
 import { RestDuration } from "@/components/suivi/rest-duration";
 
@@ -391,7 +392,8 @@ export function RepCount({
   const sauvegardeRef = useRef<{ signature: string; date: string } | null>(null);
   const requeteEnCoursRef = useRef(false);
   const [draftReady, setDraftReady] = useState(false);
-  const [draftError, setDraftError] = useState(false);
+  const [draftStatus] = useState(createDraftStatus);
+  const draftError = useSyncExternalStore(draftStatus.subscribe, draftStatus.snapshot, draftStatus.serverSnapshot);
   const [draftRestored, setDraftRestored] = useState(false);
   const [routine, setRoutine] = useState<string[]>([]);
   const historiqueRequest = useRef(0);
@@ -410,10 +412,10 @@ export function RepCount({
           prefillRef.current = restored.nom.trim().toLocaleLowerCase("fr-FR");
           setDraftRestored(true);
         }
-      } catch { setDraftError(true); }
+      } catch { draftStatus.report(true); }
     }
     setDraftReady(true);
-  }, [userId]);
+  }, [userId, draftStatus]);
 
   const persistDraft = useCallback((currentSets: SetSaisi[] = sets) => {
     if (!userId) return;
@@ -426,9 +428,9 @@ export function RepCount({
           sauvegarde: sauvegardeRef.current };
         window.localStorage.setItem(draftKey(userId), JSON.stringify(value));
       }
-      setDraftError(false);
-    } catch { setDraftError(true); }
-  }, [userId, sets, exercicesSeance, notes, nom, reps, charge, maintien, dureeSecondes, dureeRepos, finRepos, routine]);
+      draftStatus.report(false);
+    } catch { draftStatus.report(true); }
+  }, [userId, sets, exercicesSeance, notes, nom, reps, charge, maintien, dureeSecondes, dureeRepos, finRepos, routine, draftStatus]);
 
   useEffect(() => { if (draftReady) persistDraft(); }, [draftReady, persistDraft]);
 

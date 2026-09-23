@@ -45,6 +45,8 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/suivi/repcount-stepper.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:stepper,require});
 const {renderToStaticMarkup} = require('react-dom/server');
 const ui = {};
+const draftStatus = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/lib/suivi/draft-status.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports:draftStatus,require});
 let stateIndex = 0;
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/suivi/repcount.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{
   exports:ui, require: name => {
@@ -55,6 +57,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
     if(name === '@/lib/suivi/historique-exercice') return exportsModule;
     if(name === '@/lib/suivi/repcount-session') return session;
     if(name === '@/lib/suivi/repcount-draft') return {};
+    if(name === '@/lib/suivi/draft-status') return draftStatus;
     if(name === '@/lib/suivi/request-deadline') return {withRequestDeadline:()=>{throw new Error('No network request during server render');}};
     if(name === '@/components/suivi/repcount-stepper') return stepper;
     if(name === '@/components/suivi/rest-duration') return restDuration;
