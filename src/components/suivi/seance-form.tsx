@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useLocalDateInput } from "@/lib/suivi/use-local-date-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -41,7 +42,7 @@ function newExercice(): ExerciceEntry {
 // photo et sa vidéo.
 export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[] }) {
   const router = useRouter();
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useLocalDateInput();
   const [exercices, setExercices] = useState<ExerciceEntry[]>([newExercice()]);
   const [duree, setDuree] = useState("");
   const [difficulte, setDifficulte] = useState<number | null>(null);
@@ -182,7 +183,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
       </datalist>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Field label="Date">
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <Input type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
 
         <div className="flex flex-col gap-4">

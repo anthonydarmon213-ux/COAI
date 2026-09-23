@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useLocalDateInput } from "@/lib/suivi/use-local-date-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -12,7 +13,7 @@ import { mesureBodySchema, mesureValidationErrors, type MesureFieldErrors } from
 
 export function MesureForm() {
   const router = useRouter();
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useLocalDateInput();
   const [poidsKg, setPoidsKg] = useState("");
   const [tourTailleCm, setTourTailleCm] = useState("");
   const [masseGrassePourcent, setMasseGrassePourcent] = useState("");
