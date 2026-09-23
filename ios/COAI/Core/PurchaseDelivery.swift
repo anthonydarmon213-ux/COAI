@@ -90,3 +90,42 @@ final class PurchaseRecoveryBatch {
         return delivered.count
     }
 }
+
+/// One recovery at a time. StoreKit events arriving during a pass request one
+/// more pass; normal page changes are throttled. Session cancellation invalidates
+/// old completions, including operations which don't promptly honor cancellation.
+@MainActor
+final class PurchaseRecoveryScheduler {
+    private var task: Task<Void, Never>?
+    private var pending: (@MainActor () async -> Void)?
+    private var generation = UUID()
+    private var lastStarted: Date?
+
+    func request(force: Bool = false, now: Date = Date(), operation: @escaping @MainActor () async -> Void) {
+        if task != nil {
+            if force { pending = operation }
+            return
+        }
+        if !force, let lastStarted, now.timeIntervalSince(lastStarted) < 30 { return }
+        lastStarted = now
+        let token = generation
+        task = Task { [weak self] in
+            await operation()
+            guard let self, self.generation == token else { return }
+            self.task = nil
+            if let next = self.pending {
+                self.pending = nil
+                self.request(force: true, operation: next)
+            }
+        }
+    }
+
+    func cancel() {
+        generation = UUID()
+        task?.cancel(); task = nil; pending = nil; lastStarted = nil
+    }
+
+    func waitUntilIdle() async {
+        while let task { await task.value }
+    }
+}

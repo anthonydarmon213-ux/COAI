@@ -1,6 +1,7 @@
 import SwiftUI
 import WebKit
 import AuthenticationServices
+import StoreKit
 
 extension COAIWebModel {
     enum AppleAPIFailure: Error { case unavailable, invalidResponse }
@@ -83,6 +84,11 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     @Published var errorMessage: String?
     @Published var notice: String?
     @Published var showSubscription = false
+    @Published var appleRecoveryMessage: String?
+    private let appleRecovery = PurchaseRecoveryScheduler()
+    private var appleUpdates: Task<Void, Never>?
+    private var pendingAppleUpdates: [UInt64: VerificationResult<StoreKit.Transaction>] = [:]
+    private var foreground = true
     var confirmResponse: ((Bool) -> Void)?
     var alertResponse: (() -> Void)?
     @Published var externalURL: URL?
@@ -163,6 +169,72 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         webView = Self.makeWebView()
         super.init()
         attachDelegates()
+        appleUpdates = Task { [weak self] in
+            for await result in StoreKit.Transaction.updates {
+                guard !Task.isCancelled, let self else { return }
+                guard case .verified(let transaction) = result,
+                      Self.appleProductIDs.contains(transaction.productID) else { continue }
+                if case .verified(let previous) = self.pendingAppleUpdates[transaction.id],
+                   previous.signedDate > transaction.signedDate { continue }
+                self.pendingAppleUpdates[transaction.id] = result
+                self.requestAppleRecovery(force: true)
+            }
+        }
+    }
+
+    deinit { appleUpdates?.cancel() }
+
+    private static let appleProductIDs: Set<String> = ["fr.coai.mobile.essentiel.monthly", "fr.coai.mobile.essentiel.annual"]
+
+    func setForeground(_ active: Bool) {
+        foreground = active
+        if active { requestAppleRecovery(force: true) }
+        else { appleRecovery.cancel() }
+    }
+
+    private func requestAppleRecovery(force: Bool = false) {
+        guard foreground, isReady, let url = webView.url,
+              url.scheme == "https", url.host == "coai.fr",
+              NavigationPolicy.decide(url) == .inside else { return }
+        let path = url.path
+        guard !["/sign-in", "/sign-up", "/login", "/auth"].contains(where: { path == $0 || path.hasPrefix($0 + "/") }) else {
+            appleRecovery.cancel(); appleRecoveryMessage = nil
+            return
+        }
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-COAIDownloadFixture") { return }
+        #endif
+        appleRecovery.request(force: force) { [weak self] in
+            guard let self else { return }
+            let updates = self.pendingAppleUpdates
+            do {
+                // No backend requests for users without any known COAI receipt.
+                var hasReceipt = !updates.isEmpty
+                if !hasReceipt {
+                    for await result in StoreKit.Transaction.unfinished {
+                        if case .verified(let transaction) = result, Self.appleProductIDs.contains(transaction.productID) { hasReceipt = true; break }
+                    }
+                }
+                if !hasReceipt {
+                    for await result in StoreKit.Transaction.currentEntitlements {
+                        if case .verified(let transaction) = result, Self.appleProductIDs.contains(transaction.productID) { hasReceipt = true; break }
+                    }
+                }
+                try Task.checkCancellation()
+                guard hasReceipt else { return }
+                let prepared = try await self.prepareApplePurchases()
+                _ = try await prepared.service.reconcile(updates: Array(updates.values))
+                try Task.checkCancellation()
+                for (id, result) in updates where self.pendingAppleUpdates[id]?.jwsRepresentation == result.jwsRepresentation {
+                    self.pendingAppleUpdates.removeValue(forKey: id)
+                }
+                self.appleRecoveryMessage = nil
+            } catch {
+                if !Task.isCancelled {
+                    self.appleRecoveryMessage = "La synchronisation Apple n’a pas abouti. Tu peux restaurer tes achats ici ; inutile de payer à nouveau."
+                }
+            }
+        }
     }
 
     private static func makeWebView() -> WKWebView {
@@ -195,6 +267,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             Task { @MainActor [weak self, weak view] in
                 guard let self, let view, self.webView === view else { return }
                 self.currentURL = view.url
+                if !self.isLoading { self.requestAppleRecovery() }
             }
         }
         // No injected authentication, no native-JavaScript bridge, no TLS exceptions.
@@ -316,6 +389,8 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     func clearLocalSession() {
+        appleRecovery.cancel()
+        appleRecoveryMessage = nil
         downloads.cancel()
         cancelAuthentication()
         guard isReady else { return }
@@ -440,6 +515,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         isLoading = false
         canGoBack = webView.canGoBack
+        requestAppleRecovery()
     }
 
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {

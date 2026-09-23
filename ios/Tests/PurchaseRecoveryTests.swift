@@ -5,6 +5,46 @@ final class PurchaseRecoveryTests: XCTestCase {
     enum Failure: Error { case offline }
 
     @MainActor
+    func testSchedulerThrottlesPagesButNotExplicitEvents() async {
+        let scheduler = PurchaseRecoveryScheduler()
+        let now = Date(timeIntervalSince1970: 1000)
+        var calls = 0
+        scheduler.request(now: now) { calls += 1 }
+        await scheduler.waitUntilIdle()
+        scheduler.request(now: now.addingTimeInterval(1)) { calls += 1 }
+        await scheduler.waitUntilIdle()
+        XCTAssertEqual(calls, 1)
+        scheduler.request(force: true, now: now.addingTimeInterval(2)) { calls += 1 }
+        await scheduler.waitUntilIdle()
+        XCTAssertEqual(calls, 2)
+    }
+
+    @MainActor
+    func testSchedulerCoalescesEventsDuringRecovery() async {
+        let scheduler = PurchaseRecoveryScheduler()
+        var calls = 0
+        scheduler.request {
+            calls += 1
+            scheduler.request(force: true) { calls += 10 }
+            scheduler.request(force: true) { calls += 100 }
+        }
+        await scheduler.waitUntilIdle()
+        XCTAssertEqual(calls, 101)
+    }
+
+    @MainActor
+    func testCancelledGenerationCannotClearNewSessionWork() async {
+        let scheduler = PurchaseRecoveryScheduler()
+        var calls = 0
+        scheduler.request {
+            scheduler.cancel()
+            scheduler.request { calls += 1 }
+        }
+        await scheduler.waitUntilIdle()
+        XCTAssertEqual(calls, 1)
+    }
+
+    @MainActor
     func testFailureDoesNotPreventOtherDeliveryAndIsNotHidden() async throws {
         let batch = PurchaseRecoveryBatch()
         var laterDelivered = false

@@ -9,6 +9,9 @@ final class COAIUITests: XCTestCase {
         app.launch()
         let link = app.links["Voir l’abonnement iOS"]
         XCTAssertTrue(link.waitForExistence(timeout: 15))
+        XCUIDevice.shared.press(.home)
+        app.activate()
+        XCTAssertTrue(link.waitForExistence(timeout: 10))
         link.tap()
         XCTAssertTrue(app.staticTexts["apple-status"].waitForExistence(timeout: 30))
         XCTAssertFalse(app.alerts.firstMatch.exists)

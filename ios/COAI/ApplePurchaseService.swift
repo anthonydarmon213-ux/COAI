@@ -108,13 +108,14 @@ final class ApplePurchaseService {
     }
 
     /// Invoke on authenticated startup/retry, never implies a new charge.
-    func reconcile() async throws -> Int {
+    func reconcile(updates: [VerificationResult<Transaction>] = []) async throws -> Int {
         guard !reconciling else { throw Failure.busy }
         reconciling = true
         defer { reconciling = false }
         try await authorizeAccount()
         try Task.checkCancellation()
         let batch = PurchaseRecoveryBatch()
+        for result in updates { try await recover(result, into: batch) }
         for await result in Transaction.unfinished {
             try await recover(result, into: batch)
         }

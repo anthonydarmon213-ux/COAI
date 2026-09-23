@@ -32,6 +32,9 @@ struct COAIAppleSubscriptionView: View {
                             .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
                             .accessibilityIdentifier("apple-status")
                     }
+                    if let recoveryMessage = browser.appleRecoveryMessage {
+                        Text(recoveryMessage).font(.callout).fixedSize(horizontal: false, vertical: true)
+                    }
                     ForEach(offers) { offer in
                         VStack(alignment: .leading, spacing: 12) {
                             Text(offer.period == "P1M" ? "Mensuel" : "Annuel").font(.title3.weight(.semibold))
@@ -46,7 +49,9 @@ struct COAIAppleSubscriptionView: View {
                                     switch try await service.purchase(productID: offer.id) {
                                     case .cancelled: return "Achat annulé. Aucun nouvel abonnement confirmé."
                                     case .pending: return "Achat en attente de validation Apple."
-                                    case .delivered: return "Achat traité par COAI. Ton accès est vérifié côté serveur."
+                                    case .delivered:
+                                        browser.appleRecoveryMessage = nil
+                                        return "Achat traité par COAI. Ton accès est vérifié côté serveur."
                                     }
                                 }
                             }.buttonStyle(.borderedProminent).tint(gold).foregroundStyle(.black)
@@ -66,6 +71,7 @@ struct COAIAppleSubscriptionView: View {
                         guard let service else { return }
                         run {
                             let count = try await service.restorePurchases()
+                            browser.appleRecoveryMessage = nil
                             return count == 0 ? "Aucun achat COAI à restaurer pour ce compte Apple." : "Restauration traitée. Les droits dépendent de la validité de tes abonnements."
                         }
                     }.frame(minHeight: 44).disabled(busy || service == nil)
@@ -131,6 +137,7 @@ struct COAIApp: App {
 }
 
 struct COAIRootView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var browser = COAIWebModel()
     @State private var showTimer = false
     @State private var showExplorer = false
@@ -201,6 +208,7 @@ struct COAIRootView: View {
             keyboardVisible = false
         }
         .task { await browser.start() }
+        .onChange(of: scenePhase) { phase in browser.setForeground(phase == .active) }
         .sheet(isPresented: $showTimer) { RestTimerView() }
         .sheet(isPresented: $browser.showSubscription) { COAIAppleSubscriptionView(browser: browser) }
         .sheet(isPresented: $showExplorer, onDismiss: {
