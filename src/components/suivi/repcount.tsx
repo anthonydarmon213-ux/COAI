@@ -432,14 +432,13 @@ export function RepCount({
 
   useEffect(() => { if (draftReady) persistDraft(); }, [draftReady, persistDraft]);
 
-  const charger = useCallback(async () => {
+  const charger = useCallback(() => {
     const request = ++historiqueRequest.current;
-    try {
-      const donnees = await withRequestDeadline(async signal => {
-        const r = await fetch("/api/seances", { signal });
-        if (!r.ok) throw new Error("historique_indisponible");
-        return r.json();
-      });
+    return withRequestDeadline(async signal => {
+      const r = await fetch("/api/seances", { signal });
+      if (!r.ok) throw new Error("historique_indisponible");
+      return r.json();
+    }).then(donnees => {
       if (!Array.isArray(donnees) || !donnees.every(seance =>
         seance !== null && typeof seance === "object" && !Array.isArray(seance) &&
         typeof seance.date === "string" && Number.isFinite(new Date(seance.date).getTime())
@@ -447,9 +446,9 @@ export function RepCount({
       if (request !== historiqueRequest.current) return;
       setSeances(donnees);
       setHistoriqueErreur(false);
-    } catch {
+    }).catch(() => {
       if (request === historiqueRequest.current) setHistoriqueErreur(true);
-    }
+    });
   }, []);
 
   useEffect(() => {
