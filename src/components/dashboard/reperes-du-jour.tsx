@@ -1,17 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { addHydrationGlass, hydrationSnapshot, serverHydrationSnapshot, subscribeHydration } from "@/lib/daily/hydration-storage";
 
 type ActiviteResume = {
   entreeAujourdhui: { pas: number | null } | null;
   signaux: { moyenne7j: number | null };
 };
-
-const CLE_EAU = "coai_eau_aujourdhui_";
-
-function cleEau(userId: string) {
-  return `${CLE_EAU}${encodeURIComponent(userId)}_${new Date().toISOString().slice(0, 10)}`;
-}
 
 type ReperesProps = { userId: string; habitudeHydratation?: string | null };
 
@@ -20,8 +15,10 @@ export function ReperesDuJour(props: ReperesProps) {
 }
 
 function ReperesDuJourContent({ userId, habitudeHydratation }: ReperesProps) {
-  const [verres, setVerres] = useState(0);
-  const [erreurEau, setErreurEau] = useState(false);
+  const lireEau = useCallback(() => hydrationSnapshot(userId), [userId]);
+  const eau = useSyncExternalStore(subscribeHydration, lireEau, serverHydrationSnapshot);
+  const verres = Number(eau.split("|")[1] ?? 0);
+  const erreurEau = eau.endsWith("|unsaved");
   const [pas, setPas] = useState<number | null>(null);
   const [moyennePas, setMoyennePas] = useState<number | null>(null);
   const [saisiePas, setSaisiePas] = useState("");
@@ -59,10 +56,6 @@ function ReperesDuJourContent({ userId, habitudeHydratation }: ReperesProps) {
   }, [actualiserRespiration]);
 
   useEffect(() => {
-    try {
-      const eau = Number(localStorage.getItem(cleEau(userId)) ?? 0);
-      if (Number.isSafeInteger(eau) && eau >= 0) setVerres(eau);
-    } catch { /* Les pas restent accessibles sans stockage local. */ }
     let active = true;
     const revision = revisionPas.current;
     fetch("/api/activite-journaliere")
@@ -77,12 +70,7 @@ function ReperesDuJourContent({ userId, habitudeHydratation }: ReperesProps) {
   }, [userId]);
 
   function ajouterUnVerre() {
-    const suivant = verres + 1;
-    setVerres(suivant);
-    try {
-      localStorage.setItem(cleEau(userId), String(suivant));
-      setErreurEau(false);
-    } catch { setErreurEau(true); }
+    addHydrationGlass(userId);
   }
 
   function lancerRespiration() {

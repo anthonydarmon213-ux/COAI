@@ -1,25 +1,30 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
-const source=fs.readFileSync('src/components/dashboard/reperes-du-jour.tsx','utf8');
-const ast=ts.createSourceFile('card.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
-const functions=[];
-function visit(node){if(ts.isFunctionDeclaration(node)&&['cleEau','ajouterUnVerre'].includes(node.name?.text))functions.push(node.getText(ast));ts.forEachChild(node,visit);}
-visit(ast);assert.equal(functions.length,2);
-const data=new Map();let count=0,error=false,blocked=false;
-class Clock extends Date {constructor(){super('2026-09-23T12:00:00Z');}}
-const box={Date:Clock,encodeURIComponent,CLE_EAU:'coai_eau_aujourdhui_',userId:'account-a',verres:0,
- setVerres:v=>count=v,setErreurEau:v=>error=v,
- localStorage:{setItem:(key,value)=>{if(blocked)throw Error('denied');data.set(key,value);}}};
-vm.runInNewContext(ts.transpileModule(functions.join('\n'),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,box);
+const data=new Map();let blocked=false,day=23,refreshes=0,timer,cleared=false;
+class Clock {getFullYear(){return 2026;}getMonth(){return 8;}getDate(){return day;}}
+const window=new EventTarget(),document=new EventTarget();document.visibilityState='visible';
+window.localStorage={getItem:key=>{if(blocked)throw Error('denied');return data.get(key)??null;},setItem:(key,value)=>{if(blocked)throw Error('denied');data.set(key,value);}};
+window.setInterval=fn=>{timer=fn;return 1;};window.clearInterval=id=>{assert.equal(id,1);cleared=true;};
+const box={exports:{},window,document,Date:Clock,Event};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/daily/hydration-storage.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,box);
+const api=box.exports,count=user=>Number(api.hydrationSnapshot(user).split('|')[1]);
+assert.equal(api.serverHydrationSnapshot(),'');
 data.set('coai_eau_aujourdhui_2026-09-23','9');
-assert.notEqual(box.cleEau('account-a'),box.cleEau('account-b'));
-assert.notEqual(box.cleEau('account-a'), 'coai_eau_aujourdhui_2026-09-23');
-box.ajouterUnVerre();assert.equal(count,1);assert.equal(error,false);
-assert.equal(data.get(box.cleEau('account-a')),'1');
-assert.equal(data.get(box.cleEau('account-b')),undefined);
-box.userId='account-b';box.ajouterUnVerre();assert.equal(data.get(box.cleEau('account-b')),'1');
-blocked=true;box.verres=1;assert.doesNotThrow(()=>box.ajouterUnVerre());
-assert.equal(count,2);assert.equal(error,true);assert.equal(data.get(box.cleEau('account-b')),'1');
-assert.match(source,/key=\{props.userId\}/);
-assert.match(source,/localStorage.getItem\(cleEau\(userId\)\)/);
+assert.equal(count('a'),0);assert.notEqual(api.hydrationSnapshot('a'),api.hydrationSnapshot('b'));
+const cleanup=api.subscribeHydration(()=>refreshes++);
+api.addHydrationGlass('a');api.addHydrationGlass('a');assert.equal(count('a'),2);assert.equal(count('b'),0);assert.equal(refreshes,2);
+assert.equal(api.hydrationSnapshot('a'),api.hydrationSnapshot('a'),'Stable primitive snapshot');
+blocked=true;api.addHydrationGlass('b');api.addHydrationGlass('b');assert.equal(count('b'),2);assert.ok(api.hydrationSnapshot('b').endsWith('|unsaved'));
+blocked=false;api.addHydrationGlass('b');assert.equal(count('b'),3);assert.ok(api.hydrationSnapshot('b').endsWith('|saved'));
+day=24;timer();assert.equal(count('a'),0);api.addHydrationGlass('a');assert.equal(count('a'),1);
+day=23;assert.equal(count('a'),2,'Previous day not overwritten');
+const key=api.hydrationSnapshot('a').split('|')[0];
+for(const value of ['NaN','-1','1.5','Infinity']){data.set(key,value);assert.equal(count('a'),0);}
+let previous=refreshes;
+window.dispatchEvent(new Event('pageshow'));assert.equal(refreshes,previous+1);
+document.visibilityState='hidden';timer();assert.equal(refreshes,previous+1);
+document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));assert.equal(refreshes,previous+2);
+cleanup();assert.equal(cleared,true);previous=refreshes;window.dispatchEvent(new Event('pageshow'));assert.equal(refreshes,previous);
+const component=fs.readFileSync('src/components/dashboard/reperes-du-jour.tsx','utf8');
+assert.match(component,/key=\{props.userId\}/);
 assert.match(fs.readFileSync('src/app/(app)/dashboard/page.tsx','utf8'),/ReperesDuJour userId=\{user.id\}/);
-console.log('PASS hydration storage: distinct accounts, no legacy reassignment, blocked writes disclosed, account-keyed component wiring. Isolated callbacks; not live account switching.');
+console.log('PASS hydration: account/day isolation, local-calendar rollover, repeated additions, denied storage/recovery, invalid data, page return, stable snapshot and cleanup. Storage/clock simulated.');
