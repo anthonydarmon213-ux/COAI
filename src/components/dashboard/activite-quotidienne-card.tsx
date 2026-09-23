@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/tooltip";
+import { withRequestDeadline } from "@/lib/suivi/request-deadline";
 
 const STORAGE_SKIP_KEY_PREFIX = "coai_neat_passe_";
 
@@ -96,12 +97,30 @@ export function ActiviteQuotidienneCard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cle = STORAGE_SKIP_KEY_PREFIX + new Date().toISOString().slice(0, 10);
-    setPasse(Boolean(sessionStorage.getItem(cle)));
-    fetch("/api/activite-journaliere")
-      .then((res) => res.json())
-      .then((data) => setResume(data))
-      .finally(() => setLoaded(true));
+    let active = true;
+    async function charger() {
+      try {
+        const data = await withRequestDeadline(async signal => {
+          const response = await fetch("/api/activite-journaliere", { signal });
+          if (!response.ok) throw new Error("activite_indisponible");
+          return response.json();
+        });
+        if (!active) return;
+        let dejaPasse = false;
+        try {
+          const cle = STORAGE_SKIP_KEY_PREFIX + new Date().toISOString().slice(0, 10);
+          dejaPasse = Boolean(sessionStorage.getItem(cle));
+        } catch { /* Le stockage facultatif ne bloque pas la carte. */ }
+        setPasse(dejaPasse);
+        setResume(data);
+      } catch {
+        // La carte facultative reste masquée ; aucune rejection non traitée.
+      } finally {
+        if (active) setLoaded(true);
+      }
+    }
+    void charger();
+    return () => { active = false; };
   }, []);
 
   if (!loaded || !resume) return null;
@@ -132,7 +151,7 @@ export function ActiviteQuotidienneCard() {
 
   function passerAujourdhui() {
     const cle = STORAGE_SKIP_KEY_PREFIX + new Date().toISOString().slice(0, 10);
-    sessionStorage.setItem(cle, "1");
+    try { sessionStorage.setItem(cle, "1"); } catch { /* Choix conservé en mémoire. */ }
     setPasse(true);
   }
 
