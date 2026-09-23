@@ -296,7 +296,7 @@ export default async function DashboardPage() {
         <DeskResetCard />
       </div>
 
-      <ReperesDuJour habitudeHydratation={user.profile?.hydratation} />
+      <ReperesDuJour userId={user.id} habitudeHydratation={user.profile?.hydratation} />
       <DashboardIntroVideo />
 
       {/* Les formules ne sont proposées qu'ici, une fois le produit vu

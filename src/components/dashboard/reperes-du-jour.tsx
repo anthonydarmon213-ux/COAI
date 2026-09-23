@@ -9,12 +9,19 @@ type ActiviteResume = {
 
 const CLE_EAU = "coai_eau_aujourdhui_";
 
-function cleEau() {
-  return `${CLE_EAU}${new Date().toISOString().slice(0, 10)}`;
+function cleEau(userId: string) {
+  return `${CLE_EAU}${encodeURIComponent(userId)}_${new Date().toISOString().slice(0, 10)}`;
 }
 
-export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: string | null }) {
+type ReperesProps = { userId: string; habitudeHydratation?: string | null };
+
+export function ReperesDuJour(props: ReperesProps) {
+  return <ReperesDuJourContent key={props.userId} {...props} />;
+}
+
+function ReperesDuJourContent({ userId, habitudeHydratation }: ReperesProps) {
   const [verres, setVerres] = useState(0);
+  const [erreurEau, setErreurEau] = useState(false);
   const [pas, setPas] = useState<number | null>(null);
   const [moyennePas, setMoyennePas] = useState<number | null>(null);
   const [saisiePas, setSaisiePas] = useState("");
@@ -53,7 +60,7 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
 
   useEffect(() => {
     try {
-      const eau = Number(localStorage.getItem(cleEau()) ?? 0);
+      const eau = Number(localStorage.getItem(cleEau(userId)) ?? 0);
       if (Number.isSafeInteger(eau) && eau >= 0) setVerres(eau);
     } catch { /* Les pas restent accessibles sans stockage local. */ }
     let active = true;
@@ -67,12 +74,15 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
       })
       .catch(() => undefined);
     return () => { active = false; };
-  }, []);
+  }, [userId]);
 
   function ajouterUnVerre() {
     const suivant = verres + 1;
     setVerres(suivant);
-    localStorage.setItem(cleEau(), String(suivant));
+    try {
+      localStorage.setItem(cleEau(userId), String(suivant));
+      setErreurEau(false);
+    } catch { setErreurEau(true); }
   }
 
   function lancerRespiration() {
@@ -134,6 +144,7 @@ export function ReperesDuJour({ habitudeHydratation }: { habitudeHydratation?: s
         <article className="relative overflow-hidden rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.045] p-4">
           <div aria-hidden="true" className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-cyan-300/15 blur-2xl" />
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cyan-200">Hydratation</p>
+          {erreurEau && <p role="status" className="mt-2 text-xs text-cyan-200">Compteur mis à jour ici, mais non sauvegardé sur cet appareil.</p>}
           <div className="mt-3 flex items-end gap-2"><strong className="text-3xl tabular-nums text-white">{verres}</strong><span className="pb-1 text-xs text-graphite-400">verre{verres > 1 ? "s" : ""} aujourd’hui</span></div>
           <p className="mt-2 min-h-8 text-[11px] leading-4 text-graphite-400">{habitudeHydratation ? `Habitude déclarée : ${habitudeHydratation}.` : "Écoute ta soif et adapte-toi à ton effort."}</p>
           <button type="button" onClick={ajouterUnVerre} className="mt-3 w-full rounded-full border border-cyan-300/30 bg-cyan-300/10 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/20">+ Ajouter un verre</button>
