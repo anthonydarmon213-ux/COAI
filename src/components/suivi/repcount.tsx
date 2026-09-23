@@ -534,6 +534,17 @@ export function RepCount({
           }),
         });
         if (!r.ok) throw new Error(r.status === 401 ? "connexion_expiree" : "enregistrement_refuse");
+        // Ne jamais effacer les séries sur une réponse vide, HTML ou ambiguë.
+        // Le corps original reste disponible pour le suivi de première séance.
+        const confirmation: unknown = await r.clone().json();
+        if (!confirmation || typeof confirmation !== "object" || Array.isArray(confirmation)) {
+          throw new Error("confirmation_invalide");
+        }
+        const saved = confirmation as Record<string, unknown>;
+        if (typeof saved.id !== "string" || !saved.id.trim() || saved.source !== "REPCOUNT" ||
+            typeof saved.date !== "string" || new Date(saved.date).getTime() !== new Date(dateSauvegarde).getTime()) {
+          throw new Error("confirmation_invalide");
+        }
         return firstSavedConversionId(r, "REPCOUNT");
       });
       if (firstId) setPremierRepereId(firstId);

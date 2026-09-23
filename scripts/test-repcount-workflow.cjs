@@ -20,8 +20,12 @@ function load(file, resolver) {
       if(!options?.method) return {ok:true,json:async()=>[]};
       requests.push(JSON.parse(options.body));
       if(fail==='timeout') return new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>reject(new Error('request aborted'))));
+      if(fail==='html') return new Response('<html>Connexion</html>',{status:200});
+      if(fail==='empty') return new Response('{}',{status:200});
+      if(fail==='wrong-date') return Response.json({id:'saved',source:'REPCOUNT',date:'2000-01-01T00:00:00Z'});
+      if(fail==='wrong-source') return Response.json({id:'saved',source:'PROGRAMME',date:requests.at(-1).date});
       if(fail) throw new Error('connection lost');
-      return {ok:true};
+      return Response.json({id:'saved',source:'REPCOUNT',date:requests.at(-1).date});
     }
   });
   return exports;
@@ -143,5 +147,18 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
   await button('Terminer et enregistrer la séance').props.onClick();
   assert.deepEqual(requests.at(-1),previous,'First-use retry keeps same transaction identity');
   assert.ok(text(render()).includes('Premier repère posé ✓'));
+  for (const response of ['html','empty','wrong-date','wrong-source']) {
+    states.length=0; refs.length=0; storage.clear(); onboarding=false; fail=response;
+    input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});
+    button('Valider la série').props.onClick();
+    await button('Terminer et enregistrer la séance').props.onClick();
+    assert.equal(states[5].length,1,response+' must retain the unsaved series');
+    assert.ok(text(render()).includes('La sauvegarde n’a pas pu être confirmée'));
+    const previous=requests.at(-1);
+    fail=false;
+    await button('Terminer et enregistrer la séance').props.onClick();
+    assert.deepEqual(requests.at(-1),previous,'Ambiguous response retry keeps identity');
+    assert.ok(text(render()).includes('Séance enregistrée ✓'));
+  }
   console.log('PASS RepCount workflow: timed-out save and first-use shortcut preserve series and identical retry; restore, account isolation, sequence reuse');
 })().catch(error=>{console.error(error);process.exitCode=1;});
