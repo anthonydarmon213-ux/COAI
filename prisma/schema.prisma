@@ -117,6 +117,7 @@ model User {
   programmeUnlockedAt DateTime?
 
   subscription             Subscription?
+  applePurchaseAccount     ApplePurchaseAccount?
   profile                  Profile?
   programmes               ProgrammeGenerated[]
   seances                  SeanceLog[]
@@ -294,6 +295,17 @@ enum BillingInterval {
   // remise laissait un ecart trop grand avec le mensuel.
   QUARTERLY
   ANNUAL
+}
+
+// Stable StoreKit account binding only; does not grant subscription rights.
+// Server-only table, protected by RLS and revoked Data API client grants.
+model ApplePurchaseAccount {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountToken String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt    DateTime @default(now())
+
+  @@map("apple_purchase_accounts")
 }
 
 model Subscription {
