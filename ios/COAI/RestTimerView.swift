@@ -67,7 +67,7 @@ struct RestTimerView: View {
     @AppStorage("coai.rest.seconds") private var seconds = 30
     @AppStorage("coai.rest.pausedSeconds") private var pausedSeconds = 0
     @AppStorage("coai.rest.notify") private var notify = false
-    private var duration: Int { minutes * 60 + seconds }
+    private var duration: Int { RestClock.pickerDuration(minutes: minutes, seconds: seconds) }
 
     var body: some View {
         NavigationStack {

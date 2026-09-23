@@ -150,6 +150,16 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(RestClock(end: Date(timeIntervalSince1970: .nan)).remaining(at: now), 0)
         XCTAssertEqual(RestClock(end: now.addingTimeInterval(1e10)).remaining(at: now), 3600)
     }
+    func testRestPickerDurationHandlesCorruptedPreferencesWithoutOverflow() {
+        XCTAssertEqual(RestClock.pickerDuration(minutes: 1, seconds: 30), 90)
+        XCTAssertEqual(RestClock.pickerDuration(minutes: 0, seconds: 0), 0)
+        XCTAssertEqual(RestClock.pickerDuration(minutes: 59, seconds: 59), 3599)
+        XCTAssertEqual(RestClock.pickerDuration(minutes: .max, seconds: .max), 3599)
+        XCTAssertEqual(RestClock.pickerDuration(minutes: .min, seconds: .min), 0)
+        XCTAssertEqual(RestClock.pickerDuration(minutes: .max, seconds: .min), 3540)
+        XCTAssertEqual(RestClock.pickerDuration(minutes: .min, seconds: .max), 59)
+    }
+
     func testHTTPFailuresHaveActionableMessages() {
         for status in [400, 401, 403, 404, 410, 422, 429, 500, 502, 503, 504, 599] {
             XCTAssertFalse(NavigationPolicy.responseError(status: status)?.isEmpty ?? true)

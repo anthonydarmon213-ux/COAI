@@ -3,6 +3,11 @@ import Foundation
 struct RestClock {
     let end: Date
 
+    /// Bound persisted picker values before multiplying to avoid overflow.
+    static func pickerDuration(minutes: Int, seconds: Int) -> Int {
+        max(0, min(minutes, 59)) * 60 + max(0, min(seconds, 59))
+    }
+
     init(seconds: Int, now: Date = Date()) {
         end = now.addingTimeInterval(TimeInterval(max(0, min(seconds, 3600))))
     }
