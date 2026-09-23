@@ -2,6 +2,46 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testNativeNavigationWithLargeTextAndRotation() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        XCUIDevice.shared.orientation = .portrait
+        defer { XCUIDevice.shared.orientation = .portrait }
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        for orientation in [UIDeviceOrientation.portrait, .landscapeLeft, .portrait] {
+            XCUIDevice.shared.orientation = orientation
+            let rotated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                let frame = app.webViews.firstMatch.frame
+                return orientation == .landscapeLeft ? frame.width > frame.height : frame.height > frame.width
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [rotated], timeout: 10), .completed)
+            XCTAssertTrue(explorer.waitForExistence(timeout: 5))
+            let tabs = ["Séance", "Nutrition", "Récupération", "Coach", "Explorer"].map { app.buttons["native-tab-" + $0] }
+            for (index, tab) in tabs.enumerated() {
+                XCTAssertTrue(tab.isHittable)
+                XCTAssertGreaterThanOrEqual(tab.frame.width, 44)
+                XCTAssertGreaterThanOrEqual(tab.frame.height, 44)
+                XCTAssertTrue(app.frame.contains(tab.frame), "La navigation doit rester dans l’écran.")
+                if index > 0 { XCTAssertLessThanOrEqual(tabs[index - 1].frame.maxX, tab.frame.minX + 1) }
+            }
+            let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            shot.name = "Navigation grand texte — orientation \(orientation.rawValue)"
+            shot.lifetime = .keepAlways
+            add(shot)
+        }
+        explorer.tap()
+        let settings = app.buttons["explore-/compte/parametres"]
+        reveal(settings, in: app)
+        XCTAssertTrue(settings.isHittable)
+        app.buttons["Fermer"].tap()
+        XCTAssertTrue(explorer.isHittable)
+    }
+
+    @MainActor
     func testNativeExplorerReplacesWebSidebarWithoutHidingContent() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
@@ -14,14 +54,16 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(explorer.isHittable)
         explorer.tap()
         for path in ["/dashboard", "/programme/entrainement", "/suivi/repcount", "/programme/alimentation", "/programme/recuperation", "/coach"] {
-            XCTAssertTrue(app.buttons["explore-" + path].waitForExistence(timeout: 5))
+            let destination = app.buttons["explore-" + path]
+            reveal(destination, in: app)
+            XCTAssertTrue(destination.isHittable)
         }
         let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         shot.name = "Explorer natif — rubriques principales"
         shot.lifetime = .keepAlways
         add(shot)
         let settings = app.buttons["explore-/compte/parametres"]
-        reveal(settings, in: app)
+        reveal(settings, in: app, upward: false)
         XCTAssertTrue(settings.isHittable, "La déconnexion reste accessible dans Réglages.")
         app.buttons["Fermer"].tap()
         XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].exists)

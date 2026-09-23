@@ -134,7 +134,9 @@ struct COAIRootView: View {
                 Image(systemName: icon)
                     .font(.system(size: 21, weight: .medium))
                     .frame(width: 28, height: 26)
-                Text(title).font(.caption2.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.8)
+                Text(title == "Récupération" ? "Récup." : title).font(.caption2.weight(.semibold))
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    .lineLimit(1).minimumScaleFactor(0.6)
             }
             .frame(maxWidth: .infinity, minHeight: 56)
             .foregroundStyle(selected ? Color(red: 0.88, green: 0.78, blue: 0.54) : Color(red: 0.65, green: 0.69, blue: 0.71))
@@ -143,6 +145,9 @@ struct COAIRootView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
+        // A fixed five-item navigation bar must not crowd out the page at
+        // accessibility sizes. The full enlarged label remains available.
+        .accessibilityShowsLargeContentViewer { Label(title, systemImage: icon) }
         .accessibilityIdentifier("native-tab-" + title)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
@@ -157,6 +162,12 @@ private struct COAIExplorerView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section("Mon compte") {
+                    entry("Mon profil", "person", "/compte/profil")
+                    entry("Réglages et déconnexion", "gearshape", "/compte/parametres")
+                    // The existing pilot purchase guard still handles this route.
+                    entry("Abonnement", "creditcard", "/compte/abonnement")
+                }
                 Section("Au quotidien") {
                     entry("Aujourd’hui", "sun.max", "/dashboard")
                     entry("Mon entraînement", "dumbbell", "/programme/entrainement")
@@ -191,16 +202,7 @@ private struct COAIExplorerView: View {
                     entry("Fonctionnalités", "sparkles", "/fonctionnalites")
                     entry("Donner mon avis", "star.bubble", "/avis")
                 }
-                Section {
-                    entry("Mon profil", "person", "/compte/profil")
-                    entry("Réglages et déconnexion", "gearshape", "/compte/parametres")
-                    // The existing pilot purchase guard still handles this route.
-                    entry("Abonnement", "creditcard", "/compte/abonnement")
-                } header: {
-                    Text("Mon compte")
-                } footer: {
-                    Text("Version de test iPhone")
-                }
+                Text("Version de test iPhone").font(.footnote).foregroundStyle(.secondary)
             }
             .navigationTitle("Explorer")
             .navigationBarTitleDisplayMode(.inline)
@@ -216,10 +218,11 @@ private struct COAIExplorerView: View {
     private func entry(_ title: String, _ icon: String, _ path: String) -> some View {
         Button { open(path) } label: {
             HStack(spacing: 14) {
-                Image(systemName: icon).frame(width: 24).foregroundStyle(Color(red: 0.88, green: 0.78, blue: 0.54))
-                Text(title).foregroundStyle(Color(white: 0.92))
+                Image(systemName: icon).font(.system(size: 22)).frame(width: 24)
+                    .foregroundStyle(Color(red: 0.88, green: 0.78, blue: 0.54)).accessibilityHidden(true)
+                Text(title).fixedSize(horizontal: false, vertical: true).foregroundStyle(Color(white: 0.92))
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.right").font(.caption).foregroundStyle(Color(white: 0.5))
+                Image(systemName: "chevron.right").font(.system(size: 12)).foregroundStyle(Color(white: 0.5)).accessibilityHidden(true)
             }.frame(minHeight: 44).contentShape(Rectangle())
         }
         .buttonStyle(.plain)
