@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A00000000000000000000032 = {isa = PBXBuildFile; fileRef = B00000000000000000000032; };
 		A00000000000000000000030 = {isa = PBXBuildFile; fileRef = B00000000000000000000030; };
 		A00000000000000000000031 = {isa = PBXBuildFile; fileRef = B00000000000000000000031; };
 		A00000000000000000000020 = {isa = PBXBuildFile; fileRef = B00000000000000000000020; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B00000000000000000000032 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferCache.swift; sourceTree = "<group>"; };
 		B00000000000000000000030 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COAIDownload.swift; sourceTree = "<group>"; };
 		B00000000000000000000031 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadPolicy.swift; sourceTree = "<group>"; };
 		B00000000000000000000020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITests/COAIUITests.swift; sourceTree = SOURCE_ROOT; };
@@ -81,6 +83,7 @@
 				B00000000000000000000004 /* NavigationPolicy.swift */,
 				B00000000000000000000005 /* RestClock.swift */,
 				B00000000000000000000011 /* PurchaseDelivery.swift */,
+				B00000000000000000000032 /* OfferCache.swift */,
 				B00000000000000000000031,
 			);
 			path = Core;
@@ -187,6 +190,7 @@
 				A00000000000000000000005 /* RestClock.swift in Sources */,
 				A00000000000000000000010 /* ApplePurchaseService.swift in Sources */,
 				A00000000000000000000011 /* PurchaseDelivery.swift in Sources */,
+				A00000000000000000000032 /* OfferCache.swift in Sources */,
 				A00000000000000000000030,
 				A00000000000000000000031,
 			);

@@ -22,7 +22,7 @@ final class ApplePurchaseService {
     private let productIDs: Set<String>
     private let accountToken: UUID
     private let deliver: Deliver
-    private var products: [String: Product] = [:]
+    private let products = OfferCache<Product>()
     private var busy = false
     private var listener: Task<Void, Never>?
 
@@ -34,50 +34,46 @@ final class ApplePurchaseService {
 
     deinit { listener?.cancel() }
 
-    func loadProducts() async throws -> [Product] {
-        guard !productIDs.isEmpty else { throw Failure.unavailable }
-        let loaded = try await Product.products(for: productIDs)
-        let allowed = loaded.filter { productIDs.contains($0.id) && $0.type == .autoRenewable }
-        products = Dictionary(uniqueKeysWithValues: allowed.map { ($0.id, $0) })
-        return allowed.sorted { $0.id < $1.id }
-    }
-
     /// Only pass periods from the authenticated COAI catalogue. StoreKit remains
     /// authoritative for localized prices, configured offers and eligibility.
     /// Missing products or mismatched periods must not become purchase buttons.
     func loadOffers(expectedPeriods: [String: String]) async throws -> [Offer] {
-        guard Set(expectedPeriods.keys) == productIDs else { throw Failure.unknownProduct }
-        let loaded = try await loadProducts()
-        var offers: [Offer] = []
-        for product in loaded {
-            guard let subscription = product.subscription,
-                  let expected = expectedPeriods[product.id] else { continue }
-            let period = subscription.subscriptionPeriod
-            let matches = (expected == "P1M" && period.unit == .month && period.value == 1) ||
-                (expected == "P1Y" && period.unit == .year && period.value == 1)
-            guard matches else {
-                products.removeValue(forKey: product.id)
-                continue
+        guard !busy else { throw Failure.busy }
+        return try await products.reload {
+            guard !productIDs.isEmpty else { throw Failure.unavailable }
+            guard Set(expectedPeriods.keys) == productIDs else { throw Failure.unknownProduct }
+            let loaded = try await Product.products(for: productIDs)
+            var offers: [Offer] = []
+            var validated: [String: Product] = [:]
+            for product in loaded {
+                guard productIDs.contains(product.id), product.type == .autoRenewable,
+                      let subscription = product.subscription,
+                      let expected = expectedPeriods[product.id] else { continue }
+                let period = subscription.subscriptionPeriod
+                let matches = (expected == "P1M" && period.unit == .month && period.value == 1) ||
+                    (expected == "P1Y" && period.unit == .year && period.value == 1)
+                guard matches else { continue }
+                let intro = subscription.introductoryOffer
+                let sevenDays = intro.map {
+                    (($0.period.unit == .day && $0.period.value == 7) ||
+                     ($0.period.unit == .week && $0.period.value == 1)) && $0.periodCount == 1
+                } ?? false
+                let configuredTrial = intro?.paymentMode == .freeTrial && sevenDays
+                let eligible = configuredTrial ? await subscription.isEligibleForIntroOffer : false
+                validated[product.id] = product
+                offers.append(Offer(id: product.id, displayPrice: product.displayPrice,
+                                    period: expected, hasSevenDayTrial: configuredTrial && eligible))
             }
-            let intro = subscription.introductoryOffer
-            let sevenDays = intro.map {
-                (($0.period.unit == .day && $0.period.value == 7) ||
-                 ($0.period.unit == .week && $0.period.value == 1)) && $0.periodCount == 1
-            } ?? false
-            let configuredTrial = intro?.paymentMode == .freeTrial && sevenDays
-            let eligible = configuredTrial ? await subscription.isEligibleForIntroOffer : false
-            offers.append(Offer(id: product.id, displayPrice: product.displayPrice,
-                                period: expected, hasSevenDayTrial: configuredTrial && eligible))
+            return (validated, offers.sorted { $0.period == "P1M" && $1.period != "P1M" })
         }
-        return offers.sorted { $0.period == "P1M" && $1.period != "P1M" }
     }
 
     /// Wire only to an explicit purchase button after displaying Apple's price,
     /// subscription period, renewal conditions and the account being charged.
     func purchase(productID: String) async throws -> Outcome {
-        guard !busy else { throw Failure.busy }
+        guard !busy && !products.isLoading else { throw Failure.busy }
         guard AppStore.canMakePayments else { throw Failure.unavailable }
-        guard let product = products[productID] else { throw Failure.unknownProduct }
+        guard let product = products.values[productID] else { throw Failure.unknownProduct }
         busy = true
         defer { busy = false }
         switch try await product.purchase(options: [.appAccountToken(accountToken)]) {
@@ -94,7 +90,7 @@ final class ApplePurchaseService {
     /// Returned count means processed transactions, NOT necessarily active access
     /// (refunds/expiry are reconciled by the server too).
     func restorePurchases() async throws -> Int {
-        guard !busy else { throw Failure.busy }
+        guard !busy && !products.isLoading else { throw Failure.busy }
         guard !productIDs.isEmpty else { throw Failure.unavailable }
         busy = true
         defer { busy = false }
