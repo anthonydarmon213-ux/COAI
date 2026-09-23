@@ -58,9 +58,8 @@ async function buildPdf(request: Request) {
     const exerciseImages: Record<string, string> = {};
     if (pilier === "ENTRAINEMENT" && isRecord(affiche.contenu)) {
       const seances = Array.isArray(affiche.contenu.seances) ? affiche.contenu.seances : [];
-      const premiere = isRecord(seances[0]) ? seances[0] : null;
-      const exercices = premiere && Array.isArray(premiere.exercices) ? premiere.exercices : [];
-      for (const exercice of exercices.slice(0, 6)) {
+      const exercices = seances.flatMap(seance => isRecord(seance) && Array.isArray(seance.exercices) ? seance.exercices : []);
+      for (const exercice of exercices) {
         if (!isRecord(exercice) || typeof exercice.nom !== "string") continue;
         const photo = photoCoaiPourNom(exercice.nom);
         if (photo) exerciseImages[exercice.nom] = new URL(photo, request.url).toString();

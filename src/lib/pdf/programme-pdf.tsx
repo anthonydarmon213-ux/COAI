@@ -299,7 +299,7 @@ function PdfKeyValue({ data }: { data: unknown }) {
   if (isPlainObject(data)) {
     return (
       <View>
-        {Object.entries(data).map(([key, value], i, arr) => {
+        {Object.entries(data).filter(([key]) => !/^photo_?query/i.test(key)).map(([key, value], i, arr) => {
           const label = humanizeKey(key);
           const isComplex = isPlainObject(value) || Array.isArray(value);
           if (isComplex) {
@@ -333,13 +333,13 @@ const CHAMPS_EXERCICE: { cle: string; label: string }[] = [
 ];
 
 function reposLisible(value: string): string {
-  const secondes = value.match(/(\d+)\s*(?:s|sec|seconde)/i);
+  const secondes = value.trim().match(/^(\d+)\s*(?:s|sec|secondes?)$/i);
   if (!secondes) return value;
   const total = Number(secondes[1]);
   if (!Number.isFinite(total) || total < 60) return value;
   const minutes = Math.floor(total / 60);
   const reste = total % 60;
-  return `${value} · ${minutes} min${reste ? ` ${reste}` : ""}`;
+  return `${minutes} min${reste ? ` ${reste} s` : ""}`;
 }
 
 function PdfExercice({ exercice, imageUrl }: { exercice: unknown; imageUrl?: string }) {
@@ -361,7 +361,7 @@ function PdfExercice({ exercice, imageUrl }: { exercice: unknown; imageUrl?: str
         </View>
         {chips.length > 0 && (
           <View style={styles.chipRow}>
-            {chips.slice(0, 4).map((c, i) => (
+            {chips.map((c, i) => (
               <View key={i} style={styles.chip}>
                 <Text style={styles.chipLabel}>{c.label}</Text>
                 <Text style={styles.chipValue}>{c.value}</Text>
@@ -425,25 +425,25 @@ function EntrainementBody({ data, exerciseImages }: { data: Record<string, unkno
         </View>
       )}
       {Array.isArray(seances) &&
-        seances.slice(0, 1).map((seance, i) => {
+        seances.map((seance, i) => {
           const nom = typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`;
           const jour = typeof seance.jour === "string" ? seance.jour : undefined;
           const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
           const retourAuCalme = typeof seance.retourAuCalme === "string" ? seance.retourAuCalme : undefined;
           const exercices = Array.isArray(seance.exercices) ? seance.exercices : [];
           return (
-            <View key={i} style={styles.jourBlock}>
+            <View key={i} style={styles.jourBlock} break={i > 0}>
               <JourHeader index={i} titre={nom} sousTitre={jour} />
-              {echauffement && <Text style={styles.paragraph}>Échauffement · {echauffement.slice(0, 180)}{echauffement.length > 180 ? "…" : ""}</Text>}
+              {echauffement && <Text style={styles.paragraph}>Échauffement · {echauffement}</Text>}
               {exercices.length > 0 && (
                 <View style={styles.exercicesGrid}>
-                  {exercices.slice(0, 6).map((ex, j) => {
+                  {exercices.map((ex, j) => {
                     const nomExercice = isPlainObject(ex) && typeof ex.nom === "string" ? ex.nom : "";
                     return <PdfExercice key={j} exercice={ex} imageUrl={exerciseImages?.[nomExercice]} />;
                   })}
                 </View>
               )}
-              {retourAuCalme && <Text style={styles.paragraph}>Retour au calme · {retourAuCalme.slice(0, 120)}{retourAuCalme.length > 120 ? "…" : ""}</Text>}
+              {retourAuCalme && <Text style={styles.paragraph}>Retour au calme · {retourAuCalme}</Text>}
             </View>
           );
         })}
@@ -475,18 +475,18 @@ function NutritionBody({ data }: { data: Record<string, unknown> }) {
         </View>
       )}
       {Array.isArray(jours) &&
-        jours.slice(0, 1).map((jourData, i) => {
+        jours.map((jourData, i) => {
           const jourNom = typeof jourData.jour === "string" ? jourData.jour : `Jour ${i + 1}`;
           const repas = Array.isArray(jourData.repas) ? jourData.repas : null;
           const { repas: _repas, jour: _jour, ...reste } = jourData;
           void _repas;
           void _jour;
           return (
-            <View key={i} style={styles.jourBlock}>
+            <View key={i} style={styles.jourBlock} break={i > 0}>
               <JourHeader index={i} titre={jourNom} />
               {repas
-                ? repas.slice(0, 4).map((r, ri) => (
-                    <View key={ri} style={styles.subCard}>
+                ? repas.map((r, ri) => (
+                    <View key={ri} style={styles.subCard} wrap={false}>
                       <PdfKeyValue data={r} />
                     </View>
                   ))
@@ -506,14 +506,14 @@ function RecuperationBody({ data }: { data: Record<string, unknown> }) {
   return (
     <>
       {Array.isArray(jours) &&
-        jours.slice(0, 2).map((jourData, i) => {
+        jours.map((jourData, i) => {
           const jour = typeof jourData.jour === "string" ? jourData.jour : `Jour ${i + 1}`;
           const type = typeof jourData.type === "string" ? jourData.type : undefined;
           const { jour: _jour, type: _type, ...reste } = jourData;
           void _jour;
           void _type;
           return (
-            <View key={i} style={styles.jourBlock}>
+            <View key={i} style={styles.jourBlock} wrap={false}>
               <JourHeader index={i} titre={jour} sousTitre={type} />
               <PdfKeyValue data={reste} />
             </View>
@@ -648,12 +648,12 @@ function PagePilier({
   exerciseImages?: Record<string, string>;
 }) {
   return (
-    <Page size="A4" style={styles.page} wrap={false}>
+    <Page size="A4" style={styles.page} wrap>
       <HeaderFixed pilier={pilier} prenom={prenom} dateFormatee={dateFormatee} />
 
       <Text style={styles.eyebrow}>Ton programme {PILIER_LABEL[pilier].toLowerCase()}</Text>
       <Text style={styles.h1}>{titre}</Text>
-      <Text style={styles.genereLe}>Généré le {dateFormatee} par l&apos;IA COAI</Text>
+      <Text style={styles.genereLe}>Programme COAI · {dateFormatee}</Text>
       {reviewPending && <Text style={{ fontSize: 8, color: C.textBody, marginBottom: 10 }}>Relecture individuelle non effectuée.</Text>}
       {heroUrl && <PdfImage src={heroUrl} style={styles.heroImage} />}
 
@@ -675,7 +675,7 @@ export type PilierPdfEntree = {
   exerciseImages?: Record<string, string>;
 };
 
-// Fiche complète : un document, une page par pilier disponible. Les piliers
+// Fiche complète : un document, autant de pages que nécessaire. Les piliers
 // non encore générés sont simplement absents plutôt que rendus vides.
 export function ProgrammeCompletPdf({
   entrees,
