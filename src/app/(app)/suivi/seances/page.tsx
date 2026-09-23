@@ -38,7 +38,7 @@ export default async function SeancesPage() {
 
   const seances = await prisma.seanceLog.findMany({
     where: { userId: user.id },
-    orderBy: { date: "desc" },
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
     take: 30,
   });
 

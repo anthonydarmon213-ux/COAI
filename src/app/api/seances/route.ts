@@ -45,7 +45,7 @@ export async function GET() {
 
   const seances = await prisma.seanceLog.findMany({
     where: { user: { supabaseAuthId: authUser.id } },
-    orderBy: { date: "desc" },
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
   });
 
   return NextResponse.json(seances);

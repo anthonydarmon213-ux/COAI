@@ -51,7 +51,7 @@ export default async function ProgressionPage() {
     }),
     prisma.seanceLog.findMany({
       where: { userId: user.id },
-      orderBy: { date: "asc" },
+      orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     }),
     prisma.dailySession.findMany({
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
