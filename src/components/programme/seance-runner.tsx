@@ -15,6 +15,7 @@ import { videoCoaiPourNom } from "@/lib/exercices/videos-coai";
 import { parseReposSeconds } from "@/lib/programmes/repos";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
+import { withRequestDeadline } from "@/lib/suivi/request-deadline";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -478,9 +479,12 @@ export function SeanceRunner({
     // Tonnage de la séance précédente, pour la comparaison. Best-effort :
     // sans lui l'écran s'affiche simplement sans écart, jamais d'erreur.
     try {
-      const r = await fetch("/api/seances");
-      if (r.ok) {
-        const seances = (await r.json()) as { exercices?: unknown }[];
+      const seances = await withRequestDeadline(async signal => {
+        const r = await fetch("/api/seances", { signal });
+        if (!r.ok) throw new Error("historique_indisponible");
+        return await r.json() as { exercices?: unknown }[];
+      }, 2000);
+      if (Array.isArray(seances)) {
         const precedente = seances?.[0];
         if (precedente && Array.isArray(precedente.exercices)) {
           const t = (precedente.exercices as { sets?: { reps?: number; charge?: number }[] }[])
@@ -492,20 +496,32 @@ export function SeanceRunner({
     } catch { /* comparaison facultative */ }
 
     try {
-      const reponse = await fetch("/api/seances", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: dateSauvegarde,
-          source: "PROGRAMME",
-          exercices: [...parExercice.values()],
-          dureeMinutes,
-          ...checkin,
-          notes: `Séance guidée : ${nomSeance}`,
-        }),
+      const firstId = await withRequestDeadline(async signal => {
+        const reponse = await fetch("/api/seances", {
+          method: "POST",
+          signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: dateSauvegarde,
+            source: "PROGRAMME",
+            exercices: [...parExercice.values()],
+            dureeMinutes,
+            ...checkin,
+            notes: `Séance guidée : ${nomSeance}`,
+          }),
+        });
+        if (!reponse.ok) throw new Error("sauvegarde_seance_refusee");
+        const confirmation: unknown = await reponse.clone().json();
+        if (!confirmation || typeof confirmation !== "object" || Array.isArray(confirmation)) {
+          throw new Error("confirmation_invalide");
+        }
+        const saved = confirmation as Record<string, unknown>;
+        if (typeof saved.id !== "string" || !saved.id.trim() || saved.source !== "PROGRAMME" ||
+            typeof saved.date !== "string" || new Date(saved.date).getTime() !== new Date(dateSauvegarde).getTime()) {
+          throw new Error("confirmation_invalide");
+        }
+        return firstSavedConversionId(reponse, "PROGRAMME");
       });
-      if (!reponse.ok) throw new Error("sauvegarde_seance_refusee");
-      const firstId = await firstSavedConversionId(reponse, "PROGRAMME");
       if (firstId) setPremiereSeanceId(firstId);
       // La séance est confirmée côté serveur : la reprise locale peut
       // maintenant être supprimée sans risque de perdre l'effort saisi.
