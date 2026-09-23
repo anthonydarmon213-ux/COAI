@@ -19,7 +19,15 @@ export async function POST(request: Request) {
   const appURL = process.env.NEXT_PUBLIC_APP_URL;
   if (!appURL) return json({ error: 'Service temporairement indisponible' }, 503);
   let appOrigin: string;
-  try { appOrigin = new URL(appURL).origin; }
+  try {
+    const configuredURL = new URL(appURL);
+    const localHTTP = configuredURL.protocol === 'http:' &&
+      ['localhost', '127.0.0.1', '[::1]'].includes(configuredURL.hostname);
+    if (configuredURL.protocol !== 'https:' && !localHTTP) {
+      return json({ error: 'Service temporairement indisponible' }, 503);
+    }
+    appOrigin = configuredURL.origin;
+  }
   catch { return json({ error: 'Service temporairement indisponible' }, 503); }
   if (origin && origin !== appOrigin) {
     return json({ error: 'Origine non autorisée' }, 403);
