@@ -304,8 +304,30 @@ model ApplePurchaseAccount {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   accountToken String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt    DateTime @default(now())
+  transactions AppleTransaction[]
 
   @@map("apple_purchase_accounts")
+}
+
+// Server-only verified transaction snapshots, separate from Stripe billing.
+model AppleTransaction {
+  environment           String
+  transactionId         String
+  originalTransactionId String
+  userId                String
+  account               ApplePurchaseAccount @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  productId             String
+  purchasedAt           DateTime
+  expiresAt             DateTime
+  signedAt              DateTime
+  revokedAt             DateTime?
+  upgraded              Boolean @default(false)
+  receivedAt            DateTime @default(now())
+
+  @@id([environment, transactionId])
+  @@index([environment, originalTransactionId])
+  @@index([userId, environment, expiresAt])
+  @@map("apple_transactions")
 }
 
 model Subscription {

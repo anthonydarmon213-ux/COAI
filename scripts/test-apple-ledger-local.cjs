@@ -1,0 +1,51 @@
+// Real local PostgreSQL tests with synthetic verified facts, NOT Apple receipts.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const ts = require('typescript');
+const { randomUUID } = require('node:crypto');
+const { PrismaClient } = require('@prisma/client');
+const url = new URL(process.env.DATABASE_URL || 'http://missing.invalid');
+assert.equal(url.hostname, '127.0.0.1'); assert.equal(url.port, '54322');
+const db = new PrismaClient();
+const out = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/subscription/apple-ledger.ts', 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+}).outputText, { exports: out, Date });
+const save = out.persistVerifiedAppleTransaction;
+async function main() {
+  const before = JSON.stringify(await db.subscription.findMany({ orderBy: { id: 'asc' } }));
+  const id = randomUUID();
+  const user = await db.user.create({ data: { id, supabaseAuthId: id, email: `apple-ledger-${id}@example.test`, applePurchaseAccount: { create: {} } }, include: { applePurchaseAccount: true } });
+  const other = await db.applePurchaseAccount.findFirst({ where: { userId: { not: id } } });
+  assert(other);
+  const base = { environment: 'Sandbox', transactionID: `qa-${id}`, originalTransactionID: `chain-${id}`,
+    accountToken: user.applePurchaseAccount.accountToken, productID: 'test.monthly', purchasedAt: 1000,
+    expiresAt: 10000, signedAt: 2000, revokedAt: null, upgraded: false, active: true };
+  const results = await Promise.all(Array.from({length: 12}, () => save(db, id, base)));
+  assert.equal(results.length, 12);
+  assert.equal(await db.appleTransaction.count({ where: { userId: id } }), 1);
+  const revoked = { ...base, signedAt: 4000, revokedAt: 3500, active: false };
+  await save(db, id, revoked);
+  const stale = await save(db, id, base);
+  assert.equal(stale.revokedAt.getTime(), 3500, 'Replay cannot undo revocation');
+  await assert.rejects(save(db, id, { ...base, signedAt: 4000 }), /APPLE_SNAPSHOT_CONFLICT/);
+  await assert.rejects(save(db, id, { ...base, signedAt: 5000, productID: 'other' }), /APPLE_TRANSACTION_CONFLICT/);
+  await assert.rejects(save(db, other.userId, base), /APPLE_ACCOUNT_MISMATCH/);
+  await assert.rejects(save(db, other.userId, { ...base, transactionID: `other-${id}`, accountToken: other.accountToken }), /APPLE_CHAIN_ALREADY_BOUND/);
+  const renewal = { ...base, transactionID: `renewal-${id}`, purchasedAt: 9000, expiresAt: 20000, signedAt: 9001 };
+  await save(db, id, renewal);
+  assert.equal(await db.appleTransaction.count({ where: { userId: id } }), 2);
+  await save(db, id, { ...revoked, signedAt: 9500 });
+  const next = await db.appleTransaction.findUnique({ where: { environment_transactionId: { environment: 'Sandbox', transactionId: renewal.transactionID } } });
+  assert.equal(next.revokedAt, null, 'Refund of older transaction must not overwrite renewal');
+  const [security] = await db.$queryRaw`SELECT relrowsecurity FROM pg_class WHERE oid='public.apple_transactions'::regclass`;
+  assert.equal(security.relrowsecurity, true);
+  for (const role of ['anon', 'authenticated']) {
+    const [grants] = await db.$queryRaw`SELECT has_table_privilege(${role}, 'public.apple_transactions', 'SELECT,INSERT,UPDATE,DELETE') AS allowed`;
+    assert.equal(grants.allowed, false);
+  }
+  assert.equal(JSON.stringify(await db.subscription.findMany({ orderBy: { id: 'asc' } })), before);
+  console.log('PASS: real local ledger, 12 concurrent duplicates, stale replay, conflict/ownership guards, independent renewals, RLS/grants, Stripe unchanged. Synthetic facts only.');
+}
+main().catch(error => { console.error(error.message); process.exitCode=1; }).finally(() => db.$disconnect());
