@@ -238,6 +238,11 @@ async function main() {
   assert.deepEqual(await db.dailySession.findMany({where: {userId: a.user.id}}), beforeInvalidDaily);
   console.log('PASS HTTP daily invalid JSON: readable 400, saved daily unchanged');
   const postDaily = body => fetch(dailyURL, {method: 'POST', headers: {...a.cookie, 'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  const beforeEmptyCompletion = await db.dailySession.findMany({where: {userId: a.user.id}});
+  for (const body of [{action: 'complete'}, {action: 'feedback', workoutRating: 'BIEN_DOSEE', feedbackPain: false}]) {
+    assert.equal((await postDaily(body)).status, 409, 'An unavailable workout cannot be completed or rated');
+  }
+  assert.deepEqual(await db.dailySession.findMany({where: {userId: a.user.id}}), beforeEmptyCompletion);
   const checkin = {action: 'checkin', sleep: 'BON', energy: 'NORMALE', pain: false, availableMinutes: 60};
   const tomorrowName = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'][(new Date().getDay() + 1) % 7];
   const restContent = {...legacyContent, seances: [{...legacyContent.seances[0], jour: tomorrowName}]};
@@ -250,6 +255,7 @@ async function main() {
   assert.equal(rest.adaptation, null);
   assert.equal(rest.availableMinutes, null);
   assert.equal(rest.programmeVersion, training.version + 1);
+  assert.equal((await postDaily({action: 'complete'})).status, 409, 'A rest check-in is not a completed workout');
   const trainingContent = {...legacyContent, seances: [{...legacyContent.seances[0], jour: dayName}]};
   await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: trainingContent}});
   const changedDashboard = await fetch(origin + '/dashboard', {headers: a.cookie});
@@ -272,6 +278,18 @@ async function main() {
   assert(completedHTML.includes('Retrouve ta séance terminée et son bilan.'));
   assert(!completedHTML.includes('ton programme prévoit du repos'));
   console.log('PASS HTTP daily lifecycle: rest clears unfinished adaptation; completed snapshot survives concurrent check-ins and programme change');
+  // Reset only this disposable local fixture for independent recovery/pain cases.
+  await db.dailySession.update({where: {id: rest.id}, data: {completedAt: null}});
+  await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: trainingContent}});
+  assert.equal((await postDaily({...checkin, pain: true, painArea: 'Genou'})).status, 200);
+  assert.equal((await postDaily({action: 'complete'})).status, 409);
+  assert.equal((await postDaily({...checkin, chargeMentale: 'SATUREE'})).status, 200);
+  const recoveryComplete = await postDaily({action: 'complete'});
+  assert.equal(recoveryComplete.status, 200, 'Keep intentional guided recovery available');
+  const recovery = await recoveryComplete.json();
+  assert.equal((await postDaily({action: 'complete'})).status, 200);
+  assert.equal((await db.dailySession.findUnique({where: {id: rest.id}})).completedAt.toISOString(), recovery.completedAt);
+  console.log('PASS HTTP daily completion: unavailable/rest/pain rejected unchanged; guided recovery and completion retry preserved');
   // A completed profile with a declared constraint must not get a generic programme.
   await db.user.update({where: {id: b.user.id}, data: {programmeUnlockedAt: new Date()}});
   await db.profile.create({data: {userId: b.user.id, objectifs: 'Rester en forme', niveau: 'Débutant',

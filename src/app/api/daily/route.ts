@@ -3,7 +3,7 @@ import { accessibleTraining } from "@/lib/programmes/access";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
-import { adaptWorkout, getSessionDuration, getWorkoutForDate } from "@/lib/daily/session";
+import { adaptWorkout, ensureWorkoutCompleteness, getSessionDuration, getWorkoutForDate } from "@/lib/daily/session";
 import { Prisma } from "@prisma/client";
 
 function asJson(value: unknown): Prisma.InputJsonValue {
@@ -177,22 +177,32 @@ export async function POST(request: Request) {
   });
   if (!existing) return NextResponse.json({ error: "Check-in quotidien introuvable" }, { status: 404 });
 
-  if (parsed.data.action === "complete") {
-    const daily = await prisma.dailySession.update({
-      where: { id: existing.id },
-      data: { completedAt: existing.completedAt ?? new Date() },
-    });
-    return NextResponse.json(daily);
+  if (!existing.completedAt) {
+    const stored = existing.adaptedSession;
+    const session = stored && typeof stored === "object" && !Array.isArray(stored)
+      ? ensureWorkoutCompleteness(stored) : null;
+    const available = session && (
+      (Array.isArray(session.exercices) && session.exercices.length > 0) ||
+      (typeof session.echauffement === "string" && session.echauffement.trim()) ||
+      (typeof session.retourAuCalme === "string" && session.retourAuCalme.trim())
+    );
+    if (!existing.sleep || existing.pain !== false || !available) {
+      return NextResponse.json({ error: "Aucune séance à terminer. Consulte ton programme ou actualise ton bilan du jour." }, { status: 409 });
+    }
   }
 
-  const daily = await prisma.dailySession.update({
-    where: { id: existing.id },
-    data: {
+  if (parsed.data.action === "complete" && existing.completedAt) return NextResponse.json(existing);
+
+  const changed = await prisma.dailySession.updateMany({
+    // Do not complete a different adaptation changed since the availability check.
+    where: { id: existing.id, userId: user.id, updatedAt: existing.updatedAt },
+    data: parsed.data.action === "complete" ? { completedAt: new Date() } : {
       workoutRating: parsed.data.workoutRating,
       feedbackPain: parsed.data.feedbackPain,
       feedbackComment: parsed.data.feedbackComment || null,
       completedAt: existing.completedAt ?? new Date(),
     },
   });
-  return NextResponse.json(daily);
+  if (!changed.count) return NextResponse.json({ error: "Ton bilan a changé. Actualise la page avant de terminer ta séance." }, { status: 409 });
+  return NextResponse.json(await prisma.dailySession.findUniqueOrThrow({ where: { id: existing.id } }));
 }
