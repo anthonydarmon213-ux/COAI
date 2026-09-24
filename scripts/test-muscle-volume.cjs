@@ -1,0 +1,25 @@
+const fs=require('node:fs'), vm=require('node:vm'), assert=require('node:assert/strict'), ts=require('typescript');
+function load(file,requireModule){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:requireModule});return exports;}
+const muscles=load('src/lib/exercices/muscles.ts');
+const {volumeParMuscle}=load('src/lib/suivi/volume-musculaire.ts',id=>{assert.equal(id,'@/lib/exercices/muscles');return muscles;});
+const session=exercices=>({date:new Date(),exercices});
+assert.ok(muscles.musclesPourExercice('Squat'));
+const valid=volumeParMuscle([session([{nom:'Squat',sets:[{reps:10,charge:20}]}])]);
+assert.equal(valid.total,200);
+const invalid=volumeParMuscle([session([{nom:'Squat',sets:[{reps:10,charge:20},{reps:1e308,charge:1e308},{reps:-10,charge:10},null]}])]);
+assert.equal(invalid.total,200,'invalid series must not poison valid tonnage');
+for(const value of [...Object.values(invalid.volumes),...Object.values(invalid.intensites),invalid.total]) assert.ok(Number.isFinite(value)&&value>=0);
+const bodyweight=volumeParMuscle([session([{nom:'Squat',series:3,sets:[{reps:10,charge:0}]}])]);
+assert.equal(bodyweight.total,30,'preserve bodyweight series fallback');
+const strings=volumeParMuscle([session([{nom:'Squat',sets:[{reps:'10',charge:'20'}]}])]);
+assert.equal(strings.total,200,'preserve numeric legacy strings');
+const badCount=volumeParMuscle([session([{nom:'Squat',series:-2}])]);
+assert.ok(badCount.total>=0 && Number.isFinite(badCount.total));
+const huge=volumeParMuscle([session(Array.from({length:4},()=>({nom:'Squat',sets:[{reps:1,charge:1e308}]})))]);
+assert.ok(Number.isFinite(huge.total));
+assert.ok(Object.values(huge.intensites).every(v=>Number.isFinite(v)&&v>=0&&v<=1));
+const badFallback=volumeParMuscle([session([{nom:'Squat',series:1e308}])]);
+assert.equal(badFallback.total,0);
+assert.equal(volumeParMuscle([{date:new Date(0),exercices:[{nom:'Squat',series:3}]}]).total,0);
+assert.equal(volumeParMuscle([session([null,{nom:42},{nom:'unknown'}])]).total,0);
+console.log('PASS muscle volume: actual mapping, valid tonnage, overflow/negative inputs, legacy strings, bodyweight and old/unknown sessions.');

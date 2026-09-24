@@ -19,6 +19,12 @@ export type VolumeParMuscle = {
   nbSeances: number;
 };
 
+function nombrePositif(value: unknown): number {
+  if (typeof value !== "number" && typeof value !== "string") return 0;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 export function volumeParMuscle(seances: SeanceEnregistree[], joursFenetre = 30): VolumeParMuscle {
   const depuis = new Date();
   depuis.setDate(depuis.getDate() - joursFenetre);
@@ -41,8 +47,13 @@ export function volumeParMuscle(seances: SeanceEnregistree[], joursFenetre = 30)
       // le nombre de séries : une séance au poids du corps ou saisie sans
       // charge compte quand même, sans quoi elle disparaîtrait du bilan.
       const sets = Array.isArray(brut.sets) ? brut.sets : [];
-      const tonnage = sets.reduce((t, s) => t + (Number(s?.reps) || 0) * (Number(s?.charge) || 0), 0);
-      const poids = tonnage > 0 ? tonnage : (Number(brut.series) || sets.length || 1) * 10;
+      const tonnage = sets.reduce((t, s) => {
+        const suivant = t + nombrePositif(s?.reps) * nombrePositif(s?.charge);
+        return Number.isFinite(suivant) ? suivant : t;
+      }, 0);
+      const poids = tonnage > 0 ? tonnage : (nombrePositif(brut.series) || sets.length || 1) * 10;
+      // Une valeur historique extrême ne doit pas rendre toute la carte NaN.
+      if (!Number.isFinite(poids) || !Number.isFinite(total + poids)) continue;
 
       const part = poids / cible.muscles.length;
       for (const m of cible.muscles) {
