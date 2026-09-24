@@ -21,9 +21,12 @@ const page = load('src/app/(app)/suivi/progression/page.tsx', name => {
     dailySession: { findMany: async args => { assert.equal(args.where.userId, 'test-only'); assert(args.where.date.gte); return dailies; } },
   } };
   if (name.endsWith('/age-coai')) return engine;
+  if (name.endsWith('/suivi/progression-force')) return load('src/lib/suivi/progression-force.ts');
+  if (name.endsWith('/server/request-time')) return { requestTime: () => Date.now() };
   if (name.endsWith('/volume-musculaire')) return { volumeParMuscle: () => ({ intensites: {}, volumes: {}, nbSeances: 0 }) };
   if (name.endsWith('/subscription/plan')) return { getEffectivePlan: () => null };
   if (name.endsWith('/gauge')) return { Gauge };
+  assert.ok(name.startsWith('@/components/') || name === 'next/link', `Unexpected dependency: ${name}`);
   return new Proxy({}, { get: () => ({ children }) => React.createElement('div', null, children) });
 }).default;
 function gauges(node, result = []) {
