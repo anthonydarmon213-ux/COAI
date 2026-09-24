@@ -22,7 +22,6 @@ function load(file, imports) {
 function helper(db) {
   return load('src/lib/programmes/save-generated.ts',{'@/lib/db/client':{prisma:db}});
 }
-let notifications=0;
 function route(db) {
   const socle=async()=>({fixture:true,privateDetails:'must not appear in response'});
   return load('src/app/api/programmes/generate/route.ts',{
@@ -30,15 +29,10 @@ function route(db) {
     '@/lib/auth/server':{getCurrentUser:async()=>({id})},
     '@/lib/db/client':{prisma:{programmeGenerated:db.programmeGenerated,
       user:{findUnique:async()=>({id,profile:{},subscription:{plan:'PASS_IA'}})}}},
-    '@/lib/programmes/generer':{genererPilier:()=>assert.fail('No paid generation')},
     '@/lib/programmes/save-generated':helper(db),
-    '@/lib/email/client':{sendAdminNotification:async()=>{notifications++;}},
-    '@/lib/email/coach-notification':{},
-    '@/lib/subscription/plan':{hasProgrammeAccess:()=>true,getEffectivePlan:()=>'PASS_IA'},
-    '@/lib/subscription/generation-quota':{getGenerationQuotaState:()=>({epuise:false})},
+    '@/lib/subscription/content-access':{contentAccessFor:async()=>({programme:true,appleUnavailable:false})},
     '@/lib/programmes-socles':{socleAcceptable:()=>true,socleEntrainement:socle,socleNutrition:socle,socleRecuperation:socle},
     '@/lib/profil/completion':{computeProfilCompletion:()=>({essentielComplet:true})},
-    '@/lib/cycle/phase':{buildContexteFeminin:()=>''},
   });
 }
 (async()=>{
@@ -82,7 +76,6 @@ function route(db) {
   const retry=await helper(clients[1]).saveGeneratedProgramme(payload);
   const saved=await clients[0].programmeGenerated.findUnique({where:{id:retry.programme.id}});
   assert.equal(saved.version,4);
-  assert.equal(notifications,0);
   console.log('PASS actual route: 4 concurrent activations → 3 identical IDs, metadata only, pending preserved');
   console.log('PASS concurrent explicit generations: versions 1/2/3; rollback leaves no row, retry creates version 4');
   console.log('PASS pending preserved by HTTP and under the save transaction, including explicit regeneration.');

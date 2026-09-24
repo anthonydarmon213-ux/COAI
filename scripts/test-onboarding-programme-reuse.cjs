@@ -9,7 +9,7 @@ assert.ok(fs.readFileSync('src/components/marketing/diagnostic-quiz.tsx','utf8')
 const compiled = ts.transpileModule(fs.readFileSync('src/app/api/programmes/generate/route.ts','utf8'), {
   compilerOptions: {module:ts.ModuleKind.CommonJS},
 }).outputText;
-const records=[]; let authorized=true, access=true, quotaReads=0, notifications=0;
+const records=[]; let authorized=true, access=true, appleUnavailable=false;
 const prisma={
  user:{findUnique:async()=>({id:'fixture-user',profile:{},subscription:{plan:'PASS_IA'}})},
  programmeGenerated:{
@@ -26,20 +26,15 @@ const socle=async()=>({fixture:true});
 const imports={
  'next/server':{NextResponse:{json:(body,options)=>({body,status:options?.status??200})}},
  '@/lib/auth/server':{getCurrentUser:async()=>authorized?{id:'auth-fixture'}:null},
- '@/lib/programmes/generer':{genererPilier:()=>assert.fail('No paid generation expected')},
  '@/lib/programmes/save-generated':{saveGeneratedProgramme:async({onboarding,...data})=>{
    const record=await prisma.programmeGenerated.create({data:{...data,version:records.length+1}});
    const {contenu,...programme}=record;
    return {programme,created:true};
  }},
  '@/lib/db/client':{prisma},
- '@/lib/email/client':{sendAdminNotification:async()=>notifications++},
- '@/lib/email/coach-notification':{},
- '@/lib/subscription/plan':{hasProgrammeAccess:()=>access,getEffectivePlan:()=> 'PASS_IA'},
- '@/lib/subscription/generation-quota':{getGenerationQuotaState:()=>{quotaReads++;return {epuise:false};}},
+ '@/lib/subscription/content-access':{contentAccessFor:async()=>({programme:access,appleUnavailable})},
  '@/lib/programmes-socles':{socleAcceptable:()=>true,socleEntrainement:socle,socleNutrition:socle,socleRecuperation:socle},
  '@/lib/profil/completion':{computeProfilCompletion:()=>({essentielComplet:true})},
- '@/lib/cycle/phase':{buildContexteFeminin:()=>''},
 };
 const box={exports:{},URL,console,require:name=>{assert.ok(name in imports,name);return imports[name];}};
 vm.runInNewContext(compiled,box);
@@ -47,14 +42,13 @@ const request=()=>new Request('http://localhost/api/programmes/generate?mode=onb
 (async()=>{
  const first=await box.exports.POST(request());
  assert.equal(first.status,201);assert.equal(records.length,3);
- const initial=records.map(p=>p.id);const quotaBefore=quotaReads;
+ const initial=records.map(p=>p.id);
  for(let i=0;i<3;i++){
   const resumed=await box.exports.POST(request());
   assert.equal(resumed.body.reused,true);assert.equal(records.length,3);
   assert.deepEqual(Array.from(resumed.body.programmes,p=>p.id),initial);
   assert.ok(resumed.body.programmes.every(p=>!('contenu' in p)));
  }
- assert.equal(quotaReads,quotaBefore);
  records[0].statut='EN_ATTENTE';
  assert.equal((await box.exports.POST(request())).body.programmes[0].statut,'EN_ATTENTE');
  assert.equal((await box.exports.POST(new Request('http://localhost/api/programmes/generate',{method:'POST'}))).status,409);
@@ -69,8 +63,17 @@ const request=()=>new Request('http://localhost/api/programmes/generate?mode=onb
  await box.exports.POST(new Request('http://localhost/api/programmes/generate',{method:'POST'}));
  assert.equal(records.length,6);
  access=false;assert.equal((await box.exports.POST(request())).status,403);
+ appleUnavailable=true;
+ const unavailable=await box.exports.POST(request());
+ assert.equal(unavailable.status,503);
+ assert.match(unavailable.body.error,/sans effectuer de nouvel achat/);
+ assert.equal(records.length,6);
+ // Existing access survives an unavailable Apple verification service.
+ access=true;
+ assert.equal((await box.exports.POST(request())).status,201);
+ assert.equal(records.length,6);
  authorized=false;assert.equal((await box.exports.POST(request())).status,401);
- assert.equal(records.length,6);assert.equal(notifications,0);
- console.log('PASS: repeated onboarding reuses IDs, no quota, metadata only, pending preserved, partial completion, explicit regeneration, auth/access gates');
+ assert.equal(records.length,6);
+ console.log('PASS: repeated onboarding reuses IDs, metadata only, pending preserved, partial completion, explicit regeneration, auth/access gates, Apple unavailable with/without existing access');
  console.log('LIMIT: sequential requests; distributed concurrent generation is not covered');
 })().catch(error=>{console.error(error);process.exitCode=1;});
