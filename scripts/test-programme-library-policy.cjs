@@ -27,7 +27,7 @@ for (const profile of [
 ]) assert.equal(filter(profile),false);
 
 let user = {id:'fixture',profile:base,subscription:{plan:'PASS_IA'}};
-let rows=[], access=true, authenticated=true, complete=true, missing=false, failed=false;
+let rows=[], access=true, appleUnavailable=false, authenticated=true, complete=true, missing=false, failed=false;
 let creations=0, catalogueReads=0, providerCalls=0;
 const catalogue=async()=>{catalogueReads++;if(failed)throw Error('fixture unavailable');return missing?null:{fixture:true};};
 const route=load('src/app/api/programmes/generate/route.ts', {
@@ -35,7 +35,7 @@ const route=load('src/app/api/programmes/generate/route.ts', {
   '@/lib/auth/server':{getCurrentUser:async()=>authenticated?{id:'auth'}:null},
   '@/lib/db/client':{prisma:{user:{findUnique:async()=>user},
     programmeGenerated:{findFirst:async({where})=>rows.filter(p=>p.pilier===where.pilier).at(-1)??null}}},
-  '@/lib/subscription/plan':{hasProgrammeAccess:()=>access},
+  '@/lib/subscription/content-access':{contentAccessFor:async()=>({programme:access,appleUnavailable})},
   '@/lib/profil/completion':{computeProfilCompletion:()=>({essentielComplet:complete})},
   '@/lib/programmes-socles':{socleAcceptable:filter,socleEntrainement:catalogue,socleNutrition:catalogue,socleRecuperation:catalogue},
   '@/lib/programmes/save-generated':{saveGeneratedProgramme:async({contenu,onboarding,...input})=>{
@@ -98,6 +98,18 @@ const engine=load('src/lib/adaptation/engine.ts',{
  assert.equal((await route.POST(req())).status,503);assert.equal(creations,before);
  failed=false;complete=false;assert.equal((await route.POST(req())).status,422);
  complete=true;access=false;assert.equal((await route.POST(req())).status,403);
+ appleUnavailable=true;
+ const readsBeforeUnavailable=catalogueReads, writesBeforeUnavailable=creations;
+ const unavailable=await route.POST(req());
+ assert.equal(unavailable.status,503);
+ assert.match(unavailable.body.error,/sans effectuer de nouvel achat/);
+ assert.equal(catalogueReads,readsBeforeUnavailable);
+ assert.equal(creations,writesBeforeUnavailable);
+ // Historical access survives an Apple lookup outage; no second purchase.
+ access=true;rows=[];
+ assert.equal((await route.POST(req('?mode=onboarding'))).status,201);
+ assert.equal(creations,writesBeforeUnavailable+3);
+ appleUnavailable=false;
  access=true;authenticated=false;assert.equal((await route.POST(req())).status,401);
  for(const pilier of ['ENTRAINEMENT','NUTRITION','RECUPERATION'])
    await assert.rejects(provider.genererPilier(pilier,{},'fixture'),/payante automatique/);
