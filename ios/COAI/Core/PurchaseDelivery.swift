@@ -134,6 +134,9 @@ final class PurchaseRecoveryScheduler {
         lastStarted = now
         let token = generation
         task = Task { [weak self] in
+            // Cancellation is cooperative: a queued task may still start.
+            // Reject the old session before invoking any account operation.
+            guard !Task.isCancelled, self?.generation == token else { return }
             await operation()
             guard let self, self.generation == token else { return }
             self.task = nil

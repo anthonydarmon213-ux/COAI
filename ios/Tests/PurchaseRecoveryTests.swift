@@ -97,6 +97,34 @@ final class PurchaseRecoveryTests: XCTestCase {
     }
 
     @MainActor
+    func testCancellationBeforeStartDoesNotRunOldAccountOperation() async {
+        let scheduler = PurchaseRecoveryScheduler()
+        var oldAccountCalls = 0
+        var newAccountCalls = 0
+        scheduler.request { oldAccountCalls += 1 }
+        // No suspension before cancel: the queued task has not started yet.
+        scheduler.cancel()
+        scheduler.request { newAccountCalls += 1 }
+        await scheduler.waitUntilIdle()
+        await Task.yield()
+        XCTAssertEqual(oldAccountCalls, 0)
+        XCTAssertEqual(newAccountCalls, 1)
+    }
+
+    @MainActor
+    func testCancellationDiscardsQueuedForcedRecovery() async {
+        let scheduler = PurchaseRecoveryScheduler()
+        var queuedCalls = 0
+        scheduler.request {
+            scheduler.request(force: true) { queuedCalls += 1 }
+            scheduler.cancel()
+        }
+        await scheduler.waitUntilIdle()
+        await Task.yield()
+        XCTAssertEqual(queuedCalls, 0)
+    }
+
+    @MainActor
     func testFailureDoesNotPreventOtherDeliveryAndIsNotHidden() async throws {
         let batch = PurchaseRecoveryBatch()
         var laterDelivered = false
