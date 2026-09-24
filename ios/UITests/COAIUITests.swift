@@ -810,6 +810,52 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testRestPresetsHaveEqualColumns() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Repos"].waitForExistence(timeout: 15))
+        app.buttons["Repos"].tap()
+        let buttons = ["0 min 30 s", "1 min 00 s", "1 min 30 s", "2 min 00 s"].map { app.buttons["Choisir " + $0] }
+        XCTAssertTrue(buttons[0].waitForExistence(timeout: 5))
+        for button in buttons {
+            reveal(button, in: app)
+            XCTAssertGreaterThanOrEqual(button.frame.height, 44)
+            XCTAssertEqual(button.frame.width, buttons[0].frame.width, accuracy: 1)
+        }
+        XCTAssertEqual(buttons[0].frame.minY, buttons[1].frame.minY, accuracy: 1)
+        XCTAssertEqual(buttons[2].frame.minY, buttons[3].frame.minY, accuracy: 1)
+        XCTAssertEqual(buttons[0].frame.height, buttons[1].frame.height, accuracy: 1)
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "Durées de repos en deux colonnes"
+        capture.lifetime = .keepAlways
+        add(capture)
+    }
+
+    @MainActor
+    func testRestPresetsStackWithAccessibilityText() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Repos"].waitForExistence(timeout: 15))
+        app.buttons["Repos"].tap()
+        let buttons = ["0 min 30 s", "1 min 00 s", "1 min 30 s", "2 min 00 s"].map { app.buttons["Choisir " + $0] }
+        for button in buttons {
+            reveal(button, in: app)
+            XCTAssertGreaterThanOrEqual(button.frame.height, 44)
+            XCTAssertGreaterThanOrEqual(button.frame.minX, 0)
+            XCTAssertLessThanOrEqual(button.frame.maxX, app.frame.maxX)
+        }
+        XCTAssertEqual(buttons[0].frame.minX, buttons[1].frame.minX, accuracy: 1)
+        XCTAssertGreaterThanOrEqual(buttons[1].frame.minY, buttons[0].frame.maxY)
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "Durées de repos texte XXXL"
+        capture.lifetime = .keepAlways
+        add(capture)
+    }
+
+    @MainActor
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, upward: Bool = true) {
         for _ in 0..<5 {
             if element.isHittable { return }

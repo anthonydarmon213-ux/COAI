@@ -191,6 +191,7 @@ final class RestReminderService: ObservableObject {
 }
 
 struct RestTimerView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
@@ -238,12 +239,18 @@ struct RestTimerView: View {
                     }
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Préparer la durée du prochain repos").font(.headline)
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12),
+                                                count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 12) {
                             ForEach([30, 60, 90, 120], id: \.self) { value in
-                                Button(RestClock.label(seconds: value)) {
+                                Button {
                                     minutes = value / 60
                                     seconds = value % 60
-                                }.buttonStyle(.bordered).frame(minHeight: 44)
+                                } label: {
+                                    Text(RestClock.label(seconds: value))
+                                        .monospacedDigit()
+                                        .frame(maxWidth: .infinity, minHeight: 44)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }.buttonStyle(.bordered)
                                     .accessibilityLabel("Choisir " + RestClock.label(seconds: value))
                             }
                         }
