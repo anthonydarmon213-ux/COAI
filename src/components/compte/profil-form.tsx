@@ -468,7 +468,8 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           poidsKg: poidsKg ? Number(poidsKg) : undefined,
           age: age ? Number(age) : undefined,
           sexe: sexe || undefined,
-          cycleMenstruelSuivi: cycleMenstruelSuivi || undefined,
+          // false is an explicit opt-out, not an omitted update.
+          cycleMenstruelSuivi,
           dateDernieresRegles:
             cycleMenstruelSuivi && dateDernieresRegles ? new Date(dateDernieresRegles).toISOString() : undefined,
           dureeCycleJours: cycleMenstruelSuivi && dureeCycleJours ? Number(dureeCycleJours) : undefined,
