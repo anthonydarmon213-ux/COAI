@@ -23,6 +23,9 @@ export async function notifyMakeScenario(payload: NotifyMakePayload): Promise<vo
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      // Optional synchronisation must not hold a saved profile indefinitely.
+      // No automatic retry: avoid duplicate deliveries and additional usage.
+      signal: AbortSignal.timeout(5_000),
     });
   } catch (err) {
     console.error("[whatsapp] Échec de la notification Make.com", err);
