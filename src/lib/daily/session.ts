@@ -42,32 +42,16 @@ export function isCoreExercise(exercise: Record<string, unknown>) {
   return CORE_PATTERN.test(String(exercise.nom ?? ""));
 }
 
-// Les toutes premières V1 ont parfois été générées avant que le prompt
-// n'impose un finisher gainage et un retour au calme. Cette normalisation
-// complète uniquement la séance du jour : elle ne modifie jamais le programme
-// source. Le mouvement proposé est volontairement simple, sans charge, et
-// demande explicitement d'arrêter au moindre inconfort.
+// Complète le retour au calme sans inventer de mouvement supplémentaire.
+// Les exercices restent ceux du programme : ajouter automatiquement un
+// finisher contournerait le choix éditorial et la validation des médias COAI.
 export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSession {
   const exercises = Array.isArray(session.exercices) ? session.exercices : [];
   if (exercises.length === 0) return session;
 
-  const completedExercises = exercises.some(isCoreExercise)
-    ? exercises
-    : [
-        ...exercises,
-        {
-          nom: "Dead bug contrôlé — gainage profond",
-          series: "2",
-          repetitions: "6 à 8 répétitions lentes par côté",
-          repos: "45 sec",
-          charge: "Poids du corps — garde le bas du dos stable et arrête au moindre inconfort",
-          methode: "Série classique",
-        },
-      ];
-
   return {
     ...session,
-    exercices: completedExercises,
+    exercices: exercises,
     retourAuCalme:
       session.retourAuCalme ??
       "5 à 8 minutes : marche ou pédalage très léger, respiration calme, puis mobilité douce des zones travaillées. Aucun étirement ne doit provoquer de douleur.",

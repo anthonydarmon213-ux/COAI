@@ -8,6 +8,10 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/daily/session.ts'
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText, { exports: exportsObject });
 const { adaptWorkout } = exportsObject;
+const originalOnly = { nom: 'Sans finisher ajouté', exercices: [{ nom: 'Leg curl (machine)', series: 3 }] };
+const normalised = exportsObject.ensureWorkoutCompleteness(originalOnly);
+assert.equal(normalised.exercices, originalOnly.exercices, 'Do not append an unapproved automatic finisher');
+assert.equal(exportsObject.ensureWorkoutCompleteness(normalised).exercices, originalOnly.exercices);
 const checkin = { sleep: 'BON', energy: 'NORMALE', pain: false, availableMinutes: 60,
   equipementDuJour: 'Sans matériel' };
 const source = { nom: 'Séance de test', echauffement: 'Rameur', retourAuCalme: 'Vélo',
