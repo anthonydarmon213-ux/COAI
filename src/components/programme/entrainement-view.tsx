@@ -6,6 +6,7 @@ import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-but
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import Link from "next/link";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
 // semaine, puis replie chaque séance (fermée par défaut) pour éviter
@@ -74,7 +75,7 @@ export function EntrainementView({
           typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`
         }
         renderContenu={(seance) => {
-          const { echauffement, exercices, retourAuCalme, jour, nom, photoQuerySeance, ...detailSeance } = seance as {
+          const { echauffement, exercices: exercicesBruts, retourAuCalme, jour, nom, photoQuerySeance, ...detailSeance } = seance as {
             echauffement?: string;
             exercices?: unknown[];
             retourAuCalme?: string;
@@ -83,6 +84,13 @@ export function EntrainementView({
             photoQuerySeance?: string;
             [key: string]: unknown;
           };
+          const exercices = filtrerExercicesAvecMedias(Array.isArray(exercicesBruts) ? exercicesBruts : []);
+          if (!exercices.length) return (
+            <p className="rounded-xl border border-white/10 p-4 text-sm text-graphite-300">
+              Les démonstrations de cette séance ne sont pas disponibles.
+              <Link href="/programme/exercices" className="mt-3 block underline">Voir les exercices avec vidéo COAI</Link>
+            </p>
+          );
           const premierExercice = Array.isArray(exercices) && isPlainObject(exercices[0])
             ? exercices[0]
             : null;

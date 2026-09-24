@@ -1,6 +1,8 @@
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { getWorkoutForDate, getSessionDuration } from "@/lib/daily/session";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import Link from "next/link";
 
 // Séance du jour mise en avant (22/08/2026, demande Anthony : "le bouton
 // Démarrer la séance doit immédiatement lancer le Player"). Jusqu'ici le
@@ -46,7 +48,14 @@ export function SeanceDuJourHero({
   }
 
   const nom = typeof seance.nom === "string" ? seance.nom : "Ta séance du jour";
-  const exercices = Array.isArray(seance.exercices) ? seance.exercices : [];
+  const exercices = filtrerExercicesAvecMedias(Array.isArray(seance.exercices) ? seance.exercices : []);
+  if (!exercices.length) return (
+    <section id="seance-du-jour" className="scroll-mt-24 rounded-2xl border border-white/10 p-5">
+      <h2 className="text-lg font-semibold text-white">Démonstrations indisponibles pour cette séance.</h2>
+      <p className="mt-2 text-sm text-graphite-300">Retrouve les mouvements accompagnés de nos photos et vidéos.</p>
+      <Link href="/programme/exercices" className="mt-3 block underline">Voir les exercices avec vidéo COAI</Link>
+    </section>
+  );
   const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
   const retourAuCalme = typeof seance.retourAuCalme === "string" ? seance.retourAuCalme : undefined;
   void photosParExercice;

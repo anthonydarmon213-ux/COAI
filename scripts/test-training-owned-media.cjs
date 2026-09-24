@@ -9,6 +9,7 @@ vm.runInNewContext(ts.transpileModule(source, { compilerOptions: {
   module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX,
 }}).outputText, { exports: exportsView, require(name) {
   if (name === 'react/jsx-runtime') return jsx;
+  if (name.endsWith('media-coai')) return { filtrerExercicesAvecMedias: exercices => exercices.filter(e => e.nom === 'COAI fixture') };
   if (name.endsWith('photos-coai')) return { photoCoaiPourNom: nom => nom === 'COAI fixture' ? '/exercices/fixture.jpg' : null };
   return new Proxy({}, { get: (_, key) => key });
 }});
