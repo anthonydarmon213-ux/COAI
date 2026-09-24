@@ -454,6 +454,13 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     setError(null);
     setSaved(false);
     try {
+      // JSON converts NaN/Infinity to null: never interpret invalid input
+      // as an intentional deletion of an existing measurement.
+      for (const [label, value] of [["taille", tailleCm], ["poids", poidsKg], ["âge", age]]) {
+        if (value && !Number.isFinite(Number(value))) {
+          throw new Error(`Vérifie la valeur du champ ${label}.`);
+        }
+      }
       const res = await fetch("/api/profil", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -464,9 +471,9 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           lieuEntrainement,
           dureeSeanceMinutes: dureeSeance ? DUREE_EN_MINUTES[dureeSeance] : undefined,
           contraintesSante,
-          tailleCm: tailleCm ? Number(tailleCm) : undefined,
-          poidsKg: poidsKg ? Number(poidsKg) : undefined,
-          age: age ? Number(age) : undefined,
+          tailleCm: tailleCm ? Number(tailleCm) : null,
+          poidsKg: poidsKg ? Number(poidsKg) : null,
+          age: age ? Number(age) : null,
           sexe: sexe || undefined,
           // false is an explicit opt-out, not an omitted update.
           cycleMenstruelSuivi,

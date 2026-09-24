@@ -18,7 +18,7 @@ const compile = text => ts.transpileModule(text, {
 const clearableTextFields = ['niveau', 'equipementDisponible', 'lieuEntrainement', 'sportsPratiques',
   'habitudesAlimentaires', 'allergiesAlimentaires', 'repasParJour', 'hydratation',
   'consommationCafe', 'consommationAlcool', 'qualiteSommeil'];
-let stored = { userId: 'owner', cycleMenstruelSuivi: true,
+let stored = { userId: 'owner', cycleMenstruelSuivi: true, tailleCm: 175, poidsKg: 70, age: 30,
   ...Object.fromEntries(clearableTextFields.map(key => [key, 'ancienne valeur'])) };
 let writes = 0;
 const modules = {
@@ -40,7 +40,7 @@ const modules = {
 };
 const route = { exports: {}, require: name => { assert.ok(name in modules, name); return modules[name]; } };
 vm.runInNewContext(compile(fs.readFileSync('src/app/api/profil/route.ts', 'utf8')), route);
-async function submitChoice(choice, values = {}) {
+async function submitChoice(choice, values = {}, invalid = false) {
   let saved = false, refreshed = false, loading = false, error = null;
   const context = {
     objectifs: '', niveau: '', equipementDisponible: [], lieuEntrainement: '', dureeSeance: '',
@@ -59,7 +59,13 @@ async function submitChoice(choice, values = {}) {
   };
   vm.runInNewContext(compile(submit), context);
   await context.handleSubmit({ preventDefault() {} });
-  assert.equal(error, null); assert.equal(saved, true); assert.equal(refreshed, true); assert.equal(loading, false);
+  if (invalid) {
+    assert.match(error, /Vérifie la valeur du champ/);
+    assert.equal(saved, false); assert.equal(refreshed, false);
+  } else {
+    assert.equal(error, null); assert.equal(saved, true); assert.equal(refreshed, true);
+  }
+  assert.equal(loading, false);
 }
 (async () => {
   for (const body of ['', '{', 'null', '{"cycleMenstruelSuivi":"false"}']) {
@@ -68,6 +74,7 @@ async function submitChoice(choice, values = {}) {
     assert.equal(writes, 0);
   }
   await submitChoice(false);
+  for (const key of ['tailleCm', 'poidsKg', 'age']) assert.equal(stored[key], null, `Explicit numerical deletion: ${key}`);
   for (const key of clearableTextFields) assert.equal(stored[key], '', `Cleared field must not keep stale data: ${key}`);
   assert.equal(stored.cycleMenstruelSuivi, false, 'Explicit opt-out must overwrite the previous true value');
   await submitChoice(stored.cycleMenstruelSuivi);
@@ -83,5 +90,21 @@ async function submitChoice(choice, values = {}) {
   assert.equal(stored.hydratation, '2L ou plus par jour');
   assert.equal(stored.allergiesAlimentaires, 'déclaration utilisateur');
   assert.equal(writes, 4);
+  await submitChoice(false, { tailleCm: '176', poidsKg: '72.5', age: '31' });
+  assert.equal(stored.tailleCm, 176); assert.equal(stored.poidsKg, 72.5); assert.equal(stored.age, 31);
+  const partial = await route.exports.PUT(new Request('https://coai.test/api/profil', {
+    method: 'PUT', body: JSON.stringify({ objectifs: 'nouvel objectif' }),
+  }));
+  assert.equal(partial.status, 200);
+  assert.equal(stored.tailleCm, 176); assert.equal(stored.poidsKg, 72.5); assert.equal(stored.age, 31);
+  const beforeInvalid = writes;
+  for (const values of [{ tailleCm: 'abc' }, { poidsKg: 'Infinity' }, { age: 'NaN' }]) {
+    await submitChoice(false, values, true);
+    assert.equal(writes, beforeInvalid, 'Non-finite input must not be serialized as deletion');
+  }
+  for (const data of [{ tailleCm: 0 }, { poidsKg: -1 }, { age: 2.5 }, { tailleCm: 301 }, { poidsKg: 401 }, { age: 121 }]) {
+    const response = await route.exports.PUT(new Request('https://coai.test/api/profil', { method: 'PUT', body: JSON.stringify(data) }));
+    assert.equal(response.status, 400); assert.equal(writes, beforeInvalid);
+  }
   console.log('PASS: actual form → route preserves opt-out, explicit cleared text and populated choices; persistence mocked.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

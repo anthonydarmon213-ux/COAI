@@ -13,9 +13,9 @@ const bodySchema = z.object({
   dureeSeanceMinutes: z.number().int().positive().max(240).optional(),
   contraintesSante: z.string().max(1000).optional(),
   antecedentsMedicaux: z.string().max(2000).optional(),
-  tailleCm: z.number().positive().max(300).optional(),
-  poidsKg: z.number().positive().max(400).optional(),
-  age: z.number().int().positive().max(120).optional(),
+  tailleCm: z.number().positive().max(300).nullable().optional(),
+  poidsKg: z.number().positive().max(400).nullable().optional(),
+  age: z.number().int().positive().max(120).nullable().optional(),
   sexe: z.enum(["Homme", "Femme", "Préfère ne pas dire"]).optional(),
   morphologie: z.string().max(50).optional(),
   frequenceEntrainement: z.enum([
