@@ -26,6 +26,8 @@ const route = load('src/app/api/mesures/route.ts', {
     mesure: { create: async ({ data }) => { writes++; return data; } } } },
 });
 let states, cursor, refs, refCursor, calls, compressions, refreshes, failure;
+const post = route.POST;
+route.POST = request => post({ ...request, headers: new Headers() });
 const form = load('src/components/suivi/mesure-form.tsx', {
   '@/lib/suivi/mesure-validation': validation,
   '@/lib/suivi/use-local-date-input': { useLocalDateInput: () => {
@@ -42,9 +44,9 @@ const form = load('src/components/suivi/mesure-form.tsx', {
   '@/components/ui/section-label': { SectionLabel: 'span' },
   '@/lib/images/compress-progress-photo': { compressProgressPhoto: async () => { compressions++; return { file: 'mock-file' }; } },
 }, {
-  HTMLInputElement: class {}, FormData: class { append() {} },
+  HTMLInputElement: class {}, FormData: class { append() {} }, crypto: require('node:crypto').webcrypto,
   fetch: async (url, init) => {
-    calls.push({ url, body: init.body });
+    calls.push({ url, body: init.body, headers: init.headers });
     if (failure === 'network') throw new TypeError('offline');
     if (failure === 'missing-photo-path' && url === '/api/mesures/photo') return { ok: true, json: async () => ({}) };
     if (failure === url) return { ok: false, json: async () => ({ error: 'Service indisponible' }) };
@@ -96,6 +98,8 @@ function submit() { return find(render(), n => n.type === 'form').props.onSubmit
     failure = null; await submit();
     assert.equal(calls.length, before + (mode === '/api/mesures' ? 1 : 2), 'Reuse a confirmed upload after measure failure only');
     assert.equal(refreshes, 1);
+    const measureCalls = calls.filter(c => c.url === '/api/mesures');
+    if (mode === '/api/mesures') assert.equal(measureCalls[0].headers['x-coai-request-id'], measureCalls[1].headers['x-coai-request-id']);
     assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '');
   }
   reset(); photo(); failure = '/api/mesures'; await submit();

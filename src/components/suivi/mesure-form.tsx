@@ -27,6 +27,7 @@ export function MesureForm() {
   const submitting = useRef(false);
   const photoInput = useRef<HTMLInputElement>(null);
   const uploadedPhoto = useRef<{ file: File; path: string } | null>(null);
+  const pendingRequest = useRef<{ body: string; id: string } | null>(null);
 
   function showErrors(form: HTMLFormElement, fields: MesureFieldErrors, message: string) {
     setFieldErrors(fields);
@@ -82,13 +83,14 @@ export function MesureForm() {
         uploadedPhoto.current = { file: photo, path: photoData.path };
       }
 
+      const body = JSON.stringify({ ...values, photoPath });
+      if (pendingRequest.current?.body !== body) {
+        pendingRequest.current = { body, id: crypto.randomUUID() };
+      }
       const res = await fetch("/api/mesures", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...values,
-          photoPath,
-        }),
+        headers: { "Content-Type": "application/json", "x-coai-request-id": pendingRequest.current.id },
+        body,
       });
       const data = await res.json();
       if (!res.ok) {
@@ -96,6 +98,7 @@ export function MesureForm() {
         return;
       }
       setPoidsKg("");
+      pendingRequest.current = null;
       setTourTailleCm("");
       setMasseGrassePourcent("");
       setMasseMusculaireKg("");
