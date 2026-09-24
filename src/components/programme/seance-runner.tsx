@@ -232,6 +232,7 @@ type SeanceSauvegardee = {
   substitutions?: Substitutions;
   seanceCondensee?: boolean;
   nomsRealises?: Record<string, string>;
+  coches?: Record<string, boolean>;
   repos?: { index: number; fin: number };
 };
 
@@ -251,6 +252,7 @@ function lireSauvegarde(nomSeance: string, cle: string | null): SeanceSauvegarde
     if (d.substitutions !== undefined && (!isPlainObject(d.substitutions) || !Object.values(d.substitutions).every((v) => isPlainObject(v) && typeof v.variante === "string" && typeof v.consigne === "string"))) return null;
     if (d.seanceCondensee !== undefined && typeof d.seanceCondensee !== "boolean") return null;
     if (d.nomsRealises !== undefined && (!isPlainObject(d.nomsRealises) || !Object.values(d.nomsRealises).every((v) => typeof v === "string"))) return null;
+    if (d.coches !== undefined && (!isPlainObject(d.coches) || !Object.entries(d.coches).every(([k, v]) => /^(ech|calme)-\d+$/.test(k) && typeof v === "boolean"))) return null;
     if (d.repos !== undefined && (!isPlainObject(d.repos) || !Number.isInteger(d.repos.index) || d.repos.index < 0 || typeof d.repos.fin !== "number" || !Number.isSafeInteger(d.repos.fin) || !Number.isFinite(new Date(d.repos.fin).getTime()))) return null;
     if (Date.now() - d.debut > EXPIRATION_H * 3600_000) {
       window.localStorage.removeItem(cle);
@@ -366,7 +368,7 @@ export function SeanceRunner({
   const [erreurBrouillon, setErreurBrouillon] = useState(false);
   const [premiereSeanceId, setPremiereSeanceId] = useState<string | null>(null);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
-  const [coches, setCoches] = useState<Record<string, boolean>>({});
+  const [coches, setCoches] = useState<Record<string, boolean>>(() => sauvegarde?.coches ?? {});
   const [realise, setRealise] = useState<Record<string, Realise>>(() => sauvegarde?.realise ?? {});
   const [nomsRealises, setNomsRealises] = useState<Record<string, string>>(() => sauvegarde?.nomsRealises ?? {});
   const [debut] = useState(() => sauvegarde?.debut ?? Date.now());
@@ -383,7 +385,7 @@ export function SeanceRunner({
     try {
       window.localStorage.setItem(
         cleBrouillon,
-        JSON.stringify({ nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos } satisfies SeanceSauvegardee)
+        JSON.stringify({ nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos, coches } satisfies SeanceSauvegardee)
       );
       // Résultat du stockage externe, impossible à déterminer pendant le rendu.
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -393,7 +395,7 @@ export function SeanceRunner({
       // après fermeture est garantie si les dernières saisies ne sont pas écrites.
       setErreurBrouillon(true);
     }
-  }, [termine, cleBrouillon, nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos]);
+  }, [termine, cleBrouillon, nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos, coches]);
   const bip = useBip();
 
   const step = steps[index];

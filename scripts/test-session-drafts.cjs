@@ -23,12 +23,20 @@ const draft = { nomSeance: 'Full body', debut: Date.now(), index: 2, realise: { 
 storage.set(a, JSON.stringify(draft));
 storage.set('coai:seance-en-cours', JSON.stringify(draft));
 Object.assign(context, { cleBrouillon: b, nomSeance: 'Full body', debut: Date.now(), index: 0, realise: {}, substitutions: {}, seanceCondensee: false, nomsRealises: {}, repos: undefined });
+context.coches = { 'ech-0': true, 'ech-1': false, 'calme-2': true };
 const write = source.match(/window\.localStorage\.setItem\(\s*cleBrouillon,[\s\S]*?\n      \);/);
 assert.ok(write, 'tester l’écriture réelle du lecteur');
 run(write[0]);
 context.a = a; context.b = b; context.other = other;
 assert.equal(run("lireSauvegarde('Full body', a).realise['0'].charge"), '20');
 assert.equal(run("lireSauvegarde('Full body', b).index"), 0);
+assert.equal(JSON.stringify(run("lireSauvegarde('Full body', b).coches")), JSON.stringify(context.coches));
+const initializer = source.match(/const \[coches, setCoches\] = useState<Record<string, boolean>>\((.*)\);/);
+assert.ok(initializer);
+context.sauvegarde = run("lireSauvegarde('Full body', b)");
+assert.equal(JSON.stringify(run(`(${initializer[1]})()`)), JSON.stringify(context.coches));
+context.sauvegarde = draft;
+assert.equal(JSON.stringify(run(`(${initializer[1]})()`)), '{}', 'old drafts remain compatible');
 assert.equal(run("lireSauvegarde('Full body', other)"), null);
 run('effacerSauvegarde(b)');
 assert.ok(storage.has(a)); assert.ok(!storage.has(b));
@@ -45,6 +53,9 @@ for (const invalid of [
   { ...draft, debut: Date.now() + 0.5 },
   { ...draft, index: -1 },
   { ...draft, realise: [] },
+  { ...draft, coches: [] },
+  { ...draft, coches: { 'ech-0': 'true' } },
+  { ...draft, coches: { unexpected: true } },
   { ...draft, realise: { '0': { reps: 10, charge: '20' } } },
   { ...draft, repos: { index: -1, fin: Date.now() } },
   { ...draft, repos: { index: 1, fin: 1e100 } },
@@ -67,7 +78,10 @@ const ast = ts.createSourceFile('runner.tsx', source, ts.ScriptTarget.Latest, tr
 let autosave;
 function visit(node) {
   if (ts.isCallExpression(node) && node.expression.getText(ast) === 'useEffect'
-    && node.arguments[0]?.getText(ast).includes('window.localStorage.setItem')) autosave = node.arguments[0].getText(ast);
+    && node.arguments[0]?.getText(ast).includes('window.localStorage.setItem')) {
+    autosave = node.arguments[0].getText(ast);
+    assert.ok(node.arguments[1].elements.some(element => element.getText(ast) === 'coches'), 'checking a step triggers autosave');
+  }
   ts.forEachChild(node, visit);
 }
 visit(ast);
@@ -85,6 +99,9 @@ context.window.localStorage.setItem = originalWrite;
 run(`(${autosave})()`);
 assert.equal(warning, false, 'successful retry clears warning');
 assert.equal(JSON.parse(storage.get(b)).index, context.index);
+context.coches = { ...context.coches, 'ech-0': false };
+run(`(${autosave})()`);
+assert.equal(JSON.parse(storage.get(b)).coches['ech-0'], false, 'unchecking also persists');
 for (const state of [{ termine: true, cleBrouillon: b }, { termine: false, cleBrouillon: null }]) {
   Object.assign(context, state);
   warning = null;
