@@ -389,6 +389,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }
 
     func clearLocalSession() {
+        RestReminderService.shared.resetLocalReminders()
         appleRecovery.cancel()
         appleRecoveryMessage = nil
         downloads.cancel()

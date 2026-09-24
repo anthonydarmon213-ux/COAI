@@ -253,7 +253,7 @@ struct COAIRootView: View {
             Button("Effacer les données et me déconnecter", role: .destructive) { browser.clearLocalSession() }
             Button("Annuler", role: .cancel) {}
         } message: {
-            Text("Les séances et séries non synchronisées seront perdues sur cet iPhone. Annule et enregistre ta séance avant de continuer. Cette action efface aussi la connexion et le cache. Ton compte, tes programmes et les séances déjà enregistrées sur COAI ne sont pas supprimés.")
+            Text("Les séances et séries non synchronisées seront perdues sur cet iPhone. Annule et enregistre ta séance avant de continuer. Cette action efface aussi la connexion, le cache, le minuteur et les rappels locaux. Ton compte, tes programmes et les séances déjà enregistrées sur COAI ne sont pas supprimés.")
         }
     }
 

@@ -35,6 +35,27 @@ final class COAIUITests: XCTestCase {
         disable.tap()
         XCTAssertTrue(app.staticTexts["Aucun rappel programmé"].waitForExistence(timeout: 5))
         XCTAssertFalse(disable.exists)
+        // Re-enable, then verify reset clears the OS schedule across relaunch.
+        save.tap()
+        XCTAssertTrue(disable.waitForExistence(timeout: 10))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.buttons["Options COAI"].waitForExistence(timeout: 15))
+        app.buttons["Options COAI"].tap()
+        app.buttons["Réinitialiser les données locales"].tap()
+        let confirmation = app.alerts.buttons["Effacer les données et me déconnecter"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        confirmation.tap()
+        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 1))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        reveal(reminder, in: app)
+        reminder.tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Aucun rappel programmé"].exists)
+        XCTAssertFalse(disable.exists)
     }
 
     @MainActor

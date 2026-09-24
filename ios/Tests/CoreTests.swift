@@ -2,6 +2,19 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testLocalReminderResetClearsOnlyOwnedPreferences() throws {
+        let suite = "coai-reminder-reset-test-" + UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        for key in LocalReminderPreferences.keys { defaults.set(123, forKey: key) }
+        defaults.set("keep", forKey: "unrelated-setting")
+        LocalReminderPreferences.reset(in: defaults)
+        for key in LocalReminderPreferences.keys { XCTAssertNil(defaults.object(forKey: key)) }
+        XCTAssertEqual(defaults.string(forKey: "unrelated-setting"), "keep")
+        XCTAssertEqual(Set(LocalReminderPreferences.notificationIdentifiers).count, 2)
+        LocalReminderPreferences.reset(in: defaults)
+        XCTAssertEqual(defaults.string(forKey: "unrelated-setting"), "keep")
+    }
     func testWeeklyReminderUsesLocalCalendarAndRejectsCorruptValues() throws {
         for day in 1...7 {
             let plan = try XCTUnwrap(WeeklyReminderPlan(weekday: day, hour: 18, minute: 30))

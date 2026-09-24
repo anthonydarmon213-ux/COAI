@@ -12,8 +12,9 @@ struct WeeklyReminderView: View {
     @State private var busy = false
     @State private var denied = false
     @State private var revision = 0
+    @State private var loaded = false
     private let center = UNUserNotificationCenter.current()
-    private let identifier = "coai.wellness.weekly"
+    private let identifier = LocalReminderPreferences.weeklyIdentifier
     private let days = [(2, "Lundi"), (3, "Mardi"), (4, "Mercredi"), (5, "Jeudi"), (6, "Vendredi"), (7, "Samedi"), (1, "Dimanche")]
 
     var body: some View {
@@ -23,7 +24,7 @@ struct WeeklyReminderView: View {
                     .font(.title2.bold())
                 Text("Un rappel par semaine pour retrouver COAI et préparer ta prochaine séance. Facultatif, uniquement sur cet iPhone.")
                     .foregroundStyle(.secondary)
-                Text(scheduled ?? "Aucun rappel programmé")
+                Text(loaded ? (scheduled ?? "Aucun rappel programmé") : "Vérification du rappel…")
                     .accessibilityIdentifier("weekly-reminder-status")
             }
             Section("Choisir mon moment") {
@@ -42,7 +43,7 @@ struct WeeklyReminderView: View {
                         scheduled = nil; message = "Rappel désactivé sur cet iPhone."
                     }.frame(minHeight: 44).accessibilityIdentifier("weekly-reminder-disable")
                 }
-            }.disabled(busy)
+            }.disabled(busy || !loaded)
             if busy { ProgressView("Enregistrement…") }
             if let message { Section { Text(message).accessibilityIdentifier("weekly-reminder-message") } }
             if denied {
@@ -71,6 +72,7 @@ struct WeeklyReminderView: View {
         let settings = await center.notificationSettings()
         let requests = await center.pendingNotificationRequests()
         guard !busy, revision == current else { return }
+        loaded = true
         let wasDenied = denied
         denied = settings.authorizationStatus == .denied
         if let trigger = requests.first(where: { $0.identifier == identifier })?.trigger as? UNCalendarNotificationTrigger,
@@ -125,7 +127,7 @@ struct WeeklyReminderView: View {
 @MainActor
 final class RestReminderService: ObservableObject {
     static let shared = RestReminderService()
-    private static let identifier = "coai.rest.finished"
+    private static let identifier = LocalReminderPreferences.restIdentifier
     private let center = UNUserNotificationCenter.current()
     @Published private var permissionMessage: String?
     @Published private var schedulingMessage: String?
@@ -160,6 +162,16 @@ final class RestReminderService: ObservableObject {
     func update(enabled: Bool, endsAt: Double) {
         queue.update(end: enabled && endsAt.isFinite && endsAt > Date().timeIntervalSince1970
             ? Date(timeIntervalSince1970: endsAt) : nil)
+    }
+
+    func resetLocalReminders() {
+        // Queue invalidation also clears an add that finishes after cancellation.
+        queue.update(end: nil)
+        center.removePendingNotificationRequests(withIdentifiers: LocalReminderPreferences.notificationIdentifiers)
+        center.removeDeliveredNotifications(withIdentifiers: LocalReminderPreferences.notificationIdentifiers)
+        LocalReminderPreferences.reset()
+        permissionMessage = nil
+        schedulingMessage = nil
     }
 
     // Only called by the explicit switch, never on launch or timer start.

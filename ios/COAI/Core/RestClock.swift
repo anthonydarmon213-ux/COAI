@@ -1,5 +1,17 @@
 import Foundation
 
+enum LocalReminderPreferences {
+    static let restIdentifier = "coai.rest.finished"
+    static let weeklyIdentifier = "coai.wellness.weekly"
+    static let notificationIdentifiers = [restIdentifier, weeklyIdentifier]
+    static let keys = ["coai.rest.endsAt", "coai.rest.minutes", "coai.rest.seconds",
+                       "coai.rest.pausedSeconds", "coai.rest.notify"]
+
+    static func reset(in defaults: UserDefaults = .standard) {
+        keys.forEach { defaults.removeObject(forKey: $0) }
+    }
+}
+
 /// Calendar weekday uses Apple's convention: Sunday = 1, Monday = 2.
 /// Leave timezone unset so the reminder follows the iPhone's local clock.
 struct WeeklyReminderPlan: Equatable {
