@@ -18,6 +18,25 @@ function load(file) {
 }
 const exportsObject = load(path.resolve('src/lib/daily/session.ts'));
 const { adaptWorkout } = exportsObject;
+const {resolveDailyContext} = load(path.resolve('src/lib/daily/context.ts'));
+const contextDate = new Date(2026, 8, 24);
+const contextSource = {jour: 'Jeudi', nom: 'Séance actuelle', exercices: []};
+const contextProgramme = {id: 'current', version: 2, contenu: {seances: [contextSource]}};
+const contextDaily = {programmeSourceId: 'current', programmeVersion: 2, sourceSession: contextSource, sleep: 'BON', completedAt: null};
+assert.equal(resolveDailyContext(contextProgramme, contextDaily, contextDate).initialDaily, contextDaily);
+for (const stale of [{...contextDaily, programmeSourceId: 'old'}, {...contextDaily, programmeVersion: 1}, {...contextDaily, sourceSession: null}]) {
+  const result = resolveDailyContext(contextProgramme, stale, contextDate);
+  assert.equal(result.changed, true);
+  assert.equal(result.initialDaily, null);
+  assert.equal(result.sourceSession, contextSource);
+}
+const completedDaily = {...contextDaily, programmeSourceId: 'old', programmeVersion: 1, completedAt: new Date(), sourceSession: {...contextSource, nom: 'Séance terminée'}};
+const completedContext = resolveDailyContext({...contextProgramme, contenu: {seances: []}}, completedDaily, contextDate);
+assert.equal(completedContext.sourceSession, completedDaily.sourceSession);
+assert.equal(completedContext.initialDaily, completedDaily);
+assert.equal(completedContext.programmeVersion, 1);
+assert.equal(resolveDailyContext(null, completedDaily, contextDate).sourceSession, null, 'No bypass without accessible programme');
+console.log('PASS daily context: changed programme requires check-in; completed snapshot/version retained; no programme bypass');
 const originalOnly = { nom: 'Sans finisher ajouté', exercices: [{ nom: 'Leg curl (machine)', series: 3 }] };
 const normalised = exportsObject.ensureWorkoutCompleteness(originalOnly);
 assert.equal(JSON.stringify(normalised.exercices), JSON.stringify(originalOnly.exercices), 'Do not append an unapproved automatic finisher');

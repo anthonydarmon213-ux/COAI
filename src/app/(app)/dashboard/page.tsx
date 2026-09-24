@@ -9,7 +9,8 @@ import { getCoaiInsight } from "@/lib/insight/coai-insight";
 import { computeProfilCompletion } from "@/lib/profil/completion";
 import { contentAccessFor } from "@/lib/subscription/content-access";
 import { OffresCard } from "@/components/dashboard/offres-card";
-import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
+import { getSessionDuration, type WorkoutSession } from "@/lib/daily/session";
+import { resolveDailyContext } from "@/lib/daily/context";
 import { recommanderServiceDepuisProfil } from "@/lib/dashboard/besoins-identifies";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
@@ -118,7 +119,8 @@ export default async function DashboardPage() {
   const capitalPhysique = construireCapitalPhysique(testsPhysiques, user.profile);
 
   const programme = accessibleTraining(validated, latest);
-  const sourceSession = programme ? getWorkoutForDate(programme.contenu, date) : null;
+  const dailyContext = resolveDailyContext(programme, daily, date);
+  const { sourceSession, initialDaily } = dailyContext;
   const pendingCoach = Boolean(!validated && latest?.statut === "EN_ATTENTE");
   const nomSeance = sourceSession?.nom ? nomSeanceCourt(String(sourceSession.nom)) : null;
   const objective = nomSeance ? `Aujourd’hui : ${nomSeance}.` : "Une journée utile, adaptée à ton rythme.";
@@ -160,7 +162,15 @@ export default async function DashboardPage() {
             cta: "Tester RepCount gratuitement →",
           }
       : sourceSession
-        ? !daily?.sleep
+        ? initialDaily?.completedAt
+          ? {
+              kicker: "Ta mission du jour",
+              title: "Ta séance est enregistrée.",
+              description: "Retrouve ta séance terminée et son bilan. Ton historique est conservé.",
+              href: "#check-in-du-jour",
+              cta: "Voir mon bilan →",
+            }
+          : !initialDaily?.sleep
           ? {
               kicker: "Ta mission du jour",
               title: "Fais ton bilan du jour — 30 secondes.",
@@ -250,12 +260,14 @@ export default async function DashboardPage() {
             )
           ) : sourceSession ? (
             <div id="check-in-du-jour" className="scroll-mt-6">
+              {dailyContext.changed && <p role="status" className="mb-4 text-sm text-graphite-300">Ton programme a changé. Confirme ton bilan pour adapter cette nouvelle séance.</p>}
               <DailyExperience
+                key={`${programme.id}:${dailyContext.programmeVersion}:${dailyContext.changed}`}
                 sourceSession={sourceSession as WorkoutSession}
-                initialDaily={daily}
+                initialDaily={initialDaily}
                 expectedMinutes={getSessionDuration(sourceSession, user.profile?.dureeSeanceMinutes ?? 45)}
                 pendingCoach={pendingCoach}
-                programmeVersion={programme.version}
+                programmeVersion={dailyContext.programmeVersion}
                 equipementProfil={user.profile?.equipementDisponible}
               />
             </div>
@@ -265,7 +277,7 @@ export default async function DashboardPage() {
               <h2 className="mt-3 font-editorial text-3xl text-white sm:text-4xl">Aujourd&rsquo;hui, ton programme prévoit du repos.</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300">Reste à l&rsquo;écoute de ton corps ; une marche légère ou un peu de mobilité peuvent convenir seulement si tu te sens bien.</p>
               {pendingCoach && <p className="mt-4 text-sm font-semibold text-laiton-300">Programme V{programme.version} — à valider par ton coach.</p>}
-              <RestDayCheckin initialDaily={daily} />
+              <RestDayCheckin key={`${programme.id}:${programme.version}:${dailyContext.changed}`} initialDaily={initialDaily} />
             </section>
           )}
         </div>

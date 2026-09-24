@@ -252,6 +252,9 @@ async function main() {
   assert.equal(rest.programmeVersion, training.version + 1);
   const trainingContent = {...legacyContent, seances: [{...legacyContent.seances[0], jour: dayName}]};
   await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: trainingContent}});
+  const changedDashboard = await fetch(origin + '/dashboard', {headers: a.cookie});
+  assert.equal(changedDashboard.status, 200);
+  assert((await changedDashboard.text()).includes('Confirme ton bilan pour adapter cette nouvelle séance.'));
   assert.equal((await postDaily(checkin)).status, 200);
   assert.equal((await postDaily({action: 'complete'})).status, 200);
   const completed = await db.dailySession.findUnique({where: {id: rest.id}});
@@ -262,6 +265,12 @@ async function main() {
   await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: restContent}});
   assert.equal((await postDaily(checkin)).status, 409);
   assert.deepEqual(await db.dailySession.findUnique({where: {id: rest.id}}), completed);
+  const completedDashboard = await fetch(origin + '/dashboard', {headers: a.cookie});
+  assert.equal(completedDashboard.status, 200);
+  const completedHTML = await completedDashboard.text();
+  assert(completedHTML.includes('Séance historique'));
+  assert(completedHTML.includes('Retrouve ta séance terminée et son bilan.'));
+  assert(!completedHTML.includes('ton programme prévoit du repos'));
   console.log('PASS HTTP daily lifecycle: rest clears unfinished adaptation; completed snapshot survives concurrent check-ins and programme change');
   // A completed profile with a declared constraint must not get a generic programme.
   await db.user.update({where: {id: b.user.id}, data: {programmeUnlockedAt: new Date()}});
