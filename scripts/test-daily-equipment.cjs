@@ -101,6 +101,17 @@ const finishedNodes = render(gym.session, '2026-09-24T12:00:00.000Z');
 assert.ok(finishedNodes.some(n => n.props?.role === 'status' && /Séance terminée et enregistrée/.test(n.props.children)));
 assert.ok(!finishedNodes.some(n => n.props?.children === 'Progression de la séance'), 'Completed sessions must not show a reset or invented percentage');
 assert.ok(render(gym.session).some(n => n.props?.children === 'Progression de la séance'), 'Keep live progress for unfinished sessions');
+for (const label of ['Échauffement terminé', 'Retour au calme terminé']) {
+  assert.ok(!finishedNodes.some(n => n.type === 'button' && n.props.children === label));
+  assert.ok(render(gym.session).some(n => n.type === 'button' && n.props.children === label && n.props.className.includes('min-h-11')));
+}
+for (const card of finishedNodes.filter(n => n.type?.name === 'Exercise')) {
+  assert.equal(card.props.readOnly, true);
+  const opened = nodes(card.type({...card.props, active: true}));
+  assert.ok(opened.some(n => n.type === 'video'), 'Completed workout keeps its video accessible');
+  assert.ok(!opened.some(n => n.type === 'button' && n.props.onClick === card.props.onDone), 'No false editing in completed history');
+  assert.ok(opened.some(n => n.type === 'button' && n.props['aria-expanded'] === true));
+}
 const mobility = adaptWorkout(source, { ...checkin, chargeMentale: 'SATUREE' }, 60);
 assert.ok(render(mobility.session).some(n => n.props?.children === 'Commencer ma séance'), 'Keep the existing guided recovery flow');
 for (const entries of [[{ nom: 'Hip thrust barre' }, { nom: 'Leg curl allongé', series: 3 }], [{ nom: 'Hip thrust barre' }], [null, 42]]) {
@@ -121,6 +132,9 @@ for (const entries of [[{ nom: 'Hip thrust barre' }, { nom: 'Leg curl allongé',
     assert.equal(tree.some(n => n.props?.children === 'Commencer ma séance'), expected.length > 0);
     for (const card of cards) {
       const opened = nodes(card.type({ ...card.props, active: true }));
+      const toggle = opened.find(n => n.type === 'button' && n.props['aria-pressed'] === false);
+      assert.ok(toggle.props['aria-label'].includes(card.props.data.nom));
+      assert.match(toggle.props.className, /h-11 w-11/);
       assert.ok(opened.some(n => n.type === 'video' && n.props.nom === 'Leg curl (machine)'));
       assert.ok(opened.some(n => n.type === 'image' && n.props.src.startsWith('/exercices/')));
       const closed = nodes(card.type({ ...card.props, active: false }));

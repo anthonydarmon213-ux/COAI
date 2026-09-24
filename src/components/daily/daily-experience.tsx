@@ -80,6 +80,7 @@ function Exercise({
   active,
   done,
   core,
+  readOnly,
   onOpen,
   onDone,
 }: {
@@ -88,6 +89,7 @@ function Exercise({
   active: boolean;
   done: boolean;
   core: boolean;
+  readOnly: boolean;
   onOpen: () => void;
   onDone: () => void;
 }) {
@@ -96,10 +98,10 @@ function Exercise({
   return (
     <div className={`overflow-hidden rounded-2xl border transition ${done ? "border-emerald-500/30 bg-emerald-500/[0.05]" : active ? "border-laiton-400/40 bg-laiton-400/[0.06]" : "border-white/[0.07] bg-black/15"}`}>
       <div className="flex items-center gap-3 p-3.5 sm:p-4">
-        <button type="button" aria-label={done ? "Marquer comme non fait" : "Marquer comme fait"} onClick={onDone} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs transition ${done ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-laiton-400/30 text-laiton-300 hover:border-laiton-300"}`}>
+        {readOnly ? <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 text-xs text-graphite-400">{index + 1}</span> : <button type="button" aria-label={`${done ? "Marquer comme non fait" : "Marquer comme fait"} : ${nom}`} aria-pressed={done} onClick={onDone} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-xs transition ${done ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-laiton-400/30 text-laiton-300 hover:border-laiton-300"}`}>
           {done ? "✓" : index + 1}
-        </button>
-        <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
+        </button>}
+        <button type="button" aria-expanded={active} onClick={onOpen} className="min-h-11 min-w-0 flex-1 text-left">
           <div className="flex flex-wrap items-center gap-2">
             <h4 className={`text-sm font-semibold ${done ? "text-graphite-400 line-through" : "text-white"}`}>{String(data.nom ?? `Exercice ${index + 1}`)}</h4>
             {core && <span className="rounded-full border border-violet-400/25 bg-violet-400/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-violet-200">Abdos & gainage</span>}
@@ -110,7 +112,7 @@ function Exercise({
             {data.repos != null && <span>Repos {String(data.repos)}</span>}
           </div>
         </button>
-        <button type="button" aria-label={active ? "Replier l'exercice" : "Afficher les consignes"} onClick={onOpen} className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-xs text-graphite-400 transition ${active ? "rotate-180 border-laiton-400/30 text-laiton-300" : ""}`}>⌄</button>
+        <button type="button" aria-label={`${active ? "Replier l'exercice" : "Afficher les consignes"} : ${nom}`} aria-expanded={active} onClick={onOpen} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 text-xs text-graphite-400 transition ${active ? "rotate-180 border-laiton-400/30 text-laiton-300" : ""}`}>⌄</button>
       </div>
       {active && (
         <div className="border-t border-white/[0.07] px-4 py-4 sm:pl-16">
@@ -123,7 +125,7 @@ function Exercise({
           </div>
           {data.charge != null && <p className="text-xs leading-5 text-graphite-200"><span className="text-laiton-300">Repère d’effort — </span>{String(data.charge)}</p>}
           {data.methode != null && <p className="mt-2 text-[11px] text-graphite-500">Méthode : {String(data.methode)}</p>}
-          <button type="button" onClick={onDone} className={`mt-4 w-full rounded-full border px-4 py-2 text-xs font-semibold transition sm:w-auto ${done ? "border-emerald-500/30 text-emerald-300" : "border-laiton-400/30 text-laiton-200 hover:bg-laiton-400/10"}`}>{done ? "Exercice terminé ✓" : "J’ai terminé cet exercice"}</button>
+          {!readOnly && <button type="button" onClick={onDone} className={`mt-4 min-h-11 w-full rounded-full border px-4 py-2 text-xs font-semibold transition sm:w-auto ${done ? "border-emerald-500/30 text-emerald-300" : "border-laiton-400/30 text-laiton-200 hover:bg-laiton-400/10"}`}>{done ? "Exercice terminé ✓" : "J’ai terminé cet exercice"}</button>}
         </div>
       )}
     </div>
@@ -220,6 +222,7 @@ export function DailyExperience({
   const checkinReady = missingCheckinAnswers === 0;
 
   function toggleStep(key: string) {
+    if (daily?.completedAt) return;
     progressStore.update((current) => {
       const next = new Set(current.steps);
       if (next.has(key)) next.delete(key);
@@ -229,6 +232,7 @@ export function DailyExperience({
   }
 
   function completeExercise(index: number) {
+    if (daily?.completedAt) return;
     toggleStep(`exercise-${index}`);
     const next = exercises.findIndex((_, candidate) => candidate > index && !completedSteps.has(`exercise-${candidate}`));
     setActiveExercise(next >= 0 ? next : null);
@@ -390,29 +394,29 @@ export function DailyExperience({
               {activeSession.echauffement && (
                 <details className="group rounded-2xl border border-amber-400/20 bg-amber-400/[0.04]" open={started}>
                   <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none">
-                    <button type="button" onClick={(event) => { event.preventDefault(); toggleStep("warmup"); }} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("warmup") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-amber-400/30 text-amber-200"}`}>{completedSteps.has("warmup") ? "✓" : "↗"}</button>
+                    <span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("warmup") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-amber-400/30 text-amber-200"}`}>{completedSteps.has("warmup") ? "✓" : "↗"}</span>
                     <div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-amber-200">01 · Échauffement</p><p className="mt-0.5 text-xs text-graphite-400">Prépare ton corps avant les séries de travail</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span>
                   </summary>
-                  <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.echauffement}</p><button type="button" onClick={() => toggleStep("warmup")} className="mt-3 rounded-full border border-amber-400/25 px-4 py-2 text-xs text-amber-100">{completedSteps.has("warmup") ? "Échauffement terminé ✓" : "Échauffement terminé"}</button></div>
+                  <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.echauffement}</p>{!daily?.completedAt && <button type="button" aria-pressed={completedSteps.has("warmup")} onClick={() => toggleStep("warmup")} className="mt-3 min-h-11 rounded-full border border-amber-400/25 px-4 py-2 text-xs text-amber-100">{completedSteps.has("warmup") ? "Échauffement terminé ✓" : "Échauffement terminé"}</button>}</div>
                 </details>
               )}
 
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-laiton-300">02 · Renforcement principal</p><span className="text-[10px] text-graphite-500">{mainExercises.length} exercices</span></div>
-                {mainExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core={false} active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}
+                {mainExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core={false} readOnly={Boolean(daily?.completedAt)} active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}
               </div>
 
               {coreExercises.length > 0 && (
                 <div className="rounded-2xl border border-violet-400/20 bg-violet-400/[0.035] p-3 sm:p-4">
                   <div className="mb-3 flex items-center justify-between"><div><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-violet-200">03 · Finisher abdos & gainage</p><p className="mt-1 text-xs text-graphite-400">Le dernier bloc de ta séance</p></div><span className="text-xl">◉</span></div>
-                  <div className="flex flex-col gap-2.5">{coreExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}</div>
+                  <div className="flex flex-col gap-2.5">{coreExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core readOnly={Boolean(daily?.completedAt)} active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}</div>
                 </div>
               )}
 
               {activeSession.retourAuCalme && (
                 <details className="group rounded-2xl border border-sky-400/20 bg-sky-400/[0.035]" open={progress >= 70}>
-                  <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none"><button type="button" onClick={(event) => { event.preventDefault(); toggleStep("cooldown"); }} className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("cooldown") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-sky-400/30 text-sky-200"}`}>{completedSteps.has("cooldown") ? "✓" : "↓"}</button><div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-sky-200">04 · Retour au calme</p><p className="mt-0.5 text-xs text-graphite-400">5 à 8 minutes pour faire redescendre le rythme</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span></summary>
-                  <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.retourAuCalme}</p><button type="button" onClick={() => toggleStep("cooldown")} className="mt-3 rounded-full border border-sky-400/25 px-4 py-2 text-xs text-sky-100">{completedSteps.has("cooldown") ? "Retour au calme terminé ✓" : "Retour au calme terminé"}</button></div>
+                  <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none"><span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("cooldown") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-sky-400/30 text-sky-200"}`}>{completedSteps.has("cooldown") ? "✓" : "↓"}</span><div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-sky-200">04 · Retour au calme</p><p className="mt-0.5 text-xs text-graphite-400">5 à 8 minutes pour faire redescendre le rythme</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span></summary>
+                  <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.retourAuCalme}</p>{!daily?.completedAt && <button type="button" aria-pressed={completedSteps.has("cooldown")} onClick={() => toggleStep("cooldown")} className="mt-3 min-h-11 rounded-full border border-sky-400/25 px-4 py-2 text-xs text-sky-100">{completedSteps.has("cooldown") ? "Retour au calme terminé ✓" : "Retour au calme terminé"}</button>}</div>
                 </details>
               )}
             </div>
