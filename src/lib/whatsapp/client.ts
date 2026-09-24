@@ -19,7 +19,7 @@ export async function notifyMakeScenario(payload: NotifyMakePayload): Promise<vo
   }
 
   try {
-    await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -27,8 +27,13 @@ export async function notifyMakeScenario(payload: NotifyMakePayload): Promise<vo
       // No automatic retry: avoid duplicate deliveries and additional usage.
       signal: AbortSignal.timeout(5_000),
     });
-  } catch (err) {
-    console.error("[whatsapp] Échec de la notification Make.com", err);
+    if (!response.ok) {
+      console.error("[whatsapp] Notification Make.com refusée par le service distant");
+    }
+  } catch {
+    // Errors may include the webhook URL (secret) or request data. Do not log
+    // them, and never retry an optional paid workflow automatically.
+    console.error("[whatsapp] Notification Make.com indisponible ou délai dépassé");
   }
 }
 

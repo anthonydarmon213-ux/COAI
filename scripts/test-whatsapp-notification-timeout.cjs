@@ -8,9 +8,10 @@ const code = ts.transpileModule(fs.readFileSync('src/lib/whatsapp/client.ts', 'u
 }).outputText;
 async function check(configured, mode) {
   let calls = 0, signalRequested = false, receivedSignal;
+  const errors = [];
   const controller = new AbortController();
   const box = { exports: {}, process: { env: configured ? { MAKE_OUTGOING_WEBHOOK_URL: 'https://example.invalid/mock' } : {} },
-    console: { warn() {}, error() {} },
+    console: { warn() {}, error(...args) { errors.push(args); } },
     AbortSignal: { timeout: ms => {
       assert.equal(ms, 5000); signalRequested = true;
       return controller.signal;
@@ -19,7 +20,7 @@ async function check(configured, mode) {
       calls++;
       receivedSignal = options.signal;
       assert.equal(options.signal, controller.signal, 'External notifier requires a bounded wait');
-      if (mode === 'network') throw new Error('offline');
+      if (mode === 'network') throw new Error('secret webhook URL and private profile');
       if (mode === 'hung') return new Promise((resolve, reject) => {
         options.signal.addEventListener('abort', () => reject(new Error('deadline')), { once: true });
         queueMicrotask(() => controller.abort());
@@ -33,6 +34,9 @@ async function check(configured, mode) {
   assert.equal(signalRequested, configured);
   if (configured) assert.equal(receivedSignal, controller.signal);
   if (configured && mode === 'hung') assert.equal(controller.signal.aborted, true);
+  assert.ok(!JSON.stringify(errors).includes('secret'));
+  assert.ok(errors.every(args => args.length === 1 && typeof args[0] === 'string'), 'Never log raw errors or response bodies');
+  assert.equal(errors.length, configured && mode !== 'success' ? 1 : 0);
 }
 (async () => {
   await check(false);
