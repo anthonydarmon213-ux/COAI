@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 
 const JOUR_MS = 24 * 60 * 60 * 1000;
 
@@ -10,11 +11,8 @@ export async function GET() {
   if (!authUser) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   const depuis = new Date(Date.now() - 30 * JOUR_MS);
-  const seances = await prisma.seanceLog.findMany({
-    where: { user: { supabaseAuthId: authUser.id }, date: { gte: depuis } },
-    orderBy: { date: "asc" },
-    select: { date: true },
-  });
+  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id }, select: { id: true } });
+  const seances = user ? await workoutHistory(user.id, { from: depuis, order: "asc" }) : [];
   if (seances.length === 0) return NextResponse.json({ error: "Pas encore de bilan disponible" }, { status: 404 });
 
   const semainesActives = new Set(
