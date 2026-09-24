@@ -17,6 +17,8 @@ export type MuscleSlug =
 type Regle = { motifs: string[]; muscles: MuscleSlug[]; vue: "front" | "back" };
 
 const REGLES: Regle[] = [
+  // Le curl de jambes doit précéder le mot générique « curl » des bras.
+  { motifs: ["leg curl", "curl ischio"], muscles: ["hamstring"], vue: "back" },
   // — Pectoraux / poussée horizontale
   { motifs: ["développé couché", "developpe couche", "bench press", "presse pectoraux", "chest press", "écarté", "ecarte", "fly", "pompe", "push-up", "push up", "dips"],
     muscles: ["chest", "triceps", "deltoids"], vue: "front" },

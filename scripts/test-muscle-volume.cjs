@@ -4,6 +4,15 @@ const muscles=load('src/lib/exercices/muscles.ts');
 const {volumeParMuscle}=load('src/lib/suivi/volume-musculaire.ts',id=>{assert.equal(id,'@/lib/exercices/muscles');return muscles;});
 const session=exercices=>({date:new Date(),exercices});
 assert.ok(muscles.musclesPourExercice('Squat'));
+for (const nom of ['Leg curl (machine)', 'Leg curl allongé', 'Curl ischio TRX']) {
+  const cible = muscles.musclesPourExercice(nom);
+  assert.deepEqual(Array.from(cible.muscles), ['hamstring']);
+  assert.equal(cible.vue, 'back');
+  const volume = volumeParMuscle([session([{nom,sets:[{reps:10,charge:20}]}])]);
+  assert.ok(volume.volumes.hamstring > 0);
+  assert.ok(!volume.volumes.biceps);
+}
+assert.ok(muscles.musclesPourExercice('Curl biceps haltères').muscles.includes('biceps'));
 const valid=volumeParMuscle([session([{nom:'Squat',sets:[{reps:10,charge:20}]}])]);
 assert.equal(valid.total,200);
 const invalid=volumeParMuscle([session([{nom:'Squat',sets:[{reps:10,charge:20},{reps:1e308,charge:1e308},{reps:-10,charge:10},null]}])]);
