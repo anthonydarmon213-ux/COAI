@@ -310,6 +310,7 @@ export function SeanceRunner({
   const [voixSupportee] = useState(() => voixDisponible());
   const [coachParle, setCoachParle] = useState(false);
   const [questionEnCours, setQuestionEnCours] = useState(false);
+  const questionEnCoursRef = useRef(false);
   const [reponseCoach, setReponseCoach] = useState<string | null>(null);
 
   // Interrompre la voix lorsque le lecteur est fermé.
@@ -566,16 +567,25 @@ export function SeanceRunner({
   // voix haute. Le prompt côté serveur reçoit déjà ce contexte (cf.
   // coach-question.ts) : pas de nouvelle route, pas de duplication.
   function poserQuestionAuCoach() {
+    if (questionEnCoursRef.current) return;
     const reco = creerReconnaissance();
     if (!reco || questionEnCours) return;
+    questionEnCoursRef.current = true;
+    let resultatRecu = false;
+    const libererQuestion = () => {
+      questionEnCoursRef.current = false;
+      setQuestionEnCours(false);
+    };
     setQuestionEnCours(true);
     setReponseCoach(null);
     stopperVoix();
 
     reco.onresult = async (e) => {
+      if (resultatRecu) return;
+      resultatRecu = true;
       const question = e.results?.[0]?.[0]?.transcript?.trim() ?? "";
       if (!question) {
-        setQuestionEnCours(false);
+        libererQuestion();
         return;
       }
       try {
@@ -590,18 +600,22 @@ export function SeanceRunner({
             }
           : { sessionName: nomSeance };
 
-        const res = await fetch("/api/coach/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            // Contrainte de brièveté portée par la question elle-même : en
-            // pleine séance, une réponse longue est inutilisable, et lue à
-            // voix haute elle devient interminable.
-            question: `${question}\n\n(Réponds en 2 phrases courtes maximum, je suis en pleine séance.)`,
-            context: contexte,
-          }),
+        const { res, data } = await withRequestDeadline(async (signal) => {
+          const res = await fetch("/api/coach/ask", {
+            method: "POST",
+            signal,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              // Contrainte de brièveté portée par la question elle-même : en
+              // pleine séance, une réponse longue est inutilisable, et lue à
+              // voix haute elle devient interminable.
+              question: `${question}\n\n(Réponds en 2 phrases courtes maximum, je suis en pleine séance.)`,
+              context: contexte,
+            }),
+          });
+          const data = await res.json().catch(() => null);
+          return { res, data };
         });
-        const data = await res.json().catch(() => null);
         const reponse = typeof data?.answer === "string" ? data.answer : null;
         if (!res.ok || !reponse) {
           const message = typeof data?.error === "string" ? data.error : "Je n'ai pas pu répondre, réessaie.";
@@ -619,12 +633,23 @@ export function SeanceRunner({
       } catch {
         setReponseCoach("Connexion impossible pour le moment.");
       } finally {
-        setQuestionEnCours(false);
+        libererQuestion();
       }
     };
-    reco.onerror = () => setQuestionEnCours(false);
-    reco.onend = () => setQuestionEnCours(false);
-    reco.start();
+    // La fin du micro n'est pas la fin de la requête au coach.
+    reco.onerror = () => {
+      if (!resultatRecu) {
+        setReponseCoach("Le microphone n’est pas disponible. Vérifie son autorisation puis réessaie.");
+        libererQuestion();
+      }
+    };
+    reco.onend = () => { if (!resultatRecu) libererQuestion(); };
+    try {
+      reco.start();
+    } catch {
+      setReponseCoach("Le microphone n’est pas disponible. Réessaie dans un instant.");
+      libererQuestion();
+    }
   }
 
   function suivant() {
@@ -954,7 +979,7 @@ export function SeanceRunner({
                     : "border-white/15 bg-white/[0.04] text-graphite-300 hover:border-laiton-400/40 hover:text-white"
                 }`}
               >
-                {questionEnCours ? "🎙️ Je t'écoute…" : "🎙️ Poser une question au coach"}
+                {questionEnCours ? "🎙️ Question en cours…" : "🎙️ Poser une question au coach"}
               </button>
             )}
             {prochainSet && (
