@@ -370,7 +370,7 @@ export async function PilierPage({
                 <div className="flex items-center gap-2">
                   {affiche?.statut === "EN_ATTENTE" && <Badge tone="warning">Non relu par le coach · accessible</Badge>}
                   {valide && (
-                    <Badge tone="success">Généré par l&apos;IA · Supervisé par Anthony Darmon</Badge>
+                    <Badge tone="success">Programme validé par le coach</Badge>
                   )}
                   {!valide && genereIA && estSocleCoai(affiche?.contenu) && (
                     <Badge tone="success">Programme COAI · conçu par Anthony Darmon</Badge>
