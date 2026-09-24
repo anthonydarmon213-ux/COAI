@@ -310,6 +310,12 @@ private struct COAIExplorerView: View {
                     entry("Abonnement", "creditcard", "native:subscription")
                 }
                 Section("Au quotidien") {
+                    NavigationLink {
+                        WeeklyReminderView()
+                    } label: {
+                        Label("Mon rappel hebdomadaire", systemImage: "bell.badge")
+                            .frame(minHeight: 44)
+                    }.accessibilityIdentifier("weekly-reminder-open")
                     entry("Aujourd’hui", "sun.max", "/dashboard")
                     entry("Mon entraînement", "dumbbell", "/programme/entrainement")
                     entry("RepCount", "chart.bar", "/suivi/repcount")

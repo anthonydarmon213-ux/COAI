@@ -2,6 +2,42 @@ import XCTest
 
 final class COAIUITests: XCTestCase {
     @MainActor
+    func testWeeklyReminderIsOptInAndCanBeDisabled() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        let reminder = app.buttons["weekly-reminder-open"]
+        reveal(reminder, in: app)
+        reminder.tap()
+        let save = app.buttons["weekly-reminder-save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        XCTAssertFalse(springboard.alerts.firstMatch.exists, "Opening settings must not request permission")
+        reveal(save, in: app)
+        save.tap()
+        if springboard.alerts.firstMatch.waitForExistence(timeout: 3) {
+            let allow = springboard.alerts.buttons.matching(NSPredicate(format: "label == 'Autoriser' OR label == 'Allow'")).firstMatch
+            XCTAssertTrue(allow.exists)
+            allow.tap()
+        }
+        let disable = app.buttons["weekly-reminder-disable"]
+        XCTAssertTrue(disable.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Rappel enregistré sur cet iPhone."].exists)
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Rappel hebdomadaire activé"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        reveal(disable, in: app)
+        disable.tap()
+        XCTAssertTrue(app.staticTexts["Aucun rappel programmé"].waitForExistence(timeout: 5))
+        XCTAssertFalse(disable.exists)
+    }
+
+    @MainActor
     func testWebOfferLinkOpensNativeSubscription() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

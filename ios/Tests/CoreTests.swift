@@ -2,6 +2,20 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testWeeklyReminderUsesLocalCalendarAndRejectsCorruptValues() throws {
+        for day in 1...7 {
+            let plan = try XCTUnwrap(WeeklyReminderPlan(weekday: day, hour: 18, minute: 30))
+            XCTAssertEqual(plan.components.weekday, day)
+            XCTAssertEqual(plan.components.hour, 18)
+            XCTAssertEqual(plan.components.minute, 30)
+            XCTAssertNil(plan.components.timeZone)
+            XCTAssertNil(plan.components.year)
+            XCTAssertNil(plan.components.day)
+        }
+        for (day, hour, minute) in [(0,18,30),(8,18,30),(2,-1,30),(2,24,30),(2,18,-1),(2,18,60)] {
+            XCTAssertNil(WeeklyReminderPlan(weekday: day, hour: hour, minute: minute))
+        }
+    }
     func testAppleCatalogueRejectsUnexpectedOrDuplicateProducts() throws {
         let monthly = AppleCatalogueResponse.Product(id: "fr.coai.mobile.essentiel.monthly", period: "P1M")
         let annual = AppleCatalogueResponse.Product(id: "fr.coai.mobile.essentiel.annual", period: "P1Y")

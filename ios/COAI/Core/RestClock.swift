@@ -1,5 +1,22 @@
 import Foundation
 
+/// Calendar weekday uses Apple's convention: Sunday = 1, Monday = 2.
+/// Leave timezone unset so the reminder follows the iPhone's local clock.
+struct WeeklyReminderPlan: Equatable {
+    let weekday: Int
+    let hour: Int
+    let minute: Int
+
+    init?(weekday: Int, hour: Int, minute: Int) {
+        guard (1...7).contains(weekday), (0...23).contains(hour), (0...59).contains(minute) else { return nil }
+        self.weekday = weekday; self.hour = hour; self.minute = minute
+    }
+
+    var components: DateComponents {
+        DateComponents(hour: hour, minute: minute, weekday: weekday)
+    }
+}
+
 struct RestClock {
     let end: Date
 
