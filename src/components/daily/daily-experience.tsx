@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { ExerciceVideo } from "@/components/programme/exercice-video";
+import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { CoaiImageMark } from "@/components/ui/coai-image-mark";
 import { Button } from "@/components/ui/button";
 import { DailyCoach } from "@/components/daily/daily-coach";
 import { adaptWorkout, ensureWorkoutCompleteness, isCoreExercise, type DailyCheckinInput } from "@/lib/daily/session";
@@ -84,6 +88,8 @@ function Exercise({
   onOpen: () => void;
   onDone: () => void;
 }) {
+  const nom = typeof data.nom === "string" ? data.nom : "";
+  const photo = photoCoaiPourNom(nom);
   return (
     <div className={`overflow-hidden rounded-2xl border transition ${done ? "border-emerald-500/30 bg-emerald-500/[0.05]" : active ? "border-laiton-400/40 bg-laiton-400/[0.06]" : "border-white/[0.07] bg-black/15"}`}>
       <div className="flex items-center gap-3 p-3.5 sm:p-4">
@@ -105,6 +111,13 @@ function Exercise({
       </div>
       {active && (
         <div className="border-t border-white/[0.07] px-4 py-4 sm:pl-16">
+          <div className="mb-4 grid gap-3 sm:grid-cols-2">
+            {photo && <figure className="relative aspect-[4/3] overflow-hidden rounded-xl bg-black">
+              <Image src={photo} alt={`Position de référence : ${nom}`} fill unoptimized sizes="(max-width: 640px) 100vw, 50vw" className="object-contain" />
+              <CoaiImageMark />
+            </figure>}
+            <ExerciceVideo nom={nom} />
+          </div>
           {data.charge != null && <p className="text-xs leading-5 text-graphite-200"><span className="text-laiton-300">Repère d’effort — </span>{String(data.charge)}</p>}
           {data.methode != null && <p className="mt-2 text-[11px] text-graphite-500">Méthode : {String(data.methode)}</p>}
           <button type="button" onClick={onDone} className={`mt-4 w-full rounded-full border px-4 py-2 text-xs font-semibold transition sm:w-auto ${done ? "border-emerald-500/30 text-emerald-300" : "border-laiton-400/30 text-laiton-200 hover:bg-laiton-400/10"}`}>{done ? "Exercice terminé ✓" : "J’ai terminé cet exercice"}</button>
@@ -330,6 +343,7 @@ export function DailyExperience({
         <div className="relative">
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-laiton-400">Séance du jour</p>
           <h2 className="mt-3 max-w-2xl font-editorial text-3xl text-white sm:text-4xl">{activeSession.nom ?? "Ta séance personnalisée"}</h2>
+          {activeSession.mediasIndisponibles === true && <p className="mt-3 text-sm leading-6 text-graphite-200">Les exercices de cette ancienne séance n’ont pas les photos et vidéos COAI requises. Choisis une autre séance dans ton programme.</p>}
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full border border-white/10 bg-black/15 px-3 py-1.5 text-xs text-graphite-200">{daily?.availableMinutes ?? expectedMinutes} min</span>
             <span className="rounded-full border border-white/10 bg-black/15 px-3 py-1.5 text-xs text-graphite-200">{exercises.length} exercice{exercises.length > 1 ? "s" : ""}</span>

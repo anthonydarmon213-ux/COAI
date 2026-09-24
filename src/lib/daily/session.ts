@@ -1,9 +1,12 @@
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+
 export type WorkoutSession = Record<string, unknown> & {
   jour?: string;
   nom?: string;
   echauffement?: string;
   exercices?: Record<string, unknown>[];
   retourAuCalme?: string;
+  mediasIndisponibles?: boolean;
 };
 
 export type DailyCheckinInput = {
@@ -46,12 +49,20 @@ export function isCoreExercise(exercise: Record<string, unknown>) {
 // Les exercices restent ceux du programme : ajouter automatiquement un
 // finisher contournerait le choix éditorial et la validation des médias COAI.
 export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSession {
-  const exercises = Array.isArray(session.exercices) ? session.exercices : [];
-  if (exercises.length === 0) return session;
+  const sourceExercises = Array.isArray(session.exercices) ? session.exercices : [];
+  // Preserve intentional recovery-only sessions (pain, mobility), not a workout
+  // whose every exercise was excluded. This marker survives daily persistence.
+  if (sourceExercises.length === 0) return session;
+  const exercises = filtrerExercicesAvecMedias(sourceExercises);
+  if (exercises.length === 0) {
+    return { ...session, nom: "Séance à actualiser", exercices: [],
+      echauffement: undefined, retourAuCalme: undefined, mediasIndisponibles: true };
+  }
 
   return {
     ...session,
     exercices: exercises,
+    mediasIndisponibles: false,
     retourAuCalme:
       session.retourAuCalme ??
       "5 à 8 minutes : marche ou pédalage très léger, respiration calme, puis mobilité douce des zones travaillées. Aucun étirement ne doit provoquer de douleur.",
@@ -111,6 +122,8 @@ export function adaptWorkout(
 ): { session: WorkoutSession; summary: AdaptationSummary } {
   const completeSource = ensureWorkoutCompleteness(source);
   const exercices = Array.isArray(completeSource.exercices) ? completeSource.exercices : [];
+  const sourceExerciseCount = Array.isArray(source.exercices) ? source.exercices.length : 0;
+  const excludedMediaCount = Math.max(0, sourceExerciseCount - exercices.length);
   const changes: string[] = [];
 
   if (checkin.pain) {
@@ -119,6 +132,7 @@ export function adaptWorkout(
       session: {
         ...completeSource,
         nom: "Récupération prudente",
+        mediasIndisponibles: false,
         exercices: [],
         echauffement: undefined,
         retourAuCalme:
@@ -129,7 +143,7 @@ export function adaptWorkout(
         title: "COAI a adapté ta séance",
         reason: `Tu as signalé une douleur ou une gêne${zone} — on met la séance en pause aujourd'hui, par prudence. Rien à prouver, mieux vaut laisser la gêne se calmer.`,
         changes: ["Séance d'entraînement suspendue aujourd'hui", "Aucune progression ni charge proposée"],
-        originalExerciseCount: exercices.length,
+        originalExerciseCount: sourceExerciseCount,
         adaptedExerciseCount: 0,
       },
     };
@@ -145,6 +159,7 @@ export function adaptWorkout(
       session: {
         ...completeSource,
         nom: "Mobilité douce & respiration",
+        mediasIndisponibles: false,
         exercices: [],
         echauffement: undefined,
         retourAuCalme:
@@ -156,7 +171,7 @@ export function adaptWorkout(
         reason:
           "Ta journée s'annonce chargée et ton niveau de tension est élevé. On transforme la séance prévue en mouvement doux et respiration dirigée, pour souffler vraiment — sans te faire perdre ton sentiment d'accomplissement.",
         changes: ["Séance d'effort remplacée par de la mobilité et de la respiration", "Aucune charge ni intensité proposée aujourd'hui"],
-        originalExerciseCount: exercices.length,
+        originalExerciseCount: sourceExerciseCount,
         adaptedExerciseCount: 0,
       },
     };
@@ -168,6 +183,20 @@ export function adaptWorkout(
   const needsFuelCaution = checkin.food === "PAS_ENCORE" || checkin.food === "LOURD";
   let adaptedExercises = [...exercices];
   let materielAjuste = false;
+
+  if (completeSource.mediasIndisponibles) {
+    return { session: completeSource, summary: {
+      adapted: true,
+      title: "Cette séance doit être actualisée",
+      reason: "Les exercices de cette ancienne séance ne disposent pas des photos et vidéos COAI requises. Consulte ton programme pour choisir une autre séance. Ton programme d'origine reste intact.",
+      changes: ["Aucun exercice sans photo et vidéo COAI proposé"],
+      originalExerciseCount: sourceExerciseCount,
+      adaptedExerciseCount: 0,
+    } };
+  }
+  if (excludedMediaCount > 0) {
+    changes.push(`${excludedMediaCount} exercice${excludedMediaCount > 1 ? "s" : ""} sans photo et vidéo COAI retiré${excludedMediaCount > 1 ? "s" : ""}`);
+  }
 
   if (checkin.equipementDuJour && !checkin.equipementDuJour.includes("Salle de sport complète")) {
     const compatibles = adaptedExercises.filter((exercice) =>
@@ -187,7 +216,7 @@ export function adaptWorkout(
           title: "Cette séance nécessite un autre matériel",
           reason: "Aucun exercice de cette séance ne correspond au matériel indiqué aujourd'hui. Consulte ton programme pour choisir une autre séance, ou reviens lorsque le matériel sera disponible. Ton programme d'origine reste intact.",
           changes: ["Exercices incompatibles retirés", "Aucun mouvement de remplacement inventé"],
-          originalExerciseCount: exercices.length,
+          originalExerciseCount: sourceExerciseCount,
           adaptedExerciseCount: 0,
         },
       };
@@ -226,6 +255,7 @@ export function adaptWorkout(
 
   const adapted = changes.length > 0;
   const reasonParts = [];
+  if (excludedMediaCount > 0) reasonParts.push("certains exercices n'ont pas les médias COAI requis");
   if (checkin.availableMinutes < expectedMinutes) reasonParts.push(`tu disposes de ${checkin.availableMinutes === 75 ? "60+" : checkin.availableMinutes} minutes`);
   if (lowRecovery) reasonParts.push("ton sommeil ou ton énergie est faible aujourd'hui");
   if (journeeChargee) reasonParts.push("ta journée s'annonce chargée");
@@ -241,7 +271,7 @@ export function adaptWorkout(
         ? `On a ajusté ta séance parce que ${reasonParts.join(" et ")} — ton programme d'origine, lui, reste intact.`
         : "Ton check-in ne nécessite aucun ajustement aujourd'hui — profite de ta séance telle quelle.",
       changes,
-      originalExerciseCount: exercices.length,
+      originalExerciseCount: sourceExerciseCount,
       adaptedExerciseCount: adaptedExercises.length,
     },
   };
