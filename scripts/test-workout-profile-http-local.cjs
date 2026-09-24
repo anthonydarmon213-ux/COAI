@@ -274,6 +274,20 @@ async function main() {
   assert.deepEqual(dailyEntry.exercices, []);
   assert.equal(dailyEntry.dureeMinutes, null);
   assert.equal(combinedHistory.length, await db.seanceLog.count({where: {userId: a.user.id}}) + 1);
+  const cardUrl = origin + '/api/suivi/bilan-mensuel/carte';
+  assert.equal((await fetch(cardUrl)).status, 401);
+  const dailyOnly = await fixture();
+  assert.equal((await fetch(cardUrl, {headers: dailyOnly.cookie})).status, 404);
+  await db.dailySession.create({data: {userId: dailyOnly.user.id, date: new Date(),
+    completedAt: new Date(), adaptedSession: {nom: 'Séance quotidienne de test'}}});
+  assert.equal(await db.seanceLog.count({where: {userId: dailyOnly.user.id}}), 0);
+  const monthlyCard = await fetch(cardUrl, {headers: dailyOnly.cookie});
+  assert.equal(monthlyCard.status, 200);
+  assert.match(monthlyCard.headers.get('cache-control'), /private.*no-store/);
+  const monthlyPng = Buffer.from(await monthlyCard.arrayBuffer());
+  assert.equal(monthlyPng.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+  assert.equal((await fetch(cardUrl, {headers: b.cookie})).status, 404);
+  console.log('PASS monthly card HTTP: daily-only member, real PNG, private cache, unauthenticated and other account excluded');
   assert.equal((await postDaily({action: 'complete'})).status, 200);
   const retriedHistory = await (await fetch(origin + '/api/seances', {headers: a.cookie})).json();
   assert.equal(retriedHistory.filter(row => row.dailySessionId === completed.id).length, 1);
