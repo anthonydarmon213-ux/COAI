@@ -470,6 +470,18 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(app.alerts["Fichier COAI"].waitForExistence(timeout: 5))
         app.alerts.buttons["Compris"].tap()
         XCTAssertTrue(invalid.isHittable)
+        // A rejected file must release the download slot, including after
+        // backgrounding the app. Never share to a recipient in this test.
+        XCUIDevice.shared.press(.home)
+        app.activate()
+        XCTAssertTrue(export.waitForExistence(timeout: 10))
+        reveal(export, in: app)
+        export.tap()
+        XCTAssertTrue(file.waitForExistence(timeout: 10))
+        XCTAssertEqual(file.label, "COAI-document")
+        app.buttons.matching(NSPredicate(format: "label IN %@", ["Fermer", "Close"])).firstMatch.tap()
+        XCTAssertTrue(export.waitForExistence(timeout: 5))
+        XCTAssertTrue(export.isHittable)
     }
 
     @MainActor
