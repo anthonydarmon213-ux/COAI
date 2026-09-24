@@ -14,6 +14,14 @@ iOS, pas d'un simple drapeau enregistré dans l'app.
 
 ## Vérifications
 
+- 25 septembre : nouveau test UI sur simulateur QA rappel hebdomadaire,
+  iOS 26.5. Activation, changement du jour (mardi/jeudi), enregistrement,
+  arrêt du processus et relancement : le nouvel horaire est relu depuis les
+  demandes iOS. Désactivation finale réussie. Un test, zéro échec,
+  `/tmp/coai-reminder-change-0925/Logs/Test/Test-COAI-2026.09.25_01-18-19-+0200.xcresult`.
+  Page WebKit fictive hors réseau ; pas de compte ni de serveur distant.
+  Ne couvre pas le changement de l'heure, la réception ou un appareil physique.
+
 - iPhone SE 3 simulé, iOS 26.5, accessibilité XXXL : ouverture, défilement,
   bouton d'activation touchable d'au moins 44 points et dans la largeur écran.
   Captures introduction/réglages examinées : jour, heure et bouton lisibles.
@@ -70,7 +78,8 @@ Le site et le binaire devront tous deux intégrer le changement pour ce parcours
 
 - Réception effective à l'heure choisie, changements d'heure/fuseau et mode
   Concentration sur appareil physique ; persistance après redémarrage iPhone.
-- Test de modification d'horaire et autres orientations/tailles ; VoiceOver.
+- Modification de l'heure (changement de jour vérifié le 25), autres
+  orientations/tailles et VoiceOver.
 - Effacement après déconnexion/suppression avec un vrai compte : raccordé
   localement et testé par composants, validation intégrale en production restante.
 - Navigation ciblée après toucher l'alerte : ouverture de l'app uniquement,

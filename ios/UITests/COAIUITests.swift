@@ -150,6 +150,56 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testWeeklyReminderChangedDaySurvivesRelaunch() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        func openReminder() {
+            let explorer = app.buttons["native-tab-Explorer"]
+            XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+            explorer.tap()
+            let reminder = app.buttons["weekly-reminder-open"]
+            reveal(reminder, in: app)
+            reminder.tap()
+            XCTAssertTrue(app.buttons["weekly-reminder-save"].waitForExistence(timeout: 5))
+        }
+        openReminder()
+        let save = app.buttons["weekly-reminder-save"]
+        reveal(save, in: app)
+        save.tap()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if springboard.alerts.firstMatch.waitForExistence(timeout: 3) {
+            let allow = springboard.alerts.buttons.matching(NSPredicate(format: "label IN %@", ["Autoriser", "Allow"])).firstMatch
+            XCTAssertTrue(allow.exists)
+            allow.tap()
+        }
+        XCTAssertTrue(app.buttons["weekly-reminder-disable"].waitForExistence(timeout: 10))
+        let status = app.staticTexts["weekly-reminder-status"]
+        let previous = status.label
+        let chosenDay = previous.contains("mardi") ? "Jeudi" : "Mardi"
+        let dayPicker = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Jour'")).firstMatch
+        reveal(dayPicker, in: app)
+        dayPicker.tap()
+        app.buttons[chosenDay].tap()
+        reveal(save, in: app)
+        save.tap()
+        let expected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label CONTAINS %@", chosenDay.lowercased()), object: status)
+        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 5), .completed)
+        let changed = status.label
+        XCTAssertNotEqual(changed, previous)
+        app.terminate()
+        app.launch()
+        openReminder()
+        let persisted = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", changed), object: status)
+        XCTAssertEqual(XCTWaiter.wait(for: [persisted], timeout: 5), .completed)
+        let disable = app.buttons["weekly-reminder-disable"]
+        reveal(disable, in: app)
+        disable.tap()
+        XCTAssertTrue(app.staticTexts["Aucun rappel programmé"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testWeeklyReminderIsOptInAndCanBeDisabled() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
