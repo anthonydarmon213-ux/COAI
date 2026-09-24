@@ -496,7 +496,15 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           qualiteSommeil,
         }),
       });
-      if (!res.ok) throw new Error("Échec de l'enregistrement.");
+      if (!res.ok) {
+        const messages: Record<number, string> = {
+          400: "Certaines informations sont invalides. Vérifie les champs avant de réessayer.",
+          401: "Ta session a expiré. Reconnecte-toi pour enregistrer ton profil.",
+          404: "Ton profil est introuvable. Contacte le support si le problème persiste.",
+        };
+        setError(messages[res.status] ?? "Enregistrement indisponible pour le moment. Ta saisie est conservée sur cet écran. Réessaie dans un instant.");
+        return;
+      }
       setSaved(true);
       router.refresh();
     } catch (err) {

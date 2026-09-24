@@ -40,7 +40,7 @@ const modules = {
 };
 const route = { exports: {}, require: name => { assert.ok(name in modules, name); return modules[name]; } };
 vm.runInNewContext(compile(fs.readFileSync('src/app/api/profil/route.ts', 'utf8')), route);
-async function submitChoice(choice, values = {}, invalid = false) {
+async function submitChoice(choice, values = {}, invalid = false, failureStatus = null) {
   let saved = false, refreshed = false, loading = false, error = null;
   const context = {
     objectifs: '', niveau: '', equipementDisponible: [], lieuEntrainement: '', dureeSeance: '',
@@ -54,12 +54,19 @@ async function submitChoice(choice, values = {}, invalid = false) {
     setError: value => { error = value; }, router: { refresh: () => { refreshed = true; } },
     fetch: async (url, options) => {
       assert.equal(url, '/api/profil');
+      if (failureStatus) return new Response('Internal sensitive error', { status: failureStatus });
       return route.exports.PUT(new Request('https://coai.test/api/profil', options));
     },
   };
   vm.runInNewContext(compile(submit), context);
   await context.handleSubmit({ preventDefault() {} });
-  if (invalid) {
+  if (failureStatus) {
+    const expected = { 400: /informations sont invalides/, 401: /session a expiré/, 404: /profil est introuvable/ };
+    assert.match(error, expected[failureStatus] ?? /saisie est conservée/);
+    assert.doesNotMatch(error, /sensitive/);
+    assert.equal(saved, false); assert.equal(refreshed, false);
+    assert.equal(context.objectifs, values.objectifs);
+  } else if (invalid) {
     assert.match(error, /Vérifie la valeur du champ/);
     assert.equal(saved, false); assert.equal(refreshed, false);
   } else {
@@ -98,6 +105,10 @@ async function submitChoice(choice, values = {}, invalid = false) {
   assert.equal(partial.status, 200);
   assert.equal(stored.tailleCm, 176); assert.equal(stored.poidsKg, 72.5); assert.equal(stored.age, 31);
   const beforeInvalid = writes;
+  for (const status of [400, 401, 404, 500, 503]) {
+    await submitChoice(false, { objectifs: 'ma saisie non enregistrée' }, false, status);
+    assert.equal(writes, beforeInvalid, 'Failure must not report a successful save');
+  }
   for (const values of [{ tailleCm: 'abc' }, { poidsKg: 'Infinity' }, { age: 'NaN' }]) {
     await submitChoice(false, values, true);
     assert.equal(writes, beforeInvalid, 'Non-finite input must not be serialized as deletion');
