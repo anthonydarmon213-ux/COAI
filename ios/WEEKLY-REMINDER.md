@@ -47,11 +47,32 @@ iOS, pas d'un simple drapeau enregistré dans l'app.
 
 ## Restant
 
+### Déconnexion web — contrôle du 24 septembre
+
+Le bouton de déconnexion et la suppression de compte confirmée émettent
+désormais `session-ended-v1` vers `coaiSessionEnded`. Aucun jeton, identifiant
+ou contenu personnel n'est transmis. Le récepteur natif ne permet que la
+réinitialisation locale existante : rappels, préférences du minuteur,
+données WebKit et historique de navigation. La fenêtre d'abonnement se ferme.
+Les messages provenant d'une autre WebView, d'une iframe, d'une origine autre
+que HTTPS coai.fr/www.coai.fr ou d'un port autre que 443 sont refusés.
+Les échecs/annulations web ne déclenchent pas le signal. Un navigateur sans
+ce récepteur conserve son fonctionnement précédent.
+
+Tests des boutons et du signal réussis (services simulés), compilation Release
+iPhone non signée réussie. Test UI réel du récepteur WebKit sur simulateur QA :
+activation d'un rappel, signal invalide, signal valide, remplacement de la
+WebView, relancement, absence du rappel confirmée. Un test réussi, zéro ignoré :
+`/tmp/coai-session-end-20260924/Logs/Test/Test-COAI-2026.09.24_09-25-40-+0200.xcresult`.
+La page du test est une fixture locale ; aucun compte supprimé/déconnecté sur
+le serveur. Ne prouve pas la révocation des sessions distantes ni la production.
+Le site et le binaire devront tous deux intégrer le changement pour ce parcours.
+
 - Réception effective à l'heure choisie, changements d'heure/fuseau et mode
   Concentration sur appareil physique ; persistance après redémarrage iPhone.
 - Test de modification d'horaire et autres orientations/tailles ; VoiceOver.
-- Effacement automatique des rappels lors de suppression de compte web ou
-  déconnexion web : encore à intégrer. Le reset natif explicite est couvert.
+- Effacement après déconnexion/suppression avec un vrai compte : raccordé
+  localement et testé par composants, validation intégrale en production restante.
 - Navigation ciblée après toucher l'alerte : ouverture de l'app uniquement,
   pas encore de lien direct vers un check-in.
 - Ce rappel ne remplace pas le suivi personnalisé, les check-ins ou une

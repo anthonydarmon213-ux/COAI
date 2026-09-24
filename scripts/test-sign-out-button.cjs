@@ -16,6 +16,7 @@ const compiled = ts.transpileModule(handler.getText(ast), {compilerOptions:{targ
     let calls = 0, release, loading = false, error = false;
     const navigation = [];
     const box = {pending:{current:false}, setLoading:v=>loading=v, setError:v=>error=v,
+      notifyNativeSessionEnded:()=>navigation.push('native-cleanup'),
       createSupabaseBrowserClient:()=>{
         if (failure === 'client') throw new Error('configuration');
         return {auth:{signOut:async()=>{
@@ -37,7 +38,7 @@ const compiled = ts.transpileModule(handler.getText(ast), {compilerOptions:{targ
       assert.equal(box.pending.current, false); assert.deepEqual(navigation, []);
     } else {
       assert.equal(error, false); assert.equal(box.pending.current, true);
-      assert.deepEqual(navigation, ['/sign-in','refresh']);
+      assert.deepEqual(navigation, ['native-cleanup','/sign-in','refresh']);
     }
   }
   assert.match(source, /role="alert"/);

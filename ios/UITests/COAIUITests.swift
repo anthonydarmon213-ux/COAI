@@ -1,6 +1,48 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    @MainActor
+    func testConfirmedWebSessionEndClearsWeeklyReminder() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        let reminder = app.buttons["weekly-reminder-open"]
+        reveal(reminder, in: app)
+        reminder.tap()
+        let save = app.buttons["weekly-reminder-save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        reveal(save, in: app)
+        save.tap()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if springboard.alerts.firstMatch.waitForExistence(timeout: 3) {
+            let allow = springboard.alerts.buttons.matching(NSPredicate(format: "label == 'Autoriser' OR label == 'Allow'")).firstMatch
+            XCTAssertTrue(allow.exists)
+            allow.tap()
+        }
+        XCTAssertTrue(app.buttons["weekly-reminder-disable"].waitForExistence(timeout: 10))
+        app.terminate()
+        app.launch()
+        let invalid = app.buttons["Signal de fin invalide"]
+        XCTAssertTrue(invalid.waitForExistence(timeout: 15))
+        invalid.tap()
+        let end = app.buttons["Simuler une déconnexion confirmée"]
+        XCTAssertTrue(end.exists)
+        end.tap()
+        XCTAssertTrue(end.waitForNonExistence(timeout: 15), "Native cleanup replaces the old WebView")
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        reveal(reminder, in: app)
+        reminder.tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Aucun rappel programmé"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["weekly-reminder-disable"].exists)
+    }
     /// Run on the QA simulator where notification permission was explicitly denied.
     @MainActor
     func testWeeklyReminderWithPreviouslyDeniedPermission() throws {

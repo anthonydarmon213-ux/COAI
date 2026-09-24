@@ -5,7 +5,7 @@ const ts = require('typescript');
 const path = require('node:path');
 const api = {}, states = [], refs = [];
 let si=0, ri=0, status=500, confirmed=false, calls=0, downloads=0, pushes=0, hold;
-let responseBody={profile:{}}, badJson=false, networkFailure=false, confirmationText='';
+let responseBody={profile:{}}, badJson=false, networkFailure=false, confirmationText='', nativeCleanups=0;
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/compte/rgpd-actions.tsx'),'utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}
 }).outputText, {exports:api, Error, Blob, setTimeout:fn=>fn(),
@@ -21,6 +21,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../sr
     if(name==='react/jsx-runtime')return {jsx:(type,props)=>({type,props}),jsxs:(type,props)=>({type,props})};
     if(name==='next/navigation')return {useRouter:()=>({replace:()=>pushes++,refresh:()=>{}})};
     if(name==='@/components/ui/button')return {Button:'button'};
+    if(name==='@/lib/native/session-ended')return {notifyNativeSessionEnded:()=>nativeCleanups++};
     throw new Error(name);
   }
 });
@@ -58,9 +59,12 @@ function button(text){return nodes(render()).find(x=>x.type==='button'&&label(x)
   badJson=false;networkFailure=true;
   await button('Supprimer mon compte').props.onClick();assert.equal(pushes,0);
   networkFailure=false;
+  assert.equal(nativeCleanups,0,'Failures/cancellation must not clear the native session');
   const action=button('Supprimer mon compte').props.onClick;
   await action();assert.equal(pushes,1);
+  assert.equal(nativeCleanups,1,'Confirmed deletion clears native state once');
   assert.equal(button('Suppression…').props.disabled,true);
   const afterSuccess=calls;await action();assert.equal(calls,afterSuccess,'No repeated deletion during navigation');
+  assert.equal(nativeCleanups,1);
   console.log('PASS account actions: error messages, no fake export, cancellation, duplicate guard, recovery and success (mock API only)');
 })().catch(error=>{console.error(error);process.exitCode=1;});

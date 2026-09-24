@@ -1,5 +1,14 @@
 import Foundation
 
+/// One-way cleanup capability. Never grants account or payment authority.
+enum SessionEndSignal {
+    static let handlerName = "coaiSessionEnded"
+    static func accepts(body: Any, mainFrame: Bool, scheme: String, host: String, port: Int) -> Bool {
+        mainFrame && scheme == "https" && ["coai.fr", "www.coai.fr"].contains(host)
+            && [0, 443].contains(port) && (body as? String) == "session-ended-v1"
+    }
+}
+
 /// Local UX deadline, not a change to Supabase's token/state expiry policy.
 struct OAuthAttempt: Equatable {
     static let duration: TimeInterval = 9 * 60

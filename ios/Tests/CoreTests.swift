@@ -2,6 +2,23 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testSessionEndSignalOnlyAcceptsTrustedMainFrameAndExactMessage() {
+        for host in ["coai.fr", "www.coai.fr"] {
+            for port in [0, 443] {
+                XCTAssertTrue(SessionEndSignal.accepts(body: "session-ended-v1", mainFrame: true, scheme: "https", host: host, port: port))
+            }
+        }
+        for host in ["evil.test", "coai.fr.evil.test", "coai.fr.", "localhost", ""] {
+            XCTAssertFalse(SessionEndSignal.accepts(body: "session-ended-v1", mainFrame: true, scheme: "https", host: host, port: 443))
+        }
+        let bodies: [Any] = ["logout", "session-ended-v1 ", ["event": "session-ended-v1"], 1, NSNull()]
+        for body in bodies {
+            XCTAssertFalse(SessionEndSignal.accepts(body: body, mainFrame: true, scheme: "https", host: "coai.fr", port: 443))
+        }
+        XCTAssertFalse(SessionEndSignal.accepts(body: "session-ended-v1", mainFrame: false, scheme: "https", host: "coai.fr", port: 443))
+        XCTAssertFalse(SessionEndSignal.accepts(body: "session-ended-v1", mainFrame: true, scheme: "http", host: "coai.fr", port: 443))
+        XCTAssertFalse(SessionEndSignal.accepts(body: "session-ended-v1", mainFrame: true, scheme: "https", host: "coai.fr", port: 8443))
+    }
     func testLocalReminderResetClearsOnlyOwnedPreferences() throws {
         let suite = "coai-reminder-reset-test-" + UUID().uuidString
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))

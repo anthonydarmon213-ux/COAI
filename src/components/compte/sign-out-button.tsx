@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
+import { notifyNativeSessionEnded } from "@/lib/native/session-ended";
 
 type SignOutButtonProps = {
   variant?: "link" | "icon";
@@ -23,6 +24,7 @@ export function SignOutButton({ variant = "link" }: SignOutButtonProps) {
       const supabase = createSupabaseBrowserClient();
       const { error: signOutError } = await supabase.auth.signOut();
       if (signOutError) throw signOutError;
+      notifyNativeSessionEnded();
       router.replace("/sign-in");
       router.refresh();
     } catch {

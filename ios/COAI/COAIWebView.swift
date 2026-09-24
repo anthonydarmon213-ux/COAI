@@ -3,12 +3,27 @@ import WebKit
 import AuthenticationServices
 import StoreKit
 
+/// WebKit retains handlers; keep the model weak to avoid a WebView retain cycle.
+@MainActor
+private final class SessionEndHandler: NSObject, WKScriptMessageHandler {
+    weak var model: COAIWebModel?
+    init(model: COAIWebModel) { self.model = model }
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let model, model.isReady, message.webView === model.webView,
+              message.name == SessionEndSignal.handlerName else { return }
+        let origin = message.frameInfo.securityOrigin
+        guard SessionEndSignal.accepts(body: message.body, mainFrame: message.frameInfo.isMainFrame,
+            scheme: origin.protocol, host: origin.host, port: origin.port) else { return }
+        model.clearLocalSession()
+    }
+}
+
 extension COAIWebModel {
     enum AppleAPIFailure: Error { case unavailable, invalidResponse }
 
     /// Uses the existing authenticated WebKit cookie store. No session token is
     /// extracted into JavaScript arguments, native storage, logs or URL query.
-    /// Called by native purchase flow only; no script message handler is exposed.
+    /// Called by native purchase flow only; no purchase script handler is exposed.
     func deliverAppleReceipt(_ signedTransaction: String) async throws -> PurchaseAcknowledgement {
         guard !signedTransaction.isEmpty, signedTransaction.utf8.count <= 65536 else { throw AppleAPIFailure.unavailable }
         let data = try await appleRequest(path: "/api/ios/apple/transactions", method: "POST",
@@ -270,7 +285,10 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
                 if !self.isLoading { self.requestAppleRecovery() }
             }
         }
-        // No injected authentication, no native-JavaScript bridge, no TLS exceptions.
+        let controller = webView.configuration.userContentController
+        controller.removeScriptMessageHandler(forName: SessionEndSignal.handlerName)
+        controller.add(SessionEndHandler(model: self), name: SessionEndSignal.handlerName)
+        // No injected authentication, no purchase bridge, no TLS exceptions.
     }
 
     func start() async {
@@ -316,6 +334,8 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <style>body{background:#101820;color:white;font:18px system-ui;padding:24px}button{display:block;padding:16px;margin:20px 0}</style>
     <aside class="coai-app-nav"><nav><button>Ancienne navigation web</button></nav></aside>
     <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
+    <button onclick="window.webkit.messageHandlers.coaiSessionEnded.postMessage('invalid')">Signal de fin invalide</button>
+    <button onclick="window.webkit.messageHandlers.coaiSessionEnded.postMessage('session-ended-v1')">Simuler une déconnexion confirmée</button>
     <a href="/pricing">Voir l’abonnement iOS</a>
     <button onclick="history.pushState({}, '', '/programme/entrainement')">Simuler la page séance</button>
     <button onclick="history.pushState({}, '', '/compte/parametres')">Simuler la page compte</button>
@@ -390,6 +410,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
 
     func clearLocalSession() {
         RestReminderService.shared.resetLocalReminders()
+        showSubscription = false
         appleRecovery.cancel()
         appleRecoveryMessage = nil
         downloads.cancel()

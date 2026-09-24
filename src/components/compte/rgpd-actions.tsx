@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { notifyNativeSessionEnded } from "@/lib/native/session-ended";
 
 export function RgpdActions() {
   const router = useRouter();
@@ -58,6 +59,7 @@ export function RgpdActions() {
       if (!result || typeof result !== "object" || !("success" in result) || result.success !== true) {
         throw new Error("delete_unconfirmed");
       }
+      notifyNativeSessionEnded();
       router.replace("/");
       router.refresh();
     } catch (cause) {
