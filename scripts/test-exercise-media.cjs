@@ -13,6 +13,9 @@ const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+for (const name of ['Deadlift roumain', 'Deadlift roumain barre', 'Soulevé de terre roumain à la barre', 'Romanian deadlift', 'RDL', 'Soulevé de terre roumain haltères', 'Deadlift roumain haltères', 'RDL haltères']) {
+  assert.equal(videoCoaiPourNom(name), null, `Le rush mal nommé montre un rowing : ${name}`);
+}
 for (const [names, file] of [
   [['Développé incliné haltères', 'Développé incliné (haltères)', 'developpe incline halteres', 'Incline dumbbell press'], 'developpe-incline-halteres'],
   [['Développé incliné barre', 'Développé incliné (barre)', 'Incline barbell press'], 'developpe-incline-barre'],

@@ -65,8 +65,9 @@ const TABLE: Entree[] = [
 
   { motifs: ["power clean", "epaule barre", "epauler barre"], video: { fichier: "power-clean-barre", description: "Épaulé à la barre" } },
   { motifs: ["deadlift conventionnel", "souleve de terre conventionnel"], video: { fichier: "souleve-terre-conventionnel", description: "Soulevé de terre conventionnel" } },
-  { motifs: ["deadlift roumain halteres", "souleve de terre roumain halteres", "rdl halteres"], video: { fichier: "deadlift-roumain-halteres", description: "Soulevé de terre roumain aux haltères" } },
-  { motifs: ["deadlift roumain", "souleve de terre roumain", "romanian deadlift", "rdl"], video: { fichier: "deadlift-roumain-barre", description: "Soulevé de terre roumain à la barre" } },
+  // Audit visuel 24/09 : deadlift-roumain-barre.mp4 et
+  // deadlift-roumain-halteres.mp4 montrent des rowings, pas des RDL.
+  // Ne pas les rattacher au soulevé de terre malgré les noms des fichiers.
   { motifs: ["fente arriere barre", "fentes arriere barre"], video: { fichier: "fentes-arriere-barre", description: "Fentes arrière à la barre" } },
   { motifs: ["fente arriere halteres", "fentes arriere halteres", "reverse lunge"], video: { fichier: "fentes-arriere-halteres", description: "Fentes arrière aux haltères" } },
   { motifs: ["kettlebell swing", "swing kettlebell"], video: { fichier: "kettlebell-swing", description: "Kettlebell swing" } },
