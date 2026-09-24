@@ -12,6 +12,7 @@ import { CoachingVisioCta } from "@/components/suivi/coaching-visio-cta";
 import { DebriefSemaineCard } from "@/components/coach/debrief-semaine-card";
 import { getDebriefSemaine } from "@/lib/insight/debrief-semaine";
 import { prisma } from "@/lib/db/client";
+import { lundiDeSemaine } from "@/lib/checkin/semaine";
 import { CoaiMark } from "@/components/brand/coai-mark";
 
 // Hub de suivi (21/08/2026, demande Anthony) — la page ne se limite plus à
@@ -21,14 +22,6 @@ import { CoaiMark } from "@/components/brand/coai-mark";
 // implémenté) ; le contact avec un coach humain passe toujours par
 // CoachingVisioCta, jamais par une boîte de réception qui n'enverrait
 // nulle part — aucun modèle de messagerie n'existe en base.
-function debutDeSemaine(date: Date): Date {
-  const d = new Date(date);
-  const jour = d.getDay();
-  d.setDate(d.getDate() - (jour === 0 ? 6 : jour - 1));
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
 export default async function CoachPage() {
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
@@ -38,7 +31,7 @@ export default async function CoachPage() {
     buildProfilIntelligence(user.id),
     getDebriefSemaine(user.id),
     prisma.weeklyCheckin.findUnique({
-      where: { userId_semaineDebut: { userId: user.id, semaineDebut: debutDeSemaine(new Date()) } },
+      where: { userId_semaineDebut: { userId: user.id, semaineDebut: lundiDeSemaine(new Date()) } },
       select: { id: true },
     }),
   ]);
