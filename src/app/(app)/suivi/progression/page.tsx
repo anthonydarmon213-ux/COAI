@@ -200,7 +200,7 @@ export default async function ProgressionPage() {
             <Gauge label="Entraînement" percent={regularite} sublabel={`${seancesDuMois}/${objectifMensuel} séances`} sublabelColor="#9ba3a8" size={126} color="#ff8a3d" />
             <Gauge label="Alimentation" percent={alimentation} sublabel="profil nutrition" sublabelColor="#9ba3a8" size={126} color="#ffd84d" />
             <Gauge label="Récupération" percent={precisionRecuperation} sublabel="champs renseignés" sublabelColor="#9ba3a8" size={126} color="#39e67b" />
-            <Gauge label="Sommeil" percent={recuperation} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} sublabelColor="#9ba3a8" size={126} color="#4cc9f0" />
+            <Gauge label="Sommeil" percent={recuperation} displayValue={recuperation ? undefined : "—"} sublabel={recuperation ? "qualité déclarée" : "à renseigner"} sublabelColor="#9ba3a8" size={126} color="#4cc9f0" />
             <Gauge label="Score COAI" percent={coai.disponible ? coai.score : 0} displayValue={coai.disponible ? `${coai.score}/100` : "—"} sublabel={coai.disponible ? "suivi déclaré · 90 j" : "bilans à compléter"} sublabelColor="#9ba3a8" size={126} color="#c56cff" />
             <Gauge label="Âge COAI" percent={0} displayValue={age?.disponible ? `${age.ageCoai} ans` : "—"} sublabel={ageEtat} sublabelColor="#9ba3a8" size={126} color="#f56fae" />
           </div>
@@ -219,7 +219,7 @@ export default async function ProgressionPage() {
       {graphiques.length === 0 && graphiquesForce.length === 0 ? (
         <Card className="text-center">
           <p className="font-semibold text-white">Tes courbes vont prendre vie ici.</p>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-graphite-400">Ajoute une première mesure ou termine une séance : COAI commencera à révéler tes tendances, au-delà des quatre indicateurs déjà visibles.</p>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-graphite-400">Ajoute une mesure ou enregistre tes charges dans une séance pour alimenter ces courbes. Tes séances terminées comptent déjà dans ta régularité, même sans charge renseignée.</p>
         </Card>
       ) : (
         <>
