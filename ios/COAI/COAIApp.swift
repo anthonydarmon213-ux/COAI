@@ -74,7 +74,10 @@ struct COAIAppleSubscriptionView: View {
                             .font(.callout).foregroundStyle(.secondary)
                     }
                     if service == nil || offers.isEmpty {
-                        Button("Réessayer") { operation = Task { await load() } }.frame(minHeight: 44).disabled(busy)
+                        Button { operation = Task { await load() } } label: {
+                            Text("Réessayer").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                                .contentShape(Rectangle())
+                        }.disabled(busy)
                     }
                     if service == nil && !busy && message != nil {
                         Button {
@@ -86,7 +89,7 @@ struct COAIAppleSubscriptionView: View {
                                 .contentShape(Rectangle())
                         }.accessibilityIdentifier("apple-open-account")
                     }
-                    Button("Restaurer mes achats Apple") {
+                    Button {
                         guard let service else { return }
                         run {
                             let count = try await service.restorePurchases()
@@ -94,9 +97,14 @@ struct COAIAppleSubscriptionView: View {
                             confirmedAccess = service.latestAccess
                             return service.latestAccess?.confirmation ?? (count == 0 ? "Aucun achat COAI à restaurer pour ce compte Apple." : "Restauration traitée, mais l’état de ton accès n’a pas été reçu. Ne lance pas un second achat.")
                         }
-                    }.frame(minHeight: 44).disabled(busy || service == nil)
-                    Link("Gérer ou résilier dans Apple", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
-                        .frame(minHeight: 44)
+                    } label: {
+                        Text("Restaurer mes achats Apple").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }.disabled(busy || service == nil)
+                    Link(destination: URL(string: "https://apps.apple.com/account/subscriptions")!) {
+                        Text("Gérer ou résilier dans Apple").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
                     Text("Renouvellement automatique au tarif et à la période affichés. Tu peux gérer le renouvellement dans les réglages de ton compte Apple.")
                         .font(.footnote).foregroundStyle(.secondary)
                     let legalLayout = dynamicTypeSize.isAccessibilitySize

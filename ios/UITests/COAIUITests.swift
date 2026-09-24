@@ -190,6 +190,15 @@ final class COAIUITests: XCTestCase {
         link.tap()
         let account = app.buttons["apple-open-account"]
         XCTAssertTrue(account.waitForExistence(timeout: 30))
+        let retry = app.buttons["Réessayer"]
+        reveal(retry, in: app)
+        XCTAssertTrue(retry.isHittable)
+        XCTAssertGreaterThanOrEqual(retry.frame.height, 44)
+        for title in ["Restaurer mes achats Apple", "Gérer ou résilier dans Apple"] {
+            let control = app.buttons[title]
+            reveal(control, in: app)
+            XCTAssertGreaterThanOrEqual(control.frame.height, 44, title)
+        }
         reveal(account, in: app)
         XCTAssertTrue(account.isHittable)
         XCTAssertGreaterThanOrEqual(account.frame.height, 44)
