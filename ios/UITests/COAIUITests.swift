@@ -338,7 +338,16 @@ final class COAIUITests: XCTestCase {
         expectation(for: NSPredicate(format: "selected == false"), evaluatedWith: tabs[3])
         waitForExpectations(timeout: 5)
         tabs[4].tap()
-        app.buttons["explore-native:timer"].tap()
+        XCTAssertTrue(app.navigationBars["Explorer"].waitForExistence(timeout: 5))
+        let timerDestination = app.buttons["explore-native:timer"]
+        reveal(timerDestination, in: app)
+        let list = app.collectionViews.firstMatch
+        if timerDestination.frame.minY < app.navigationBars["Explorer"].frame.maxY {
+            list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
+                .press(forDuration: 0.1, thenDragTo: list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6)))
+        }
+        XCTAssertGreaterThanOrEqual(timerDestination.frame.minY, app.navigationBars["Explorer"].frame.maxY)
+        timerDestination.tap()
         XCTAssertTrue(app.staticTexts["Ton temps de récupération"].waitForExistence(timeout: 5))
         app.buttons["Fermer"].tap()
         XCTAssertTrue(tabs[2].isHittable)
