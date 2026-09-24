@@ -1,6 +1,6 @@
 # Inventaire de confidentialité iOS — brouillon technique
 
-Audit du code au 17 septembre 2026. Ce document prépare la déclaration App
+Audit du code actualisé le 25 septembre 2026. Ce document prépare la déclaration App
 Store Connect ; il ne constitue ni une déclaration soumise, ni une validation
 juridique, ni la preuve de la configuration des services de production.
 Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
@@ -12,12 +12,12 @@ Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
 | Compte | Nom, email, identifiant Auth et compte, coordonnées facultatives | `prisma/schema.prisma`, `src/lib/auth/server.ts` ; finalités et durées à confirmer dans les parcours réels |
 | Coaching | Profil, objectifs, mesures, antécédents, sommeil, stress, check-ins et séances | Modèles Profile, SeanceLog, Mesure, WeeklyCheckin ; données liées au compte, certaines sensibles. L'existence d'un champ ne prouve pas sa collecte effective chez chaque membre |
 | Photos | Avatar et images de suivi | `src/lib/storage/progress-photos.ts` ; bucket exact `progress photos`, contrôle du préfixe propriétaire, URL signée 1 h. Vérifier en production caractère privé, règles d'accès et traitement des métadonnées des images |
-| Abonnements | Identifiants et état d'abonnement | Modèle Subscription ; StoreKit préparé mais non raccordé. Déclaration finale à refaire après intégration Apple et validation serveur |
-| Fonctionnement natif | Durée, pause et échéance du repos conservées localement | RestTimerView et PrivacyInfo.xcprivacy ; UserDefaults déclaré. Notification locale générique et facultative |
+| Abonnements | Identifiants et état d'abonnement Stripe ; jeton de compte et instantanés de transactions Apple | Modèles Subscription, ApplePurchaseAccount et AppleTransaction. Raccordement Apple présent dans le code, activation distante et Sandbox réel non validés. Pas de données bancaires dans ces modèles |
+| Fonctionnement natif | Durée, pause et échéance du repos conservées localement ; rappel hebdomadaire facultatif | RestTimerView et PrivacyInfo.xcprivacy ; UserDefaults déclaré. Notifications locales génériques, horaire hebdomadaire relu depuis les demandes iOS |
 | Export de séance | PDF/PNG/JPEG temporaires choisis par l'utilisateur | COAIDownload et DownloadPolicy ; dossier local protégé, nettoyage, feuille de partage explicite. Test actuel : fichiers fictifs, pas séance réelle connectée |
 | Mesure facultative | Google Analytics, Meta, Vercel Analytics ; attribution UTM | Désactivés pour le pilote marqué COAIiOS ; règles WebKit complémentaires. Safari garde ses choix. Vérification réseau complète restant à faire |
 | Diagnostic technique | Erreurs conditionnées par le DSN Sentry | Filtre commun `src/lib/analytics/error-privacy.ts` ajouté : valeurs libres et pièces jointes retirées, liste explicite de champs techniques. Traces de performance désactivées pendant l'audit. Transport mémoire du vrai SDK testé ; déploiement et flux réels restent non vérifiés |
-| Événements internes | Nom d'événement, identifiant utilisateur et métadonnées | `src/lib/analytics/product-events.ts` journalise côté serveur. Ce flux n'est pas supprimé par le refus des traceurs du navigateur ; inventaire, minimisation et conservation à examiner |
+| Événements internes | Nom d'événement, identifiant utilisateur ; indicateur first et valeurs autorisées pilier/source | `src/lib/analytics/product-events.ts` utilise une liste fermée de métadonnées : pas de texte libre, santé ou dates. L'identifiant reste journalisé : ce n'est pas anonyme. Conservation et flux de production restent à vérifier |
 
 Ne pas déclarer « aucune donnée collectée ». Ne pas confondre absence de SDK
 HealthKit natif et absence de données de santé saisies dans les écrans web.
@@ -31,10 +31,18 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    les erreurs et métadonnées avant déclaration définitive.
 2. Finaliser la suppression de compte : concurrence, révocation des sessions,
    fichiers et test complet avec un compte jetable autorisé. Voir checklist.
-3. L'export de compte (`src/app/api/compte/export/route.ts`) n'inclut que profil,
-   abonnement, programmes, séances, mesures et événements WhatsApp. Les
-   check-ins et autres relations ne sont pas inclus explicitement : couverture
-   à compléter. Le téléchargement natif JSON est désormais testé avec un objet
+3. L'export de compte (`src/app/api/compte/export/route.ts`) inclut maintenant
+   18 relations : profil, abonnement Stripe, programmes, séances, mesures,
+   événements WhatsApp, repas, avis, tests maxi, check-ins hebdomadaires,
+   adaptations, activités quotidiennes, séances quotidiennes, récupération
+   musculaire, achats de programmes, routines, analyses de mouvement et retour
+   de résiliation. Il ne constitue toujours pas un export exhaustif : relations
+   Apple et événements d'usage IA non inclus, fichiers binaires et données
+   détenues par les fournisseurs hors périmètre. Notes privées du coach et
+   prospects non liés nécessitent un circuit distinct, sans joindre les données
+   d'un autre compte. La promesse publique « toutes tes données » doit être
+   confrontée à ces limites avant publication. Le téléchargement natif JSON
+   est testé avec un objet
    fictif et un fichier invalide (`/tmp/coai-json-export.xcresult`) ; le parcours
    complet de compte connecté reste à valider, sans le confondre avec les fiches
    PDF/Story ou avec le simple affichage de la feuille système.
@@ -45,6 +53,20 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    vérifier sur appareil, puis soumettre à la validation du titulaire.
 
 ## Preuves et limites du lot traceurs
+
+### Contrôle du 25 septembre
+
+Tests `test-account-export.cjs`, `test-product-event-privacy.cjs` et
+`test-error-privacy.cjs` réussis. Export : Auth/DB simulées, propriétaire imposé
+par le serveur, 18 relations, erreurs privées et sans cache. Journal produit :
+vraie fonction testée, valeurs interdites exclues, identifiant toujours présent.
+Sentry : vrai SDK avec transport en mémoire, aucun envoi externe. Ces preuves
+ne valident ni les données distantes, ni les durées de conservation, ni toutes
+les transmissions des fournisseurs. Aucun formulaire App Privacy rempli.
+
+Les GET historiques et bilans quotidiens/hebdomadaires portent désormais
+`private, no-store` et varient selon Cookie/Authorization, vérifiés en HTTP
+avec Auth/PostgreSQL locaux. Aucun déploiement de ces protections effectué.
 
 ### Réduction des rapports d'erreur (local seulement)
 
@@ -74,12 +96,13 @@ lint et build web réussis. Après changement du User-Agent et des règles :
 **3 tests UI hors réseau réussis**, zéro échec, partage PNG/PDF, ajout Photos
 accepté et refusé (`/tmp/coai-native-privacy-offline-regression.xcresult`).
 
-La consultation Vercel confirme le déploiement production READY
+Observation historique du 17 septembre : la consultation Vercel confirmait le déploiement production READY
 `dpl_5MkwBYMHj9aTPszpWBJUApiADh3b`, commit `371edfb`, qui **précède** ce correctif.
 GitHub et coai.fr ne sont plus joignables depuis le Mac lors des derniers essais.
-Le nouveau commit est local, son push a échoué. Le test UI public de
-confidentialité ne peut donc pas être déclaré réussi. Reprendre push,
-vérification du SHA déployé, puis test public dès le réseau rétabli.
+Le commit était local et son push avait échoué. Ce constat historique ne
+prouve pas l'état de production actuel. Toute nouvelle publication requiert
+l'autorisation explicite d'Anthony ; ensuite vérifier le SHA et les parcours
+distants, sans assimiler les tests locaux à une validation de production.
 
 Références Apple consultées :
 
