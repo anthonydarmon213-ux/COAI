@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { adaptWorkout, getSessionDuration, getWorkoutForDate } from "@/lib/daily/session";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 function asJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -13,6 +13,32 @@ function asJson(value: unknown): Prisma.InputJsonValue {
 function today() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+async function saveCheckin(userId: string, date: Date, data: Omit<Prisma.DailySessionUncheckedCreateInput, "userId" | "date">) {
+  const where = { userId_date: { userId, date } };
+  let daily;
+  try {
+    daily = await prisma.dailySession.upsert({
+      where,
+      create: { userId, date, ...data },
+      update: {},
+    });
+  } catch (error) {
+    // Two first check-ins may create the same day simultaneously.
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") throw error;
+    daily = await prisma.dailySession.findUniqueOrThrow({ where });
+  }
+  // The condition is checked by the database, not by a stale pre-read:
+  // a late check-in must never rewrite a completed workout's snapshot.
+  const changed = await prisma.dailySession.updateMany({
+    where: { id: daily.id, userId, completedAt: null },
+    data,
+  });
+  if (!changed.count) {
+    return NextResponse.json({ error: "Ta séance est déjà terminée. Son bilan est conservé." }, { status: 409 });
+  }
+  return NextResponse.json(await prisma.dailySession.findUniqueOrThrow({ where }));
 }
 
 async function currentAppUser() {
@@ -114,12 +140,16 @@ export async function POST(request: Request) {
     };
 
     if (!source) {
-      const daily = await prisma.dailySession.upsert({
-        where: { userId_date: { userId: user.id, date } },
-        create: { userId: user.id, date, programmeSourceId: programme.id, programmeVersion: programme.version, ...checkinCommun },
-        update: checkinCommun,
+      return saveCheckin(user.id, date, {
+        ...checkinCommun,
+        programmeSourceId: programme.id,
+        programmeVersion: programme.version,
+        sourceSession: Prisma.DbNull,
+        adaptedSession: Prisma.DbNull,
+        adaptation: Prisma.DbNull,
+        availableMinutes: null,
+        equipementDuJour: null,
       });
-      return NextResponse.json(daily);
     }
 
     const expectedMinutes = getSessionDuration(source, user.profile?.dureeSeanceMinutes ?? 45);
@@ -139,12 +169,7 @@ export async function POST(request: Request) {
       adaptation: asJson(summary),
       ...checkinCommun,
     };
-    const daily = await prisma.dailySession.upsert({
-      where: { userId_date: { userId: user.id, date } },
-      create: { userId: user.id, date, ...seanceCommune },
-      update: seanceCommune,
-    });
-    return NextResponse.json(daily);
+    return saveCheckin(user.id, date, seanceCommune);
   }
 
   const existing = await prisma.dailySession.findUnique({
