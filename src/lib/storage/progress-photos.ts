@@ -44,15 +44,10 @@ export async function uploadAvatar(
   const path = `${userId}/avatar.${ext}`;
   const admin = createSupabaseAdminClient();
 
-  const { data: existing } = await admin.storage.from(PROGRESS_PHOTOS_BUCKET).list(userId, {
-    search: "avatar.",
-  });
-  if (existing?.length) {
-    await admin.storage.from(PROGRESS_PHOTOS_BUCKET).remove(
-      existing.map((item) => `${userId}/${item.name}`)
-    );
-  }
-
+  // Do not delete the current avatar before the replacement is stored and its
+  // path saved by the caller. Keep the other format variants (at most three
+  // fixed paths) so a failed upload/database write cannot break the old path.
+  // Account deletion removes all variants through deleteAllProgressPhotos.
   const { error } = await admin.storage
     .from(PROGRESS_PHOTOS_BUCKET)
     .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: true });
