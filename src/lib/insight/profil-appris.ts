@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
 import { MIN_JOURS_NEAT } from "@/lib/neat/signaux";
 import { buildTendancesDaily, type TendanceLongitudinale } from "@/lib/insight/tendances-longitudinales";
@@ -192,7 +193,7 @@ export async function buildProfilIntelligence(userId: string): Promise<ProfilInt
   const depuis90Jours = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 
   const [seances, checkins, tests, repas, activites, dailies] = await Promise.all([
-    prisma.seanceLog.findMany({ where: { userId, date: { gte: depuis90Jours } }, orderBy: { date: "asc" } }),
+    workoutHistory(userId, { from: depuis90Jours, order: "asc" }),
     prisma.weeklyCheckin.findMany({ where: { userId }, orderBy: { semaineDebut: "desc" }, take: 8 }),
     prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "asc" } }),
     prisma.repasLog.findMany({ where: { userId, date: { gte: depuis90Jours } } }),
