@@ -81,20 +81,31 @@ export default async function ProgressionPage() {
       : [];
     let tonnageSeance = 0;
     for (const ex of exercices) {
-      if (!ex.nom) continue;
+      if (!ex || typeof ex !== "object" || typeof ex.nom !== "string" || !ex.nom.trim()) continue;
       const nom = ex.nom.trim();
       let vol = 0;
-      if (ex.sets && ex.sets.length > 0) {
-        vol = ex.sets.reduce((s, set) => s + (set.reps ?? 0) * (set.charge ?? 0), 0);
-      } else if (typeof ex.chargeKg === "number") {
-        vol = (ex.series ?? 1) * (ex.repetitions ?? 1) * ex.chargeKg;
+      if (Array.isArray(ex.sets) && ex.sets.length > 0) {
+        vol = ex.sets.reduce((s, set) => {
+          if (!set || typeof set !== "object" || typeof set.reps !== "number" || typeof set.charge !== "number" ||
+              !Number.isFinite(set.reps) || !Number.isFinite(set.charge) || set.reps <= 0 || set.charge < 0) return s;
+          const suivant = s + set.reps * set.charge;
+          return Number.isFinite(suivant) ? suivant : s;
+        }, 0);
+      } else if (typeof ex.chargeKg === "number" && Number.isFinite(ex.chargeKg) && ex.chargeKg >= 0) {
+        const series = ex.series ?? 1;
+        const repetitions = ex.repetitions ?? 1;
+        if (typeof series === "number" && Number.isFinite(series) && series > 0 &&
+            typeof repetitions === "number" && Number.isFinite(repetitions) && repetitions > 0) {
+          const total = series * repetitions * ex.chargeKg;
+          if (Number.isFinite(total)) vol = total;
+        }
       }
       if (vol > 0) {
         const liste = tonnageParExercice.get(nom) ?? [];
         liste.push(vol);
         tonnageParExercice.set(nom, liste);
       }
-      tonnageSeance += vol;
+      if (Number.isFinite(tonnageSeance + vol)) tonnageSeance += vol;
     }
     if (tonnageSeance > 0) tonnageParSeance.push(tonnageSeance);
   }
