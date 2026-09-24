@@ -39,15 +39,16 @@ const bodySchema = z.object({
 });
 
 export async function GET() {
+  const headers = { "Cache-Control": "private, no-store", Vary: "Cookie, Authorization" };
   const authUser = await getCurrentUser();
   if (!authUser) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401, headers });
   }
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id }, select: { id: true } });
   const seances = user ? await workoutHistory(user.id) : [];
 
-  return NextResponse.json(seances);
+  return NextResponse.json(seances, { headers });
 }
 
 export async function POST(request: Request) {

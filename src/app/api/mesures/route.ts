@@ -6,9 +6,10 @@ import { prisma } from "@/lib/db/client";
 import { isOwnedProgressPhotoPath } from "@/lib/storage/progress-photos";
 
 export async function GET() {
+  const headers = { "Cache-Control": "private, no-store", Vary: "Cookie, Authorization" };
   const authUser = await getCurrentUser();
   if (!authUser) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401, headers });
   }
 
   const mesures = await prisma.mesure.findMany({
@@ -16,7 +17,7 @@ export async function GET() {
     orderBy: { date: "desc" },
   });
 
-  return NextResponse.json(mesures);
+  return NextResponse.json(mesures, { headers });
 }
 
 export async function POST(request: Request) {
