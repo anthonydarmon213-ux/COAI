@@ -46,6 +46,7 @@ const form = load('src/components/suivi/mesure-form.tsx', {
   fetch: async (url, init) => {
     calls.push({ url, body: init.body });
     if (failure === 'network') throw new TypeError('offline');
+    if (failure === 'missing-photo-path' && url === '/api/mesures/photo') return { ok: true, json: async () => ({}) };
     if (failure === url) return { ok: false, json: async () => ({ error: 'Service indisponible' }) };
     return { ok: true, json: async () => ({ path: 'owned/photo.jpg' }) };
   },
@@ -93,9 +94,20 @@ function submit() { return find(render(), n => n.type === 'form').props.onSubmit
     assert.equal(find(render(), n => n.props?.type === 'submit').props.disabled, false);
     const before = calls.length;
     failure = null; await submit();
-    assert.equal(calls.length, before + 2, 'Selected photo survives failure and can be retried');
+    assert.equal(calls.length, before + (mode === '/api/mesures' ? 1 : 2), 'Reuse a confirmed upload after measure failure only');
     assert.equal(refreshes, 1);
     assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '');
   }
+  reset(); photo(); failure = '/api/mesures'; await submit();
+  const firstUploadCount = calls.filter(c => c.url === '/api/mesures/photo').length;
+  photo(); failure = null; await submit();
+  assert.equal(calls.filter(c => c.url === '/api/mesures/photo').length, firstUploadCount + 1, 'Changing the photo invalidates the saved path');
+  photo(); await submit();
+  assert.equal(calls.filter(c => c.url === '/api/mesures/photo').length, firstUploadCount + 2, 'Success clears the previous upload reference');
+  reset(); photo(); failure = 'missing-photo-path'; await submit();
+  assert.equal(calls.length, 1, 'No measure write without confirmed photo path');
+  assert.equal(refreshes, 0);
+  failure = null; await submit();
+  assert.equal(calls.filter(c => c.url === '/api/mesures/photo').length, 2, 'Unconfirmed upload is not cached');
   console.log('PASS: empty/invalid/valid measures, photo alone, ownership/auth, pre-upload validation, preserved draft, duplicate-submit guard. No real writes.');
 })().catch(e => { console.error(e); process.exitCode = 1; });

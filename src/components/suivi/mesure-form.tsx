@@ -26,6 +26,7 @@ export function MesureForm() {
   const [fieldErrors, setFieldErrors] = useState<MesureFieldErrors>({});
   const submitting = useRef(false);
   const photoInput = useRef<HTMLInputElement>(null);
+  const uploadedPhoto = useRef<{ file: File; path: string } | null>(null);
 
   function showErrors(form: HTMLFormElement, fields: MesureFieldErrors, message: string) {
     setFieldErrors(fields);
@@ -65,14 +66,20 @@ export function MesureForm() {
     try {
       let photoPath: string | undefined;
 
-      if (photo) {
+      if (photo && uploadedPhoto.current?.file === photo) {
+        photoPath = uploadedPhoto.current.path;
+      } else if (photo) {
         const optimized = await compressProgressPhoto(photo);
         const formData = new FormData();
         formData.append("file", optimized.file);
         const photoRes = await fetch("/api/mesures/photo", { method: "POST", body: formData });
         const photoData = await photoRes.json();
         if (!photoRes.ok) throw new Error(photoData.error ?? "Échec de l'envoi de la photo.");
+        if (typeof photoData.path !== "string" || !photoData.path.trim()) {
+          throw new Error("L’envoi de la photo n’a pas pu être confirmé. Réessaie.");
+        }
         photoPath = photoData.path;
+        uploadedPhoto.current = { file: photo, path: photoData.path };
       }
 
       const res = await fetch("/api/mesures", {
@@ -94,6 +101,7 @@ export function MesureForm() {
       setMasseMusculaireKg("");
       setFrequenceCardiaqueReposBpm("");
       setPhoto(null);
+      uploadedPhoto.current = null;
       setPhotoInfo(null);
       if (photoInput.current) photoInput.current.value = "";
       router.refresh();
@@ -142,9 +150,11 @@ export function MesureForm() {
               <input
                 ref={photoInput}
                 type="file"
+                disabled={loading}
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => {
                   const selected = e.target.files?.[0] ?? null;
+                  uploadedPhoto.current = null;
                   setPhoto(selected);
                   setPhotoInfo(selected ? "La photo sera optimisée automatiquement avant l’envoi." : null);
                 }}
