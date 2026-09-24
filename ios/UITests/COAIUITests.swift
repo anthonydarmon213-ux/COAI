@@ -1,6 +1,67 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Run on the QA simulator where notification permission was explicitly denied.
+    @MainActor
+    func testWeeklyReminderWithPreviouslyDeniedPermission() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        let reminder = app.buttons["weekly-reminder-open"]
+        reveal(reminder, in: app)
+        reminder.tap()
+        let settings = app.buttons["Ouvrir les réglages de COAI"]
+        guard settings.waitForExistence(timeout: 5) else {
+            throw XCTSkip("Ce scénario nécessite le simulateur QA dont les notifications sont refusées ; un test ignoré ne valide pas ce parcours.")
+        }
+        let save = app.buttons["weekly-reminder-save"]
+        reveal(save, in: app)
+        save.tap()
+        let message = app.staticTexts["weekly-reminder-message"]
+        XCTAssertTrue(message.waitForExistence(timeout: 5))
+        XCTAssertEqual(message.label, "Notifications non autorisées. Aucun nouveau rappel n’a été programmé.")
+        XCTAssertFalse(app.buttons["weekly-reminder-disable"].exists)
+        XCTAssertFalse(app.staticTexts["Rappel enregistré sur cet iPhone."].exists)
+        XCTAssertTrue(save.isEnabled)
+        XCTAssertFalse(XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch.exists)
+    }
+
+    @MainActor
+    func testWeeklyReminderSmallScreenLargeText() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        XCUIDevice.shared.orientation = .portrait
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        let reminder = app.buttons["weekly-reminder-open"]
+        reveal(reminder, in: app)
+        reminder.tap()
+        let save = app.buttons["weekly-reminder-save"]
+        XCTAssertTrue(app.navigationBars["Mon rappel"].waitForExistence(timeout: 5))
+        let intro = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        intro.name = "Rappel petit écran XXXL — introduction"
+        intro.lifetime = .keepAlways
+        add(intro)
+        reveal(save, in: app)
+        XCTAssertTrue(save.isHittable)
+        XCTAssertGreaterThanOrEqual(save.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(save.frame.minX, 0)
+        XCTAssertLessThanOrEqual(save.frame.maxX, app.frame.maxX)
+        XCTAssertFalse(XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch.exists)
+        let controls = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        controls.name = "Rappel petit écran XXXL — réglages"
+        controls.lifetime = .keepAlways
+        add(controls)
+    }
+
     @MainActor
     func testWeeklyReminderIsOptInAndCanBeDisabled() throws {
         continueAfterFailure = false

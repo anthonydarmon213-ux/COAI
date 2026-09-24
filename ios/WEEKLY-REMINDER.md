@@ -14,6 +14,16 @@ iOS, pas d'un simple drapeau enregistré dans l'app.
 
 ## Vérifications
 
+- iPhone SE 3 simulé, iOS 26.5, accessibilité XXXL : ouverture, défilement,
+  bouton d'activation touchable d'au moins 44 points et dans la largeur écran.
+  Captures introduction/réglages examinées : jour, heure et bouton lisibles.
+  Test 02:29 réussi, aucun test ignoré. Premier essai corrigé car le test
+  attendait un élément de liste non encore matérialisé avant défilement.
+- Test de refus sur le simulateur QA avec autorisation déjà refusée : message
+  explicite, lien Réglages, bouton utilisable, aucun faux succès ni nouvelle
+  alerte de permission. Ce scénario nécessite cet état de permission ; un
+  test ignoré sur un autre appareil ne constitue pas une preuve.
+
 - Réinitialisation locale : efface les notifications hebdomadaire/repos,
   les notifications déjà livrées et les préférences du minuteur. La file du
   minuteur est invalidée pour éviter une alerte ajoutée tardivement.
@@ -39,7 +49,7 @@ iOS, pas d'un simple drapeau enregistré dans l'app.
 
 - Réception effective à l'heure choisie, changements d'heure/fuseau et mode
   Concentration sur appareil physique ; persistance après redémarrage iPhone.
-- Test UI dédié du refus et modification d'horaire, petits écrans et texte XXL.
+- Test de modification d'horaire et autres orientations/tailles ; VoiceOver.
 - Effacement automatique des rappels lors de suppression de compte web ou
   déconnexion web : encore à intégrer. Le reset natif explicite est couvert.
 - Navigation ciblée après toucher l'alerte : ouverture de l'app uniquement,
