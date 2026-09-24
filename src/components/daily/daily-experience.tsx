@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { DailyCoach } from "@/components/daily/daily-coach";
 import { adaptWorkout, ensureWorkoutCompleteness, isCoreExercise, type DailyCheckinInput } from "@/lib/daily/session";
 import { ShareProgressCardButton } from "@/components/suivi/share-progress-card-button";
+import { createDailyProgressStore } from "@/lib/daily/progress-store";
 
 type Session = Record<string, unknown> & {
   nom?: string;
@@ -29,6 +30,8 @@ type Adaptation = {
 };
 
 type Daily = {
+  id?: string;
+  updatedAt?: string | Date;
   adaptedSession: unknown;
   adaptation: unknown;
   sleep: string | null;
@@ -178,14 +181,34 @@ export function DailyExperience({
   const [rating, setRating] = useState("");
   const [feedbackPain, setFeedbackPain] = useState<boolean | null>(null);
   const [comment, setComment] = useState("");
-  const [started, setStarted] = useState(Boolean(initialDaily?.completedAt));
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(() => new Set());
   const [activeExercise, setActiveExercise] = useState<number | null>(null);
 
   const rawSession = (daily?.adaptedSession as Session | null) ?? sourceSession;
   const activeSession = ensureWorkoutCompleteness(rawSession);
   const adaptation = daily?.adaptation as Adaptation | null;
   const exercises = Array.isArray(activeSession.exercices) ? activeSession.exercices : [];
+  const snapshotVersion = daily?.updatedAt ? new Date(daily.updatedAt).toISOString() : "";
+  const progressKey = daily?.id && snapshotVersion && !daily.completedAt ? `coai:daily-progress:v1:${daily.id}:${snapshotVersion}` : null;
+  const exerciseCount = exercises.length;
+  const hasWarmup = Boolean(activeSession.echauffement);
+  const hasCooldown = Boolean(activeSession.retourAuCalme);
+  const allowedSteps = JSON.stringify([
+    ...(hasWarmup ? ["warmup"] : []),
+    ...Array.from({length: exerciseCount}, (_, index) => `exercise-${index}`),
+    ...(hasCooldown ? ["cooldown"] : []),
+  ]);
+  const progressIdentity = JSON.stringify([progressKey, allowedSteps]);
+  const [progressState, setProgressState] = useState(() => ({
+    identity: progressIdentity, store: createDailyProgressStore(progressKey, allowedSteps),
+  }));
+  if (progressState.identity !== progressIdentity) {
+    setProgressState({identity: progressIdentity, store: createDailyProgressStore(progressKey, allowedSteps)});
+  }
+  const progressStore = progressState.store;
+  const savedProgress = useSyncExternalStore(progressStore.subscribe, progressStore.snapshot, progressStore.serverSnapshot);
+  const started = Boolean(daily?.completedAt || savedProgress.started);
+  const completedSteps = new Set(savedProgress.steps);
+  const setStarted = (value: boolean) => progressStore.update(previous => ({started: value, steps: previous.steps}));
   const sessionAvailable = exercises.length > 0 || Boolean(activeSession.echauffement || activeSession.retourAuCalme);
   const mainExercises = exercises.map((exercise, index) => ({ exercise, index })).filter(({ exercise }) => !isCoreExercise(exercise));
   const coreExercises = exercises.map((exercise, index) => ({ exercise, index })).filter(({ exercise }) => isCoreExercise(exercise));
@@ -197,11 +220,11 @@ export function DailyExperience({
   const checkinReady = missingCheckinAnswers === 0;
 
   function toggleStep(key: string) {
-    setCompletedSteps((current) => {
-      const next = new Set(current);
+    progressStore.update((current) => {
+      const next = new Set(current.steps);
       if (next.has(key)) next.delete(key);
       else next.add(key);
-      return next;
+      return {started: current.started, steps: [...next]};
     });
   }
 
@@ -339,6 +362,7 @@ export function DailyExperience({
       )}
 
       {checkinDone && <section className="relative overflow-hidden rounded-3xl border border-laiton-400/25 bg-gradient-to-br from-white/[0.07] via-white/[0.025] to-laiton-400/[0.08] p-5 shadow-[0_32px_100px_-50px_rgba(201,162,98,.55)] sm:p-7">
+          {savedProgress.failed && <p role="alert" className="mb-4 text-sm text-amber-200">La reprise sur cet appareil n’a pas pu être sauvegardée. Garde cette page ouverte pendant ta séance.</p>}
         <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-laiton-400/10 blur-3xl" />
         <div className="relative">
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-laiton-400">Séance du jour</p>

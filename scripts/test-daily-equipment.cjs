@@ -70,7 +70,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/components/daily/dail
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
 }).outputText, { exports: uiExports, require(name) {
   if (name === 'react/jsx-runtime') return { jsx, jsxs: jsx };
-  if (name === 'react') return { useState: value => [typeof value === 'function' ? value() : value, () => {}] };
+  if (name === 'react') return { useState: value => [typeof value === 'function' ? value() : value, () => {}], useMemo: fn => fn(), useSyncExternalStore: (_subscribe, _snapshot, serverSnapshot) => serverSnapshot() };
   if (name === 'next/navigation') return { useRouter: () => ({ refresh() {} }) };
   if (name === 'next/link') return { default: 'link' };
   if (name === 'next/image') return { default: 'image' };
@@ -78,6 +78,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/components/daily/dail
   if (name.endsWith('/coai-image-mark')) return { CoaiImageMark: 'mark' };
   if (name === '@/lib/exercices/photos-coai') return load(path.resolve('src/lib/exercices/photos-coai.ts'));
   if (name === '@/lib/daily/session') return exportsObject;
+  if (name === '@/lib/daily/progress-store') return load(path.resolve('src/lib/daily/progress-store.ts'));
   if (name.endsWith('/button')) return { Button: 'button' };
   if (name.endsWith('/daily-coach')) return { DailyCoach: 'coach' };
   if (name.endsWith('/share-progress-card-button')) return { ShareProgressCardButton: 'share' };

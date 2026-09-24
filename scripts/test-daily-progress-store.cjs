@@ -1,0 +1,38 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('typescript');
+const vm = require('node:vm');
+const moduleExports = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/daily/progress-store.ts', 'utf8'), {
+  compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
+}).outputText, {exports: moduleExports});
+const create = (key, allowed, storage) => moduleExports.createDailyProgressStore(key, JSON.stringify(allowed), storage);
+const values = new Map();
+const storage = () => ({getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value)});
+const first = create('daily-A-version-1', ['warmup', 'exercise-0'], storage);
+let notifications = 0;
+const unsubscribe = first.subscribe(() => notifications++);
+assert.equal(first.serverSnapshot().started, false);
+first.update(() => ({started: true, steps: ['warmup']}));
+assert.equal(notifications, 1);
+const remount = create('daily-A-version-1', ['warmup', 'exercise-0'], storage);
+assert.equal(remount.snapshot().started, true);
+assert.equal(JSON.stringify(remount.snapshot().steps), '["warmup"]');
+assert.equal(remount.snapshot(), remount.snapshot(), 'Snapshot must be stable for React');
+assert.equal(create('daily-B-version-1', ['warmup'], storage).snapshot().started, false);
+assert.equal(create('daily-A-version-2', ['warmup'], storage).snapshot().started, false);
+assert.equal(create('daily-A-version-1', [], storage).snapshot().steps.length, 0);
+values.set('corrupt', '{');
+assert.equal(create('corrupt', [], storage).snapshot().failed, true);
+const blocked = create('blocked', ['warmup'], () => {throw new Error('Storage denied');});
+assert.equal(blocked.snapshot().failed, true);
+blocked.update(() => ({started: true, steps: ['warmup']}));
+assert.equal(blocked.snapshot().started, true);
+assert.equal(blocked.snapshot().failed, true);
+values.set('expired', JSON.stringify({version: 1, started: true, steps: ['warmup'], savedAt: Date.now() - 73 * 3600_000}));
+assert.equal(create('expired', ['warmup'], storage).snapshot().started, false);
+unsubscribe();
+first.update(() => ({started: true, steps: []}));
+assert.equal(notifications, 1);
+assert.equal(JSON.stringify(create('daily-A-version-1', ['warmup'], storage).snapshot().steps), '[]');
+console.log('PASS daily progress: remount, version/account isolation, bounds, expiry, denied storage and subscriptions (memory storage, no browser).');
