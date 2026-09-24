@@ -2,29 +2,54 @@
 
 ## État courant — 24 septembre 2026
 
-Contrôle relancé sur le code après d872a25. Les anciens comptes rendus ci-dessous
+Contrôle relancé sur le code après 5ad47b9. Les anciens comptes rendus ci-dessous
 sont historiques et ne valident pas le binaire actuel en production.
 
-- `bash scripts/check-ios.sh --device-release` : 43 tests Swift, 65 contrôles
+- `bash scripts/check-ios.sh --device-release` : 49 tests Swift, 65 contrôles
   autonomes, compilation réelle des règles WebKit, plist/manifeste/schéma XML,
-  compilation Release arm64 et inclusion du manifeste réussis. Le contrôle
-  autonome des liens d’offres attendait encore l’ancienne alerte ; il vérifie
-  maintenant la feuille native, sans autoriser checkout/API Stripe.
+  compilation Release arm64 non signée et inclusion du manifeste réussis.
+  Preuve : `/tmp/coai-release-current-0924.log`. Ce contrôle ne lance aucun
+  parcours connecté et ne valide pas une archive distribuable.
 - Une identité Apple Development est disponible dans le trousseau ; aucune
   identité Apple Distribution n’y est listée. Cela ne prouve pas à lui seul
   l’état de l’adhésion du compte Apple.
-- iPhone 17 Pro déclaré indisponible. iPhone 13 Pro détecté par CoreDevice,
-  mais refusé par Xcode : appairage en cours / dialogue de confiance requis.
-  Aucun binaire installé ou remplacé pendant ce contrôle. Déverrouillage et
-  connexion de l’iPhone 17 Pro demandés à Anthony.
+- iPhone 17 Pro maintenant appairé et disponible : Debug signée construite,
+  signature vérifiée et installation sans désinstallation réussie. Le lancement
+  reste refusé par iOS (Security ; dernière tentative à 19:53). La cause exacte
+  n'est pas prouvée : vérification de la confiance développeur demandée à Anthony.
+  Profil de développement valable jusqu'au 1er octobre 2026, 16:39 UTC.
+  Aucune recette physique connectée validée. iPhone 13 Pro non appairé dans Xcode.
 - Abonnement natif : compte/catalogue, reçus, reprise au premier plan,
   confirmation des droits et réception serveur des notifications raccordés
   dans le code. Ventes, notifications distantes et droits Apple de production
   non activés. Achat Apple réel, restauration et TestFlight toujours non prouvés.
-- Connexion Apple non trouvée dans les composants d’authentification inspectés
-  (Google et email présents). À traiter et confronter aux exigences de revue.
+- Connexion Apple implémentée, désactivée par défaut via
+  `NEXT_PUBLIC_APPLE_SIGN_IN_ENABLED`. Voir `APPLE-SIGN-IN.md` : fournisseur,
+  identifiants distants et parcours Apple réel restent à configurer/vérifier.
+  Les tests avec fournisseurs simulés ne prouvent pas une connexion Apple.
+- Trois tests UI natifs sur simulateur SE (alignement, grande taille de texte,
+  rotation et explorateur) réussis le 24 septembre. Données de test locales,
+  sans validation des parcours serveur ou des médias réels.
+- Cinq tests UI supplémentaires relancés sur SE le 24 septembre : deux exports
+  fictifs (PNG/PDF/JSON, rejet de formats, reprise après fermeture/arrière-plan),
+  puis trois parcours publics réels (connexion/clavier, navigation inscription
+  et récupération, saisie/visibilité du mot de passe). Tous réussis, captures
+  clavier et partage inspectées. Aucun formulaire soumis, aucune authentification
+  complète ni demande de récupération envoyée. Journaux :
+  `/tmp/coai-export-current-0924.log`, `/tmp/coai-auth-current-0924.log`.
+  Ces tests ne couvrent ni panne réseau simulée ni restauration de connexion.
+- Intégration HTTP locale connectée réussie : profil, sauvegardes de séance,
+  contrôle inter-comptes, programmes et téléchargement de deux PDF réels.
+  Les PDF ont une signature et un format valides ; leur contenu visuel complet
+  et leur enregistrement physique sur iPhone ne sont pas validés par ce test.
+- Anciens exercices sans médias encore observés en production. Corrections
+  locales des aperçus, lecteur et exports non publiées : autorisation explicite
+  de publication demandée, pas encore reçue. Ne pas annoncer ce problème résolu
+  pour les utilisateurs de coai.fr.
 - Manifeste présent : motif UserDefaults déclaré. Ce fichier seul ne valide
   ni la collecte du site embarqué ni les réponses de confidentialité App Store.
+  Écarts ouverts : portée des données WhatsApp, usages IA, métadonnées de paiement
+  et limites de l'export. Usage réel Make/Twilio à confirmer avec Anthony.
 
 Prochaines validations prioritaires : connexion complète et persistante dans
 l’app physique ; parcours Apple sandbox avec backend dédié ; contrôle des
