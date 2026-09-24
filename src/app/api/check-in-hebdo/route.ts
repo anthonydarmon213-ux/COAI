@@ -16,7 +16,9 @@ const bodySchema = z.object({
   seancesRealisees: z.number().int().min(0).max(14).optional(),
   repasMaison: z.number().int().min(0).max(21).optional(),
   repasRestaurant: z.number().int().min(0).max(21).optional(),
-  commentaire: z.string().max(1000).optional(),
+  commentaire: z.string().trim().max(1000).optional(),
+}).refine(data => Object.values(data).some(value => value !== undefined && value !== ""), {
+  message: "Renseigne au moins une réponse avant d’enregistrer ton bilan.",
 });
 
 // Le check-in hebdomadaire est dû dès qu'aucune entrée n'existe pour la

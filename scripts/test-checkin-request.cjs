@@ -20,7 +20,7 @@ const box = { exports: {}, require: id => { if (!(id in dependencies)) throw Err
 vm.runInNewContext(code, box);
 const post = body => box.exports.POST(new Request('http://localhost/api/check-in-hebdo', { method: 'POST', body }));
 (async () => {
-  for (const body of ['', '{', 'null', '{"energie":9}']) {
+  for (const body of ['', '{', 'null', '{}', '{"userId":"someone-else"}', '{"commentaire":"   "}', '{"energie":9}']) {
     const response = await post(body);
     assert.equal(response.status, 400);
     assert.ok((await response.json()).error);
@@ -33,5 +33,9 @@ const post = body => box.exports.POST(new Request('http://localhost/api/check-in
   assert.equal(response.status, 201);
   assert.equal((await response.json()).userId, 'user-test');
   assert.equal(writes, 1);
+  for (const body of ['{"douleurs":false}', '{"seancesRealisees":0}', '{"repasMaison":0}', '{"commentaire":"  Bilan réel  "}']) {
+    assert.equal((await post(body)).status, 201);
+  }
+  assert.equal(writes, 5);
   console.log('PASS: malformed check-ins rejected before DB; auth and valid submission preserved (mock DB).');
 })().catch(error => { console.error(error); process.exitCode = 1; });
