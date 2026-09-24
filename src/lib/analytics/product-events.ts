@@ -34,5 +34,15 @@ export function trackServerEvent(
   userId: string | null,
   meta?: Record<string, unknown>
 ): void {
-  console.log(`[product-event] ${name}`, { userId, ...meta });
+  // Logs are not the coaching database. Never copy free text, health signals,
+  // travel dates or nested objects into the hosting provider's logs.
+  const details: Record<string, string | boolean | null> = { userId };
+  if (typeof meta?.first === "boolean") details.first = meta.first;
+  if (typeof meta?.pilier === "string" && ["ENTRAINEMENT", "NUTRITION", "RECUPERATION"].includes(meta.pilier)) {
+    details.pilier = meta.pilier;
+  }
+  if (typeof meta?.source === "string" && ["SAISIE_MANUELLE", "MONTRE", "APPLICATION_SANTE"].includes(meta.source)) {
+    details.source = meta.source;
+  }
+  console.log(`[product-event] ${name}`, details);
 }
