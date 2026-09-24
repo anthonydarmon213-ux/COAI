@@ -1,5 +1,20 @@
 # Suppression de compte — vérification du 24 septembre 2026
 
+## Complément HTTP du 25 septembre — panne réelle de Storage
+
+La pile locale Auth/PostgreSQL utilisée ne lance pas Storage (inventaire Docker
+vérifié). Une première tentative de tester la suppression complète reçoit donc
+503 ; elle ne compte pas comme suppression réussie. Le test de panne explicite
+vérifie ensuite : message de nettoyage non confirmé, aucun faux succès,
+compte et données Apple/IA conservés, accès cookie/bearer utilisables pour
+réessayer, autre compte intact malgré un userId tiers envoyé dans le corps.
+Journal `/tmp/coai-delete-outage-http-0925.log`, fixtures nettoyées.
+
+Cette preuve ne remplace ni un nettoyage réel de photos ni une suppression
+HTTP réussie. La relation AiUsageEvent est SetNull dans le schéma : ne pas
+annoncer la suppression de tous les événements techniques ou leur anonymat
+sur cette seule base. Politique de conservation et corrélations à examiner.
+
 ## Vérifié localement
 
 - Protection de provenance : en-tête explicite requis, origine exacte de

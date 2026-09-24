@@ -387,6 +387,23 @@ async function main() {
   assert.equal((await constrained.json()).requiresCoachReview, true);
   assert.equal(await db.programmeGenerated.count({where: {userId: b.user.id}}), 0);
   console.log('PASS HTTP programme: real auth/profile/catalogue/database, 3 concurrent activations without duplicates, retry, other account denied, three server-rendered pillar pages');
+  // This isolated stack intentionally has no Storage service. Verify that a
+  // real storage outage never silently deletes the account or reports success.
+  const deleted = await fetch(origin + '/api/compte/delete', {method: 'POST',
+    headers: {...a.bearer, 'x-coai-delete-confirmation': '1', 'Content-Type': 'application/json'},
+    body: JSON.stringify({userId: b.user.id})});
+  const deletionResult = await deleted.json();
+  assert.equal(deleted.status, 503, JSON.stringify(deletionResult));
+  assert.match(deletionResult.error, /suppression des photos.*pas pu être confirmée/);
+  assert.equal(deletionResult.success, undefined);
+  assert.equal(await db.appleTransaction.count({where: {userId: a.user.id}}), 1);
+  assert.equal((await db.aiUsageEvent.findUnique({where: {id: a.usageFixture.id}})).userId, a.user.id);
+  for (const headers of [a.cookie, a.bearer]) {
+    assert.equal((await fetch(exportURL, {headers})).status, 200, 'Account retained and retryable after storage failure');
+  }
+  assert.equal((await fetch(exportURL, {headers: b.bearer})).status, 200, 'Other account preserved');
+  assert.equal(await db.user.count({where: {id: a.user.id}}), 1);
+  console.log('PASS HTTP deletion failure: real Storage unavailable, readable 503 without success, account/Apple/AI retained, both credentials still usable, other account preserved');
   console.log('LIMIT: local HTTP/Auth/DB, not browser UI, physical iPhone, production or Apple purchases');
 }
 async function cleanup() {
@@ -397,11 +414,18 @@ async function cleanup() {
       if (owned.user) {
         // AI usage uses SetNull on user deletion; remove only our exact fixtures first.
         await db.aiUsageEvent.deleteMany({where: {userId: owned.user.id}});
+        if (owned.usageFixture) await db.aiUsageEvent.deleteMany({where: {id: owned.usageFixture.id}});
         await db.seanceLog.deleteMany({where: {userId: owned.user.id}});
         await db.profile.deleteMany({where: {userId: owned.user.id}});
-        await db.user.delete({where: {id: owned.user.id}});
+        await db.user.deleteMany({where: {id: owned.user.id}});
       }
-      const {error} = await admin.auth.admin.deleteUser(owned.authId); assert.equal(error, null);
+      const remaining = await admin.auth.admin.getUserById(owned.authId);
+      if (remaining.data.user) {
+        const {error} = await admin.auth.admin.deleteUser(owned.authId); assert.equal(error, null);
+      } else {
+        assert.equal(remaining.error?.status, 404);
+        assert.equal(remaining.error?.code, 'user_not_found');
+      }
     } catch (error) { errors.push(error); }
   }
   await db.$disconnect();
