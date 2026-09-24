@@ -13,6 +13,10 @@ const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+for (const name of ['Développé incliné machine', 'Développé incliné (machine)', 'Développé incliné à la machine', 'Développé incliné barre', 'Développé couché incliné', 'Développé couché incliné haltères', 'Incline bench press', 'Incline dumbbell press', 'Incline chest press machine']) {
+  assert.equal(videoCoaiPourNom(name), null, `Aucune substitution épaules, Smith ou banc plat : ${name}`);
+}
+assert.equal(videoCoaiPourNom('Pompes inclinées')?.fichier, 'pompes-inclinees');
 for (const name of ['Deadlift roumain', 'Deadlift roumain barre', 'Soulevé de terre roumain à la barre', 'Romanian deadlift', 'RDL', 'Soulevé de terre roumain haltères', 'Deadlift roumain haltères', 'RDL haltères']) {
   assert.equal(videoCoaiPourNom(name), null, `Le rush mal nommé montre un rowing : ${name}`);
 }

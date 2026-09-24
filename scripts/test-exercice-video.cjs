@@ -23,16 +23,17 @@ for (const extension of ['.ts', '.tsx']) {
 const { ExerciceVideo } = require('../src/components/programme/exercice-video.tsx');
 for (const [nom, fichier] of [
   ['Tirage horizontal (machine)', 'tirage-horizontal'],
-  ['Développé incliné à la machine', 'developpe-incline-machine'],
+  ['Superman au sol', 'superman'],
 ]) {
   const html = renderToStaticMarkup(React.createElement(ExerciceVideo, { nom }));
   assert.match(html, /<video\b/);
   assert.match(html, /controls=""/);
-  assert.match(html, /playsinline=""/);
+  assert.match(html, /playsinline=""/i);
   assert.match(html, /preload="none"/);
   assert.ok(html.includes(`/videos/exercices/${fichier}.mp4`));
   assert.doesNotMatch(html, /autoplay|<button|<img/);
   assert.ok(fs.existsSync(path.join(root, 'public/videos/exercices', `${fichier}.mp4`)));
 }
 assert.equal(renderToStaticMarkup(React.createElement(ExerciceVideo, { nom: 'Exercice inconnu de test' })), '');
+assert.equal(renderToStaticMarkup(React.createElement(ExerciceVideo, { nom: 'Développé incliné à la machine' })), '');
 console.log('PASS: native video SSR, manual playback, exact sources, no invisible overlay, unknown exercise hidden');

@@ -13,9 +13,8 @@ export type VideoCoai = {
 type Entree = { motifs: string[]; video: VideoCoai };
 
 const TABLE: Entree[] = [
-  // Lot du 02/09/2026. Les variantes unilaterales precedent la version
-  // classique, et "developpe incline (machine)" porte un motif explicite :
-  // un motif generique "developpe incline" capterait la version barre.
+  // Lot du 02/09/2026. Les variantes unilatérales précèdent la version
+  // classique ; les associations invalidées par audit restent exclues.
   { motifs: ["pont fessier unilateral", "hip bridge unilateral"], video: { fichier: "pont-fessier-unilateral", description: "Pont fessier unilatéral" } },
   { motifs: ["pont fessier", "glute bridge"], video: { fichier: "pont-fessier", description: "Pont fessier au sol" } },
   { motifs: ["developpe arnold", "arnold press"], video: { fichier: "developpe-arnold", description: "Développé Arnold assis" } },
@@ -28,7 +27,8 @@ const TABLE: Entree[] = [
   // capturait aussi les prescriptions à la poulie basse/haute.
   { motifs: ["face pull elastique", "face pull a l'elastique", "face pull avec elastique"], video: { fichier: "face-pull-elastique", description: "Face pull à l'élastique" } },
   { motifs: ["kickback triceps a l'elastique", "kickback triceps elastique"], video: { fichier: "kickback-elastique", description: "Kickback triceps à l'élastique" } },
-  { motifs: ["developpe incline (machine)", "developpe incline machine", "developpe incline a la machine"], video: { fichier: "developpe-incline-machine", description: "Développé incliné à la machine" } },
+  // Audit visuel 24/09 : le clip nommé developpe-incline-machine montre
+  // une poussée au-dessus de la tête, pas le développé pectoraux prescrit.
   // Lot fonctionnel réel du 25/08/2026. Les variantes précises restent
   // avant les motifs génériques (notamment « burpee »).
   { motifs: ["ballon leste par-dessus l'epaule", "medecine ball par-dessus l'epaule"], video: { fichier: "medecine-ball-par-dessus-epaule", description: "Ballon lesté par-dessus l’épaule" } },
@@ -85,7 +85,8 @@ const TABLE: Entree[] = [
   { motifs: ["tirage vertical", "lat pulldown", "tirage poulie haute", "tirage vertical poulie"], video: { fichier: "tirage-vertical", description: "Tirage vertical à la poulie haute" } },
   { motifs: ["curl poulie basse", "bicep curl poulie", "cable curl"], video: { fichier: "bicep-curl-poulie-basse", description: "Curl biceps à la poulie basse" } },
   { motifs: ["developpe couche (barre)", "developpe couche classique", "developpe couche barre", "bench press barre", "bench press"], video: { fichier: "developpe-couche-classique", description: "Développé couché classique à la barre" } },
-  { motifs: ["developpe couche incline", "developpe incline barre", "incline bench press"], video: { fichier: "developpe-couche-incline", description: "Développé couché incliné à la barre" } },
+  // Le clip developpe-couche-incline utilise une barre guidée (Smith),
+  // différente de la barre libre illustrée : aucune association par défaut.
   // Le rush s'appelait « press machin incliné » mais montre une presse à
   // cuisses inclinée (jambes sur le plateau), pas un développé pectoraux.
   { motifs: ["presse a cuisses", "presse à cuisses", "leg press"], video: { fichier: "presse-a-cuisses", description: "Presse à cuisses inclinée" } },
@@ -142,6 +143,8 @@ function normaliser(texte: string): string {
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {
   const normalise = normaliser(nom);
+  // Empêcher aussi le repli « bench press » vers le développé à plat.
+  if (/(developpe.*incline|incline.*press)/.test(normalise)) return null;
   // Rush inspecté : exécution allongée à deux jambes uniquement.
   if (normalise.includes("leg curl") && !["leg curl", "leg curl (machine)", "leg curl machine", "leg curl allonge", "leg curl allonge (machine)"].includes(normalise)) return null;
   // Audit visuel : ces rushes ne correspondent pas aux fiches/photos actuelles.

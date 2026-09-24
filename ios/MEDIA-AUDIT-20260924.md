@@ -1,5 +1,25 @@
 # Médias RDL — contrôle visuel du 24 septembre 2026
 
+## Complément : développés inclinés
+
+Inspection de séquences multi-images : `developpe-incline-machine.mp4`
+montre une poussée au-dessus de la tête, distincte de la poussée pectoraux
+décrite et illustrée. `developpe-couche-incline.mp4` montre une barre guidée
+Smith, alors que la photo barre présente une barre libre.
+Associations retirées sans supprimer les fichiers ni changer les prescriptions.
+Un garde-fou empêche le nom anglais « incline bench press » de retomber sur
+la vidéo de développé à plat. Les pompes inclinées restent inchangées.
+Le catalogue compte désormais 60 exercices avec références photo et vidéo,
+sans que cela constitue une validation visuelle de tous ces exercices.
+Correction locale uniquement, pas encore vérifiée en production.
+
+Vérifications complémentaires : tests médias/lecteur/contenu propriétaire,
+TypeScript, lint (six avertissements existants), build web et contrôle iOS
+`check-ios.sh --device-release` réussis. Binaire iPhone arm64 non signé compilé
+avec manifeste de confidentialité. 356 références locales sans fichier absent.
+La bibliothèque reste à 86 variantes incomplètes sur 90 (388 occurrences).
+Ni installation, ni archive de distribution, ni publication effectuées.
+
 Deux noms de fichiers sont trompeurs. Séquences examinées par extraction
 de plusieurs images réparties dans chaque clip, pas uniquement le poster :
 
