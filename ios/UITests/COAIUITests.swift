@@ -180,6 +180,30 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testUnavailableSubscriptionCanOpenAccount() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let link = app.links["Voir l’abonnement iOS"]
+        XCTAssertTrue(link.waitForExistence(timeout: 15))
+        link.tap()
+        let account = app.buttons["apple-open-account"]
+        XCTAssertTrue(account.waitForExistence(timeout: 30))
+        reveal(account, in: app)
+        XCTAssertTrue(account.isHittable)
+        XCTAssertGreaterThanOrEqual(account.frame.height, 44)
+        account.tap()
+        XCTAssertTrue(account.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.webViews.buttons["Continuer avec Google"].waitForExistence(timeout: 30))
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Compte accessible depuis offre indisponible"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        // Anonymous public navigation only. No credentials or purchase submitted.
+    }
+
+    @MainActor
     func testSubscriptionSmallScreenLargeText() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

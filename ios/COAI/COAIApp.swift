@@ -76,6 +76,16 @@ struct COAIAppleSubscriptionView: View {
                     if service == nil || offers.isEmpty {
                         Button("Réessayer") { operation = Task { await load() } }.frame(minHeight: 44).disabled(busy)
                     }
+                    if service == nil && !busy && message != nil {
+                        Button {
+                            browser.open(path: "/compte/parametres")
+                            dismiss()
+                        } label: {
+                            Text("Ouvrir mon compte COAI")
+                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                                .contentShape(Rectangle())
+                        }.accessibilityIdentifier("apple-open-account")
+                    }
                     Button("Restaurer mes achats Apple") {
                         guard let service else { return }
                         run {
