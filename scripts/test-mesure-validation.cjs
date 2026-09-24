@@ -25,9 +25,13 @@ const route = load('src/app/api/mesures/route.ts', {
   '@/lib/db/client': { prisma: { user: { findUnique: async () => ({ id: 'user' }) },
     mesure: { create: async ({ data }) => { writes++; return data; } } } },
 });
-let states, cursor, refs, refCursor, calls, compressions, refreshes;
+let states, cursor, refs, refCursor, calls, compressions, refreshes, failure;
 const form = load('src/components/suivi/mesure-form.tsx', {
   '@/lib/suivi/mesure-validation': validation,
+  '@/lib/suivi/use-local-date-input': { useLocalDateInput: () => {
+    const i = cursor++; if (!(i in states)) states[i] = date;
+    return [states[i], value => { states[i] = value; }];
+  } },
   react: {
     useState: initial => { const i = cursor++; if (!(i in states)) states[i] = typeof initial === 'function' ? initial() : initial; return [states[i], v => { states[i] = v; }]; },
     useRef: value => { const i = refCursor++; return refs[i] ?? (refs[i] = { current: value }); },
@@ -39,7 +43,12 @@ const form = load('src/components/suivi/mesure-form.tsx', {
   '@/lib/images/compress-progress-photo': { compressProgressPhoto: async () => { compressions++; return { file: 'mock-file' }; } },
 }, {
   HTMLInputElement: class {}, FormData: class { append() {} },
-  fetch: async (url, init) => { calls.push({ url, body: init.body }); return { ok: true, json: async () => ({ path: 'owned/photo.jpg' }) }; },
+  fetch: async (url, init) => {
+    calls.push({ url, body: init.body });
+    if (failure === 'network') throw new TypeError('offline');
+    if (failure === url) return { ok: false, json: async () => ({ error: 'Service indisponible' }) };
+    return { ok: true, json: async () => ({ path: 'owned/photo.jpg' }) };
+  },
 });
 function find(n, predicate) {
   if (!n || typeof n !== 'object') return;
@@ -47,7 +56,7 @@ function find(n, predicate) {
   for (const c of [n.props?.children].flat(Infinity)) { const match = find(c, predicate); if (match) return match; }
 }
 function render() { cursor = refCursor = 0; return form.MesureForm(); }
-function reset() { states = []; refs = []; calls = []; compressions = refreshes = 0; render(); }
+function reset() { states = []; refs = []; calls = []; compressions = refreshes = 0; failure = null; render(); }
 function change(name, value) { find(render(), n => n.props?.name === name).props.onChange({ target: { value } }); }
 function photo() { find(render(), n => n.props?.type === 'file').props.onChange({ target: { files: [{}] } }); }
 function submit() { return find(render(), n => n.type === 'form').props.onSubmit({ preventDefault() {}, currentTarget: { elements: { namedItem: () => null } } }); }
@@ -75,5 +84,18 @@ function submit() { return find(render(), n => n.type === 'form').props.onSubmit
   reset(); photo(); await Promise.all([submit(), submit()]);
   assert.equal(compressions, 1); assert.equal(calls.length, 2);
   assert.equal(JSON.parse(calls[1].body).photoPath, 'owned/photo.jpg');
+  for (const mode of ['network', '/api/mesures/photo', '/api/mesures']) {
+    reset(); photo(); change('poidsKg', '80'); failure = mode;
+    await submit();
+    assert.equal(refreshes, 0, 'Never clear/reload after failure');
+    assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '80');
+    assert.ok(find(render(), n => n.props?.role === 'alert'));
+    assert.equal(find(render(), n => n.props?.type === 'submit').props.disabled, false);
+    const before = calls.length;
+    failure = null; await submit();
+    assert.equal(calls.length, before + 2, 'Selected photo survives failure and can be retried');
+    assert.equal(refreshes, 1);
+    assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '');
+  }
   console.log('PASS: empty/invalid/valid measures, photo alone, ownership/auth, pre-upload validation, preserved draft, duplicate-submit guard. No real writes.');
 })().catch(e => { console.error(e); process.exitCode = 1; });
