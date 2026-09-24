@@ -10,6 +10,7 @@ import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-but
 import { storySeance } from "@/lib/programmes/story-seance";
 import { accessibleTraining } from "@/lib/programmes/access";
 import { illustrerStory } from "@/lib/programmes/story-photos";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
 
 // Fiche de séance imprimable et partageable (23/08/2026, format validé
 // par Anthony) — page dédiée plutôt qu'un bloc de plus sur
@@ -74,7 +75,16 @@ export default async function SeanceDuJourPage(props: { searchParams?: Promise<{
 
   const s = seance as Record<string, unknown>;
   const nom = texte(s.nom) ?? "Séance du jour";
-  const exercices = Array.isArray(s.exercices) ? s.exercices : [];
+  const exercices = filtrerExercicesAvecMedias(Array.isArray(s.exercices) ? s.exercices : []);
+  if (!exercices.length) return (
+    <div className="flex flex-col gap-4">
+      {choix}
+      <h1 className="text-2xl font-semibold text-white">Démonstrations indisponibles pour cette séance.</h1>
+      <p className="text-sm text-graphite-300">Retrouve les mouvements accompagnés de nos photos et vidéos.</p>
+      <Link href="/programme/exercices" className="text-laiton-300 underline">Voir les exercices avec vidéo COAI</Link>
+      <Link href="/programme/entrainement" className="text-sm underline">Retour à mon programme</Link>
+    </div>
+  );
   const story = illustrerStory(storySeance(exercices, s.echauffement, s.retourAuCalme), genre);
 
   return (
