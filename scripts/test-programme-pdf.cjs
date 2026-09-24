@@ -4,6 +4,16 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const { NextResponse } = require('next/server');
 const jsx = require('react/jsx-runtime');
+const path = require('node:path');
+const mediaCache = new Map();
+function loadMedia(file) {
+  if (mediaCache.has(file)) return mediaCache.get(file);
+  const exports = {}; mediaCache.set(file, exports);
+  vm.runInNewContext(ts.transpileModule(fs.readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
+    { exports, require: name => loadMedia(path.resolve('src', name.slice(2) + '.ts')) });
+  return exports;
+}
+const media = loadMedia(path.resolve('src/lib/exercices/media-coai.ts'));
 function load(file, dependencies) {
   const exports = {};
   const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -18,10 +28,12 @@ function load(file, dependencies) {
 const access = load('src/lib/programmes/access.ts', {});
 async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', signedIn = true, validated = false, failure = false } = {}) {
   let queries = 0, rendered;
-  const latest = { statut: status, contenu: { titre: 'Test local', seances: [] }, generatedAt: new Date('2026-09-17T12:00:00Z') };
+  const latest = { statut: status, contenu: { titre: 'Test local', seances: [{ nom: 'Ancienne séance', exercices: [{ nom: 'Hip thrust barre' }, { nom: 'Leg curl allongé', series: 3 }] }] }, generatedAt: new Date('2026-09-17T12:00:00Z') };
+  const original = JSON.stringify(latest);
   const api = load(file, {
     'react/jsx-runtime': jsx, 'next/server': { NextResponse },
     '@/lib/programmes/access': access,
+    '@/lib/exercices/media-coai': media,
     '@/lib/auth/server': { getCurrentAppUser: async () => signedIn ? { id: 'owner-fixture', prenom: 'Test' } : null },
     '@/lib/db/client': { prisma: { programmeGenerated: { findFirst: async ({ where }) => {
       queries++;
@@ -46,11 +58,14 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
     assert.equal(response.headers.get('content-type'), 'application/pdf');
     assert.match(response.headers.get('content-disposition'), /^attachment;/);
     const entry = rendered.entrees?.[0] ?? rendered;
+    if (pilier === 'ENTRAINEMENT') assert.deepEqual(Array.from(entry.data.seances[0].exercices, e => e.nom), ['Leg curl (machine)']);
+    else assert.equal(entry.data, latest.contenu);
     assert.equal(entry.reviewPending, !validated && status === 'EN_ATTENTE');
   } else {
     assert.equal(rendered, undefined);
     assert.ok(!(await response.text()).includes('PRIVATE_DATABASE_DETAIL'));
   }
+  assert.equal(JSON.stringify(latest), original);
 }
 (async () => {
   let count = 0;

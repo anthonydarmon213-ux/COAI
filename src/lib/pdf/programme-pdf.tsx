@@ -434,6 +434,7 @@ function EntrainementBody({ data, exerciseImages }: { data: Record<string, unkno
           return (
             <View key={i} style={styles.jourBlock} break={i > 0}>
               <JourHeader index={i} titre={nom} sousTitre={jour} />
+              {exercices.length === 0 && <Text style={styles.paragraph}>Les démonstrations de cette séance ne sont pas disponibles. Retrouve les exercices avec vidéo COAI dans l’application.</Text>}
               {echauffement && <Text style={styles.paragraph}>Échauffement · {echauffement}</Text>}
               {exercices.length > 0 && (
                 <View style={styles.exercicesGrid}>

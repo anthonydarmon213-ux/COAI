@@ -6,6 +6,7 @@ import { ProgrammeCompletPdf, type PilierPdfEntree } from "@/lib/pdf/programme-p
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import type { Pilier } from "@prisma/client";
 import { accessibleProgrammePdf } from "@/lib/programmes/access";
+import { programmeAvecMediasCoai } from "@/lib/exercices/media-coai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,10 +55,11 @@ async function buildPdf(request: Request) {
     ]);
     const affiche = accessibleProgrammePdf(pilier, valide, dernier);
     if (!affiche) continue;
+    const contenu = pilier === "ENTRAINEMENT" ? programmeAvecMediasCoai(affiche.contenu) : affiche.contenu;
 
     const exerciseImages: Record<string, string> = {};
-    if (pilier === "ENTRAINEMENT" && isRecord(affiche.contenu)) {
-      const seances = Array.isArray(affiche.contenu.seances) ? affiche.contenu.seances : [];
+    if (pilier === "ENTRAINEMENT" && isRecord(contenu)) {
+      const seances = Array.isArray(contenu.seances) ? contenu.seances : [];
       const exercices = seances.flatMap(seance => isRecord(seance) && Array.isArray(seance.exercices) ? seance.exercices : []);
       for (const exercice of exercices) {
         if (!isRecord(exercice) || typeof exercice.nom !== "string") continue;
@@ -69,7 +71,7 @@ async function buildPdf(request: Request) {
     entrees.push({
       pilier,
       reviewPending: affiche.statut === "EN_ATTENTE",
-      data: affiche.contenu,
+      data: contenu,
       generatedAt: affiche.generatedAt,
       heroUrl: new URL(heroPath[pilier], request.url).toString(),
       exerciseImages,

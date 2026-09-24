@@ -68,3 +68,14 @@ export function filtrerExercicesAvecMedias(exercices: unknown[]): Record<string,
     return [{ ...donnees, nom: canonique.nom }];
   });
 }
+
+/** Vue d'export uniquement : ne modifie jamais le programme enregistré. */
+export function programmeAvecMediasCoai(value: unknown): Record<string, unknown> {
+  const data = value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown> : {};
+  return { ...data, seances: (Array.isArray(data.seances) ? data.seances : []).flatMap(seance => {
+    if (!seance || typeof seance !== "object" || Array.isArray(seance)) return [];
+    const row = seance as Record<string, unknown>;
+    return [{ ...row, exercices: filtrerExercicesAvecMedias(Array.isArray(row.exercices) ? row.exercices : []) }];
+  }) };
+}
