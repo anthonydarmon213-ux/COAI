@@ -29,10 +29,13 @@ async function lire(sousDossier: string, cle: string): Promise<unknown | null> {
   try {
     const brut = await readFile(join(DOSSIER, sousDossier, `${cle}.json`), "utf8");
     return JSON.parse(brut);
-  } catch {
-    // Fichier absent ou illisible : pas une erreur, la bibliothèque est
-    // simplement incomplète. Le log reste côté serveur pour savoir quelles
-    // combinaisons manquent réellement en production.
+  } catch (error) {
+    // Seule l'absence d'une surcharge éditoriale autorise le socle de
+    // secours. Une lecture refusée ou un JSON corrompu ne doit jamais
+    // remplacer silencieusement le programme attendu par un autre.
+    if (!error || typeof error !== "object" || !("code" in error) || error.code !== "ENOENT") {
+      throw error;
+    }
     console.info(`[socles] aucun socle ${sousDossier}/${cle}`);
     return null;
   }
