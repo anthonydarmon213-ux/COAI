@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 
 export const dynamic = "force-dynamic";
-const headers = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" };
+const headers = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", Vary: "Cookie, Authorization" };
 
 // Structured account data only. Media binaries, unlinked diagnostic leads,
 // provider records and private coach notes need a separate access workflow.
@@ -36,6 +36,10 @@ export async function GET() {
         routines: true,
         formChecks: true,
         churnFeedback: true,
+        aiUsageEvents: true,
+        // Only transactions related to this user's purchase account. No
+        // provider request, signed receipt, credential or other account join.
+        applePurchaseAccount: { include: { transactions: true } },
       },
     });
 

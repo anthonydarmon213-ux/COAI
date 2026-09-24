@@ -32,13 +32,15 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
 2. Finaliser la suppression de compte : concurrence, révocation des sessions,
    fichiers et test complet avec un compte jetable autorisé. Voir checklist.
 3. L'export de compte (`src/app/api/compte/export/route.ts`) inclut maintenant
-   18 relations : profil, abonnement Stripe, programmes, séances, mesures,
+   20 relations : profil, abonnement Stripe, programmes, séances, mesures,
    événements WhatsApp, repas, avis, tests maxi, check-ins hebdomadaires,
    adaptations, activités quotidiennes, séances quotidiennes, récupération
    musculaire, achats de programmes, routines, analyses de mouvement et retour
-   de résiliation. Il ne constitue toujours pas un export exhaustif : relations
-   Apple et événements d'usage IA non inclus, fichiers binaires et données
-   détenues par les fournisseurs hors périmètre. Notes privées du coach et
+   de résiliation, événements d'usage IA et compte Apple avec ses transactions.
+   Ces deux derniers ajouts sont locaux et testés avec Auth/DB simulées ;
+   téléchargement connecté et production restent à valider. Il ne constitue
+   toujours pas un export exhaustif : fichiers binaires et données détenues
+   par les fournisseurs hors périmètre. Notes privées du coach et
    prospects non liés nécessitent un circuit distinct, sans joindre les données
    d'un autre compte. La promesse publique « toutes tes données » doit être
    confrontée à ces limites avant publication. Le téléchargement natif JSON
@@ -58,7 +60,9 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
 
 Tests `test-account-export.cjs`, `test-product-event-privacy.cjs` et
 `test-error-privacy.cjs` réussis. Export : Auth/DB simulées, propriétaire imposé
-par le serveur, 18 relations, erreurs privées et sans cache. Journal produit :
+par le serveur, 20 relations, seul sous-ensemble imbriqué autorisé : transactions
+du compte Apple lié. Absence de compte Apple conservée à null. Erreurs privées
+et sans cache ; Cookie/Authorization dans Vary. Journal produit :
 vraie fonction testée, valeurs interdites exclues, identifiant toujours présent.
 Sentry : vrai SDK avec transport en mémoire, aucun envoi externe. Ces preuves
 ne valident ni les données distantes, ni les durées de conservation, ni toutes
