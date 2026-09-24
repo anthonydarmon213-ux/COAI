@@ -176,22 +176,22 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-graphite-400">Énergie</span>
-          <ScalePicker value={energie} onChange={setEnergie} labelMin="Faible" labelMax="Élevée" />
+          <ScalePicker label="Énergie" value={energie} onChange={setEnergie} labelMin="Faible" labelMax="Élevée" />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-graphite-400">Stress</span>
-          <ScalePicker value={stress} onChange={setStress} labelMin="Faible" labelMax="Élevé" />
+          <ScalePicker label="Stress" value={stress} onChange={setStress} labelMin="Faible" labelMax="Élevé" />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-graphite-400">Faim</span>
-          <ScalePicker value={faim} onChange={setFaim} labelMin="Faible" labelMax="Élevée" />
+          <ScalePicker label="Faim" value={faim} onChange={setFaim} labelMin="Faible" labelMax="Élevée" />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-graphite-400">Motivation</span>
-          <ScalePicker value={motivation} onChange={setMotivation} labelMin="Faible" labelMax="Élevée" />
+          <ScalePicker label="Motivation" value={motivation} onChange={setMotivation} labelMin="Faible" labelMax="Élevée" />
         </div>
 
         <Field label="Poids (kg, facultatif)">
@@ -207,11 +207,12 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-graphite-400">Douleurs cette semaine ?</span>
-          <div className="flex gap-2">
+          <div role="group" aria-label="Douleurs cette semaine" className="flex gap-2">
             <button
               type="button"
               onClick={() => setDouleurs(false)}
-              className={`flex-1 rounded-lg border px-3 py-2 text-sm transition ${
+              aria-pressed={douleurs === false}
+              className={`min-h-11 min-w-11 flex-1 rounded-lg border px-3 py-2 text-sm transition ${
                 douleurs === false
                   ? "border-laiton-400/50 bg-laiton-400/15 text-laiton-200"
                   : "border-graphite-800 text-graphite-400 hover:text-white"
@@ -222,7 +223,8 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
             <button
               type="button"
               onClick={() => setDouleurs(true)}
-              className={`flex-1 rounded-lg border px-3 py-2 text-sm transition ${
+              aria-pressed={douleurs === true}
+              className={`min-h-11 min-w-11 flex-1 rounded-lg border px-3 py-2 text-sm transition ${
                 douleurs === true
                   ? "border-amber-600/60 bg-amber-500/10 text-amber-300"
                   : "border-graphite-800 text-graphite-400 hover:text-white"
@@ -244,7 +246,7 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Repas à la maison">
             <Input type="number" min="0" max="21" placeholder="ex : 10" value={repasMaison} onChange={(e) => setRepasMaison(e.target.value)} />
           </Field>

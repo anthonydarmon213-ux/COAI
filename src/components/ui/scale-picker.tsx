@@ -9,21 +9,25 @@ export function ScalePicker({
   onChange,
   labelMin,
   labelMax,
+  label,
 }: {
   value: number | null;
   onChange: (value: number) => void;
   labelMin: string;
   labelMax: string;
+  label: string;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex gap-2">
+      <div role="group" aria-label={label} className="flex flex-wrap gap-2">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             type="button"
+            aria-label={`${label} : ${n} sur 5${n === 1 ? ` — ${labelMin}` : n === 5 ? ` — ${labelMax}` : ""}`}
+            aria-pressed={value === n}
             onClick={() => onChange(n)}
-            className={`flex h-11 flex-1 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+            className={`flex min-h-11 min-w-11 flex-1 items-center justify-center rounded-lg border text-sm font-semibold transition ${
               value === n
                 ? "border-laiton-400/50 bg-laiton-400/15 text-laiton-200"
                 : "border-graphite-800 text-graphite-400 hover:border-graphite-700 hover:text-white"

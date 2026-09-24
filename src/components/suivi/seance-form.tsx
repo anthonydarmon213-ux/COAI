@@ -288,6 +288,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-graphite-400">Difficulté de la séance</span>
             <ScalePicker
+              label="Difficulté de la séance"
               value={difficulte}
               onChange={setDifficulte}
               labelMin="Très facile"
@@ -297,7 +298,7 @@ export function SeanceForm({ exercicesConnus = [] }: { exercicesConnus?: string[
 
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-graphite-400">Énergie</span>
-            <ScalePicker value={energie} onChange={setEnergie} labelMin="À plat" labelMax="En forme" />
+            <ScalePicker label="Énergie" value={energie} onChange={setEnergie} labelMin="À plat" labelMax="En forme" />
           </div>
 
           <div className="flex flex-col gap-1.5">
