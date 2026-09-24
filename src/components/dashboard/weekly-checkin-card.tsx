@@ -105,6 +105,13 @@ function WeeklyCheckinModal({ onClose, onDone }: { onClose: () => void; onDone: 
 
   async function handleSubmit() {
     if (loading) return;
+    const hasAnswer = [sommeil, poidsKg, seancesRealisees, repasMaison, repasRestaurant, commentaire]
+      .some(value => value.trim() !== "") ||
+      [energie, stress, faim, motivation, douleurs].some(value => value !== null);
+    if (!hasAnswer) {
+      setError("Renseigne au moins une réponse avant d’envoyer ton bilan. Tu peux laisser les autres champs vides.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
