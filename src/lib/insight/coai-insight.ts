@@ -63,6 +63,12 @@ function composerDepuisSignaux(signaux: SignauxAdaptation, signauxNeat?: Signaux
   }
 
   if (phrases.length === 0) {
+    if (signaux.nombreSeancesRecentes === 0) {
+      return {
+        texte: `${signaux.checkinHebdo ? "Ton bilan est enregistré. " : ""}Aucune séance enregistrée ces deux dernières semaines. Retrouve ton programme pour choisir ta prochaine séance, ou ajoute une séance déjà réalisée à ton suivi.`,
+        ton: "neutral",
+      };
+    }
     phrases.push(
       `${signaux.nombreSeancesRecentes} séance${signaux.nombreSeancesRecentes > 1 ? "s" : ""} loguée${signaux.nombreSeancesRecentes > 1 ? "s" : ""} ces 2 dernières semaines — continue comme ça.`
     );
