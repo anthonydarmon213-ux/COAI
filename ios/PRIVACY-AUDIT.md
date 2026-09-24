@@ -37,8 +37,11 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    adaptations, activités quotidiennes, séances quotidiennes, récupération
    musculaire, achats de programmes, routines, analyses de mouvement et retour
    de résiliation, événements d'usage IA et compte Apple avec ses transactions.
-   Ces deux derniers ajouts sont locaux et testés avec Auth/DB simulées ;
-   téléchargement connecté et production restent à valider. Il ne constitue
+   Ces deux derniers ajouts sont locaux et testés aussi par HTTP avec
+   Auth/PostgreSQL réels isolés (25 septembre) : deux comptes, cookie/bearer,
+   identifiant tiers ignoré, absence de compte Apple, réponses privées.
+   Transactions fictives en base, aucun achat ni appel fournisseur.
+   Téléchargement natif connecté et production restent à valider. Il ne constitue
    toujours pas un export exhaustif : fichiers binaires et données détenues
    par les fournisseurs hors périmètre. Notes privées du coach et
    prospects non liés nécessitent un circuit distinct, sans joindre les données

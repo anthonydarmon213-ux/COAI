@@ -42,6 +42,37 @@ async function main() {
   const anonymousHistory = await fetch(endpoint);
   assert.equal(anonymousHistory.status, 401); assertPrivateHistory(anonymousHistory);
   const a = await fixture(), b = await fixture();
+  const exportURL = origin + '/api/compte/export';
+  const anonymousExport = await fetch(exportURL);
+  assert.equal(anonymousExport.status, 401); assertPrivateHistory(anonymousExport);
+  const emptyExport = await fetch(exportURL, {headers: a.cookie});
+  assert.equal(emptyExport.status, 200);
+  const emptyData = await emptyExport.json();
+  assert.equal(emptyData.applePurchaseAccount, null);
+  assert.deepEqual(emptyData.aiUsageEvents, []);
+  for (const owner of [a, b]) {
+    owner.appleFixtureId = 'local-export-' + randomUUID();
+    await db.applePurchaseAccount.create({data: {userId: owner.user.id, accountToken: randomUUID(),
+      transactions: {create: {environment: 'Sandbox', transactionId: owner.appleFixtureId,
+        originalTransactionId: owner.appleFixtureId, productId: 'local.export.fixture',
+        purchasedAt: new Date('2020-01-01'), expiresAt: new Date('2020-02-01'), signedAt: new Date('2020-01-01')}}}});
+    owner.usageFixture = await db.aiUsageEvent.create({data: {userId: owner.user.id,
+      feature: 'local-export-fixture', model: 'no-model-called', inputTokens: 0, outputTokens: 0, estimatedCostUsdMicros: 0}});
+  }
+  for (const [owner, otherOwner] of [[a, b], [b, a]]) {
+    for (const headers of [owner.cookie, owner.bearer]) {
+      const exported = await fetch(exportURL + '?userId=' + otherOwner.user.id, {headers});
+      assert.equal(exported.status, 200); assertPrivateHistory(exported);
+      const data = await exported.json();
+      assert.equal(data.id, owner.user.id);
+      assert.equal(data.applePurchaseAccount.userId, owner.user.id);
+      assert.deepEqual(data.applePurchaseAccount.transactions.map(row => row.transactionId), [owner.appleFixtureId]);
+      assert.deepEqual(data.aiUsageEvents.map(row => row.id), [owner.usageFixture.id]);
+      assert(!JSON.stringify(data).includes(otherOwner.appleFixtureId));
+      assert(!JSON.stringify(data).includes(otherOwner.usageFixture.id));
+    }
+  }
+  console.log('PASS HTTP account export: actual Apple/AI joins, absent account, cookie/bearer, ignored forged owner, private responses; no provider calls');
   for (const path of ['/api/daily', '/api/check-in-hebdo']) {
     for (const headers of [undefined, a.cookie, a.bearer]) {
       const response = await fetch(origin + path, {headers});
@@ -364,6 +395,8 @@ async function cleanup() {
     try {
       if (owned.client) await owned.client.auth.signOut();
       if (owned.user) {
+        // AI usage uses SetNull on user deletion; remove only our exact fixtures first.
+        await db.aiUsageEvent.deleteMany({where: {userId: owned.user.id}});
         await db.seanceLog.deleteMany({where: {userId: owned.user.id}});
         await db.profile.deleteMany({where: {userId: owned.user.id}});
         await db.user.delete({where: {id: owned.user.id}});
