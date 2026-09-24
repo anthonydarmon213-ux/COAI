@@ -43,7 +43,11 @@ function composerDepuisSignaux(signaux: SignauxAdaptation, signauxNeat?: Signaux
   }
 
   if (!douleurImportante && signaux.checkinHebdo?.stress != null && signaux.checkinHebdo.stress >= 4) {
-    phrases.push("Ton stress est élevé cette semaine — la récupération compte autant que l'entraînement en ce moment.");
+    const dateBilan = new Date(`${signaux.checkinHebdo.semaineDebut}T00:00:00Z`);
+    const repere = Number.isNaN(dateBilan.getTime())
+      ? "ton dernier bilan"
+      : `ton bilan de la semaine du ${dateBilan.toLocaleDateString("fr-FR", { timeZone: "UTC" })}`;
+    phrases.push(`Tu as signalé un stress élevé dans ${repere}. Pense à actualiser ton bilan si ta situation a changé.`);
   } else if (douleurLegere && phrases.length === 0) {
     phrases.push(
       `Une gêne légère${signaux.douleurRecente?.zone ? ` au niveau ${signaux.douleurRecente.zone.toLowerCase()}` : ""} a été signalée — à surveiller.`
