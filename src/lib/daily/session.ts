@@ -189,6 +189,25 @@ export function adaptWorkout(
     const compatibles = adaptedExercises.filter((exercice) =>
       exerciceCompatibleAvecMateriel(exercice, checkin.equipementDuJour ?? "")
     );
+    if (compatibles.length === 0 && adaptedExercises.length > 0) {
+      return {
+        session: {
+          ...completeSource,
+          nom: "Matériel à ajuster",
+          exercices: [],
+          echauffement: undefined,
+          retourAuCalme: undefined,
+        },
+        summary: {
+          adapted: true,
+          title: "Cette séance nécessite un autre matériel",
+          reason: "Aucun exercice de cette séance ne correspond au matériel indiqué aujourd'hui. Consulte ton programme pour choisir une autre séance, ou reviens lorsque le matériel sera disponible. Ton programme d'origine reste intact.",
+          changes: ["Exercices incompatibles retirés", "Aucun mouvement de remplacement inventé"],
+          originalExerciseCount: exercices.length,
+          adaptedExerciseCount: 0,
+        },
+      };
+    }
     if (compatibles.length > 0 && compatibles.length < adaptedExercises.length) {
       const retires = adaptedExercises.length - compatibles.length;
       adaptedExercises = compatibles;

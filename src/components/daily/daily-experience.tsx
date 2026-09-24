@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DailyCoach } from "@/components/daily/daily-coach";
 import { adaptWorkout, ensureWorkoutCompleteness, isCoreExercise, type DailyCheckinInput } from "@/lib/daily/session";
@@ -172,6 +173,7 @@ export function DailyExperience({
   const activeSession = ensureWorkoutCompleteness(rawSession);
   const adaptation = daily?.adaptation as Adaptation | null;
   const exercises = Array.isArray(activeSession.exercices) ? activeSession.exercices : [];
+  const sessionAvailable = exercises.length > 0 || Boolean(activeSession.echauffement || activeSession.retourAuCalme);
   const mainExercises = exercises.map((exercise, index) => ({ exercise, index })).filter(({ exercise }) => !isCoreExercise(exercise));
   const coreExercises = exercises.map((exercise, index) => ({ exercise, index })).filter(({ exercise }) => isCoreExercise(exercise));
   const checkinDone = Boolean(daily?.sleep);
@@ -376,8 +378,9 @@ export function DailyExperience({
             </div>
           )}
 
-          {checkinDone && !daily?.completedAt && !pain && !started && <Button onClick={() => { setStarted(true); setActiveExercise(0); }} className="mt-6 w-full">Commencer ma séance</Button>}
-          {checkinDone && !daily?.completedAt && !pain && started && <Button onClick={completeWorkout} disabled={loading} className="mt-6 w-full">{loading ? "Enregistrement…" : "Terminer ma séance"}</Button>}
+          {checkinDone && !sessionAvailable && <Link href="/programme/entrainement" className="mt-6 inline-flex min-h-11 items-center rounded-xl border border-laiton-400/30 px-4 py-3 text-sm font-semibold text-laiton-200">Voir les séances de mon programme</Link>}
+          {checkinDone && sessionAvailable && !daily?.completedAt && !pain && !started && <Button onClick={() => { setStarted(true); setActiveExercise(0); }} className="mt-6 w-full">Commencer ma séance</Button>}
+          {checkinDone && sessionAvailable && !daily?.completedAt && !pain && started && <Button onClick={completeWorkout} disabled={loading} className="mt-6 w-full">{loading ? "Enregistrement…" : "Terminer ma séance"}</Button>}
           {checkinDone && pain && <p className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm leading-6 text-amber-100">Ne t’entraîne pas à travers une douleur. Si elle persiste, s’intensifie ou t’inquiète, demande l’avis d’un professionnel de santé.</p>}
           {checkinDone && (
             <DailyCoach context={{
