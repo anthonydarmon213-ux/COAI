@@ -125,6 +125,62 @@ async function main() {
   assert.equal((await updateProfile({poidsKg: -1})).status, 400);
   assert.equal((await db.profile.findUnique({where: {userId: a.user.id}})).poidsKg, null);
   console.log('PASS HTTP profile: persisted edits, cleared values/opt-out, invalid values rejected, forged ownership ignored');
+
+  const activate = owner => fetch(origin + '/api/programmes/generate?mode=onboarding', {
+    method: 'POST', headers: owner.cookie,
+  });
+  assert.equal((await activate(a)).status, 403);
+  // Local fixture only: historical programme entitlement, no purchase/provider.
+  await db.user.update({where: {id: a.user.id}, data: {programmeUnlockedAt: new Date()}});
+  assert.equal((await activate(a)).status, 422);
+  response = await updateProfile({objectifs: 'Rester en forme', niveau: 'Débutant',
+    frequenceEntrainement: '2 fois par semaine', dureeSeanceMinutes: 45,
+    equipementDisponible: 'Salle de sport', age: 35, sexe: 'Homme'});
+  assert.equal(response.status, 200);
+  const activations = await Promise.all([activate(a), activate(a), activate(a)]);
+  assert.deepEqual(activations.map(r => r.status), [201, 201, 201]);
+  const activationBodies = await Promise.all(activations.map(r => r.json()));
+  const programmes = await db.programmeGenerated.findMany({where: {userId: a.user.id}});
+  assert.equal(programmes.length, 3);
+  assert.deepEqual(programmes.map(p => p.pilier).sort(), ['ENTRAINEMENT', 'NUTRITION', 'RECUPERATION']);
+  for (const body of activationBodies) {
+    assert.equal(body.echecs, 0);
+    assert.deepEqual(body.programmes.map(p => p.id).sort(), programmes.map(p => p.id).sort());
+    assert.ok(body.programmes.every(p => !('contenu' in p)));
+  }
+  assert.ok(programmes.every(p => p.version === 1 && p.contenu && Object.keys(p.contenu).length > 0));
+  const resumed = await activate(a);
+  assert.equal(resumed.status, 201); assert.equal((await resumed.json()).reused, true);
+  assert.equal(await db.programmeGenerated.count({where: {userId: a.user.id}}), 3);
+  assert.equal((await activate(b)).status, 403);
+  assert.equal(await db.programmeGenerated.count({where: {userId: b.user.id}}), 0);
+  const escapeHTML = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#x27;');
+  for (const [path, pilier, heading] of [
+    ['/programme/entrainement', 'ENTRAINEMENT', 'Ton entraînement.'],
+    ['/programme/alimentation', 'NUTRITION', 'Ton alimentation.'],
+    ['/programme/recuperation', 'RECUPERATION', 'Ta récupération.'],
+  ]) {
+    const page = await fetch(origin + path, {headers: a.cookie, redirect: 'manual'});
+    assert.equal(page.status, 200, path);
+    const html = await page.text();
+    assert.ok(html.includes('<main'), path + ' has main content');
+    assert.ok(html.includes(heading), path + ' has the expected heading');
+    const title = programmes.find(p => p.pilier === pilier).contenu.titre;
+    assert.equal(typeof title, 'string');
+    assert.ok(title.length > 0 && html.includes(escapeHTML(title)), path + ' displays persisted catalogue title');
+    assert.ok(!html.includes('NEXT_REDIRECT') && !html.includes('NEXT_HTTP_ERROR_FALLBACK'), path + ' has no server error/redirect');
+  }
+  // A completed profile with a declared constraint must not get a generic programme.
+  await db.user.update({where: {id: b.user.id}, data: {programmeUnlockedAt: new Date()}});
+  await db.profile.create({data: {userId: b.user.id, objectifs: 'Rester en forme', niveau: 'Débutant',
+    frequenceEntrainement: '2 fois par semaine', dureeSeanceMinutes: 45,
+    equipementDisponible: 'Salle de sport', age: 35, sexe: 'Homme', contraintesSante: 'Contrainte déclarée de test'}});
+  const constrained = await activate(b);
+  assert.equal(constrained.status, 409);
+  assert.equal((await constrained.json()).requiresCoachReview, true);
+  assert.equal(await db.programmeGenerated.count({where: {userId: b.user.id}}), 0);
+  console.log('PASS HTTP programme: real auth/profile/catalogue/database, 3 concurrent activations without duplicates, retry, other account denied, three server-rendered pillar pages');
   console.log('LIMIT: local HTTP/Auth/DB, not browser UI, physical iPhone, production or Apple purchases');
 }
 async function cleanup() {
