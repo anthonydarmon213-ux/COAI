@@ -376,14 +376,16 @@ export function DailyExperience({
 
           {checkinDone && exercises.length > 0 && (
             <div className="mt-6 flex flex-col gap-5">
-              <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-4">
+              {daily?.completedAt ? (
+                <p role="status" className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.05] p-4 text-sm text-emerald-100">Séance terminée et enregistrée. Retrouve ci-dessous les mouvements de ta séance.</p>
+              ) : <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-4">
                 <div className="flex items-end justify-between gap-4">
                   <div><p className="font-mono text-[9px] uppercase tracking-[0.18em] text-laiton-400">Progression de la séance</p><p className="mt-1 text-sm text-white">{completedSteps.size} étape{completedSteps.size > 1 ? "s" : ""} sur {totalSteps}</p></div>
                   <span className="font-editorial text-3xl text-laiton-200">{progress}%</span>
                 </div>
                 <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-laiton-500 to-laiton-200 transition-all duration-500" style={{ width: `${progress}%` }} /></div>
                 <div className="mt-3 grid grid-cols-4 gap-1.5 text-center font-mono text-[8px] uppercase tracking-wide text-graphite-500"><span>Échauffement</span><span>Renforcement</span><span>Abdos</span><span>Retour au calme</span></div>
-              </div>
+              </div>}
 
               {activeSession.echauffement && (
                 <details className="group rounded-2xl border border-amber-400/20 bg-amber-400/[0.04]" open={started}>

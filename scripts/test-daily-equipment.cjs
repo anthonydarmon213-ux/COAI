@@ -89,14 +89,18 @@ function nodes(value, found = []) {
   else if (value && typeof value === 'object') { found.push(value); nodes(value.props?.children, found); }
   return found;
 }
-function render(session) {
+function render(session, completedAt = null) {
   return nodes(uiExports.DailyExperience({ sourceSession: source, expectedMinutes: 60, pendingCoach: false,
-    programmeVersion: 1, initialDaily: { sleep: 'BON', energy: 'NORMALE', pain: false, adaptedSession: session } }));
+    programmeVersion: 1, initialDaily: { sleep: 'BON', energy: 'NORMALE', pain: false, adaptedSession: session, completedAt } }));
 }
 const emptyNodes = render(none.session);
 assert.ok(emptyNodes.some(n => n.props?.href === '/programme/entrainement'));
 assert.ok(!emptyNodes.some(n => n.props?.children === 'Commencer ma séance'));
 assert.ok(render(gym.session).some(n => n.props?.children === 'Commencer ma séance'));
+const finishedNodes = render(gym.session, '2026-09-24T12:00:00.000Z');
+assert.ok(finishedNodes.some(n => n.props?.role === 'status' && /Séance terminée et enregistrée/.test(n.props.children)));
+assert.ok(!finishedNodes.some(n => n.props?.children === 'Progression de la séance'), 'Completed sessions must not show a reset or invented percentage');
+assert.ok(render(gym.session).some(n => n.props?.children === 'Progression de la séance'), 'Keep live progress for unfinished sessions');
 const mobility = adaptWorkout(source, { ...checkin, chargeMentale: 'SATUREE' }, 60);
 assert.ok(render(mobility.session).some(n => n.props?.children === 'Commencer ma séance'), 'Keep the existing guided recovery flow');
 for (const entries of [[{ nom: 'Hip thrust barre' }, { nom: 'Leg curl allongé', series: 3 }], [{ nom: 'Hip thrust barre' }], [null, 42]]) {
