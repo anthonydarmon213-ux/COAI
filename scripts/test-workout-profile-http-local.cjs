@@ -195,6 +195,46 @@ async function main() {
   }
   assert.deepEqual((await db.programmeGenerated.findUnique({where: {id: training.id}})).contenu, legacyContent);
   console.log('PASS HTTP legacy media: persisted fixture filtered on both pages, both authenticated PDF downloads valid, database unchanged');
+  const dailyURL = origin + '/api/daily';
+  assert.equal((await fetch(dailyURL)).status, 401);
+  assert.equal((await fetch(dailyURL, {headers: b.cookie})).status, 200);
+  assert.equal(await (await fetch(dailyURL, {headers: b.cookie})).json(), null);
+  const dayName = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'][new Date().getDay()];
+  for (const exercises of [legacyContent.seances[0].exercices, [{nom: 'Hip thrust barre', series: 3}]]) {
+    const content = { ...legacyContent, seances: [{ ...legacyContent.seances[0], jour: dayName, exercices: exercises }] };
+    await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: content}});
+    const response = await fetch(dailyURL, {method: 'POST', headers: {...a.cookie, 'Content-Type': 'application/json'},
+      body: JSON.stringify({action: 'checkin', sleep: 'BON', energy: 'NORMALE', pain: false,
+        availableMinutes: 60, equipementDuJour: 'Salle de sport complète', userId: b.user.id})});
+    assert.equal(response.status, 200);
+    const saved = await response.json();
+    const expectedNames = exercises.length === 2 ? ['Leg curl (machine)'] : [];
+    assert.equal(saved.userId, a.user.id);
+    assert.deepEqual(saved.adaptedSession.exercices.map(e => e.nom), expectedNames);
+    assert.equal(saved.adaptedSession.mediasIndisponibles, expectedNames.length === 0);
+    assert.deepEqual(saved.sourceSession.exercices, exercises);
+    assert.equal(saved.adaptation.originalExerciseCount, exercises.length);
+    assert.equal(saved.adaptation.adaptedExerciseCount, expectedNames.length);
+    const reloadedResponse = await fetch(dailyURL, {headers: a.bearer});
+    assert.equal(reloadedResponse.status, 200);
+    const reloaded = await reloadedResponse.json();
+    assert.equal(reloaded.id, saved.id);
+    assert.deepEqual(reloaded.adaptedSession, saved.adaptedSession);
+    const stored = await db.dailySession.findUnique({where: {id: saved.id}});
+    assert.deepEqual(stored.adaptedSession, saved.adaptedSession);
+    assert.equal(await db.dailySession.count({where: {userId: a.user.id}}), 1);
+    assert.equal(await db.dailySession.count({where: {userId: b.user.id}}), 0);
+    assert.deepEqual((await db.programmeGenerated.findUnique({where: {id: training.id}})).contenu, content);
+  }
+  assert.equal(await (await fetch(dailyURL, {headers: b.cookie})).json(), null);
+  assert.equal((await fetch(dailyURL, {headers: {...a.cookie, Authorization: 'Bearer invalid'}})).status, 401);
+  console.log('PASS HTTP daily media: real check-in, canonical/empty adaptation, persisted marker, cookie/bearer reload, source unchanged, account isolation');
+  const beforeInvalidDaily = await db.dailySession.findMany({where: {userId: a.user.id}});
+  const invalidDaily = await fetch(dailyURL, {method: 'POST', headers: {...a.cookie, 'Content-Type': 'application/json'}, body: '{'});
+  assert.equal(invalidDaily.status, 400);
+  assert.deepEqual(await invalidDaily.json(), {error: 'Données du check-in illisibles. Réessaie l’enregistrement.'});
+  assert.deepEqual(await db.dailySession.findMany({where: {userId: a.user.id}}), beforeInvalidDaily);
+  console.log('PASS HTTP daily invalid JSON: readable 400, saved daily unchanged');
   // A completed profile with a declared constraint must not get a generic programme.
   await db.user.update({where: {id: b.user.id}, data: {programmeUnlockedAt: new Date()}});
   await db.profile.create({data: {userId: b.user.id, objectifs: 'Rester en forme', niveau: 'Débutant',

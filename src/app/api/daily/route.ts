@@ -78,7 +78,16 @@ export async function POST(request: Request) {
   const user = await currentAppUser();
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
-  const parsed = requestSchema.safeParse(await request.json());
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Données du check-in illisibles. Réessaie l’enregistrement." },
+      { status: 400 }
+    );
+  }
+  const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
