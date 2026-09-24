@@ -57,6 +57,30 @@ async function main() {
   assert.equal(await db.seanceLog.count({where: {userId: a.user.id}}), 1);
   console.log('PASS HTTP workout: cookie + bearer, concurrency/retry, history, account isolation, invalid token/JSON');
 
+  const measureKey = randomUUID();
+  const measureBody = {date: '2026-09-24', poidsKg: 80};
+  const postMeasure = (owner, body = measureBody, key = measureKey) => fetch(origin + '/api/mesures', {
+    method: 'POST', headers: {...owner.cookie, 'Content-Type': 'application/json', 'x-coai-request-id': key}, body: JSON.stringify(body),
+  });
+  assert.equal((await fetch(origin + '/api/mesures')).status, 401);
+  const measureResponses = await Promise.all([postMeasure(a), postMeasure(a), postMeasure(a)]);
+  assert.deepEqual(measureResponses.map(r => r.status).sort(), [200, 200, 201]);
+  const measureRows = await Promise.all(measureResponses.map(r => r.json()));
+  assert.equal(new Set(measureRows.map(r => r.id)).size, 1);
+  assert.equal(await db.mesure.count({where: {userId: a.user.id}}), 1);
+  assert.equal((await postMeasure(a, {...measureBody, poidsKg: 81})).status, 409);
+  const measureHistory = await fetch(origin + '/api/mesures', {headers: a.bearer});
+  assert.equal(measureHistory.status, 200);
+  const savedMeasures = await measureHistory.json();
+  assert.equal(savedMeasures.length, 1); assert.equal(savedMeasures[0].poidsKg, 80);
+  assert.deepEqual(await (await fetch(origin + '/api/mesures', {headers: b.cookie})).json(), []);
+  assert.equal((await postMeasure(b)).status, 201);
+  assert.equal((await postMeasure(a, {...measureBody, photoPath: `${b.authId}/private.jpg`})).status, 400);
+  assert.equal((await postMeasure(a, measureBody, 'invalid')).status, 400);
+  assert.equal((await fetch(origin + '/api/mesures', {headers: {...a.cookie, Authorization: 'Bearer invalid'}})).status, 401);
+  assert.equal(await db.mesure.count({where: {userId: a.user.id}}), 1);
+  console.log('PASS HTTP measures: real login, concurrent retries, conflict, persisted history, owner/photo isolation, invalid key/token');
+
   const updateProfile = body => fetch(origin + '/api/profil', {
     method: 'PUT', headers: {...a.cookie, 'Content-Type': 'application/json'}, body: JSON.stringify(body),
   });
