@@ -1,6 +1,41 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
-## État courant — 24 septembre 2026
+## État courant — 25 septembre 2026
+
+Objectif non atteint. Aucun déploiement ni soumission Apple effectué dans cette
+passe. Les preuves ci-dessous restent distinctes d'une validation en production.
+
+- Régression native du 25 : 49 tests Swift, 65 contrôles core, règles WebKit
+  macOS, plist/manifeste et Release iPhone arm64 non signé réussis.
+  Journal : `/tmp/coai-native-release-0925.log`.
+- Simulateur QA petit écran : navigation avec très grande taille de texte et
+  rotation, conservation du localStorage fictif après relance puis effacement
+  après signal de déconnexion réussis (2 tests). Partage de PDF/PNG fictifs,
+  refus de format et refus Photos avec retour utilisable réussis (2 autres).
+  Journaux : `/tmp/coai-native-regression-0925.log` et
+  `/tmp/coai-native-files-0925.log`. Aucun compte connecté ni achat Apple testé.
+- HTTP/Auth/PostgreSQL locaux : suite profil, mesures, séances, programmes,
+  PDF et historique réussie. Carte mensuelle : vrai PNG pour membre ayant
+  seulement une séance quotidienne terminée, accès privé vérifié. Journal :
+  `/tmp/coai-history-e2e-0925.log`. Pas de preuve du partage connecté sur iPhone.
+- Corrections locales récentes : historique quotidien inclus dans compteur,
+  journal, progression, bilan hebdomadaire, profil appris, carte mensuelle et
+  classement des jours d'activité. Pas de performances prescrites transformées
+  en performances réalisées. Lecteurs adaptation, administration et e-mail
+  mensuel restent à auditer séparément.
+- Contrôle des appareils le 25 : iPhone 17 Pro **unavailable** ; iPhone 13 Pro
+  détecté par câble, iOS 17.6.1, mais **unpaired**, services développeur indisponibles.
+  Aucune nouvelle installation ou tentative de contournement de confiance.
+  Reconnexion/déverrouillage et confiance développeur demandés à Anthony.
+- Une identité Apple Development, aucune Apple Distribution listée. L'adhésion
+  Developer n'est pas déduite de ce seul contrôle. Archive distribuable,
+  achats/restauration Sandbox, connexion Apple réelle et confidentialité restent
+  des validations ouvertes. Aucun achat autorisé implicitement.
+- Autorisation explicite de publier les corrections sur le projet Vercel
+  existant redemandée ; aucune réponse reçue à ce stade. Elle ne vaudrait pas
+  autorisation de soumission Apple.
+
+## Historique — 24 septembre 2026
 
 Contrôle relancé sur le code après 5ad47b9. Les anciens comptes rendus ci-dessous
 sont historiques et ne valident pas le binaire actuel en production.
