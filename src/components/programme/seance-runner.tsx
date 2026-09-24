@@ -326,7 +326,18 @@ export function SeanceRunner({
     )];
     const cible = Math.max(2, Math.ceil(indexExercices.length / 2));
     const aGarder = new Set(indexExercices.filter((_, i) => i === 0 || i % 2 === 1).slice(0, cible));
-    return tousLesSteps.filter((s) => s.type !== "set" || aGarder.has(s.exerciceIndex));
+    return tousLesSteps.flatMap((s, position): Step[] => {
+      if (s.type === "set") return aGarder.has(s.exerciceIndex) ? [s] : [];
+      if (s.type !== "repos") return [s];
+      const precedent = tousLesSteps[position - 1];
+      if (precedent?.type !== "set" || !aGarder.has(precedent.exerciceIndex)) return [];
+      const prochain = tousLesSteps.slice(position + 1).find(
+        (step): step is Extract<Step, { type: "set" }> => step.type === "set" && aGarder.has(step.exerciceIndex)
+      );
+      // Keep the prescribed rest after a retained set, never the rests of
+      // omitted sets or a final rest with no exercise left to perform.
+      return prochain ? [{ ...s, prochainNom: prochain.nom }] : [];
+    });
   }, [tousLesSteps, seanceCondensee]);
   // Restauration synchrone à l'initialisation : passer par un useEffect
   // ferait clignoter l'écran sur l'état vierge avant de sauter à la reprise.
