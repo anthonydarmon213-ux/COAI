@@ -463,13 +463,17 @@ export function SeanceRunner({
     const dureeMinutes = Math.max(1, Math.round((Date.now() - debut) / 60000));
     type SetDetail = { set: number; reps: number; charge: number; dureeSecondes?: number };
     const parExercice = new Map<string, { nom: string; series: number; chargeKg?: number; sets: SetDetail[] }>();
-    steps.forEach((s, i) => {
-      if (s.type !== "set" || i >= index + 1) return;
+    tousLesSteps.forEach((s) => {
+      if (s.type !== "set") return;
       const cle = `${s.exerciceIndex}-${s.setIndex}`;
+      const positionActive = steps.indexOf(s);
+      // A mode change can hide already completed sets. Keep their recorded
+      // identities, plus visited steps for older drafts without names.
+      if (nomsRealises[cle] === undefined && (positionActive < 0 || positionActive > index)) return;
       const saisi = realise[cle];
       // Le nom est figé au moment de valider la série : un remplacement
       // ultérieur ne doit pas réattribuer les séries déjà réalisées.
-      const nom = nomsRealises[cle] ?? (i === index ? substitutions[s.nom]?.variante : undefined) ?? s.nom;
+      const nom = nomsRealises[cle] ?? (positionActive === index ? substitutions[s.nom]?.variante : undefined) ?? s.nom;
       const entree = parExercice.get(nom) ?? { nom, series: 0, sets: [] };
       entree.series += 1;
       const reps = Number(saisi?.reps);

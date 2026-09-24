@@ -42,6 +42,7 @@ async function scenario(mode, historyHangs = false) {
       return Response.json({id:'saved',source:mode==='source'?'REPCOUNT':'PROGRAMME',date:mode==='date'?'2000-01-01':box.dateSauvegarde});
     },
   };
+  box.tousLesSteps = box.steps;
   for(const name of ['EnvoiEnCours','ErreurSauvegarde','Bilan','TonnagePrecedent','PremiereSeanceId','Termine']) {
     box['set'+name]=value=>state[name]=value;
   }
