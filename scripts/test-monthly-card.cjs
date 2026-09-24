@@ -6,10 +6,13 @@ const ts = require('typescript');
 let signedIn = true, count = 1;
 const box = { exports: {}, require: name =>
   name === '@/lib/auth/server' ? { getCurrentUser: async () => signedIn ? { id: 'fixture' } : null } :
-  name === '@/lib/db/client' ? { prisma: { seanceLog: { findMany: async args => {
-    assert.equal(args.where.user.supabaseAuthId, 'fixture');
+  name === '@/lib/db/client' ? { prisma: { user: { findUnique: async args => {
+    assert.equal(args.where.supabaseAuthId, 'fixture'); return {id: 'member'};
+  } } } } :
+  name === '@/lib/suivi/workout-history' ? { workoutHistory: async (id, options) => {
+    assert.equal(id, 'member'); assert.equal(options.order, 'asc');
     return Array.from({ length: count }, () => ({ date: new Date() }));
-  } } } } : require(name) };
+  } } : require(name) };
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/app/api/suivi/bilan-mensuel/carte/route.tsx', 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
 }).outputText, box);

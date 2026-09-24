@@ -17,6 +17,7 @@ function route(prisma, authId, events) {
     'next/server': require('next/server'), zod:require('zod'),
     '@/lib/auth/server':{getCurrentUser:async()=>authId ? {id:authId} : null},
     '@/lib/db/client':{prisma},
+    '@/lib/suivi/workout-history':{workoutHistory:()=>assert.fail('POST must not read history')},
     '@/lib/analytics/product-events':{trackServerEvent:(...args)=>events.push(args)},
   };
   const box = {exports:{},require:name=>{assert.ok(name in imports,name);return imports[name];}};

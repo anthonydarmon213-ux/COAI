@@ -11,6 +11,7 @@ const imports = {
   '@/lib/auth/server': {getCurrentUser: async () => authenticated ? {id: 'local-test'} : null},
   '@/lib/db/client': {prisma: {user: {findUnique: async () => { databaseCalls++; throw Error('Unexpected database access'); }}}},
   '@/lib/analytics/product-events': {trackServerEvent: () => assert.fail('Unexpected event')},
+  '@/lib/suivi/workout-history': {workoutHistory: () => assert.fail('POST must not read history')},
 };
 const box = {exports: {}, require: name => {assert(name in imports); return imports[name];}};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/app/api/seances/route.ts', 'utf8'), {
