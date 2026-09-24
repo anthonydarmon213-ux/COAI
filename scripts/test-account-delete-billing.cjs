@@ -4,14 +4,14 @@ const path=require('node:path');
 const vm=require('node:vm');
 const ts=require('typescript');
 const source=ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/app/api/compte/delete/route.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-async function scenario({status='active',customer='cus_owner',retrieveError=false,cancelError=false,cancelStatus='canceled',signedIn=true,hasSubscription=true,photosError=false,hasProfile=true,profileError=false,identityError=false,identityThrows=false,identityId='auth_test',requestHeaders={},appURL='https://coai.fr'}={}) {
+async function scenario({status='active',customer='cus_owner',retrieveError=false,cancelError=false,cancelStatus='canceled',signedIn=true,hasSubscription=true,photosError=false,hasProfile=true,profileError=false,identityError=false,identityThrows=false,identityId='auth_test',lookupResult={data:{user:null},error:null},requestHeaders={},appURL='https://coai.fr'}={}) {
   const events=[],api={};
   let authCalls=0;
   vm.runInNewContext(source,{exports:api,URL,process:{env:{NEXT_PUBLIC_APP_URL:appURL}},require:name=>{
     const modules={
       'next/server':{NextResponse:{json:(body,options)=>({body,status:options?.status??200})}},
       '@/lib/auth/server':{getCurrentUser:async()=>{authCalls++;return signedIn?{id:'auth_test'}:null;}},
-      '@/lib/auth/admin':{createSupabaseAdminClient:()=>({auth:{admin:{deleteUser:async(id)=>{assert.equal(id,'auth_test');events.push('identity');if(identityThrows)throw new Error('network');return {data:{user:identityId?{id:identityId}:null},error:identityError?new Error('failed'):null};}}}})},
+      '@/lib/auth/admin':{createSupabaseAdminClient:()=>({auth:{admin:{getUserById:async(id)=>{assert.equal(id,'auth_test');events.push('lookup');return lookupResult;},deleteUser:async(id)=>{assert.equal(id,'auth_test');events.push('identity');if(identityThrows)throw new Error('network');return {data:{user:identityId?{id:identityId}:null},error:identityError?new Error('failed'):null};}}}})},
       '@/lib/stripe/client':{stripe:{subscriptions:{
         retrieve:async()=>{events.push('retrieve');if(retrieveError)throw new Error('network');return {id:'sub_test',customer,status};},
         cancel:async()=>{events.push('cancel');if(cancelError)throw new Error('network');return {status:cancelStatus};}
@@ -72,6 +72,18 @@ async function scenario({status='active',customer='cus_owner',retrieveError=fals
     assert.match(result.response.body.error,/suppression de ton accès/);
   }
   const failedProfile=await scenario({profileError:true});
+  const absent={data:{user:null},error:{status:404,code:'user_not_found'}};
+  const confirmed=await scenario({identityId:null,lookupResult:absent});
+  assert.equal(confirmed.response.status,200);
+  assert.equal(confirmed.events.at(-1),'lookup');
+  for(const lookupResult of [
+    {data:{user:null},error:{status:500,code:'unexpected_failure'}},
+    {data:{user:null},error:{status:404,code:'unknown'}},
+    {data:{user:null},error:{status:401,code:'user_not_found'}},
+    {data:{user:{id:'auth_test'}},error:null},
+    {data:{user:null},error:null},
+  ]) assert.equal((await scenario({identityId:null,lookupResult})).response.status,503);
+  assert.equal((await scenario({identityId:'another_user',lookupResult:absent})).response.status,503);
   assert.equal(failedProfile.response.status,503);
   assert.ok(!failedProfile.events.includes('identity'));
   const resumed=await scenario({hasProfile:false});

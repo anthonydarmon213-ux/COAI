@@ -78,7 +78,17 @@ export async function POST(request: Request) {
   try {
     const admin = createSupabaseAdminClient();
     const { data, error } = await admin.auth.admin.deleteUser(authUser.id);
-    if (error || data.user?.id !== authUser.id) throw new Error("identity_deletion_unconfirmed");
+    if (error) throw new Error("identity_deletion_unconfirmed");
+    if (data.user?.id !== authUser.id) {
+      // Some Auth versions return an empty user after a successful hard delete.
+      // Confirm absence explicitly; a network failure is never proof of deletion.
+      if (data.user?.id) throw new Error("identity_deletion_unconfirmed");
+      const remaining = await admin.auth.admin.getUserById(authUser.id);
+      if (remaining.data.user || remaining.error?.status !== 404 ||
+          remaining.error?.code !== "user_not_found") {
+        throw new Error("identity_deletion_unconfirmed");
+      }
+    }
   } catch {
     return NextResponse.json({ error: "Tes données de profil ont été effacées, mais la suppression de ton accès n’a pas pu être confirmée. Réessaie pour terminer ou contacte l’assistance." }, { status: 503 });
   }
