@@ -21,16 +21,19 @@ const clearableTextFields = ['niveau', 'equipementDisponible', 'lieuEntrainement
 let stored = { userId: 'owner', cycleMenstruelSuivi: true, tailleCm: 175, poidsKg: 70, age: 30,
   ...Object.fromEntries(clearableTextFields.map(key => [key, 'ancienne valeur'])) };
 let writes = 0;
+let databaseFailure = null;
 const modules = {
   'next/server': { NextResponse: Response },
   zod: require('zod'),
   '@/lib/auth/server': { getCurrentUser: async () => ({ id: 'authenticated' }) },
   '@/lib/db/client': { prisma: {
     user: { findUnique: async args => {
+      if (databaseFailure === 'read') throw new Error('private database connection details');
       assert.equal(args.where.supabaseAuthId, 'authenticated');
       return { id: 'owner' };
     } },
     profile: { upsert: async args => {
+      if (databaseFailure === 'write') throw new Error('private database connection details');
       assert.equal(args.where.userId, 'owner');
       stored = { ...stored, ...args.update }; writes++;
       return stored;
@@ -103,8 +106,20 @@ async function submitChoice(choice, values = {}, invalid = false, failureStatus 
     method: 'PUT', body: JSON.stringify({ objectifs: 'nouvel objectif' }),
   }));
   assert.equal(partial.status, 200);
+  assert.equal(partial.headers.get('cache-control'), 'private, no-store');
   assert.equal(stored.tailleCm, 176); assert.equal(stored.poidsKg, 72.5); assert.equal(stored.age, 31);
   const beforeInvalid = writes;
+  for (const phase of ['read', 'write']) {
+    databaseFailure = phase;
+    const response = await route.exports.PUT(new Request('https://coai.test/api/profil', {
+      method: 'PUT', body: JSON.stringify({ objectifs: 'ne pas perdre' }),
+    }));
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get('cache-control'), 'private, no-store');
+    assert.doesNotMatch(await response.text(), /private database/);
+    assert.equal(writes, beforeInvalid);
+  }
+  databaseFailure = null;
   for (const status of [400, 401, 404, 500, 503]) {
     await submitChoice(false, { objectifs: 'ma saisie non enregistrée' }, false, status);
     assert.equal(writes, beforeInvalid, 'Failure must not report a successful save');
@@ -117,5 +132,8 @@ async function submitChoice(choice, values = {}, invalid = false, failureStatus 
     const response = await route.exports.PUT(new Request('https://coai.test/api/profil', { method: 'PUT', body: JSON.stringify(data) }));
     assert.equal(response.status, 400); assert.equal(writes, beforeInvalid);
   }
-  console.log('PASS: actual form → route preserves opt-out, explicit cleared text and populated choices; persistence mocked.');
+  await submitChoice(false, { objectifs: 'réessai après panne' });
+  assert.equal(stored.objectifs, 'réessai après panne');
+  assert.equal(writes, beforeInvalid + 1, 'One successful save after recovery, without automatic retries');
+  console.log('PASS: actual form → route preserves profile choices and handles database failures/retry; persistence mocked.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

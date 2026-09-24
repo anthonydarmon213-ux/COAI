@@ -47,26 +47,40 @@ const bodySchema = z.object({
   coachPreference: z.enum(["FULL_IA", "HYBRIDE", "VIP_PRESENTIEL"]).optional(),
 });
 
+function profileResponse(body: unknown, status = 200) {
+  return NextResponse.json(body, { status, headers: { "Cache-Control": "private, no-store" } });
+}
+
+function unavailableResponse() {
+  return profileResponse({ error: "Enregistrement indisponible pour le moment. Réessaie dans un instant." }, 503);
+}
+
 export async function PUT(request: Request) {
   const authUser = await getCurrentUser();
   if (!authUser) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    return profileResponse({ error: "Non authentifié" }, 401);
   }
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Les informations reçues sont invalides. Réessaie depuis ton profil." }, { status: 400 });
+    return profileResponse({ error: "Les informations reçues sont invalides. Réessaie depuis ton profil." }, 400);
   }
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return profileResponse({ error: parsed.error.flatten() }, 400);
   }
 
-  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
+  let user;
+  try {
+    user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
+  } catch {
+    // Never expose connection strings or profile values in an error response.
+    return unavailableResponse();
+  }
   if (!user) {
-    return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+    return profileResponse({ error: "Profil introuvable" }, 404);
   }
 
   // dateDernieresRegles/dateReferenceMaternite arrivent en chaîne ISO
@@ -78,11 +92,16 @@ export async function PUT(request: Request) {
     ...(dateReferenceMaternite !== undefined && { dateReferenceMaternite: new Date(dateReferenceMaternite) }),
   };
 
-  const profile = await prisma.profile.upsert({
-    where: { userId: user.id },
-    update: data,
-    create: { userId: user.id, ...data },
-  });
+  let profile;
+  try {
+    profile = await prisma.profile.upsert({
+      where: { userId: user.id },
+      update: data,
+      create: { userId: user.id, ...data },
+    });
+  } catch {
+    return unavailableResponse();
+  }
 
   if (user.phoneWhatsapp) {
     await notifyMakeScenario({
@@ -92,5 +111,5 @@ export async function PUT(request: Request) {
     });
   }
 
-  return NextResponse.json(profile);
+  return profileResponse(profile);
 }
