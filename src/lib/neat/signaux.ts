@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import type { TypeTravail } from "@prisma/client";
 
 const FENETRE_RECENTE_JOURS = 7;
@@ -40,10 +41,7 @@ export async function collecterSignauxNeat(userId: string): Promise<SignauxNeat>
       where: { userId, date: { gte: depuisReference } },
       orderBy: { date: "desc" },
     }),
-    prisma.seanceLog.findMany({
-      where: { userId, date: { gte: depuisReference } },
-      select: { date: true },
-    }),
+    workoutHistory(userId, { from: depuisReference }),
   ]);
 
   const joursEntrainement = new Set(seances.map((s) => s.date.toISOString().slice(0, 10)));
