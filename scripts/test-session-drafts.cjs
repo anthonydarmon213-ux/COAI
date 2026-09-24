@@ -62,4 +62,36 @@ const originalRead = context.window.localStorage.getItem;
 context.window.localStorage.getItem = () => { throw new Error('storage denied'); };
 assert.equal(run("lireSauvegarde('Full body', b)"), null);
 context.window.localStorage.getItem = originalRead;
+// Execute the actual autosave effect, including its error/recovery state.
+const ast = ts.createSourceFile('runner.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+let autosave;
+function visit(node) {
+  if (ts.isCallExpression(node) && node.expression.getText(ast) === 'useEffect'
+    && node.arguments[0]?.getText(ast).includes('window.localStorage.setItem')) autosave = node.arguments[0].getText(ast);
+  ts.forEachChild(node, visit);
+}
+visit(ast);
+assert.ok(autosave, 'actual autosave effect found');
+let warning = null;
+context.setErreurBrouillon = value => { warning = value; };
+context.termine = false;
+const originalWrite = context.window.localStorage.setItem;
+const previous = storage.get(b);
+context.window.localStorage.setItem = () => { throw new Error('quota exceeded'); };
+assert.doesNotThrow(() => run(`(${autosave})()`));
+assert.equal(warning, true);
+assert.equal(storage.get(b), previous, 'failed write preserves previous draft');
+context.window.localStorage.setItem = originalWrite;
+run(`(${autosave})()`);
+assert.equal(warning, false, 'successful retry clears warning');
+assert.equal(JSON.parse(storage.get(b)).index, context.index);
+for (const state of [{ termine: true, cleBrouillon: b }, { termine: false, cleBrouillon: null }]) {
+  Object.assign(context, state);
+  warning = null;
+  context.window.localStorage.setItem = () => assert.fail('must not write');
+  run(`(${autosave})()`);
+  assert.equal(warning, null);
+}
+context.window.localStorage.setItem = originalWrite;
 console.log('PASS : isolation compte/prescription, reprise des charges, suppression ciblée, expiration, ancien brouillon préservé');
+console.log('PASS : stockage refusé non bloquant, avertissement, reprise de sauvegarde, aucune écriture après fin ou sans compte');

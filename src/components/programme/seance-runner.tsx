@@ -363,6 +363,7 @@ export function SeanceRunner({
   // Pas de réponse présélectionnée ni de copie des douleurs dans le stockage local.
   const [checkin, setCheckin] = useState<SeanceCheckinValeurs>({});
   const [erreurSauvegarde, setErreurSauvegarde] = useState(false);
+  const [erreurBrouillon, setErreurBrouillon] = useState(false);
   const [premiereSeanceId, setPremiereSeanceId] = useState<string | null>(null);
   const [consigneOuverte, setConsigneOuverte] = useState(false);
   const [coches, setCoches] = useState<Record<string, boolean>>({});
@@ -384,9 +385,13 @@ export function SeanceRunner({
         cleBrouillon,
         JSON.stringify({ nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos } satisfies SeanceSauvegardee)
       );
+      // Résultat du stockage externe, impossible à déterminer pendant le rendu.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setErreurBrouillon(false);
     } catch {
-      // Quota dépassé ou navigation privée : la séance continue normalement,
-      // elle ne sera simplement pas reprenable.
+      // Continuer reste possible, mais ne pas laisser croire qu'une reprise
+      // après fermeture est garantie si les dernières saisies ne sont pas écrites.
+      setErreurBrouillon(true);
     }
   }, [termine, cleBrouillon, nomSeance, debut, index, realise, substitutions, seanceCondensee, nomsRealises, repos]);
   const bip = useBip();
@@ -650,6 +655,11 @@ export function SeanceRunner({
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
       {premiereSeanceId && <TrackConversion name="first_workout_completed" onceKey={premiereSeanceId} />}
+      {!termine && erreurBrouillon && (
+        <p role="alert" className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">
+          La reprise de ta séance n’a pas pu être sauvegardée sur cet appareil. Garde cet écran ouvert jusqu’à l’enregistrement final pour ne pas perdre tes dernières saisies.
+        </p>
+      )}
       {!termine && reprise && (
         <div className="border-b border-laiton-300/25 bg-laiton-400/[0.08] px-4 py-2.5 text-center text-xs text-laiton-100">
           Séance reprise là où tu l&apos;avais laissée — chrono et séries conservés.
