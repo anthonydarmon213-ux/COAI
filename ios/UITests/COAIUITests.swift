@@ -1,6 +1,35 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Exercises the real persistent WKWebsiteDataStore, not the daily screen or API.
+    @MainActor
+    func testWebDraftSurvivesRelaunchAndClearsAfterSessionEnd() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIDownloadFixture"]
+        app.launch()
+        let clear = app.buttons["Effacer le brouillon fictif"]
+        XCTAssertTrue(clear.waitForExistence(timeout: 15))
+        reveal(clear, in: app)
+        clear.tap()
+        XCTAssertTrue(app.staticTexts["Aucun brouillon fictif"].exists)
+        let save = app.buttons["Enregistrer le brouillon fictif"]
+        reveal(save, in: app)
+        save.tap()
+        XCTAssertTrue(app.staticTexts["Brouillon fictif conservé"].exists)
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Brouillon fictif conservé"].waitForExistence(timeout: 15))
+        let end = app.buttons["Simuler une déconnexion confirmée"]
+        reveal(end, in: app)
+        end.tap()
+        XCTAssertTrue(end.waitForNonExistence(timeout: 15))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Aucun brouillon fictif"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["Brouillon fictif conservé"].exists)
+    }
+
     @MainActor
     func testConfirmedWebSessionEndClearsWeeklyReminder() throws {
         continueAfterFailure = false
@@ -23,7 +52,18 @@ final class COAIUITests: XCTestCase {
             XCTAssertTrue(allow.exists)
             allow.tap()
         }
-        XCTAssertTrue(app.buttons["weekly-reminder-disable"].waitForExistence(timeout: 10))
+        let reminderEnabled = app.buttons["weekly-reminder-disable"].waitForExistence(timeout: 10)
+        if !reminderEnabled {
+            let state = XCTAttachment(string: app.debugDescription)
+            state.name = "Échec activation rappel — état interface"
+            state.lifetime = .keepAlways
+            add(state)
+            let capture = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            capture.name = "Échec activation rappel"
+            capture.lifetime = .keepAlways
+            add(capture)
+        }
+        XCTAssertTrue(reminderEnabled)
         app.terminate()
         app.launch()
         let invalid = app.buttons["Signal de fin invalide"]
@@ -57,11 +97,16 @@ final class COAIUITests: XCTestCase {
         reveal(reminder, in: app)
         reminder.tap()
         let settings = app.buttons["Ouvrir les réglages de COAI"]
+        // Form rows below the viewport are created lazily on small iPhones.
+        for _ in 0..<4 {
+            if settings.exists { break }
+            app.swipeUp()
+        }
         guard settings.waitForExistence(timeout: 5) else {
             throw XCTSkip("Ce scénario nécessite le simulateur QA dont les notifications sont refusées ; un test ignoré ne valide pas ce parcours.")
         }
         let save = app.buttons["weekly-reminder-save"]
-        reveal(save, in: app)
+        reveal(save, in: app, upward: false)
         save.tap()
         let message = app.staticTexts["weekly-reminder-message"]
         XCTAssertTrue(message.waitForExistence(timeout: 5))

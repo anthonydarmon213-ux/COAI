@@ -349,7 +349,14 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <button onclick="save('invalid')">Tester le format refusé</button>
     <button onclick="save('json')">Exporter les données fictives</button>
     <button onclick="save('invalidjson')">Tester le JSON invalide</button>
+    <p id="storage-status" role="status"></p>
+    <button onclick="localStorage.setItem('coai-ui-storage-fixture', 'saved'); refreshStorage()">Enregistrer le brouillon fictif</button>
+    <button onclick="localStorage.removeItem('coai-ui-storage-fixture'); refreshStorage()">Effacer le brouillon fictif</button>
     <script>
+    function refreshStorage() {
+      document.getElementById('storage-status').textContent = localStorage.getItem('coai-ui-storage-fixture') === 'saved' ? 'Brouillon fictif conservé' : 'Aucun brouillon fictif';
+    }
+    refreshStorage();
     function save(kind) {
       const invalid = kind === 'invalid';
       const encoded = kind === 'pdf' ? '\(pdf)' : 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aCfoAAAAASUVORK5CYII=';
