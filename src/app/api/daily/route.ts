@@ -92,12 +92,13 @@ const requestSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function GET() {
+  const headers = { "Cache-Control": "private, no-store", Vary: "Cookie, Authorization" };
   const user = await currentAppUser();
-  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401, headers });
   const daily = await prisma.dailySession.findUnique({
     where: { userId_date: { userId: user.id, date: today() } },
   });
-  return NextResponse.json(daily);
+  return NextResponse.json(daily, { headers });
 }
 
 export async function POST(request: Request) {

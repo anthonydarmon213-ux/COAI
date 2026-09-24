@@ -14,6 +14,12 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUP
   auth: {persistSession: false, autoRefreshToken: false},
 });
 const fixtures = [];
+function assertPrivateHistory(response) {
+  const directives = response.headers.get('cache-control')?.toLowerCase().split(',').map(value => value.trim()) ?? [];
+  assert.ok(directives.includes('private') && directives.includes('no-store'), 'Personal history must not be stored');
+  const vary = response.headers.get('vary')?.toLowerCase().split(',').map(value => value.trim()) ?? [];
+  assert.ok(vary.includes('cookie') && vary.includes('authorization'), 'Both authentication methods must vary');
+}
 async function fixture() {
   const email = `coai-http-${randomUUID()}@example.test`, password = randomUUID() + 'aA1!';
   const {data, error} = await admin.auth.admin.createUser({email, password, email_confirm: true});
@@ -33,8 +39,16 @@ async function fixture() {
 }
 async function main() {
   const endpoint = origin + '/api/seances';
-  assert.equal((await fetch(endpoint)).status, 401);
+  const anonymousHistory = await fetch(endpoint);
+  assert.equal(anonymousHistory.status, 401); assertPrivateHistory(anonymousHistory);
   const a = await fixture(), b = await fixture();
+  for (const path of ['/api/daily', '/api/check-in-hebdo']) {
+    for (const headers of [undefined, a.cookie, a.bearer]) {
+      const response = await fetch(origin + path, {headers});
+      assert.equal(response.status, headers ? 200 : 401);
+      assertPrivateHistory(response);
+    }
+  }
   const payload = {date: new Date().toISOString(), source: 'PROGRAMME',
     exercices: [{nom: 'Test local', sets: [{set: 1, reps: 8, charge: 12}]}], energie: 4, difficulte: 3, douleur: 'AUCUNE'};
   const post = body => fetch(endpoint, {method: 'POST', headers: {...a.cookie, 'Content-Type': 'application/json'}, body: JSON.stringify(body)});
@@ -45,10 +59,12 @@ async function main() {
   const retry = await post({...payload, notes: 'Must not replace the original'});
   assert.equal(retry.status, 200); assert.equal((await retry.json()).notes, null);
   const history = await fetch(endpoint, {headers: a.bearer}); assert.equal(history.status, 200);
+  assertPrivateHistory(history);
   const rows = await history.json(); assert.equal(rows.length, 1);
   assert.equal(rows[0].exercices[0].sets[0].charge, 12);
   assert.equal(await db.seanceLog.count({where: {userId: a.user.id}}), 1);
   const other = await fetch(endpoint, {headers: b.cookie}); assert.equal(other.status, 200);
+  assertPrivateHistory(other);
   assert.deepEqual(await other.json(), []);
   assert.equal((await fetch(endpoint, {headers: {...a.cookie, Authorization: 'Bearer invalid'}})).status, 401);
   const malformed = await fetch(endpoint, {method: 'POST', headers: {...a.cookie, 'Content-Type': 'application/json'}, body: '{'});
@@ -62,7 +78,8 @@ async function main() {
   const postMeasure = (owner, body = measureBody, key = measureKey) => fetch(origin + '/api/mesures', {
     method: 'POST', headers: {...owner.cookie, 'Content-Type': 'application/json', 'x-coai-request-id': key}, body: JSON.stringify(body),
   });
-  assert.equal((await fetch(origin + '/api/mesures')).status, 401);
+  const anonymousMeasures = await fetch(origin + '/api/mesures');
+  assert.equal(anonymousMeasures.status, 401); assertPrivateHistory(anonymousMeasures);
   const measureResponses = await Promise.all([postMeasure(a), postMeasure(a), postMeasure(a)]);
   assert.deepEqual(measureResponses.map(r => r.status).sort(), [200, 200, 201]);
   const measureRows = await Promise.all(measureResponses.map(r => r.json()));
@@ -71,9 +88,12 @@ async function main() {
   assert.equal((await postMeasure(a, {...measureBody, poidsKg: 81})).status, 409);
   const measureHistory = await fetch(origin + '/api/mesures', {headers: a.bearer});
   assert.equal(measureHistory.status, 200);
+  assertPrivateHistory(measureHistory);
   const savedMeasures = await measureHistory.json();
   assert.equal(savedMeasures.length, 1); assert.equal(savedMeasures[0].poidsKg, 80);
-  assert.deepEqual(await (await fetch(origin + '/api/mesures', {headers: b.cookie})).json(), []);
+  const otherMeasures = await fetch(origin + '/api/mesures', {headers: b.cookie});
+  assert.equal(otherMeasures.status, 200); assertPrivateHistory(otherMeasures);
+  assert.deepEqual(await otherMeasures.json(), []);
   assert.equal((await postMeasure(b)).status, 201);
   assert.equal((await postMeasure(a, {...measureBody, photoPath: `${b.authId}/private.jpg`})).status, 400);
   assert.equal((await postMeasure(a, measureBody, 'invalid')).status, 400);
@@ -98,7 +118,9 @@ async function main() {
   const weeklyRows = await Promise.all(weeklyResponses.map(r => r.json()));
   assert.equal(weeklyRows[0].id, weeklyRows[1].id);
   assert.equal(await db.weeklyCheckin.count({where: {userId: a.user.id}}), 1);
-  weekly = await (await fetch(weeklyURL, {headers: a.bearer})).json();
+  const savedWeeklyResponse = await fetch(weeklyURL, {headers: a.bearer});
+  assertPrivateHistory(savedWeeklyResponse);
+  weekly = await savedWeeklyResponse.json();
   assert.equal(weekly.du, false); assert.equal(weekly.dernier.energie, 3);
   assert.equal(weekly.dernier.douleurs, false); assert.equal(weekly.dernier.seancesRealisees, 0);
   assert.equal(weekly.dernier.commentaire, 'Repas maison : 0 — Bilan local');
@@ -219,6 +241,7 @@ async function main() {
     assert.equal(saved.adaptation.adaptedExerciseCount, expectedNames.length);
     const reloadedResponse = await fetch(dailyURL, {headers: a.bearer});
     assert.equal(reloadedResponse.status, 200);
+    assertPrivateHistory(reloadedResponse);
     const reloaded = await reloadedResponse.json();
     assert.equal(reloaded.id, saved.id);
     assert.deepEqual(reloaded.adaptedSession, saved.adaptedSession);

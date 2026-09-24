@@ -26,14 +26,15 @@ const bodySchema = z.object({
 // l'instant, la carte du dashboard se contente de s'afficher tant que ce
 // n'est pas fait (cf. WeeklyCheckinCard).
 export async function GET() {
+  const headers = { "Cache-Control": "private, no-store", Vary: "Cookie, Authorization" };
   const authUser = await getCurrentUser();
   if (!authUser) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401, headers });
   }
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
   if (!user) {
-    return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+    return NextResponse.json({ error: "Profil introuvable" }, { status: 404, headers });
   }
 
   const semaineDebut = lundiDeSemaine(new Date());
@@ -51,7 +52,7 @@ export async function GET() {
     du: !checkinSemaine,
     semaineDebut: semaineDebut.toISOString(),
     dernier,
-  });
+  }, { headers });
 }
 
 export async function POST(request: Request) {
