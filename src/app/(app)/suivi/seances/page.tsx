@@ -1,6 +1,6 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { AccessRecovery } from "@/components/auth/access-recovery";
-import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import { SeanceForm } from "@/components/suivi/seance-form";
 import { EXERCICES } from "@/lib/exercices/catalogue";
 import { exerciceAvecMediasCoai } from "@/lib/exercices/media-coai";
@@ -36,11 +36,7 @@ export default async function SeancesPage() {
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 
-  const seances = await prisma.seanceLog.findMany({
-    where: { userId: user.id },
-    orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-    take: 30,
-  });
+  const seances = await workoutHistory(user.id, { take: 30 });
 
   return (
     <div className="flex flex-col gap-6">
@@ -73,6 +69,12 @@ export default async function SeancesPage() {
 
           return (
             <Card key={s.id} className="coai-history-row flex flex-col gap-3 p-4">
+              {s.dailySessionId && <div>
+                <p className="text-sm font-semibold text-graphite-50">{s.dailyTitle}</p>
+                <p className="mt-1 text-xs text-graphite-400">Séance quotidienne terminée · charges, répétitions et durée réalisées non renseignées.</p>
+                {s.dailyRating && <p className="mt-2 text-sm">Ressenti : {s.dailyRating === "TROP_FACILE" ? "Trop facile" : s.dailyRating === "TROP_DURE" ? "Trop dure" : "Bien dosée"}</p>}
+                {s.dailyPain != null && <p className="mt-1 text-sm">Douleur ou gêne signalée : {s.dailyPain ? "oui" : "non"}</p>}
+              </div>}
               <div className="flex items-center justify-between">
                 <span className="font-mono text-sm font-semibold text-laiton-400">
                   {s.date.toISOString().slice(0, 10)}

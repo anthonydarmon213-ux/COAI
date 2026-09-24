@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { workoutHistoryCount } from "@/lib/suivi/workout-history";
 import { accessibleTraining } from "@/lib/programmes/access";
 import { redirect } from "next/navigation";
 import { getCurrentAppUser } from "@/lib/auth/server";
@@ -77,9 +78,7 @@ export default async function DashboardPage() {
       orderBy: { generatedAt: "desc" },
       select: { id: true },
     }),
-    prisma.seanceLog.count({
-      where: { userId: user.id, date: { gte: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) } },
-    }),
+    workoutHistoryCount(user.id, { from: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) }),
     prisma.testMaxi.findMany({
       where: { userId: user.id },
       orderBy: { date: "desc" },

@@ -1,4 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/server";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import Link from "next/link";
 import { requestTime } from "@/lib/server/request-time";
 import { AccessRecovery } from "@/components/auth/access-recovery";
@@ -49,10 +50,7 @@ export default async function ProgressionPage() {
       where: { userId: user.id },
       orderBy: { date: "asc" },
     }),
-    prisma.seanceLog.findMany({
-      where: { userId: user.id },
-      orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
-    }),
+    workoutHistory(user.id, { order: "asc" }),
     prisma.dailySession.findMany({
       where: { userId: user.id, date: { gte: new Date(date.getTime() - 90 * 24 * 60 * 60 * 1000) } },
       select: { sleep: true, energy: true, workoutRating: true, pain: true, completedAt: true },

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 
 // Débrief hebdomadaire affiché sur /coach (21/08/2026, demande Anthony :
 // "volume total validé, progression sur les exercices clés, score de
@@ -38,14 +39,8 @@ export async function getDebriefSemaine(userId: string): Promise<DebriefSemaine>
   debutSemainePrecedente.setDate(debutSemainePrecedente.getDate() - 7);
 
   const [seancesSemaine, seancesPrecedentes, dailies] = await Promise.all([
-    prisma.seanceLog.findMany({
-      where: { userId, date: { gte: debutSemaine } },
-      select: { exercices: true, dureeMinutes: true },
-    }),
-    prisma.seanceLog.findMany({
-      where: { userId, date: { gte: debutSemainePrecedente, lt: debutSemaine } },
-      select: { exercices: true },
-    }),
+    workoutHistory(userId, { from: debutSemaine }),
+    workoutHistory(userId, { from: debutSemainePrecedente, before: debutSemaine }),
     prisma.dailySession.findMany({
       where: { userId, date: { gte: debutSemaine } },
       select: { sleep: true, energy: true, pain: true },

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 
 // Streak et badges (22/08/2026, demande Anthony) — entièrement calculés à
 // partir de ce que l'utilisateur a réellement enregistré. Aucun badge ne se
@@ -80,11 +81,7 @@ function meilleurStreakHistorique(jours: Set<string>): number {
 
 export async function getGamification(userId: string): Promise<Gamification> {
   const [seances, dailies, mesures] = await Promise.all([
-    prisma.seanceLog.findMany({
-      where: { userId },
-      select: { date: true, exercices: true },
-      orderBy: { date: "desc" },
-    }),
+    workoutHistory(userId),
     prisma.dailySession.findMany({
       where: { userId, sleep: { not: null } },
       select: { date: true },

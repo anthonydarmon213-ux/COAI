@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
@@ -43,10 +44,8 @@ export async function GET() {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const seances = await prisma.seanceLog.findMany({
-    where: { user: { supabaseAuthId: authUser.id } },
-    orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-  });
+  const user = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id }, select: { id: true } });
+  const seances = user ? await workoutHistory(user.id) : [];
 
   return NextResponse.json(seances);
 }
