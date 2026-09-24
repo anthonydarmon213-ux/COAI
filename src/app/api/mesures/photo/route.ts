@@ -11,11 +11,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const formData = await request.formData();
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "Envoi incomplet. Sélectionne à nouveau la photo puis réessaie." }, { status: 400 });
+  }
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
+  }
+  if (file.size === 0) {
+    return NextResponse.json({ error: "L’image est vide. Sélectionne une autre photo." }, { status: 400 });
   }
   if (!ALLOWED_TYPES.has(file.type)) {
     return NextResponse.json({ error: "Formats acceptés : JPG, PNG ou WebP" }, { status: 400 });
@@ -24,10 +32,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image trop volumineuse après optimisation (2 Mo max)" }, { status: 400 });
   }
 
-  const result = await uploadProgressPhoto(authUser.id, file);
-  if ("error" in result) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
+  try {
+    const result = await uploadProgressPhoto(authUser.id, file);
+    if ("error" in result) throw new Error("photo_upload_failed");
+    return NextResponse.json(result, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "L’envoi de la photo n’a pas pu être confirmé. Réessaie dans un instant." }, { status: 503 });
   }
-
-  return NextResponse.json(result, { status: 201 });
 }
