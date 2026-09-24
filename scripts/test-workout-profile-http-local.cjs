@@ -171,6 +171,30 @@ async function main() {
     assert.ok(title.length > 0 && html.includes(escapeHTML(title)), path + ' displays persisted catalogue title');
     assert.ok(!html.includes('NEXT_REDIRECT') && !html.includes('NEXT_HTTP_ERROR_FALLBACK'), path + ' has no server error/redirect');
   }
+  // Historical persisted programmes must obey the same media rule as new catalogue plans.
+  const training = programmes.find(p => p.pilier === 'ENTRAINEMENT');
+  const legacyContent = { titre: 'Programme historique de test', seances: [{
+    nom: 'Séance historique', jour: 'LUN', echauffement: 'Préparation locale', retourAuCalme: 'Repos local',
+    exercices: [{nom: 'Hip thrust barre', series: 3}, {nom: 'Leg curl allongé', series: 3, repetitions: '8-12', repos: '60 sec'}],
+  }] };
+  await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: legacyContent}});
+  for (const path of ['/programme/entrainement', '/programme/seance-du-jour?seance=0']) {
+    const response = await fetch(origin + path, {headers: a.cookie});
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.ok(html.includes('Leg curl (machine)'), path + ' retains canonical demonstrated movement');
+    assert.ok(!html.includes('Hip thrust barre'), path + ' removes undemonstrated movement');
+  }
+  for (const path of ['/api/programmes/fiche-complete', '/api/programmes/entrainement/pdf']) {
+    const response = await fetch(origin + path, {headers: a.cookie});
+    assert.equal(response.status, 200, path);
+    assert.equal(response.headers.get('content-type'), 'application/pdf');
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(bytes.subarray(0, 5).toString(), '%PDF-');
+    assert.ok(bytes.length > 1000);
+  }
+  assert.deepEqual((await db.programmeGenerated.findUnique({where: {id: training.id}})).contenu, legacyContent);
+  console.log('PASS HTTP legacy media: persisted fixture filtered on both pages, both authenticated PDF downloads valid, database unchanged');
   // A completed profile with a declared constraint must not get a generic programme.
   await db.user.update({where: {id: b.user.id}, data: {programmeUnlockedAt: new Date()}});
   await db.profile.create({data: {userId: b.user.id, objectifs: 'Rester en forme', niveau: 'Débutant',
