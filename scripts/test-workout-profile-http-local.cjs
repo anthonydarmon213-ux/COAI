@@ -81,6 +81,36 @@ async function main() {
   assert.equal(await db.mesure.count({where: {userId: a.user.id}}), 1);
   console.log('PASS HTTP measures: real login, concurrent retries, conflict, persisted history, owner/photo isolation, invalid key/token');
 
+  const weeklyURL = origin + '/api/check-in-hebdo';
+  const postWeekly = body => fetch(weeklyURL, {method: 'POST',
+    headers: {...a.cookie, 'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  assert.equal((await fetch(weeklyURL)).status, 401);
+  let weekly = await (await fetch(weeklyURL, {headers: a.cookie})).json();
+  assert.equal(weekly.du, true); assert.equal(weekly.dernier, null);
+  for (const empty of [{}, {commentaire: '   '}, {userId: b.user.id}]) {
+    assert.equal((await postWeekly(empty)).status, 400);
+  }
+  assert.equal(await db.weeklyCheckin.count({where: {userId: a.user.id}}), 0);
+  const weeklyBody = {energie: 3, douleurs: false, seancesRealisees: 0, repasMaison: 0,
+    commentaire: '  Bilan local  ', userId: b.user.id};
+  const weeklyResponses = await Promise.all([postWeekly(weeklyBody), postWeekly(weeklyBody)]);
+  assert.deepEqual(weeklyResponses.map(r => r.status), [201, 201]);
+  const weeklyRows = await Promise.all(weeklyResponses.map(r => r.json()));
+  assert.equal(weeklyRows[0].id, weeklyRows[1].id);
+  assert.equal(await db.weeklyCheckin.count({where: {userId: a.user.id}}), 1);
+  weekly = await (await fetch(weeklyURL, {headers: a.bearer})).json();
+  assert.equal(weekly.du, false); assert.equal(weekly.dernier.energie, 3);
+  assert.equal(weekly.dernier.douleurs, false); assert.equal(weekly.dernier.seancesRealisees, 0);
+  assert.equal(weekly.dernier.commentaire, 'Repas maison : 0 — Bilan local');
+  const otherWeekly = await (await fetch(weeklyURL, {headers: b.cookie})).json();
+  assert.equal(otherWeekly.du, true); assert.equal(otherWeekly.dernier, null);
+  assert.equal((await postWeekly({energie: 4})).status, 201);
+  weekly = await (await fetch(weeklyURL, {headers: a.cookie})).json();
+  assert.equal(weekly.dernier.energie, 4); assert.equal(weekly.dernier.douleurs, false);
+  assert.equal(await db.weeklyCheckin.count({where: {userId: a.user.id}}), 1);
+  assert.equal((await fetch(weeklyURL, {headers: {...a.cookie, Authorization: 'Bearer invalid'}})).status, 401);
+  console.log('PASS HTTP weekly check-in: empty rejection, concurrent save, persisted false/zero, partial update, cookie/bearer and account isolation');
+
   const updateProfile = body => fetch(origin + '/api/profil', {
     method: 'PUT', headers: {...a.cookie, 'Content-Type': 'application/json'}, body: JSON.stringify(body),
   });
