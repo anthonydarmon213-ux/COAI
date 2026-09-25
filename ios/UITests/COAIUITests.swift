@@ -683,6 +683,32 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(tabs[2].isHittable)
     }
 
+    // Start with loopback stopped, then restore it while this bounded test retries.
+    // No injected network state, authentication, or replacement HTML.
+    @MainActor
+    func testLocalNetworkRestorationLoadsLoginWithoutRelaunch() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Page indisponible"].waitForExistence(timeout: 30))
+        let email = app.webViews.textFields["EMAIL"]
+        XCTAssertFalse(email.exists)
+        for _ in 0..<30 {
+            let retry = app.buttons["Réessayer"]
+            if retry.isHittable { retry.tap() }
+            if email.waitForExistence(timeout: 3) { break }
+        }
+        XCTAssertTrue(email.exists, "La restauration du serveur doit permettre de reprendre sans relancer l'app.")
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        XCTAssertTrue(app.webViews.buttons["Continuer avec Google"].exists)
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "Retour réseau local — connexion rechargée sans relance"
+        capture.lifetime = .keepAlways
+        add(capture)
+    }
+
     // Run alone on a QA simulator with the loopback server stopped.
     // Never alter the user's network or production host to induce failure.
     // No injected error: exercises the real WebKit navigation failure.

@@ -2,6 +2,18 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Reprise après panne locale
+
+`testLocalNetworkRestorationLoadsLoginWithoutRelaunch` passe (xcresult
+06-38-53). Démarrer serveur localhost:3050 arrêté, attendre l'erreur réelle et
+les tentatives « Réessayer », puis démarrer `serve-native` pendant le test.
+Le test est borné à 30 tentatives avec attente de trois secondes chacune.
+Il exige erreur initiale et formulaire absent, puis retour du vrai champ EMAIL
+et du bouton Google, sans relance ni HTML injecté. Aucun identifiant saisi.
+Ne pas exécuter simultanément avec un test nécessitant le serveur disponible.
+Cette preuve porte sur panne/reprise de navigation, pas sur une sauvegarde
+interrompue en cours d'envoi ni une synchronisation hors ligne.
+
 - Navigation web des piliers dupliquée : masquée dans l'app native, contrôlée
   sur pages connectées ; le site Safari conserve sa navigation.
 - `testLocalConnectedLoginSurvivesRelaunch` : Nutrition/Récupération, recettes
