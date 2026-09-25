@@ -37,6 +37,15 @@ final class COAIUITests: XCTestCase {
         settings.tap()
         let signOut = web.buttons["Se déconnecter"].firstMatch
         XCTAssertTrue(signOut.waitForExistence(timeout: 20))
+        let birthDate = web.descendants(matching: .any).matching(NSPredicate(
+            format: "label == %@ AND elementType != %d", "DATE DE NAISSANCE", XCUIElement.ElementType.staticText.rawValue
+        )).firstMatch
+        XCTAssertTrue(birthDate.exists)
+        XCTAssertNotEqual(birthDate.elementType, .staticText, "Mesurer le champ, pas son libellé.")
+        XCTAssertGreaterThanOrEqual(birthDate.frame.height, 44)
+        let firstName = web.textFields["PRÉNOM"]
+        XCTAssertLessThanOrEqual(birthDate.frame.maxX, firstName.frame.maxX + 2,
+                                 "Le champ date ne doit pas dépasser la largeur des autres champs.")
         let connected = XCTAttachment(screenshot: app.screenshot())
         connected.name = "Compte local connecté après fermeture et relance"
         connected.lifetime = .keepAlways

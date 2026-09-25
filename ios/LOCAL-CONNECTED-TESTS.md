@@ -1,5 +1,19 @@
 # Parcours natif connecté local — 25 septembre 2026
 
+## Correctif champ date — même jour
+
+Débordement corrigé dans Input : min-width 0, max-width 100%, apparence du champ
+date neutralisée et hauteur minimale 50px pour les valeurs vides. Le contrôle
+reste type=date ; logique de saisie/sauvegarde inchangée.
+Test final : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.25_03-27-05-+0200.xcresult`.
+Le contrôle date réel (Other, pas le StaticText du label) est mesuré à
+285 × 51 points, identique au champ prénom en largeur. Capture inspectée :
+`/tmp/coai-date-final-attachments-0925/B34EF511-7A6E-4A42-ACE7-A08247F0C5B8.png`.
+Un test intermédiaire mesurait le label : rejeté puis corrigé pour éviter
+un faux positif. Types/lint/build web local passés, compte jetable nettoyé.
+Non publié, pas de validation de sauvegarde d'une nouvelle date ou iPhone
+physique sur cette passe. Le défaut ci-dessous décrit la capture historique.
+
 `testLocalConnectedLoginSurvivesRelaunch` passe sur le simulateur QA petit écran
 693D66D1-61CD-4AB1-89B8-A5CAD9CA7480, iOS 26.5. Il saisit les identifiants d'un
 compte jetable dans le vrai formulaire WebKit, ouvre les réglages authentifiés,
