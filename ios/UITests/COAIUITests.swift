@@ -683,14 +683,16 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(tabs[2].isHittable)
     }
 
-    // Run alone on a QA simulator while the COAI host is unreachable.
+    // Run alone on a QA simulator with the loopback server stopped.
+    // Never alter the user's network or production host to induce failure.
     // No injected error: exercises the real WebKit navigation failure.
     @MainActor
     func testUnavailableNetworkKeepsRecoveryControlsAccessible() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
         app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
         let error = app.staticTexts["Page indisponible"]
         XCTAssertTrue(error.waitForExistence(timeout: 30), "Une panne ne doit pas laisser un chargement pendant une minute.")
         XCTAssertTrue(app.staticTexts["Impossible de charger COAI. Vérifie ta connexion, puis réessaie. Le minuteur reste accessible."].exists)
@@ -706,7 +708,10 @@ final class COAIUITests: XCTestCase {
         app.buttons["Fermer"].tap()
         XCTAssertTrue(app.buttons["Réessayer"].isHittable)
         app.buttons["Réessayer"].tap()
-        XCTAssertTrue(error.waitForNonExistence(timeout: 5))
+        // Loopback refusal can finish before XCTest observes the loading frame.
+        // Do not require a transient disappearance; the second failure must be usable.
+        XCTAssertTrue(error.waitForExistence(timeout: 30))
+        XCTAssertTrue(app.buttons["Réessayer"].isHittable)
         XCTAssertTrue(app.buttons["Repos"].isHittable)
         // Network restoration and successful retry remain separate checks.
     }
