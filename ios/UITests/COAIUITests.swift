@@ -29,6 +29,20 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(settings.waitForExistence(timeout: 5))
         settings.tap()
         XCTAssertTrue(web.buttons["Se déconnecter"].firstMatch.waitForExistence(timeout: 20))
+        let editableName = web.textFields["PRÉNOM"]
+        XCTAssertEqual(editableName.value as? String, "Test local")
+        editableName.tap()
+        editableName.typeText(" vérifié")
+        let savedName = editableName.value as? String
+        XCTAssertTrue(savedName?.contains("vérifié") == true)
+        let saveIdentity = web.buttons["Enregistrer"].firstMatch
+        let typingCapture = XCTAttachment(screenshot: app.screenshot())
+        typingCapture.name = "Saisie identité avant sauvegarde"
+        typingCapture.lifetime = .keepAlways
+        add(typingCapture)
+        reveal(saveIdentity, in: app)
+        saveIdentity.tap()
+        XCTAssertTrue(web.staticTexts["Identité enregistrée."].waitForExistence(timeout: 15))
         app.terminate()
         app.launch()
         XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 15))
@@ -44,6 +58,7 @@ final class COAIUITests: XCTestCase {
         XCTAssertNotEqual(birthDate.elementType, .staticText, "Mesurer le champ, pas son libellé.")
         XCTAssertGreaterThanOrEqual(birthDate.frame.height, 44)
         let firstName = web.textFields["PRÉNOM"]
+        XCTAssertEqual(firstName.value as? String, savedName?.trimmingCharacters(in: .whitespaces), "La modification doit venir du serveur après relance.")
         XCTAssertLessThanOrEqual(birthDate.frame.maxX, firstName.frame.maxX + 2,
                                  "Le champ date ne doit pas dépasser la largeur des autres champs.")
         let connected = XCTAttachment(screenshot: app.screenshot())
@@ -1048,7 +1063,17 @@ final class COAIUITests: XCTestCase {
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, upward: Bool = true) {
         for _ in 0..<5 {
             if element.isHittable { return }
-            if upward { app.swipeUp() } else { app.swipeDown() }
+            if app.keyboards.firstMatch.exists {
+                // Keep the gesture above the keyboard instead of swiping its keys.
+                let top = app.frame.minY + 160
+                // The keyboard frame excludes prediction/accessory rows on iOS.
+                let bottom = app.keyboards.firstMatch.frame.minY - 140
+                let origin = app.coordinate(withNormalizedOffset: .zero)
+                let high = origin.withOffset(CGVector(dx: app.frame.width * 0.85, dy: top))
+                let low = origin.withOffset(CGVector(dx: app.frame.width * 0.85, dy: bottom))
+                if upward { low.press(forDuration: 0.05, thenDragTo: high) }
+                else { high.press(forDuration: 0.05, thenDragTo: low) }
+            } else if upward { app.swipeUp() } else { app.swipeDown() }
         }
         XCTAssertTrue(element.isHittable)
     }

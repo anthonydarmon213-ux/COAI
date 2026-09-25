@@ -1,5 +1,17 @@
 # Parcours natif connecté local — 25 septembre 2026
 
+## Sauvegarde réelle du prénom et relance
+
+Le test connecté modifie désormais le prénom, atteint Enregistrer avec le
+clavier affiché, attend « Identité enregistrée. », puis vérifie la valeur
+après fermeture et relance. Vérification indépendante dans PostgreSQL local
+réussie (`ui-verify`), compte jetable supprimé ensuite (`ui-cleanup`).
+Résultat : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.25_03-48-07-+0200.xcresult`.
+Un test, zéro échec. Les essais précédents échouaient parce que le geste
+automatisé touchait la barre de suggestions du clavier : le geste passe
+maintenant au-dessus. Aucun correctif applicatif de sauvegarde n'a été
+nécessaire. Cette preuve concerne le prénom, pas la date ni la production.
+
 ## Correctif champ date — même jour
 
 Débordement corrigé dans Input : min-width 0, max-width 100%, apparence du champ
