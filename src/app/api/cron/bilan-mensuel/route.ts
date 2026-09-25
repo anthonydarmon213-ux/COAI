@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/client";
 import { sendEmail } from "@/lib/email/client";
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 
 // Bilan mensuel automatique (11/08/2026) — deuxième volet de la stratégie de
 // rétention avec relance-inactifs : là où relance-inactifs relance ceux qui
@@ -172,10 +173,7 @@ async function envoyerBilansMensuels(appUrl: string): Promise<number> {
     const debutFenetre = derniereEcheance;
 
     const [seances, mesures] = await Promise.all([
-      prisma.seanceLog.findMany({
-        where: { userId: user.id, date: { gte: debutFenetre } },
-        select: { date: true, exercices: true },
-      }),
+      workoutHistory(user.id, { from: debutFenetre, before: new Date(maintenant), order: "asc" }),
       prisma.mesure.findMany({
         where: { userId: user.id, date: { gte: debutFenetre } },
         select: { date: true, poidsKg: true },
