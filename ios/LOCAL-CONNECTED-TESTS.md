@@ -2,6 +2,19 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Fiche coach : contrôle HTTP connecté réel
+
+Le mode `admin-http` du helper local passe sur le build intégrant 311c91d.
+Deux comptes Auth/PostgreSQL jetables sont créés ; une séance quotidienne avec
+titre unique, ressenti BIEN_DOSEE et douleur déclarée appartient au second.
+Visiteur et premier membre ne reçoivent pas ce titre et sont redirigés.
+Le premier compte devient administrateur uniquement dans la base locale :
+la réponse HTTP 200 contient alors titre, ressenti et intensité non précisée,
+avec cache-control privé/no-store. Après retrait du rôle, la même session est
+de nouveau refusée et le titre n'est plus présent. Déconnexion puis nettoyage
+des deux fixtures terminés avec succès. Aucun compte réel modifié.
+Preuve HTTP/Auth/DB, pas une inspection visuelle sur appareil ni la production.
+
 ### Reprise après panne locale
 
 `testLocalNetworkRestorationLoadsLoginWithoutRelaunch` passe (xcresult
