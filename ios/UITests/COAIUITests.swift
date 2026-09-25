@@ -52,10 +52,20 @@ final class COAIUITests: XCTestCase {
         recipe.tap()
         XCTAssertTrue(web.staticTexts["150 g de blanc de poulet"].waitForNonExistence(timeout: 5))
         let vegan = web.switches["Vegan"]
-        reveal(vegan, in: app, upward: false)
+        for _ in 0..<20 {
+            if vegan.isHittable { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.45))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.65)))
+        }
+        XCTAssertTrue(vegan.isHittable)
         vegan.tap()
         let reset = web.buttons["Réinitialiser les filtres"]
-        reveal(reset, in: app)
+        for _ in 0..<15 {
+            if reset.isHittable { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.65))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.45)))
+        }
+        XCTAssertTrue(reset.isHittable)
         reset.tap()
         XCTAssertTrue(reset.waitForNonExistence(timeout: 5))
         XCTAssertEqual(vegan.value as? String, "0")
