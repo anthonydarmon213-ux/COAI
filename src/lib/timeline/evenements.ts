@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
 import type { Pilier } from "@prisma/client";
 
@@ -20,9 +21,9 @@ const PILIER_LABEL: Record<Pilier, string> = {
 // l'entraînement ; un futur événement côté coach humain n'aurait qu'à
 // pousser un item de plus dans le même tableau).
 export async function buildTimeline(userId: string): Promise<EvenementTimeline[]> {
-  const [user, premiereSeance, programmesInitiaux, adaptations, checkins, tests] = await Promise.all([
+  const [user, premieresSeances, programmesInitiaux, adaptations, checkins, tests] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { createdAt: true } }),
-    prisma.seanceLog.findFirst({ where: { userId }, orderBy: { date: "asc" } }),
+    workoutHistory(userId, { order: "asc", take: 1 }),
     prisma.programmeGenerated.findMany({
       where: { userId, version: 1 },
       select: { pilier: true, generatedAt: true },
@@ -44,6 +45,7 @@ export async function buildTimeline(userId: string): Promise<EvenementTimeline[]
     evenements.push({ date: user.createdAt, titre: "Compte COAI créé" });
   }
 
+  const premiereSeance = premieresSeances[0];
   if (premiereSeance) {
     evenements.push({ date: premiereSeance.date, titre: "Première séance terminée" });
   }
