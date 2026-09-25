@@ -478,6 +478,8 @@ final class COAIUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.webViews.staticTexts["Test local de fichier"].waitForExistence(timeout: 15))
         XCTAssertFalse(app.webViews.buttons["Ancienne navigation web"].exists)
+        XCTAssertFalse(app.webViews.buttons["Navigation piliers dupliquée"].exists)
+        XCTAssertTrue(app.webViews.buttons["Navigation contenu conservée"].exists)
         XCTAssertTrue(app.buttons["native-tab-Séance"].isHittable)
         let explorer = app.buttons["native-tab-Explorer"]
         XCTAssertTrue(explorer.isHittable)

@@ -333,6 +333,8 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     <!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
     <style>body{background:#101820;color:white;font:18px system-ui;padding:24px}button{display:block;padding:16px;margin:20px 0}</style>
     <aside class="coai-app-nav"><nav><button>Ancienne navigation web</button></nav></aside>
+    <nav class="coai-pillar-switcher"><button>Navigation piliers dupliquée</button></nav>
+    <nav><button>Navigation contenu conservée</button></nav>
     <h1>Test local de fichier</h1><p>Aucun compte ni donnée personnelle.</p>
     <button onclick="window.webkit.messageHandlers.coaiSessionEnded.postMessage('invalid')">Signal de fin invalide</button>
     <button onclick="window.webkit.messageHandlers.coaiSessionEnded.postMessage('session-ended-v1')">Simuler une déconnexion confirmée</button>
