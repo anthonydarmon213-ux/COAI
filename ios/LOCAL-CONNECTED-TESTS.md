@@ -1,5 +1,17 @@
 # Parcours natif connecté local — 25 septembre 2026
 
+## Onglets Nutrition et Récupération connectés
+
+Le test visite maintenant les deux onglets natifs après connexion réelle locale,
+attend le titre propre à chaque page et refuse l'écran « Page indisponible ».
+Résultat réussi : xcresult `2026.09.25_04-34-49-+0200` dans le même dossier Test.
+Captures inspectées dans `/tmp/coai-pillars-attachments-0925` : titres et sélection
+native cohérents, pas de débordement visible. Navigation web des trois piliers
+encore répétée au-dessus du contenu : friction à simplifier séparément.
+Ce test valide l'accès aux pages, pas les recettes, journaux de repas ni routines
+complètes. Aucun programme nutrition/récupération injecté. Sauvegarde du prénom,
+relance et déconnexion passent toujours ; contrôle DB réussi, compte nettoyé.
+
 ## Sauvegarde réelle du prénom et relance
 
 Le test connecté modifie désormais le prénom, atteint Enregistrer avec le

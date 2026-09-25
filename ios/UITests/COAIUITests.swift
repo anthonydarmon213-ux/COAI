@@ -24,6 +24,17 @@ final class COAIUITests: XCTestCase {
         reveal(submit, in: app)
         submit.tap()
         XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        for (tab, heading) in [("Nutrition", "Ton alimentation."), ("Récupération", "Ta récupération.")] {
+            let destination = app.buttons["native-tab-" + tab]
+            XCTAssertTrue(destination.waitForExistence(timeout: 10))
+            destination.tap()
+            XCTAssertTrue(web.staticTexts[heading].waitForExistence(timeout: 20))
+            XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+            let screen = XCTAttachment(screenshot: app.screenshot())
+            screen.name = "Onglet connecté local — " + tab
+            screen.lifetime = .keepAlways
+            add(screen)
+        }
         app.buttons["native-tab-Explorer"].tap()
         let settings = app.buttons["explore-/compte/parametres"]
         XCTAssertTrue(settings.waitForExistence(timeout: 5))
