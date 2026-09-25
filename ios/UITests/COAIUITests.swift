@@ -1,6 +1,64 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Real loopback authentication and workout persistence, with a disposable account.
+    @MainActor
+    func testLocalConnectedDailyWorkoutPersists() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap()
+        email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app)
+        submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        func shortReveal(_ element: XCUIElement) {
+            for _ in 0..<25 {
+                if element.isHittable { break }
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.65))
+                    .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.45)))
+            }
+            XCTAssertTrue(element.isHittable)
+        }
+        app.buttons["native-tab-Explorer"].tap()
+        app.buttons["explore-/dashboard"].tap()
+        let start = web.buttons["Commencer ma séance"]
+        XCTAssertTrue(start.waitForExistence(timeout: 20))
+        shortReveal(start)
+        start.tap()
+        let finish = web.buttons["Terminer ma séance"]
+        shortReveal(finish)
+        finish.tap()
+        let rating = web.switches["Bien dosée"]
+        XCTAssertTrue(rating.waitForExistence(timeout: 15))
+        shortReveal(rating)
+        rating.tap()
+        let noPain = web.switches["Non"]
+        shortReveal(noPain)
+        noPain.tap()
+        let save = web.buttons["Enregistrer mon ressenti"]
+        shortReveal(save)
+        save.tap()
+        XCTAssertTrue(web.staticTexts["Séance accomplie."].waitForExistence(timeout: 15))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 15))
+        app.buttons["native-tab-Explorer"].tap()
+        app.buttons["explore-/dashboard"].tap()
+        XCTAssertTrue(web.staticTexts["Séance accomplie."].waitForExistence(timeout: 30))
+        XCTAssertFalse(web.buttons["Commencer ma séance"].exists)
+    }
+
     /// Requires the isolated loopback server and disposable local fixture.
     /// Real password login/cookies; no HTML fixture or injected authentication.
     @MainActor
