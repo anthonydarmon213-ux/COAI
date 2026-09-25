@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 import type { Pilier } from "@prisma/client";
 
 const FENETRE_SEANCES_JOURS = 14;
@@ -8,7 +9,7 @@ export type SignauxAdaptation = {
   nombreSeancesRecentes: number;
   moyenneDifficulte: number | null;
   moyenneEnergie: number | null;
-  douleurRecente: { niveau: "LEGERE" | "IMPORTANTE"; zone: string | null; date: string } | null;
+  douleurRecente: { niveau: "LEGERE" | "IMPORTANTE" | "NON_PRECISE"; zone: string | null; date: string } | null;
   checkinHebdo: {
     semaineDebut: string;
     sommeil: string | null;
@@ -41,10 +42,7 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
 
   const [seancesRecentes, dernierCheckin, mesures, testsRecents, dernierProgramme, repasRecents] =
     await Promise.all([
-      prisma.seanceLog.findMany({
-        where: { userId, date: { gte: depuis } },
-        orderBy: { date: "desc" },
-      }),
+      workoutHistory(userId, { from: depuis, before: new Date(maintenant), order: "desc" }),
       prisma.weeklyCheckin.findFirst({ where: { userId }, orderBy: { semaineDebut: "desc" } }),
       prisma.mesure.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 2 }),
       prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 20 }),
@@ -60,7 +58,8 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
   const moyenne = (values: number[]) =>
     values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10 : null;
 
-  const seanceAvecDouleur = seancesRecentes.find((s) => s.douleur && s.douleur !== "AUCUNE");
+  const seanceAvecDouleur = seancesRecentes.find((s) =>
+    s.douleur === "LEGERE" || s.douleur === "IMPORTANTE" || s.dailyPain === true);
 
   let tendancePoidsKg: number | null = null;
   const [mesureRecente, mesurePrecedente] = mesures;
@@ -104,7 +103,8 @@ export async function collecterSignaux(userId: string, pilier: Pilier): Promise<
     moyenneEnergie: moyenne(energies),
     douleurRecente: seanceAvecDouleur
       ? {
-          niveau: seanceAvecDouleur.douleur as "LEGERE" | "IMPORTANTE",
+          niveau: seanceAvecDouleur.douleur === "LEGERE" || seanceAvecDouleur.douleur === "IMPORTANTE"
+            ? seanceAvecDouleur.douleur : "NON_PRECISE",
           zone: seanceAvecDouleur.douleurZone,
           date: seanceAvecDouleur.date.toISOString().slice(0, 10),
         }

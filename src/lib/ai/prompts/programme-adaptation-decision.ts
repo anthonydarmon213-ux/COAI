@@ -58,7 +58,7 @@ Difficulté moyenne ressentie : ${signaux.moyenneDifficulte ?? "non renseignée"
 Énergie moyenne en séance : ${signaux.moyenneEnergie ?? "non renseignée"} / 5
 Douleur récente : ${
     signaux.douleurRecente
-      ? `${signaux.douleurRecente.niveau === "IMPORTANTE" ? "IMPORTANTE" : "légère"}${signaux.douleurRecente.zone ? ` (${signaux.douleurRecente.zone})` : ""}, le ${signaux.douleurRecente.date}`
+      ? `${signaux.douleurRecente.niveau === "IMPORTANTE" ? "IMPORTANTE" : signaux.douleurRecente.niveau === "LEGERE" ? "légère" : "intensité non précisée"}${signaux.douleurRecente.zone ? ` (${signaux.douleurRecente.zone})` : ""}, le ${signaux.douleurRecente.date}`
       : "aucune signalée"
   }
 Tendance du poids : ${signaux.tendancePoidsKg != null ? `${signaux.tendancePoidsKg > 0 ? "+" : ""}${signaux.tendancePoidsKg} kg entre les 2 dernières mesures` : "non renseignée"}

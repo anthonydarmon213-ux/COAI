@@ -65,9 +65,10 @@ function appliquerGardeFous(
 ): DecisionAdaptationIA {
   let { decision, changements } = decisionIA;
 
-  const douleurImportante =
-    signaux.douleurRecente?.niveau === "IMPORTANTE" || douleurSignaleeManuelle === "IMPORTANTE";
-  if (douleurImportante && decision === "PROGRESSER") {
+  const douleurSansProgression =
+    signaux.douleurRecente?.niveau === "IMPORTANTE" ||
+    signaux.douleurRecente?.niveau === "NON_PRECISE" || douleurSignaleeManuelle === "IMPORTANTE";
+  if (douleurSansProgression && decision === "PROGRESSER") {
     decision = "GARDER";
     changements = [];
     return {
@@ -75,7 +76,7 @@ function appliquerGardeFous(
       confiance: decisionIA.confiance,
       changements,
       resume:
-        "Une douleur importante a été signalée : COAI maintient ton programme en l'état par prudence, plutôt que d'augmenter la charge. COAI ne remplace pas un professionnel de santé — si la douleur est importante, inhabituelle ou persistante, demande l'avis d'un professionnel.",
+        "Une douleur a été signalée : COAI maintient ton programme en l'état par prudence, plutôt que d'augmenter la charge. COAI ne remplace pas un professionnel de santé — si la douleur est importante, inhabituelle ou persistante, demande l'avis d'un professionnel.",
     };
   }
 
