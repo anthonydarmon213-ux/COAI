@@ -5,6 +5,31 @@
 Objectif non atteint. Aucun déploiement ni soumission Apple effectué dans cette
 passe. Les preuves ci-dessous restent distinctes d'une validation en production.
 
+Complément après les contrôles du 25 septembre au matin :
+
+- Connexion native **locale réelle** maintenant vérifiée : saisie du mot de
+  passe, sauvegarde du prénom, fermeture/relance, lecture du prénom enregistré,
+  déconnexion et relance déconnectée. Contrôle PostgreSQL indépendant réussi,
+  compte jetable supprimé. Voir `LOCAL-CONNECTED-TESTS.md`, résultat 03-48-07.
+  Cela ne valide pas Google/Apple, la production ni les achats.
+- Champ date contenu dans sa carte sur petit écran (285 × 51 points), capture
+  inspectée. La modification de date reste à tester séparément.
+- Les lecteurs du bilan mensuel, des alertes coach, de l'adaptation et de la
+  chronologie utilisent maintenant l'historique commun. Tests locaux réussis ;
+  ce n'est pas une preuve des écrans connectés en production. La fiche client
+  administrateur et son total business lisent encore directement SeanceLog.
+- Dernière régression : `/tmp/coai-identity-ios-regression-0925.log` (49 Swift,
+  65 core, règles WebKit et Release arm64 non signée), puis deux tests UI
+  clavier/brouillon dans `/tmp/coai-identity-ui-valid-0925.log`.
+- Appareils et trousseau recontrôlés : 13 Pro disponible au transport, mais
+  explicitement **unpaired**, DDI indisponible ; 17 Pro indisponible. Une seule
+  identité Apple Development, aucune Distribution. Pas d'installation tentée.
+
+Les listes datées ci-dessous décrivent les passes antérieures ; ne pas reprendre
+leurs mentions « non raccordé » ou « aucun compte connecté » comme état actuel.
+Les achats sont raccordés dans le code, mais aucune transaction Apple Sandbox
+de bout en bout n'est prouvée. Le passage App Store reste ouvert.
+
 - Régression native du 25 : 49 tests Swift, 65 contrôles core, règles WebKit
   macOS, plist/manifeste et Release iPhone arm64 non signé réussis.
   Journal : `/tmp/coai-native-release-0925.log`.
