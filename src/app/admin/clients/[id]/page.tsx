@@ -11,6 +11,7 @@ import { computeFlags, buildWhatsAppContactLink, FLAG_LABELS } from "@/lib/admin
 import { getEffectivePlan, PLAN_LABELS } from "@/lib/subscription/plan";
 import type { Pilier } from "@prisma/client";
 import { CoachNotes } from "@/components/admin/coach-notes";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 
 const PILIER_LABEL: Record<Pilier, string> = {
   ENTRAINEMENT: "Entraînement",
@@ -66,7 +67,7 @@ export default async function AdminClientPage(props: { params: Promise<{ id: str
         })
       )
     ),
-    prisma.seanceLog.findMany({ where: { userId: client.id }, orderBy: { date: "desc" }, take: 5 }),
+    workoutHistory(client.id, { take: 5 }),
     prisma.weeklyCheckin.findFirst({ where: { userId: client.id }, orderBy: { semaineDebut: "desc" } }),
     prisma.mesure.findMany({ where: { userId: client.id }, orderBy: { date: "desc" }, take: 3 }),
     computeFlags(client.id),
@@ -209,6 +210,9 @@ export default async function AdminClientPage(props: { params: Promise<{ id: str
               {seancesRecentes.map((s) => (
                 <div key={s.id} className="flex flex-wrap items-center gap-2 text-sm text-graphite-300">
                   <span className="text-graphite-500">{s.date.toLocaleDateString("fr-FR")}</span>
+                  {s.dailyTitle && <span>{s.dailyTitle}</span>}
+                  {s.dailyRating && <Badge tone="neutral">{s.dailyRating === "BIEN_DOSEE" ? "Bien dosée" : s.dailyRating === "TROP_FACILE" ? "Trop facile" : s.dailyRating === "TROP_DURE" ? "Trop dure" : "Ressenti enregistré"}</Badge>}
+                  {s.dailyPain === true && <Badge tone="warning">Douleur signalée — intensité non précisée</Badge>}
                   {s.difficulte != null && <Badge tone="neutral">Difficulté {s.difficulte}/5</Badge>}
                   {s.energie != null && <Badge tone="neutral">Énergie {s.energie}/5</Badge>}
                   {s.douleur && s.douleur !== "AUCUNE" && (
