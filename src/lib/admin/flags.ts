@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { workoutHistory } from "@/lib/suivi/workout-history";
 
 // Suivi par exception plutôt que par calendrier : au lieu de relire
 // manuellement chaque abonné toutes les X semaines (ne scale pas avec le
@@ -102,12 +103,9 @@ export async function computeFlags(userId: string): Promise<Flag[]> {
   const maintenant = Date.now();
   const flags: Flag[] = [];
 
-  const [derniereSeance, seancesRecentes, derniereMesure, testsRecents, checkinsMotivation] = await Promise.all([
-    prisma.seanceLog.findFirst({ where: { userId }, orderBy: { date: "desc" } }),
-    prisma.seanceLog.findMany({
-      where: { userId, date: { gte: new Date(maintenant - FENETRE_DOULEUR_JOURS * JOUR_MS) } },
-      orderBy: { date: "desc" },
-    }),
+  const [dernieresSeances, seancesRecentes, derniereMesure, testsRecents, checkinsMotivation] = await Promise.all([
+    workoutHistory(userId, { take: 1 }),
+    workoutHistory(userId, { from: new Date(maintenant - FENETRE_DOULEUR_JOURS * JOUR_MS) }),
     prisma.mesure.findFirst({ where: { userId }, orderBy: { date: "desc" } }),
     prisma.testMaxi.findMany({ where: { userId }, orderBy: { date: "desc" }, take: 20 }),
     prisma.weeklyCheckin.findMany({
@@ -116,13 +114,16 @@ export async function computeFlags(userId: string): Promise<Flag[]> {
       take: 3,
     }),
   ]);
+  const derniereSeance = dernieresSeances[0];
 
   const seanceAvecDouleur = seancesRecentes.find((s) => {
+    if (s.dailyPain === true || s.douleur === "LEGERE" || s.douleur === "IMPORTANTE") return true;
     const texte = `${s.ressenti ?? ""} ${s.notes ?? ""}`.toLowerCase();
     return MOTS_DOULEUR.some((mot) => texte.includes(mot));
   });
   if (seanceAvecDouleur) {
-    const extrait = (seanceAvecDouleur.ressenti || seanceAvecDouleur.notes || "").slice(0, 160);
+    // A daily boolean records a report, not a diagnosis or a severity level.
+    const extrait = (seanceAvecDouleur.ressenti || seanceAvecDouleur.notes || "Douleur déclarée après la séance").slice(0, 160);
     flags.push({
       type: "douleur",
       detail: `Séance du ${seanceAvecDouleur.date.toLocaleDateString("fr-FR")} : « ${extrait} »`,
