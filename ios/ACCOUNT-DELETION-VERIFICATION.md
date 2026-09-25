@@ -1,8 +1,29 @@
 # Suppression de compte — vérification du 24 septembre 2026
 
+## Complément du 25 septembre — suppression HTTP avec Storage réel
+
+`scripts/test-account-delete-http-storage-local.cjs` vérifie exclusivement les
+services locaux (hôtes/ports imposés) : Auth, PostgreSQL, Storage et serveur
+Next compilé. Deux comptes synthétiques, deux sessions par compte, 101 PNG
+pour A et un PNG pour B dans le bucket privé `progress photos`.
+
+Résultat : HTTP 200, 101 fichiers supprimés malgré la pagination à 100,
+utilisateur/profil A supprimés ; deux anciens jetons refusés par Auth et
+l'export HTTP (401), renouvellements et ancien mot de passe refusés.
+Le userId B forgé dans le corps ne détourne pas la suppression : son compte
+reste accessible et son fichier est retéléchargé et comparé octet par octet.
+Fixtures nettoyées, bucket partagé conservé. Journal :
+`/tmp/coai-delete-storage-http-0925.log`.
+
+Cela complète, sans remplacer, le scénario de panne ci-dessous qui exige
+Storage indisponible. Aucun abonnement payant dans cette nouvelle fixture,
+aucun test natif connecté, production ou annulation Apple. Les événements IA
+et reçus Apple restent couverts séparément ; aucune preuve d'anonymisation
+globale n'est déduite de ce test.
+
 ## Complément HTTP du 25 septembre — panne réelle de Storage
 
-La pile locale Auth/PostgreSQL utilisée ne lance pas Storage (inventaire Docker
+La pile locale Auth/PostgreSQL utilisée à ce moment ne lançait pas Storage (inventaire Docker
 vérifié). Une première tentative de tester la suppression complète reçoit donc
 503 ; elle ne compte pas comme suppression réussie. Le test de panne explicite
 vérifie ensuite : message de nettoyage non confirmé, aucun faux succès,
