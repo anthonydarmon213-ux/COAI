@@ -1,5 +1,45 @@
 # Parcours natif connecté local — 25 septembre 2026
 
+## État actuel — remplace les limites historiques ci-dessous
+
+- Navigation web des piliers dupliquée : masquée dans l'app native, contrôlée
+  sur pages connectées ; le site Safari conserve sa navigation.
+- `testLocalConnectedLoginSurvivesRelaunch` : Nutrition/Récupération, recettes
+  (ouvrir/fermer, Vegan, réinitialiser), prénom sauvegardé, relance et
+  déconnexion. Deux passages réussis : résultats 05-33-30 et 05-36-43.
+- `testLocalConnectedDailyWorkoutPersists` : bilan initial réellement saisi,
+  aperçu puis confirmation, démarrage/fin de séance, ressenti sans douleur,
+  relance et état accompli conservé. Résultat 06-08-29.
+
+Ces résultats sont dans `/tmp/coai-native-connected-0925/Logs/Test/` avec le
+préfixe `Test-COAI-2026.09.25_` et le suffixe `-+0200.xcresult`.
+
+### Fixtures distinctes obligatoires
+
+Le test de connexion utilise `ui-create`. Le test quotidien utilise
+`ui-create --without-checkin` : ne pas préenregistrer sa DailySession, car cela
+contournerait précisément le formulaire à vérifier. Après chaque test, contrôler
+respectivement `ui-verify` ou `ui-workout-verify --checkin`, puis `ui-cleanup`.
+Recréer le compte avant le test suivant, même après un échec : les cookies du
+test précédent peuvent persister. Ne pas exécuter ces deux tests en parallèle
+avec le même compte. Toutes ces commandes visent uniquement le helper local
+et la pile jetable décrits ci-dessous, jamais les comptes réels.
+
+Le contrôle quotidien en base exige une seule séance, les cinq valeurs saisies
+(NORMALE, BON, false, 40 minutes, salle complète), completedAt et BIEN_DOSEE,
+feedbackPain false. Le programme est encore précréé : ceci ne prouve pas
+l'inscription, le diagnostic initial, l'achat ou la génération d'un programme.
+
+### Distribution : contrôle actuel
+
+Release arm64 non signée réussie (`/tmp/coai-ios-release-recheck-0925.log`).
+Le 25 septembre, devicectl détecte le 13 Pro mais indique `pairingState: unpaired`
+et `ddiServicesAvailable: false` ; le 17 Pro est indisponible. Une identité
+Apple Development est présente, aucune identité Distribution n'est retournée.
+Cela ne permet pas de conclure sur l'état de l'adhésion Developer.
+L'installation physique, la signature de distribution, TestFlight et les
+transactions Apple réelles restent non vérifiés. Aucun envoi autorisé par ces tests.
+
 ## Onglets Nutrition et Récupération connectés
 
 Le test visite maintenant les deux onglets natifs après connexion réelle locale,
