@@ -25,13 +25,30 @@ final class COAIUITests: XCTestCase {
         func shortReveal(_ element: XCUIElement) {
             for _ in 0..<25 {
                 if element.isHittable { break }
-                app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.65))
-                    .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.45)))
+                let above = element.frame.midY < app.frame.midY
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.45 : 0.65))
+                    .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.65 : 0.45)))
             }
             XCTAssertTrue(element.isHittable)
         }
         app.buttons["native-tab-Explorer"].tap()
         app.buttons["explore-/dashboard"].tap()
+        // Fixture must be created with --without-checkin: answers travel through the real UI/API.
+        let energy = web.switches["Normale"].firstMatch
+        XCTAssertTrue(energy.waitForExistence(timeout: 20))
+        for label in ["Normale", "Bon", "Non", "40 min", "Salle de sport complète"] {
+            let choice = web.switches[label].firstMatch
+            shortReveal(choice)
+            if choice.value as? String != "1" { choice.tap() }
+            XCTAssertEqual(choice.value as? String, "1")
+        }
+        let preview = web.buttons["Voir les ajustements →"]
+        shortReveal(preview)
+        preview.tap()
+        let confirm = web.buttons["Confirmer ma séance du jour"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 15))
+        shortReveal(confirm)
+        confirm.tap()
         let start = web.buttons["Commencer ma séance"]
         XCTAssertTrue(start.waitForExistence(timeout: 20))
         shortReveal(start)
