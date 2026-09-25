@@ -4,7 +4,13 @@ import Foundation
 enum SessionEndSignal {
     static let handlerName = "coaiSessionEnded"
     static func accepts(body: Any, mainFrame: Bool, scheme: String, host: String, port: Int) -> Bool {
-        mainFrame && scheme == "https" && ["coai.fr", "www.coai.fr"].contains(host)
+        #if DEBUG && targetEnvironment(simulator)
+        if NavigationPolicy.localIntegrationTest {
+            return mainFrame && scheme == "http" && host == "localhost" && port == 3050
+                && (body as? String) == "session-ended-v1"
+        }
+        #endif
+        return mainFrame && scheme == "https" && ["coai.fr", "www.coai.fr"].contains(host)
             && [0, 443].contains(port) && (body as? String) == "session-ended-v1"
     }
 }
@@ -70,8 +76,32 @@ enum NavigationDecision: Equatable {
 }
 
 enum NavigationPolicy {
-    static let baseURL = URL(string: "https://coai.fr")!
+    #if DEBUG && targetEnvironment(simulator)
+    // Fixed loopback only, absent from physical and Release builds. No auth bypass.
+    static let localIntegrationTest = ProcessInfo.processInfo.arguments.contains("-COAILocalIntegration")
+    #endif
+    static let baseURL: URL = {
+        #if DEBUG && targetEnvironment(simulator)
+        if localIntegrationTest { return URL(string: "http://localhost:3050")! }
+        #endif
+        return URL(string: "https://coai.fr")!
+    }()
+    static var appTitle: String {
+        #if DEBUG && targetEnvironment(simulator)
+        if localIntegrationTest { return "COAI · test local" }
+        #endif
+        return "COAI"
+    }
     static let purchasePaths = ["/pricing", "/compte/abonnement", "/api/stripe", "/checkout"]
+    static var webContentRules: String {
+        #if DEBUG && targetEnvironment(simulator)
+        if localIntegrationTest {
+            // Apply the same sidebar and first-party resource rules to the test origin.
+            return contentRules.replacingOccurrences(of: #"^https://(www\\.)?coai\\.fr/"#, with: "^http://localhost:3050/")
+        }
+        #endif
+        return contentRules
+    }
 
     static func responseError(status: Int) -> String? {
         switch status {
@@ -109,6 +139,14 @@ enum NavigationPolicy {
 
     static func decide(_ url: URL) -> NavigationDecision {
         guard url.user == nil, url.password == nil else { return .blocked }
+        #if DEBUG && targetEnvironment(simulator)
+        if localIntegrationTest {
+            guard url.scheme == "http", url.host == "localhost", url.port == 3050 else { return .blocked }
+            let path = (url.path.removingPercentEncoding ?? url.path).lowercased()
+            if purchasePaths.contains(where: { path == $0 || path.hasPrefix($0 + "/") }) { return .purchasesUnavailable }
+            return .inside
+        }
+        #endif
         let scheme = url.scheme?.lowercased()
         guard scheme == "https" else {
             return ["mailto", "tel"].contains(scheme ?? "") ? .external : .blocked

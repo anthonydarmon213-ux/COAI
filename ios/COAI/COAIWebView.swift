@@ -299,7 +299,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
             let rules: WKContentRuleList = try await withCheckedThrowingContinuation { continuation in
                 WKContentRuleListStore.default().compileContentRuleList(
                     forIdentifier: "coai-ios-pilot-native-navigation-v3",
-                    encodedContentRuleList: NavigationPolicy.contentRules
+                    encodedContentRuleList: NavigationPolicy.webContentRules
                 ) { rules, error in
                     if let rules { continuation.resume(returning: rules) }
                     else { continuation.resume(throwing: error ?? NSError(domain: "COAI", code: 1)) }

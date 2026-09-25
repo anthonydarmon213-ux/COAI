@@ -207,7 +207,7 @@ struct COAIRootView: View {
                 }
             }
             .background(Color(red: 0.04, green: 0.07, blue: 0.09))
-            .navigationTitle("COAI")
+            .navigationTitle(NavigationPolicy.appTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

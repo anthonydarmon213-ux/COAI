@@ -1,6 +1,58 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Requires the isolated loopback server and disposable local fixture.
+    /// Real password login/cookies; no HTML fixture or injected authentication.
+    @MainActor
+    func testLocalConnectedLoginSurvivesRelaunch() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        // Fail before entering even disposable credentials if the local mode is absent.
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap()
+        email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app)
+        submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Explorer"].tap()
+        let settings = app.buttons["explore-/compte/parametres"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        settings.tap()
+        XCTAssertTrue(web.buttons["Se déconnecter"].firstMatch.waitForExistence(timeout: 20))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 15))
+        app.buttons["native-tab-Explorer"].tap()
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        settings.tap()
+        let signOut = web.buttons["Se déconnecter"].firstMatch
+        XCTAssertTrue(signOut.waitForExistence(timeout: 20))
+        let connected = XCTAttachment(screenshot: app.screenshot())
+        connected.name = "Compte local connecté après fermeture et relance"
+        connected.lifetime = .keepAlways
+        add(connected)
+        reveal(signOut, in: app)
+        signOut.tap()
+        XCTAssertTrue(email.waitForExistence(timeout: 20))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(email.waitForExistence(timeout: 20))
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "Connexion locale réelle puis déconnexion conservée après relance"
+        capture.lifetime = .keepAlways
+        add(capture)
+    }
+
     /// Exercises the real persistent WKWebsiteDataStore, not the daily screen or API.
     @MainActor
     func testWebDraftSurvivesRelaunchAndClearsAfterSessionEnd() throws {

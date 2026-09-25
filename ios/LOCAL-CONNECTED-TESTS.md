@@ -1,0 +1,39 @@
+# Parcours natif connecté local — 25 septembre 2026
+
+`testLocalConnectedLoginSurvivesRelaunch` passe sur le simulateur QA petit écran
+693D66D1-61CD-4AB1-89B8-A5CAD9CA7480, iOS 26.5. Il saisit les identifiants d'un
+compte jetable dans le vrai formulaire WebKit, ouvre les réglages authentifiés,
+ferme/relance l'app, retrouve les réglages, se déconnecte puis vérifie que la
+relance reste déconnectée. Aucun cookie injecté, aucun HTML fictif.
+
+Le mode `-COAILocalIntegration` est compilé uniquement avec DEBUG sur simulateur.
+Origine fixe http://localhost:3050 ; autres navigations principales refusées,
+achats bloqués, pas d'URL arbitraire ni de modification ATS/TLS. Le test exige
+le titre « COAI · test local » avant de saisir ses identifiants. Les règles
+cosmétiques de navigation sont adaptées à cette origine uniquement.
+Connexion Apple, StoreKit et téléchargements ne sont PAS validés par ce mode.
+
+Préparation utilisée : helper local `/tmp/coai-local-http-0924.cjs`, modes
+`build-native`, `serve-native`, `ui-create`, `ui-cleanup`. Serveur localhost,
+Auth localhost:54321, Postgres 127.0.0.1:54322 ; seules clés de démo Docker lues
+en mémoire. Ne jamais utiliser un environnement ou des comptes de production.
+La fixture connue du test est créée uniquement dans cette pile isolée.
+
+Commande Xcode : configuration Debug, schéma COAI, destination ci-dessus,
+`-only-testing:COAIUITests/COAIUITests/testLocalConnectedLoginSurvivesRelaunch`,
+`CODE_SIGNING_ALLOWED=NO test`. Ce test nécessite les services et la fixture ;
+il ne doit pas être lancé comme simple test offline.
+
+Preuve finale :
+`/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.25_03-07-14-+0200.xcresult`.
+Captures exportées dans `/tmp/coai-native-connected-layout-attachments-0925`,
+inspectées. Défaut visuel identifié : champ date de naissance déborde de la
+carte des réglages sur petit écran ; à corriger, pas déclaré résolu.
+
+49 tests Swift, 65 contrôles core, compilation des règles WebKit et Release
+iPhone arm64 non signée passent. `check-ios.sh --device-release` contrôle
+l'absence du drapeau et de l'origine locale dans le binaire Release.
+Journal `/tmp/coai-local-mode-layout-release-0925.log`.
+Types/lint (6 avertissements existants, 0 erreur), build web local et 356
+références médias vérifiés. Aucun envoi, achat, publication, compte personnel,
+connexion Google/Apple réelle, iPhone physique ou TestFlight testé ici.
