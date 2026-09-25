@@ -72,7 +72,7 @@ export function RecetteCard({ recette, photoUrl }: { recette: Recette; photoUrl:
         )}
 
         <details className="group/details mt-1 text-xs">
-          <summary className="cursor-pointer list-none font-semibold text-laiton-300 transition hover:text-laiton-200">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center py-3 font-semibold text-laiton-300 transition hover:text-laiton-200">
             Voir la recette →
           </summary>
           <div className="mt-3 flex flex-col gap-3">

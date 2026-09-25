@@ -36,8 +36,36 @@ final class COAIUITests: XCTestCase {
             add(screen)
         }
         app.buttons["native-tab-Explorer"].tap()
+        let recipes = app.buttons["explore-/programme/recettes"]
+        reveal(recipes, in: app)
+        recipes.tap()
+        XCTAssertTrue(web.staticTexts["Recettes."].waitForExistence(timeout: 20))
+        let recipe = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Voir la recette →")).firstMatch
+        for _ in 0..<15 {
+            if recipe.isHittable { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.7))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.45)))
+        }
+        XCTAssertTrue(recipe.isHittable)
+        recipe.tap()
+        XCTAssertTrue(web.staticTexts["150 g de blanc de poulet"].waitForExistence(timeout: 5))
+        recipe.tap()
+        XCTAssertTrue(web.staticTexts["150 g de blanc de poulet"].waitForNonExistence(timeout: 5))
+        let vegan = web.switches["Vegan"]
+        reveal(vegan, in: app, upward: false)
+        vegan.tap()
+        let reset = web.buttons["Réinitialiser les filtres"]
+        reveal(reset, in: app)
+        reset.tap()
+        XCTAssertTrue(reset.waitForNonExistence(timeout: 5))
+        XCTAssertEqual(vegan.value as? String, "0")
+        XCTAssertTrue(web.staticTexts["Poulet, boulgour et courgettes rôties"].exists)
+        XCTAssertTrue(web.staticTexts["Porridge avoine, fruits rouges et amandes"].exists)
+        XCTAssertTrue(web.staticTexts["Saumon, quinoa et brocolis"].exists)
+        app.buttons["native-tab-Explorer"].tap()
         let settings = app.buttons["explore-/compte/parametres"]
         XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        reveal(settings, in: app, upward: false)
         settings.tap()
         XCTAssertTrue(web.buttons["Se déconnecter"].firstMatch.waitForExistence(timeout: 20))
         let editableName = web.textFields["PRÉNOM"]
