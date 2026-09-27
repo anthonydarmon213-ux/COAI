@@ -10,7 +10,7 @@ enum DownloadPolicy {
         downloadActive && error.domain == "WebKitErrorDomain" && error.code == 102
     }
 
-    static func trustedURL(_ url: URL) -> Bool {
+    static func trustedPage(_ url: URL) -> Bool {
         #if DEBUG && targetEnvironment(simulator)
         // Same fixed loopback as the connected test app, never compiled into
         // physical-device or Release builds. All MIME/size/header checks remain.
@@ -19,15 +19,19 @@ enum DownloadPolicy {
             return NavigationPolicy.decide(url) == .inside
         }
         #endif
-        if url.scheme?.lowercased() == "blob" {
-            guard let origin = URL(string: String(url.absoluteString.dropFirst(5))) else { return false }
-            return origin.scheme == "https" && NavigationPolicy.decide(origin) == .inside
-        }
         return url.scheme == "https" && NavigationPolicy.decide(url) == .inside
     }
 
+    static func trustedURL(_ url: URL) -> Bool {
+        if url.scheme?.lowercased() == "blob" {
+            guard let origin = URL(string: String(url.absoluteString.dropFirst(5))) else { return false }
+            return trustedPage(origin)
+        }
+        return trustedPage(url)
+    }
+
     static func permits(url: URL, source: URL?, mainFrame: Bool, method: String?, downloadAttribute: Bool, linkActivated: Bool) -> Bool {
-        guard mainFrame, let source, source.scheme == "https", NavigationPolicy.decide(source) == .inside,
+        guard mainFrame, let source, trustedPage(source),
               (method ?? "GET") == "GET", trustedURL(url) else { return false }
         return downloadAttribute || (url.scheme == "blob" && linkActivated)
     }

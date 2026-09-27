@@ -307,6 +307,48 @@ final class COAIUITests: XCTestCase {
 
     /// Real authenticated PDF endpoint; never publish or choose a share recipient.
     @MainActor
+    func testLocalConnectedAccountExportShares() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap()
+        email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app)
+        submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Explorer"].tap()
+        let settings = app.buttons["explore-/compte/parametres"]
+        reveal(settings, in: app, upward: false)
+        settings.tap()
+        let export = web.buttons["Exporter mes données"]
+        XCTAssertTrue(export.waitForExistence(timeout: 30))
+        reveal(export, in: app)
+        export.tap()
+        let file = app.otherElements["LP.CaptionBar.TopCaption"]
+        XCTAssertTrue(file.waitForExistence(timeout: 30))
+        XCTAssertTrue(file.label.lowercased().contains("coai"))
+        XCTAssertTrue(app.cells["Enregistrer dans Fichiers"].exists)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Export du compte jetable local — partage iOS sans destinataire"
+        proof.lifetime = .keepAlways
+        add(proof)
+        app.buttons.matching(NSPredicate(format: "label IN %@", ["Fermer", "Close"])).firstMatch.tap()
+        XCTAssertTrue(export.waitForExistence(timeout: 10))
+        XCTAssertTrue(export.isEnabled)
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+    }
+
+    @MainActor
     func testLocalConnectedProgrammePDFShares() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

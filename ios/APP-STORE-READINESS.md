@@ -2,6 +2,15 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 20 h 29 : export JSON du compte jetable connecté vérifié sur iPhone
+SE simulateur : authentification réelle locale, paramètres, export, feuille iOS
+avec JSON de 5 ko et action Fichiers, fermeture puis écran toujours utilisable.
+Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_20-29-08-+0200.xcresult`.
+L’exception localhost pour les blobs est réservée au Debug simulateur avec
+mode local explicite ; aucune autorisation HTTP ajoutée en Release.
+51 tests Swift réussis, Release arm64 non signée compilée. Enregistrement du
+JSON connecté dans Fichiers, appareil physique et production restent à valider.
+
 Complément 20 h 07 : cinq tests du vrai service `ApplePurchaseService` avec
 StoreKit Xcode local réussis (annulation/attente, serveur indisponible puis
 restauration, mauvais compte refusé, remboursement, invalidation du catalogue

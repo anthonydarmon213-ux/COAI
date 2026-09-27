@@ -130,6 +130,10 @@ final class CoreTests: XCTestCase {
         XCTAssertFalse(permits("blob:https://coai.fr/123", source: nil))
         XCTAssertFalse(permits("blob:https://coai.fr/123", main: false))
         XCTAssertFalse(permits("https://coai.fr/a.pdf", method: "POST"))
+        // Loopback is never a trusted download origin in distributed builds.
+        XCTAssertFalse(DownloadPolicy.trustedPage(URL(string: "http://localhost:3050/compte/parametres")!))
+        XCTAssertFalse(DownloadPolicy.trustedURL(URL(string: "blob:http://localhost:3050/123")!))
+        XCTAssertFalse(permits("blob:https://coai.fr/123", source: URL(string: "blob:https://coai.fr/123")))
     }
 
     func testDownloadFormatsSizeAndSignatures() {

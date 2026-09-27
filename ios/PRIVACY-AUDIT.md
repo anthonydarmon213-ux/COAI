@@ -49,8 +49,12 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    confrontée à ces limites avant publication. Le téléchargement natif JSON
    est testé avec un objet
    fictif et un fichier invalide (`/tmp/coai-json-export.xcresult`) ; le parcours
-   complet de compte connecté reste à valider, sans le confondre avec les fiches
-   PDF/Story ou avec le simple affichage de la feuille système.
+   connecté jusqu’à la feuille système a ensuite réussi le 27 septembre à 20 h 29
+   sur simulateur SE avec compte jetable et serveur local réels
+   (`Test-COAI-2026.09.27_20-29-08-+0200.xcresult`). Capture inspectée : JSON de
+   5 ko et action Enregistrer dans Fichiers. Aucun destinataire contacté.
+   La sauvegarde du JSON connecté dans Fichiers et le contrôle du fichier final
+   restent à vérifier, ainsi que l’appareil physique et la production.
 4. Vérifier les consentements des données sensibles, les destinataires réels,
    les durées de conservation et les régions des fournisseurs. Les affirmations
    de la page confidentialité doivent correspondre à ces preuves.

@@ -469,8 +469,14 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         guard let url = action.request.url else { decisionHandler(.cancel); return }
         if action.shouldPerformDownload || url.scheme == "blob" {
             let source = action.sourceFrame.securityOrigin
-            let trustedFrame = action.sourceFrame.isMainFrame && source.protocol == "https"
+            var trustedFrame = action.sourceFrame.isMainFrame && source.protocol == "https"
                 && ["coai.fr", "www.coai.fr"].contains(source.host) && [0, 443].contains(source.port)
+            #if DEBUG && targetEnvironment(simulator)
+            if NavigationPolicy.localIntegrationTest, action.sourceFrame.isMainFrame,
+               source.protocol == "http", source.host == "localhost", source.port == 3050 {
+                trustedFrame = true
+            }
+            #endif
             if !downloads.isBusy, trustedFrame,
                DownloadPolicy.permits(url: url, source: action.sourceFrame.request.url,
                    mainFrame: action.targetFrame?.isMainFrame != false,
