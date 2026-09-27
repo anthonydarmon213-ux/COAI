@@ -1,6 +1,34 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
-## État courant — 25 septembre 2026
+## État courant — 27 septembre 2026
+
+Objectif non atteint. Les sections suivantes sont des preuves historiques,
+pas une validation de la version actuelle en production.
+
+- Inscription, retour du lien e-mail, consentements, diagnostic et sauvegarde
+  du profil vérifiés dans l’application sur simulateur avec services locaux.
+  Résultat natif : `Test-COAI-2026.09.27_16-59-01-+0200.xcresult` dans
+  `/tmp/coai-native-connected-0925/Logs/Test/`. Le parcours gratuit s’arrête
+  au choix de l’accompagnement : aucun achat Apple validé par ce test.
+- Test HTTP réel local : droits contrôlés, trois préparations simultanées sans
+  duplication, trois piliers persistés, reprise sans recréation. Douleur,
+  antécédent, allergie, grossesse et post-partum orientent vers le coach sans
+  programme générique. Effacement explicite des anciennes données sensibles
+  vérifié en base ; champs omis conservés. Fixtures et sessions supprimées.
+- Compilation Release iPhone arm64 non signée et contrôles du script
+  `check-ios.sh --device-release` réussis, journal
+  `/tmp/coai-release-recheck-0927.log`. Ce n’est ni une archive signée,
+  ni une installation, ni une validation App Store.
+- **Blocage éditorial : 86 variantes sur 90 restent incomplètes en médias**,
+  sept mouvements concernés. Une réponse HTTP 200 ne prouve pas la qualité
+  du programme. Aucun média approximatif réintroduit. Rushes conformes ou
+  révision éditoriale validée indispensables.
+- 13 Pro détecté mais non appairé ; 17 Pro indisponible. Une identité de
+  développement seulement observée. Tests physiques, achats/restauration
+  Apple Sandbox, signature de distribution et vérifications de production
+  restent ouverts. Pas de publication ni de soumission dans cette passe.
+
+## Historique — 25 septembre 2026
 
 Objectif non atteint. Aucun déploiement ni soumission Apple effectué dans cette
 passe. Les preuves ci-dessous restent distinctes d'une validation en production.

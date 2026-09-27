@@ -60,6 +60,8 @@ let authId, userId;
       { contraintesSante: 'Douleur déclarée — fixture locale' },
       { antecedentsMedicaux: 'Antécédent déclaré — fixture locale' },
       { allergiesAlimentaires: 'Allergie déclarée — fixture locale' },
+      { statutMaternite: 'ENCEINTE' },
+      { statutMaternite: 'POST_PARTUM' },
     ]) {
       const profile = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, ...constraint }) });
       assert.equal(profile.status, 200);
@@ -67,7 +69,7 @@ let authId, userId;
       assert.equal((await refused.json()).requiresCoachReview, true);
       assert.equal(await db.programmeGenerated.count({ where: { userId } }), 0);
     }
-    const reset = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const reset = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, statutMaternite: null, dateReferenceMaternite: null }) });
     assert.equal(reset.status, 200);
     const firstResponses = await Promise.all([generate(), generate(), generate()]);
     const initialResults = [];
