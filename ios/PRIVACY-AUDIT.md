@@ -7,6 +7,13 @@ Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
 
 ## Contrôle natif du 27 septembre
 
+Recontrôle à 23 h 20 : 51 XCTest, 65 contrôles cœur, compilation des règles
+WebKit et Release iPhone arm64 non signée réussis. Manifeste comparé dans le
+bundle, marqueurs locaux et ressources StoreKit de test absents selon le
+script. Deux tests UI SE grand texte/rotation réussis avec captures examinées
+(`Test-COAI-2026.09.27_23-19-12-+0200.xcresult`). Ces tests emploient du contenu
+fictif, pas un abonnement Apple réel. Pas de signature de distribution.
+
 Les cinq clés AppStorage du minuteur et le reset UserDefaults concernent les
 préférences internes COAI. Le motif CA92.1 du manifeste correspond à cet usage,
 selon la documentation Apple consultée le 27 septembre :
@@ -37,6 +44,34 @@ Ne pas déclarer « aucune donnée collectée ». Ne pas confondre absence de SD
 HealthKit natif et absence de données de santé saisies dans les écrans web.
 Les déclarations caméra/micro/Photos de l'Info.plist ne prouvent pas à elles
 seules que chaque usage est testé, nécessaire ou effectivement déclenché.
+
+## Destinataires supplémentaires identifiés dans le code — 27 septembre
+
+- Anthropic : `src/lib/ai/client.ts` transmet les prompts et, pour les appels
+  vision, l'image encodée. Le coach web construit un contexte à partir du profil,
+  de la question et de la mémoire de progression ; le coach WhatsApp inclut aussi
+  contraintes et antécédents lorsqu'ils existent. Ce ne sont pas des données
+  anonymes par simple absence d'email. Configuration, consentement et rétention
+  distants non vérifiés ; aucun appel réel effectué pendant ces tests.
+- Resend : `src/lib/email/client.ts` transmet destinataire, sujet, texte et HTML.
+  Les notifications de diagnostic peuvent inclure coordonnées et réponses libres
+  (`lead-notification.ts`). Le commentaire historique « aucune donnée de santé »
+  ne prouve pas l'absence de contenu sensible dans une réponse libre.
+- ntfy : ce même client transmettait sujet et texte des emails. Correction locale
+  `b09a417` : alerte générique uniquement, sans coordonnées ni contenu diagnostic.
+  Réponses d'erreur et exceptions des prestataires ne sont plus recopiées dans
+  les logs. Tests avec transport simulé ; pas de preuve de déploiement.
+- ManyChat / WhatsApp : la route entrante reçoit numéro et message et conserve
+  des événements liés au compte. Elle renvoie la réponse IA au service appelant.
+  Le secret d'entrée et le circuit distant réel restent à vérifier. Contrôle
+  d'abonnement et quotas testés localement, sans livraison WhatsApp réelle.
+- Make : `src/lib/whatsapp/client.ts` prévoit un envoi optionnel de contexte au
+  webhook configuré. L'existence de ce code ne prouve pas son activation.
+  Timeout de cinq secondes et absence de relance automatique déjà testés.
+
+Ces éléments complètent l'inventaire, pas la déclaration finale App Privacy.
+Les durées de conservation, régions et contrats des fournisseurs ne peuvent
+pas être déduits du code et restent à confirmer par le titulaire.
 
 ## Points non clos, classés par impact
 
