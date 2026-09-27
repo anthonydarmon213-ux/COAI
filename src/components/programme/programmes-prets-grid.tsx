@@ -40,8 +40,9 @@ export function ProgrammesPretsGrid({
         <span className="mr-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-graphite-500">Catégorie :</span>
         <button
           type="button"
+          aria-pressed={categorie === null}
           onClick={() => setCategorie(null)}
-          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+          className={`min-h-11 min-w-11 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
             categorie === null ? "border-laiton-300/60 bg-laiton-400/15 text-laiton-200" : "border-white/10 text-graphite-400 hover:text-white"
           }`}
         >
@@ -51,8 +52,9 @@ export function ProgrammesPretsGrid({
           <button
             key={key}
             type="button"
+            aria-pressed={categorie === key}
             onClick={() => setCategorie(categorie === key ? null : key)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+            className={`min-h-11 min-w-11 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
               categorie === key ? "border-laiton-300/60 bg-laiton-400/15 text-laiton-200" : "border-white/10 text-graphite-400 hover:text-white"
             }`}
           >

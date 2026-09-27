@@ -2,6 +2,12 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 18 h 30 : parcours natif connecté local recettes (filtre, ingrédients,
+préparation) puis découverte récupération vérifié. Filtres du catalogue agrandis
+à 45 points observés, état sélectionné accessible et testé. Résultat
+`Test-COAI-2026.09.27_18-29-04-+0200.xcresult`. Aucun achat de protocole ni test
+en production ; la longueur de l'introduction du catalogue reste à améliorer.
+
 Complément 17 h 58 : PDF connecté testé dans l’app sur simulateur local, de la
 connexion au partage iOS puis au retour à la séance. Correction de la fausse
 erreur réseau lors du transfert de navigation vers WKDownload. Résultat

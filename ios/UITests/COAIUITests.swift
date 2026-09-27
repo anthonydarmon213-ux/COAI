@@ -188,6 +188,52 @@ final class COAIUITests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testLocalConnectedRecipesAndRecoveryDiscovery() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app); submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Explorer"].tap()
+        let recipes = app.buttons["explore-/programme/recettes"]
+        reveal(recipes, in: app); recipes.tap()
+        let breakfast = web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Petit-déjeuner")).firstMatch
+        XCTAssertTrue(breakfast.waitForExistence(timeout: 20))
+        reveal(breakfast, in: app); breakfast.tap()
+        let porridge = web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Porridge avoine, fruits rouges et amandes")).firstMatch
+        XCTAssertTrue(porridge.waitForExistence(timeout: 10))
+        let details = web.buttons["Voir la recette →"].firstMatch
+        reveal(details, in: app); details.tap()
+        XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Ingrédients")).firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Préparation")).firstMatch.exists)
+        app.buttons["native-tab-Explorer"].tap()
+        let recovery = app.buttons["explore-/programme/programmes-prets?categorie=RECUPERATION"]
+        reveal(recovery, in: app); recovery.tap()
+        let recoveryFilter = web.switches["Récupération"]
+        XCTAssertTrue(recoveryFilter.waitForExistence(timeout: 20))
+        XCTAssertEqual(recoveryFilter.value as? String, "1")
+        reveal(recoveryFilter, in: app)
+        XCTAssertGreaterThanOrEqual(recoveryFilter.frame.height, 44)
+        let sleep = web.buttons["Choisir Sommeil réparateur — 14 jours"]
+        XCTAssertTrue(sleep.waitForExistence(timeout: 20))
+        reveal(sleep, in: app)
+        XCTAssertTrue(sleep.isHittable)
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Découverte récupération après lecture recette — local connecté"
+        proof.lifetime = .keepAlways; add(proof)
+    }
+
     /// Real authenticated PDF endpoint; never publish or choose a share recipient.
     @MainActor
     func testLocalConnectedProgrammePDFShares() throws {
