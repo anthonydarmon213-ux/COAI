@@ -1,9 +1,23 @@
 # Inventaire de confidentialité iOS — brouillon technique
 
-Audit du code actualisé le 25 septembre 2026. Ce document prépare la déclaration App
+Audit du code actualisé le 27 septembre 2026. Ce document prépare la déclaration App
 Store Connect ; il ne constitue ni une déclaration soumise, ni une validation
 juridique, ni la preuve de la configuration des services de production.
 Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
+
+## Contrôle natif du 27 septembre
+
+Les cinq clés AppStorage du minuteur et le reset UserDefaults concernent les
+préférences internes COAI. Le motif CA92.1 du manifeste correspond à cet usage,
+selon la documentation Apple consultée le 27 septembre :
+https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype
+
+`scripts/test-ios-privacy-config.cjs`, intégré à `check-ios.sh`, vérifie ce motif,
+la présence de textes de permissions non vides et l'absence d'exception ATS.
+Cinq cas négatifs doivent être refusés : manifeste absent, catégorie absente,
+motif modifié, texte Photos vide et connexion arbitraire autorisée. Ce contrôle
+est volontairement limité : ni inventaire exhaustif des API, ni mesure des flux
+réseau, ni déclaration App Privacy, ni approbation Apple.
 
 ## Données et preuves dans le dépôt
 

@@ -19,6 +19,7 @@ plutil -lint ios/COAI/Info.plist ios/COAI.xcodeproj/project.pbxproj
 # A share-sheet image save must not fall back to asking for full-library access.
 test -n "$(/usr/libexec/PlistBuddy -c 'Print :NSPhotoLibraryAddUsageDescription' ios/COAI/Info.plist)"
 plutil -lint ios/COAI/PrivacyInfo.xcprivacy
+node scripts/test-ios-privacy-config.cjs
 xmllint --noout ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme
 if rg -q 'StoreKitConfigurationFileReference|COAIDownloadFixture' ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme; then
     echo "FAIL: normal COAI scheme must not activate the local StoreKit fixture" >&2
