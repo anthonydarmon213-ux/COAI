@@ -38,10 +38,16 @@ let authId, userId;
     const generate = () => fetch(origin + '/api/programmes/generate?mode=onboarding', { method: 'POST', headers: cookie() });
     assert.equal((await generate()).status, 403);
     await db.user.update({ where: { id: userId }, data: { programmeUnlockedAt: new Date() } });
-    const first = await generate(); const initial = await first.json();
-    assert.equal(first.status, 201, JSON.stringify(initial));
+    const firstResponses = await Promise.all([generate(), generate(), generate()]);
+    const initialResults = [];
+    for (const response of firstResponses) {
+      const result = await response.json(); assert.equal(response.status, 201, JSON.stringify(result));
+      assert.equal(result.echecs, 0); initialResults.push(result);
+    }
+    const initial = initialResults[0];
     assert.equal(initial.echecs, 0); assert.equal(initial.programmes.length, 3);
     const ids = initial.programmes.map(p => p.id).sort();
+    for (const result of initialResults) assert.deepEqual(result.programmes.map(p => p.id).sort(), ids);
     for (const response of await Promise.all([generate(), generate()])) {
       assert.equal(response.status, 201);
       const resumed = await response.json(); assert.equal(resumed.reused, true);
@@ -58,7 +64,7 @@ let authId, userId;
     await db.user.update({ where: { id: userId }, data: { programmeUnlockedAt: null } });
     assert.equal((await generate()).status, 403);
     assert.equal(await db.programmeGenerated.count({ where: { userId } }), 3);
-    console.log('PASS real local Auth/HTTP/DB: profile saved; access denied then explicitly granted in fixture; three catalogue pillars; retries preserve IDs; three authenticated pages return 200; revoked access denied. No purchase or paid AI.');
+    console.log('PASS real local Auth/HTTP/DB: profile saved; access denied then explicitly granted in fixture; three concurrent first requests create only three catalogue pillars; retries preserve IDs; three authenticated pages return 200; revoked access denied. No purchase or paid AI.');
   } finally {
     await client.auth.signOut({ scope: 'global' });
     if (userId) await db.user.delete({ where: { id: userId } });

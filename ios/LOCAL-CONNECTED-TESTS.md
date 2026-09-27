@@ -12,8 +12,9 @@ HTTP 200 des trois pages privées, préparation refusée après retrait du droit
 Exactement trois programmes en base, statut GENERE_IA non transformé en VALIDE.
 Session révoquée, utilisateur local/Auth et données associées supprimés.
 Clés démo et origines loopback imposées, fournisseurs payants absents.
-Ce n'est ni un achat réel ni un contrôle visuel des trois pages ; la première
-création concurrente et la première séance native depuis ce compte restent à tester.
+Complément passé : trois toutes premières demandes simultanées retournent les
+mêmes trois IDs, sans doublon en base. Ce n'est ni un achat réel ni un contrôle
+visuel des trois pages ; la première séance native depuis ce compte reste à tester.
 
 ### Droits du diagnostic alignés — 27 septembre, 17 h 02
 
