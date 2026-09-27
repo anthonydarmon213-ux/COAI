@@ -2,6 +2,18 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 21 h 20 : les deux parcours Photos (autorisation d'ajout limitée et
+refus) réussissent sur simulateur SE ; retour à l'app toujours utilisable.
+Le fichier IMG_0013.PNG du stockage Photos du simulateur est comparé octet par
+octet au PNG fictif du test : 68 octets identiques, sauvegarde effective prouvée.
+Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_21-20-29-+0200.xcresult`.
+L'iPhone 17 Pro est désormais connecté et la compilation de développement signée
+réussit, mais iOS refuse encore le programme de tests à 21 h 17 : certificat
+développeur non approuvé. Aucun test physique exécuté. Profil valable jusqu'au
+1er octobre 2026 ; aucune archive de distribution ni validation TestFlight.
+Les chemins de revue sont précisés dans SOUMISSION-BROUILLON.md sans présenter
+les preuves locales comme une validation de la version distribuée.
+
 Complément avatar : envoi multipart incomplet et image vide désormais refusés
 avec réponse JSON claire (400). Pannes Storage/DB/signature et URL absente
 retournent une erreur réessayable (503), sans message interne ni faux succès.

@@ -1,6 +1,6 @@
 # COAI — dossier de soumission (brouillon, non publié)
 
-Mise à jour : 23 septembre 2026. Préparation sans frais autorisée par Anthony.
+Mise à jour : 27 septembre 2026. Préparation sans frais autorisée par Anthony.
 Ce document ne constitue ni une validation fonctionnelle ni une soumission Apple.
 
 ## Métadonnées proposées
@@ -43,9 +43,18 @@ Capturer les tailles demandées par App Store Connect lorsque la fiche sera acce
 - L'application combine une interface SwiftUI et des écrans web WKWebView.
 - Expliquer concrètement les fonctions natives : navigation, minuteur et partage de fichiers, après vérification sur le binaire soumis.
 - Fournir un compte de revue durable dans les champs privés App Store Connect, avec accès aux fonctions soumises. Ne pas utiliser le compte QA local ni un compte personnel.
-- Indiquer le chemin exact d'accès aux abonnements et à la restauration une fois raccordés.
-- Indiquer le chemin de suppression du compte après test complet autorisé.
+- Chemin présent dans le code : Explorer → Abonnement → Restaurer mes achats Apple. La présence de ce bouton ne prouve pas la disponibilité du catalogue Apple de production ni la restauration d'un achat réel.
+- Suppression : Explorer → Réglages et déconnexion → Supprimer mon compte → confirmation. L'écran avertit que la suppression du compte ne résilie pas l'abonnement Apple. Annulation, suppression et persistance après relance ont été testées avec un compte jetable sur le backend local et le simulateur ; refaire ces contrôles sur la version distribuée avant soumission.
+- Export : Explorer → Réglages et déconnexion → Exporter mes données. Le partage natif et l'enregistrement du JSON dans Fichiers ont été vérifiés sur simulateur avec des données locales de test.
 - Maintenir le backend disponible pendant la revue. Ne pas promettre que toutes les fonctionnalités sont natives ou hors ligne.
+
+## Vérification physique du 27 septembre — non validée
+
+La compilation de développement signée pour l'iPhone 17 Pro a réussi. Son profil expire le 1er octobre 2026 ; ce n'est pas une archive de distribution App Store.
+
+Les tentatives de lancement des trois tests physiques (partage de fichiers, colonnes de repos et très gros caractères), dont la relance à 21 h 17, ont été refusées par iOS : certificat développeur non approuvé sur l'appareil. Aucun de ces trois tests n'a donc été exécuté sur l'iPhone. L'approbation dans Réglages → Général → VPN et gestion de l'appareil doit être effectuée par le propriétaire avant une nouvelle tentative. Ne pas contourner cette protection.
+
+Les preuves locales et les captures de test ne constituent pas une validation de production, TestFlight ou App Store. Aucun achat, déploiement ni dépôt Apple n'a été effectué pour ces vérifications.
 
 ## Conditions de sortie avant soumission
 
