@@ -31,8 +31,12 @@ export function RecuperationView({
     [key: string]: unknown;
   };
   void _source;
+  const donneesIncompletes = [jours, protocoles].some((liste) =>
+    Array.isArray(liste) && liste.some((element) => !isPlainObject(element))
+  );
+  const protocolesUtiles = Array.isArray(protocoles) ? protocoles.filter(isPlainObject) : [];
   const joursUtiles = Array.isArray(jours)
-    ? jours.filter((jour) => Object.entries(jour).some(([cle, valeur]) =>
+    ? jours.filter(isPlainObject).filter((jour) => Object.entries(jour).some(([cle, valeur]) =>
         !["jour", "type", "photoQueryJour"].includes(cle) &&
         valeur !== null && valeur !== undefined && valeur !== "" &&
         (!Array.isArray(valeur) || valeur.length > 0)
@@ -99,6 +103,12 @@ export function RecuperationView({
 
   return (
     <div className="coai-recovery-view flex flex-col gap-5">
+      {donneesIncompletes && (
+        <p role="status" className="rounded-xl border border-laiton-400/25 p-3 text-sm text-graphite-200">
+          Certaines informations sont incomplètes. Les éléments disponibles restent affichés.
+          Si le problème persiste, contacte ton coach depuis la rubrique Coach.
+        </p>
+      )}
       {showContreIndications && <ContreIndications items={contreIndications} />}
       {(titre || vueEnsemble) && (
         <div>
@@ -108,7 +118,7 @@ export function RecuperationView({
       )}
       {recuperationDuJour && rendreRecuperation(recuperationDuJour)}
 
-      {Array.isArray(protocoles) && protocoles.length > 0 && (
+      {protocolesUtiles.length > 0 && (
         <section className="flex flex-col gap-3">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
@@ -119,7 +129,7 @@ export function RecuperationView({
             </h3>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {protocoles.map((protocole, index) => {
+            {protocolesUtiles.map((protocole, index) => {
               const nom = typeof protocole.nom === "string" ? protocole.nom : "Récupération";
               const photo = photoRecuperationPourTexte(nom, sexe);
               return (

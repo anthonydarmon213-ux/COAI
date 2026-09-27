@@ -2,6 +2,14 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 18 h 53 : nutrition/récupération résistent aux entrées non objet
+dans les listes de jours/conseils/protocoles. Rendu réel testé et parcours natif
+avec données incomplètes locales réussi, relance comprise :
+`Test-COAI-2026.09.27_18-52-40-+0200.xcresult`. Aucun contenu valide supprimé
+en base, avertissement explicite. Pas de validation en production.
+Le catalogue a également été raccourci : premier programme accessible sans
+défilement sur SE 3, filtres repliables testés (`18-40-52`).
+
 Complément 18 h 30 : parcours natif connecté local recettes (filtre, ingrédients,
 préparation) puis découverte récupération vérifié. Filtres du catalogue agrandis
 à 45 points observés, état sélectionné accessible et testé. Résultat

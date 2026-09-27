@@ -255,6 +255,36 @@ final class COAIUITests: XCTestCase {
         proof.lifetime = .keepAlways; add(proof)
     }
 
+    /// Real local programmes containing interrupted list entries, not injected HTML.
+    @MainActor
+    func testLocalIncompletePillarsPreserveAvailableContent() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app); submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        for (tab, retainedText) in [("Nutrition", "Conseil nutrition conservé"), ("Récupération", "Conseil récupération conservé")] {
+            app.buttons["native-tab-" + tab].tap()
+            XCTAssertTrue(web.staticTexts[retainedText].waitForExistence(timeout: 20))
+            let warning = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Certaines informations sont incomplètes")).firstMatch
+            XCTAssertTrue(warning.exists)
+            XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        }
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.buttons["native-tab-Récupération"].waitForExistence(timeout: 10))
+        app.buttons["native-tab-Récupération"].tap()
+        XCTAssertTrue(web.staticTexts["Conseil récupération conservé"].waitForExistence(timeout: 20))
+    }
+
     /// Real authenticated PDF endpoint; never publish or choose a share recipient.
     @MainActor
     func testLocalConnectedProgrammePDFShares() throws {

@@ -45,6 +45,10 @@ export function NutritionView({
     [key: string]: unknown;
   };
   void _source;
+  const donneesIncompletes = [jours, conseilsHabitudes].some((liste) =>
+    Array.isArray(liste) && liste.some((element) => !isPlainObject(element))
+  );
+  const conseilsUtiles = Array.isArray(conseilsHabitudes) ? conseilsHabitudes.filter(isPlainObject) : [];
 
   // Calories et macros sont désormais dans AnneauxMacros — ne restent en
   // badges que les éventuelles autres clés (hydratation, etc.), pour ne
@@ -56,11 +60,17 @@ export function NutritionView({
         .map(([, v]) => ({ icone: "💧", texte: String(v) }))
     : [];
   const joursUtiles = Array.isArray(jours)
-    ? jours.filter((jour) => Array.isArray(jour.repas) && jour.repas.length > 0)
+    ? jours.filter(isPlainObject).filter((jour) => Array.isArray(jour.repas) && jour.repas.length > 0)
     : [];
 
   return (
     <div className="coai-nutrition-view flex flex-col gap-5">
+      {donneesIncompletes && (
+        <p role="status" className="rounded-xl border border-laiton-400/25 p-3 text-sm text-graphite-200">
+          Certaines informations sont incomplètes. Les éléments disponibles restent affichés.
+          Si le problème persiste, contacte ton coach depuis la rubrique Coach.
+        </p>
+      )}
       {showContreIndications && <ContreIndications items={contreIndications} />}
       {/* Anneaux de macros en tête (22/08/2026) — remplacent les badges
           textuels de SemainePlan, qui affichaient la même information en
@@ -93,22 +103,22 @@ export function NutritionView({
         }}
       />
 
-      {Array.isArray(conseilsHabitudes) && conseilsHabitudes.length > 0 && (
+      {conseilsUtiles.length > 0 && (
         <div className="flex flex-col gap-2.5">
           <span className="font-mono text-xs uppercase tracking-wider text-laiton-500">
             💡 Conseils sur tes habitudes
           </span>
-          {conseilsHabitudes.map((c, i) => (
+          {conseilsUtiles.map((c, i) => (
             <div key={i} className="coai-habit-card rounded-xl border border-graphite-800 bg-graphite-900/40 p-4">
-              {c.sujet && (
+              {typeof c.sujet === "string" && c.sujet && (
                 <span className="text-xs font-semibold uppercase tracking-wide text-laiton-300">
                   {c.sujet}
                 </span>
               )}
-              {c.constatActuel && (
+              {typeof c.constatActuel === "string" && c.constatActuel && (
                 <p className="mt-1.5 text-xs leading-5 text-graphite-400">{c.constatActuel}</p>
               )}
-              {c.conseil && (
+              {typeof c.conseil === "string" && c.conseil && (
                 <p className="mt-1 text-sm leading-6 text-graphite-100">{c.conseil}</p>
               )}
             </div>
