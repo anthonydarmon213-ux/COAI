@@ -52,13 +52,9 @@ export default async function ProgrammesPretsPage(
           <span className="coai-diagnostic-kicker-status animate-status-pulse" aria-hidden="true" />
           <span>Boutique COAI</span>
         </div>
-        <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">Choisis ton programme. Garde-le à vie.</h1>
-        <p className="max-w-2xl text-base leading-7 text-graphite-300">
-          Une sélection de programmes ciblés — mobilité, bureau, préparation de course, perte de
-          poids, poids du corps, fessiers, challenge 30 jours — indépendante de ton programme
-          personnalisé généré par IA. Mobilité est offert pour découvrir la méthode. Les autres packs
-          sont disponibles à l&apos;unité ; l&apos;abonnement ajoute ensuite le suivi, les conseils et
-          les adaptations continues.
+        <h1 className="font-editorial text-3xl font-normal tracking-tight sm:text-5xl">Tes programmes ciblés</h1>
+        <p className="max-w-2xl text-sm leading-6 text-graphite-300">
+          Explore les programmes selon ton objectif. Mobilité est offert pour découvrir COAI.
         </p>
       </div>
       {searchParams?.achat === "success" && (

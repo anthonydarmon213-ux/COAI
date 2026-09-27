@@ -219,14 +219,35 @@ final class COAIUITests: XCTestCase {
         app.buttons["native-tab-Explorer"].tap()
         let recovery = app.buttons["explore-/programme/programmes-prets?categorie=RECUPERATION"]
         reveal(recovery, in: app); recovery.tap()
+        let sleep = web.buttons["Choisir Sommeil réparateur — 14 jours"]
+        XCTAssertTrue(sleep.waitForExistence(timeout: 20))
+        XCTAssertTrue(sleep.isHittable, "Le premier programme doit être accessible sans défilement")
+        XCTAssertLessThan(sleep.frame.minY, web.frame.maxY)
+        let filters = web.buttons["Filtrer les programmes"]
+        XCTAssertTrue(filters.exists)
+        XCTAssertGreaterThanOrEqual(filters.frame.height, 44)
+        filters.tap()
+        func revealFilter(_ element: XCUIElement) {
+            for _ in 0..<12 {
+                if element.isHittable { return }
+                let origin = web.coordinate(withNormalizedOffset: .zero)
+                let high = origin.withOffset(CGVector(dx: web.frame.width * 0.9, dy: 120))
+                let low = origin.withOffset(CGVector(dx: web.frame.width * 0.9, dy: 240))
+                if element.frame.minY < web.frame.minY {
+                    high.press(forDuration: 0.05, thenDragTo: low)
+                } else {
+                    low.press(forDuration: 0.05, thenDragTo: high)
+                }
+            }
+            XCTAssertTrue(element.isHittable)
+        }
         let recoveryFilter = web.switches["Récupération"]
         XCTAssertTrue(recoveryFilter.waitForExistence(timeout: 20))
         XCTAssertEqual(recoveryFilter.value as? String, "1")
-        reveal(recoveryFilter, in: app)
+        revealFilter(recoveryFilter)
         XCTAssertGreaterThanOrEqual(recoveryFilter.frame.height, 44)
-        let sleep = web.buttons["Choisir Sommeil réparateur — 14 jours"]
-        XCTAssertTrue(sleep.waitForExistence(timeout: 20))
-        reveal(sleep, in: app)
+        let closeFilters = web.buttons["Fermer les filtres"]
+        revealFilter(closeFilters); closeFilters.tap()
         XCTAssertTrue(sleep.isHittable)
         XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
         let proof = XCTAttachment(screenshot: app.screenshot())

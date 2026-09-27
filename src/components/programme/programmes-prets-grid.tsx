@@ -28,6 +28,7 @@ export function ProgrammesPretsGrid({
     ? (depuisUrl as CategorieProgrammePret)
     : null;
   const [categorie, setCategorie] = useState<CategorieProgrammePret | null>(initiale);
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
 
   const filtres = useMemo(
     () => (categorie ? items.filter((i) => i.programme.categorie === categorie) : items),
@@ -36,6 +37,22 @@ export function ProgrammesPretsGrid({
 
   return (
     <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p role="status" className="text-sm text-graphite-300">
+          {categorie ? CATEGORIE_PROGRAMME_LABEL[categorie] : "Tous les programmes"}
+          {" · "}{filtres.length}
+        </p>
+        <button
+          type="button"
+          aria-expanded={filtresOuverts}
+          aria-controls="categories-programmes"
+          onClick={() => setFiltresOuverts((ouvert) => !ouvert)}
+          className="min-h-11 rounded-full border border-white/20 px-4 text-sm font-semibold text-graphite-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-300"
+        >
+          {filtresOuverts ? "Fermer les filtres" : "Filtrer les programmes"}
+        </button>
+      </div>
+      <div id="categories-programmes" hidden={!filtresOuverts}>
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="mr-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-graphite-500">Catégorie :</span>
         <button
@@ -61,6 +78,7 @@ export function ProgrammesPretsGrid({
             {label}
           </button>
         ))}
+      </div>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
