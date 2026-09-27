@@ -307,6 +307,68 @@ final class COAIUITests: XCTestCase {
 
     /// Real authenticated PDF endpoint; never publish or choose a share recipient.
     @MainActor
+    func testLocalConnectedAccountDeletionPersists() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        // Destructive actions are limited to this explicitly marked loopback app
+        // and the disposable account seeded by the local test harness.
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap()
+        email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app)
+        submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Explorer"].tap()
+        let settings = app.buttons["explore-/compte/parametres"]
+        reveal(settings, in: app, upward: false)
+        settings.tap()
+        let delete = web.buttons["Supprimer mon compte"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 30))
+        reveal(delete, in: app)
+        delete.tap()
+        let confirmation = app.alerts["COAI"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        XCTAssertTrue(confirmation.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "facturation continuera")).firstMatch.exists)
+        confirmation.buttons["Annuler"].tap()
+        XCTAssertTrue(delete.isEnabled)
+        // Cancellation must preserve the connected profile, not just dismiss UI.
+        let export = web.buttons["Exporter mes données"]
+        for _ in 0..<15 {
+            if export.isHittable { break }
+            let above = export.frame.midY < web.frame.midY
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.35 : 0.65))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.55 : 0.45)))
+        }
+        XCTAssertTrue(export.isHittable)
+        export.tap()
+        XCTAssertTrue(app.otherElements["LP.CaptionBar.TopCaption"].waitForExistence(timeout: 20))
+        app.buttons.matching(NSPredicate(format: "label IN %@", ["Fermer", "Close"])).firstMatch.tap()
+        reveal(delete, in: app)
+        delete.tap()
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Confirmation de suppression du compte jetable — avertissement Apple"
+        proof.lifetime = .keepAlways
+        add(proof)
+        confirmation.buttons["Confirmer"].tap()
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.webViews.textFields["EMAIL"].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.webViews.buttons["Supprimer mon compte"].exists)
+    }
+
+    @MainActor
     func testLocalConnectedAccountExportShares() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

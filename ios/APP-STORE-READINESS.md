@@ -2,6 +2,17 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 20 h 44 : suppression native connectée réussie sur SE simulateur.
+Annuler conserve l’accès (export réel encore possible), confirmer supprime le
+compte et revient à la connexion, y compris après relance. Avertissement Apple
+visible et boutons accessibles sur capture inspectée.
+Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_20-43-42-+0200.xcresult`.
+Contrôle indépendant : utilisateur PostgreSQL et identité Auth absents, ancien
+mot de passe refusé. Régression HTTP locale réussie : 101 photos supprimées,
+deux anciennes sessions refusées, autre compte et sa photo préservés.
+Compte jetable uniquement, aucun abonnement réel ni production ; concurrence
+et environnements distants restent à valider.
+
 Complément 20 h 29 : export JSON du compte jetable connecté vérifié sur iPhone
 SE simulateur : authentification réelle locale, paramètres, export, feuille iOS
 avec JSON de 5 ko et action Fichiers, fermeture puis écran toujours utilisable.

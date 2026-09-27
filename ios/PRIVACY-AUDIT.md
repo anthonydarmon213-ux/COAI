@@ -29,8 +29,12 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
 1. Vérifier les transmissions réelles des écrans connectés et les journaux
    techniques ; définir puis tester la suppression des données sensibles dans
    les erreurs et métadonnées avant déclaration définitive.
-2. Finaliser la suppression de compte : concurrence, révocation des sessions,
-   fichiers et test complet avec un compte jetable autorisé. Voir checklist.
+2. Suppression de compte : parcours natif connecté local vérifié le 27 septembre
+   à 20 h 44 (annulation préserve l’export, confirmation puis relance déconnectée).
+   Identité Auth et utilisateur PostgreSQL absents, mot de passe refusé après
+   l’action UI. Test HTTP local complémentaire : 101 photos, deux anciennes
+   sessions refusées, autre compte et photo préservés. Restent concurrence,
+   abonnements réels et validation en production. Voir checklist.
 3. L'export de compte (`src/app/api/compte/export/route.ts`) inclut maintenant
    20 relations : profil, abonnement Stripe, programmes, séances, mesures,
    événements WhatsApp, repas, avis, tests maxi, check-ins hebdomadaires,
