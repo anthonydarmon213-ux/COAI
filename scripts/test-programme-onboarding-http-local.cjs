@@ -31,13 +31,26 @@ let authId, userId;
     const body = { objectifs: 'Prendre du muscle — activité quotidienne : Journée mixte : assis et debout',
       niveau: 'Débutant', equipementDisponible: 'Salle de sport complète', lieuEntrainement: 'Salle de sport',
       dureeSeanceMinutes: 45, frequenceEntrainement: '3 fois par semaine', age: 35, tailleCm: 178, poidsKg: 75,
-      sexe: 'Homme', contraintesSante: '', habitudesAlimentaires: 'Repas structurés et équilibrés',
+      sexe: 'Homme', contraintesSante: '', antecedentsMedicaux: '', allergiesAlimentaires: '', habitudesAlimentaires: 'Repas structurés et équilibrés',
       qualiteSommeil: 'Bonne (7-8h, plutôt réparateur)' };
     const saved = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     assert.equal(saved.status, 200);
     const generate = () => fetch(origin + '/api/programmes/generate?mode=onboarding', { method: 'POST', headers: cookie() });
     assert.equal((await generate()).status, 403);
     await db.user.update({ where: { id: userId }, data: { programmeUnlockedAt: new Date() } });
+    for (const constraint of [
+      { contraintesSante: 'Douleur déclarée — fixture locale' },
+      { antecedentsMedicaux: 'Antécédent déclaré — fixture locale' },
+      { allergiesAlimentaires: 'Allergie déclarée — fixture locale' },
+    ]) {
+      const profile = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, ...constraint }) });
+      assert.equal(profile.status, 200);
+      const refused = await generate(); assert.equal(refused.status, 409);
+      assert.equal((await refused.json()).requiresCoachReview, true);
+      assert.equal(await db.programmeGenerated.count({ where: { userId } }), 0);
+    }
+    const reset = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    assert.equal(reset.status, 200);
     const firstResponses = await Promise.all([generate(), generate(), generate()]);
     const initialResults = [];
     for (const response of firstResponses) {
@@ -64,7 +77,7 @@ let authId, userId;
     await db.user.update({ where: { id: userId }, data: { programmeUnlockedAt: null } });
     assert.equal((await generate()).status, 403);
     assert.equal(await db.programmeGenerated.count({ where: { userId } }), 3);
-    console.log('PASS real local Auth/HTTP/DB: profile saved; access denied then explicitly granted in fixture; three concurrent first requests create only three catalogue pillars; retries preserve IDs; three authenticated pages return 200; revoked access denied. No purchase or paid AI.');
+    console.log('PASS real local Auth/HTTP/DB: profile saved; access denied then explicitly granted in fixture; declared pain/history/allergy require coach review with no generic programme; three concurrent first requests create only three catalogue pillars; retries preserve IDs; three authenticated pages return 200; revoked access denied. No purchase or paid AI.');
   } finally {
     await client.auth.signOut({ scope: 'global' });
     if (userId) await db.user.delete({ where: { id: userId } });

@@ -2,6 +2,21 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Contrôles complémentaires et limite éditoriale — 27 septembre
+
+Le test HTTP des trois piliers vérifie aussi douleur, antécédent et allergie
+déclarés : 409 avec requiresCoachReview et zéro programme générique créé.
+Après remise à zéro explicite des champs de la fixture, le parcours habituel
+et les créations concurrentes passent. Aucune décision médicale testée.
+
+Audit exhaustif relancé : toujours 4/90 variantes complètes, 86/90 incomplètes,
+388 occurrences sur 7 noms. C'est la confirmation du blocage déjà consigné dans
+MEDIA-AUDIT-20260924.md, pas un nouveau défaut créé par les corrections récentes.
+Le test HTTP prouve persistance/droits/reprise, PAS conformité éditoriale de
+ces programmes. Ne pas déclarer ces 86 variantes prêtes. Aucun remplacement
+de mouvement, changement de prescription ou fausse association vidéo effectué.
+Rushes conformes supplémentaires ou révision de séances à valider demandés.
+
 ### Préparation des trois piliers en HTTP réel — 27 septembre, 17 h 08
 
 `scripts/test-programme-onboarding-http-local.cjs`, lancé avec le helper local
