@@ -2,6 +2,15 @@
 
 ## État courant — 27 septembre 2026
 
+Complément avatar : envoi multipart incomplet et image vide désormais refusés
+avec réponse JSON claire (400). Pannes Storage/DB/signature et URL absente
+retournent une erreur réessayable (503), sans message interne ni faux succès.
+`test-avatar-route.cjs` reproduisait l’exception avant correction, puis passe
+avec services simulés. `test-avatar-http-local.cjs` vérifie les vrais services
+locaux : upload authentifié, chemin persisté, octets identiques, refus des
+envois incomplets/vides, avatar conservé, nouvel essai réussi. Compte/image
+jetables supprimés. Typage/lint/build réussis ; UI avatar et production non prouvées.
+
 Complément 20 h 59 : défaut reproduit puis corrigé sur les demandes simultanées
 de suppression. Avant : une réponse 200 et une fausse erreur 503 après disparition
 du profil. Après : deux réponses 200 sur deux exécutions HTTP locales, absence
