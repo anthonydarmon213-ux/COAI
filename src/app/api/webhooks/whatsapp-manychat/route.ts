@@ -5,7 +5,7 @@ import { isValidWhatsappWebhookRequest } from "@/lib/whatsapp/client";
 import { generateTextWithAI } from "@/lib/ai/client";
 import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
-import { getEffectivePlan } from "@/lib/subscription/plan";
+import { getEffectivePlan, hasPaidSubscription } from "@/lib/subscription/plan";
 
 // Appelé par ManyChat (étape "External Request" du flow WhatsApp) à chaque
 // message reçu d'un abonné — remplace l'ancienne hypothèse Make.com/Twilio,
@@ -42,6 +42,14 @@ export async function POST(request: Request) {
     return NextResponse.json({
       reply:
         "Je ne retrouve pas ton compte COAI avec ce numéro. Connecte-toi sur coai.fr, va dans Compte > Paramètres, et renseigne ce numéro WhatsApp pour qu'on puisse discuter ici.",
+    });
+  }
+
+  // Same paid-access boundary as /api/coach/ask, before storing personal
+  // messages, reserving quota or triggering a billed AI call.
+  if (!hasPaidSubscription(user.subscription)) {
+    return NextResponse.json({
+      reply: "Un abonnement actif est nécessaire pour le coach IA. Consulte ton abonnement dans ton compte COAI.",
     });
   }
 
@@ -98,8 +106,8 @@ export async function POST(request: Request) {
       data: { userId: user.id, direction: "OUTBOUND", payload: { reply } as Prisma.InputJsonValue },
     });
     return NextResponse.json({ reply });
-  } catch (error) {
-    console.error("[webhooks/whatsapp-manychat]", error);
+  } catch {
+    console.error("[webhooks/whatsapp-manychat] Réponse indisponible");
     return NextResponse.json(
       { reply: "Petit souci technique de mon côté, réessaie dans quelques instants." },
       { status: 200 }
