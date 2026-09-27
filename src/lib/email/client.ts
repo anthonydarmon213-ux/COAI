@@ -9,7 +9,8 @@
 // exception sur un accent dans une valeur de header) — nos sujets contiennent
 // systématiquement des accents ("à valider", "généré"...). Le titre affiché
 // à l'écran de verrouillage passe donc par le header (sans accent), le sujet
-// exact (avec accents) reste lisible en première ligne du corps du message.
+// Les push utilisent désormais un texte générique : aucun sujet d'email,
+// nom, contact ou contenu de diagnostic ne doit être transmis à ntfy.
 // Ne garde que de l'ASCII pur (code point <= 127) : un header HTTP est un
 // ByteString, fetch/undici lève une exception dès qu'un caractère dépasse
 // 255 (ex: le tiret cadratin "—", U+2014, utilisé dans plusieurs sujets de
@@ -23,21 +24,23 @@ function toAscii(value: string): string {
     .join("");
 }
 
-async function sendPushNotification(title: string, message: string): Promise<void> {
+async function sendPushNotification(): Promise<void> {
   const topic = process.env.NTFY_TOPIC;
   if (!topic) return;
   const server = process.env.NTFY_SERVER ?? "https://ntfy.sh";
   try {
     const res = await fetch(`${server}/${topic}`, {
       method: "POST",
-      headers: { Title: toAscii(title), Priority: "high" },
-      body: `${title}\n\n${message}`,
+      // A push may appear on a locked phone and is processed by another
+      // provider. Never forward the email subject or its personal content.
+      headers: { Title: toAscii("COAI — notification coach"), Priority: "high" },
+      body: "Une nouvelle notification COAI est disponible. Consulte ta messagerie coach.",
     });
     if (!res.ok) {
-      console.error("[push] ntfy a répondu une erreur", res.status, await res.text());
+      console.error("[push] ntfy a répondu une erreur", res.status);
     }
-  } catch (err) {
-    console.error("[push] Échec de l'envoi", err);
+  } catch {
+    console.error("[push] Échec de l'envoi");
   }
 }
 
@@ -60,7 +63,7 @@ export async function sendAdminNotification(subject: string, text: string, html?
       : Promise.resolve(
           console.warn("[email] RESEND_API_KEY ou ADMIN_NOTIFICATION_EMAIL non configuré, notification ignorée")
         ),
-    sendPushNotification(subject, text),
+    sendPushNotification(),
   ]);
 }
 
@@ -91,12 +94,12 @@ export async function sendEmail(to: string, subject: string, text: string, html?
       }),
     });
     if (!res.ok) {
-      console.error("[email] Resend a répondu une erreur", res.status, await res.text());
+      console.error("[email] Resend a répondu une erreur", res.status);
       return false;
     }
     return true;
-  } catch (err) {
-    console.error("[email] Échec de l'envoi", err);
+  } catch {
+    console.error("[email] Échec de l'envoi");
     return false;
   }
 }

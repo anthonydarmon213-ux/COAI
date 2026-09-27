@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExerciceVideo } from "@/components/programme/exercice-video";
@@ -79,6 +79,8 @@ export function ExerciceCatalogue() {
   const [materiels, setMateriels] = useState<Materiel[]>([]);
   const [types, setTypes] = useState<TypeExercice[]>([]);
   const [genreVisuel, setGenreVisuel] = useState<GenreVisuel>("femme");
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
+  const boutonFiltres = useRef<HTMLButtonElement>(null);
 
   const filtres = useMemo(() => {
     return EXERCICES.filter((ex) => {
@@ -92,15 +94,24 @@ export function ExerciceCatalogue() {
   }, [groupes, materiels, types, query]);
 
   const aucunFiltre = groupes.length === 0 && materiels.length === 0 && types.length === 0 && !query.trim();
+  const nombreFiltres = groupes.length + materiels.length + types.length;
   const reset = () => { setQuery(""); setGroupes([]); setMateriels([]); setTypes([]); };
 
   return (
     <div className="flex flex-col gap-6">
       <Card className="flex flex-col gap-4">
-        <label className="text-sm font-semibold text-white">Rechercher un exercice
-          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. : presse, développé, haltères…" className="mt-2 min-h-11 w-full rounded-xl border border-white/20 bg-slate-950 px-4 py-3 text-base font-normal text-white" />
-        </label>
+        <form role="search" onSubmit={event => { event.preventDefault(); event.currentTarget.querySelector("input")?.blur(); }}>
+          <label className="text-sm font-semibold text-white">Rechercher un exercice
+            <input type="search" enterKeyHint="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. : presse, développé, haltères…" className="mt-2 min-h-11 w-full rounded-xl border border-white/20 bg-slate-950 px-4 py-3 text-base font-normal text-white" />
+          </label>
+        </form>
         {query && <button type="button" onClick={() => setQuery("")} className="min-h-11 self-start px-2 text-sm text-laiton-200 underline">Effacer la recherche</button>}
+        <button ref={boutonFiltres} type="button" aria-expanded={filtresOuverts} aria-controls="filtres-exercices" onClick={() => setFiltresOuverts(ouvert => !ouvert)} className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-white/15 px-4 py-2 text-left text-sm font-semibold text-white">
+          <span>{`Filtres${nombreFiltres ? ` · ${nombreFiltres} actif${nombreFiltres > 1 ? "s" : ""}` : ""}`}</span>
+          <span aria-hidden="true">{filtresOuverts ? "−" : "+"}</span>
+        </button>
+        <div id="filtres-exercices" hidden={!filtresOuverts}>
+        {filtresOuverts && <div className="flex flex-col gap-4">
         <FilterGroup titre="Groupe musculaire" options={GROUPES} labels={GROUPE_PRINCIPAL_LABEL} actifs={groupes} onToggle={(v) => setGroupes((prev) => toggle(prev, v))} />
         <FilterGroup titre="Matériel" options={MATERIELS} labels={MATERIEL_LABEL} actifs={materiels} onToggle={(v) => setMateriels((prev) => toggle(prev, v))} />
         <FilterGroup titre="Type" options={TYPES} labels={TYPE_LABEL} actifs={types} onToggle={(v) => setTypes((prev) => toggle(prev, v))} />
@@ -125,7 +136,10 @@ export function ExerciceCatalogue() {
           </div>
           <span className="text-[11px] text-graphite-500">Selon les versions actuellement disponibles.</span>
         </div>
-        {!aucunFiltre && (
+        <button type="button" onClick={() => { setFiltresOuverts(false); boutonFiltres.current?.focus(); }} className="min-h-11 rounded-xl bg-laiton-400 px-4 py-3 text-sm font-semibold text-graphite-950">Voir les résultats</button>
+        </div>}
+        </div>
+        {nombreFiltres > 0 && (
           <button
             type="button"
             onClick={reset}

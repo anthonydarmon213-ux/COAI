@@ -297,9 +297,16 @@ final class COAIUITests: XCTestCase {
         reveal(catalogue, in: app); catalogue.tap()
         let search = web.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 20))
-        reveal(search, in: app); search.tap(); search.typeText("Rowing haltère unilatéral")
+        let filters = web.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Filtres")).firstMatch
+        XCTAssertTrue(filters.exists)
+        XCTAssertGreaterThanOrEqual(filters.frame.height, 44)
+        XCTAssertFalse(web.switches["Dos"].exists, "Filtres repliés au départ")
+        reveal(search, in: app); search.tap(); search.typeText("Rowing haltère unilatéral\n")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
         let empty = web.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Aucun exercice trouvé.")).firstMatch
         XCTAssertTrue(empty.waitForExistence(timeout: 10))
+        XCTAssertTrue(empty.isHittable, "Le résultat vide doit être visible après la recherche")
+        XCTAssertLessThanOrEqual(empty.frame.maxY, web.frame.maxY)
         // WebKit may expose the search field value as static text too.
         // Assert the actual result count rather than absence of typed text.
         XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "0 exercice correspondant.")).firstMatch.exists)
@@ -308,13 +315,26 @@ final class COAIUITests: XCTestCase {
         excluded.lifetime = .keepAlways; add(excluded)
         let clear = web.buttons["Effacer la recherche"]
         reveal(clear, in: app); clear.tap()
-        reveal(search, in: app); search.tap(); search.typeText("Gainage planche")
+        reveal(search, in: app); search.tap(); search.typeText("Gainage planche\n")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
         XCTAssertTrue(web.staticTexts["Gainage planche"].waitForExistence(timeout: 10))
         XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "1 exercice correspondant.")).firstMatch.exists)
         XCTAssertFalse(empty.exists)
         let proof = XCTAttachment(screenshot: app.screenshot())
         proof.name = "Catalogue — recherche après exclusion du mauvais rowing"
         proof.lifetime = .keepAlways; add(proof)
+        reveal(clear, in: app); clear.tap()
+        reveal(filters, in: app); filters.tap()
+        let back = web.switches["Dos"]
+        XCTAssertTrue(back.waitForExistence(timeout: 5))
+        reveal(back, in: app); back.tap()
+        XCTAssertEqual(back.value as? String, "1")
+        XCTAssertTrue(web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "1 actif")).firstMatch.exists)
+        reveal(filters, in: app); filters.tap()
+        XCTAssertFalse(back.exists)
+        let reset = web.buttons["Tout réinitialiser"]
+        reveal(reset, in: app); reset.tap()
+        XCTAssertFalse(web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "1 actif")).firstMatch.exists)
     }
 
     @MainActor
