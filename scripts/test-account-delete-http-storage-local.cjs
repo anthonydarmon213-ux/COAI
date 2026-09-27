@@ -50,6 +50,9 @@ async function main() {
   const before = await bucket.list(a.id, { limit: 200 });
   assert.equal(before.error, null);
   assert.equal(before.data.length, 101);
+  const signedPhoto = await bucket.createSignedUrl(a.paths[0], 3600);
+  assert.equal(signedPhoto.error, null);
+  assert.equal((await fetch(signedPhoto.data.signedUrl)).status, 200);
   const response = await fetch('http://127.0.0.1:3050/api/compte/delete', {
     method: 'POST',
     headers: { ...headers(a), 'x-coai-delete-confirmation': '1', 'Content-Type': 'application/json' },
@@ -72,7 +75,22 @@ async function main() {
     assert(refresh.error);
     const denied = await fetch('http://127.0.0.1:3050/api/compte/export', { headers: { Authorization: `Bearer ${session.access_token}` } });
     assert.equal(denied.status, 401);
+    for (const endpoint of ['/api/profil/avatar', '/api/mesures/photo']) {
+      const form = new FormData();
+      form.set('file', new Blob([png], { type: 'image/png' }), 'deleted-account.png');
+      const upload = await fetch('http://127.0.0.1:3050' + endpoint, {
+        method: 'POST', headers: { Authorization: `Bearer ${session.access_token}` }, body: form,
+      });
+      assert.equal(upload.status, 401, `${endpoint} must reject a deleted account`);
+    }
   }
+  const removedPhoto = await fetch(signedPhoto.data.signedUrl, { cache: 'no-store' });
+  assert([400, 404].includes(removedPhoto.status), 'A service outage is not proof of deletion');
+  const removedPhotoError = await removedPhoto.json();
+  assert.match(removedPhotoError.message, /object not found/i);
+  const noRecreatedPhotos = await bucket.list(a.id, { limit: 200 });
+  assert.equal(noRecreatedPhotos.error, null);
+  assert.deepEqual(noRecreatedPhotos.data, []);
   assert((await client().auth.signInWithPassword({ email: a.email, password: a.password })).error);
   assert.equal((await exportAccount(b)).status, 200);
   assert.equal(await db.user.count({ where: { id: b.user.id } }), 1);
@@ -80,6 +98,7 @@ async function main() {
   assert.equal(preserved.error, null);
   assert.deepEqual(Buffer.from(await preserved.data.arrayBuffer()), png);
   console.log('PASS real local HTTP deletion: 101 files across pagination removed, user/profile removed, both old sessions and password denied; forged owner ignored, other account/file preserved');
+  console.log('PASS old sessions cannot upload avatars/progress photos; previous signed photo URL no longer serves the removed object; no photos recreated');
   console.log('LIMIT: local services only; no native UI, production, paid subscriptions or Apple cancellation verified');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

@@ -33,7 +33,11 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    à 20 h 44 (annulation préserve l’export, confirmation puis relance déconnectée).
    Identité Auth et utilisateur PostgreSQL absents, mot de passe refusé après
    l’action UI. Test HTTP local complémentaire : 101 photos, deux anciennes
-   sessions refusées, autre compte et photo préservés. Restent concurrence,
+   sessions refusées, autre compte et photo préservés. Ces anciennes sessions
+   reçoivent aussi 401 sur les envois avatar/photo de suivi ; un ancien lien
+   signé répond « Object not found », aucun objet recréé dans le préfixe.
+   Vérifications ajoutées au test HTTP réel local, pas seulement à une doublure.
+   Restent concurrence,
    abonnements réels et validation en production. Voir checklist.
 3. L'export de compte (`src/app/api/compte/export/route.ts`) inclut maintenant
    20 relations : profil, abonnement Stripe, programmes, séances, mesures,
