@@ -27,5 +27,7 @@ for (const [nom, expected] of [['Sans média', null], ['COAI fixture', '/exercic
   if (expected) assert.equal(images[0].props.src, expected);
 }
 assert(!fs.readFileSync('src/components/programme/seance-runner.tsx', 'utf8').includes('photosParExercice?.['));
-assert(fs.readFileSync('src/components/programme/pilier-page.tsx', 'utf8').includes('PILIERS[index] !== "ENTRAINEMENT" && index === indexPilierActif'));
+// La page ne charge désormais de photos externes pour aucun pilier.
+// Vérifier son exécution réelle plutôt qu'une ancienne condition de code.
+require('node:child_process').execFileSync(process.execPath, [require('node:path').join(__dirname, 'test-pillar-owned-media.cjs')], { stdio: 'inherit' });
 console.log('PASS: séance sans média sans photo stock ; média COAI conservé ; lecteur et chargement entraînement sans repli stock.');

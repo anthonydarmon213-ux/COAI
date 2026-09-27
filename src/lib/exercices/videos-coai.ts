@@ -91,7 +91,9 @@ const TABLE: Entree[] = [
   // cuisses inclinée (jambes sur le plateau), pas un développé pectoraux.
   { motifs: ["presse a cuisses", "presse à cuisses", "leg press"], video: { fichier: "presse-a-cuisses", description: "Presse à cuisses inclinée" } },
 
-  { motifs: ["rowing haltere unilateral", "one arm dumbbell row"], video: { fichier: "rowing-haltere-unilateral", description: "Rowing haltère unilatéral" } },
+  // Audit visuel 27/09 : rowing-haltere-unilateral.mp4 montre deux pieds
+  // au sol ; la fiche et sa photo imposent un genou sur banc. Rush conservé,
+  // mais aucune association tant qu'une démonstration concordante manque.
   { motifs: ["rowing halteres", "rowing buste penche", "bent over row"], video: { fichier: "rowing-halteres", description: "Rowing buste penché aux haltères" } },
   { motifs: ["rowing menton", "tirage menton", "upright row"], video: { fichier: "rowing-menton-barre", description: "Rowing menton à la barre" } },
   { motifs: ["chin up", "chin-up", "traction supination"], video: { fichier: "chin-up", description: "Traction en supination" } },
@@ -143,6 +145,8 @@ function normaliser(texte: string): string {
 
 export function videoCoaiPourNom(nom: string): VideoCoai | null {
   const normalise = normaliser(nom);
+  // Bloquer aussi les noms enrichis qui pourraient tomber sur « bent over row ».
+  if (/rowing halteres? unilateral|(?:one|single)[ -]arm dumbbell row/.test(normalise)) return null;
   // Empêcher aussi le repli « bench press » vers le développé à plat.
   if (/(developpe.*incline|incline.*press)/.test(normalise)) return null;
   // Rush inspecté : exécution allongée à deux jambes uniquement.

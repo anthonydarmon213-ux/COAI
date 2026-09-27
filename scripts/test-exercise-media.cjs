@@ -6,17 +6,31 @@ function load(file) {
   const exports = {};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(file, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS },
-  }).outputText, { exports });
+  }).outputText, { exports, require: name => name.startsWith('@/') ? load('src/' + name.slice(2) + '.ts') : require(name) });
   return exports;
 }
 const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
 const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
+const { filtrerExercicesAvecMedias, programmeAvecMediasCoai } = load('src/lib/exercices/media-coai.ts');
+const stored = { seances: [{ nom: 'Séance conservée', exercices: [
+  { nom: 'Rowing haltère unilatéral', series: '3' },
+  { nom: 'Gainage planche', repetitions: '30 sec' },
+] }] };
+const before = JSON.stringify(stored);
+assert.deepEqual(Array.from(filtrerExercicesAvecMedias(stored.seances[0].exercices), e => e.nom), ['Gainage planche']);
+assert.deepEqual(Array.from(programmeAvecMediasCoai(stored).seances[0].exercices, e => e.nom), ['Gainage planche']);
+assert.equal(JSON.stringify(stored), before, 'Le filtrage séance/export ne réécrit pas le programme sauvegardé');
 for (const name of ['Développé incliné machine', 'Développé incliné (machine)', 'Développé incliné à la machine', 'Développé incliné barre', 'Développé couché incliné', 'Développé couché incliné haltères', 'Incline bench press', 'Incline dumbbell press', 'Incline chest press machine']) {
   assert.equal(videoCoaiPourNom(name), null, `Aucune substitution épaules, Smith ou banc plat : ${name}`);
 }
 assert.equal(videoCoaiPourNom('Pompes inclinées')?.fichier, 'pompes-inclinees');
+for (const name of ['Rowing haltère unilatéral', 'Rowing haltères unilatéral', 'One arm dumbbell row', 'One-arm dumbbell row', 'Single arm dumbbell row', 'Rowing haltère unilatéral (bent over row)']) {
+  assert.equal(videoCoaiPourNom(name), null, `Pas de vidéo deux pieds au sol pour la fiche genou sur banc : ${name}`);
+}
+assert.equal(videoCoaiPourNom('Rowing haltères')?.fichier, 'rowing-halteres', 'Préserver le rowing bilatéral');
+assert.equal(videoCoaiPourNom('Développé Arnold')?.fichier, 'developpe-arnold', 'Rotation confirmée dans le clip');
 for (const name of ['Deadlift roumain', 'Deadlift roumain barre', 'Soulevé de terre roumain à la barre', 'Romanian deadlift', 'RDL', 'Soulevé de terre roumain haltères', 'Deadlift roumain haltères', 'RDL haltères']) {
   assert.equal(videoCoaiPourNom(name), null, `Le rush mal nommé montre un rowing : ${name}`);
 }
