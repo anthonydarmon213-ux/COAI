@@ -2,6 +2,40 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Consentements lisibles sur petit écran — 27 septembre, 15 h 05
+
+La capture du retour email a révélé que le label flex séparait texte, lien
+confidentialité et suite du texte en colonnes. Chaque texte est maintenant
+regroupé dans un span min-w-0, avec case shrink-0. Texte, lien, consentements
+décochés et contrôles serveur inchangés. Capture corrigée inspectée : texte
+continu, bouton complet visible. Types/lint (0 erreur, 6 avertissements),
+build local et tests auth/inscription passent ; 356 médias présents.
+Test natif final : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_15-04-24-+0200.xcresult`,
+un test zéro échec, captures `/tmp/coai-consent-final-proof-0927`.
+Le test accepte la fenêtre Ouvrir ou le retour direct si iOS a mémorisé
+l'autorisation ; il exige toujours la session avec l'adresse attendue.
+Compte/email jetables nettoyés. Correction locale non publiée.
+
+### Retour email via le système iOS — 27 septembre, 14 h 57
+
+`testLocalEmailLinkReturnsToOriginalSession` passe : inscription UI réelle,
+email SMTP local, confirmation Auth, ouverture du lien dédié par simctl openurl,
+geste explicite Ouvrir sur la fenêtre SpringBoard, puis Finalise ton compte
+avec l'adresse attendue, sans nouvelle saisie de mot de passe. Aucun cookie
+injecté. Test sur simulateur QA petit écran, app déjà ouverte : un test,
+zéro échec. Compte Auth confirmé et email local contrôlés puis supprimés ;
+aucun compte applicatif créé. Le premier essai manquait le geste système,
+le second l'inclut, sans contournement dans l'application.
+Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_14-56-42-+0200.xcresult`.
+Captures : `/tmp/coai-email-os-proof-0927`.
+Le helper `/tmp/coai-open-email-ios-0927.cjs` doit être lancé après le marqueur
+COAI_EMAIL_RETURN_READY, sur le seul simulateur validé ; ne journalise pas le code.
+Préflight/cleanup SMTP via `/tmp/coai-local-http-0924.cjs` ; cleanup --confirmed.
+Limites : pas de geste Mail/Safari réel, pas de démarrage à froid, pas de
+finalisation UI des consentements, pas d'iPhone physique ni de production.
+Le mode local dépend des arguments de lancement Debug : un démarrage OS à
+froid doit être testé séparément sans prétendre conserver ces arguments.
+
 ### Raccordement email → page de retour iOS — 27 septembre
 
 Inscription et renvoi utilisent maintenant confirmationCallback avec le

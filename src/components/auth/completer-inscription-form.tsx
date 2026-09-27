@@ -80,24 +80,28 @@ export function CompleterInscriptionForm({
           type="checkbox"
           checked={consentRgpd}
           onChange={(e) => setConsentRgpd(e.target.checked)}
-          className="mt-1"
+          className="mt-1 shrink-0"
         />
-        J&apos;ai lu la{" "}
-        <Link href="/confidentialite" target="_blank" className="underline">
-          politique de confidentialité
-        </Link>{" "}
-        et je consens au traitement de mes données de santé pour la personnalisation de mon
-        coaching (RGPD).
+        <span className="min-w-0">
+          J&apos;ai lu la{" "}
+          <Link href="/confidentialite" target="_blank" className="underline">
+            politique de confidentialité
+          </Link>{" "}
+          et je consens au traitement de mes données de santé pour la personnalisation de mon
+          coaching (RGPD).
+        </span>
       </label>
       <label className="flex items-start gap-2 text-sm text-graphite-300">
         <input
           type="checkbox"
           checked={consentSante}
           onChange={(e) => setConsentSante(e.target.checked)}
-          className="mt-1"
+          className="mt-1 shrink-0"
         />
-        Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de doute
-        ou d&apos;antécédent médical.
+        <span className="min-w-0">
+          Je certifie être apte à la pratique sportive, ou avoir consulté un médecin en cas de doute
+          ou d&apos;antécédent médical.
+        </span>
       </label>
       {error && <p className="text-sm text-red-400">{error}</p>}
       <Button type="submit" disabled={loading}>

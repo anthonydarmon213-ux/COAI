@@ -4,6 +4,16 @@ final class COAIUITests: XCTestCase {
     /// Requires local SMTP preflight and cleanup; does not confirm email or grant access.
     @MainActor
     func testLocalSignupReachesEmailConfirmation() throws {
+        try localSignup(waitForReturn: false)
+    }
+
+    @MainActor
+    func testLocalEmailLinkReturnsToOriginalSession() throws {
+        try localSignup(waitForReturn: true)
+    }
+
+    @MainActor
+    private func localSignup(waitForReturn: Bool) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -40,6 +50,24 @@ final class COAIUITests: XCTestCase {
         capture.name = "Inscription locale — confirmation email"
         capture.lifetime = .keepAlways
         add(capture)
+        if waitForReturn {
+            print("COAI_EMAIL_RETURN_READY")
+            let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+            let open = springboard.alerts.buttons["Ouvrir"]
+            let returnReady = XCTNSPredicateExpectation(
+                predicate: NSPredicate { _, _ in
+                    open.exists || web.staticTexts["Finalise ton compte"].exists
+                }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [returnReady], timeout: 90), .completed)
+            if open.exists { open.tap() }
+            XCTAssertTrue(web.staticTexts["Finalise ton compte"].waitForExistence(timeout: 90))
+            XCTAssertTrue(web.staticTexts["coai-ui-signup-20260927@example.test"].exists)
+            XCTAssertFalse(web.buttons["Se connecter"].exists)
+            let returned = XCTAttachment(screenshot: app.screenshot())
+            returned.name = "Retour email local — session d’origine"
+            returned.lifetime = .keepAlways
+            add(returned)
+        }
     }
 
     /// Real loopback authentication and workout persistence, with a disposable account.
