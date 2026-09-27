@@ -478,12 +478,12 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           // false is an explicit opt-out, not an omitted update.
           cycleMenstruelSuivi,
           dateDernieresRegles:
-            cycleMenstruelSuivi && dateDernieresRegles ? new Date(dateDernieresRegles).toISOString() : undefined,
-          dureeCycleJours: cycleMenstruelSuivi && dureeCycleJours ? Number(dureeCycleJours) : undefined,
-          reglesDouloureuses: cycleMenstruelSuivi ? reglesDouloureuses : undefined,
-          statutMaternite: statutMaternite || undefined,
+            cycleMenstruelSuivi && dateDernieresRegles ? new Date(dateDernieresRegles).toISOString() : null,
+          dureeCycleJours: cycleMenstruelSuivi && dureeCycleJours ? Number(dureeCycleJours) : null,
+          reglesDouloureuses: cycleMenstruelSuivi ? reglesDouloureuses : null,
+          statutMaternite: statutMaternite || null,
           dateReferenceMaternite:
-            statutMaternite && dateReferenceMaternite ? new Date(dateReferenceMaternite).toISOString() : undefined,
+            statutMaternite && dateReferenceMaternite ? new Date(dateReferenceMaternite).toISOString() : null,
           morphologie,
           frequenceEntrainement: frequenceEntrainement || undefined,
           sportsPratiques: sportsPratiques.join(", "),

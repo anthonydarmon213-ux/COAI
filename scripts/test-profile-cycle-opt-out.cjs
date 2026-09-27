@@ -135,5 +135,17 @@ async function submitChoice(choice, values = {}, invalid = false, failureStatus 
   await submitChoice(false, { objectifs: 'réessai après panne' });
   assert.equal(stored.objectifs, 'réessai après panne');
   assert.equal(writes, beforeInvalid + 1, 'One successful save after recovery, without automatic retries');
-  console.log('PASS: actual form → route preserves profile choices and handles database failures/retry; persistence mocked.');
+  await submitChoice(true, { statutMaternite: 'ENCEINTE', dateReferenceMaternite: '2026-08-01',
+    dateDernieresRegles: '2026-07-01', dureeCycleJours: '28', reglesDouloureuses: true });
+  assert.equal(stored.statutMaternite, 'ENCEINTE');
+  assert.equal(stored.dateReferenceMaternite.toISOString(), '2026-08-01T00:00:00.000Z');
+  await route.exports.PUT(new Request('https://coai.test/api/profil', {
+    method: 'PUT', body: JSON.stringify({ objectifs: 'modification indépendante' }),
+  }));
+  assert.equal(stored.statutMaternite, 'ENCEINTE', 'An omitted field is not a deletion');
+  await submitChoice(false);
+  for (const key of ['statutMaternite', 'dateReferenceMaternite', 'dateDernieresRegles', 'dureeCycleJours', 'reglesDouloureuses']) {
+    assert.equal(stored[key], null, `Explicit clearing must remove stale sensitive data: ${key}`);
+  }
+  console.log('PASS: actual form → route preserves profile choices, clears explicit sensitive fields and handles retry; persistence mocked.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

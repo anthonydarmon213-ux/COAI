@@ -35,6 +35,24 @@ let authId, userId;
       qualiteSommeil: 'Bonne (7-8h, plutôt réparateur)' };
     const saved = await fetch(origin + '/api/profil', { method: 'PUT', headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     assert.equal(saved.status, 200);
+    const updateProfile = async values => {
+      const response = await fetch(origin + '/api/profil', { method: 'PUT',
+        headers: { ...cookie(), 'Content-Type': 'application/json' }, body: JSON.stringify(values) });
+      assert.equal(response.status, 200);
+      return db.profile.findUniqueOrThrow({ where: { userId } });
+    };
+    await updateProfile({ statutMaternite: 'ENCEINTE', dateReferenceMaternite: '2026-08-01T00:00:00.000Z',
+      cycleMenstruelSuivi: true, dateDernieresRegles: '2026-07-01T00:00:00.000Z', dureeCycleJours: 28, reglesDouloureuses: true });
+    const untouched = await updateProfile({ objectifs: body.objectifs });
+    assert.equal(untouched.statutMaternite, 'ENCEINTE');
+    assert.equal(untouched.dateReferenceMaternite.toISOString(), '2026-08-01T00:00:00.000Z');
+    const cleared = await updateProfile({ statutMaternite: null, dateReferenceMaternite: null,
+      cycleMenstruelSuivi: false, dateDernieresRegles: null, dureeCycleJours: null, reglesDouloureuses: null });
+    for (const key of ['statutMaternite', 'dateReferenceMaternite', 'dateDernieresRegles', 'dureeCycleJours', 'reglesDouloureuses']) {
+      assert.equal(cleared[key], null, key);
+    }
+    assert.equal(cleared.cycleMenstruelSuivi, false);
+    console.log('PASS real profile persistence: omitted sensitive fields preserved, explicitly cleared fields removed.');
     const generate = () => fetch(origin + '/api/programmes/generate?mode=onboarding', { method: 'POST', headers: cookie() });
     assert.equal((await generate()).status, 403);
     await db.user.update({ where: { id: userId }, data: { programmeUnlockedAt: new Date() } });

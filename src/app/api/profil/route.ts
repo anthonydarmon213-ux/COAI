@@ -39,11 +39,11 @@ const bodySchema = z.object({
   // déduit du sexe déclaré. dateDernieresRegles/dateReferenceMaternite
   // arrivent en chaîne ISO depuis le client, converties ici.
   cycleMenstruelSuivi: z.boolean().optional(),
-  dateDernieresRegles: z.string().datetime().optional(),
-  dureeCycleJours: z.number().int().min(15).max(60).optional(),
-  reglesDouloureuses: z.boolean().optional(),
-  statutMaternite: z.enum(["ENCEINTE", "POST_PARTUM"]).optional(),
-  dateReferenceMaternite: z.string().datetime().optional(),
+  dateDernieresRegles: z.string().datetime().nullable().optional(),
+  dureeCycleJours: z.number().int().min(15).max(60).nullable().optional(),
+  reglesDouloureuses: z.boolean().nullable().optional(),
+  statutMaternite: z.enum(["ENCEINTE", "POST_PARTUM"]).nullable().optional(),
+  dateReferenceMaternite: z.string().datetime().nullable().optional(),
   coachPreference: z.enum(["FULL_IA", "HYBRIDE", "VIP_PRESENTIEL"]).optional(),
 });
 
@@ -88,8 +88,8 @@ export async function PUT(request: Request) {
   const { dateDernieresRegles, dateReferenceMaternite, ...reste } = parsed.data;
   const data = {
     ...reste,
-    ...(dateDernieresRegles !== undefined && { dateDernieresRegles: new Date(dateDernieresRegles) }),
-    ...(dateReferenceMaternite !== undefined && { dateReferenceMaternite: new Date(dateReferenceMaternite) }),
+    ...(dateDernieresRegles !== undefined && { dateDernieresRegles: dateDernieresRegles === null ? null : new Date(dateDernieresRegles) }),
+    ...(dateReferenceMaternite !== undefined && { dateReferenceMaternite: dateReferenceMaternite === null ? null : new Date(dateReferenceMaternite) }),
   };
 
   let profile;
