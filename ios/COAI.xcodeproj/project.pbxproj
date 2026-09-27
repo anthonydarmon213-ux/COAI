@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A00000000000000000000040 = {isa = PBXBuildFile; fileRef = B00000000000000000000040; };
+		A00000000000000000000041 = {isa = PBXBuildFile; fileRef = B00000000000000000000041; };
+		A00000000000000000000042 = {isa = PBXBuildFile; fileRef = B00000000000000000000010; };
+		A00000000000000000000043 = {isa = PBXBuildFile; fileRef = B00000000000000000000011; };
+		A00000000000000000000044 = {isa = PBXBuildFile; fileRef = B00000000000000000000032; };
 		A00000000000000000000032 = {isa = PBXBuildFile; fileRef = B00000000000000000000032; };
 		A00000000000000000000030 = {isa = PBXBuildFile; fileRef = B00000000000000000000030; };
 		A00000000000000000000031 = {isa = PBXBuildFile; fileRef = B00000000000000000000031; };
@@ -23,6 +28,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B00000000000000000000040 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitTests/COAIStoreKitLocalTests.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000041 = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKitTests/COAILocal.storekit; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000042 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = COAIStoreKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000032 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferCache.swift; sourceTree = "<group>"; };
 		B00000000000000000000030 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COAIDownload.swift; sourceTree = "<group>"; };
 		B00000000000000000000031 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadPolicy.swift; sourceTree = "<group>"; };
@@ -58,6 +66,8 @@
 				C00000000000000000000002 /* COAI */,
 				C00000000000000000000004 /* Products */,
 				B00000000000000000000020,
+				B00000000000000000000040,
+				B00000000000000000000041,
 			);
 			sourceTree = "<group>";
 		};
@@ -94,6 +104,7 @@
 			children = (
 				B00000000000000000000007 /* COAI.app */,
 				B00000000000000000000021,
+				B00000000000000000000042,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,6 +112,17 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E00000000000000000000040 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F00000000000000000000040;
+			buildPhases = (D00000000000000000000040,D00000000000000000000021,);
+			buildRules = ();
+			dependencies = (E00000000000000000000021,);
+			name = COAIStoreKitTests;
+			productName = COAIStoreKitTests;
+			productReference = B00000000000000000000042;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E00000000000000000000020 = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F00000000000000000000020;
@@ -161,11 +183,13 @@
 			targets = (
 				E00000000000000000000001 /* COAI */,
 				E00000000000000000000020,
+				E00000000000000000000040,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		D00000000000000000000021 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000041,); runOnlyForDeploymentPostprocessing = 0; };
 		D00000000000000000000003 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -179,6 +203,7 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		D00000000000000000000020 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000020,); runOnlyForDeploymentPostprocessing = 0; };
+		D00000000000000000000040 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000040,A00000000000000000000042,A00000000000000000000043,A00000000000000000000044,); runOnlyForDeploymentPostprocessing = 0; };
 		D00000000000000000000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -199,6 +224,19 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		F20000000000000000000040 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = fr.coai.mobile.storekittests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/COAI.app/COAI";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+			};
+			name = Debug;
+		};
 		F20000000000000000000020 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -277,6 +315,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F00000000000000000000040 = {isa = XCConfigurationList; buildConfigurations = (F20000000000000000000040,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
 		F00000000000000000000020 = {isa = XCConfigurationList; buildConfigurations = (F20000000000000000000020,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
 		F00000000000000000000001 /* Build configuration list for PBXProject "COAI" */ = {
 			isa = XCConfigurationList;

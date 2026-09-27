@@ -1,0 +1,28 @@
+{
+  "identifier": "COAI-LOCAL-QA",
+  "nonRenewingSubscriptions": [],
+  "products": [],
+  "settings": { "_locale": "fr_FR", "_storefront": "FRA", "_timeRate": 0 },
+  "subscriptionGroups": [{
+    "id": "COAI-LOCAL-ESSENTIEL", "localizations": [], "name": "COAI local test only",
+    "subscriptions": [
+      {
+        "adHocOffers": [], "codeOffers": [], "displayPrice": "19.99",
+        "familyShareable": false, "groupNumber": 1, "internalID": "COAI-LOCAL-MONTH",
+        "introductoryOffer": { "displayPrice": "0", "internalID": "COAI-LOCAL-TRIAL-M", "paymentMode": "free", "subscriptionPeriod": "P1W" },
+        "localizations": [{ "description": "Test local sans facturation", "displayName": "Essentiel mensuel — TEST", "locale": "fr_FR" }],
+        "productID": "fr.coai.localtest.essentiel.monthly", "recurringSubscriptionPeriod": "P1M",
+        "referenceName": "Essentiel mensuel TEST", "subscriptionGroupID": "COAI-LOCAL-ESSENTIEL", "type": "RecurringSubscription", "winbackOffers": []
+      },
+      {
+        "adHocOffers": [], "codeOffers": [], "displayPrice": "119.00",
+        "familyShareable": false, "groupNumber": 1, "internalID": "COAI-LOCAL-YEAR",
+        "introductoryOffer": { "displayPrice": "0", "internalID": "COAI-LOCAL-TRIAL-Y", "paymentMode": "free", "subscriptionPeriod": "P1W" },
+        "localizations": [{ "description": "Test local sans facturation", "displayName": "Essentiel annuel — TEST", "locale": "fr_FR" }],
+        "productID": "fr.coai.localtest.essentiel.annual", "recurringSubscriptionPeriod": "P1Y",
+        "referenceName": "Essentiel annuel TEST", "subscriptionGroupID": "COAI-LOCAL-ESSENTIEL", "type": "RecurringSubscription", "winbackOffers": []
+      }
+    ]
+  }],
+  "version": { "major": 4, "minor": 0 }
+}

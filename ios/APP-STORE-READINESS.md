@@ -2,6 +2,22 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 20 h 07 : cinq tests du vrai service `ApplePurchaseService` avec
+StoreKit Xcode local réussis (annulation/attente, serveur indisponible puis
+restauration, mauvais compte refusé, remboursement, invalidation du catalogue
+après erreur). Prix français et essai consommé contrôlés. L’éligibilité se met
+à jour de façon asynchrone ; test borné en attente de cette mise à jour.
+Preuve : `/tmp/coai-storekit-local.zxNzAf/Logs/Test/Test-COAIStoreKitLocal-2026.09.27_20-06-53-+0200.xcresult`.
+Configuration dédiée dans `StoreKitTests`, identifiants `fr.coai.localtest`,
+serveur et droits simulés, aucune facturation. Cela ne valide ni App Store
+Connect, ni signatures reçues par le serveur, ni feuille d’achat UI, ni Sandbox.
+Release arm64 non signée, 51 tests Swift et 65 contrôles cœur revalidés ;
+absence du catalogue/code de test dans Release vérifiée. Exécution documentée
+dans `StoreKitTests/README.md`. Aucun push/déploiement/soumission effectué.
+Non-régression UI réussie : lien d’offre → abonnement natif, fermeture et
+petit écran en texte XXXL ; capture inspectée, liens juridiques empilés et
+accessibles. `Test-COAI-2026.09.27_20-08-36-+0200.xcresult` (deux tests).
+
 Complément 19 h 32 : séance native connectée complète puis relance réussies,
 `Test-COAI-2026.09.27_19-28-38-+0200.xcresult` (66,4 s), compte fictif nettoyé.
 Chat : préservation d’un nouveau brouillon pendant la réponse précédente,

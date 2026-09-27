@@ -20,6 +20,10 @@ plutil -lint ios/COAI/Info.plist ios/COAI.xcodeproj/project.pbxproj
 test -n "$(/usr/libexec/PlistBuddy -c 'Print :NSPhotoLibraryAddUsageDescription' ios/COAI/Info.plist)"
 plutil -lint ios/COAI/PrivacyInfo.xcprivacy
 xmllint --noout ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme
+if rg -q 'StoreKitConfigurationFileReference|COAIDownloadFixture' ios/COAI.xcodeproj/xcshareddata/xcschemes/COAI.xcscheme; then
+    echo "FAIL: normal COAI scheme must not activate the local StoreKit fixture" >&2
+    exit 1
+fi
 
 if [[ "${1:-}" == "--simulator" || "${1:-}" == "--device-release" ]]; then
     if ! xcodebuild -version; then
@@ -36,6 +40,14 @@ if [[ "${1:-}" == "--simulator" || "${1:-}" == "--device-release" ]]; then
         xcrun lipo "$task_app/COAI" -verify_arch arm64
         if rg -a -q 'COAILocalIntegration|http://localhost:3050' "$task_app/COAI"; then
             echo "FAIL: local simulator mode leaked into Release" >&2
+            exit 1
+        fi
+        if rg --files "$task_app" | rg -q '(\.storekit$|StoreKitTests|LocalTesting\.entitlements$)'; then
+            echo "FAIL: local StoreKit test resources leaked into Release" >&2
+            exit 1
+        fi
+        if rg -a -q 'fr\.coai\.localtest|COAIStoreKitLocalTests' "$task_app/COAI"; then
+            echo "FAIL: local StoreKit test code leaked into Release" >&2
             exit 1
         fi
         echo "PASS: unsigned Release built for iPhone arm64 with privacy manifest. NOT signed, installed, archived or App Store validated."
