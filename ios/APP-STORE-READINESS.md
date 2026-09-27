@@ -2,6 +2,17 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 20 h 59 : défaut reproduit puis corrigé sur les demandes simultanées
+de suppression. Avant : une réponse 200 et une fausse erreur 503 après disparition
+du profil. Après : deux réponses 200 sur deux exécutions HTTP locales, absence
+du profil/Auth/photos vérifiée. Suppression SQL bornée à l’id ET l’identité Auth ;
+absence Auth reconnue seulement après confirmation explicite 404/user_not_found.
+Les erreurs réseau, base et identité non confirmée restent bloquantes.
+Parcours natif annulation/export/confirmation/relance réussi sur le build corrigé :
+`/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_20-59-03-+0200.xcresult`.
+Typage, lint et build web réussis. Aucun déploiement ; concurrence avec d’autres
+écritures déjà en vol et abonnements réels restent hors preuve.
+
 Complément 20 h 44 : suppression native connectée réussie sur SE simulateur.
 Annuler conserve l’accès (export réel encore possible), confirmer supprime le
 compte et revient à la connexion, y compris après relance. Avertissement Apple

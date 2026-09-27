@@ -44,6 +44,24 @@ async function main() {
     const created = await admin.storage.createBucket('progress photos', { public: false });
     assert.equal(created.error, null);
   } else assert.equal(existing.public, false);
+  if (process.argv.includes('--concurrent')) {
+    const concurrent = await fixture(2);
+    const results = await Promise.all(concurrent.sessions.map(async session => {
+      const response = await fetch('http://127.0.0.1:3050/api/compte/delete', {
+        method: 'POST', headers: { Authorization: `Bearer ${session.access_token}`, 'x-coai-delete-confirmation': '1' },
+      });
+      return { status: response.status, body: await response.json() };
+    }));
+    console.log('Concurrent deletion responses', JSON.stringify(results));
+    assert(results.some(result => result.status === 200 && result.body.success === true));
+    assert(results.every(result => result.status === 200 || result.status === 401),
+      'A second request must not report a service failure after successful concurrent deletion');
+    assert.equal(await db.user.count({ where: { id: concurrent.user.id } }), 0);
+    assert.equal((await admin.auth.admin.getUserById(concurrent.id)).error?.code, 'user_not_found');
+    assert.deepEqual((await bucket.list(concurrent.id)).data, []);
+    console.log('PASS concurrent local deletion: no false service failure, profile/Auth/photos absent');
+    return;
+  }
   const a = await fixture(101), b = await fixture(1);
   assert.equal((await exportAccount(a)).status, 200);
   assert.equal((await exportAccount(b)).status, 200);

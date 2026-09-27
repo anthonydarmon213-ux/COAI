@@ -69,7 +69,10 @@ export async function POST(request: Request) {
 
   if (user) {
     try {
-      await prisma.user.delete({ where: { id: user.id } });
+      // Another already-authenticated request may have removed this exact
+      // profile after findUnique. A zero-row delete is an idempotent success;
+      // database failures still abort before deleting the Auth identity.
+      await prisma.user.deleteMany({ where: { id: user.id, supabaseAuthId: authUser.id } });
     } catch {
       return NextResponse.json({ error: "La suppression du profil n’a pas pu être confirmée. Certaines données peuvent déjà avoir été effacées. Réessaie ou contacte l’assistance." }, { status: 503 });
     }
@@ -78,8 +81,9 @@ export async function POST(request: Request) {
   try {
     const admin = createSupabaseAdminClient();
     const { data, error } = await admin.auth.admin.deleteUser(authUser.id);
-    if (error) throw new Error("identity_deletion_unconfirmed");
-    if (data.user?.id !== authUser.id) {
+    const alreadyAbsent = error?.status === 404 && error.code === "user_not_found";
+    if (error && !alreadyAbsent) throw new Error("identity_deletion_unconfirmed");
+    if (alreadyAbsent || data.user?.id !== authUser.id) {
       // Some Auth versions return an empty user after a successful hard delete.
       // Confirm absence explicitly; a network failure is never proof of deletion.
       if (data.user?.id) throw new Error("identity_deletion_unconfirmed");

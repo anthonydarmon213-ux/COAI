@@ -37,7 +37,10 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    reçoivent aussi 401 sur les envois avatar/photo de suivi ; un ancien lien
    signé répond « Object not found », aucun objet recréé dans le préfixe.
    Vérifications ajoutées au test HTTP réel local, pas seulement à une doublure.
-   Restent concurrence,
+   Deux suppressions simultanées ont révélé une fausse erreur 503 : corrigée et
+   retestée le 27 septembre à 20 h 59 (deux succès, état final absent). L’absence
+   d’identité doit être confirmée ; une panne n’est jamais assimilée à un succès.
+   Restent concurrence avec d’autres écritures déjà en vol,
    abonnements réels et validation en production. Voir checklist.
 3. L'export de compte (`src/app/api/compte/export/route.ts`) inclut maintenant
    20 relations : profil, abonnement Stripe, programmes, séances, mesures,
