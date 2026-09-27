@@ -2,6 +2,24 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Inscription réelle locale — recontrôle du 27 septembre
+
+`scripts/test-signup-http-local.cjs` passe via le mode `signup-http` du helper
+`/tmp/coai-local-http-0924.cjs`. Le helper vérifie que SMTP pointe vers le
+collecteur Mailpit local et que la confirmation email est obligatoire.
+Le script refuse les URL Auth/DB non locales et les clés non demo.
+Création par signUp (pas création administrateur), email réellement capturé,
+lien confirmé sans suivre la redirection, puis connexion par mot de passe.
+Sans authentification : 401. Sans chacun des consentements : 400 sans compte
+applicatif créé. Un diagnostic fixture récent est repris malgré la casse de
+l'adresse ; un code parrain inexistant ne bloque pas l'inscription.
+Trois répétitions concurrentes après création conservent le prénom et le profil
+modifié. La page bienvenue répond 200 sans redirection. Compte, diagnostic et
+message local supprimés à la fin ; aucun email externe ni paiement.
+Limites : diagnostic préinséré, pas de quiz saisi, pas de callback dans WebKit,
+pas de formulaire iPhone ni de production. Les tests d'interactions simulées
+et de stockage du diagnostic passent également. Code produit inchangé.
+
 ### Fiche coach : contrôle HTTP connecté réel
 
 Le mode `admin-http` du helper local passe sur le build intégrant 311c91d.
