@@ -1574,7 +1574,7 @@ export function DiagnosticQuiz({
                   <button
                     type="button"
                     onClick={restartDiagnostic}
-                    className="font-mono text-[11px] uppercase tracking-[0.12em] text-graphite-500 underline transition hover:text-white"
+                    className="min-h-11 rounded-lg px-3 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-graphite-400 underline transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-laiton-300"
                   >
                     Recommencer à zéro
                   </button>
@@ -2247,7 +2247,7 @@ export function DiagnosticQuiz({
                 {revealIndex === 1 && (
                   <>
                     <p className="font-mono text-xs uppercase tracking-[0.18em] text-laiton-400">
-                      Tes signaux, déjà mesurés
+                      Tes repères, d’après tes réponses
                     </p>
                     <div className="grid grid-cols-3 gap-x-4 gap-y-6">
                       <Gauge label="Entraînement" percent={signauxDiagnostic.entrainement} size={92} color="#ff8a3d" />
@@ -2329,9 +2329,9 @@ export function DiagnosticQuiz({
                   Ton point de départ est clair. Voici la trajectoire.
                 </h2>
                 <div className="coai-analysis-proof" aria-label="Analyse personnalisée terminée">
-                  <span><i />16 dimensions explorées</span>
-                  <span><i />4 capacités physiques évaluées</span>
-                  <span><i />1 trajectoire personnelle</span>
+                  <span><i />Tes réponses analysées</span>
+                  <span><i />Tes priorités identifiées</span>
+                  <span><i />Des pistes adaptées à ton profil</span>
                 </div>
                 {(() => {
                   // L'âge est l'accroche (partageable), le score la preuve.

@@ -18,7 +18,12 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func localSignup(waitForReturn: Bool, finalize: Bool = false) throws {
+    func testLocalNewAccountDiagnosticReachesResult() throws {
+        try localSignup(waitForReturn: true, finalize: true, diagnostic: true)
+    }
+
+    @MainActor
+    private func localSignup(waitForReturn: Bool, finalize: Bool = false, diagnostic: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -93,12 +98,73 @@ final class COAIUITests: XCTestCase {
                 reveal(finish, in: app)
                 finish.tap()
                 XCTAssertTrue(web.otherElements["Bienvenue, Test inscription iPhone."].waitForExistence(timeout: 30))
-                XCTAssertTrue(web.buttons["Faire mon diagnostic"].waitForExistence(timeout: 10))
+                let diagnosticEntry = web.buttons.matching(NSPredicate(format: "label IN %@", ["Faire mon diagnostic", "Continuer mon diagnostic"])).firstMatch
+                XCTAssertTrue(diagnosticEntry.waitForExistence(timeout: 10))
                 XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
                 let welcome = XCTAttachment(screenshot: app.screenshot())
                 welcome.name = "Inscription complète — accueil réel"
                 welcome.lifetime = .keepAlways
                 add(welcome)
+                if diagnostic {
+                    func tap(_ element: XCUIElement) {
+                        XCTAssertTrue(element.waitForExistence(timeout: 15))
+                        if app.keyboards.firstMatch.exists {
+                            reveal(element, in: app)
+                        } else {
+                            for _ in 0..<40 {
+                                if element.isHittable { break }
+                                let above = element.frame.midY < app.frame.midY
+                                app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.45 : 0.65))
+                                    .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.65 : 0.45)))
+                            }
+                            XCTAssertTrue(element.isHittable)
+                        }
+                        element.tap()
+                    }
+                    func choice(_ label: String) {
+                        let element = web.switches.matching(NSPredicate(format: "label BEGINSWITH %@", label)).firstMatch
+                        tap(element)
+                        XCTAssertEqual(element.value as? String, "1")
+                    }
+                    func next() { tap(web.buttons["Continuer"]) }
+                    tap(diagnosticEntry)
+                    let restart = web.buttons.matching(NSPredicate(format: "label ==[c] %@", "Recommencer à zéro")).firstMatch
+                    if restart.waitForExistence(timeout: 2) {
+                        tap(restart)
+                    } else {
+                        tap(web.buttons["Commencer mon bilan offert"])
+                    }
+                    // A real navigation interruption must expose the saved draft.
+                    XCTAssertTrue(web.switches["Homme"].waitForExistence(timeout: 15))
+                    app.buttons["Page précédente"].tap()
+                    tap(diagnosticEntry)
+                    XCTAssertTrue(restart.waitForExistence(timeout: 15))
+                    XCTAssertGreaterThanOrEqual(restart.frame.height, 44)
+                    tap(restart)
+                    choice("Homme")
+                    for (label, value) in [("ÂGE", "35"), ("TAILLE (CM)", "178"), ("POIDS (KG)", "75")] {
+                        let field = web.textFields[label]
+                        tap(field)
+                        field.typeText(value)
+                    }
+                    next()
+                    for label in ["Journée mixte : assis et debout", "Débutant", "Prendre du muscle", "Salle de sport complète", "Salle de sport", "45 minutes", "3 fois par semaine", "Repas structurés et équilibrés", "Bonne (7-8h, plutôt réparateur)"] {
+                        choice(label)
+                        next()
+                        if label == "3 fois par semaine" { tap(web.buttons["Continuer mon bilan"]) }
+                    }
+                    choice("Aucune, je suis en pleine forme")
+                    tap(web.buttons["Voir mon diagnostic →"])
+                    tap(web.buttons["Voir mon bilan complet →"])
+                    XCTAssertTrue(web.buttons["Générer mon programme"].waitForExistence(timeout: 15))
+                    XCTAssertTrue(web.staticTexts["Tes réponses analysées"].exists)
+                    XCTAssertFalse(web.staticTexts["4 capacités physiques évaluées"].exists)
+                    XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+                    let result = XCTAttachment(screenshot: app.screenshot())
+                    result.name = "Diagnostic réel — compte neuf"
+                    result.lifetime = .keepAlways
+                    add(result)
+                }
             }
         }
     }

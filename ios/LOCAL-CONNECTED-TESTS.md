@@ -2,6 +2,35 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Diagnostic natif depuis un compte neuf — 27 septembre, 15 h 57
+
+`testLocalNewAccountDiagnosticReachesResult` passe : inscription réelle,
+email local et retour OS, consentements, accueil, diagnostic, interruption
+par Retour natif, réouverture du brouillon, Recommencer à zéro puis toutes
+les questions du parcours homme sans contrainte et affichage du bilan.
+Âge/taille/poids saisis au clavier ; choix explicitement validés ; écran
+explicatif après fréquence inclus. Le test finit avant Générer mon programme :
+il ne prouve PAS la sauvegarde du bilan dans Profile ni l'accès au programme.
+La progression de diagnostic persistait entre essais : le test utilise le
+bouton public de remise à zéro, pas une injection/suppression de localStorage.
+
+Défauts corrigés : cible Recommencer à zéro mesurée à 19 points, maintenant
+au moins 44 points (assertion native) ; anciennes mentions « 16 dimensions »
+et « 4 capacités physiques évaluées » supprimées, car les capacités ne sont
+plus demandées par le parcours actuel. Aucun résultat médical inventé :
+formulations fondées sur les réponses déclarées. Pas de modification du score.
+Preuve finale : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_15-55-38-+0200.xcresult`,
+un test zéro échec en 127 secondes. Captures `/tmp/coai-diagnostic-final-proof-0927`.
+Coordination email : `/tmp/coai-wait-email-ios-0927.cjs` attend le marqueur du
+test dans un journal neuf puis ouvre le seul email local ; délai borné.
+Comptes/sessions/email jetables nettoyés. Aucun fournisseur payant configuré.
+Types/lint (0 erreur, 6 avertissements)/build local passent, 50 tests Swift,
+navigation/progression/stockage/cadence/recommandation diagnostic verts ;
+concurrence résultat testée sur PostgreSQL local avec email simulé. 356 médias présents.
+À poursuivre : sauvegarde du profil puis accès programme, parcours femme et
+contraintes, iPhone physique/production. En-tête marketing encore présent dans
+le diagnostic natif : cohérence visuelle à améliorer. Aucun déploiement.
+
 ### Inscription complète par l'interface iPhone — 27 septembre, 15 h 13
 
 `testLocalSignupConsentCreatesAccount` passe en 46 secondes : inscription,
