@@ -136,17 +136,29 @@ final class COAIUITests: XCTestCase {
                     }
                     // A real navigation interruption must expose the saved draft.
                     XCTAssertTrue(web.switches["Homme"].waitForExistence(timeout: 15))
+                    let marketingHidden = XCTNSPredicateExpectation(
+                        predicate: NSPredicate { _, _ in !web.buttons["EXPLORER"].exists }, object: nil)
+                    XCTAssertEqual(XCTWaiter.wait(for: [marketingHidden], timeout: 5), .completed,
+                                   "The loaded diagnostic must use native navigation, not duplicate the site menu")
                     app.buttons["Page précédente"].tap()
                     tap(diagnosticEntry)
                     XCTAssertTrue(restart.waitForExistence(timeout: 15))
                     XCTAssertGreaterThanOrEqual(restart.frame.height, 44)
                     tap(restart)
                     choice("Homme")
-                    for (label, value) in [("ÂGE", "35"), ("TAILLE (CM)", "178"), ("POIDS (KG)", "75")] {
+                    for (label, value) in [("ÂGE", "121"), ("TAILLE (CM)", "178"), ("POIDS (KG)", "75")] {
                         let field = web.textFields[label]
                         tap(field)
                         field.typeText(value)
+                        if label == "ÂGE" {
+                            XCTAssertEqual(field.value as? String, "121")
+                            XCTAssertTrue(web.staticTexts["Indique un âge entier entre 1 et 120 ans."].waitForExistence(timeout: 5))
+                            XCTAssertFalse(web.buttons["Continuer"].isEnabled)
+                            field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 3) + "35")
+                            XCTAssertEqual(field.value as? String, "35")
+                        }
                     }
+                    XCTAssertTrue(web.buttons["Continuer"].isEnabled)
                     next()
                     for label in ["Journée mixte : assis et debout", "Débutant", "Prendre du muscle", "Salle de sport complète", "Salle de sport", "45 minutes", "3 fois par semaine", "Repas structurés et équilibrés", "Bonne (7-8h, plutôt réparateur)"] {
                         choice(label)
@@ -163,6 +175,8 @@ final class COAIUITests: XCTestCase {
                     tap(web.buttons["Générer mon programme"])
                     XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
                     XCTAssertTrue(web.staticTexts["Choisis ton accompagnement COAI pour accéder à ton programme."].exists)
+                    XCTAssertFalse(web.links["Programme musculation IA"].exists,
+                                   "Marketing footer must not distract from the diagnostic next step")
                     XCTAssertFalse(web.buttons["Commencer ma première séance"].exists,
                                    "A new unpaid account must not receive invented programme access")
                     let result = XCTAttachment(screenshot: app.screenshot())

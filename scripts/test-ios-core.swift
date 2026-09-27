@@ -32,7 +32,7 @@ struct IOSCoreChecks {
         }
         let cosmetic = rules.filter { ($0["action"] as? [String: Any])?["type"] as? String == "css-display-none" }
         check(cosmetic.count == 1, "one scoped native navigation cosmetic rule")
-        check((cosmetic[0]["action"] as? [String: Any])?["selector"] as? String == "aside.coai-app-nav, nav.coai-pillar-switcher", "only duplicated navigation hidden")
+        check((cosmetic[0]["action"] as? [String: Any])?["selector"] as? String == "aside.coai-app-nav, nav.coai-pillar-switcher, .coai-site-shell:has(.coai-diagnostic-page) > header.coai-public-header, .coai-site-shell:has(.coai-diagnostic-page) > footer.coai-marketing-footer", "only duplicated navigation and diagnostic marketing chrome hidden")
         let cosmeticTrigger = cosmetic[0]["trigger"] as! [String: Any]
         let cosmeticExpression = try NSRegularExpression(pattern: cosmeticTrigger["url-filter"] as! String, options: [.caseInsensitive])
         for value in ["https://coai.fr/programme/entrainement", "https://www.coai.fr/compte/profil"] {

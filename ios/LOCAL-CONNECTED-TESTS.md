@@ -2,6 +2,30 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Diagnostic natif allégé et saisies contrôlées — 27 septembre, 16 h 52
+
+Suppression ciblée du header/footer marketing uniquement lorsque le diagnostic
+est présent dans l'app : règle cosmétique WebKit, aucun changement du site web,
+des autres pages, des liens légaux dans les formulaires ou des accès.
+Contrôle du menu après chargement réel, footer absent, capture inspectée :
+`/tmp/coai-diagnostic-chrome-proof-0927/617B3B39-F68D-4B57-8AEB-39FF459F2F43.png`.
+
+Âge entier, taille et poids contrôlés dès saisie selon les limites de stockage
+de /api/profil (pas une évaluation médicale). Clavier décimal pour taille/poids,
+erreurs accessibles, bouton Continuer désactivé si valeur invalide.
+Test natif final : saisie 121 → erreur → correction 35 → questions → résultat →
+profil enregistré → choix d'offre. Vérification indépendante du Profile confirme
+35 ans et les autres réponses. Nettoyage exact de la fixture effectué.
+`/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_16-48-49-+0200.xcresult` :
+1 test, 0 échec, 191 secondes. Les essais échoués de synchronisation/navigation
+et de placement du curseur du robot ne sont pas comptés comme validation.
+Tests purs des valeurs numériques, sauvegarde, navigation, accès passent.
+Types/lint (6 avertissements existants), build web local, 50 tests Swift,
+65 contrôles core, compilation WebKit et build Release iPhone non signé passent.
+Release vérifiée sans drapeau/origine locale ; 356 références médias présentes.
+NON PUBLIÉ / non validé en production. iPhone 13 Pro détecté mais non appairé,
+DDI indisponible ; seule identité Apple Development disponible à 16 h 49.
+
 ### Diagnostic enregistré — 27 septembre, 16 h 22
 
 Le même test natif va désormais jusqu'à « Générer mon programme » : le compte

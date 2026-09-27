@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { SectionLabel } from "@/components/ui/section-label";
 import { storeDiagnosticAnswers } from "@/lib/diagnostic/storage";
+import { physicalInputErrors } from "@/lib/diagnostic/physical-inputs";
 import {
   clearDiagnosticProgress,
   readDiagnosticProgress,
@@ -1116,7 +1117,8 @@ export function DiagnosticQuiz({
     if (step === "duree") return Boolean(duree);
     if (step === "frequence") return Boolean(frequence);
     if (step === "santeFeminine") return true; // entièrement facultatif, opt-in
-    if (step === "profilPhysique") return Boolean(sexe && age && tailleCm && poidsKg);
+    if (step === "profilPhysique") return Boolean(sexe && age.trim() && tailleCm.trim() && poidsKg.trim())
+      && !Object.values(physicalInputErrors(age, tailleCm, poidsKg)).some(Boolean);
     if (step === "alimentation") return Boolean(habitudesAlimentaires);
     if (step === "sommeil") return Boolean(qualiteSommeil);
     if (step === "sante") return true; // peut n'avoir rien à signaler
@@ -1996,12 +1998,15 @@ export function DiagnosticQuiz({
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <Field label="Âge">
-                  <Input type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} />
+                  <Input type="number" inputMode="numeric" min={1} max={120} step={1} value={age} onChange={(e) => setAge(e.target.value)}
+                    aria-invalid={Boolean(physicalInputErrors(age, tailleCm, poidsKg).age)} aria-describedby="diagnostic-physical-errors" />
                 </Field>
                 <Field label="Taille (cm)">
                   <Input
                     type="number"
-                    inputMode="numeric"
+                    inputMode="decimal"
+                    min={0} max={300} step="any"
+                    aria-invalid={Boolean(physicalInputErrors(age, tailleCm, poidsKg).height)} aria-describedby="diagnostic-physical-errors"
                     value={tailleCm}
                     onChange={(e) => setTailleCm(e.target.value)}
                   />
@@ -2009,11 +2014,16 @@ export function DiagnosticQuiz({
                 <Field label="Poids (kg)">
                   <Input
                     type="number"
-                    inputMode="numeric"
+                    inputMode="decimal"
+                    min={0} max={400} step="any"
+                    aria-invalid={Boolean(physicalInputErrors(age, tailleCm, poidsKg).weight)} aria-describedby="diagnostic-physical-errors"
                     value={poidsKg}
                     onChange={(e) => setPoidsKg(e.target.value)}
                   />
                 </Field>
+              </div>
+              <div id="diagnostic-physical-errors" aria-live="polite" className="text-sm text-laiton-200">
+                {Object.entries(physicalInputErrors(age, tailleCm, poidsKg)).map(([key, message]) => message && <p key={key}>{message}</p>)}
               </div>
             </div>
           )}
