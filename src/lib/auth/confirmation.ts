@@ -13,7 +13,11 @@ export function authLinkIssue(search: string, hash = ""): AuthLinkIssue | null {
   return fragment.has("error") || query.has("error") ? "link" : null;
 }
 
-export function confirmationCallback(origin: string, returnTo?: string | null): string {
+export function confirmationCallback(origin: string, returnTo?: string | null, userAgent = ""): string {
+  // Routing hint only, never authorization. Native exchange still requires PKCE.
+  if (/(?:^|\s)COAIiOS\/\d+(?:\s|$)/.test(userAgent)) {
+    return new URL("/auth/ios-confirmation", origin).toString();
+  }
   const callback = new URL("/auth/callback", origin);
   callback.searchParams.set("redirect_to", sanitizeReturnTo(returnTo) ?? "/bienvenue");
   return callback.toString();

@@ -52,7 +52,7 @@ export function ConfirmationEmail({ initialEmail = "", returnTo, initialCooldown
       const { error: sendError } = await createSupabaseBrowserClient().auth.resend({
         type: "signup",
         email: email.trim(),
-        options: { emailRedirectTo: confirmationCallback(window.location.origin, returnTo) },
+        options: { emailRedirectTo: confirmationCallback(window.location.origin, returnTo, window.navigator?.userAgent) },
       });
       if (sendError) throw sendError;
       // Réponse volontairement neutre : ne révèle pas l'existence d'un compte.

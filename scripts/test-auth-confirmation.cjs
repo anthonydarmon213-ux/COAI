@@ -30,6 +30,8 @@ for(const [search,hash,expected] of [
   ['?error_description=arbitrary','','null']
 ]) assert.equal(String(helpers.authLinkIssue(search,hash)),expected);
 assert.equal(new URL(helpers.confirmationCallback('http://localhost:3050','/bienvenue?source=diagnostic')).searchParams.get('redirect_to'),'/bienvenue?source=diagnostic');
+assert.equal(helpers.confirmationCallback('https://coai.fr','/admin','Mozilla COAIiOS/1'),'https://coai.fr/auth/ios-confirmation');
+assert.equal(new URL(helpers.confirmationCallback('https://coai.fr','/bienvenue','NotCOAIiOS/1')).pathname,'/auth/callback');
 for(const target of ['https://evil.test','//evil.test','/\\evil.test']) {
   assert.equal(new URL(helpers.confirmationCallback('http://localhost:3050',target)).searchParams.get('redirect_to'),'/bienvenue');
   assert.equal(helpers.authFailureDestination('http://localhost:3050',target,'otp_expired').searchParams.has('redirect_to'),false);

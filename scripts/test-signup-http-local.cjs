@@ -14,6 +14,7 @@ const origin = 'http://localhost:3050';
 const mailOrigin = 'http://127.0.0.1:54324';
 const email = `coai-signup-${randomUUID()}@example.test`;
 const password = randomUUID() + 'Aa1!';
+const nativePage = process.argv.includes('--native-page');
 const db = new PrismaClient();
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY,
   { auth: { persistSession: false, autoRefreshToken: false } });
@@ -32,7 +33,7 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
   try {
     const signed = await client.auth.signUp({ email, password, options: {
       data: { given_name: 'Test inscription' },
-      emailRedirectTo: origin + '/auth/callback?redirect_to=%2Fbienvenue',
+      emailRedirectTo: origin + (nativePage ? '/auth/ios-confirmation' : '/auth/callback?redirect_to=%2Fbienvenue'),
     } });
     assert.equal(signed.error, null); assert(signed.data.user); authId = signed.data.user.id;
     assert.equal(signed.data.session, null, 'Email confirmation required');
@@ -53,7 +54,18 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
     const verified = await fetch(url, { redirect: 'manual' });
     assert.equal(verified.status, 303);
     assert(!new URL(verified.headers.get('location')).hash.includes('error'));
-    const callback = new URL(verified.headers.get('location'));
+    let callback = new URL(verified.headers.get('location'));
+    if(nativePage) {
+      assert.equal(callback.origin,origin); assert.equal(callback.pathname,'/auth/ios-confirmation');
+      const landing=await fetch(callback,{redirect:'manual'}); assert.equal(landing.status,200);
+      const html=await landing.text();
+      const deepLink=html.match(/href="(fr\.coai\.mobile:\/\/auth\/email-confirmation\?code=[A-Za-z0-9_-]+)"/);
+      assert(deepLink); assert.equal(landing.headers.get('set-cookie'),null);
+      assert.equal(landing.headers.get('referrer-policy'),'no-referrer');
+      callback=new URL('/auth/callback',origin);
+      callback.searchParams.set('code',new URL(deepLink[1]).searchParams.get('code'));
+      callback.searchParams.set('redirect_to','/bienvenue');
+    }
     assert.equal(callback.origin, origin); assert.equal(callback.pathname, '/auth/callback');
     assert(callback.searchParams.get('code'));
     const missingVerifier = process.argv.includes('--missing-verifier');

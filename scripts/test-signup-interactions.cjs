@@ -23,6 +23,7 @@ function setup() {
     'next/navigation':{useSearchParams:()=>new URLSearchParams(query)},
     'next/link':{default:'a'},
     '@/lib/diagnostic/storage':{readDiagnosticSignupEmail:()=>stored},
+    '@/lib/auth/confirmation':{confirmationCallback:origin=>origin+'/auth/callback?redirect_to=%2Fbienvenue'},
     '@/lib/auth/client':{createSupabaseBrowserClient:()=>({auth:{signUp:()=>{calls++;return new Promise((resolve,reject)=>{settle=resolve;rejectRequest=reject;});}}})},
     '@/lib/parrainage/cookie':{storeParrainageCookie(){}},
     '@/lib/checkout/intended-plan-cookie':{storeIntendedPlanCookie(){}},

@@ -2,6 +2,25 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Raccordement email → page de retour iOS — 27 septembre
+
+Inscription et renvoi utilisent maintenant confirmationCallback avec le
+user-agent COAIiOS : destination /auth/ios-confirmation, sans changer le site.
+La page autonome propose un lien explicite fr.coai.mobile vers le handler natif,
+sans consommer le code. Aucun script, tracker ou cookie de session ; no-store,
+no-referrer, noindex et CSP restrictive. Codes dupliqués/injectés ou paramètres
+supplémentaires refusés avec une page de récupération. Destination fixe.
+Revue React : lecture du user-agent uniquement dans l'événement, pas de nouveau
+state/listener ni différence de rendu serveur/client. Route dédiée suivant
+les consignes Next.js, sans shell marketing ni échange Auth côté navigateur.
+Tests ios-email-return/auth-confirmation/signup-interactions verts. Types,
+lint (0 erreur/6 avertissements), build local passent. `signup-http --native-page`
+et variante --missing-verifier passent avec de vrais emails locaux et le vrai
+callback serveur ; comptes/emails nettoyés. Ceci simule encore le transfert
+du code entre page et callback : ouverture OS iPhone non couverte, ni production.
+Avant publication, contrôler la liste des redirect URLs Supabase pour cette
+nouvelle destination ; aucun paramètre du projet distant n'a été modifié.
+
 ### Réception native des liens email — implémentation partielle du 27 septembre
 
 Le handler SwiftUI onOpenURL accepte désormais uniquement

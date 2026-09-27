@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/auth/client";
+import { confirmationCallback } from "@/lib/auth/confirmation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -123,11 +124,7 @@ export default function SignUpPage() {
         password,
         options: {
           data: prenom ? { given_name: prenom } : undefined,
-          emailRedirectTo: (() => {
-            const callbackUrl = new URL("/auth/callback", window.location.origin);
-            callbackUrl.searchParams.set("redirect_to", destinationApresInscription);
-            return callbackUrl.toString();
-          })(),
+          emailRedirectTo: confirmationCallback(window.location.origin, destinationApresInscription, window.navigator?.userAgent),
         },
       });
       if (signUpError) throw signUpError;
