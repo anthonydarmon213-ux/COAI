@@ -51,7 +51,7 @@ export default async function ProfilPage(
         <p className="max-w-2xl text-sm leading-6 text-graphite-400">
           {enOnboarding
             ? "Ton diagnostic nous a donné les bases. Complète maintenant les quelques informations qui permettront à COAI de construire un programme vraiment précis."
-            : "Ces informations nourrissent votre programme IA — entraînement, alimentation, récupération — relu et validé par votre coach."}
+            : "Ces informations aident COAI à personnaliser ton accompagnement : entraînement, alimentation et récupération. La relecture par le coach est indiquée sur ton programme lorsqu’elle a été effectuée."}
         </p>
       </div>
 
@@ -61,7 +61,7 @@ export default async function ProfilPage(
       <div className="flex flex-col gap-3">
         <Link
           href="/programme"
-          className="flex items-center justify-between gap-4 rounded-2xl border border-laiton-400/30 bg-laiton-400/[0.08] px-6 py-5 transition hover:border-laiton-400/50 hover:bg-laiton-400/[0.12]"
+          className="flex flex-col items-start gap-4 rounded-2xl border border-laiton-400/30 bg-laiton-400/[0.08] px-6 py-5 transition hover:border-laiton-400/50 hover:bg-laiton-400/[0.12] sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex flex-col gap-1">
             <SectionLabel>Ton programme</SectionLabel>

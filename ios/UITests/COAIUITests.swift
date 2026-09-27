@@ -275,6 +275,41 @@ final class COAIUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
     }
 
+    @MainActor
+    func testLocalProfileProgrammeLinkFitsSmallScreen() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        // This read-only layout test may reuse the disposable local session.
+        if email.waitForExistence(timeout: 5) {
+            email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+            let password = web.secureTextFields["MOT DE PASSE"]
+            reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+            let submit = web.buttons["Se connecter"]
+            reveal(submit, in: app); submit.tap()
+            XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        }
+        app.buttons["native-tab-Explorer"].tap()
+        let profile = app.buttons["explore-/compte/profil"]
+        reveal(profile, in: app); profile.tap()
+        let explanation = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "lorsqu’elle a été effectuée")).firstMatch
+        XCTAssertTrue(explanation.waitForExistence(timeout: 20))
+        let programme = web.links.matching(NSPredicate(format: "label CONTAINS[c] %@", "Voir mon programme")).firstMatch
+        reveal(programme, in: app)
+        XCTAssertTrue(programme.isHittable)
+        XCTAssertGreaterThanOrEqual(programme.frame.minX, web.frame.minX)
+        XCTAssertLessThanOrEqual(programme.frame.maxX, web.frame.maxX + 1)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Profil — accès programme sur petit écran"
+        proof.lifetime = .keepAlways; add(proof)
+        programme.tap()
+        XCTAssertFalse(app.staticTexts["Page indisponible"].waitForExistence(timeout: 3))
+    }
+
     /// Real local programmes containing interrupted list entries, not injected HTML.
     @MainActor
     func testLocalIncompletePillarsPreserveAvailableContent() throws {

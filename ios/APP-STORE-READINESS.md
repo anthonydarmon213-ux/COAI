@@ -2,6 +2,17 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 21 h 45 : profil corrigé sans promesse automatique de relecture du
+coach ; carte programme empilée sur petit écran. Capture SE inspectée : texte
+lisible et bouton contenu dans sa carte. Test natif connecté local réussi en
+16,5 secondes après correction du sélecteur insensible à la casse et redémarrage
+du simulateur (l'exécution précédente attendait les animations pendant 60 s).
+Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_21-44-46-+0200.xcresult`.
+Typage, lint sans erreur, build web et 356 références médias présents vérifiés.
+L'API avatar n'est appelée par aucun composant de l'interface actuelle : les tests
+HTTP ne prouvent pas une fonction de changement d'avatar utilisable par un membre.
+Pas de déploiement ni validation physique pour ces changements.
+
 Complément 21 h 20 : les deux parcours Photos (autorisation d'ajout limitée et
 refus) réussissent sur simulateur SE ; retour à l'app toujours utilisable.
 Le fichier IMG_0013.PNG du stockage Photos du simulateur est comparé octet par
