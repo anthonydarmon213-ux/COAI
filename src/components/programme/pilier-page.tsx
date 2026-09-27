@@ -25,38 +25,8 @@ import { AccessRecovery } from "@/components/auth/access-recovery";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
-import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 import type { CSSProperties } from "react";
-
-// Traverse le JSON d'un programme généré (structure non garantie — contenu
-// IA, différente par pilier) pour en extraire tous les "photoQuery" que
-// l'IA a déjà générés à sa charge (un par exercice/repas, un par séance/
-// jour via "photoQuerySeance"/"photoQueryJour" — cf. les prompts
-// programme-*-session.ts / *-jour.ts) — jamais de requête inventée ici,
-// uniquement celles déjà présentes dans le contenu généré, où qu'elles
-// soient dans l'arborescence.
-const CLES_PHOTO_QUERY = new Set(["photoQuery", "photoQuerySeance", "photoQueryJour"]);
-
-function extractPhotoQueries(contenu: unknown): string[] {
-  const queries = new Set<string>();
-  function walk(node: unknown) {
-    if (Array.isArray(node)) {
-      for (const item of node) walk(item);
-      return;
-    }
-    if (typeof node !== "object" || node === null) return;
-    for (const [key, value] of Object.entries(node)) {
-      if (CLES_PHOTO_QUERY.has(key) && typeof value === "string" && value.trim()) {
-        queries.add(value);
-      } else {
-        walk(value);
-      }
-    }
-  }
-  walk(contenu);
-  return Array.from(queries);
-}
 
 function estSocleCoai(contenu: unknown): boolean {
   return typeof contenu === "object" && contenu !== null && !Array.isArray(contenu) &&
@@ -147,20 +117,11 @@ export async function PilierPage({
       )
     : null;
 
-  // Photos Pexels (19/08/2026, demande Anthony, étendu aux 3 piliers) :
-  // résolues une seule fois ici (Server Component, clé jamais exposée au
-  // client) à partir des "photoQuery"/"photoQuerySeance"/"photoQueryJour"
-  // que l'IA génère elle-même dans le contenu (cf. extractPhotoQueries).
+  // Les vues utilisent la médiathèque COAI, y compris pour les anciens
+  // programmes : aucune recherche de photo externe ne doit retarder le rendu.
   const contenusAffiches = PILIERS.map((_, index) =>
     valides[index]?.contenu ??
     (PILIERS[index] === "ENTRAINEMENT" ? accessibleTraining(null, derniers[index] ?? null)?.contenu : derniers[index]?.statut === "GENERE_IA" ? derniers[index]?.contenu : null)
-  );
-  const photosParPilier = await Promise.all(
-    contenusAffiches.map((contenu, index) =>
-      PILIERS[index] !== "ENTRAINEMENT" && index === indexPilierActif && contenu && !estSocleCoai(contenu)
-        ? getStockPhotos(extractPhotoQueries(contenu))
-        : Promise.resolve(undefined)
-    )
   );
   const recupHero = user.profile?.sexe?.toLowerCase() === "homme"
     ? "/recuperation/sauna-homme-blond-premium.jpg"
@@ -427,9 +388,9 @@ export async function PilierPage({
               {(() => {
                 const contenu = affiche?.contenu ?? null;
                 if (!contenu) return <p className="text-sm text-graphite-400">Pas encore généré.</p>;
-                if (pilier === "ENTRAINEMENT") return <EntrainementView userId={user.id} data={contenu} photosParExercice={photosParPilier[i]} dureeProfil={user.profile?.dureeSeanceMinutes} premiereSeance={premiereSeance} />;
-                if (pilier === "NUTRITION") return <NutritionView data={contenu} photosParExercice={photosParPilier[i]} />;
-                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} photosParExercice={photosParPilier[i]} sexe={user.profile?.sexe} />;
+                if (pilier === "ENTRAINEMENT") return <EntrainementView userId={user.id} data={contenu} dureeProfil={user.profile?.dureeSeanceMinutes} premiereSeance={premiereSeance} />;
+                if (pilier === "NUTRITION") return <NutritionView data={contenu} />;
+                if (pilier === "RECUPERATION") return <RecuperationView data={contenu} sexe={user.profile?.sexe} />;
                 return <JsonView data={contenu} typeMedia={TYPE_MEDIA[pilier]} />;
               })()}
 
@@ -440,7 +401,7 @@ export async function PilierPage({
                 </Link>
               )}
               {pilier === "RECUPERATION" && (
-                <Link href="/programme/programmes-prets" className="self-start text-sm font-semibold text-laiton-400 underline">
+                <Link href="/programme/programmes-prets?categorie=RECUPERATION" className="self-start text-sm font-semibold text-laiton-400 underline">
                   Sommeil, respiration, méditation, sauna & massage →
                 </Link>
               )}
