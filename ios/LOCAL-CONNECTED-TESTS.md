@@ -2,6 +2,27 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Droits du diagnostic alignés — 27 septembre, 17 h 02
+
+La page utilise désormais contentAccessFor comme l'API de préparation : Stripe,
+Apple (selon le rollout existant) et accès historiques. Seulement deux booléens
+passent au composant client, aucun reçu ni détail d'abonnement. Lectures serveur
+indépendantes en parallèle. En cas de vérification Apple indisponible sans autre
+droit, pas de recommandation de rachat ni de lien commercial de bas de bilan.
+Le compte neuf lit « Enregistrer et continuer » et sait avant le clic qu'une
+offre est nécessaire. Aucun prix, droit, activation Apple ou paiement modifié.
+
+10 cas de la vraie page serveur testés avec dépendances simulées ; politique
+d'accès testée séparément (24 combinaisons de configuration/panne). Ce n'est
+PAS une validation d'achat ou de restauration Apple réelle.
+Parcours natif final compte neuf → diagnostic → saisie invalide/correction →
+« Enregistrer et continuer » → profil vérifié en base → lien de choix d'offre :
+`/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_16-59-01-+0200.xcresult`,
+1 test zéro échec, 200 secondes. Fixture et email nettoyés.
+Types/lint/build local et 356 références médias passent. Non publié.
+À poursuivre : parcours abonné réel, profils supplémentaires, première séance
+depuis diagnostic neuf, Mail/app froide, appareil physique et production.
+
 ### Diagnostic natif allégé et saisies contrôlées — 27 septembre, 16 h 52
 
 Suppression ciblée du header/footer marketing uniquement lorsque le diagnostic

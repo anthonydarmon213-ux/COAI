@@ -3,6 +3,7 @@ import { BackLink } from "@/components/marketing/back-link";
 import { DiagnosticQuiz, type PilierPhotos } from "@/components/marketing/diagnostic-quiz";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { contentAccessFor } from "@/lib/subscription/content-access";
 import { Card } from "@/components/ui/card";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 // Visuels éditoriaux COAI : stables, rapides et cohérents avec la marque.
@@ -45,9 +46,13 @@ export default async function DiagnosticPage(
   // (génération automatique) — un abonné existant qui reprend le
   // diagnostic pour ajuster son profil garde le geste explicite habituel
   // ("Mettre à jour mon profil", régénération jamais silencieuse).
-  const dejaUnProgramme = user
-    ? Boolean(await prisma.programmeGenerated.findFirst({ where: { userId: user.id }, select: { id: true } }))
-    : false;
+  const [programme, access] = user
+    ? await Promise.all([
+        prisma.programmeGenerated.findFirst({ where: { userId: user.id }, select: { id: true } }),
+        contentAccessFor(user),
+      ])
+    : [null, null];
+  const dejaUnProgramme = Boolean(programme);
   const inviteParUnMembre = !user && searchParams?.utm_source === "parrainage";
   const scorePartage = Number(searchParams?.challenge_score);
   const scoreDefi = Number.isInteger(scorePartage) && scorePartage >= 0 && scorePartage <= 100
@@ -76,7 +81,7 @@ export default async function DiagnosticPage(
         </Card>
       )}
       <div className="relative z-10 w-full">
-        <DiagnosticQuiz connecte={!!user} abonnementActif={user?.subscription?.status === "ACTIVE"} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
+        <DiagnosticQuiz connecte={!!user} accesProgrammeActif={access?.programme ?? false} verificationAccesIndisponible={Boolean(access?.appleUnavailable && !access.programme)} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
       </div>
     </main>
   );

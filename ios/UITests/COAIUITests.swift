@@ -168,11 +168,11 @@ final class COAIUITests: XCTestCase {
                     choice("Aucune, je suis en pleine forme")
                     tap(web.buttons["Voir mon diagnostic →"])
                     tap(web.buttons["Voir mon bilan complet →"])
-                    XCTAssertTrue(web.buttons["Générer mon programme"].waitForExistence(timeout: 15))
+                    XCTAssertTrue(web.buttons["Enregistrer et continuer"].waitForExistence(timeout: 15))
                     XCTAssertTrue(web.staticTexts["Tes réponses analysées"].exists)
                     XCTAssertFalse(web.staticTexts["4 capacités physiques évaluées"].exists)
                     XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
-                    tap(web.buttons["Générer mon programme"])
+                    tap(web.buttons["Enregistrer et continuer"])
                     XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
                     XCTAssertTrue(web.staticTexts["Choisis ton accompagnement COAI pour accéder à ton programme."].exists)
                     XCTAssertFalse(web.links["Programme musculation IA"].exists,

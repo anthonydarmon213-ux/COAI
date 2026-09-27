@@ -601,10 +601,11 @@ const PILIER_PHOTOS_VIDE: PilierPhotos = {
 
 export function DiagnosticQuiz({
   connecte = false,
-  abonnementActif = false,
+  accesProgrammeActif = false,
+  verificationAccesIndisponible = false,
   aDejaUnProgramme = false,
   pilierPhotos = PILIER_PHOTOS_VIDE,
-}: { connecte?: boolean; abonnementActif?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
+}: { connecte?: boolean; accesProgrammeActif?: boolean; verificationAccesIndisponible?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
   const [analyseIndex, setAnalyseIndex] = useState(0);
   const [analyseProgress, setAnalyseProgress] = useState(0);
@@ -2420,13 +2421,18 @@ export function DiagnosticQuiz({
 
               {/* Après avoir montré le fonctionnement concret, le bilan
                   débouche sur une seule formule expliquée par les réponses. */}
-              {abonnementActif ? (
+              {accesProgrammeActif ? (
                 <section className="w-full rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-6 text-center" aria-label="La suite de ton bilan">
-                  <SectionLabel>Ton accompagnement est déjà actif</SectionLabel>
+                  <SectionLabel>Ton accès au programme est déjà actif</SectionLabel>
                   <p className="mt-3 text-sm text-graphite-300">Pas besoin de souscrire à nouveau. Utilise ce bilan dans ton espace COAI.</p>
                   <a href="#appliquer-mon-bilan" className="mt-4 inline-flex rounded-xl bg-laiton-300 px-6 py-3 font-semibold text-[#111216]">
                     {applyStatus === "pret" ? "Accéder à ma première séance" : aDejaUnProgramme ? "Mettre à jour mon profil" : "Préparer ma première séance"} →
                   </a>
+                </section>
+              ) : verificationAccesIndisponible ? (
+                <section className="w-full rounded-2xl border border-laiton-400/25 p-6 text-center" aria-label="Vérification de ton accès">
+                  <SectionLabel>Ton accès reste à vérifier</SectionLabel>
+                  <p className="mt-3 text-sm text-graphite-300">La vérification est momentanément indisponible. Ne souscris pas à nouveau : tu peux enregistrer ton bilan puis réessayer depuis ton programme.</p>
                 </section>
               ) : (
                 <FormuleRecommandeeCard recommandation={diagnostic.recommandation} />
@@ -2669,7 +2675,11 @@ export function DiagnosticQuiz({
                       <p className="max-w-md text-sm leading-6 text-graphite-300">
                         {aDejaUnProgramme
                           ? "Applique ces réponses à ton profil COAI pour que ton prochain programme en tienne compte."
-                          : "Applique ces réponses et génère ton programme personnalisé."}
+                          : accesProgrammeActif
+                            ? "Applique ces réponses et prépare ton programme personnalisé."
+                            : verificationAccesIndisponible
+                              ? "Enregistre ton bilan. Ton accès sera vérifié à nouveau avant de préparer ton programme."
+                              : "Enregistre ton bilan, puis choisis ton accompagnement pour accéder à ton programme."}
                       </p>
                       <Button
                         onClick={appliquerAuProfil}
@@ -2680,7 +2690,7 @@ export function DiagnosticQuiz({
                           ? "…"
                           : aDejaUnProgramme
                             ? "Appliquer à mon futur programme →"
-                            : "Générer mon programme"}
+                            : accesProgrammeActif ? "Générer mon programme" : "Enregistrer et continuer"}
                       </Button>
                     </>
                   )}
@@ -2714,7 +2724,7 @@ export function DiagnosticQuiz({
                   aucun accès direct aux tarifs à cet endroit — le seul lien
                   "Comparer les 3 formules" vit dans FormuleRecommandeeCard,
                   plus haut sur l'écran. Ajouté ici aussi, à la vraie sortie. */}
-              {connecte ? (
+              {connecte && !accesProgrammeActif && !verificationAccesIndisponible ? (
                 <Link href="/pricing" className="text-sm font-semibold text-laiton-300 underline decoration-laiton-300/40 underline-offset-4 hover:text-laiton-200">
                   Voir les accompagnements →
                 </Link>
