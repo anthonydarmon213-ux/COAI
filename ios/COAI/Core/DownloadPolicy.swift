@@ -4,7 +4,21 @@ import Foundation
 enum DownloadPolicy {
     static let maximumBytes: Int64 = 15 * 1024 * 1024
 
+    static func isNavigationHandoff(_ error: NSError, downloadActive: Bool) -> Bool {
+        // WebKit's frame-load policy interruption after accepting a download,
+        // not a network failure. Never suppress unrelated domains or failures.
+        downloadActive && error.domain == "WebKitErrorDomain" && error.code == 102
+    }
+
     static func trustedURL(_ url: URL) -> Bool {
+        #if DEBUG && targetEnvironment(simulator)
+        // Same fixed loopback as the connected test app, never compiled into
+        // physical-device or Release builds. All MIME/size/header checks remain.
+        if NavigationPolicy.localIntegrationTest, url.scheme == "http",
+           url.host == "localhost", url.port == 3050 {
+            return NavigationPolicy.decide(url) == .inside
+        }
+        #endif
         if url.scheme?.lowercased() == "blob" {
             guard let origin = URL(string: String(url.absoluteString.dropFirst(5))) else { return false }
             return origin.scheme == "https" && NavigationPolicy.decide(origin) == .inside

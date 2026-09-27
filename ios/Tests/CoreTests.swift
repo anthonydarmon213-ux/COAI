@@ -2,6 +2,13 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testDownloadHandoffDoesNotHideNetworkFailures() {
+        XCTAssertTrue(DownloadPolicy.isNavigationHandoff(NSError(domain: "WebKitErrorDomain", code: 102), downloadActive: true))
+        XCTAssertFalse(DownloadPolicy.isNavigationHandoff(NSError(domain: "WebKitErrorDomain", code: 102), downloadActive: false))
+        XCTAssertFalse(DownloadPolicy.isNavigationHandoff(NSError(domain: NSURLErrorDomain, code: 102), downloadActive: true))
+        XCTAssertFalse(DownloadPolicy.isNavigationHandoff(NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet), downloadActive: true))
+    }
+
     func testEmailConfirmationOnlyAcceptsOneCodeAndFixedDestination() throws {
         let url = try XCTUnwrap(NativeEmailConfirmation.exchangeURL(URL(string: "fr.coai.mobile://auth/email-confirmation?code=abc_123-XYZ")!))
         XCTAssertEqual(url.scheme, "https")

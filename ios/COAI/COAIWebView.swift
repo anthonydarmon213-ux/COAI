@@ -565,12 +565,16 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         guard self.webView === webView else { download.cancel(nil); return }
         isLoading = false
+        // WebKit has converted this navigation to a download. Its provisional
+        // page interruption must not cover the still-valid underlying page.
+        errorMessage = nil
         downloads.begin(download)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         guard self.webView === webView else { download.cancel(nil); return }
         isLoading = false
+        errorMessage = nil
         downloads.begin(download)
     }
 
@@ -614,6 +618,7 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     private func failed(_ error: Error) {
         isLoading = false
         guard (error as NSError).code != NSURLErrorCancelled else { return }
+        guard !DownloadPolicy.isNavigationHandoff(error as NSError, downloadActive: downloads.isBusy) else { return }
         errorMessage = "Impossible de charger COAI. Vérifie ta connexion, puis réessaie. Le minuteur reste accessible."
     }
 }

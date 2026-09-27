@@ -2,6 +2,14 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 17 h 58 : PDF connecté testé dans l’app sur simulateur local, de la
+connexion au partage iOS puis au retour à la séance. Correction de la fausse
+erreur réseau lors du transfert de navigation vers WKDownload. Résultat
+`Test-COAI-2026.09.27_17-57-47-+0200.xcresult` dans le dossier QA connecté.
+Compte jetable nettoyé ; aucun partage envoyé. Release arm64 non signé et
+absence du mode local revalidés (`/tmp/coai-pdf-handoff-release-final-0927.log`).
+Cela ne valide pas le contenu complet des fiches ni le téléchargement en production.
+
 Objectif non atteint. Les sections suivantes sont des preuves historiques,
 pas une validation de la version actuelle en production.
 
