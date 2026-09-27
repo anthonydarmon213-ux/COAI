@@ -1413,6 +1413,9 @@ export function DiagnosticQuiz({
       trackFunnelEvent("first_programme_viewed");
       setApplyStatus("pret");
     } catch {
+      if (!profilApplique) {
+        setApplyErrorMessage("Ton profil n’a pas pu être enregistré. Tes réponses restent affichées : vérifie ta connexion puis réessaie.");
+      }
       setApplyStatus(profilApplique ? "erreur" : "idle");
     }
   }
@@ -2650,6 +2653,9 @@ export function DiagnosticQuiz({
                   ) : (
                     <>
                       <SectionLabel>Mettre à jour ton profil</SectionLabel>
+                      {applyErrorMessage && (
+                        <p className="max-w-md text-sm leading-6 text-laiton-200" role="alert">{applyErrorMessage}</p>
+                      )}
                       <p className="max-w-md text-sm leading-6 text-graphite-300">
                         {aDejaUnProgramme
                           ? "Applique ces réponses à ton profil COAI pour que ton prochain programme en tienne compte."

@@ -2,6 +2,24 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Diagnostic enregistré — 27 septembre, 16 h 22
+
+Le même test natif va désormais jusqu'à « Générer mon programme » : le compte
+sans offre retrouve un lien actionnable « Choisir mon accompagnement », sans
+faux programme prêt. Âge, taille, poids, sexe, objectif/activité, fréquence,
+lieu et durée vérifiés indépendamment dans Profile local avant nettoyage.
+Preuve finale : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_16-18-43-+0200.xcresult`.
+Un test zéro échec, 205 secondes. Un essai précédent interrompu pour blocage
+d'animation XCTest n'est pas compté comme succès. Aucun achat ni accès offert.
+
+Correction additionnelle : l'échec d'enregistrement ne remet plus silencieusement
+le bouton à zéro ; un message accessible annonce l'échec et invite à réessayer.
+`test-diagnostic-profile-save.cjs` reproduit le défaut avant correction puis
+passe sur le gestionnaire réel (réseau simulé : hors ligne, 400, 503, accès 403,
+programme existant). Ce test ne prouve pas l'affichage de cette erreur sur appareil.
+Types/lint/build local, 50 tests Swift, navigation/progression et 356 médias passent.
+NON PUBLIÉ. Restent accès abonné réel, autres profils, appareil et production.
+
 ### Diagnostic natif depuis un compte neuf — 27 septembre, 15 h 57
 
 `testLocalNewAccountDiagnosticReachesResult` passe : inscription réelle,

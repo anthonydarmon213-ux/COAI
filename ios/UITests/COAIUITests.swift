@@ -160,6 +160,11 @@ final class COAIUITests: XCTestCase {
                     XCTAssertTrue(web.staticTexts["Tes réponses analysées"].exists)
                     XCTAssertFalse(web.staticTexts["4 capacités physiques évaluées"].exists)
                     XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+                    tap(web.buttons["Générer mon programme"])
+                    XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
+                    XCTAssertTrue(web.staticTexts["Choisis ton accompagnement COAI pour accéder à ton programme."].exists)
+                    XCTAssertFalse(web.buttons["Commencer ma première séance"].exists,
+                                   "A new unpaid account must not receive invented programme access")
                     let result = XCTAttachment(screenshot: app.screenshot())
                     result.name = "Diagnostic réel — compte neuf"
                     result.lifetime = .keepAlways
