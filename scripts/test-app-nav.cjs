@@ -15,15 +15,25 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/components/app-nav.ts
   if(name==='@/components/compte/sign-out-button')return {SignOutButton:()=>null};
   return require(name);
 }});
-for(const [route,label] of [['/suivi/repcount','RepCount'],['/programme/recettes','Nutrition'],['/suivi/alimentation','Nutrition'],['/programme/evolution','Progression'],['/programme/recuperation','Récupération']]) {
+for(const [route,label,primary] of [
+  ['/suivi/repcount','RepCount','/suivi/progression'],
+  ['/programme/recettes','Nutrition','/programme/entrainement'],
+  ['/suivi/alimentation','Nutrition','/suivi/progression'],
+  ['/programme/evolution','Progression','/suivi/progression'],
+  ['/programme/recuperation','Récupération','/programme/entrainement'],
+]) {
   pathname=route;
   const html=renderToStaticMarkup(React.createElement(api.AppNav));
   const desktop=html.split('aria-label="Navigation principale"')[1].split('</nav>')[0];
-  assert.equal((desktop.match(/coai-nav-actif/g)||[]).length,1,route);
+  // Current simplified navigation exposes its state semantically, not through
+  // the removed coai-nav-actif class or the retired three-link quick bar.
+  assert.equal((desktop.match(/aria-current="page"/g)||[]).length,1,route);
+  assert.ok(desktop.includes(`href="${primary}" aria-current="page"`),route);
+  assert.equal((desktop.match(/href=/g)||[]).length,4);
   assert.ok(html.includes(`· ${label}`),route);
   assert.ok(html.includes('href="/programme/exercices"') || label!=='Entraînement');
   for(const target of ['/coach','/club','/compte/profil','/compte/parametres','/videos']) assert.ok(html.includes(`href="${target}"`));
-  const quick=html.split('aria-label="Accès rapides"')[1].split('</nav>')[0];
-  assert.equal((quick.match(/href=/g)||[]).length,3);
+  assert.ok(html.includes('aria-label="Toutes les rubriques"'));
+  assert.ok(html.includes('Explorer'));
 }
-console.log('PASS navigation: 3 quick links, all sections retained, unique active section, nutrition/progression routes');
+console.log('PASS navigation: four primary destinations, unique aria-current, full explorer retained, nutrition/progression routes');

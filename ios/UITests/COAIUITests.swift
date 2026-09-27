@@ -253,6 +253,26 @@ final class COAIUITests: XCTestCase {
         let proof = XCTAttachment(screenshot: app.screenshot())
         proof.name = "Découverte récupération après lecture recette — local connecté"
         proof.lifetime = .keepAlways; add(proof)
+        app.buttons["native-tab-Explorer"].tap()
+        let club = app.buttons["explore-/club"]
+        reveal(club, in: app); club.tap()
+        XCTAssertTrue(web.staticTexts["Le Direct du Coach."].waitForExistence(timeout: 20))
+        XCTAssertTrue(web.staticTexts["Premier rendez-vous en préparation."].exists)
+        XCTAssertTrue(web.staticTexts["1 heure par mois · En groupe · Sans replay"].exists)
+        let question = web.links["Préparer ma question sur WhatsApp"]
+        XCTAssertTrue(question.exists)
+        revealFilter(question)
+        let clubProof = XCTAttachment(screenshot: app.screenshot())
+        clubProof.name = "COAI Club — question préparée explicitement, sans envoi"
+        clubProof.lifetime = .keepAlways; add(clubProof)
+        let clubHierarchy = XCTAttachment(string: web.debugDescription)
+        clubHierarchy.name = "Club accessibility hierarchy"
+        clubHierarchy.lifetime = .keepAlways; add(clubHierarchy)
+        // WKWebView reports the text line (20 pt) for this external link,
+        // not the padded anchor. Inspect the retained screenshot for layout.
+        XCTAssertTrue(question.isHittable)
+        // No external contact, reservation, payment or message is triggered.
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
     }
 
     /// Real local programmes containing interrupted list entries, not injected HTML.

@@ -2,6 +2,22 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 19 h 24 : parcours natif connecté recettes → récupération → Club
+réussi sur simulateur SE 3 : `Test-COAI-2026.09.27_19-22-29-+0200.xcresult`.
+Le Club affiche le rendez-vous en préparation, le direct collectif sans replay
+et le lien de préparation WhatsApp accessible. Aucun message envoyé. La capture
+confirme le bouton tactile de 44 points ; WebKit expose seulement sa ligne de
+texte dans le rectangle d’accessibilité. Compte de test local supprimé.
+Test des destinations et de l’unique navigation active également réussi.
+Ces preuves sont locales et ne constituent pas une validation en production.
+
+Complément soirée : Release arm64 non signée revalidée, 51 tests Swift et
+65 contrôles cœur réussis, vérification WebKit et exclusion du mode local
+réussies (`/tmp/coai-release-recheck-evening-0927.log`). Aucun achat Apple réel,
+archive signée, déploiement ou installation physique prouvé par ces contrôles.
+Suppression des recherches externes de photos inutilisées pour les anciens
+programmes ; orchestration serveur et non-régression native testées (`19-00-51`).
+
 Complément 18 h 53 : nutrition/récupération résistent aux entrées non objet
 dans les listes de jours/conseils/protocoles. Rendu réel testé et parcours natif
 avec données incomplètes locales réussi, relance comprise :
