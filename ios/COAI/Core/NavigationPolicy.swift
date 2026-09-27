@@ -70,6 +70,26 @@ enum NativeOAuth {
     }
 }
 
+/// Email links only transport a one-time PKCE code. The server still requires
+/// the verifier in the originating WebKit cookie store; no tokens are imported.
+enum NativeEmailConfirmation {
+    static func exchangeURL(_ incoming: URL) -> URL? {
+        guard incoming.scheme == "fr.coai.mobile", incoming.host == "auth",
+              incoming.path == "/email-confirmation", incoming.user == nil,
+              incoming.password == nil, incoming.port == nil, incoming.fragment == nil,
+              let parts = URLComponents(url: incoming, resolvingAgainstBaseURL: false),
+              let items = parts.queryItems, items.count == 1,
+              items[0].name == "code", let code = items[0].value,
+              !code.isEmpty, code.count <= 2048,
+              code.range(of: "^[A-Za-z0-9_-]+$", options: .regularExpression) != nil,
+              var destination = URLComponents(url: NavigationPolicy.baseURL.appendingPathComponent("auth/callback"), resolvingAgainstBaseURL: false)
+        else { return nil }
+        destination.queryItems = [URLQueryItem(name: "code", value: code),
+                                  URLQueryItem(name: "redirect_to", value: "/bienvenue")]
+        return destination.url
+    }
+}
+
 /// Internal iPhone pilot. Not an App Store payment-compliance certification.
 enum NavigationDecision: Equatable {
     case inside, external, subscription, purchasesUnavailable, blocked

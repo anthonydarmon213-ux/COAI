@@ -2,6 +2,21 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Réception native des liens email — implémentation partielle du 27 septembre
+
+Le handler SwiftUI onOpenURL accepte désormais uniquement
+`fr.coai.mobile://auth/email-confirmation?code=…`. Validation stricte du chemin,
+autorité, code unique borné/alphanumérique URL-safe, absence de fragment et
+de paramètre supplémentaire. Destination fixe /auth/callback puis /bienvenue.
+Le serveur échange le code avec le cookie PKCE existant ; aucun token importé.
+Avant initialisation WebKit, la destination est conservée jusqu'à installation
+des règles ; en session OAuth active elle est ignorée ; doublon immédiat ignoré.
+50 tests Swift passent, dont cas liens altérés/rejetés. Contrôles core/WebKit,
+manifestes et Release arm64 non signée passent (`/tmp/coai-email-links-release-0927.log`).
+IMPORTANT : pas encore relié à la destination email web, ni testé par ouverture
+OS réelle. Ne constitue pas encore un parcours Mail → app fonctionnel complet.
+Le schéma était déjà enregistré ; aucun associated domain ni achat ajouté.
+
 ### Callback email réel — 27 septembre
 
 Le test HTTP signup suit maintenant le lien capturé jusqu'à `/auth/callback`

@@ -2,6 +2,29 @@ import XCTest
 @testable import COAICore
 
 final class CoreTests: XCTestCase {
+    func testEmailConfirmationOnlyAcceptsOneCodeAndFixedDestination() throws {
+        let url = try XCTUnwrap(NativeEmailConfirmation.exchangeURL(URL(string: "fr.coai.mobile://auth/email-confirmation?code=abc_123-XYZ")!))
+        XCTAssertEqual(url.scheme, "https")
+        XCTAssertEqual(url.host, "coai.fr")
+        XCTAssertEqual(url.path, "/auth/callback")
+        let items = URLComponents(url: url, resolvingAgainstBaseURL: false)!.queryItems!
+        XCTAssertEqual(items, [URLQueryItem(name: "code", value: "abc_123-XYZ"), URLQueryItem(name: "redirect_to", value: "/bienvenue")])
+        for value in [
+            "https://auth/email-confirmation?code=a",
+            "fr.coai.mobile://other/email-confirmation?code=a",
+            "fr.coai.mobile://auth/callback?code=a",
+            "fr.coai.mobile://user@auth/email-confirmation?code=a",
+            "fr.coai.mobile://auth:443/email-confirmation?code=a",
+            "fr.coai.mobile://auth/email-confirmation?code=a#token",
+            "fr.coai.mobile://auth/email-confirmation?code=",
+            "fr.coai.mobile://auth/email-confirmation?code=a&code=b",
+            "fr.coai.mobile://auth/email-confirmation?code=a&redirect_to=https://evil.example",
+            "fr.coai.mobile://auth/email-confirmation?access_token=a",
+            "fr.coai.mobile://auth/email-confirmation?code=a%20b",
+            "fr.coai.mobile://auth/email-confirmation?code=" + String(repeating: "a", count: 2049),
+        ] { XCTAssertNil(NativeEmailConfirmation.exchangeURL(URL(string: value)!), value) }
+    }
+
     func testSessionEndSignalOnlyAcceptsTrustedMainFrameAndExactMessage() {
         for host in ["coai.fr", "www.coai.fr"] {
             for port in [0, 443] {

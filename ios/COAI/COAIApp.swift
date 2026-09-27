@@ -236,6 +236,7 @@ struct COAIRootView: View {
             keyboardVisible = false
         }
         .task { await browser.start() }
+        .onOpenURL { url in browser.receiveEmailConfirmation(url) }
         .onChange(of: scenePhase) { phase in browser.setForeground(phase == .active) }
         .sheet(isPresented: $showTimer) { RestTimerView() }
         .sheet(isPresented: $browser.showSubscription) { COAIAppleSubscriptionView(browser: browser) }

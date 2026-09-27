@@ -376,6 +376,19 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     }()
     #endif
 
+    private var lastEmailConfirmation: URL?
+
+    func receiveEmailConfirmation(_ incoming: URL) {
+        guard let destination = NativeEmailConfirmation.exchangeURL(incoming),
+              destination != lastEmailConfirmation else { return }
+        // Do not interfere with an active Google/Apple system authentication.
+        guard authenticationSession == nil else { return }
+        lastEmailConfirmation = destination
+        lastRequestedURL = destination
+        if isReady { load(destination) }
+        // Cold start: start() loads lastRequestedURL after installing content rules.
+    }
+
     func open(path: String) {
         cancelAuthentication()
         guard isReady, let url = URL(string: path, relativeTo: NavigationPolicy.baseURL)?.absoluteURL else { return }
