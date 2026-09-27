@@ -12,6 +12,7 @@ function load(file, deps, logs = []) {
   return box.exports;
 }
 const plans = load('src/lib/subscription/plan.ts', {});
+const quota = load('src/lib/subscription/coach-quota.ts', {});
 async function run(subscription, options = {}) {
   let ai = 0, writes = 0, reads = 0;
   const logs = [];
@@ -20,10 +21,11 @@ async function run(subscription, options = {}) {
     zod: require('zod'),
     '@/lib/whatsapp/client': { isValidWhatsappWebhookRequest: () => !options.unauthorized },
     '@/lib/subscription/plan': plans,
+    '@/lib/subscription/coach-quota': quota,
     '@/lib/ai/prompts/coach-question': { buildCoachQuestionPrompt: () => 'fixture' },
     '@/lib/ai/client': { generateTextWithAI: async () => { ai++; if (options.fail) throw Error('SECRET provider payload'); return 'Fixture answer'; } },
     '@/lib/db/client': { prisma: {
-      user: { findUnique: async () => { reads++; return options.missing ? null : { id: 'fixture', subscription, profile: {}, coachQuestionsUsed: 0, coachQuestionsResetAt: new Date() }; }, update: async () => { writes++; } },
+      user: { findUnique: async () => { reads++; return options.missing ? null : { id: 'fixture', subscription, profile: {}, coachQuestionsUsed: 0, coachQuestionsResetAt: new Date() }; }, updateMany: async () => { writes++; return { count: 1 }; } },
       whatsAppEvent: { create: async () => { writes++; } },
     } },
   }, logs);

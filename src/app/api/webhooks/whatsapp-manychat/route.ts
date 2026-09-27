@@ -6,6 +6,7 @@ import { generateTextWithAI } from "@/lib/ai/client";
 import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
 import { getEffectivePlan, hasPaidSubscription } from "@/lib/subscription/plan";
+import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
 
 // Appelé par ManyChat (étape "External Request" du flow WhatsApp) à chaque
 // message reçu d'un abonné — remplace l'ancienne hypothèse Make.com/Twilio,
@@ -13,9 +14,6 @@ import { getEffectivePlan, hasPaidSubscription } from "@/lib/subscription/plan";
 // POST, header x-webhook-secret, body { phoneWhatsapp, message }. Réponse
 // { reply } que ManyChat renvoie tel quel à l'abonné sur WhatsApp.
 export const maxDuration = 30;
-
-const QUOTA_LIMITE = 4;
-const QUOTA_FENETRE_MS = 30 * 24 * 60 * 60 * 1000;
 
 const bodySchema = z.object({
   phoneWhatsapp: z.string().min(6),
@@ -65,13 +63,27 @@ export async function POST(request: Request) {
   // uniquement) — sans ça WhatsApp serait une voie de contournement du
   // quota web pour le même service.
   const estLimite = getEffectivePlan(user.subscription) === "PASS_IA";
+  let reservedWindow: Date | null = null;
   if (estLimite) {
-    const fenetreExpiree =
-      !user.coachQuestionsResetAt ||
-      Date.now() - user.coachQuestionsResetAt.getTime() >= QUOTA_FENETRE_MS;
-    const questionsUtilisees = fenetreExpiree ? 0 : user.coachQuestionsUsed;
+    const quota = getCoachQuotaState(user.coachQuestionsUsed, user.coachQuestionsResetAt);
+    if (quota.expired) {
+      await prisma.user.updateMany({
+        where: { id: user.id, coachQuestionsResetAt: user.coachQuestionsResetAt },
+        data: { coachQuestionsUsed: 0, coachQuestionsResetAt: new Date() },
+      });
+    }
+    const current = await prisma.user.findUnique({
+      where: { id: user.id }, select: { coachQuestionsResetAt: true },
+    });
+    const reserved = current?.coachQuestionsResetAt
+      ? await prisma.user.updateMany({
+          where: { id: user.id, coachQuestionsResetAt: current.coachQuestionsResetAt,
+            coachQuestionsUsed: { lt: COACH_QUOTA_LIMIT } },
+          data: { coachQuestionsUsed: { increment: 1 } },
+        })
+      : { count: 0 };
 
-    if (questionsUtilisees >= QUOTA_LIMITE) {
+    if (reserved.count === 0) {
       const reply =
         "Tu as atteint tes 4 questions offertes ce mois-ci sur l'offre COAI Essentiel. Passe à Premium Remote — un accompagnement individuel avec Anthony, 960€ pour un engagement de 3 mois minimum, sur devis — pour un accès illimité au coach IA et le regard d'un coach humain.";
       await prisma.whatsAppEvent.create({
@@ -80,13 +92,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ reply });
     }
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        coachQuestionsUsed: questionsUtilisees + 1,
-        ...(fenetreExpiree ? { coachQuestionsResetAt: new Date() } : {}),
-      },
-    });
+    reservedWindow = current!.coachQuestionsResetAt;
   }
 
   const profil = {
@@ -107,6 +113,14 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ reply });
   } catch {
+    if (reservedWindow) {
+      // Refund only this quota window: a late failure must not decrement
+      // a new month's counter. Never retry the billed AI call automatically.
+      await prisma.user.updateMany({
+        where: { id: user.id, coachQuestionsResetAt: reservedWindow, coachQuestionsUsed: { gt: 0 } },
+        data: { coachQuestionsUsed: { decrement: 1 } },
+      }).catch(() => console.error("[webhooks/whatsapp-manychat] Restitution du quota indisponible"));
+    }
     console.error("[webhooks/whatsapp-manychat] Réponse indisponible");
     return NextResponse.json(
       { reply: "Petit souci technique de mon côté, réessaie dans quelques instants." },
