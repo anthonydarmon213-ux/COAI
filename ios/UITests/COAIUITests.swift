@@ -1,6 +1,47 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Requires local SMTP preflight and cleanup; does not confirm email or grant access.
+    @MainActor
+    func testLocalSignupReachesEmailConfirmation() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let signup = web.links["S'inscrire"]
+        XCTAssertTrue(signup.waitForExistence(timeout: 30))
+        reveal(signup, in: app)
+        signup.tap()
+        let firstName = web.textFields["PRÉNOM"]
+        XCTAssertTrue(firstName.waitForExistence(timeout: 20))
+        reveal(firstName, in: app)
+        firstName.tap()
+        firstName.typeText("Test inscription iPhone")
+        let email = web.textFields["EMAIL"]
+        reveal(email, in: app)
+        email.tap()
+        email.typeText("coai-ui-signup-20260927@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Coai-local-Signup-0927-only!")
+        let submit = web.buttons["Créer mon compte gratuit →"]
+        reveal(submit, in: app)
+        XCTAssertTrue(submit.isHittable)
+        XCTAssertGreaterThanOrEqual(submit.frame.height, 44)
+        submit.tap()
+        XCTAssertTrue(web.staticTexts["Ton espace est presque prêt."].waitForExistence(timeout: 30))
+        XCTAssertTrue(web.staticTexts["Ton espace est presque prêt."].isHittable,
+                      "Confirmation must be visible without scrolling after submission")
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "Inscription locale — confirmation email"
+        capture.lifetime = .keepAlways
+        add(capture)
+    }
+
     /// Real loopback authentication and workout persistence, with a disposable account.
     @MainActor
     func testLocalConnectedDailyWorkoutPersists() throws {

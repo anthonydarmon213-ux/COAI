@@ -2,6 +2,25 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Inscription dans WebKit natif — 27 septembre
+
+`testLocalSignupReachesEmailConfirmation` saisit prénom, email et mot de passe
+dans le vrai formulaire local, puis soumet avec clavier et défilement réels.
+Préflight obligatoire : helper `ui-signup-preflight`, qui refuse une adresse
+fixture déjà utilisée ou SMTP non local. Après le test : `ui-signup-cleanup`
+exige exactement un utilisateur Auth non confirmé, un email Mailpit et aucun
+User applicatif, puis supprime uniquement ces données jetables.
+Premier passage 14-17-18 réussi fonctionnellement mais capture montrant le
+message de confirmation hors écran : la position du formulaire était conservée.
+Correctif client sign-up : retour en haut après rendu emailEnvoye, via effet
+client (consignes Next.js), aucun changement de droits ni d'authentification.
+Passage corrigé 14-20-45 : titre de réussite exigé visible sans geste supplémentaire,
+bouton d'envoi >=44 points et pas d'erreur native. Capture inspectée dans
+`/tmp/coai-native-signup-fixed-captures-0927/`. Types, lint (0 erreur/6 avertissements),
+build local et test interactions signup passent ; 356 médias présents.
+Cette preuve n'inclut pas l'ouverture du lien depuis Mail dans l'app, les
+consentements après confirmation ni la production. Pas de publication.
+
 ### Inscription réelle locale — recontrôle du 27 septembre
 
 `scripts/test-signup-http-local.cjs` passe via le mode `signup-http` du helper

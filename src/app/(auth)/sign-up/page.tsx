@@ -104,6 +104,12 @@ export default function SignUpPage() {
   const [emailEnvoye, setEmailEnvoye] = useState(false);
   const submitting = useRef(false);
 
+  useEffect(() => {
+    // The confirmation replaces a long form without changing route. Reveal its
+    // heading instead of retaining the submit button's old scroll position.
+    if (emailEnvoye) window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [emailEnvoye]);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (submitting.current) return;
