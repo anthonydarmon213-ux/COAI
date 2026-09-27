@@ -45,10 +45,13 @@ export default async function AdminBusinessPage() {
   const [totalUsers, subscriptions, programmesCount, seancesCount, signupDates, capacity, aiEconomics, revenue, churnReasons, liensParrainage, filleuls, diagnosticLeads30d, usersAvecAbonnement, activationCohort] = await Promise.all([
     prisma.user.count(),
     prisma.subscription.findMany({
-      select: { plan: true, billingInterval: true, amountCents: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, createdAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: { where: { source: "PROGRAMME" } } } } } } },
+      select: { plan: true, billingInterval: true, amountCents: true, status: true, cancelAtPeriodEnd: true, trialEnd: true, trialActivationReminderSentAt: true, createdAt: true, updatedAt: true, user: { select: { _count: { select: { programmes: true, seances: { where: { source: "PROGRAMME" } }, dailySessions: { where: { completedAt: { not: null } } } } } } } },
     }),
     prisma.programmeGenerated.count(),
-    prisma.seanceLog.count(),
+    Promise.all([
+      prisma.seanceLog.count(),
+      prisma.dailySession.count({ where: { completedAt: { not: null } } }),
+    ]).then(([logs, daily]) => logs + daily),
     prisma.user.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
     getCapacitySnapshot(),
     getAIEconomics(),
@@ -85,6 +88,12 @@ export default async function AdminBusinessPage() {
         testsMaxi: {
           select: { createdAt: true },
           orderBy: { createdAt: "asc" },
+          take: 1,
+        },
+        dailySessions: {
+          where: { completedAt: { not: null } },
+          select: { completedAt: true },
+          orderBy: { completedAt: "asc" },
           take: 1,
         },
       },
@@ -124,7 +133,9 @@ export default async function AdminBusinessPage() {
     (s) => s.status === "CANCELED" && s.updatedAt >= ilYA30Jours
   ).length;
   const essaisAvecProgramme = essaisActifs.filter((subscription) => subscription.user._count.programmes > 0).length;
-  const essaisAvecSeance = essaisActifs.filter((subscription) => subscription.user._count.seances > 0).length;
+  const essaisAvecSeance = essaisActifs.filter((subscription) =>
+    subscription.user._count.seances > 0 || subscription.user._count.dailySessions > 0
+  ).length;
   const tauxActivationProgramme = essaisActifs.length > 0 ? (essaisAvecProgramme / essaisActifs.length) * 100 : 0;
   const tauxActivationSeance = essaisActifs.length > 0 ? (essaisAvecSeance / essaisActifs.length) * 100 : 0;
   const relancesActivationEnvoyees = subscriptions.filter((subscription) => subscription.trialActivationReminderSentAt).length;
@@ -187,7 +198,7 @@ export default async function AdminBusinessPage() {
   // compter que les séances rendait invisibles les utilisateurs qui avaient
   // déjà enregistré une charge et obtenu leur courbe de progression.
   const premiereValeurDe = (user: (typeof usersAvecAbonnement)[number]) => {
-    const dates = [user.seances[0]?.createdAt, user.testsMaxi[0]?.createdAt]
+    const dates = [user.seances[0]?.createdAt, user.testsMaxi[0]?.createdAt, user.dailySessions[0]?.completedAt]
       .filter((date): date is Date => Boolean(date))
       .sort((a, b) => a.getTime() - b.getTime());
     return dates[0] ?? null;
