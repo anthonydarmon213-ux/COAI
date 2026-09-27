@@ -276,6 +276,48 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testLocalExerciseCatalogueRejectsMismatchedRowing() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        if email.waitForExistence(timeout: 5) {
+            email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+            let password = web.secureTextFields["MOT DE PASSE"]
+            reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+            let submit = web.buttons["Se connecter"]
+            reveal(submit, in: app); submit.tap()
+            XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        }
+        app.buttons["native-tab-Explorer"].tap()
+        let catalogue = app.buttons["explore-/programme/exercices"]
+        reveal(catalogue, in: app); catalogue.tap()
+        let search = web.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 20))
+        reveal(search, in: app); search.tap(); search.typeText("Rowing haltère unilatéral")
+        let empty = web.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Aucun exercice trouvé.")).firstMatch
+        XCTAssertTrue(empty.waitForExistence(timeout: 10))
+        // WebKit may expose the search field value as static text too.
+        // Assert the actual result count rather than absence of typed text.
+        XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "0 exercice correspondant.")).firstMatch.exists)
+        let excluded = XCTAttachment(screenshot: app.screenshot())
+        excluded.name = "Catalogue — rowing exclu, zéro résultat"
+        excluded.lifetime = .keepAlways; add(excluded)
+        let clear = web.buttons["Effacer la recherche"]
+        reveal(clear, in: app); clear.tap()
+        reveal(search, in: app); search.tap(); search.typeText("Gainage planche")
+        XCTAssertTrue(web.staticTexts["Gainage planche"].waitForExistence(timeout: 10))
+        XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "1 exercice correspondant.")).firstMatch.exists)
+        XCTAssertFalse(empty.exists)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Catalogue — recherche après exclusion du mauvais rowing"
+        proof.lifetime = .keepAlways; add(proof)
+    }
+
+    @MainActor
     func testLocalProfileProgrammeLinkFitsSmallScreen() throws {
         continueAfterFailure = false
         let app = XCUIApplication()

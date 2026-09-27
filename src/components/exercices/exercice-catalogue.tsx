@@ -137,8 +137,7 @@ export function ExerciceCatalogue() {
       </Card>
 
       <p role="status" className="text-sm text-graphite-300">
-        {filtres.length} exercice{filtres.length > 1 ? "s" : ""}
-        {aucunFiltre ? "" : " correspondant" + (filtres.length > 1 ? "s" : "")}.
+        {`${filtres.length} exercice${filtres.length > 1 ? "s" : ""}${aucunFiltre ? "" : " correspondant" + (filtres.length > 1 ? "s" : "")}.`}
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

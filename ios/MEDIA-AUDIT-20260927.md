@@ -34,6 +34,29 @@ Logs : `/tmp/coai-rowing-type-0927.log`, `/tmp/coai-rowing-lint-0927.log`,
 nouveau build non validés. Le build utilise des paramètres locaux factices ;
 ne pas le confondre avec le build connecté aux fixtures d'authentification.
 
+### Contrôle natif connecté ultérieur — 22 h 39
+
+Build reconstruit avec l'authentification locale de test. Le nouveau test
+`testLocalExerciseCatalogueRejectsMismatchedRowing` passe sur iPhone SE simulé
+en 24,9 secondes : navigation Explorer → catalogue, recherche du rowing,
+compteur zéro et message vide, effacement, recherche de planche, compteur un.
+Les compteurs sont vérifiés dans l'arbre d'accessibilité WebKit, pas déduits
+de la simple présence du texte saisi. Le compteur React est désormais une
+phrase unique au lieu de plusieurs fragments.
+
+Trois essais préalables ont échoué dans le test : confusion entre texte saisi
+et titre, compteur fragmenté, puis défilement d'un texte non interactif par le
+helper générique. Ils ne sont pas comptés comme des succès.
+
+Preuve : `Test-COAI-2026.09.27_22-38-48-+0200.xcresult` dans
+`/tmp/coai-native-connected-0925/Logs/Test/`. Captures inspectées : la saisie
+reste visible au-dessus du clavier ; les résultats sont plus bas, derrière
+le long bloc de filtres. Leur accessibilité ne prouve pas une visibilité
+immédiate : simplification de ce bloc encore à traiter.
+
+Typage, lint et build connecté réussis. Compte jetable supprimé et sessions
+révoquées. Aucun compte personnel, achat ni production affecté.
+
 ## Remplacements
 
 Le dossier de préparation est dans le workspace, sous
