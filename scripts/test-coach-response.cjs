@@ -11,7 +11,7 @@ function nodes(node) {
   if (!node || typeof node !== 'object') return [];
   return [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
 }
-async function scenario(body, status = 200, offline = false) {
+async function scenario(body, status = 200, offline = false, nextDraft) {
   const values = []; let cursor = 0; let requests = 0;
   const exports = {};
   const dependencies = {
@@ -29,6 +29,8 @@ async function scenario(body, status = 200, offline = false) {
     fetch: async (url, options) => {
       requests++; assert.equal(url, '/api/coach/ask');
       assert.equal(JSON.parse(options.body).question, 'Ma question');
+      // A user can type their next message while the previous reply loads.
+      if (nextDraft !== undefined) values[0] = nextDraft;
       if (offline) throw Error('offline');
       return { ok: status === 200, status, json: async () => body };
     },
@@ -44,6 +46,9 @@ async function scenario(body, status = 200, offline = false) {
 (async () => {
   const success = await scenario({ answer: 'Réponse utile', quotaRemaining: 1 });
   assert.equal(success[0], ''); assert.equal(success[4][0].reponse, 'Réponse utile'); assert.equal(success[5], 1);
+  const next = await scenario({ answer: 'Réponse utile', quotaRemaining: 1 }, 200, false, 'Mon prochain message');
+  assert.equal(next[0], 'Mon prochain message', 'An incoming reply must not erase a newer draft');
+  assert.equal(next[4][0].question, 'Ma question');
   for (const body of [null, {}, { answer: '' }, { answer: '  ' }]) {
     const failure = await scenario(body);
     assert.equal(failure[0], 'Ma question'); assert.equal(failure[4].length, 0); assert.ok(failure[2]);

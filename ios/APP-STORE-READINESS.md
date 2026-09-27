@@ -2,6 +2,13 @@
 
 ## État courant — 27 septembre 2026
 
+Complément 19 h 32 : séance native connectée complète puis relance réussies,
+`Test-COAI-2026.09.27_19-28-38-+0200.xcresult` (66,4 s), compte fictif nettoyé.
+Chat : préservation d’un nouveau brouillon pendant la réponse précédente,
+test réel du gestionnaire avec transport simulé rouge avant / vert après.
+Typage, build local et audit des 356 chemins média réussis ; lint sans erreur
+(six avertissements existants). Ni réponse IA payante ni publication effectuée.
+
 Complément 19 h 24 : parcours natif connecté recettes → récupération → Club
 réussi sur simulateur SE 3 : `Test-COAI-2026.09.27_19-22-29-+0200.xcresult`.
 Le Club affiche le rendez-vous en préparation, le direct collectif sans replay

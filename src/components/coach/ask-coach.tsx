@@ -42,7 +42,8 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
       }
       setHistorique((prev) => [...prev, { question: q, reponse: data.answer }]);
       if (typeof data.quotaRemaining === "number") setQuotaRemaining(data.quotaRemaining);
-      setQuestion("");
+      // Preserve a newer draft entered while this answer was loading.
+      setQuestion((current) => current.trim() === q ? "" : current);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
