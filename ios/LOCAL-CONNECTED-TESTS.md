@@ -2,6 +2,19 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Préparation des trois piliers en HTTP réel — 27 septembre, 17 h 08
+
+`scripts/test-programme-onboarding-http-local.cjs`, lancé avec le helper local
+mode `programme-http`, vérifie : profil sauvegardé par PUT, préparation refusée
+sans droit, droit historique ajouté uniquement à la fixture, trois piliers
+catalogue créés, deux reprises concurrentes conservant les mêmes IDs, réponses
+HTTP 200 des trois pages privées, préparation refusée après retrait du droit.
+Exactement trois programmes en base, statut GENERE_IA non transformé en VALIDE.
+Session révoquée, utilisateur local/Auth et données associées supprimés.
+Clés démo et origines loopback imposées, fournisseurs payants absents.
+Ce n'est ni un achat réel ni un contrôle visuel des trois pages ; la première
+création concurrente et la première séance native depuis ce compte restent à tester.
+
 ### Droits du diagnostic alignés — 27 septembre, 17 h 02
 
 La page utilise désormais contentAccessFor comme l'API de préparation : Stripe,
