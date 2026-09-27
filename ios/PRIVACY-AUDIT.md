@@ -53,8 +53,10 @@ seules que chaque usage est testé, nécessaire ou effectivement déclenché.
    sur simulateur SE avec compte jetable et serveur local réels
    (`Test-COAI-2026.09.27_20-29-08-+0200.xcresult`). Capture inspectée : JSON de
    5 ko et action Enregistrer dans Fichiers. Aucun destinataire contacté.
-   La sauvegarde du JSON connecté dans Fichiers et le contrôle du fichier final
-   restent à vérifier, ainsi que l’appareil physique et la production.
+   La sauvegarde du JSON connecté dans Fichiers a ensuite réussi à 20 h 36
+   (`Test-COAI-2026.09.27_20-35-44-+0200.xcresult`) : fichier de 5 136 octets
+   retrouvé dans File Provider local, JSON parsé, adresse du compte jetable,
+   profil et programme contrôlés. Appareil physique et production non validés.
 4. Vérifier les consentements des données sensibles, les destinataires réels,
    les durées de conservation et les régions des fournisseurs. Les affirmations
    de la page confidentialité doivent correspondre à ces preuves.

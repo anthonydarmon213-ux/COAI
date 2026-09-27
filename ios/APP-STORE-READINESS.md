@@ -8,8 +8,12 @@ avec JSON de 5 ko et action Fichiers, fermeture puis écran toujours utilisable.
 Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_20-29-08-+0200.xcresult`.
 L’exception localhost pour les blobs est réservée au Debug simulateur avec
 mode local explicite ; aucune autorisation HTTP ajoutée en Release.
-51 tests Swift réussis, Release arm64 non signée compilée. Enregistrement du
-JSON connecté dans Fichiers, appareil physique et production restent à valider.
+51 tests Swift réussis, Release arm64 non signée compilée. Complément 20 h 36 :
+second export après fermeture puis sauvegarde dans Fichiers réussis
+(`Test-COAI-2026.09.27_20-35-44-+0200.xcresult`). Fichier local de 5 136 octets
+retrouvé dans le stockage File Provider du simulateur : JSON valide, compte
+jetable attendu, profil présent et un programme. Appareil physique et
+production restent à valider.
 
 Complément 20 h 07 : cinq tests du vrai service `ApplePurchaseService` avec
 StoreKit Xcode local réussis (annulation/attente, serveur indisponible puis

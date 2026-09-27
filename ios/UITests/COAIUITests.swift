@@ -346,6 +346,29 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(export.waitForExistence(timeout: 10))
         XCTAssertTrue(export.isEnabled)
         XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        // A second export after dismissal must still work and can be saved
+        // locally. Never select a recipient or a cloud destination in this test.
+        export.tap()
+        let save = app.cells["Enregistrer dans Fichiers"]
+        XCTAssertTrue(save.waitForExistence(timeout: 15))
+        save.tap()
+        let picker = XCUIApplication(bundleIdentifier: "com.apple.DocumentManagerUICore.SaveToFiles")
+        let filename = picker.textFields["DOCPicker.filenameTextField"]
+        XCTAssertTrue(filename.waitForExistence(timeout: 30))
+        filename.tap()
+        filename.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "COAI-document".count))
+        let savedName = "COAI-connected-export-" + UUID().uuidString
+        filename.typeText(savedName)
+        let destination = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        destination.name = "Destination locale JSON — " + savedName
+        destination.lifetime = .keepAlways
+        add(destination)
+        let confirm = picker.buttons.matching(NSPredicate(format: "label IN %@", ["Enregistrer", "Save"])).firstMatch
+        XCTAssertTrue(confirm.isEnabled)
+        confirm.tap()
+        XCTAssertTrue(filename.waitForNonExistence(timeout: 15))
+        XCTAssertTrue(export.waitForExistence(timeout: 10))
+        XCTAssertTrue(export.isHittable)
     }
 
     @MainActor
