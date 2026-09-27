@@ -30,7 +30,10 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
 });
 (async () => {
   try {
-    const signed = await client.auth.signUp({ email, password, options: { data: { given_name: 'Test inscription' } } });
+    const signed = await client.auth.signUp({ email, password, options: {
+      data: { given_name: 'Test inscription' },
+      emailRedirectTo: origin + '/auth/callback?redirect_to=%2Fbienvenue',
+    } });
     assert.equal(signed.error, null); assert(signed.data.user); authId = signed.data.user.id;
     assert.equal(signed.data.session, null, 'Email confirmation required');
     assert.equal((await register({ consentRgpd: true, consentSante: true }, false)).status, 401);
@@ -50,8 +53,32 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
     const verified = await fetch(url, { redirect: 'manual' });
     assert.equal(verified.status, 303);
     assert(!new URL(verified.headers.get('location')).hash.includes('error'));
-    const login = await client.auth.signInWithPassword({ email, password });
-    assert.equal(login.error, null); assert(login.data.session);
+    const callback = new URL(verified.headers.get('location'));
+    assert.equal(callback.origin, origin); assert.equal(callback.pathname, '/auth/callback');
+    assert(callback.searchParams.get('code'));
+    const missingVerifier = process.argv.includes('--missing-verifier');
+    const exchanged = await fetch(callback, { redirect: 'manual', headers: missingVerifier ? {} : { Cookie: cookie() } });
+    assert.equal(exchanged.status, 307);
+    const destination = new URL(exchanged.headers.get('location'));
+    assert.equal(destination.origin, origin);
+    assert.equal(destination.pathname, missingVerifier ? '/sign-in' : '/completer-inscription');
+    assert.equal(destination.searchParams.get('redirect_to'), '/bienvenue');
+    if (missingVerifier) {
+      assert(destination.searchParams.get('error'));
+      assert.equal((await register({ consentRgpd: true, consentSante: true }, false)).status, 401);
+      // Confirmation remains effective even if a different browser lacks the verifier.
+      const login = await client.auth.signInWithPassword({ email, password });
+      assert.equal(login.error, null); assert(login.data.session);
+    } else {
+      // Use only cookies set by the real callback: no password login to hide an exchange failure.
+      for (const header of exchanged.headers.getSetCookie()) {
+        const pair = header.split(';')[0], split = pair.indexOf('=');
+        jar.set(pair.slice(0, split), decodeURIComponent(pair.slice(split + 1)));
+      }
+      const completion = await fetch(destination, { redirect: 'manual', headers: { Cookie: cookie() } });
+      assert.equal(completion.status, 200);
+      assert((await completion.text()).includes('Finalise ton compte'));
+    }
     for (const consent of [{ consentRgpd: false, consentSante: true }, { consentRgpd: true, consentSante: false }]) {
       assert.equal((await register(consent)).status, 400);
       assert.equal(await db.user.count({ where: { supabaseAuthId: authId } }), 0);
@@ -71,7 +98,7 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
     assert.equal(await db.user.count({ where: { supabaseAuthId: authId } }), 1);
     const welcome = await fetch(origin + '/bienvenue', { headers: { Cookie: cookie() }, redirect: 'manual' });
     assert.equal(welcome.status, 200); assert(!(await welcome.text()).includes('NEXT_REDIRECT'));
-    console.log('PASS local signup: real confirmation email, login, consent gates, diagnostic recovery, retries preserve profile, welcome accessible. No native UI or production claim.');
+    console.log('PASS local signup: real email/callback ' + (missingVerifier ? 'refused without verifier, password recovery works' : 'sets authenticated cookies without password login') + ', consent gates, diagnostic recovery, retries preserve profile, welcome accessible. No native callback or production claim.');
   } finally {
     await client.auth.signOut();
     if (authId) {

@@ -2,6 +2,22 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Callback email réel — 27 septembre
+
+Le test HTTP signup suit maintenant le lien capturé jusqu'à `/auth/callback`
+avec son code PKCE réel. Avec le cookie d'origine : HTTP 307 vers finalisation,
+cookies de session réellement émis par le serveur, page Finalise ton compte
+HTTP 200 et inscription réussie sans connexion préalable par mot de passe.
+Le mode `signup-http --missing-verifier` omet ce cookie : redirection contrôlée
+vers connexion, accès anonyme refusé, puis connexion par mot de passe réussie
+sur l'adresse désormais confirmée. Les deux variantes passent et nettoient
+leurs comptes/emails/diagnostics. Tests auth-confirmation et auth-async verts.
+Pas de modification produit ; cette preuve HTTP ne démontre pas le retour
+Mail → app. Aucun handler onOpenURL/associated domains trouvé dans le code iOS
+actuel : le traitement ASWebAuthenticationSession existant concerne OAuth,
+pas le lien email externe. Ce parcours natif reste explicitement à construire
+et valider ; ne pas considérer la variante mot de passe comme son remplacement.
+
 ### Inscription dans WebKit natif — 27 septembre
 
 `testLocalSignupReachesEmailConfirmation` saisit prénom, email et mot de passe
