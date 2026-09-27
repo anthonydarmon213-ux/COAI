@@ -35,3 +35,17 @@ Tests réussis, ainsi que droits d'accès, typage, lint et build.
 simulés ne constituent pas cette preuve. Si la base refuse aussi la restitution,
 une erreur générique est journalisée : aucune restitution durable automatique
 n'est garantie. Livraison ManyChat et doublons d'événements restent à auditer.
+
+## Preuve PostgreSQL locale
+
+`node scripts/test-coach-quota-postgres.cjs --local` réussi trois fois : douze
+demandes mêlant les handlers web et WhatsApp pour une dernière place, puis
+douze demandes après expiration. Une seule réponse dans le premier cas,
+quatre dans le second ; compteurs relus directement en base conformes.
+Panne IA : compteur restitué. Abonnement résilié : aucun appel IA ni nouveau
+message stocké. Comptes et événements jetables supprimés et absence vérifiée.
+
+La base Prisma/PostgreSQL est réelle et exclusivement sur 127.0.0.1:54322.
+IA et authentification entrante sont simulées ; ce n'est ni une preuve HTTP,
+ni une livraison ManyChat, ni un test de production. Aucun code produit modifié
+dans ce complément de vérification.
