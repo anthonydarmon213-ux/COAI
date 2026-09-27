@@ -2,6 +2,22 @@
 
 ## État actuel — remplace les limites historiques ci-dessous
 
+### Inscription complète par l'interface iPhone — 27 septembre, 15 h 13
+
+`testLocalSignupConsentCreatesAccount` passe en 46 secondes : inscription,
+confirmation email locale/retour OS, refus avec zéro consentement, refus avec
+RGPD seul, puis choix explicite du second consentement et création réelle.
+Accueil nominatif et bouton Faire mon diagnostic présents. Les deux cases
+étaient initialement décochées. Contrôle indépendant DB : identité Auth exacte,
+prénom et deux horodatages présents. Sessions révoquées puis compte applicatif,
+compte Auth et unique email jetables retirés (`ui-signup-cleanup --finalized`).
+Preuve : `/tmp/coai-native-connected-0925/Logs/Test/Test-COAI-2026.09.27_15-12-51-+0200.xcresult`.
+Captures : `/tmp/coai-signup-complete-proof-0927`. Le titre h1 est un Other
+WebKit avec plusieurs StaticText enfants ; le test initial cherchait à tort
+un StaticText unique. Aucun changement produit nécessaire pour la création.
+Reste : diagnostic complet depuis ce nouveau compte, appareil physique,
+démarrage froid/Mail/Safari et production. Aucun achat ni publication.
+
 ### Consentements lisibles sur petit écran — 27 septembre, 15 h 05
 
 La capture du retour email a révélé que le label flex séparait texte, lien

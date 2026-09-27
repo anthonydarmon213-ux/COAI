@@ -13,7 +13,12 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func localSignup(waitForReturn: Bool) throws {
+    func testLocalSignupConsentCreatesAccount() throws {
+        try localSignup(waitForReturn: true, finalize: true)
+    }
+
+    @MainActor
+    private func localSignup(waitForReturn: Bool, finalize: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -67,6 +72,34 @@ final class COAIUITests: XCTestCase {
             returned.name = "Retour email local — session d’origine"
             returned.lifetime = .keepAlways
             add(returned)
+            if finalize {
+                let finish = web.buttons["Créer mon espace et commencer →"]
+                reveal(finish, in: app)
+                finish.tap()
+                XCTAssertTrue(web.staticTexts["Le consentement au traitement des données de santé est requis."].waitForExistence(timeout: 5))
+                let privacy = web.switches.matching(NSPredicate(format: "label BEGINSWITH %@", "J'ai lu la")).firstMatch
+                let health = web.switches.matching(NSPredicate(format: "label BEGINSWITH %@", "Je certifie être apte")).firstMatch
+                XCTAssertTrue(privacy.exists)
+                XCTAssertTrue(health.exists)
+                XCTAssertEqual(privacy.value as? String, "0")
+                XCTAssertEqual(health.value as? String, "0")
+                reveal(privacy, in: app)
+                privacy.tap()
+                reveal(finish, in: app)
+                finish.tap()
+                XCTAssertTrue(web.staticTexts["La certification d'aptitude sportive est requise."].waitForExistence(timeout: 5))
+                reveal(health, in: app)
+                health.tap()
+                reveal(finish, in: app)
+                finish.tap()
+                XCTAssertTrue(web.otherElements["Bienvenue, Test inscription iPhone."].waitForExistence(timeout: 30))
+                XCTAssertTrue(web.buttons["Faire mon diagnostic"].waitForExistence(timeout: 10))
+                XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+                let welcome = XCTAttachment(screenshot: app.screenshot())
+                welcome.name = "Inscription complète — accueil réel"
+                welcome.lifetime = .keepAlways
+                add(welcome)
+            }
         }
     }
 
