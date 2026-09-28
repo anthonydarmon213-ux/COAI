@@ -10,6 +10,11 @@ de fichier. HealthKit structuré reste sans IA. Détails et limites dans
 `PRIVACY-AUDIT.md`. Non publié, non validé sur iPhone pour ce changement ;
 consentements coach/génération et rétention fournisseur encore à auditer.
 
+Complément fiabilité photo : fichier vide et envoi interrompu maintenant
+refusés proprement avant IA ; 42 cas simulés et 27 cas HTTP réels locaux
+réussis, y compris HealthKit sans analyse d’image. Build/types/lint réussis,
+aucun appel payant ni déploiement. iPhone 17 Pro toujours indisponible.
+
 Nom sous l'icône corrigé : Release affichait encore « COAI test » dans son
 Info.plist compilé. Variable par configuration : « COAI » en Release,
 « COAI test » en Debug. Les deux valeurs sont désormais contrôlées sur les

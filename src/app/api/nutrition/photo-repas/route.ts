@@ -36,7 +36,12 @@ export async function POST(request: Request) {
   if (!hasAIImageConsent(request.headers, "repas")) {
     return NextResponse.json({ error: AI_IMAGE_CONSENT_ERROR, code: "AI_IMAGE_CONSENT_REQUIRED" }, { status: 403 });
   }
-  const formData = await request.formData();
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "L’envoi de la photo est incomplet. Sélectionne-la à nouveau." }, { status: 400 });
+  }
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
@@ -47,6 +52,9 @@ export async function POST(request: Request) {
       { error: "Format non supporté (JPEG, PNG, GIF ou WEBP requis)" },
       { status: 400 }
     );
+  }
+  if (file.size === 0) {
+    return NextResponse.json({ error: "Cette image est vide. Choisis une autre photo." }, { status: 400 });
   }
   if (file.size > MAX_SIZE_BYTES) {
     return NextResponse.json({ error: "Image trop volumineuse (10 Mo max)" }, { status: 400 });

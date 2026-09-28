@@ -152,6 +152,25 @@ de composants. Tests médias existants réussis.
 génération, politique de confidentialité complète et configuration/rétention
 réelle du prestataire. Pas de conclusion de conformité App Store ou RGPD globale.
 
+### Envois incomplets — 28 septembre, vérification locale complémentaire
+
+Défaut reproduit : un fichier vide atteignait l’IA (502 dans le test avec
+prestataire simulé) au lieu d’être refusé. Les cinq routes rejettent maintenant
+les fichiers vides et les multipart illisibles avec un message JSON 400 clair,
+sans appel IA ni écriture de profil. JSON HealthKit tronqué également traité.
+Ce contrôle ne décode pas le contenu d’une image non vide et ne prouve pas
+l’intégrité de tous les formats ni la résistance aux envois géants.
+
+`test-vision-error-privacy.cjs` : 42 cas réussis. Nouveau
+`test-vision-input-http-local.cjs` : 27 cas sur le vrai serveur compilé et les
+services Auth/PostgreSQL locaux, compte/abonnement fictifs. Accord absent,
+obsolète ou de mauvaise portée refusé ; envois vides/interrompus refusés,
+profil intact ; mesure HealthKit structurée persistée séparément. Serveur sans
+clé IA, aucune photo valide transmise. Compte, abonnement et profil fictifs
+supprimés, session révoquée. Typage/lint/build et tests médias réussis.
+Navigateur de connexion local sans erreur détectée après redémarrage. Aucun
+déploiement ; iPhone 17 Pro indisponible lors du contrôle.
+
 1. Vérifier les transmissions réelles des écrans connectés et les journaux
    techniques ; définir puis tester la suppression des données sensibles dans
    les erreurs et métadonnées avant déclaration définitive.

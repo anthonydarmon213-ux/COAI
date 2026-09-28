@@ -49,7 +49,7 @@ async function exercise([route, promptModule, promptFunction], mode) {
   const source = fs.readFileSync(path.join(root, 'src/app/api', route, 'route.ts'), 'utf8');
   vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, box);
   const body = new FormData();
-  body.append('file', new File(['synthetic-image-only'], 'fixture.png', { type: 'image/png' }));
+  body.append('file', new File(mode === 'empty-file' ? [] : ['synthetic-image-only'], 'fixture.png', { type: 'image/png' }));
   body.append('exercice', 'Squat');
   const headers = mode === 'no-consent' ? {}
     : mode === 'wrong-scope' ? consent.aiImageConsentHeaders(scopes[route] === 'menu' ? 'repas' : 'menu', true)
@@ -57,6 +57,8 @@ async function exercise([route, promptModule, promptFunction], mode) {
     : consent.aiImageConsentHeaders(scopes[route], true);
   const requestOptions = mode === 'healthkit'
     ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ source: 'healthkit', pasMoyenParJour: 7500 }) }
+    : mode === 'broken-form' ? { method: 'POST', headers: { ...headers, 'content-type': 'multipart/form-data; boundary=interrupted' }, body: '--interrupted\r\nPRIVATE-truncated-body' }
+    : mode === 'broken-healthkit' ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{PRIVATE-broken-json' }
     : { method: 'POST', headers, body };
   const response = await box.exports.POST(new Request('http://localhost/api/' + route, requestOptions));
   const payload = await response.text();
@@ -70,6 +72,13 @@ async function exercise([route, promptModule, promptFunction], mode) {
   }
   assert.equal(writes, 0, route + ': failures must not update the profile');
   assert.ok(!payload.includes('PRIVATE'), route + ': response leaked provider content');
+  if (['empty-file', 'broken-form', 'broken-healthkit'].includes(mode)) {
+    assert.equal(response.status, 400, route + ': invalid upload should give a recoverable client error');
+    assert.equal(typeof JSON.parse(payload).error, 'string');
+    assert.equal(aiCalls, 0);
+    assert.equal(logs.length, 0);
+    return;
+  }
   if (mode === 'provider-error') {
     assert.equal(response.status, 502);
     assert.equal(aiCalls, 1);
@@ -85,7 +94,8 @@ async function exercise([route, promptModule, promptFunction], mode) {
   }
 }
 (async () => {
-  for (const item of cases) for (const mode of ['provider-error', 'unauthenticated', 'unpaid', 'no-consent', 'wrong-scope', 'old-consent']) await exercise(item, mode);
+  for (const item of cases) for (const mode of ['provider-error', 'unauthenticated', 'unpaid', 'no-consent', 'wrong-scope', 'old-consent', 'empty-file', 'broken-form']) await exercise(item, mode);
   await exercise(cases.find(item => item[0] === 'profil/montre'), 'healthkit');
-  console.log('PASS — five real vision routes, 31 cases: explicit scoped consent, private provider errors excluded, no profile mutation on failure, auth/payment gates preserved; structured HealthKit stays AI-free without image consent. All providers simulated.');
+  await exercise(cases.find(item => item[0] === 'profil/montre'), 'broken-healthkit');
+  console.log('PASS — five real vision routes, 42 cases: consent and auth gates, private errors excluded, interrupted/empty uploads rejected without AI or writes; structured HealthKit stays AI-free. All providers simulated.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
