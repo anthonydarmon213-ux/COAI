@@ -2,6 +2,13 @@
 
 ## État courant — 28 septembre 2026
 
+Recontrôle natif à 13 h 03 : `bash scripts/check-ios.sh --device-release`
+réussi, 51 XCTest, 65 contrôles cœur, règles WebKit compilées sur macOS,
+configuration de confidentialité et cinq cas négatifs validés. Release iPhone
+arm64 non signée compilée, manifeste inclus, nom COAI vérifié, marqueurs de
+test locaux absents selon le script. Ce contrôle ne charge pas le site distant
+et ne valide ni signature, installation, achats réels ni publication App Store.
+
 WhatsApp : absence de contrôle d'accord fournisseur reproduite, puis garde
 serveur ajoutée avant profil/message/quota/IA. Tests de refus et quotas réussis
 (dont PostgreSQL local réel, fournisseur simulé). Contrat et blocage de mise en
