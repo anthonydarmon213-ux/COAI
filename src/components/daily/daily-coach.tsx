@@ -54,10 +54,13 @@ export function DailyCoach({ context }: { context: CoachSessionContext }) {
       const data = await response.json();
       if (!response.ok) {
         setQuotaReached(response.status === 429);
-        throw new Error(typeof data.error === "string" ? data.error : "Le coach ne peut pas répondre pour le moment.");
+        throw new Error(typeof data?.error === "string" ? data.error : "Le coach ne peut pas répondre pour le moment.");
       }
-      setHistory((current) => [...current, { question: currentQuestion, answer: String(data.answer) }]);
-      setQuestion("");
+      if (typeof data?.answer !== "string" || !data.answer.trim()) {
+        throw new Error("La réponse n’a pas abouti. Tu peux réessayer.");
+      }
+      setHistory((current) => [...current, { question: currentQuestion, answer: data.answer }]);
+      setQuestion((current) => current.trim() === currentQuestion ? "" : current);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Une erreur est survenue.");
     } finally {

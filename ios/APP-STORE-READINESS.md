@@ -2,6 +2,18 @@
 
 ## État courant — 28 septembre 2026
 
+Coach pendant la séance : défaut du format vocal reproduit (`context.source`
+absent, donc refus 400 par le schéma de l’API), puis corrigé. Le test du vrai
+gestionnaire extrait désormais le vrai schéma serveur et couvre échauffement
+et exercice, en plus du double appui, du refus micro, du délai réseau et de la
+relance. `test-runner-voice-question.cjs` réussi, voix et transport simulés.
+Coach texte de séance : réponse absente/vide rejetée sans bulle « undefined » ;
+brouillon suivant préservé après réponse tardive. Défaut de brouillon reproduit,
+puis `test-daily-coach-response.cjs` réussi (React/transport simulés).
+Typage/lint sans erreur/build local et tests médias réussis. Contrôle React :
+mise à jour fonctionnelle du brouillon, pas de nouvel effet ni dépendance.
+Non publié, aucune conversation IA payante ni validation physique effectuée.
+
 Analyses d’images : accord explicite Anthropic ajouté localement sur les cinq
 outils et leurs sept points d’entrée ; refus serveur sans acquittement propre à
 l’outil. 31 cas de routes et tests des sept interfaces réussis, prestataire

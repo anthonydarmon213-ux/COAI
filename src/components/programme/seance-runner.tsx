@@ -610,7 +610,7 @@ export function SeanceRunner({
               // pleine séance, une réponse longue est inutilisable, et lue à
               // voix haute elle devient interminable.
               question: `${question}\n\n(Réponds en 2 phrases courtes maximum, je suis en pleine séance.)`,
-              context: contexte,
+              context: { source: "DAILY_WORKOUT", ...contexte },
             }),
           });
           const data = await res.json().catch(() => null);

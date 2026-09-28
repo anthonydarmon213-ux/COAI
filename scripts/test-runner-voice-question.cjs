@@ -12,15 +12,24 @@ function visit(node) {
 }
 visit(ast);
 assert.ok(handler);
-async function scenario(mode) {
+const routeSource = fs.readFileSync('src/app/api/coach/ask/route.ts', 'utf8');
+const routeAST = ts.createSourceFile('route.ts', routeSource, ts.ScriptTarget.Latest, true);
+const schemaStatements = routeAST.statements.filter(node => ts.isVariableStatement(node)
+  && node.declarationList.declarations.some(declaration => ['contextSchema', 'bodySchema'].includes(declaration.name.getText(routeAST))));
+assert.equal(schemaStatements.length, 2);
+const schemaBox = { z: require('zod').z };
+vm.runInNewContext(schemaStatements.map(node => node.getText(routeAST)).join('\n') + '\nglobalThis.schema = bodySchema;', schemaBox);
+async function scenario(mode, exerciseStep = false) {
   let creations = 0, requests = 0, busy = false, answer, resolve;
+  const payloads = [];
   const reco = { start() { if (mode === 'start-error') throw Error('denied'); } };
   const box = {
     questionEnCours: false, questionEnCoursRef: {current:false},
     creerReconnaissance: () => { creations++; return reco; },
     setQuestionEnCours: value => { busy = value; }, setReponseCoach: value => {answer=value;},
     setCoachParle() {}, stopperVoix() {}, parler() {},
-    step: {type:'echauffement'}, nomSeance:'Test',
+    step: exerciseStep ? {type:'set', nom:'Squat', exercice:{series:'3', repetitions:'10', repos:'60 s', charge:'Confortable'}} : {type:'echauffement'}, nomSeance:'Test',
+    substitutions: {},
     window: {setTimeout() {}},
     withRequestDeadline: async operation => {
       const controller = new AbortController();
@@ -29,6 +38,7 @@ async function scenario(mode) {
     },
     fetch: (_url, options) => {
       requests++;
+      payloads.push(JSON.parse(options.body));
       return new Promise((done, reject) => {
         resolve = () => done(Response.json({answer:'Réponse test'}));
         options.signal.addEventListener('abort', () => reject(Error('timeout')));
@@ -53,11 +63,18 @@ async function scenario(mode) {
   assert.equal(creations,1); assert.equal(requests,1,'duplicate transcript ignored');
   if (mode === 'ok') resolve();
   await pending;
+  for (const payload of payloads) {
+    const result = schemaBox.schema.safeParse(payload);
+    assert.equal(result.success, true, 'Actual coach API contract: ' + JSON.stringify(result.error?.issues));
+    assert.equal(payload.context.source, 'DAILY_WORKOUT');
+    if (exerciseStep) assert.equal(payload.context.exerciseName, 'Squat');
+  }
   assert.equal(busy,false); assert.equal(box.questionEnCoursRef.current,false);
   assert.match(answer,mode === 'ok' ? /Réponse test/ : /Connexion impossible/);
   box.run(); assert.equal(creations,2,'manual retry available'); reco.onend();
 }
 (async () => {
   for (const mode of ['ok','timeout','start-error','no-result','denied']) await scenario(mode);
-  console.log('PASS vocal coach: double tap/result, microphone end while pending, response, timeout, denied/start failure, manual retry. Simulated only.');
+  await scenario('ok', true);
+  console.log('PASS vocal coach: real API schema accepts warmup and exercise context; double tap/result, microphone end while pending, response, timeout, denied/start failure, manual retry. Speech and network simulated.');
 })().catch(error => {console.error(error);process.exitCode=1;});
