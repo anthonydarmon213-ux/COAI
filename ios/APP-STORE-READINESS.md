@@ -2,6 +2,19 @@
 
 ## État courant — 28 septembre 2026
 
+Reprise réseau revalidée à 14 h 31 sur le simulateur QA : arrêt du seul
+serveur localhost:3050, erreur WebKit réelle, message compréhensible,
+Réessayer et Repos accessibles, minuteur ouvrable puis fermeture sans blocage.
+`testUnavailableNetworkKeepsRecoveryControlsAccessible` passe (9,628 s),
+résultat `/tmp/coai-network-unavailable-09281430.xcresult`.
+Test séparé démarré serveur toujours arrêté, puis serveur rétabli pendant
+les tentatives : formulaire de connexion et Google revenus sans relancer
+l'application, erreur disparue. `testLocalNetworkRestorationLoadsLoginWithoutRelaunch`
+passe (65,105 s, durée incluant l'attente volontaire du serveur), résultat
+`/tmp/coai-network-restored-09281431.xcresult`. Aucun réseau utilisateur ou
+service de production modifié. Ne couvre pas les coupures pendant sauvegarde,
+achat ou transfert photo, ni les conditions cellulaires sur appareil physique.
+
 Nutrition, 14 h 23 : défaut reproduit puis corrigé — les principes généraux
 étaient masqués dès que le programme contenait des jours. Ils restent désormais
 accessibles dans une section repliée ; sans jours, leur affichage initial est
