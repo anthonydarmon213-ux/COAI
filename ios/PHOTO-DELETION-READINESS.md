@@ -11,6 +11,15 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Vérifié
 
+- Reprise d'une réponse d'envoi perdue, même avec Storage local réel : chaque
+  envoi porte un UUID serveur dans les métadonnées. Après erreur seulement,
+  l'app consulte `info` et exige UUID + chemin + bucket exacts avant confirmation.
+  Le test `test-photo-lost-response-local.cjs` fait réellement enregistrer un
+  PNG fictif puis perd sa réponse HTTP ; avatar et photo de suivi récupérés et
+  supprimés ensuite. Ancien marqueur, mauvais chemin/bucket, métadonnées absentes
+  et panne de lecture restent refusés dans les tests unitaires.
+- Les photos de suivi utilisent désormais l'UUID d'envoi, et non une date à la
+  milliseconde, pour éviter la collision de deux envois simultanés.
 - Test des vrais modules avec PostgreSQL local et stockage simulé : lecture du
   fichier retardée, envoi déjà en cours, nouvelle tentative de suppression,
   reconnexion, confirmation inconnue, isolation des propriétaires.
@@ -28,10 +37,11 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Obligatoire avant publication
 
-1. Définir et tester une reprise opérationnelle des envois incertains. Un timeout
+1. Compléter la reprise opérationnelle des envois incertains. Un timeout
    ne prouve pas que le stockage a refusé le fichier : NE PAS supprimer la
-   réservation sur délai, NE PAS marquer settled sans preuve. En l'état, une
-   réponse perdue bloque l'effacement et nécessite assistance. Cette limite
+   réservation sur délai, NE PAS marquer settled sans preuve. La réponse perdue
+   est récupérée si le processus peut lire la preuve exacte ; un arrêt du
+   processus ou une preuve indisponible bloque encore l'effacement. Cette limite
    empêche de considérer la suppression prête pour production.
 2. Compléter le parcours HTTP local réussi par les scénarios de panne et de
    concurrence avec stockage réel, puis sur l'environnement autorisé. Les

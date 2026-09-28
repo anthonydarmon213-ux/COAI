@@ -6,23 +6,42 @@ export const PROGRESS_PHOTOS_BUCKET = "progress photos";
 
 const SIGNED_URL_TTL_SECONDS = 3600;
 
-export async function uploadProgressPhoto(
-  userId: string,
-  file: File
-): Promise<{ path: string } | { error: string }> {
+async function storeRegisteredPhoto(userId: string, file: File, avatar: boolean): Promise<{ path: string } | { error: string }> {
   const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
-  const path = `${userId}/${Date.now()}.${ext}`;
-
   const admin = createSupabaseAdminClient();
   const body = await file.arrayBuffer();
   const operation = await reservePhotoWrite(userId);
-  const { error } = await admin.storage
-    .from(PROGRESS_PHOTOS_BUCKET)
-    .upload(path, body, { contentType: file.type });
+  const path = `${userId}/${avatar ? "avatar" : operation}.${ext}`;
+  const bucket = admin.storage.from(PROGRESS_PHOTOS_BUCKET);
 
-  if (error) return { error: error.message };
+  // A lost response is recoverable only with positive evidence for THIS write,
+  // not merely an existing avatar, matching bytes, or an elapsed timeout.
+  async function storedOperationMatches(): Promise<boolean> {
+    try {
+      const { data, error } = await bucket.info(path);
+      return !error && data.name === path && data.bucketId === PROGRESS_PHOTOS_BUCKET
+        && data.metadata?.coaiUploadOperation === operation;
+    } catch {
+      return false;
+    }
+  }
+
+  try {
+    const { error } = await bucket.upload(path, body, {
+      contentType: file.type, upsert: avatar,
+      metadata: { coaiUploadOperation: operation },
+    });
+    if (error && !await storedOperationMatches()) return { error: error.message };
+  } catch (error) {
+    if (!await storedOperationMatches()) throw error;
+  }
+
   await confirmPhotoWrite(userId, operation);
   return { path };
+}
+
+export async function uploadProgressPhoto(userId: string, file: File): Promise<{ path: string } | { error: string }> {
+  return storeRegisteredPhoto(userId, file, false);
 }
 
 export function isOwnedProgressPhotoPath(userId: string, path: string): boolean {
@@ -44,23 +63,11 @@ export async function uploadAvatar(
   userId: string,
   file: File
 ): Promise<{ path: string } | { error: string }> {
-  const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
-  const path = `${userId}/avatar.${ext}`;
-  const admin = createSupabaseAdminClient();
-
   // Do not delete the current avatar before the replacement is stored and its
   // path saved by the caller. Keep the other format variants (at most three
   // fixed paths) so a failed upload/database write cannot break the old path.
   // Account deletion removes all variants through deleteAllProgressPhotos.
-  const body = await file.arrayBuffer();
-  const operation = await reservePhotoWrite(userId);
-  const { error } = await admin.storage
-    .from(PROGRESS_PHOTOS_BUCKET)
-    .upload(path, body, { contentType: file.type, upsert: true });
-
-  if (error) return { error: error.message };
-  await confirmPhotoWrite(userId, operation);
-  return { path };
+  return storeRegisteredPhoto(userId, file, true);
 }
 
 export async function deleteAllProgressPhotos(userId: string): Promise<void> {
