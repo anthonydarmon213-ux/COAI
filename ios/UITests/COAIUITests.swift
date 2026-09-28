@@ -172,6 +172,20 @@ final class COAIUITests: XCTestCase {
                     XCTAssertTrue(web.staticTexts["Tes réponses analysées"].exists)
                     XCTAssertFalse(web.staticTexts["4 capacités physiques évaluées"].exists)
                     XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+                    let saveShortcut = web.links["Passer à l’enregistrement de mon bilan →"]
+                    XCTAssertTrue(saveShortcut.waitForExistence(timeout: 10))
+                    XCTAssertTrue(saveShortcut.isHittable, "Saving must be reachable without scrolling through the result")
+                    // WebKit exposes the text bounds, excluding the anchor padding.
+                    // Keep a visual proof and verify the actual navigation instead.
+                    let shortcutProof = XCTAttachment(screenshot: app.screenshot())
+                    shortcutProof.name = "Bilan — accès direct à l’enregistrement"
+                    shortcutProof.lifetime = .keepAlways; add(shortcutProof)
+                    tap(saveShortcut)
+                    let saveVisible = NSPredicate { _, _ in
+                        web.buttons["Enregistrer et continuer"].isHittable
+                    }
+                    expectation(for: saveVisible, evaluatedWith: nil)
+                    waitForExpectations(timeout: 10)
                     tap(web.buttons["Enregistrer et continuer"])
                     XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
                     XCTAssertTrue(web.staticTexts["Choisis ton accompagnement COAI pour accéder à ton programme."].exists)

@@ -2342,6 +2342,14 @@ export function DiagnosticQuiz({
                 <h2 className="coai-gradient-text max-w-2xl font-display text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
                   Ton point de départ est clair. Voici la trajectoire.
                 </h2>
+                {connecte && !accesProgrammeActif && applyStatus === "idle" && (
+                  <a
+                    href="#appliquer-mon-bilan"
+                    className="inline-flex min-h-14 w-full items-center justify-center rounded-xl border border-laiton-300/40 px-4 py-3 text-sm font-semibold text-laiton-300 sm:w-auto"
+                  >
+                    Passer à l’enregistrement de mon bilan →
+                  </a>
+                )}
                 <div className="coai-analysis-proof" aria-label="Analyse personnalisée terminée">
                   <span><i />Tes réponses analysées</span>
                   <span><i />Tes priorités identifiées</span>

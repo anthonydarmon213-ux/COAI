@@ -13,9 +13,19 @@ absence du compte de séance et refus de son ancien mot de passe confirmés.
 Résultats : `/tmp/coai-signup-current-092813.xcresult` et
 `/tmp/coai-workout-current-092813.xcresult`. Accès programme synthétique pour
 la séance, aucun achat Apple ni IA ; pas une validation en production.
-Friction identifiée : nouveau compte sans abonnement, action d'enregistrement
-du bilan très bas dans le résultat ; raccourci haut actuellement réservé aux
-comptes avec accès programme. À simplifier puis retester, sans sauvegarde tacite.
+Friction corrigée localement à 13 h 45 : raccourci d'enregistrement ajouté
+sous le titre pour le membre connecté sans accès programme. Visible et
+utilisable sans défilement sur le simulateur petit écran ; rejoint le vrai
+bouton sans sauvegarde tacite. Parcours complet réussi (130,012 s), réponses
+exactes vérifiées en PostgreSQL puis compte/email fictifs nettoyés.
+Preuve : `/tmp/coai-signup-shortcut-09281444.xcresult`, capture examinée
+`/tmp/coai-shortcut-visible-captures/A49377AC-266F-41B3-B986-30B41C24A918.png`.
+Deux essais avaient rejeté une mesure WebKit des lignes de texte (39 points),
+pas de toute l'ancre ; contrôle remplacé par accessibilité immédiate et saut
+réel, hauteur CSS minimale 56 px. Un essai interrompu pour attente d'animations
+du simulateur a nécessité son redémarrage sans effacement. Types, lint
+(6 avertissements existants), build et régressions diagnostic passent.
+Non publié ; contrôle physique et production encore requis.
 
 Recontrôle natif à 13 h 03 : `bash scripts/check-ios.sh --device-release`
 réussi, 51 XCTest, 65 contrôles cœur, règles WebKit compilées sur macOS,
