@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AICoachConsent } from "@/components/ai/coach-consent";
+import { aiCoachConsentHeaders } from "@/lib/ai/coach-consent";
 
 type Echange = { question: string; reponse: string };
 
@@ -14,11 +16,12 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
   const [quotaAtteint, setQuotaAtteint] = useState(false);
   const [historique, setHistorique] = useState<Echange[]>([]);
   const [quotaRemaining, setQuotaRemaining] = useState(initialQuotaRemaining);
+  const [aiAgreed, setAIAgreed] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const q = question.trim();
-    if (!q || loading) return;
+    if (!q || loading || !aiAgreed) return;
 
     setLoading(true);
     setError(null);
@@ -26,7 +29,7 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
     try {
       const res = await fetch("/api/coach/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...aiCoachConsentHeaders(aiAgreed) },
         body: JSON.stringify({ question: q }),
       });
       const data = await res.json();
@@ -131,8 +134,10 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
             </button>
           ))}
         </div>
+        <AICoachConsent agreed={aiAgreed} onChange={setAIAgreed} disabled={loading} />
         <form onSubmit={handleSubmit} className="flex items-end gap-2">
           <textarea
+            aria-label="Message au coach IA"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Écris ton message…"
@@ -140,7 +145,7 @@ export function AskCoach({ initialQuotaRemaining }: { initialQuotaRemaining: num
             maxLength={1000}
             className="max-h-32 min-h-[3rem] w-full flex-1 resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-graphite-50 placeholder:text-graphite-500 focus:border-cyan-300/45 focus:outline-none focus:shadow-[0_0_24px_-10px_rgba(76,201,240,.7)]"
           />
-          <Button type="submit" disabled={loading || !question.trim()} className="h-11 flex-none rounded-full px-5">
+          <Button type="submit" disabled={loading || !question.trim() || !aiAgreed} className="h-11 flex-none rounded-full px-5">
             {loading ? "…" : "Envoyer"}
           </Button>
         </form>

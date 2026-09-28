@@ -28,6 +28,28 @@ réseau, ni déclaration App Privacy, ni approbation Apple.
 
 ## Données et preuves dans le dépôt
 
+### Coach conversationnel — contrôle local du 28 septembre
+
+Les trois interfaces web du coach demandent un accord initialement décoché
+avant partage avec Anthropic. Le texte décrit question, profil, contraintes et
+antécédents renseignés, observations/tendances et contexte éventuel de séance.
+La dictée précise que le service vocal de l'appareil/navigateur peut recevoir
+l'audio. Sans accord, le bouton vocal ouvre cette information sans lancer le
+micro ; revenir à la séance reste possible. Le retrait bloque les futurs envois.
+
+`/api/coach/ask` exige l'acquittement versionné propre au coach avant lecture
+du profil, mémoire et quota. Ce contrôle n'est ni une authentification ni une
+preuve juridique durable. Les accords image ne sont pas réutilisés.
+
+Tests des vraies interfaces/gestionnaires avec transport simulé, neuf cas de
+route et concurrence des quotas sur PostgreSQL local réussis. Navigateur local
+connecté 390 × 844 : trois écrans examinés, activation/retrait, retour sans
+accord et refus HTTP 403 vérifiés. Aucun message transmis au prestataire.
+Compte fictif nettoyé, suppression Auth/application vérifiée. Types, lint,
+build et contrôle médias réussis. Non publié, non testé sur iPhone pour ce lot.
+WhatsApp et génération automatique ne sont pas couverts par ce changement ;
+conservation fournisseur, consentement durable et audit réseau restent ouverts.
+
 ### Préparation des images — contrôle du 28 septembre, local
 
 `compressProgressPhoto` redessine l'image dans un canvas avant envoi. Correction

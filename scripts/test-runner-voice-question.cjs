@@ -3,6 +3,11 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const ts = require('typescript');
+const consentBox = { exports: {} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/ai/coach-consent.ts', 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS },
+}).outputText, consentBox);
+const consent = consentBox.exports;
 const source = fs.readFileSync('src/components/programme/seance-runner.tsx', 'utf8');
 const ast = ts.createSourceFile('runner.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 let handler;
@@ -24,6 +29,8 @@ async function scenario(mode, exerciseStep = false) {
   const payloads = [];
   const reco = { start() { if (mode === 'start-error') throw Error('denied'); } };
   const box = {
+    coachAIAgreed: mode !== 'no-consent', setCoachConsentOpen(value) { assert.equal(value, true); },
+    aiCoachConsentHeaders: consent.aiCoachConsentHeaders,
     questionEnCours: false, questionEnCoursRef: {current:false},
     creerReconnaissance: () => { creations++; return reco; },
     setQuestionEnCours: value => { busy = value; }, setReponseCoach: value => {answer=value;},
@@ -38,6 +45,7 @@ async function scenario(mode, exerciseStep = false) {
     },
     fetch: (_url, options) => {
       requests++;
+      assert(consent.hasAICoachConsent(new Headers(options.headers)));
       payloads.push(JSON.parse(options.body));
       return new Promise((done, reject) => {
         resolve = () => done(Response.json({answer:'Réponse test'}));
@@ -47,6 +55,9 @@ async function scenario(mode, exerciseStep = false) {
   };
   vm.runInNewContext(ts.transpileModule(handler+'\nglobalThis.run=poserQuestionAuCoach;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText, box);
   box.run();
+  if (mode === 'no-consent') {
+    assert.equal(creations, 0); assert.equal(requests, 0); assert.equal(busy, false); return;
+  }
   if (mode === 'start-error') {
     assert.equal(busy,false); assert.match(answer,/microphone/); assert.equal(requests,0); return;
   }
@@ -74,7 +85,7 @@ async function scenario(mode, exerciseStep = false) {
   box.run(); assert.equal(creations,2,'manual retry available'); reco.onend();
 }
 (async () => {
-  for (const mode of ['ok','timeout','start-error','no-result','denied']) await scenario(mode);
+  for (const mode of ['ok','timeout','start-error','no-result','denied','no-consent']) await scenario(mode);
   await scenario('ok', true);
   console.log('PASS vocal coach: real API schema accepts warmup and exercise context; double tap/result, microphone end while pending, response, timeout, denied/start failure, manual retry. Speech and network simulated.');
 })().catch(error => {console.error(error);process.exitCode=1;});

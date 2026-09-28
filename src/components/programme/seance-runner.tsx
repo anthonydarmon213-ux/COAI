@@ -16,6 +16,8 @@ import { parseReposSeconds } from "@/lib/programmes/repos";
 import { TrackConversion } from "@/components/analytics/track-conversion";
 import { firstSavedConversionId } from "@/lib/analytics/first-saved-conversion";
 import { withRequestDeadline } from "@/lib/suivi/request-deadline";
+import { AICoachConsent } from "@/components/ai/coach-consent";
+import { aiCoachConsentHeaders } from "@/lib/ai/coach-consent";
 
 // Lecteur de séance guidé (21/08/2026, demande Anthony, référence : écran
 // "Chest Press... 00:35" de MyFitCoach) — jusqu'ici la séance n'était
@@ -136,7 +138,8 @@ function useBip() {
 
 // Saisie vocale (22/08/2026, demande Anthony) — en salle, les mains sont
 // souvent occupées ou moites. Utilise la Web Speech API du navigateur
-// (aucune dépendance, aucun envoi audio à un serveur). Indisponible sur
+// (aucune dépendance ; le service vocal du navigateur peut traiter l’audio
+// à distance). Indisponible sur
 // Firefox et sur certains navigateurs : le bouton ne s'affiche alors pas
 // du tout, plutôt qu'un bouton mort qui ne réagit jamais.
 type ReconnaissanceVocale = {
@@ -312,6 +315,8 @@ export function SeanceRunner({
   const [questionEnCours, setQuestionEnCours] = useState(false);
   const questionEnCoursRef = useRef(false);
   const [reponseCoach, setReponseCoach] = useState<string | null>(null);
+  const [coachAIAgreed, setCoachAIAgreed] = useState(false);
+  const [coachConsentOpen, setCoachConsentOpen] = useState(false);
 
   // Interrompre la voix lorsque le lecteur est fermé.
   useEffect(() => {
@@ -568,6 +573,7 @@ export function SeanceRunner({
   // coach-question.ts) : pas de nouvelle route, pas de duplication.
   function poserQuestionAuCoach() {
     if (questionEnCoursRef.current) return;
+    if (!coachAIAgreed) { setCoachConsentOpen(true); return; }
     const reco = creerReconnaissance();
     if (!reco || questionEnCours) return;
     questionEnCoursRef.current = true;
@@ -604,7 +610,7 @@ export function SeanceRunner({
           const res = await fetch("/api/coach/ask", {
             method: "POST",
             signal,
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...aiCoachConsentHeaders(coachAIAgreed) },
             body: JSON.stringify({
               // Contrainte de brièveté portée par la question elle-même : en
               // pleine séance, une réponse longue est inutilisable, et lue à
@@ -675,6 +681,18 @@ export function SeanceRunner({
   // suivant()/useEffect le maintiennent correct — sans ce garde, chaque
   // accès à step.type plus bas est "possibly undefined" (noUncheckedIndexedAccess).
   if (steps.length === 0 || !step) return null;
+
+  if (coachConsentOpen) return (
+    <section role="dialog" aria-modal="true" aria-labelledby="voice-consent-title"
+      onKeyDown={(event) => { if (event.key === "Escape") setCoachConsentOpen(false); }}
+      className="fixed inset-0 z-[120] overflow-y-auto bg-abysse p-6">
+      <div className="mx-auto max-w-md">
+        <h2 id="voice-consent-title" className="text-xl font-semibold text-white">Avant de parler au coach IA</h2>
+        <AICoachConsent agreed={coachAIAgreed} onChange={setCoachAIAgreed} disabled={questionEnCours} voice />
+        <button type="button" onClick={() => setCoachConsentOpen(false)} className="min-h-11 w-full rounded-full bg-laiton-400 px-4 py-3 font-semibold text-graphite-950">Revenir à ma séance</button>
+      </div>
+    </section>
+  );
 
   const prochainSet = steps.slice(index + 1).find((s): s is Extract<Step, { type: "set" }> => s.type === "set");
   const consigne = step.type === "set" ? substitutions[step.nom]?.consigne ?? (typeof step.exercice.charge === "string" ? step.exercice.charge : null) : null;
@@ -969,6 +987,7 @@ export function SeanceRunner({
 
           <div className="flex flex-col gap-2 border-t border-white/10 px-6 py-4">
             {vocalDisponible && (
+              <>
               <button
                 type="button"
                 onClick={poserQuestionAuCoach}
@@ -981,6 +1000,9 @@ export function SeanceRunner({
               >
                 {questionEnCours ? "🎙️ Question en cours…" : "🎙️ Poser une question au coach"}
               </button>
+              {coachAIAgreed && <button type="button" onClick={() => setCoachConsentOpen(true)} disabled={questionEnCours}
+                className="min-h-11 text-xs text-graphite-300 underline">Confidentialité du coach vocal</button>}
+              </>
             )}
             {prochainSet && (
               <p className="text-center text-[11px] uppercase tracking-wide text-graphite-600">À venir · {substitutions[prochainSet.nom]?.variante ?? prochainSet.nom}</p>

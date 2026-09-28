@@ -3,6 +3,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
+const consentBox = { exports: {} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/ai/coach-consent.ts', 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS },
+}).outputText, consentBox);
+const consent = consentBox.exports;
 const source = ts.transpileModule(fs.readFileSync('src/components/daily/daily-coach.tsx', 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
 }).outputText;
@@ -20,10 +25,13 @@ async function scenario(body, status = 200, draft, offline = false) {
         return [values[index], value => { values[index] = typeof value === 'function' ? value(values[index]) : value; }]; },
     },
     '@/components/ui/button': { Button: 'button' },
+    '@/components/ai/coach-consent': { AICoachConsent: 'consent' },
+    '@/lib/ai/coach-consent': consent,
   };
   const box = { exports: {}, require: key => { assert(key in dependencies, key); return dependencies[key]; },
     fetch: async (url, options) => {
       requests++; assert.equal(url, '/api/coach/ask');
+      assert(consent.hasAICoachConsent(new Headers(options.headers)));
       assert.equal(JSON.parse(options.body).question, 'Ma question');
       assert.equal(JSON.parse(options.body).context.source, 'DAILY_WORKOUT');
       if (draft !== undefined) values[1] = draft;
@@ -35,6 +43,14 @@ async function scenario(body, status = 200, draft, offline = false) {
   const render = () => { cursor = 0; return nodes(box.exports.DailyCoach({ context: { source: 'DAILY_WORKOUT' } })); };
   render().find(node => node.type === 'button').props.onClick();
   render().find(node => node.type === 'textarea').props.onChange({ target: { value: 'Ma question' } });
+  assert.equal(render().find(node => node.type === 'consent').props.agreed, false);
+  await render().find(node => node.type === 'form').props.onSubmit({ preventDefault() {} });
+  assert.equal(requests, 0, 'No daily coach request without consent');
+  render().find(node => node.type === 'consent').props.onChange(true);
+  render().find(node => node.type === 'consent').props.onChange(false);
+  await render().find(node => node.type === 'form').props.onSubmit({ preventDefault() {} });
+  assert.equal(requests, 0, 'Withdrawing consent must prevent sending');
+  render().find(node => node.type === 'consent').props.onChange(true);
   await render().find(node => node.type === 'form').props.onSubmit({ preventDefault() {} });
   assert.equal(requests, 1); assert.equal(values[2], false);
   return values;

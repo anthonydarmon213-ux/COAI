@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { AI_COACH_CONSENT_ERROR, hasAICoachConsent } from "@/lib/ai/coach-consent";
 import { getCurrentUser } from "@/lib/auth/server";
 import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { generateTextWithAI } from "@/lib/ai/client";
@@ -49,6 +50,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
+  if (!hasAICoachConsent(request.headers)) {
+    return NextResponse.json({ error: AI_COACH_CONSENT_ERROR, code: "AI_COACH_CONSENT_REQUIRED" }, { status: 403 });
+  }
   const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json({ error: "Question invalide" }, { status: 400 });

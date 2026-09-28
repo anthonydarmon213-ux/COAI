@@ -2,6 +2,19 @@
 
 ## État courant — 28 septembre 2026
 
+Coach texte et vocal : accord facultatif explicite ajouté aux trois entrées
+(`/coach`, coach du jour, lecteur de séance). Sans accord, aucune dictée ni
+requête IA déclenchée par ces interfaces ; l'API refuse les acquittements
+absents, obsolètes ou destinés aux images avant lecture du profil et quota.
+Tests des trois interfaces/gestionnaires et neuf cas de route réussis ; quota
+concurrent revalidé sur PostgreSQL local. Build, typage, lint et médias réussis.
+Navigateur local connecté 390 × 844 : accord initialement décoché, activation
+et retrait contrôlés, retour à la séance sans accord, réponse HTTP 403 vérifiée.
+Captures examinées ; compte fictif supprimé et suppression vérifiée. Aucun
+appel IA payant, déploiement ou test iPhone pour ce changement. WhatsApp,
+génération automatique, conservation fournisseur et preuve durable d'accord
+restent à auditer. Ceci ne constitue pas une conformité globale validée.
+
 Coach pendant la séance : défaut du format vocal reproduit (`context.source`
 absent, donc refus 400 par le schéma de l’API), puis corrigé. Le test du vrai
 gestionnaire extrait désormais le vrai schéma serveur et couvre échauffement
@@ -20,7 +33,7 @@ l’outil. 31 cas de routes et tests des sept interfaces réussis, prestataire
 simulé ; profil mobile connecté contrôlé dans le navigateur local sans envoi
 de fichier. HealthKit structuré reste sans IA. Détails et limites dans
 `PRIVACY-AUDIT.md`. Non publié, non validé sur iPhone pour ce changement ;
-consentements coach/génération et rétention fournisseur encore à auditer.
+consentements des autres canaux/génération et rétention fournisseur encore à auditer.
 
 Complément fiabilité photo : fichier vide et envoi interrompu maintenant
 refusés proprement avant IA ; 42 cas simulés et 27 cas HTTP réels locaux

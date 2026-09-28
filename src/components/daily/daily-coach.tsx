@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { AICoachConsent } from "@/components/ai/coach-consent";
+import { aiCoachConsentHeaders } from "@/lib/ai/coach-consent";
 import type { CoachSessionContext } from "@/lib/ai/prompts/coach-question";
 
 type Exchange = { question: string; answer: string };
@@ -13,6 +15,7 @@ export function DailyCoach({ context }: { context: CoachSessionContext }) {
   const [error, setError] = useState("");
   const [quotaReached, setQuotaReached] = useState(false);
   const [history, setHistory] = useState<Exchange[]>([]);
+  const [aiAgreed, setAIAgreed] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -41,14 +44,14 @@ export function DailyCoach({ context }: { context: CoachSessionContext }) {
   async function ask(event: FormEvent) {
     event.preventDefault();
     const currentQuestion = question.trim();
-    if (!currentQuestion || loading) return;
+    if (!currentQuestion || loading || !aiAgreed) return;
     setLoading(true);
     setError("");
     setQuotaReached(false);
     try {
       const response = await fetch("/api/coach/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...aiCoachConsentHeaders(aiAgreed) },
         body: JSON.stringify({ question: currentQuestion, context }),
       });
       const data = await response.json();
@@ -102,6 +105,7 @@ export function DailyCoach({ context }: { context: CoachSessionContext }) {
                 {context.pain && <p className="mt-1 text-xs text-amber-200">Gêne déclarée{context.painArea ? ` : ${context.painArea}` : ""}</p>}
               </div>
 
+              <AICoachConsent agreed={aiAgreed} onChange={setAIAgreed} disabled={loading} />
               {history.length === 0 && <p className="mt-4 text-sm leading-6 text-graphite-400">Je connais ta séance, ton exercice ouvert et ton bilan du jour. Pose-moi une question précise.</p>}
               <div className="mt-4 flex flex-col gap-4">
                 {history.map((exchange, index) => (
@@ -119,8 +123,8 @@ export function DailyCoach({ context }: { context: CoachSessionContext }) {
                 {suggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => { setQuestion(suggestion); inputRef.current?.focus(); }} className="shrink-0 rounded-full border border-laiton-400/25 px-3 py-2 text-[11px] text-laiton-200 hover:bg-laiton-400/10">{suggestion}</button>)}
               </div>
               <form onSubmit={ask} className="flex items-end gap-2">
-                <textarea ref={inputRef} value={question} onChange={(event) => setQuestion(event.target.value)} maxLength={1000} rows={2} placeholder="Pose ta question…" className="min-h-[50px] flex-1 resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/40" />
-                <Button type="submit" size="compact" disabled={loading || !question.trim()} className="h-[50px] px-4">Envoyer</Button>
+                <textarea aria-label="Message au coach IA" ref={inputRef} value={question} onChange={(event) => setQuestion(event.target.value)} maxLength={1000} rows={2} placeholder="Pose ta question…" className="min-h-[50px] flex-1 resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-graphite-500 focus:border-laiton-400/40" />
+                <Button type="submit" size="compact" disabled={loading || !question.trim() || !aiAgreed} className="h-[50px] px-4">Envoyer</Button>
               </form>
               {error && <p className="mt-2 text-xs text-red-300">{error}{quotaReached ? " Tu peux aussi contacter Anthony depuis l’onglet Coach." : ""}</p>}
               <p className="mt-2 text-[10px] leading-4 text-graphite-600">Le Coach IA conseille, mais ne remplace pas un professionnel de santé.</p>

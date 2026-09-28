@@ -22,6 +22,7 @@ function load(file, deps) {
 const deps = {
   'next/server': { NextResponse: { json: (body, init) => ({ body, status: init?.status ?? 200 }) } },
   zod: require('zod'),
+  '@/lib/ai/coach-consent': load('src/lib/ai/coach-consent.ts', {}),
   '@/lib/db/client': { prisma: db },
   '@/lib/whatsapp/client': { isValidWhatsappWebhookRequest: () => true },
   '@/lib/auth/server': { getCurrentUser: async () => ({ id }) },
@@ -34,7 +35,7 @@ const deps = {
 const whatsapp = load('src/app/api/webhooks/whatsapp-manychat/route.ts', deps);
 const web = load('src/app/api/coach/ask/route.ts', deps);
 const ask = channel => channel.POST({ json: async () => ({ phoneWhatsapp: phone, message: 'fixture', ...(channel === web ? { question: 'fixture' } : {}) }) });
-const askWeb = () => web.POST({ json: async () => ({ question: 'fixture' }) });
+const askWeb = () => web.POST({ headers: new Headers(deps['@/lib/ai/coach-consent'].aiCoachConsentHeaders(true)), json: async () => ({ question: 'fixture' }) });
 async function state() { return db.user.findUniqueOrThrow({ where: { id } }); }
 async function reset(used, window = new Date()) {
   aiCalls = 0; failAI = false;
