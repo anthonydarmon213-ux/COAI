@@ -2,6 +2,21 @@
 
 ## État courant — 28 septembre 2026
 
+Parcours natifs locaux revalidés vers 13 h 14 sur simulateur petit écran :
+`testLocalNewAccountDiagnosticReachesResult` réussi (201,481 s), vraie
+inscription, email Mailpit, lien ouvert par iOS, accords, diagnostic, reprise
+et contrôle de saisie. Profil exact vérifié en PostgreSQL. Captures du retour
+email et du résultat examinées. `testLocalConnectedDailyWorkoutPersists`
+réussi (65,276 s) : check-in, séance fictive, ressenti, fermeture et relance ;
+état final et réponses exactes vérifiés en base. Fixtures et email supprimés,
+absence du compte de séance et refus de son ancien mot de passe confirmés.
+Résultats : `/tmp/coai-signup-current-092813.xcresult` et
+`/tmp/coai-workout-current-092813.xcresult`. Accès programme synthétique pour
+la séance, aucun achat Apple ni IA ; pas une validation en production.
+Friction identifiée : nouveau compte sans abonnement, action d'enregistrement
+du bilan très bas dans le résultat ; raccourci haut actuellement réservé aux
+comptes avec accès programme. À simplifier puis retester, sans sauvegarde tacite.
+
 Recontrôle natif à 13 h 03 : `bash scripts/check-ios.sh --device-release`
 réussi, 51 XCTest, 65 contrôles cœur, règles WebKit compilées sur macOS,
 configuration de confidentialité et cinq cas négatifs validés. Release iPhone
