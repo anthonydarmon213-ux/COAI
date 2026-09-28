@@ -102,8 +102,9 @@ export async function POST(request: Request) {
         mediaType,
         { userId: user.id, feature: "vision_montre" }
       );
-    } catch (err) {
-      console.error("[profil/montre] Échec de l'extraction IA", err);
+    } catch {
+      // Provider exceptions can contain request/image data; log no payload.
+      console.error("[profil/montre] Échec de l'extraction IA");
       return NextResponse.json(
         { error: "Impossible d'analyser ce screenshot, réessaie avec une autre image." },
         { status: 502 }

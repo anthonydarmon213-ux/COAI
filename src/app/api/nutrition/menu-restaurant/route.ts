@@ -72,8 +72,9 @@ export async function POST(request: Request) {
       mediaType,
       { userId: user.id, feature: "vision_menu" }
     );
-  } catch (err) {
-    console.error("[nutrition/menu-restaurant] Échec de l'extraction IA", err);
+  } catch {
+    // Provider exceptions can contain request/image data; log no payload.
+    console.error("[nutrition/menu-restaurant] Échec de l'extraction IA");
     return NextResponse.json(
       { error: "Impossible de lire ce menu, réessaie avec une photo plus nette." },
       { status: 502 }

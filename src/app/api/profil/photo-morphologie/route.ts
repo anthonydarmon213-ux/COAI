@@ -74,8 +74,9 @@ export async function POST(request: Request) {
       mediaType,
       { userId: user.id, feature: "vision_morphologie" }
     );
-  } catch (err) {
-    console.error("[profil/photo-morphologie] Échec de l'extraction IA", err);
+  } catch {
+    // Provider exceptions can contain request/image data; log no payload.
+    console.error("[profil/photo-morphologie] Échec de l'extraction IA");
     return NextResponse.json(
       { error: "Impossible d'analyser cette photo, réessaie avec une autre image." },
       { status: 502 }

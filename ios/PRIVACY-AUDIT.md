@@ -96,6 +96,33 @@ pas être déduits du code et restent à confirmer par le titulaire.
 
 ## Points non clos, classés par impact
 
+### Ajouts du 28 septembre — analyses d'images
+
+Les cinq routes `profil/photo-morphologie`, `profil/montre`,
+`programme/motion-check`, `nutrition/photo-repas` et
+`nutrition/menu-restaurant` ne journalisent plus l'objet d'erreur du
+prestataire. Signal technique fixe conservé ; messages utilisateur inchangés.
+`scripts/test-vision-error-privacy.cjs` exécute les vraies routes transpilées :
+15 cas, erreur prestataire contenant de fausses données sensibles, absence
+d'écriture de profil après échec, refus sans authentification/abonnement avant
+l'appel IA. Authentification, base et prestataire simulés ; aucun appel payant.
+Ce contrôle ne couvre pas les journaux du SDK, de l'infrastructure ou du
+prestataire, ni les autres routes IA. Non publié.
+
+Blocage App Store identifié dans les interfaces de scan morphologique :
+`scan-morpho-posture.tsx` et `profil-form.tsx` affichent « jamais conservée(s) »
+alors que le fichier est transmis à Anthropic. La non-écriture du fichier dans
+la base COAI ne prouve pas l'absence de rétention chez le prestataire. Ces
+écrans déclenchent l'analyse à la sélection du fichier, sans information
+explicite sur ce destinataire ni accord spécifique observé dans ce parcours.
+Préparer un accord clair avant transfert, auditer aussi montre/repas/menu/
+mouvement/coach et confronter les promesses de conservation à la configuration
+du compte fournisseur. Ne pas conclure que la déclaration générale de
+confidentialité suffit. Aucune modification des droits d'abonnement effectuée.
+Référence consultée le 28 septembre : Apple, section 5.1.2(i), partage avec une
+IA tierce et permission explicite :
+https://developer.apple.com/app-store/review/guidelines/#data-use-and-sharing
+
 1. Vérifier les transmissions réelles des écrans connectés et les journaux
    techniques ; définir puis tester la suppression des données sensibles dans
    les erreurs et métadonnées avant déclaration définitive.

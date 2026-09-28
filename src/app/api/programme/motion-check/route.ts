@@ -79,8 +79,9 @@ export async function POST(request: Request) {
       mediaType,
       { userId: user.id, feature: "vision_motion" }
     );
-  } catch (err) {
-    console.error("[programme/motion-check] Échec de l'extraction IA", err);
+  } catch {
+    // Provider exceptions can contain request/image data; log no payload.
+    console.error("[programme/motion-check] Échec de l'extraction IA");
     return NextResponse.json(
       { error: "Impossible d'analyser cette photo, réessaie." },
       { status: 502 }
