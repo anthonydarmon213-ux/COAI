@@ -15,11 +15,18 @@ export async function compressProgressPhoto(file: File): Promise<OptimizedPhoto>
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error("Choisis une photo JPG, PNG, WebP, HEIC ou HEIF.");
   }
+  if (file.size === 0) {
+    throw new Error("Cette photo est vide. Choisis-en une autre.");
+  }
   if (file.size > MAX_INPUT_BYTES) {
     throw new Error("Cette photo dépasse 40 Mo.");
   }
 
   const image = await loadImage(file);
+  if (!Number.isFinite(image.naturalWidth) || !Number.isFinite(image.naturalHeight)
+    || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+    throw new Error("Cette image ne peut pas être lue.");
+  }
   const ratio = Math.min(1, MAX_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight));
   const width = Math.max(1, Math.round(image.naturalWidth * ratio));
   const height = Math.max(1, Math.round(image.naturalHeight * ratio));
@@ -34,15 +41,19 @@ export async function compressProgressPhoto(file: File): Promise<OptimizedPhoto>
   const blob = await new Promise<Blob | null>((resolve) =>
     canvas.toBlob(resolve, "image/webp", WEBP_QUALITY)
   );
-  if (!blob) throw new Error("Impossible de compresser cette photo.");
+  if (!blob || blob.size === 0) throw new Error("Impossible de compresser cette photo.");
   if (blob.size > MAX_OUTPUT_BYTES) {
     throw new Error("La photo reste trop volumineuse après optimisation. Choisis-en une autre.");
   }
 
+  // Browsers may fall back to PNG when the requested encoder is unavailable.
+  // Preserve the actual encoding, never relabel those bytes as WebP. Only the
+  // newly encoded pixels are uploaded; don't forward the source's name/metadata.
+  const extension = ({ "image/webp": "webp", "image/png": "png", "image/jpeg": "jpg" } as Record<string, string>)[blob.type];
+  if (!extension) throw new Error("Le format de cette photo n’a pas pu être préparé.");
+
   return {
-    file: new File([blob], `${file.name.replace(/\.[^.]+$/, "") || "progression"}.webp`, {
-      type: "image/webp",
-    }),
+    file: new File([blob], `coai-photo.${extension}`, { type: blob.type }),
     originalBytes: file.size,
     optimizedBytes: blob.size,
   };

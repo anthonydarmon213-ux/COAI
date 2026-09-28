@@ -1,6 +1,6 @@
 # Inventaire de confidentialité iOS — brouillon technique
 
-Audit du code actualisé le 27 septembre 2026. Ce document prépare la déclaration App
+Audit du code actualisé le 28 septembre 2026. Ce document prépare la déclaration App
 Store Connect ; il ne constitue ni une déclaration soumise, ni une validation
 juridique, ni la preuve de la configuration des services de production.
 Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
@@ -27,6 +27,27 @@ est volontairement limité : ni inventaire exhaustif des API, ni mesure des flux
 réseau, ni déclaration App Privacy, ni approbation Apple.
 
 ## Données et preuves dans le dépôt
+
+### Préparation des images — contrôle du 28 septembre, local
+
+`compressProgressPhoto` redessine l'image dans un canvas avant envoi. Correction
+du repli d'encodage : si le navigateur produit du PNG au lieu du WebP demandé,
+le type MIME et l'extension suivent désormais les octets réellement produits.
+Le nom de fichier d'origine n'est plus transmis par cette fonction. Images
+vides, dimensions invalides et sorties vides sont refusées avec un message.
+
+Tests : `node scripts/test-photo-compression.cjs` exerce la vraie fonction avec
+encodeurs simulés (WebP/PNG/JPEG, bornes, erreurs, libération des URL).
+`node scripts/test-photo-compression-webkit.cjs` exécute la fonction transpilée
+dans un WKWebView macOS réel, sans connexion réseau, sur un PNG synthétique
+contenant une métadonnée témoin. Décodage, dimensions, absence de cette
+métadonnée, repli PNG forcé et pixels du PNG de sortie vérifiés.
+
+Limites : pas de photo personnelle utilisée, pas d'EXIF GPS réel testé, pas de
+preuve exhaustive pour HEIC/orientations/profils couleur. Cela ne prouve pas la
+sanitisation des requêtes directes aux API, qui ne passent pas forcément par
+cette fonction, ni des anciens objets déjà stockés. Aucun déploiement ; test
+du parcours d'import iPhone et contrôle en production encore requis.
 
 | Périmètre | Données prévues par le code | Source / point à vérifier |
 | --- | --- | --- |
