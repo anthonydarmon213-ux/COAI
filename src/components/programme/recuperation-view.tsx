@@ -51,10 +51,10 @@ export function RecuperationView({
   const recuperationDuJour =
     joursUtiles.find((jour) => normaliser(String(jour.jour ?? "")) === normaliser(jourActuel)) ??
     joursUtiles[0];
+  const autresJours = joursUtiles.filter((jour) => jour !== recuperationDuJour);
 
-  const rendreRecuperation = (jourData: Record<string, unknown>) => {
+  const rendreRecuperation = (jourData: Record<string, unknown>, duJour = true) => {
     const { jour, type, sommeil, photoQueryJour, ...detailJour } = jourData;
-    void jour;
     void photoQueryJour;
     void photosParExercice;
     const texteDuJour = [type, sommeil, ...Object.values(detailJour)]
@@ -70,7 +70,7 @@ export function RecuperationView({
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
-                Récupération du jour
+                {duJour ? "Récupération du jour" : `Récupération · ${String(jour ?? "Jour du programme")}`}
               </p>
               <h3 className="mt-1 font-display text-xl font-semibold text-white">
                 {typeof type === "string" ? type : "Prends soin de ton corps"}
@@ -82,7 +82,7 @@ export function RecuperationView({
           {!photoJourUrl && (
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">
-                Récupération du jour
+                {duJour ? "Récupération du jour" : `Récupération · ${String(jour ?? "Jour du programme")}`}
               </p>
               <h3 className="mt-1 font-display text-xl font-semibold text-white">
                 {typeof type === "string" ? type : "Prends soin de ton corps"}
@@ -117,6 +117,20 @@ export function RecuperationView({
         </div>
       )}
       {recuperationDuJour && rendreRecuperation(recuperationDuJour)}
+      {autresJours.length > 0 && (
+        <section aria-label="Les autres jours de ta semaine" className="flex flex-col gap-3">
+          <h3 className="font-display text-xl font-semibold text-white">Les autres jours de ta semaine</h3>
+          {autresJours.map((jour, index) => (
+            <details key={`${String(jour.jour)}-${index}`} className="rounded-xl border border-white/10 bg-white/[0.02]">
+              <summary aria-label={`Consulter la récupération de ${String(jour.jour ?? `Jour ${index + 1}`)}`} className="flex min-h-14 cursor-pointer items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-graphite-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-300">
+                <span>{String(jour.jour ?? `Jour ${index + 1}`)}</span>
+                {typeof jour.type === "string" && <span className="text-xs font-normal text-graphite-300">{jour.type}</span>}
+              </summary>
+              <div className="p-3 pt-0">{rendreRecuperation(jour, false)}</div>
+            </details>
+          ))}
+        </section>
+      )}
 
       {protocolesUtiles.length > 0 && (
         <section className="flex flex-col gap-3">

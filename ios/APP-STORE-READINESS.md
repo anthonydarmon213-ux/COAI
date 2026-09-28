@@ -2,6 +2,23 @@
 
 ## État courant — 28 septembre 2026
 
+Récupération, 14 h 02 : défaut reproduit puis corrigé — la vue ne rendait
+qu'un jour et masquait les six autres jours stockés. Le jour actuel reste
+en premier ; les autres sont consultables dans des sections repliées, avec
+leur propre libellé de jour. Aucun conseil, protocole, droit ou programme
+n'est modifié. Test du rendu réel : sept recommandations présentes exactement
+une fois, six sections fermées, absence de section vide pour un seul jour,
+contenus incomplets toujours tolérés. Types/lint/build et médias des piliers
+passent. Test natif connecté `testLocalIncompletePillarsPreserveAvailableContent`
+réussi après relance (31,553 s), ouverture et lecture du mardi vérifiées.
+Résultat `/tmp/coai-recovery-week-09281411.xcresult`, capture examinée
+`/tmp/coai-recovery-week-proof/CF9CD52A-2029-442E-9616-2F1C6DB56CB4.png`.
+Fixture locale `--registered --incomplete-pillars` enrichie avec sept jours
+et un élément nul ; compte révoqué/nettoyé et ancien mot de passe refusé.
+Essai précédent interrompu pour blocage d'animations du simulateur, puis
+redémarrage sans effacement. Non publié, ni test physique ni validation
+du suivi d'une routine réelle sur plusieurs jours.
+
 Découverte recettes → récupération → Club revalidée à 13 h 47 : test natif
 connecté réussi (67,430 s), ingrédients/préparation visibles, filtre récupération
 conservé et premier programme accessible, Club « 1 heure par mois · En groupe ·

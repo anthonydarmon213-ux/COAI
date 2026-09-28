@@ -43,4 +43,20 @@ for (const invalid of [null, 17, 'entrée interrompue', []]) {
 }
 assert.ok(!render(RecuperationView, { jours: [day], protocoles: [protocol] }).includes('incomplètes'));
 assert.ok(!render(NutritionView, { jours: [meal], conseilsHabitudes: [habit] }).includes('incomplètes'));
+const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((jour, index) => ({
+  jour, type: 'Repos', sommeil: `Conseil unique du jour ${index}`,
+}));
+const completeWeek = render(RecuperationView, { jours: week });
+for (let index = 0; index < week.length; index++) {
+  assert.equal(completeWeek.split(`Conseil unique du jour ${index}`).length - 1, 1,
+    'Every stored recovery day must be available exactly once');
+}
+assert.ok(completeWeek.includes('Les autres jours de ta semaine'));
+const today = new Intl.DateTimeFormat('fr-FR', {weekday:'long', timeZone:'Europe/Paris'}).format(new Date());
+const todayIndex = week.findIndex(day => day.jour.toLowerCase() === today);
+assert.ok(completeWeek.indexOf(`Conseil unique du jour ${todayIndex}`) < completeWeek.indexOf('Les autres jours de ta semaine'));
+assert.equal((completeWeek.match(/<details\b/g) || []).length, 6);
+assert.ok(!/<details[^>]*\sopen(?:[\s=>])/.test(completeWeek), 'Other days start collapsed');
+assert.ok(!render(RecuperationView, { jours: [day] }).includes('Les autres jours de ta semaine'));
+console.log('PASS recovery week: today first, six other days collapsed, all seven stored recommendations available exactly once.');
 console.log('PASS real nutrition/recovery render: incomplete list entries do not crash, valid content preserved, warning shown only when needed.');

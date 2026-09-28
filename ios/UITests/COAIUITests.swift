@@ -414,6 +414,17 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(app.buttons["native-tab-Récupération"].waitForExistence(timeout: 10))
         app.buttons["native-tab-Récupération"].tap()
         XCTAssertTrue(web.staticTexts["Conseil récupération conservé"].waitForExistence(timeout: 20))
+        let otherDay = web.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Consulter la récupération de ")).firstMatch
+        XCTAssertTrue(otherDay.waitForExistence(timeout: 10))
+        let dayName = otherDay.label.replacingOccurrences(of: "Consulter la récupération de ", with: "")
+        reveal(otherDay, in: app); otherDay.tap()
+        let dayAdvice = web.staticTexts["Conseil sommeil conservé pour " + dayName]
+        XCTAssertTrue(dayAdvice.waitForExistence(timeout: 10))
+        reveal(dayAdvice, in: app)
+        XCTAssertTrue(dayAdvice.isHittable)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Récupération — autre jour consultable après relance"
+        proof.lifetime = .keepAlways; add(proof)
     }
 
     /// Real authenticated PDF endpoint; never publish or choose a share recipient.
