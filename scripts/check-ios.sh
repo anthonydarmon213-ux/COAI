@@ -36,6 +36,7 @@ if [[ "${1:-}" == "--simulator" || "${1:-}" == "--device-release" ]]; then
             -sdk iphoneos -destination 'generic/platform=iOS' \
             -derivedDataPath ios/DerivedDataDevice CODE_SIGNING_ALLOWED=NO build
         task_app="ios/DerivedDataDevice/Build/Products/Release-iphoneos/COAI.app"
+        test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$task_app/Info.plist")" = "COAI"
         cmp ios/COAI/PrivacyInfo.xcprivacy "$task_app/PrivacyInfo.xcprivacy"
         test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleSupportedPlatforms:0' "$task_app/Info.plist")" = "iPhoneOS"
         xcrun lipo "$task_app/COAI" -verify_arch arm64
@@ -57,6 +58,7 @@ if [[ "${1:-}" == "--simulator" || "${1:-}" == "--device-release" ]]; then
         -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
         -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=NO build
     cmp ios/COAI/PrivacyInfo.xcprivacy ios/DerivedData/Build/Products/Debug-iphonesimulator/COAI.app/PrivacyInfo.xcprivacy
+    test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' ios/DerivedData/Build/Products/Debug-iphonesimulator/COAI.app/Info.plist)" = "COAI test"
     echo "PASS: privacy manifest included in simulator app; App Store privacy audit still required."
     fi
 else

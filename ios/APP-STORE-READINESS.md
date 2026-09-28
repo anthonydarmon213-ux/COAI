@@ -1,5 +1,27 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
+## État courant — 28 septembre 2026
+
+Nom sous l'icône corrigé : Release affichait encore « COAI test » dans son
+Info.plist compilé. Variable par configuration : « COAI » en Release,
+« COAI test » en Debug. Les deux valeurs sont désormais contrôlées sur les
+applications compilées par `check-ios.sh`. Builds Release arm64 non signée
+et simulateur réussis, tests Swift/cœur/WebKit/confidentialité réussis.
+Typage web, lint sans erreur (six avertissements), build avec bases factices
+et présence des 356 références médias vérifiés. Icône 1024 × 1024 sans alpha.
+Journaux : `/tmp/coai-release-name-0928.log`, `/tmp/coai-debug-name-0928.log`,
+`/tmp/coai-web-precommit-0928.log`. Non installé en distribution, non publié.
+
+Le blocage de certificat historique ci-dessous est levé : trois tests sur
+iPhone 17 Pro ont réussi (durées alignées, partage fictif, durées XXXL).
+Deux tests supplémentaires ont échoué avec une vidéo flottante externe
+recouvrant la navigation. Ils restent à reprendre sur appareil sans cette
+interférence. Les deux mêmes tests réussissent après recompilation sur SE
+simulé : `/tmp/coai-simulator-recheck-0928.xcresult`, 40,901 secondes ;
+navigation après rotation et minuteur conservé après relance. Captures
+paysage et minuteur inspectées. Cela ne valide ni production, ni achats
+Apple, ni distribution. Objectif global non atteint.
+
 ## État courant — 27 septembre 2026
 
 Complément 21 h 45 : profil corrigé sans promesse automatique de relecture du
