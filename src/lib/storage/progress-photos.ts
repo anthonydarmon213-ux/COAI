@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
+import { closePhotoWrites, confirmPhotoWrite, reservePhotoWrite } from "./photo-write-registry";
 
 // Nom exact du bucket privé existant dans Supabase.
 export const PROGRESS_PHOTOS_BUCKET = "progress photos";
@@ -13,11 +14,14 @@ export async function uploadProgressPhoto(
   const path = `${userId}/${Date.now()}.${ext}`;
 
   const admin = createSupabaseAdminClient();
+  const body = await file.arrayBuffer();
+  const operation = await reservePhotoWrite(userId);
   const { error } = await admin.storage
     .from(PROGRESS_PHOTOS_BUCKET)
-    .upload(path, await file.arrayBuffer(), { contentType: file.type });
+    .upload(path, body, { contentType: file.type });
 
   if (error) return { error: error.message };
+  await confirmPhotoWrite(userId, operation);
   return { path };
 }
 
@@ -48,17 +52,21 @@ export async function uploadAvatar(
   // path saved by the caller. Keep the other format variants (at most three
   // fixed paths) so a failed upload/database write cannot break the old path.
   // Account deletion removes all variants through deleteAllProgressPhotos.
+  const body = await file.arrayBuffer();
+  const operation = await reservePhotoWrite(userId);
   const { error } = await admin.storage
     .from(PROGRESS_PHOTOS_BUCKET)
-    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: true });
+    .upload(path, body, { contentType: file.type, upsert: true });
 
   if (error) return { error: error.message };
+  await confirmPhotoWrite(userId, operation);
   return { path };
 }
 
 export async function deleteAllProgressPhotos(userId: string): Promise<void> {
   // Never allow an empty/root prefix with the privileged Storage client.
   if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new Error("invalid_photo_owner");
+  await closePhotoWrites(userId);
   const admin = createSupabaseAdminClient();
   const bucket = admin.storage.from(PROGRESS_PHOTOS_BUCKET);
   const paths = new Set<string>();

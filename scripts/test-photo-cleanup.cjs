@@ -29,6 +29,7 @@ async function scenario({ count = 205, listError = false, removeError = false,
     },
   };
   vm.runInNewContext(source, { exports: api, require: name => {
+    if (name === './photo-write-registry') return { closePhotoWrites: async () => {} };
     assert.equal(name, '@/lib/auth/admin');
     return { createSupabaseAdminClient: () => ({ storage: { from: name => {
       assert.equal(name, 'progress photos'); return bucket;

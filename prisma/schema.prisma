@@ -1105,6 +1105,26 @@ enum StatutFormCheck {
   REPONDU
 }
 
+// Server-only photo deletion coordination; no FK to User because a closed gate
+// must survive deletion and reject already-authenticated, delayed requests.
+model PhotoOwnerGate {
+  ownerKey String @id
+  closed Boolean @default(false)
+  uploads PhotoUpload[]
+
+  @@map("photo_owner_gates")
+}
+
+model PhotoUpload {
+  id String @id
+  ownerKey String
+  settled Boolean @default(false)
+  owner PhotoOwnerGate @relation(fields: [ownerKey], references: [ownerKey], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ownerKey, settled], map: "photo_uploads_owner_pending_idx")
+  @@map("photo_uploads")
+}
+
 model FormCheck {
   id         String          @id @default(uuid())
   userId     String

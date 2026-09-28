@@ -24,6 +24,9 @@ async function scenario(type, failure) {
     },
   };
   vm.runInNewContext(source, { exports: api, require: name => {
+    if (name === './photo-write-registry') return {
+      reservePhotoWrite: async () => 'test-operation', confirmPhotoWrite: async () => {},
+    };
     assert.equal(name, '@/lib/auth/admin');
     return { createSupabaseAdminClient: () => ({ storage: { from: name => {
       assert.equal(name, 'progress photos'); return bucket;
