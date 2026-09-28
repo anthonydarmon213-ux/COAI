@@ -34,7 +34,7 @@ const deps = {
 };
 const whatsapp = load('src/app/api/webhooks/whatsapp-manychat/route.ts', deps);
 const web = load('src/app/api/coach/ask/route.ts', deps);
-const ask = channel => channel.POST({ json: async () => ({ phoneWhatsapp: phone, message: 'fixture', ...(channel === web ? { question: 'fixture' } : {}) }) });
+const ask = channel => channel.POST({ headers: new Headers(deps['@/lib/ai/coach-consent'].aiCoachConsentHeaders(true)), json: async () => ({ phoneWhatsapp: phone, message: 'fixture', ...(channel === web ? { question: 'fixture' } : {}) }) });
 const askWeb = () => web.POST({ headers: new Headers(deps['@/lib/ai/coach-consent'].aiCoachConsentHeaders(true)), json: async () => ({ question: 'fixture' }) });
 async function state() { return db.user.findUniqueOrThrow({ where: { id } }); }
 async function reset(used, window = new Date()) {
@@ -46,6 +46,10 @@ async function reset(used, window = new Date()) {
     await db.user.create({ data: { id, supabaseAuthId: id, email: `quota-${id}@example.test`, phoneWhatsapp: phone,
       subscription: { create: { stripeCustomerId: `fixture-${id}`, status: 'ACTIVE', plan: 'PASS_IA' } } } });
     await reset(3);
+    const denied = await whatsapp.POST({ headers: new Headers(), json: async () => ({ phoneWhatsapp: phone, message: 'not shared' }) });
+    assert.equal(denied.body.code, 'AI_COACH_CONSENT_REQUIRED');
+    assert.equal(aiCalls, 0); assert.equal((await state()).coachQuestionsUsed, 3);
+    assert.equal(await db.whatsAppEvent.count({ where: { userId: id } }), 0);
     await Promise.all(Array.from({ length: 12 }, (_, i) => i % 2 ? ask(whatsapp) : askWeb()));
     assert.equal(aiCalls, 1); assert.equal((await state()).coachQuestionsUsed, 4);
     await reset(4, null);

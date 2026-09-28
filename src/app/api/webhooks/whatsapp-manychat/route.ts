@@ -7,12 +7,15 @@ import { buildCoachQuestionPrompt } from "@/lib/ai/prompts/coach-question";
 import { prisma } from "@/lib/db/client";
 import { getEffectivePlan, hasPaidSubscription } from "@/lib/subscription/plan";
 import { COACH_QUOTA_LIMIT, getCoachQuotaState } from "@/lib/subscription/coach-quota";
+import { hasAICoachConsent } from "@/lib/ai/coach-consent";
 
 // Appelé par ManyChat (étape "External Request" du flow WhatsApp) à chaque
 // message reçu d'un abonné — remplace l'ancienne hypothèse Make.com/Twilio,
 // jamais mise en place (cf. CLAUDE.md, 10/08/2026). Contrat côté ManyChat :
 // POST, header x-webhook-secret, body { phoneWhatsapp, message }. Réponse
 // { reply } que ManyChat renvoie tel quel à l'abonné sur WhatsApp.
+// The consent header must reflect the member's explicit, current choice in
+// the flow, never a static integration default. See ios/WHATSAPP-CONSENT.md.
 export const maxDuration = 30;
 
 const bodySchema = z.object({
@@ -23,6 +26,15 @@ const bodySchema = z.object({
 export async function POST(request: Request) {
   if (!isValidWhatsappWebhookRequest(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
+  // No profile lookup, message storage, quota or provider call before consent.
+  // HTTP 200 preserves the reply contract and avoids webhook retry storms.
+  if (!hasAICoachConsent(request.headers)) {
+    return NextResponse.json({
+      code: "AI_COACH_CONSENT_REQUIRED",
+      reply: "Avant de partager ta question et ton contexte personnel avec Anthropic, ton accord est nécessaire. Tu peux utiliser le coach dans ton espace COAI : https://coai.fr/coach, où les informations et le choix de partage sont présentés. Aucun message n’a été envoyé à l’IA par COAI.",
+    });
   }
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));

@@ -2,6 +2,13 @@
 
 ## État courant — 28 septembre 2026
 
+WhatsApp : absence de contrôle d'accord fournisseur reproduite, puis garde
+serveur ajoutée avant profil/message/quota/IA. Tests de refus et quotas réussis
+(dont PostgreSQL local réel, fournisseur simulé). Contrat et blocage de mise en
+ligne dans `WHATSAPP-CONSENT.md` : flow ManyChat réel non inspecté/configuré,
+aucun en-tête statique à ajouter. Non publié ; ce lot seul ne prouve pas le
+recueil d'accord sur WhatsApp et ne doit pas être déployé sans transition validée.
+
 Inscription : le webhook Auth fabriquait une date d'accord RGPD et créait un
 compte avant le formulaire. Test de reproduction rouge, puis correction : le
 webhook authentifié accuse réception sans créer de compte ni d'accord.

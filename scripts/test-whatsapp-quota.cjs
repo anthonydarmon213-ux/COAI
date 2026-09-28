@@ -12,6 +12,7 @@ function load(file, deps) {
   return box.exports;
 }
 async function scenario({ used, expired = false, count = 1, fail = false, changeWindow = false, failSave = false }) {
+  const consent = load('src/lib/ai/coach-consent.ts', {});
   const state = { used, window: expired ? null : new Date(), ai: 0, resets: 0 };
   const user = {
     findUnique: async () => ({ id: 'fixture', subscription: { status: 'ACTIVE', plan: 'PASS_IA' },
@@ -29,6 +30,7 @@ async function scenario({ used, expired = false, count = 1, fail = false, change
   const route = load('src/app/api/webhooks/whatsapp-manychat/route.ts', {
     'next/server': { NextResponse: { json: (body, init) => ({ body, status: init?.status ?? 200 }) } },
     zod: require('zod'),
+    '@/lib/ai/coach-consent': consent,
     '@/lib/whatsapp/client': { isValidWhatsappWebhookRequest: () => true },
     '@/lib/subscription/plan': load('src/lib/subscription/plan.ts', {}),
     '@/lib/subscription/coach-quota': load('src/lib/subscription/coach-quota.ts', {}),
@@ -43,7 +45,7 @@ async function scenario({ used, expired = false, count = 1, fail = false, change
       if (failSave && data.direction === 'OUTBOUND') throw Error('storage outage');
     } } } },
   });
-  const responses = await Promise.all(Array.from({ length: count }, () => route.POST({ json: async () => ({ phoneWhatsapp: '00000000', message: 'fixture' }) })));
+  const responses = await Promise.all(Array.from({ length: count }, () => route.POST({ headers: new Headers(consent.aiCoachConsentHeaders(true)), json: async () => ({ phoneWhatsapp: '00000000', message: 'fixture' }) })));
   return { ...state, responses };
 }
 (async () => {

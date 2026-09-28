@@ -39,9 +39,10 @@ exécute les vraies fonctions avec données simulées, pas une analyse médicale
 L'accord fournisseur pour ces générateurs devient donc une condition préalable
 à une éventuelle réactivation, et non un nouvel écran à imposer au parcours
 bibliothèque actuel. WhatsApp reste distinct : le contrôle d'abonnement est
-testé (`test-whatsapp-paid-access.cjs`), mais aucun accord explicite Anthropic
-n'est actuellement recueilli dans cette route. Ne pas activer ce canal en
-production sans résoudre ce point et vérifier le flow ManyChat réel.
+testé (`test-whatsapp-paid-access.cjs`), mais le recueil explicite Anthropic dans
+le flow réel reste à vérifier. Le serveur local exige maintenant l'acquittement
+avant profil, stockage et IA ; refus, quotas et absence de message en base sans
+accord testés. Voir `WHATSAPP-CONSENT.md` pour la transition avant publication.
 
 ### Consentement d'inscription — correction locale du 28 septembre
 

@@ -13,12 +13,14 @@ function load(file, deps, logs = []) {
 }
 const plans = load('src/lib/subscription/plan.ts', {});
 const quota = load('src/lib/subscription/coach-quota.ts', {});
+const consent = load('src/lib/ai/coach-consent.ts', {});
 async function run(subscription, options = {}) {
   let ai = 0, writes = 0, reads = 0;
   const logs = [];
   const route = load('src/app/api/webhooks/whatsapp-manychat/route.ts', {
     'next/server': { NextResponse: { json: (body, init) => ({ body, status: init?.status ?? 200 }) } },
     zod: require('zod'),
+    '@/lib/ai/coach-consent': consent,
     '@/lib/whatsapp/client': { isValidWhatsappWebhookRequest: () => !options.unauthorized },
     '@/lib/subscription/plan': plans,
     '@/lib/subscription/coach-quota': quota,
@@ -29,10 +31,17 @@ async function run(subscription, options = {}) {
       whatsAppEvent: { create: async () => { writes++; } },
     } },
   }, logs);
-  const response = await route.POST({ json: async () => ({ phoneWhatsapp: '00000000', message: 'Fixture question' }) });
+  const headers = new Headers(options.consentHeaders ?? consent.aiCoachConsentHeaders(true));
+  const response = await route.POST({ headers, json: async () => ({ phoneWhatsapp: '00000000', message: 'Fixture question' }) });
   return { response, ai, writes, reads, logs };
 }
 (async () => {
+  for (const consentHeaders of [{}, { [consent.AI_COACH_CONSENT_HEADER]: 'anthropic-coach-v0' }, { 'x-coai-ai-image-consent': 'anthropic-image-v1:repas' }]) {
+    const result = await run({ status: 'ACTIVE', plan: 'PREMIUM' }, { consentHeaders });
+    assert.equal(result.ai, 0); assert.equal(result.writes, 0); assert.equal(result.reads, 0);
+    assert.equal(result.response.body.code, 'AI_COACH_CONSENT_REQUIRED');
+    assert.match(result.response.body.reply, /coai.fr\/coach/);
+  }
   for (const subscription of [null, ...['CANCELED', 'PAST_DUE', 'INCOMPLETE', 'UNPAID'].map(status => ({ status, plan: 'PREMIUM' }))]) {
     const result = await run(subscription);
     assert.equal(result.ai, 0); assert.equal(result.writes, 0);
