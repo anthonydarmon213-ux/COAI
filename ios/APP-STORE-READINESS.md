@@ -2,6 +2,22 @@
 
 ## État courant — 28 septembre 2026
 
+Compte, 14 h 40 : `testLocalConnectedAccountDeletionPersists` réussi (34,186 s)
+sur simulateur, vraie connexion au compte jetable local, annulation de la
+suppression puis export via partage iOS, nouvelle confirmation et suppression,
+retour connexion conservé après relance. Vérificateur indépendant (sans nettoyage)
+confirme profil et identité Auth absents, ancien mot de passe refusé.
+Résultat `/tmp/coai-account-deletion-0928-current.xcresult`, avertissement Apple
+examiné dans `/tmp/coai-account-deletion-proof-0928/52386565-28AE-4BB6-BBED-C3E2362954F0.png`.
+Compte fictif seul supprimé ; aucune donnée réelle touchée. Les consignes
+Supabase ont limité les opérations à cette fixture locale et imposé le contrôle
+séparé de l'identité. Tests `test-account-export.cjs` et
+`test-account-delete-billing.cjs` réussis : isolation par propriétaire, 20 relations,
+erreurs sûres et protection contre suppression avant annulation Stripe confirmée.
+Ces deux scripts simulent Auth/base/facturation. Le test UI ne comporte aucun
+abonnement réel ni photo : ni résiliation réelle, ni purge chez les prestataires,
+ni restauration d'un fichier exporté ne sont validées par ce passage.
+
 Abonnement, 14 h 35 : trois tests UI natifs réussis (42,318 s au total) :
 `testUnavailableSubscriptionCanOpenAccount`, `testSubscriptionSmallScreenLargeText`
 et `testWebOfferLinkOpensNativeSubscription`. Ouverture depuis lien, fermeture,
