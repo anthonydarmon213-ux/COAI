@@ -109,7 +109,7 @@ l'appel IA. Authentification, base et prestataire simulés ; aucun appel payant.
 Ce contrôle ne couvre pas les journaux du SDK, de l'infrastructure ou du
 prestataire, ni les autres routes IA. Non publié.
 
-Blocage App Store identifié dans les interfaces de scan morphologique :
+Constat initial, corrigé localement ci-dessous :
 `scan-morpho-posture.tsx` et `profil-form.tsx` affichent « jamais conservée(s) »
 alors que le fichier est transmis à Anthropic. La non-écriture du fichier dans
 la base COAI ne prouve pas l'absence de rétention chez le prestataire. Ces
@@ -122,6 +122,35 @@ confidentialité suffit. Aucune modification des droits d'abonnement effectuée.
 Référence consultée le 28 septembre : Apple, section 5.1.2(i), partage avec une
 IA tierce et permission explicite :
 https://developer.apple.com/app-store/review/guidelines/#data-use-and-sharing
+
+### Accord préalable aux analyses d’images — 28 septembre, local uniquement
+
+Les cinq outils (morphologie, montre, mouvement, repas, menu) affichent maintenant
+le destinataire Anthropic, les données transmises et l’usage du résultat avant
+sélection. Case décochée au départ ; import désactivé sans accord. Les sept points
+d’entrée partagent ce composant. Retirer la case empêche les prochains envois ;
+cela ne rappelle pas un fichier déjà transmis. Les promesses « jamais conservée »
+du scan ont été retirées, aucune durée fournisseur n’étant prouvée.
+
+Chaque route exige un acquittement versionné propre à l’outil avant lecture du
+multipart/appel IA. Ce contrôle n’est ni une authentification ni une preuve
+juridique durable : l’en-tête peut être fourni par un client. Droits d’abonnement
+inchangés. La synchronisation JSON HealthKit reste séparée, sans appel IA.
+
+Preuves : `test-ai-image-consent-ui.cjs` (sept entrées, état React simulé et rendu
+du vrai composant), `test-vision-error-privacy.cjs` (31 cas, vraies routes
+transpilées, fournisseurs/base/auth simulés), typage et build local réussis,
+lint sans erreur. Navigateur connecté au build isolé, largeur 390 × 844 : trois
+imports du profil bloqués au départ, activation indépendante montre/morphologie/
+scan et retrait vérifiés ; aucun débordement horizontal ni erreur navigateur
+détecté. Capture `/tmp/coai-consent-mobile-0928.png`. Aucun fichier envoyé.
+Le compte fictif ne comporte pas de plan nutrition : les deux outils nutrition
+n’ont pas été vérifiés visuellement dans ce parcours, seulement par les tests
+de composants. Tests médias existants réussis.
+
+À faire : validation native/iPhone et version publiée, chemins coach texte et
+génération, politique de confidentialité complète et configuration/rétention
+réelle du prestataire. Pas de conclusion de conformité App Store ou RGPD globale.
 
 1. Vérifier les transmissions réelles des écrans connectés et les journaux
    techniques ; définir puis tester la suppression des données sensibles dans

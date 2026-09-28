@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { AIImageConsent } from "@/components/ai/image-consent";
+import { aiImageConsentHeaders } from "@/lib/ai/image-consent";
 import { useRouter } from "next/navigation";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
@@ -19,11 +21,13 @@ type Extraction = {
 export function WatchScreenshotCta() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [aiAgreed, setAIAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultat, setResultat] = useState<Extraction | null>(null);
 
   async function handleFile(file: File) {
+    if (!aiAgreed) return;
     setLoading(true);
     setError(null);
     setResultat(null);
@@ -31,7 +35,7 @@ export function WatchScreenshotCta() {
       const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
       formData.append("file", optimized.file);
-      const res = await fetch("/api/profil/montre", { method: "POST", body: formData });
+      const res = await fetch("/api/profil/montre", { method: "POST", headers: aiImageConsentHeaders("montre", aiAgreed), body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse du screenshot.");
       setResultat({
@@ -62,12 +66,13 @@ export function WatchScreenshotCta() {
         pour affiner ton programme, automatiquement.
       </p>
 
+      <AIImageConsent scope="montre" agreed={aiAgreed} onChange={setAIAgreed} disabled={loading} />
       <input
         ref={inputRef}
         type="file"
         accept="image/*,.heic,.heif"
         className="hidden"
-        disabled={loading}
+        disabled={loading || !aiAgreed}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleFile(file);
@@ -78,7 +83,7 @@ export function WatchScreenshotCta() {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        disabled={loading}
+        disabled={loading || !aiAgreed}
         className="mt-1 inline-flex w-fit items-center gap-2 rounded-lg bg-laiton-400 px-4 py-2 text-sm font-medium text-graphite-950 transition hover:bg-laiton-300 disabled:opacity-60"
       >
         {loading ? "Analyse en cours…" : "Analyser un screenshot"}

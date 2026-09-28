@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { AIImageConsent } from "@/components/ai/image-consent";
+import { aiImageConsentHeaders } from "@/lib/ai/image-consent";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
 // Scan Morpho & Posture (22/08/2026, demande Anthony) — module dédié,
@@ -41,6 +43,7 @@ export function ScanMorphoPosture({
   observationsInitiales?: string | null;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [aiAgreed, setAIAgreed] = useState(false);
   const vueEnCoursRef = useRef<Vue>("face");
   const [chargement, setChargement] = useState<Vue | null>(null);
   const [resultats, setResultats] = useState<Resultat[]>([]);
@@ -48,6 +51,7 @@ export function ScanMorphoPosture({
   const [refus, setRefus] = useState<string | null>(null);
 
   async function analyser(fichier: File, vue: Vue) {
+    if (!aiAgreed) return;
     setChargement(vue);
     setErreur(null);
     setRefus(null);
@@ -56,7 +60,7 @@ export function ScanMorphoPosture({
       const form = new FormData();
       form.append("file", optimise.file);
       form.append("vue", vue);
-      const res = await fetch("/api/profil/photo-morphologie", { method: "POST", body: form });
+      const res = await fetch("/api/profil/photo-morphologie", { method: "POST", headers: aiImageConsentHeaders("morphologie", aiAgreed), body: form });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         setErreur(typeof data?.error === "string" ? data.error : "Analyse impossible pour le moment.");
@@ -90,13 +94,15 @@ export function ScanMorphoPosture({
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-laiton-300">Diagnostic enrichi · Optionnel</p>
       <h2 className="mt-1.5 text-lg font-semibold text-white">📸 Scan morpho &amp; posture</h2>
       <p className="mt-1 text-xs leading-5 text-graphite-400">
-        Deux photos en tenue de sport permettent d&apos;équilibrer ton programme selon ta posture réelle.
-        Elles sont analysées puis supprimées — <strong className="font-semibold text-graphite-300">jamais conservées</strong>.
+        Deux photos en tenue de sport permettent de proposer des observations sur ta posture.
+        Ce retour automatique ne remplace pas l’avis d’un professionnel de santé.
       </p>
 
+      <AIImageConsent scope="morphologie" agreed={aiAgreed} onChange={setAIAgreed} disabled={chargement !== null} />
       <input
         ref={inputRef}
         type="file"
+        disabled={chargement !== null || !aiAgreed}
         accept="image/*"
         capture="environment"
         className="sr-only"
@@ -131,7 +137,7 @@ export function ScanMorphoPosture({
                   vueEnCoursRef.current = vue;
                   inputRef.current?.click();
                 }}
-                disabled={chargement !== null}
+                disabled={chargement !== null || !aiAgreed}
                 className="mt-2.5 w-full rounded-full border border-laiton-400/35 bg-laiton-400/10 py-2 text-[11px] font-semibold text-laiton-200 transition hover:bg-laiton-400/20 disabled:opacity-60"
               >
                 {chargement === vue ? "Analyse…" : fait ? "Reprendre" : "Prendre la photo"}

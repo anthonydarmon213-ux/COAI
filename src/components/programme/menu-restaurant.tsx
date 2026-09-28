@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { AIImageConsent } from "@/components/ai/image-consent";
+import { aiImageConsentHeaders } from "@/lib/ai/image-consent";
 
 // Restaurant Decoder (22/08/2026, demande Anthony) — photographie la carte,
 // COAI propose les 2 meilleurs choix et l'ajustement à demander au serveur.
@@ -42,11 +44,13 @@ type Resultat = {
 
 export function MenuRestaurant() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [aiAgreed, setAIAgreed] = useState(false);
   const [chargement, setChargement] = useState(false);
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
 
   async function analyser(fichier: File) {
+    if (!aiAgreed) return;
     setChargement(true);
     setErreur(null);
     setResultat(null);
@@ -54,7 +58,7 @@ export function MenuRestaurant() {
       const compresse = await compresser(fichier);
       const form = new FormData();
       form.append("file", compresse, "menu.jpg");
-      const res = await fetch("/api/nutrition/menu-restaurant", { method: "POST", body: form });
+      const res = await fetch("/api/nutrition/menu-restaurant", { method: "POST", headers: aiImageConsentHeaders("menu", aiAgreed), body: form });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         setErreur(typeof data?.error === "string" ? data.error : "Analyse impossible pour le moment.");
@@ -77,9 +81,11 @@ export function MenuRestaurant() {
         Photographie la carte : COAI te propose deux plats cohérents avec ton objectif, et quoi demander au serveur.
       </p>
 
+      <AIImageConsent scope="menu" agreed={aiAgreed} onChange={setAIAgreed} disabled={chargement} />
       <input
         ref={inputRef}
         type="file"
+        disabled={chargement || !aiAgreed}
         accept="image/*"
         capture="environment"
         className="sr-only"
@@ -92,7 +98,7 @@ export function MenuRestaurant() {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        disabled={chargement}
+        disabled={chargement || !aiAgreed}
         className="mt-3 w-full rounded-full border border-laiton-400/35 bg-laiton-400/10 py-2.5 text-xs font-semibold text-laiton-200 transition hover:bg-laiton-400/20 disabled:opacity-60"
       >
         {chargement ? "Lecture de la carte…" : "Photographier le menu →"}

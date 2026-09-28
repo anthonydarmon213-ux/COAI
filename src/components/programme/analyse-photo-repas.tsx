@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { AIImageConsent } from "@/components/ai/image-consent";
+import { aiImageConsentHeaders } from "@/lib/ai/image-consent";
 import { useRouter } from "next/navigation";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 
@@ -23,6 +25,7 @@ type Resultat = {
 // de suivi durable (V1 volontairement simple).
 export function AnalysePhotoRepas() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [aiAgreed, setAIAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultat, setResultat] = useState<Resultat | null>(null);
@@ -33,6 +36,7 @@ export function AnalysePhotoRepas() {
   const router = useRouter();
 
   async function handleFile(file: File) {
+    if (!aiAgreed) return;
     setLoading(true);
     setError(null);
     setResultat(null);
@@ -41,7 +45,7 @@ export function AnalysePhotoRepas() {
       const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
       formData.append("file", optimized.file);
-      const res = await fetch("/api/nutrition/photo-repas", { method: "POST", body: formData });
+      const res = await fetch("/api/nutrition/photo-repas", { method: "POST", headers: aiImageConsentHeaders("repas", aiAgreed), body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse de la photo.");
       setResultat(data);
@@ -62,9 +66,11 @@ export function AnalysePhotoRepas() {
         rapide, pas une mesure exacte de laboratoire.
       </p>
 
+      <AIImageConsent scope="repas" agreed={aiAgreed} onChange={setAIAgreed} disabled={loading} />
       <input
         ref={inputRef}
         type="file"
+        disabled={loading || !aiAgreed}
         accept="image/*"
         capture="environment"
         className="hidden"
@@ -77,7 +83,7 @@ export function AnalysePhotoRepas() {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        disabled={loading}
+        disabled={loading || !aiAgreed}
         className="self-start rounded-full border border-laiton-400/40 bg-laiton-400/[0.1] px-5 py-2.5 text-sm font-semibold text-laiton-200 transition hover:bg-laiton-400/[0.16] disabled:opacity-50"
       >
         {loading ? "Analyse en cours…" : "Prendre une photo de mon plat"}

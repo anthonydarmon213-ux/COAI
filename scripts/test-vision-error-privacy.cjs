@@ -4,6 +4,13 @@ const vm = require('node:vm');
 const path = require('node:path');
 const ts = require('typescript');
 const root = path.resolve(__dirname, '..');
+const consentBox = { exports: {} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(root, 'src/lib/ai/image-consent.ts'), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS },
+}).outputText, consentBox);
+const consent = consentBox.exports;
+const scopes = { 'profil/photo-morphologie': 'morphologie', 'profil/montre': 'montre',
+  'programme/motion-check': 'mouvement', 'nutrition/photo-repas': 'repas', 'nutrition/menu-restaurant': 'menu' };
 const cases = [
   ['profil/photo-morphologie', 'body-photo-extraction', 'buildBodyPhotoExtractionPrompt'],
   ['profil/montre', 'watch-screenshot-extraction', 'buildWatchScreenshotExtractionPrompt'],
@@ -19,11 +26,19 @@ async function exercise([route, promptModule, promptFunction], mode) {
   const dependencies = {
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
     zod: require('zod'),
+    '@/lib/ai/image-consent': consent,
     '@/lib/auth/server': { getCurrentUser: async () => mode === 'unauthenticated' ? null : { id: 'fixture-auth' } },
     '@/lib/subscription/plan': { hasPaidSubscription: () => mode !== 'unpaid' },
     '@/lib/db/client': { prisma: {
       user: { findUnique: async () => ({ id: 'fixture-user', subscription: {}, profile: {} }) },
-      profile: { upsert: async () => { writes++; throw Error('Unexpected profile write'); } },
+      profile: { upsert: async (args) => {
+        writes++;
+        if (mode !== 'healthkit') throw Error('Unexpected profile write');
+        assert.equal(args.where.userId, 'fixture-user');
+        assert.equal(args.update.pasMoyenParJour, 7500);
+        assert.equal(args.update.resumeMontre, 'Synchronisé automatiquement via Apple Santé.');
+        return args.update;
+      } },
     } },
     '@/lib/ai/client': { generateWithVision: async () => { aiCalls++; throw providerError; } },
     ['@/lib/ai/prompts/' + promptModule]: { [promptFunction]: () => 'synthetic-prompt' },
@@ -36,8 +51,23 @@ async function exercise([route, promptModule, promptFunction], mode) {
   const body = new FormData();
   body.append('file', new File(['synthetic-image-only'], 'fixture.png', { type: 'image/png' }));
   body.append('exercice', 'Squat');
-  const response = await box.exports.POST(new Request('http://localhost/api/' + route, { method: 'POST', body }));
+  const headers = mode === 'no-consent' ? {}
+    : mode === 'wrong-scope' ? consent.aiImageConsentHeaders(scopes[route] === 'menu' ? 'repas' : 'menu', true)
+    : mode === 'old-consent' ? { [consent.AI_IMAGE_CONSENT_HEADER]: 'anthropic-image-v0:' + scopes[route] }
+    : consent.aiImageConsentHeaders(scopes[route], true);
+  const requestOptions = mode === 'healthkit'
+    ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ source: 'healthkit', pasMoyenParJour: 7500 }) }
+    : { method: 'POST', headers, body };
+  const response = await box.exports.POST(new Request('http://localhost/api/' + route, requestOptions));
   const payload = await response.text();
+  if (mode === 'healthkit') {
+    assert.equal(response.status, 200);
+    assert.equal(writes, 1);
+    assert.equal(aiCalls, 0);
+    assert.equal(logs.length, 0);
+    assert.equal(JSON.parse(payload).pasMoyenParJour, 7500);
+    return;
+  }
   assert.equal(writes, 0, route + ': failures must not update the profile');
   assert.ok(!payload.includes('PRIVATE'), route + ': response leaked provider content');
   if (mode === 'provider-error') {
@@ -48,9 +78,14 @@ async function exercise([route, promptModule, promptFunction], mode) {
     assert.ok([401, 402, 403].includes(response.status));
     assert.equal(aiCalls, 0);
     assert.equal(logs.length, 0);
+    if (['no-consent', 'wrong-scope', 'old-consent'].includes(mode)) {
+      assert.equal(response.status, 403);
+      assert.equal(JSON.parse(payload).code, 'AI_IMAGE_CONSENT_REQUIRED');
+    }
   }
 }
 (async () => {
-  for (const item of cases) for (const mode of ['provider-error', 'unauthenticated', 'unpaid']) await exercise(item, mode);
-  console.log('PASS — five real vision routes, 15 cases: private provider error excluded from logs/responses, no profile mutation, auth/payment gates preserved. All providers simulated.');
+  for (const item of cases) for (const mode of ['provider-error', 'unauthenticated', 'unpaid', 'no-consent', 'wrong-scope', 'old-consent']) await exercise(item, mode);
+  await exercise(cases.find(item => item[0] === 'profil/montre'), 'healthkit');
+  console.log('PASS — five real vision routes, 31 cases: explicit scoped consent, private provider errors excluded, no profile mutation on failure, auth/payment gates preserved; structured HealthKit stays AI-free without image consent. All providers simulated.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

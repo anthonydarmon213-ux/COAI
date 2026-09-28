@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { AIImageConsent } from "@/components/ai/image-consent";
+import { aiImageConsentHeaders } from "@/lib/ai/image-consent";
 
 // Motion Check (22/08/2026, demande Anthony) — retour de technique à partir
 // d'une photo prise en bas de mouvement.
@@ -35,12 +37,14 @@ type Resultat = {
 
 export function MotionCheck({ nomExercice }: { nomExercice: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [aiAgreed, setAIAgreed] = useState(false);
   const [ouvert, setOuvert] = useState(false);
   const [chargement, setChargement] = useState(false);
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
 
   async function analyser(fichier: File) {
+    if (!aiAgreed) return;
     setChargement(true);
     setErreur(null);
     setResultat(null);
@@ -49,7 +53,7 @@ export function MotionCheck({ nomExercice }: { nomExercice: string }) {
       const form = new FormData();
       form.append("file", compresse, "position.jpg");
       form.append("exercice", nomExercice);
-      const res = await fetch("/api/programme/motion-check", { method: "POST", body: form });
+      const res = await fetch("/api/programme/motion-check", { method: "POST", headers: aiImageConsentHeaders("mouvement", aiAgreed), body: form });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         setErreur(typeof data?.error === "string" ? data.error : "Analyse impossible pour le moment.");
@@ -91,14 +95,16 @@ export function MotionCheck({ nomExercice }: { nomExercice: string }) {
                   </ul>
                 </div>
                 <p className="mt-2 text-[10px] leading-4 text-graphite-500">
-                  La photo est analysée puis supprimée — elle n&apos;est jamais conservée.
+                  Ce retour automatique porte uniquement sur la position visible, pas sur l’ensemble du mouvement.
                 </p>
               </>
             )}
 
+            <AIImageConsent scope="mouvement" agreed={aiAgreed} onChange={setAIAgreed} disabled={chargement} />
             <input
               ref={inputRef}
               type="file"
+              disabled={chargement || !aiAgreed}
               accept="image/*"
               capture="environment"
               className="sr-only"
@@ -159,7 +165,7 @@ export function MotionCheck({ nomExercice }: { nomExercice: string }) {
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                disabled={chargement}
+                disabled={chargement || !aiAgreed}
                 className="coai-rainbow-cta flex-1 rounded-full border-0 py-2.5 text-xs font-extrabold text-[#111216] disabled:opacity-60"
               >
                 {chargement ? "Analyse…" : resultat ? "Nouvelle photo" : "Prendre la photo"}

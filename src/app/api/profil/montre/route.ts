@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { AI_IMAGE_CONSENT_ERROR, hasAIImageConsent } from "@/lib/ai/image-consent";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { hasPaidSubscription } from "@/lib/subscription/plan";
@@ -75,6 +76,9 @@ export async function POST(request: Request) {
     }
     data.resumeMontre = "Synchronisé automatiquement via Apple Santé.";
   } else {
+    if (!hasAIImageConsent(request.headers, "montre")) {
+      return NextResponse.json({ error: AI_IMAGE_CONSENT_ERROR, code: "AI_IMAGE_CONSENT_REQUIRED" }, { status: 403 });
+    }
     const formData = await request.formData();
     const file = formData.get("file");
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { AI_IMAGE_CONSENT_ERROR, hasAIImageConsent } from "@/lib/ai/image-consent";
 import { getCurrentUser } from "@/lib/auth/server";
 import { hasPaidSubscription } from "@/lib/subscription/plan";
 import { prisma } from "@/lib/db/client";
@@ -29,6 +30,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
+  if (!hasAIImageConsent(request.headers, "morphologie")) {
+    return NextResponse.json({ error: AI_IMAGE_CONSENT_ERROR, code: "AI_IMAGE_CONSENT_REQUIRED" }, { status: 403 });
+  }
   const formData = await request.formData();
   const file = formData.get("file");
   // Vue déclarée par l'utilisateur (face/profil) — facultative : une photo

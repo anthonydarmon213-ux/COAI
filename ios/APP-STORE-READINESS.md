@@ -2,6 +2,14 @@
 
 ## État courant — 28 septembre 2026
 
+Analyses d’images : accord explicite Anthropic ajouté localement sur les cinq
+outils et leurs sept points d’entrée ; refus serveur sans acquittement propre à
+l’outil. 31 cas de routes et tests des sept interfaces réussis, prestataire
+simulé ; profil mobile connecté contrôlé dans le navigateur local sans envoi
+de fichier. HealthKit structuré reste sans IA. Détails et limites dans
+`PRIVACY-AUDIT.md`. Non publié, non validé sur iPhone pour ce changement ;
+consentements coach/génération et rétention fournisseur encore à auditer.
+
 Nom sous l'icône corrigé : Release affichait encore « COAI test » dans son
 Info.plist compilé. Variable par configuration : « COAI » en Release,
 « COAI test » en Debug. Les deux valeurs sont désormais contrôlées sur les

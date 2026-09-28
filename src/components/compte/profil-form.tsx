@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Select } from "@/components/ui/select";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
+import { AIImageConsent } from "@/components/ai/image-consent";
+import { aiImageConsentHeaders } from "@/lib/ai/image-consent";
 
 // Badge "Nouveau" (14/08/2026, demande Anthony) : le bracelet connecté et
 // la photo morphologique sont des fonctionnalités récentes, faciles à
@@ -374,16 +376,18 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     resumeMontre: profil.resumeMontre ?? null,
   });
   const [montreLoading, setMontreLoading] = useState(false);
+  const [montreAIAgreed, setMontreAIAgreed] = useState(false);
   const [montreError, setMontreError] = useState<string | null>(null);
 
   async function handleAnalyserMontre(file: File) {
+    if (!montreAIAgreed) return;
     setMontreLoading(true);
     setMontreError(null);
     try {
       const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
       formData.append("file", optimized.file);
-      const res = await fetch("/api/profil/montre", { method: "POST", body: formData });
+      const res = await fetch("/api/profil/montre", { method: "POST", headers: aiImageConsentHeaders("montre", montreAIAgreed), body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse du screenshot.");
       setMontreData({
@@ -407,10 +411,12 @@ export function ProfilForm({ profil }: { profil: Profil }) {
     observationsPosture: profil.observationsPosture ?? null,
   });
   const [photoLoading, setPhotoLoading] = useState(false);
+  const [photoAIAgreed, setPhotoAIAgreed] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [photoRejected, setPhotoRejected] = useState<string | null>(null);
 
   async function handleAnalyserPhoto(file: File) {
+    if (!photoAIAgreed) return;
     setPhotoLoading(true);
     setPhotoError(null);
     setPhotoRejected(null);
@@ -418,7 +424,7 @@ export function ProfilForm({ profil }: { profil: Profil }) {
       const optimized = await compressProgressPhoto(file);
       const formData = new FormData();
       formData.append("file", optimized.file);
-      const res = await fetch("/api/profil/photo-morphologie", { method: "POST", body: formData });
+      const res = await fetch("/api/profil/photo-morphologie", { method: "POST", headers: aiImageConsentHeaders("morphologie", photoAIAgreed), body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Échec de l'analyse de la photo.");
       if (!data.analysable) {
@@ -527,12 +533,13 @@ export function ProfilForm({ profil }: { profil: Profil }) {
             Health...) — on en extrait automatiquement pas, fréquence cardiaque, sommeil, VO2 max
             et calories pour affiner ton programme.
           </p>
+          <AIImageConsent scope="montre" agreed={montreAIAgreed} onChange={setMontreAIAgreed} disabled={montreLoading} />
           <label className="w-fit">
             <input
               type="file"
               accept="image/*,.heic,.heif"
               className="hidden"
-              disabled={montreLoading}
+              disabled={montreLoading || !montreAIAgreed}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleAnalyserMontre(file);
@@ -582,15 +589,16 @@ export function ProfilForm({ profil }: { profil: Profil }) {
           <p className="text-sm font-medium leading-6 text-graphite-200">
             Envoie une photo de toi en tenue de sport (legging, short, brassière, débardeur...),
             de face, en pied — on en extrait des observations de posture et de morphologie pour
-            affiner ton programme d&apos;entraînement. Photo jamais conservée, uniquement les
-            observations.
+            affiner ton programme d&apos;entraînement. Ce retour automatique ne remplace pas
+            l’avis d’un professionnel de santé.
           </p>
+          <AIImageConsent scope="morphologie" agreed={photoAIAgreed} onChange={setPhotoAIAgreed} disabled={photoLoading} />
           <label className="w-fit">
             <input
               type="file"
               accept="image/*,.heic,.heif"
               className="hidden"
-              disabled={photoLoading}
+              disabled={photoLoading || !photoAIAgreed}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleAnalyserPhoto(file);
