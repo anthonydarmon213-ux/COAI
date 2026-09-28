@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
-import { closePhotoWrites, confirmPhotoWrite, reservePhotoWrite } from "./photo-write-registry";
+import { closePhotoWrites, confirmPhotoWrite, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
 
 // Nom exact du bucket privé existant dans Supabase.
 export const PROGRESS_PHOTOS_BUCKET = "progress photos";
@@ -70,12 +70,9 @@ export async function uploadAvatar(
   return storeRegisteredPhoto(userId, file, true);
 }
 
-export async function deleteAllProgressPhotos(userId: string): Promise<void> {
-  // Never allow an empty/root prefix with the privileged Storage client.
-  if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new Error("invalid_photo_owner");
-  await closePhotoWrites(userId);
-  const admin = createSupabaseAdminClient();
-  const bucket = admin.storage.from(PROGRESS_PHOTOS_BUCKET);
+type PhotoBucket = ReturnType<ReturnType<typeof createSupabaseAdminClient>["storage"]["from"]>;
+
+async function listPhotoPaths(userId: string, bucket: PhotoBucket): Promise<string[]> {
   const paths = new Set<string>();
   // Collect before deleting: increasing an offset while deleting skips objects.
   // Uploads create flat files only; unexpected subfolders require investigation.
@@ -96,7 +93,40 @@ export async function deleteAllProgressPhotos(userId: string): Promise<void> {
     if (paths.size >= 10000) throw new Error("photo_cleanup_requires_assistance");
   }
 
-  const allPaths = [...paths];
+  return [...paths];
+}
+
+export async function deleteAllProgressPhotos(userId: string): Promise<void> {
+  // Never allow an empty/root prefix with the privileged Storage client.
+  if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new Error("invalid_photo_owner");
+  const bucket = createSupabaseAdminClient().storage.from(PROGRESS_PHOTOS_BUCKET);
+  try {
+    await closePhotoWrites(userId);
+  } catch (error) {
+    if (!(error instanceof UnresolvedPhotoWritesError)) throw error;
+    // Admissions are durably closed. Recover only positively identified writes
+    // left by an interrupted process. No timestamp/absence-based expiry.
+    const pending = new Set(error.operations);
+    for (const path of await listPhotoPaths(userId, bucket)) {
+      const name = path.slice(userId.length + 1);
+      const match = /^(avatar|[0-9a-f-]{36})\.(jpg|png|webp)$/.exec(name);
+      const stem = match?.[1];
+      if (!stem || (stem !== "avatar" && !pending.has(stem))) continue;
+      const { data, error: infoError } = await bucket.info(path);
+      if (infoError || !data || data.name !== path || data.bucketId !== PROGRESS_PHOTOS_BUCKET) continue;
+      const operation = data.metadata?.coaiUploadOperation;
+      if (typeof operation !== "string" || !pending.has(operation)) continue;
+      // A progress file must also be named after this exact operation.
+      if (stem !== "avatar" && stem !== operation) continue;
+      await confirmPhotoWrite(userId, operation);
+      pending.delete(operation);
+    }
+    // Recheck before any removal; missing/overwritten proof remains unresolved.
+    await closePhotoWrites(userId);
+  }
+  // Relist after all writers are confirmed: the recovery listing may have run
+  // while an admitted upload was still finishing.
+  const allPaths = await listPhotoPaths(userId, bucket);
   for (let offset = 0; offset < allPaths.length; offset += 100) {
     const { error } = await bucket.remove(allPaths.slice(offset, offset + 100));
     if (error) throw new Error("photo_removal_failed");

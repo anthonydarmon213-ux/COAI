@@ -36,18 +36,22 @@ export async function confirmPhotoWrite(userId: string, operation: string): Prom
   }, { maxWait: 5000, timeout: 5000 });
 }
 
+export class UnresolvedPhotoWritesError extends Error {
+  constructor(public readonly operations: readonly string[]) {
+    super("photo_writes_unresolved");
+    this.name = "UnresolvedPhotoWritesError";
+  }
+}
+
 export async function closePhotoWrites(userId: string): Promise<void> {
   const key = ownerKey(userId);
-  const ready = await prisma.$transaction(async tx => {
+  const pending = await prisma.$transaction(async tx => {
     await lock(tx, key);
     await tx.$executeRaw`UPDATE photo_owner_gates SET closed=true WHERE "ownerKey"=${key}`;
-    const rows = await tx.$queryRaw<{ pending: boolean }[]>`SELECT EXISTS (
-      SELECT 1 FROM photo_uploads WHERE "ownerKey"=${key} AND NOT settled
-    ) AS pending`;
-    const state = rows[0];
-    if (!state) throw new Error("photo_gate_state_missing");
-    return !state.pending;
+    return tx.$queryRaw<{ id: string }[]>`SELECT id FROM photo_uploads
+      WHERE "ownerKey"=${key} AND NOT settled ORDER BY id LIMIT 1001`;
   }, { maxWait: 5000, timeout: 5000 });
   // Throw outside the transaction: the closed gate must remain committed.
-  if (!ready) throw new Error("photo_writes_unresolved");
+  if (pending.length > 1000) throw new Error("photo_cleanup_requires_assistance");
+  if (pending.length) throw new UnresolvedPhotoWritesError(pending.map(row => row.id));
 }

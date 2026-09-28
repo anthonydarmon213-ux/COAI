@@ -20,6 +20,14 @@ adresse email ou donnée de santé dans les deux tables.
   et panne de lecture restent refusés dans les tests unitaires.
 - Les photos de suivi utilisent désormais l'UUID d'envoi, et non une date à la
   milliseconde, pour éviter la collision de deux envois simultanés.
+- Reprise après arrêt brutal testée dans six scénarios avec Storage/PostgreSQL
+  locaux réels : un processus enfant quitte immédiatement après l'enregistrement,
+  avant confirmation. Le processus suivant retrouve la preuve et efface le
+  fichier (avatar et suivi). Arrêt avant envoi et marqueur remplacé restent
+  explicitement refusés. Test : `test-photo-process-crash-local.cjs`.
+- La suppression ferme d'abord les admissions, cherche les preuves exactes des
+  opérations en attente, recontrôle le registre puis refait la liste avant tout
+  effacement. Aucun appel Storage dans la transaction de verrouillage.
 - Test des vrais modules avec PostgreSQL local et stockage simulé : lecture du
   fichier retardée, envoi déjà en cours, nouvelle tentative de suppression,
   reconnexion, confirmation inconnue, isolation des propriétaires.
@@ -40,8 +48,9 @@ adresse email ou donnée de santé dans les deux tables.
 1. Compléter la reprise opérationnelle des envois incertains. Un timeout
    ne prouve pas que le stockage a refusé le fichier : NE PAS supprimer la
    réservation sur délai, NE PAS marquer settled sans preuve. La réponse perdue
-   est récupérée si le processus peut lire la preuve exacte ; un arrêt du
-   processus ou une preuve indisponible bloque encore l'effacement. Cette limite
+   et l'arrêt après enregistrement sont récupérés si la preuve exacte existe.
+   Un arrêt avant envoi, un écrasement de la preuve ou un stockage indisponible
+   restent sans résolution automatique. Cette limite
    empêche de considérer la suppression prête pour production.
 2. Compléter le parcours HTTP local réussi par les scénarios de panne et de
    concurrence avec stockage réel, puis sur l'environnement autorisé. Les
