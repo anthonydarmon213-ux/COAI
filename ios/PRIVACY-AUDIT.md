@@ -28,6 +28,21 @@ réseau, ni déclaration App Privacy, ni approbation Apple.
 
 ## Données et preuves dans le dépôt
 
+### Portée de la génération automatique — recontrôle du 28 septembre
+
+Le parcours actuel `/api/programmes/generate` utilise la bibliothèque, pas
+Anthropic. `PROGRAMME_AI_PAID_ENABLED` reste à `false` ; les entrées de
+génération et d'adaptation IA sont bloquées avant appel fournisseur.
+`test-programme-library-policy.cjs` revalidé : trois offres, profils hors
+catalogue, erreurs, relecture en attente et absence de repli payant. Ce test
+exécute les vraies fonctions avec données simulées, pas une analyse médicale.
+L'accord fournisseur pour ces générateurs devient donc une condition préalable
+à une éventuelle réactivation, et non un nouvel écran à imposer au parcours
+bibliothèque actuel. WhatsApp reste distinct : le contrôle d'abonnement est
+testé (`test-whatsapp-paid-access.cjs`), mais aucun accord explicite Anthropic
+n'est actuellement recueilli dans cette route. Ne pas activer ce canal en
+production sans résoudre ce point et vérifier le flow ManyChat réel.
+
 ### Consentement d'inscription — correction locale du 28 septembre
 
 Le webhook `auth.users INSERT` créait un User avec `consentRgpdAt = now()` sans
