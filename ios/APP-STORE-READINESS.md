@@ -2,6 +2,20 @@
 
 ## État courant — 28 septembre 2026
 
+Abonnement, 14 h 35 : trois tests UI natifs réussis (42,318 s au total) :
+`testUnavailableSubscriptionCanOpenAccount`, `testSubscriptionSmallScreenLargeText`
+et `testWebOfferLinkOpensNativeSubscription`. Ouverture depuis lien, fermeture,
+retour au compte anonyme et accès aux contrôles/légaux en XXXL vérifiés.
+Résultat `/tmp/coai-subscription-fallback-0928.xcresult`, deux captures examinées
+dans `/tmp/coai-subscription-fallback-proof`. Départ sur fixture Debug ; retour
+au compte via la page publique réelle, sans connexion ni transaction.
+Tests serveur `test-apple-delivery`, `test-apple-transactions-route`,
+`test-apple-transaction-policy`, `test-apple-catalogue` et
+`test-apple-account-route-errors` réussis : liaison au compte, erreurs sûres,
+ordre vérification/persistance/lecture, configuration et contrôle des entrées.
+Leurs dépendances sont simulées : aucune preuve nouvelle d'achat StoreKit,
+de signature de reçu réelle, de restauration Apple ou de publication.
+
 Reprise réseau revalidée à 14 h 31 sur le simulateur QA : arrêt du seul
 serveur localhost:3050, erreur WebKit réelle, message compréhensible,
 Réessayer et Repos accessibles, minuteur ouvrable puis fermeture sans blocage.
