@@ -409,6 +409,32 @@ final class COAIUITests: XCTestCase {
             let warning = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Certaines informations sont incomplètes")).firstMatch
             XCTAssertTrue(warning.exists)
             XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+            if tab == "Nutrition" {
+                // WebKit exposes both the summary and its text as buttons.
+                let principles = web.buttons.matching(identifier: "🥗 Principes de la semaine").firstMatch
+                XCTAssertTrue(principles.waitForExistence(timeout: 10))
+                func revealOverview(_ element: XCUIElement) {
+                    for _ in 0..<24 {
+                        if element.isHittable { return }
+                        let upper = web.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.35))
+                        let lower = web.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.60))
+                        if element.frame.minY < web.frame.minY {
+                            upper.press(forDuration: 0.05, thenDragTo: lower)
+                        } else {
+                            lower.press(forDuration: 0.05, thenDragTo: upper)
+                        }
+                    }
+                    XCTAssertTrue(element.isHittable)
+                }
+                revealOverview(principles); principles.tap()
+                let advice = web.staticTexts["Principes nutrition sauvegardés dans le programme local."]
+                XCTAssertTrue(advice.waitForExistence(timeout: 10))
+                revealOverview(advice)
+                XCTAssertTrue(advice.isHittable)
+                let proof = XCTAttachment(screenshot: app.screenshot())
+                proof.name = "Nutrition — principes accessibles avec les repas"
+                proof.lifetime = .keepAlways; add(proof)
+            }
         }
         app.terminate(); app.launch()
         XCTAssertTrue(app.buttons["native-tab-Récupération"].waitForExistence(timeout: 10))

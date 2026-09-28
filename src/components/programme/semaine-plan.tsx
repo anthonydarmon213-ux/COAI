@@ -56,6 +56,16 @@ export function SemainePlan({
         </div>
       ) : null}
 
+      {jours.length > 0 && vueEnsemble && (
+        <details className="group/overview rounded-xl border border-laiton-400/20 bg-laiton-400/[0.04]">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-laiton-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-laiton-300">
+            <span>{vueEnsembleLabel}</span>
+            <span aria-hidden="true" className="transition-transform group-open/overview:rotate-180">⌄</span>
+          </summary>
+          <p className="px-4 pb-4 text-sm leading-6 text-graphite-100">{vueEnsemble}</p>
+        </details>
+      )}
+
       {jours.length > 0 && (
         <div className="coai-week-days flex flex-col gap-2.5">
           {jours.map((jourData, i) => {

@@ -26,11 +26,20 @@ function load(name) {
 }
 const { RecuperationView } = load('@/components/programme/recuperation-view');
 const { NutritionView } = load('@/components/programme/nutrition-view');
+const { SemainePlan } = load('@/components/programme/semaine-plan');
 const render = (component, data) => renderToStaticMarkup(React.createElement(component, { data }));
 const day = { jour: 'Lundi', type: 'Routine locale', sommeil: 'Conseil sommeil existant' };
 const protocol = { nom: 'Protocole local', conseil: 'Conseil récupération existant' };
 const meal = { jour: 'Lundi', repas: [{ nom: 'Repas local', quantite: 'Portion existante' }] };
 const habit = { sujet: 'Habitude locale', conseil: 'Conseil nutrition existant' };
+const overview = 'Consigne générale conservée avec le planning';
+const nutritionWithOverview = render(NutritionView, { vueEnsemble: overview, jours: [meal] });
+assert.ok(nutritionWithOverview.includes(overview), 'Nutrition overview must remain available with meals');
+for (const jours of [[], [{jour:'Lundi'}]]) {
+  const html = renderToStaticMarkup(React.createElement(SemainePlan, {jours, vueEnsemble:overview, renderContenu:()=> 'Séance conservée'}));
+  assert.equal(html.split(overview).length - 1, 1);
+  if (jours.length) assert.ok(html.includes('Séance conservée'));
+}
 for (const invalid of [null, 17, 'entrée interrompue', []]) {
   const recovery = render(RecuperationView, { jours: [invalid, day], protocoles: [invalid, protocol] });
   assert.ok(recovery.includes('Conseil sommeil existant'));

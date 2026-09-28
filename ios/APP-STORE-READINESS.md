@@ -2,6 +2,24 @@
 
 ## État courant — 28 septembre 2026
 
+Nutrition, 14 h 23 : défaut reproduit puis corrigé — les principes généraux
+étaient masqués dès que le programme contenait des jours. Ils restent désormais
+accessibles dans une section repliée ; sans jours, leur affichage initial est
+préservé. Aucun conseil ni programme modifié. Rendu réel, types, lint, build,
+médias des piliers et paires exercice/vidéo vérifiés. Test natif connecté
+`testLocalIncompletePillarsPreserveAvailableContent` réussi (49,481 s), avec
+ouverture des principes et consultation du mardi de récupération après relance.
+Résultat `/tmp/coai-nutrition-overview-09281424.xcresult` ; capture examinée
+`/tmp/coai-nutrition-overview-proof/1CAEFD93-CB17-4854-BA25-96A3D6E7C786.png`.
+Les essais précédents ont révélé un défilement trop ample et une sélection
+ambiguë du bouton dans le test, ainsi qu'une session résiduelle et un blocage
+d'animations du simulateur. Test ajusté, fixture recréée, simulateur redémarré
+sans effacement avant le passage réussi. Compte temporaire révoqué/supprimé,
+absence Auth/application et refus de l'ancien mot de passe confirmés.
+Non publié ; validation locale sur simulateur, pas en production.
+Contrôle matériel : iPhone 17 Pro toujours indisponible ; seule identité
+Apple Development présente, aucune identité Apple Distribution détectée.
+
 Récupération, 14 h 02 : défaut reproduit puis corrigé — la vue ne rendait
 qu'un jour et masquait les six autres jours stockés. Le jour actuel reste
 en premier ; les autres sont consultables dans des sections repliées, avec
