@@ -2,6 +2,16 @@
 
 ## État courant — 28 septembre 2026
 
+Découverte recettes → récupération → Club revalidée à 13 h 47 : test natif
+connecté réussi (67,430 s), ingrédients/préparation visibles, filtre récupération
+conservé et premier programme accessible, Club « 1 heure par mois · En groupe ·
+Sans replay » et premier rendez-vous explicitement en préparation. Captures
+examinées dans `/tmp/coai-discovery-final-captures`, résultat
+`/tmp/coai-discovery-09281446.xcresult`. Aucun lien WhatsApp déclenché, aucun
+message/réservation/achat. Compte fictif supprimé après révocation ; absence
+Auth/application et refus de l'ancien mot de passe vérifiés. Ce test porte
+sur la découverte, pas sur une séance complète de récupération ou un vrai direct.
+
 Parcours natifs locaux revalidés vers 13 h 14 sur simulateur petit écran :
 `testLocalNewAccountDiagnosticReachesResult` réussi (201,481 s), vraie
 inscription, email Mailpit, lien ouvert par iOS, accords, diagnostic, reprise
