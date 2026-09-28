@@ -28,7 +28,7 @@ export default async function CompleterInscriptionPage(
 
   const returnTo = sanitizeReturnTo(searchParams.redirect_to);
   const existing = await prisma.user.findUnique({ where: { supabaseAuthId: authUser.id } });
-  if (existing) {
+  if (existing?.consentRgpdAt && existing.consentSanteAt) {
     redirect(returnTo ?? "/dashboard");
   }
 

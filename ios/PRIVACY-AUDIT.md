@@ -28,6 +28,29 @@ réseau, ni déclaration App Privacy, ni approbation Apple.
 
 ## Données et preuves dans le dépôt
 
+### Consentement d'inscription — correction locale du 28 septembre
+
+Le webhook `auth.users INSERT` créait un User avec `consentRgpdAt = now()` sans
+action utilisateur. `test-auth-webhook-consent.cjs` a reproduit cette écriture,
+puis vérifié son absence après correction : le webhook ne fait désormais
+qu'accuser réception après authentification, sans utiliser les métadonnées
+éditables comme preuve d'accord. JSON invalide refusé proprement.
+
+La création reste dans `/api/compte/register`, après authentification et les
+deux cases explicites. Un compte ancien incomplet peut finaliser ces accords ;
+seules les dates nulles sont complétées, sous conditions en base pour supporter
+les appels concurrents. Callback, dashboard et page de finalisation vérifiés
+par HTTP local. `test-signup-http-local.cjs --legacy-account` couvre ce chemin,
+la conservation des dates/profil et trois nouvelles tentatives concurrentes.
+Inscription neuve, vérificateur PKCE absent et page de confirmation native
+également retestés avec Auth/email/PostgreSQL locaux. Aucun email externe.
+
+Limites : pas de notification Supabase distante déclenchée, pas de publication,
+pas de validation iPhone. Les dates historiques potentiellement automatiques
+ne sont pas effacées ni certifiées fiables par cette correction. Un audit de
+leur provenance reste nécessaire avant publication. La portée des accords
+tiers IA et le contrôle de tous les accès directs restent des audits distincts.
+
 ### Coach conversationnel — contrôle local du 28 septembre
 
 Les trois interfaces web du coach demandent un accord initialement décoché

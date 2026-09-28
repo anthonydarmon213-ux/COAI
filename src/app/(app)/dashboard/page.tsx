@@ -49,7 +49,7 @@ export default async function DashboardPage() {
   // Une identité Auth confirmée n'est pas encore un compte COAI : les
   // consentements restent à recueillir après une connexion par mot de passe.
   // Ne jamais laisser ce cas sur un tableau de bord vide.
-  if (!user) redirect("/completer-inscription?redirect_to=%2Fdashboard");
+  if (!user?.consentRgpdAt || !user.consentSanteAt) redirect("/completer-inscription?redirect_to=%2Fdashboard");
 
   const date = today();
   const completion = computeProfilCompletion(user.profile);

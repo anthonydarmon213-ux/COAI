@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const parsed = bodySchema.safeParse(await request.json());
+  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     .map((lead) => ({ lead, profile: profileDepuisReponsesLead(lead.reponses) }))
     .find((item) => item.profile);
 
-  const user = await prisma.user.upsert({
+  let user = await prisma.user.upsert({
     where: { supabaseAuthId: authUser.id },
     update: {},
     create: {
@@ -93,6 +93,16 @@ export async function POST(request: Request) {
       utmTerm: parsed.data.utmTerm ?? leadAvecProfil?.lead.utmTerm,
     },
   });
+
+  // Repair only missing acknowledgements on an account created by an older
+  // webhook. Both booleans were explicitly validated above. Conditional writes
+  // preserve original timestamps even when registration requests race/retry.
+  if (!user.consentRgpdAt || !user.consentSanteAt) {
+    const agreedAt = new Date();
+    await prisma.user.updateMany({ where: { id: user.id, consentRgpdAt: null }, data: { consentRgpdAt: agreedAt } });
+    await prisma.user.updateMany({ where: { id: user.id, consentSanteAt: null }, data: { consentSanteAt: agreedAt } });
+    user = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+  }
 
   // Jamais d'écrasement : si le profil existe déjà, l'appel idempotent à
   // register ne modifie aucune donnée. Le consentement santé vient d'être

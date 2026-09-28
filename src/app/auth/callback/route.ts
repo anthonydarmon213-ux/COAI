@@ -26,7 +26,7 @@ export async function GET(request: Request) {
   }
 
   const user = await prisma.user.findUnique({ where: { supabaseAuthId: data.user.id } });
-  if (!user) {
+  if (!user?.consentRgpdAt || !user.consentSanteAt) {
     const destination = new URL("/completer-inscription", origin);
     if (returnTo) destination.searchParams.set("redirect_to", returnTo);
     return NextResponse.redirect(destination);

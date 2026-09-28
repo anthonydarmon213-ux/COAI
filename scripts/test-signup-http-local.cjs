@@ -15,6 +15,7 @@ const mailOrigin = 'http://127.0.0.1:54324';
 const email = `coai-signup-${randomUUID()}@example.test`;
 const password = randomUUID() + 'Aa1!';
 const nativePage = process.argv.includes('--native-page');
+const legacyAccount = process.argv.includes('--legacy-account');
 const db = new PrismaClient();
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY,
   { auth: { persistSession: false, autoRefreshToken: false } });
@@ -68,6 +69,10 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
     }
     assert.equal(callback.origin, origin); assert.equal(callback.pathname, '/auth/callback');
     assert(callback.searchParams.get('code'));
+    const legacyConsentAt = new Date('2026-01-01T00:00:00Z');
+    if (legacyAccount) {
+      await db.user.create({ data: { supabaseAuthId: authId, email, prenom: 'Test inscription', consentRgpdAt: legacyConsentAt } });
+    }
     const missingVerifier = process.argv.includes('--missing-verifier');
     const exchanged = await fetch(callback, { redirect: 'manual', headers: missingVerifier ? {} : { Cookie: cookie() } });
     assert.equal(exchanged.status, 307);
@@ -91,9 +96,17 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
       assert.equal(completion.status, 200);
       assert((await completion.text()).includes('Finalise ton compte'));
     }
+    if (legacyAccount) {
+      const completion = await fetch(origin + '/completer-inscription', { headers: { Cookie: cookie() }, redirect: 'manual' });
+      assert.equal(completion.status, 200); assert((await completion.text()).includes('Finalise ton compte'));
+      const dashboard = await fetch(origin + '/dashboard', { headers: { Cookie: cookie() }, redirect: 'manual' });
+      const dashboardText = await dashboard.text();
+      assert(dashboard.headers.get('location')?.includes('/completer-inscription') || dashboardText.includes('/completer-inscription?redirect_to='));
+    }
     for (const consent of [{ consentRgpd: false, consentSante: true }, { consentRgpd: true, consentSante: false }]) {
       assert.equal((await register(consent)).status, 400);
-      assert.equal(await db.user.count({ where: { supabaseAuthId: authId } }), 0);
+      assert.equal(await db.user.count({ where: { supabaseAuthId: authId } }), legacyAccount ? 1 : 0);
+      if (legacyAccount) assert.equal((await db.user.findUnique({ where: { supabaseAuthId: authId } })).consentSanteAt, null);
     }
     await db.diagnosticLead.create({ data: { email: email.toUpperCase(), resultEmailSentAt: new Date(),
       reponses: { objectif: 'Rester en forme', niveau: 'Débutant', duree: '45 minutes', frequence: '2 fois par semaine' } } });
@@ -101,16 +114,19 @@ const register = (body, authenticated = true) => fetch(origin + '/api/compte/reg
     assert.equal(response.status, 201);
     const user = await db.user.findUnique({ where: { supabaseAuthId: authId }, include: { profile: true } });
     assert(user.consentRgpdAt); assert(user.consentSanteAt); assert.equal(user.parraineParId, null);
+    if (legacyAccount) assert.equal(user.consentRgpdAt.toISOString(), legacyConsentAt.toISOString());
     assert.equal(user.profile.dureeSeanceMinutes, 45); assert.equal(user.profile.objectifs, 'Rester en forme');
     await db.profile.update({ where: { userId: user.id }, data: { dureeSeanceMinutes: 30 } });
     const retried = await Promise.all([1, 2, 3].map(() => register({ consentRgpd: true, consentSante: true, prenom: 'Ne pas écraser' })));
     assert(retried.every(result => result.status === 201));
     const persisted = await db.user.findUnique({ where: { id: user.id }, include: { profile: true } });
     assert.equal(persisted.prenom, 'Test inscription'); assert.equal(persisted.profile.dureeSeanceMinutes, 30);
+    assert.equal(persisted.consentRgpdAt.toISOString(), user.consentRgpdAt.toISOString());
+    assert.equal(persisted.consentSanteAt.toISOString(), user.consentSanteAt.toISOString());
     assert.equal(await db.user.count({ where: { supabaseAuthId: authId } }), 1);
     const welcome = await fetch(origin + '/bienvenue', { headers: { Cookie: cookie() }, redirect: 'manual' });
     assert.equal(welcome.status, 200); assert(!(await welcome.text()).includes('NEXT_REDIRECT'));
-    console.log('PASS local signup: real email/callback ' + (missingVerifier ? 'refused without verifier, password recovery works' : 'sets authenticated cookies without password login') + ', consent gates, diagnostic recovery, retries preserve profile, welcome accessible. No native callback or production claim.');
+    console.log('PASS local signup' + (legacyAccount ? ' (legacy incomplete account)' : '') + ': real email/callback ' + (missingVerifier ? 'refused without verifier, password recovery works' : 'sets authenticated cookies without password login') + ', consent gates, diagnostic recovery, retries preserve profile and consent dates, welcome accessible. No native callback or production claim.');
   } finally {
     await client.auth.signOut();
     if (authId) {

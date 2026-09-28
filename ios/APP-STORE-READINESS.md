@@ -2,6 +2,18 @@
 
 ## État courant — 28 septembre 2026
 
+Inscription : le webhook Auth fabriquait une date d'accord RGPD et créait un
+compte avant le formulaire. Test de reproduction rouge, puis correction : le
+webhook authentifié accuse réception sans créer de compte ni d'accord.
+Callback et tableau de bord renvoient les comptes incomplets au formulaire ;
+celui-ci reste accessible pour ces comptes. La validation explicite complète
+uniquement les dates manquantes, sans écraser profil ni dates existantes.
+Tests HTTP avec Auth, email local et PostgreSQL réels : nouvelle inscription,
+ancien compte incomplet, absence de vérificateur PKCE et page de confirmation
+iOS réussis ; identités/messages fictifs nettoyés. Types/build/lint/médias OK.
+Pas de test iPhone ni production pour ce lot. Les anciennes dates en production
+ne sont pas corrigées automatiquement : leur provenance nécessite un audit.
+
 Coach texte et vocal : accord facultatif explicite ajouté aux trois entrées
 (`/coach`, coach du jour, lecteur de séance). Sans accord, aucune dictée ni
 requête IA déclenchée par ces interfaces ; l'API refuse les acquittements

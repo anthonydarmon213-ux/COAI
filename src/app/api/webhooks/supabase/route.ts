@@ -1,41 +1,25 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db/client";
+import { z } from "zod";
 
-type SupabaseAuthWebhookPayload = {
-  type: string;
-  table: string;
-  record: {
-    id: string;
-    email: string;
-    raw_user_meta_data?: Record<string, unknown>;
-  };
-};
+const eventSchema = z.object({ type: z.string(), table: z.string(), schema: z.string() });
 
-// Chemin alternatif à /api/compte/register : si un Database Webhook Supabase
-// est configuré sur auth.users (INSERT), il crée ici l'enregistrement User
-// applicatif. Utile en filet de sécurité si le client n'a pas pu appeler
-// /api/compte/register (ex: coupure réseau juste après l'inscription).
+// Compatibility endpoint for an existing auth.users webhook. Authentication
+// does not establish consent. Only the authenticated registration form may
+// finalize the application account; retries recover via /completer-inscription.
+// Never infer consent from editable raw_user_meta_data or an Auth INSERT.
 export async function POST(request: Request) {
   const providedSecret = request.headers.get("x-webhook-secret");
   if (!process.env.SUPABASE_WEBHOOK_SECRET || providedSecret !== process.env.SUPABASE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const payload = (await request.json()) as SupabaseAuthWebhookPayload;
+  const parsed = eventSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: "Événement invalide" }, { status: 400 });
+  const payload = parsed.data;
 
-  if (payload.table !== "users" || payload.type !== "INSERT") {
+  if (payload.schema !== "auth" || payload.table !== "users" || payload.type !== "INSERT") {
     return NextResponse.json({ ignored: true });
   }
 
-  await prisma.user.upsert({
-    where: { supabaseAuthId: payload.record.id },
-    update: {},
-    create: {
-      supabaseAuthId: payload.record.id,
-      email: payload.record.email,
-      consentRgpdAt: new Date(),
-    },
-  });
-
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true, registrationRequired: true });
 }
