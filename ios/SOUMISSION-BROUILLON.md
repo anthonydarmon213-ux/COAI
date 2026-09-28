@@ -1,6 +1,6 @@
 # COAI — dossier de soumission (brouillon, non publié)
 
-Mise à jour : 27 septembre 2026. Préparation sans frais autorisée par Anthony.
+Mise à jour : 28 septembre 2026. Préparation sans frais autorisée par Anthony.
 Ce document ne constitue ni une validation fonctionnelle ni une soumission Apple.
 
 ## Métadonnées proposées
@@ -21,9 +21,11 @@ Découvre ton programme, consulte les démonstrations des exercices, note tes s�
 
 COAI accompagne une pratique de bien-être et de fitness. L'application ne fournit pas de diagnostic médical et ne remplace pas un professionnel de santé.
 
-Les fonctions incluses, les tarifs et les conditions des abonnements seront précisés avant toute souscription.
+COAI Essentiel est proposé par abonnement mensuel ou annuel. Tarifs de référence en France : 19,99 € par mois ou 119 € par an. Le prix applicable est affiché par l'App Store avant confirmation. Un essai gratuit de 7 jours est proposé aux personnes éligibles selon Apple. À la fin de l'essai, l'abonnement se renouvelle automatiquement au prix et à la périodicité choisis, sauf résiliation. Gérez votre abonnement dans les réglages de votre compte Apple.
 
-Ne pas publier cette dernière phrase comme substitut aux conditions réelles : remplacer ce paragraphe par les offres Apple approuvées, leur durée, le renouvellement, l'essai éventuel et les liens nécessaires avant soumission. Ne pas promettre de coaching humain individuel, de replay, d'Apple Health, de résultats chiffrés ou de conversation IA illimitée.
+Conditions : https://coai.fr/cgv — Confidentialité : https://coai.fr/confidentialite
+
+Avant publication, comparer ce brouillon aux produits et essais réellement actifs dans App Store Connect. Le catalogue en code ne prouve pas leur activation. Les pages liées ont été corrigées localement le 28 septembre ; leur publication et leur contrôle en production restent à faire. La conformité juridique complète et le choix des conditions de licence restent à valider. Ne pas promettre de coaching humain individuel, de replay, d'Apple Health, de résultats chiffrés ou de conversation IA illimitée.
 
 ## Captures à produire sur la version finale
 
@@ -48,13 +50,25 @@ Capturer les tailles demandées par App Store Connect lorsque la fiche sera acce
 - Export : Explorer → Réglages et déconnexion → Exporter mes données. Le partage natif et l'enregistrement du JSON dans Fichiers ont été vérifiés sur simulateur avec des données locales de test.
 - Maintenir le backend disponible pendant la revue. Ne pas promettre que toutes les fonctionnalités sont natives ou hors ligne.
 
-## Vérification physique du 27 septembre — non validée
+## Vérification physique — mise à jour du 28 septembre
 
 La compilation de développement signée pour l'iPhone 17 Pro a réussi. Son profil expire le 1er octobre 2026 ; ce n'est pas une archive de distribution App Store.
 
-Les tentatives de lancement des trois tests physiques (partage de fichiers, colonnes de repos et très gros caractères), dont la relance à 21 h 17, ont été refusées par iOS : certificat développeur non approuvé sur l'appareil. Aucun de ces trois tests n'a donc été exécuté sur l'iPhone. L'approbation dans Réglages → Général → VPN et gestion de l'appareil doit être effectuée par le propriétaire avant une nouvelle tentative. Ne pas contourner cette protection.
+Le blocage de confiance du certificat observé le 27 septembre a été résolu. Trois tests ont ensuite réussi sur l'iPhone 17 Pro : colonnes du minuteur, partage natif de fichier avec conservation de la page, et disposition du minuteur en très gros caractères. Preuves : `/tmp/coai-physical-confirmed-0928.xcresult` et `/tmp/coai-physical-files-accessibility-0928.xcresult`.
+
+Deux tests restent à reprendre sur l'appareil : navigation avec gros texte et rotation ; persistance du minuteur après relance. Les dernières tentatives ont rencontré une vidéo flottante recouvrant la navigation. Ils passent sur simulateur, ce qui ne remplace pas le contrôle physique. Le dernier contrôle du téléphone demandait son code de déverrouillage. Ces résultats concernent le binaire de développement testé, pas une future archive Release.
 
 Les preuves locales et les captures de test ne constituent pas une validation de production, TestFlight ou App Store. Aucun achat, déploiement ni dépôt Apple n'a été effectué pour ces vérifications.
+
+Contrôle suivant du 28 septembre : CoreDevice indique désormais l'iPhone 17 Pro indisponible. Aucun nouveau test physique exécuté ; reconnecter cet appareil pour reprendre les deux tests, sans remplacer silencieusement l'appareil de validation.
+
+## Informations commerciales — contrôles locaux du 28 septembre
+
+- CGV : offres actuelles Essentiel, Premium Remote et VIP Présentiel ; accompagnements individuels sur devis ; distinction Stripe / Apple ; essai Apple conditionné à l'éligibilité ; lien de gestion et distinction suppression du compte / résiliation.
+- Confidentialité : distinction numéros de carte non reçus / références de transaction conservées pour les droits d'accès et la restauration.
+- `node scripts/test-ios-legal-pages.cjs` : rendu des pages réelles vérifié hors ligne, tarifs comparés au catalogue Apple approuvé.
+- TypeScript, compilation Next.js et tests du catalogue d'exercices réussis ; audit des fichiers média sans fichier manquant ; lint sans erreur (six avertissements préexistants).
+- Non publié. Ces vérifications ne valident ni le catalogue Apple distant, ni l'ensemble des clauses juridiques, ni les pages actuellement en production.
 
 ## Conditions de sortie avant soumission
 

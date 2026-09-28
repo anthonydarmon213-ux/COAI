@@ -10,7 +10,7 @@ export default function ConfidentialitePage() {
     <LegalPage
       label="RGPD"
       titre="Politique de confidentialité"
-      majLe="6 août 2026"
+      majLe="28 septembre 2026"
     >
       <section>
         <h2>1. Responsable de traitement</h2>
@@ -39,7 +39,7 @@ export default function ConfidentialitePage() {
             Données de suivi : séances loguées, mesures corporelles, photos de progression que tu
             choisis d&apos;ajouter.
           </li>
-          <li>Données de paiement : gérées directement par Stripe, jamais stockées par COAI.</li>
+          <li>Données d&apos;achat : paiement traité par Stripe pour le site, ou par Apple pour les achats dans l&apos;application iOS. COAI ne reçoit pas les numéros de carte bancaire. COAI conserve les références de transaction, la formule, les dates et l&apos;état de l&apos;abonnement nécessaires à la vérification de tes droits d&apos;accès et à leur restauration.</li>
         </ul>
       </section>
 
@@ -61,7 +61,8 @@ export default function ConfidentialitePage() {
         <ul>
           <li>Supabase (hébergement de la base de données et authentification, UE/Frankfurt)</li>
           <li>Vercel (hébergement de l&apos;application)</li>
-          <li>Stripe (traitement des paiements)</li>
+          <li>Stripe (traitement des paiements sur le site)</li>
+          <li>Apple (paiements, abonnements et restauration des achats effectués dans l&apos;application iOS ; un identifiant technique relie l&apos;achat au compte COAI)</li>
           <li>Anthropic (génération des programmes par intelligence artificielle — les données de profil sportif et de santé sont transmises pour cette seule finalité, sans être utilisées pour entraîner leurs modèles)</li>
           <li>
             Sentry (suivi technique des erreurs de l&apos;application, UE) — reçoit uniquement des
