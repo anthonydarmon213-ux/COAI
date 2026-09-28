@@ -2,6 +2,22 @@
 
 ## État courant — 28 septembre 2026
 
+Rappels/session, 14 h 50 : brouillon fictif conservé après relance puis effacé
+après signal de déconnexion confirmé, test réussi (19,023 s) dans
+`/tmp/coai-session-cleanup-0928-current.xcresult`. Ce résultat contient aussi
+un échec du test d'activation : le simulateur petit écran avait déjà refusé
+les notifications (capture examinée), précondition incompatible, pas un succès.
+Le scénario dédié au refus passe ensuite (10,501 s), aucun faux message
+d'enregistrement, contrôle toujours disponible et aucune nouvelle demande iOS :
+`/tmp/coai-reminder-denied-0928-current.xcresult`.
+Sur le simulateur dédié `COAI QA rappel hebdomadaire`, le nettoyage du rappel
+après fin de session et le changement de jour conservé après relance passent
+(27,744 s et 28,466 s), puis rappel désactivé par le test :
+`/tmp/coai-reminder-authorized-0928-current.xcresult`.
+Fixtures Debug sans compte réel ; ces contrôles valident la persistance et le
+nettoyage natifs, pas la réception d'une notification une semaine plus tard,
+ni tous les brouillons métiers ou une déconnexion serveur distante.
+
 Compte, 14 h 40 : `testLocalConnectedAccountDeletionPersists` réussi (34,186 s)
 sur simulateur, vraie connexion au compte jetable local, annulation de la
 suppression puis export via partage iOS, nouvelle confirmation et suppression,
