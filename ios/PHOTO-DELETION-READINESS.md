@@ -19,6 +19,12 @@ adresse email ou donnée de santé dans les deux tables.
   garde de facturation réussis.
 - TypeScript et lint passent (six avertissements préexistants).
 - Compilation locale réussie avec une base factice.
+- Parcours HTTP avec Auth/PostgreSQL/Storage locaux réels réussis : avatar
+  stocké et relu à l'identique, entrées invalides refusées, nouvelle tentative
+  réussie ; suppression de 101 fichiers paginés, anciennes sessions refusées,
+  autre compte et fichier conservés, deux suppressions simultanées réussies.
+  La course envoi/suppression reste testée avec stockage simulé (pas de proxy
+  de panne sur le vrai service). Aucun test en production.
 
 ## Obligatoire avant publication
 
@@ -27,8 +33,9 @@ adresse email ou donnée de santé dans les deux tables.
    réservation sur délai, NE PAS marquer settled sans preuve. En l'état, une
    réponse perdue bloque l'effacement et nécessite assistance. Cette limite
    empêche de considérer la suppression prête pour production.
-2. Valider le parcours HTTP avec le stockage local réel puis sur l'environnement
-   autorisé. Les tests simulés ne couvrent pas les pannes réelles du service.
+2. Compléter le parcours HTTP local réussi par les scénarios de panne et de
+   concurrence avec stockage réel, puis sur l'environnement autorisé. Les
+   tests simulés ne couvrent pas les pannes réelles du service.
 3. Autorisation distincte pour la migration Prisma puis le déploiement. Les
    anciennes instances sans registre doivent être arrêtées/drainées avant de
    garantir l'absence d'envoi tardif. Ne pas publier ce code sans les tables.
