@@ -171,6 +171,23 @@ supprimés, session révoquée. Typage/lint/build et tests médias réussis.
 Navigateur de connexion local sans erreur détectée après redémarrage. Aucun
 déploiement ; iPhone 17 Pro indisponible lors du contrôle.
 
+### Erreurs du coach texte — 28 septembre
+
+Objets d’erreur retirés des deux journaux explicites de `api/coach/ask`
+(construction du contexte et réponse fournisseur). Test négatif reproduit
+avant correction avec faux contenu de santé/question/clé, puis six scénarios
+réussis dans `test-coach-error-privacy.cjs`. Repli sans mémoire conservé,
+remboursement de quota après panne conservé. Test de l’interface coach réussi
+(réponse, brouillon suivant préservé, réponse vide, quota, hors-ligne).
+Services simulés, aucun appel IA réel. Types/lint/build local réussis.
+Cette correction ne règle pas l’accord au transfert des données du coach,
+ni la journalisation interne du SDK ou de l’hébergeur.
+
+Contrôle natif complémentaire : `bash scripts/check-ios.sh` réussi — 51 tests
+Swift, 65 contrôles du cœur, exécution WebKit macOS sans navigation, syntaxe et
+configuration de confidentialité. Pas de nouveau build interface iPhone ni
+de test physique dans ce contrôle.
+
 1. Vérifier les transmissions réelles des écrans connectés et les journaux
    techniques ; définir puis tester la suppression des données sensibles dans
    les erreurs et métadonnées avant déclaration définitive.

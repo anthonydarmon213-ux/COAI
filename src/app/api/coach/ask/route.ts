@@ -114,8 +114,9 @@ export async function POST(request: Request) {
     // La mémoire est toujours recalculée côté serveur : le client ne peut ni
     // fabriquer ni modifier les apprentissages utilisés par le Coach IA.
     // Un échec isolé de ce calcul ne doit pas rendre le Coach indisponible.
-    const intelligence = await buildProfilIntelligence(user.id).catch((error) => {
-      console.error("[coach/ask:memory]", error);
+    const intelligence = await buildProfilIntelligence(user.id).catch(() => {
+      // Errors may carry profile/query context; never log the raw object.
+      console.error("[coach/ask:memory] Contexte temporairement indisponible");
       return null;
     });
     const memory = intelligence ? {
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
       ? Math.max(0, COACH_QUOTA_LIMIT - refreshedUser.coachQuestionsUsed)
       : null;
     return NextResponse.json({ answer, quotaRemaining });
-  } catch (error) {
+  } catch {
     // Une panne IA ne consomme jamais une question payée par l'abonné.
     if (quotaReserved) {
       await prisma.user.update({
@@ -142,7 +143,7 @@ export async function POST(request: Request) {
         data: { coachQuestionsUsed: { decrement: 1 } },
       }).catch(() => undefined);
     }
-    console.error("[coach/ask]", error);
+    console.error("[coach/ask] Réponse IA indisponible");
     return NextResponse.json({ error: "Échec de la génération de la réponse" }, { status: 502 });
   }
 }
