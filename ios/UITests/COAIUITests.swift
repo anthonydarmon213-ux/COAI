@@ -1,6 +1,124 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Local Auth + local SMTP only. The recovery email is opened in Safari,
+    /// a different cookie store from the app that requested it.
+    @MainActor
+    func testLocalPasswordRecoveryAcrossSafariAndApp() async throws {
+        guard #available(iOS 16.4, *) else { throw XCTSkip("Safari URL automation requires iOS 16.4+") }
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let forgotten = web.links["Mot de passe oublié ?"]
+        XCTAssertTrue(forgotten.waitForExistence(timeout: 30))
+        reveal(forgotten, in: app); forgotten.tap()
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 15))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let request = web.buttons["Envoyer le lien de réinitialisation"]
+        reveal(request, in: app); request.tap()
+        XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Si un compte existe avec cette adresse")).firstMatch.waitForExistence(timeout: 20))
+
+        // Read only the known disposable address from the local mail sink.
+        let (listData, _) = try await URLSession.shared.data(from: URL(string: "http://127.0.0.1:54324/api/v1/messages")!)
+        let list = try XCTUnwrap(JSONSerialization.jsonObject(with: listData) as? [String: Any])
+        let messages = try XCTUnwrap(list["messages"] as? [[String: Any]])
+        let matching = messages.filter { item in
+            (item["To"] as? [[String: Any]])?.contains { $0["Address"] as? String == "coai-ui-20260924-http@example.test" } == true
+        }
+        XCTAssertEqual(matching.count, 1)
+        let identifier = try XCTUnwrap(matching.first?["ID"] as? String)
+        XCTAssertNotNil(identifier.range(of: "^[A-Za-z0-9_-]{1,100}$", options: .regularExpression))
+        let (mailData, _) = try await URLSession.shared.data(from: URL(string: "http://127.0.0.1:54324/api/v1/message/" + identifier)!)
+        let mail = try XCTUnwrap(JSONSerialization.jsonObject(with: mailData) as? [String: Any])
+        let html = try XCTUnwrap(mail["HTML"] as? String)
+        let expression = try NSRegularExpression(pattern: "href=\"([^\"]+)\"")
+        let links = expression.matches(in: html, range: NSRange(html.startIndex..., in: html)).compactMap { match -> URL? in
+            guard let range = Range(match.range(at: 1), in: html) else { return nil }
+            return URL(string: String(html[range]).replacingOccurrences(of: "&amp;", with: "&"))
+        }
+        let recovery = try XCTUnwrap(links.first { $0.path == "/auth/v1/verify" })
+        XCTAssertEqual(recovery.scheme, "http")
+        XCTAssertTrue(["localhost", "127.0.0.1"].contains(recovery.host ?? ""))
+        XCTAssertEqual(recovery.port, 54321)
+        XCTAssertEqual(URLComponents(url: recovery, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "type" }?.value, "recovery")
+        let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
+        safari.open(recovery)
+        safari.activate()
+        guard safari.wait(for: .runningForeground, timeout: 10) else {
+            XCTFail("Safari must be foreground before entering the local recovery password")
+            return
+        }
+        let browser = safari.webViews.firstMatch
+        let newPassword = browser.secureTextFields["NOUVEAU MOT DE PASSE"]
+        guard newPassword.waitForExistence(timeout: 30) else {
+            XCTFail("The local recovery link did not show the password form")
+            return
+        }
+        newPassword.tap()
+        // iOS presents its strong-password offer outside the web view.
+        // Decline only that identified system sheet for this disposable fixture;
+        // keep the actual product's password-manager support enabled.
+        let closePasswordOffer = safari.buttons["xmark"]
+        if closePasswordOffer.waitForExistence(timeout: 3) &&
+            safari.buttons["GenerateStrongPasswordButton"].exists {
+            closePasswordOffer.tap()
+        }
+        guard safari.keyboards.firstMatch.waitForExistence(timeout: 10) else {
+            XCTFail("Safari did not open the keyboard for the recovery field")
+            return
+        }
+        newPassword.typeText("Coai-recovered-local-1001!")
+        let confirmation = browser.secureTextFields["CONFIRMER LE MOT DE PASSE"]
+        reveal(confirmation, in: safari); confirmation.tap(); confirmation.typeText("Coai-recovered-local-1001!")
+        let save = browser.buttons["Mettre à jour le mot de passe"]
+        reveal(save, in: safari); save.tap()
+        guard browser.buttons["Se connecter"].waitForExistence(timeout: 30) else {
+            XCTFail("Password recovery did not return to sign-in")
+            return
+        }
+        // Do not store disposable fixture credentials in the simulator keychain.
+        let later = safari.buttons["Plus tard"]
+        if later.waitForExistence(timeout: 3) { later.tap() }
+        let proof = XCTAttachment(screenshot: safari.screenshot())
+        proof.name = "Récupération locale — mot de passe changé dans Safari"
+        proof.lifetime = .keepAlways; add(proof)
+
+        safari.open(recovery)
+        let expired = browser.staticTexts["Ce lien est invalide ou a expiré. Demande un nouveau lien de réinitialisation."]
+        guard expired.waitForExistence(timeout: 20) else {
+            XCTFail("An already-used recovery link must not reopen the password form")
+            return
+        }
+        XCTAssertFalse(browser.secureTextFields["NOUVEAU MOT DE PASSE"].exists)
+        let anotherLink = browser.links["Demander un nouveau lien"]
+        XCTAssertTrue(anotherLink.isHittable)
+        anotherLink.tap()
+        guard browser.buttons["Envoyer le lien de réinitialisation"].waitForExistence(timeout: 15) else {
+            XCTFail("An expired recovery link must offer a usable retry route")
+            return
+        }
+
+        app.terminate(); app.launch()
+        XCTAssertTrue(email.waitForExistence(timeout: 20))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-recovered-local-1001!")
+        let login = web.buttons["Se connecter"]
+        reveal(login, in: app); login.tap()
+        XCTAssertTrue(login.waitForNonExistence(timeout: 30))
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 10))
+        app.buttons["native-tab-Explorer"].tap()
+        let settings = app.buttons["explore-/compte/parametres"]
+        reveal(settings, in: app, upward: false); settings.tap()
+        XCTAssertTrue(web.buttons["Exporter mes données"].waitForExistence(timeout: 30))
+        XCTAssertFalse(web.buttons["Se connecter"].exists)
+    }
+
     /// Physical device, existing session: no photo selection, upload or measurement save.
     @MainActor
     func testPhysicalPhotoPickerCancellationKeepsFormUsable() throws {

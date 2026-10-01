@@ -2,6 +2,23 @@
 
 ## État courant — 1er octobre 2026
 
+À 16 h 57 : récupération de mot de passe complète réussie sur simulateur SE
+iOS 26.5, Auth et SMTP exclusivement locaux. Demande dans l'app, ouverture du
+lien reçu dans Safari (stockage de session distinct), saisie du nouveau mot de
+passe, retour à la connexion, refus du lien déjà utilisé et retour utilisable
+vers une nouvelle demande. Reconnexion dans l'app et session après relance
+vérifiées. Test `testLocalPasswordRecoveryAcrossSafariAndApp`, 1 réussite,
+0 échec : `/tmp/coai-password-recovery-reuse-1001.xcresult`.
+Le contrôle indépendant `scripts/verify-native-password-recovery.cjs` confirme
+l'ancien mot de passe refusé, le nouveau accepté et le même profil conservé.
+Sessions révoquées, seul compte fictif et ses emails locaux supprimés.
+Les essais antérieurs échouaient dans le pilote sur la proposition native de
+mot de passe robuste de Safari ; le test la ferme explicitement, sans supprimer
+cette fonction du produit. Capture de connexion inspectée. TypeScript, lint
+(six avertissements préexistants), build Next 132 pages, tests de navigation
+de récupération et 356 chemins média contrôlés. Ce résultat ne valide pas
+la délivrabilité email distante, un iPhone physique ou la production.
+
 À 16 h 27 : échec réel de suppression dû à une photo non confirmée vérifié
 dans l'app sur simulateur SE, backend local. Message lisible, nouvelle tentative
 possible, session conservée après relance et export disponible. État de la base
@@ -1034,7 +1051,7 @@ pas encore une expérience native complète validée.
 | Parcours | État réel | Preuve / travail restant avant validation |
 | --- | --- | --- |
 | 1. Installation et ouverture | Validé partiellement sur appareil | Debug signé installé sur iPhone 17 Pro ; navigation connectée, partage PDF et persistance du minuteur vérifiés le 1er octobre. Navigation native en gros texte et rotation vérifiée avec fixture web. Archive de distribution, installation propre et TestFlight non validés. |
-| 2. Compte et connexion | Validé partiellement en local | Compte fictif : confirmation email, mauvais mot de passe puis correction et session après relance vérifiés dans l’app simulée. Session existante utilisée sur iPhone, sans refaire une connexion. Récupération complète, connexion Apple et parcours d’authentification en production restent à valider/compléter. |
+| 2. Compte et connexion | Validé partiellement en local | Compte fictif : confirmation email, mauvais mot de passe puis correction et session après relance vérifiés dans l’app simulée. Récupération app → email local → Safari → reconnexion persistante dans l’app, ancien mot de passe refusé et lien déjà utilisé refusé vérifiés le 1er octobre. Session existante utilisée sur iPhone, sans refaire une connexion. Récupération physique/distante, connexion Apple et parcours d’authentification en production restent à valider/compléter. |
 | 3. Diagnostic et score COAI | Validé partiellement en local | Nouveau compte, email de confirmation, diagnostic, reprise, contrôle des réponses sauvegardées et raccourci d'enregistrement testés dans l'app simulée le 28 septembre. Validation physique et production restantes. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
 | 5. Entraînement, nutrition, récupération | Validé partiellement sur appareil | Navigation Nutrition/Récupération/Recettes/Coach/Séance et partage PDF vérifiés en ligne sur iPhone le 1er octobre ; minuteur persistant vérifié. Programmes nutrition/récupération EN_ATTENTE : contenu complet non validé. Catalogue physique en échec (clavier et rowing encore présent en ligne), corrections locales non publiées. Droits, cohérence de tous les médias et petits écrans restent à compléter. |
