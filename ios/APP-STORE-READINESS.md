@@ -2,6 +2,20 @@
 
 ## État courant — 1er octobre 2026
 
+À 13 h 03 : suite StoreKit Xcode étendue à l’arrêt de renouvellement puis
+expiration. Achat fictif livré, arrêt du renouvellement sans perte anticipée
+de la période payée, expiration forcée et réconciliation des droits inactifs.
+Six scénarios réussis, zéro échec dans
+`/tmp/coai-storekit-expiry-settled-1001.xcresult` (serveur simulé, environnement
+Xcode exigé, transactions fictives nettoyées). La première version du test
+étendu lisait trop tôt le reçu et a échoué ; attente bornée ajoutée puis retest.
+Cette preuve ne valide PAS les signatures serveur réelles, Sandbox Apple,
+App Store Connect, notifications Apple ni facturation réelle.
+`bash scripts/check-ios.sh --device-release` réussi : contrôles cœur,
+confidentialité et build iPhone arm64 Release non signé, absence des modes et
+catalogues de test. Version du binaire vérifiée : 0.1.0 (1).
+Ce n’est ni une archive de distribution signée, ni un dépôt TestFlight.
+
 À 12 h 54 : correction locale du formulaire mesures : une réponse HTML/null
 ou un succès sans identifiant ne vide plus la saisie ; message de confirmation
 manquante lisible, bouton réutilisable, même identifiant de tentative conservé.

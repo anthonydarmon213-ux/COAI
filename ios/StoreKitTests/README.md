@@ -31,6 +31,8 @@ ne sélectionne aucun catalogue local.
   le propriétaire initial.
 - Remboursement : mise à jour du reçu et affichage des droits inactifs renvoyés
   par le serveur simulé ; essai déjà utilisé non reproposé.
+- Arrêt du renouvellement : accès conservé pendant la période payée ; expiration
+  forcée locale : reçu expiré vérifié puis droits inactifs via le serveur simulé.
 - Chargement des produits en échec : anciennes offres invalidées, achat refusé.
 
 Chaque scénario nettoie les transactions fictives. Les opérations sur la boutique

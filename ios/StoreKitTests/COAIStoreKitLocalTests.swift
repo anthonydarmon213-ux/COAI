@@ -181,6 +181,54 @@ final class COAIStoreKitLocalTests: XCTestCase {
     }
 
     @MainActor
+    func testLocalExpirationReconcilesInactiveAccess() async throws {
+        let session = try localSession()
+        defer { session.clearTransactions() }
+        let token = UUID()
+        let service = ApplePurchaseService(productIDs: Set(periods.keys), accountToken: token,
+            authorizeAccount: {}, deliver: { jws in
+                let payload = try self.localPayload(jws)
+                let expires = try XCTUnwrap(payload["expiresDate"] as? NSNumber)
+                let active = expires.doubleValue > Date().timeIntervalSince1970 * 1000
+                    && payload["revocationDate"] == nil
+                return PurchaseAcknowledgement(transactionID: try XCTUnwrap(payload["transactionId"] as? String),
+                    accountToken: token, persisted: true,
+                    access: .init(subscribed: active, programme: active, sources: .init(stripe: false, apple: active)))
+            })
+        _ = try await service.loadOffers(expectedPeriods: periods)
+        let outcome = try await service.purchase(productID: monthly)
+        XCTAssertEqual(outcome, .delivered)
+        XCTAssertEqual(service.latestAccess?.subscribed, true)
+        let purchased = try XCTUnwrap(session.allTransactions().first)
+        try session.disableAutoRenewForTransaction(identifier: purchased.identifier)
+        var latestBeforeExpiry = await StoreKit.Transaction.latest(for: monthly)
+        for _ in 0..<30 where latestBeforeExpiry == nil {
+            try await Task.sleep(for: .milliseconds(100))
+            latestBeforeExpiry = await StoreKit.Transaction.latest(for: monthly)
+        }
+        let beforeExpiry = try XCTUnwrap(latestBeforeExpiry)
+        guard case .verified(let paidPeriod) = beforeExpiry else { return XCTFail("Missing paid period") }
+        XCTAssertGreaterThan(try XCTUnwrap(paidPeriod.expirationDate), Date())
+        _ = try await service.reconcile(updates: [beforeExpiry])
+        XCTAssertEqual(service.latestAccess?.subscribed, true, "Stopping renewal must preserve the paid period")
+        try session.expireSubscription(productIdentifier: monthly)
+        var update = await StoreKit.Transaction.latest(for: monthly)
+        for _ in 0..<30 {
+            if case .verified(let transaction) = update,
+                let expires = transaction.expirationDate, expires <= Date() { break }
+            try await Task.sleep(for: .milliseconds(100))
+            update = await StoreKit.Transaction.latest(for: monthly)
+        }
+        guard case .verified(let expired) = update else { return XCTFail("Missing verified expired receipt") }
+        XCTAssertLessThanOrEqual(try XCTUnwrap(expired.expirationDate), Date())
+        let reconciled = try await service.reconcile(updates: [try XCTUnwrap(update)])
+        XCTAssertEqual(reconciled, 1)
+        XCTAssertEqual(service.latestAccess?.subscribed, false)
+        XCTAssertEqual(service.latestAccess?.programme, false)
+        XCTAssertEqual(service.latestAccess?.sources.apple, false)
+    }
+
+    @MainActor
     func testLocalProductFetchFailureInvalidatesPreviouslyLoadedOffers() async throws {
         let session = try localSession()
         defer { session.clearTransactions(); session.resetToDefaultState() }
