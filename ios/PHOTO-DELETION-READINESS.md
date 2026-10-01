@@ -14,6 +14,18 @@ Les admissions fermées restent représentées par une empreinte, pas cet identi
 
 ## Vérifié
 
+- 1er octobre — suivi : le champ photo accepte maintenant les types HEIC/HEIF
+  et leurs extensions, déjà pris en charge par le compresseur. Le test du
+  formulaire reproduit l'ancien filtre incomplet puis passe après correction.
+  Test WebKit macOS hors réseau enrichi : PNG synthétique converti en vrai HEIC
+  par sips, décodage des deux types MIME, conversion PNG, dimensions et pixels
+  décodés conservés, nom source non transmis. Tests de validation/compresseur,
+  TypeScript, lint (six avertissements préexistants) et build Next réussis.
+  Ce contrôle n'est PAS une sélection HEIC via Fichiers/Photos sur iPhone,
+  ni un test iCloud. Modification locale non publiée. L'annulation du sélecteur
+  sur iPhone physique avec le site actuel est vérifiée séparément dans
+  `/tmp/coai-physical-photo-cancel-1001.xcresult` : aucune sélection/sauvegarde.
+
 - 1er octobre — erreur de suppression identifiable : la route renvoie le code
   stable `PHOTO_DELETION_UNCONFIRMED` et le compte affiche une explication dédiée
   (suppression non terminée, photos éventuellement déjà effacées, nouveaux envois

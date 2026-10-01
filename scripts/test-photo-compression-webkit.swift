@@ -18,7 +18,7 @@ final class CompressionCheck: NSObject, WKNavigationDelegate, WKScriptMessageHan
         guard let result = message.body as? [String: Any], result["ok"] as? Bool == true else {
             failure = String(describing: message.body); done = true; return
         }
-        print("PASS: real macOS WebKit photo encoding, PNG fallback, pixel dimensions and metadata removal; offline synthetic fixture only.")
+        print("PASS: real macOS WebKit photo encoding, HEIC/HEIF decoding, PNG fallback, pixel dimensions and metadata removal; offline synthetic fixtures only. Not an iPhone picker test.")
         done = true
     }
 }

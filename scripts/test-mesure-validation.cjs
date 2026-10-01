@@ -67,6 +67,11 @@ function change(name, value) { find(render(), n => n.props?.name === name).props
 function photo() { find(render(), n => n.props?.type === 'file').props.onChange({ target: { files: [{}] } }); }
 function submit() { return find(render(), n => n.type === 'form').props.onSubmit({ preventDefault() {}, currentTarget: { elements: { namedItem: () => null } } }); }
 (async () => {
+  reset();
+  const acceptedPhotos = find(render(), n => n.props?.type === 'file').props.accept.split(',');
+  for (const type of ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', '.heic', '.heif']) {
+    assert(acceptedPhotos.includes(type), `Photo picker must accept ${type} supported by the compressor`);
+  }
   for (const input of invalid) {
     assert.equal(validation.mesureBodySchema.safeParse(input).success, false);
     const before = writes;

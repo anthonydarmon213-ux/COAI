@@ -2,6 +2,13 @@
 
 ## État courant — 1er octobre 2026
 
+Photos de suivi : filtre HEIC/HEIF corrigé localement ; test du formulaire
+échoué avant correction, réussi après. Décodage d'un vrai HEIC synthétique et
+réencodage validés dans WebKit macOS (pixels/dimensions contrôlés), sans réseau
+ni photo personnelle. Validation HEIC du sélecteur iPhone/iCloud et publication
+restantes ; détails dans `PHOTO-DELETION-READINESS.md`. Aucun verrou serveur
+de suppression levé par cette correction d'interface.
+
 À 15 h 47 : annulation du sélecteur photo vérifiée sur iPhone 17 Pro/iOS 26.1,
 avec la page Mesures en ligne et la session existante. Test
 `testPhysicalPhotoPickerCancellationKeepsFormUsable` réussi (1 test, 0 échec),

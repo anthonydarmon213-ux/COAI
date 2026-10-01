@@ -30,18 +30,26 @@ const png = Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]), chunk('IHDR'
 assert.ok(png.includes(marker));
 const source = fs.readFileSync(path.join(root, 'src/lib/images/compress-progress-photo.ts'), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.CommonJS } }).outputText;
-const script = `(function() {
+const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'coai-photo-webkit-'));
+try {
+  const inputPNG = path.join(directory, 'synthetic.png');
+  const inputHEIC = path.join(directory, 'synthetic.heic');
+  fs.writeFileSync(inputPNG, png);
+  execFileSync('/usr/bin/sips', ['-s', 'format', 'heic', inputPNG, '--out', inputHEIC], { stdio: 'pipe' });
+  const heic = fs.readFileSync(inputHEIC);
+  assert(heic.subarray(4, 32).includes('ftyp'), 'Fixture must be an encoded HEIF container');
+  const script = `(function() {
   const exports = {};
   ${compiled}
   (async () => {
     const check = (value, message) => { if (!value) throw new Error(message); };
     const bytes = Uint8Array.from(atob(${JSON.stringify(png.toString('base64'))}), c => c.charCodeAt(0));
     const input = new File([bytes], 'private-location.png', { type: 'image/png' });
-    async function verify(forcePNG) {
+    async function verify(forcePNG, photo = input) {
       const original = HTMLCanvasElement.prototype.toBlob;
       if (forcePNG) HTMLCanvasElement.prototype.toBlob = function(callback) { return original.call(this, callback, 'image/png'); };
       let result;
-      try { result = await exports.compressProgressPhoto(input); }
+      try { result = await exports.compressProgressPhoto(photo); }
       finally { HTMLCanvasElement.prototype.toBlob = original; }
       check(result.file.name.startsWith('coai-photo.'), 'Private source filename forwarded');
       const data = new Uint8Array(await result.file.arrayBuffer());
@@ -57,17 +65,29 @@ const script = `(function() {
         check(image.naturalWidth === 2 && image.naturalHeight === 1, 'Dimensions changed');
         const canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 1;
         const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
-        if (forcePNG) {
+        if (forcePNG && photo === input) {
           check(Array.from(context.getImageData(0, 0, 2, 1).data).join(',') === '255,0,0,255,0,255,0,255', 'PNG pixels changed');
+        }
+        if (forcePNG && photo !== input) {
+          const outputPixels = Array.from(context.getImageData(0, 0, 2, 1).data).join(',');
+          const sourceURL = URL.createObjectURL(photo);
+          try {
+            const sourceImage = new Image();
+            await new Promise((resolve, reject) => { sourceImage.onload = resolve; sourceImage.onerror = reject; sourceImage.src = sourceURL; });
+            context.clearRect(0, 0, 2, 1); context.drawImage(sourceImage, 0, 0);
+            check(outputPixels === Array.from(context.getImageData(0, 0, 2, 1).data).join(','), 'Decoded HEIC pixels changed');
+          } finally { URL.revokeObjectURL(sourceURL); }
         }
       } finally { URL.revokeObjectURL(url); }
     }
     await verify(false); await verify(true);
+    const heicBytes = Uint8Array.from(atob(${JSON.stringify(heic.toString('base64'))}), c => c.charCodeAt(0));
+    for (const type of ['image/heic', 'image/heif']) {
+      await verify(true, new File([heicBytes], 'private-location.heic', { type }));
+    }
     window.webkit.messageHandlers.compressionResult.postMessage({ ok: true });
   })().catch(error => window.webkit.messageHandlers.compressionResult.postMessage({ ok: false, error: String(error) }));
 })();`;
-const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'coai-photo-webkit-'));
-try {
   const javascript = path.join(directory, 'fixture.js'), binary = path.join(directory, 'check');
   fs.writeFileSync(javascript, script);
   execFileSync('xcrun', ['--sdk', 'macosx', 'swiftc', '-parse-as-library', '-swift-version', '5',

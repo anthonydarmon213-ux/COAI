@@ -175,7 +175,7 @@ export function MesureForm() {
                 ref={photoInput}
                 type="file"
                 disabled={loading}
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
                 onChange={(e) => {
                   const selected = e.target.files?.[0] ?? null;
                   uploadedPhoto.current = null;
