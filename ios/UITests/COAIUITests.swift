@@ -18,8 +18,14 @@ final class COAIUITests: XCTestCase {
         try runLocalMeasurementPersistence(lostResponse: false, cancelPhoto: true)
     }
 
+    /// Requires the synthetic turquoise fixture imported into the dedicated simulator.
     @MainActor
-    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false) throws {
+    func testLocalProgressPhotoPersistsAfterRelaunch() throws {
+        try runLocalMeasurementPersistence(lostResponse: false, selectPhoto: true)
+    }
+
+    @MainActor
+    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false, selectPhoto: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -55,7 +61,7 @@ final class COAIUITests: XCTestCase {
         }
         XCTAssertTrue(weight.isHittable)
         weight.tap(); weight.typeText("75")
-        if cancelPhoto {
+        if cancelPhoto || selectPhoto {
             // SE screenshot confirms WebKit's keyboard accessory checkmark here.
             // Dismiss the keyboard as a user would before opening the photo menu.
             let keyboard = app.keyboards.firstMatch
@@ -73,9 +79,21 @@ final class COAIUITests: XCTestCase {
             let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
             XCTAssertTrue(cancel.waitForExistence(timeout: 10))
             let pickerProof = XCTAttachment(screenshot: app.screenshot())
-            pickerProof.name = "Sélecteur photo système — avant annulation"
+            pickerProof.name = "Sélecteur photo système"
             pickerProof.lifetime = .keepAlways; add(pickerProof)
-            cancel.tap()
+            if selectPhoto {
+                let photo = app.images.matching(identifier: "PXGGridLayout-Info").firstMatch
+                XCTAssertTrue(photo.waitForExistence(timeout: 10))
+                // Photos exposes the visible thumbnail as non-hittable on iOS 26.5.
+                // Use its observed frame, not a guessed screen coordinate.
+                app.coordinate(withNormalizedOffset: .zero)
+                    .withOffset(CGVector(dx: photo.frame.midX, dy: photo.frame.midY)).tap()
+                let done = app.buttons["PUOneUpBarButtonItemIdentifierAssetExplorerReviewScreenDone"]
+                XCTAssertTrue(done.waitForExistence(timeout: 10)); done.tap()
+                XCTAssertTrue(done.waitForNonExistence(timeout: 10))
+            } else {
+                cancel.tap()
+            }
             XCTAssertEqual(weight.value as? String, "75")
         }
         let save = web.buttons["Ajouter la mesure"]

@@ -2,6 +2,26 @@
 
 ## État courant — 1er octobre 2026
 
+À 12 h 19 : envoi réel depuis Photothèque dans l’app SE simulé/iOS 26.5,
+confirmation système, sauvegarde de 75 kg avec image, relance et historique
+avec vignette turquoise observé. `testLocalProgressPhotoPersistsAfterRelaunch` :
+1 réussi / 0 échec, `/tmp/coai-photo-positive-done-1001.xcresult`.
+Capture examinée : `/tmp/coai-photo-done-proof/EC07AA94-FADE-4397-A79C-8BA2F0D754D7.png`.
+Vérification indépendante PostgreSQL + téléchargement Storage : une mesure,
+un fichier, pixels synthétiques attendus, 1600 × 1200 PNG / 36 268 octets
+depuis un PNG 3200 × 2400. Safari utilise ici le repli PNG, pas WebP.
+Des balises EXIF techniques sont présentes après canvas : ne pas affirmer
+« aucun EXIF ». Le retrait des métadonnées GPS d’une vraie photo reste à tester.
+Compte fictif, fichier et registre locaux nettoyés ; absence Auth/DB vérifiée.
+Aucun déploiement, appareil physique, HEIC ou accès iCloud validé par ce test.
+Les trois essais préparatoires échoués relevaient de l’automatisation
+(type AX, vignette déclarée non cliquable, confirmation système manquante).
+Reproduction : générer `node scripts/create-native-photo-fixture.cjs`, importer
+le PNG comme dernière photo du simulateur dédié avec `simctl addmedia`, créer
+le compte jetable local, lancer le test, puis appeler le vérificateur
+`scripts/verify-native-progress-photo.cjs` via le harnais local avec
+`ui-measures-verify --with-photo`. Le vérificateur refuse un endpoint distant.
+
 À 11 h 56 : sélecteur photo système ouvert puis annulé dans l’app sur SE
 simulé/iOS 26.5. Valeur fictive 75 kg conservée, sauvegarde possible ensuite,
 historique retrouvé après relance. `testLocalPhotoPickerCancellationPreservesMeasurement`
