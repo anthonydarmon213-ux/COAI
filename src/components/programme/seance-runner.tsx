@@ -317,6 +317,34 @@ export function SeanceRunner({
   const [reponseCoach, setReponseCoach] = useState<string | null>(null);
   const [coachAIAgreed, setCoachAIAgreed] = useState(false);
   const [coachConsentOpen, setCoachConsentOpen] = useState(false);
+  const readerRef = useRef<HTMLDivElement>(null);
+
+  // WKWebView changes its height when the native keyboard opens. The short
+  // viewport layout can otherwise leave the focused field above/below view.
+  useEffect(() => {
+    const reader = readerRef.current;
+    if (!reader) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const revealFocusedInput = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const active = document.activeElement;
+        if (active instanceof HTMLInputElement && reader.contains(active)) {
+          active.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" });
+        }
+      }, 300);
+    };
+    reader.addEventListener("focusin", revealFocusedInput);
+    window.addEventListener("resize", revealFocusedInput);
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", revealFocusedInput);
+    return () => {
+      clearTimeout(timer);
+      reader.removeEventListener("focusin", revealFocusedInput);
+      window.removeEventListener("resize", revealFocusedInput);
+      viewport?.removeEventListener("resize", revealFocusedInput);
+    };
+  }, [coachConsentOpen]);
 
   // Interrompre la voix lorsque le lecteur est fermé.
   useEffect(() => {
@@ -698,7 +726,7 @@ export function SeanceRunner({
   const consigne = step.type === "set" ? substitutions[step.nom]?.consigne ?? (typeof step.exercice.charge === "string" ? step.exercice.charge : null) : null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-abysse [@media(max-height:500px)]:overflow-y-auto [@media(max-height:500px)]:[&>div]:shrink-0" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
+    <div ref={readerRef} className="fixed inset-0 z-[100] flex flex-col bg-abysse [@media(max-height:500px)]:overflow-y-auto [@media(max-height:500px)]:[&>div]:shrink-0" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
       {premiereSeanceId && <TrackConversion name="first_workout_completed" onceKey={premiereSeanceId} />}
       {!termine && erreurBrouillon && (
         <p role="alert" className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">

@@ -2,6 +2,39 @@
 
 ## État courant — 1er octobre 2026
 
+À 19 h 14 : bilan de séance corrigé sur petit écran (centrage vertical sûr,
+noms d'exercices non tronqués, absence de charge distinguée du poids du corps).
+Test natif `/tmp/coai-guided-summary-fixed-1001.xcresult` réussi (137 s), puis
+contrôle PostgreSQL indépendant : une séance, cinq exercices, quinze séries,
+dix répétitions explicitement saisies. Compte fictif supprimé après contrôle.
+L'inspection de la capture a révélé un débordement horizontal de l'anneau
+décoratif : correction supplémentaire du centrage et du débordement en cours
+de vérification dans `/tmp/coai-guided-history-visible-input-1001.xcresult`.
+Le test étendu vérifie également l'historique après relance. Un essai précédent
+(`/tmp/coai-guided-summary-history-1001.xcresult`) a échoué avant le bilan :
+XCTest visait le champ masqué sous le pied fixe. Le ciblage contrôle maintenant
+ses bornes visibles avant l'appui. **Nouveau défaut observé pendant le retest :
+le clavier peut masquer le champ de répétitions sur SE** ; ne pas considérer
+l'ergonomie de saisie comme validée même si la valeur est enregistrée.
+Build, types, lint (six avertissements existants), tests brouillons/sauvegarde/
+séance condensée et 356 médias passent. Aucun changement publié.
+
+À 19 h 38 : essai `coai-guided-history-visible-input-1001` interrompu
+explicitement après constat visuel du champ masqué par le clavier ; XCTest
+attendait aussi 60 s par geste pour la stabilisation. Ce n'est pas une réussite
+du parcours. Correction locale préparée : recentrer uniquement l'input actif
+du lecteur après ouverture/redimensionnement du clavier, sans écouteur restant
+après fermeture. Test de cycle de vie `test-runner-keyboard-visibility.cjs`
+réussi (événements simulés, isolation, annulation, absence de VisualViewport),
+types et lint réussis ; contrôle natif renforcé à exécuter après recompilation.
+Autre point détecté : `test-journal-navigation.cjs` échoue car sa doublure
+`workoutHistory` manque ; journal à retester, notamment le rendu des maintiens.
+Recompilation corrigée réussie (132 pages), tests brouillons, confirmation de
+sauvegarde, séries réalisées et séance condensée réussis. Nouveau parcours
+natif lancé : `/tmp/coai-guided-keyboard-visible-fixed-1001.xcresult` ; résultat
+encore à contrôler. Il exige le champ dans la fenêtre au-dessus du clavier,
+puis conserve les contrôles du bilan, de la relance et de l'historique.
+
 À 19 h 04 : séance guidée parcourue jusqu'au bilan puis app relancée :
 `/tmp/coai-guided-save-1001.xcresult` (134 s). Vérification PostgreSQL locale
 indépendante réussie avec `verify-native-first-programme.cjs --completed-workout` :

@@ -146,8 +146,35 @@ final class COAIUITests: XCTestCase {
                 afterAdvice.lifetime = .keepAlways; add(afterAdvice)
                 if orientation == .portrait {
                     let repetitions = web.textFields.matching(NSPredicate(format: "label ==[c] %@", "Reps faites")).firstMatch
-                    revealWebControl(repetitions, in: app)
-                    repetitions.tap(); repetitions.typeText("10")
+                    XCTAssertTrue(repetitions.waitForExistence(timeout: 5))
+                    let footer = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Poser une question au coach")).firstMatch
+                    for _ in 0..<12 {
+                        let top = web.frame.minY + 145
+                        let bottom = footer.frame.minY - 24
+                        if repetitions.frame.minY > top && repetitions.frame.maxY < bottom { break }
+                        let origin = app.coordinate(withNormalizedOffset: .zero)
+                        let high = origin.withOffset(CGVector(dx: web.frame.maxX - 32, dy: top + 10))
+                        let low = origin.withOffset(CGVector(dx: web.frame.maxX - 32, dy: bottom - 8))
+                        if repetitions.frame.minY <= top {
+                            high.press(forDuration: 0.05, thenDragTo: low)
+                        } else {
+                            low.press(forDuration: 0.05, thenDragTo: high)
+                        }
+                    }
+                    XCTAssertGreaterThan(repetitions.frame.minY, web.frame.minY + 145)
+                    XCTAssertLessThan(repetitions.frame.maxY, footer.frame.minY - 24)
+                    repetitions.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+                    XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+                    let inputVisible = NSPredicate { _, _ in
+                        repetitions.exists && repetitions.frame.minY >= web.frame.minY
+                            && repetitions.frame.maxY < app.keyboards.firstMatch.frame.minY - 40
+                    }
+                    expectation(for: inputVisible, evaluatedWith: nil)
+                    waitForExpectations(timeout: 5)
+                    let keyboardProof = XCTAttachment(screenshot: app.screenshot())
+                    keyboardProof.name = "Séance guidée — champ visible avec clavier"
+                    keyboardProof.lifetime = .keepAlways; add(keyboardProof)
+                    repetitions.typeText("10")
                     let done = app.toolbars.buttons["OK"]
                     XCTAssertTrue(done.waitForExistence(timeout: 5)); done.tap()
                     XCTAssertEqual(repetitions.value as? String, "10")
@@ -181,6 +208,16 @@ final class COAIUITests: XCTestCase {
             }
             XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Séance terminée")).firstMatch.waitForExistence(timeout: 20))
             XCTAssertFalse(web.buttons["Réessayer l'enregistrement"].exists)
+            let heading = web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Séance terminée")).firstMatch
+            revealWebControl(heading, in: app)
+            XCTAssertTrue(web.frame.contains(heading.frame), "Le titre du bilan doit être entièrement visible")
+            let topSummary = XCTAttachment(screenshot: app.screenshot())
+            topSummary.name = "Séance guidée — haut du bilan"
+            topSummary.lifetime = .keepAlways; add(topSummary)
+            XCTAssertFalse(web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "poids du corps")).firstMatch.exists)
+            let doneWorkout = web.buttons["Terminer"]
+            revealWebControl(doneWorkout, in: app)
+            XCTAssertTrue(doneWorkout.isHittable)
             let saved = XCTAttachment(screenshot: app.screenshot())
             saved.name = "Séance guidée — bilan après enregistrement"
             saved.lifetime = .keepAlways; add(saved)
@@ -196,6 +233,21 @@ final class COAIUITests: XCTestCase {
         let proof = XCTAttachment(screenshot: app.screenshot())
         proof.name = "Premier programme — séance accessible après relance"
         proof.lifetime = .keepAlways; add(proof)
+        if completeWorkout {
+            app.buttons["native-tab-Explorer"].tap()
+            let repcount = app.buttons["explore-/suivi/repcount"]
+            reveal(repcount, in: app); repcount.tap()
+            XCTAssertTrue(web.staticTexts["Note ta série."].waitForExistence(timeout: 20))
+            let history = web.buttons["Reprendre une séance passée"]
+            XCTAssertTrue(history.waitForExistence(timeout: 15))
+            revealWebControl(history, in: app); history.tap()
+            let exercises = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@ AND label CONTAINS %@", "Squat barre", "Crunch")).firstMatch
+            XCTAssertTrue(exercises.waitForExistence(timeout: 10))
+            revealWebControl(exercises, in: app)
+            let historyProof = XCTAttachment(screenshot: app.screenshot())
+            historyProof.name = "Séance guidée — historique après relance"
+            historyProof.lifetime = .keepAlways; add(historyProof)
+        }
     }
 
     /// Real local login, two exercises, durable draft, one persisted workout.

@@ -60,7 +60,7 @@ export function SeanceBilan({
     : null;
 
   return (
-    <div className="coai-bilan flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-6 py-10 text-center">
+    <div className="coai-bilan flex min-h-0 flex-1 flex-col items-center gap-6 overflow-x-hidden overflow-y-auto px-6 py-10 text-center [justify-content:safe_center] [&>*]:shrink-0">
       <div className="coai-bilan-anneau" aria-hidden="true" />
 
       {sauvegardeErreur && (
@@ -124,11 +124,11 @@ export function SeanceBilan({
               <Link
                 key={e.nom}
                 href={{ pathname: "/suivi/repcount", query: { exercice: e.nom } }}
-                className="group flex items-baseline justify-between gap-3 rounded-lg px-1 py-1.5 text-xs transition hover:bg-white/[0.04]"
+                className="group flex flex-col gap-1 rounded-lg px-1 py-2 text-xs transition hover:bg-white/[0.04] sm:flex-row sm:items-baseline sm:justify-between sm:gap-3"
               >
-                <span className="min-w-0 truncate text-graphite-200">{e.nom}</span>
+                <span className="min-w-0 break-words text-graphite-200">{e.nom}</span>
                 <span className="flex-none font-mono tabular-nums text-graphite-400 transition group-hover:text-cyan-200">
-                  {e.series} séries · {maintien > 0 ? `${maintien} s de maintien` : t > 0 ? `${t.toLocaleString("fr-FR")} kg cumulés` : "poids du corps"}
+                  {e.series} séries · {maintien > 0 ? `${maintien} s de maintien` : t > 0 ? `${t.toLocaleString("fr-FR")} kg cumulés` : "sans charge comptabilisée"}
                   <span className="ml-1.5" aria-hidden="true">↗</span>
                 </span>
               </Link>
