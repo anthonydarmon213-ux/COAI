@@ -50,7 +50,27 @@ Capturer les tailles demandées par App Store Connect lorsque la fiche sera acce
 - Export : Explorer → Réglages et déconnexion → Exporter mes données. Le partage natif et l'enregistrement du JSON dans Fichiers ont été vérifiés sur simulateur avec des données locales de test.
 - Maintenir le backend disponible pendant la revue. Ne pas promettre que toutes les fonctionnalités sont natives ou hors ligne.
 
-## Vérification physique — mise à jour du 28 septembre
+## Vérification physique — mise à jour du 1er octobre
+
+L’iPhone 17 Pro est de nouveau disponible et déverrouillé. Sur le build Debug
+signé actuel, deux tests physiques réussissent dans
+`/tmp/coai-physical-navigation-rest-1001.xcresult` : navigation en très grande
+taille de texte avec rotation portrait/paysage/portrait (contenu web de test),
+et minuteur mis en pause, fermé, relancé, repris puis arrêté (persistance réelle).
+Captures inspectées. Cela clôt les deux reprises physiques signalées ci-dessous,
+sans valider tous les écrans web en accessibilité ni une archive Release.
+
+Le 1er octobre, navigation des destinations wellness et ouverture/fermeture du
+partage PDF du programme ont également réussi sur les pages en ligne. Les
+programmes nutrition/récupération du compte restent en attente de relecture.
+Le catalogue en ligne échoue au contrôle de fermeture du clavier et conserve
+un mouvement exclu localement : déploiement puis retest nécessaires.
+
+Expiration du profil embarqué relue dans le binaire installé :
+`2026-10-01T16:39:21Z`, soit 18 h 39 à Paris. Aucun renouvellement ni achat
+effectué. Les observations d’indisponibilité suivantes sont historiques.
+
+### Historique du 28 septembre
 
 La compilation de développement signée pour l'iPhone 17 Pro a réussi. Son profil expire le 1er octobre 2026 ; ce n'est pas une archive de distribution App Store.
 
@@ -72,8 +92,9 @@ Contrôle suivant du 28 septembre : CoreDevice indique désormais l'iPhone 17 Pr
 
 ## Conditions de sortie avant soumission
 
-Point de contrôle du 1er octobre : iPhone 17 Pro toujours indisponible et une
-seule identité locale Apple Development détectée, sans Apple Distribution.
+Point de contrôle du 1er octobre à 14 h 37 : iPhone 17 Pro disponible, tests
+physiques ci-dessus réussis, et une seule identité locale Apple Development
+détectée, sans Apple Distribution.
 L’adhésion distante n’a pas été vérifiée : l’absence de certificat local ne
 permet pas de conclure que le compte Apple n’est pas inscrit. Le build Release
 arm64 0.1.0 (1) a été compilé sans signature ; il n’est pas distribuable tel quel.

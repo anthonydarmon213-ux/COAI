@@ -2,6 +2,16 @@
 
 ## État courant — 1er octobre 2026
 
+À 14 h 37 : deux reprises physiques réussies sur iPhone 17 Pro/iOS 26.1,
+`/tmp/coai-physical-navigation-rest-1001.xcresult`. Navigation native très gros
+texte en portrait/paysage/portrait : cibles >=44 points, sans chevauchement,
+dans l’écran, Explorer et fermeture accessibles (fixture web Debug, pas tous
+les écrans connectés). Minuteur : pause, fermeture, relance du processus,
+reprise puis arrêt, persistance réelle. Captures inspectées. Ces contrôles
+étaient ouverts depuis le 28 septembre ; ils ne sont plus bloqués par une vidéo
+flottante. Profil embarqué actuel expirant à 16:39:21 UTC le 1er octobre
+(18:39:21 Paris), lu via `security cms` ; aucune archive de distribution créée.
+
 À 14 h 30 : iPhone 17 Pro de nouveau disponible, appairé et déverrouillé
 (iOS 26.1). Build Debug signé installé et tests physiques exécutés avec
 `DEVELOPMENT_TEAM=33L78928V3`. Sans ce paramètre, la cible UI échouait avant
