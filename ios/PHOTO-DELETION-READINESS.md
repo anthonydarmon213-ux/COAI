@@ -11,6 +11,16 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Vérifié
 
+- 1er octobre, après changement des chemins d'avatar : parcours HTTP de
+  suppression réussi avec 99 fichiers fictifs et deux avatars successifs
+  créés par `/api/profil/avatar` (101 objets, donc pagination réelle).
+  Compte/profil/identité Auth et les 101 objets disparaissent ; deux anciennes
+  sessions et le mot de passe sont refusés, les routes photo refusent tout
+  nouvel envoi, l'ancienne URL signée ne sert plus l'objet. Un autre compte
+  et son fichier restent intacts, même avec un identifiant forgé dans la
+  demande. Test `test-account-delete-http-storage-local.cjs`, services locaux
+  réels uniquement. Ce test ne prouve pas la résolution d'un envoi incertain.
+
 - 1er octobre : les nouveaux avatars utilisent maintenant un chemin UUID par
   opération et `upsert: false`, comme les photos de suivi. Un remplacement ne
   détruit plus la preuve d'un envoi précédent, ni l'ancien avatar du même format
