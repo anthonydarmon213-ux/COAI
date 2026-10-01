@@ -2,6 +2,22 @@
 
 ## État courant — 1er octobre 2026
 
+À 11 h 32 : `testLocalMeasurementPersistsAfterRelaunch` passe sur iPhone SE
+simulé / iOS 26.5, app SwiftUI + WebKit et services Auth/PostgreSQL locaux.
+Saisie fictive 75 kg, bouton accessible clavier ouvert, enregistrement,
+fermeture/relance et retour à l’historique : 1 réussi, 0 échec en 53,160 s
+(`/tmp/coai-measures-native-scroll-1001.xcresult`). Deux captures examinées
+dans `/tmp/coai-measures-native-success-proof/`. Contrôle indépendant en
+base : exactement une mesure 75 kg, sans photo ni doublon. Compte supprimé
+ensuite et vérification indépendante Auth/profil/ancien mot de passe réussie.
+Précondition : `/tmp/coai-local-http-0924.cjs ui-create --registered` ; contrôle
+indépendant `ui-measures-verify`. Les deux premiers essais ont révélé des
+erreurs de sélection/défilement du test (libellé majuscule puis geste trop
+long), corrigées sans modification de l’app. Un lancement antérieur avec un
+identifiant de simulateur mal saisi a terminé 70 avant tests. Aucune de ces
+tentatives n’est comptée comme réussite. Pas de photo choisie, pas de test
+hors ligne, sur appareil physique ou en production dans ce scénario.
+
 TERMINÉ LOCAL : contenu réel des avatars et photos de progression décodé
 avant stockage ; fichier illisible refusé. Parcours HTTP photo → mesure →
 historique et nouvel essai sans doublon réussi. Suppression de 101 fichiers

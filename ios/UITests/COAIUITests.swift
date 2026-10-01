@@ -1,6 +1,90 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Disposable registered local account only; never writes to production.
+    @MainActor
+    func testLocalMeasurementPersistsAfterRelaunch() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let login = web.buttons["Se connecter"]
+        reveal(login, in: app); login.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        func openMeasures() {
+            let explore = app.buttons["native-tab-Explorer"]
+            XCTAssertTrue(explore.waitForExistence(timeout: 15)); explore.tap()
+            let measures = app.buttons["explore-/suivi/mesures"]
+            reveal(measures, in: app); measures.tap()
+            XCTAssertTrue(web.staticTexts["Mesures corporelles."].waitForExistence(timeout: 20))
+        }
+        openMeasures()
+        let weight = web.textFields.matching(NSPredicate(format: "label ==[c] %@", "Poids (kg)")).firstMatch
+        XCTAssertTrue(weight.waitForExistence(timeout: 10))
+        // Short, directional drags avoid jumping past the field on an SE screen.
+        for _ in 0..<12 {
+            if weight.isHittable { break }
+            let origin = app.coordinate(withNormalizedOffset: .zero)
+            let high = origin.withOffset(CGVector(dx: app.frame.width * 0.9, dy: 220))
+            let low = origin.withOffset(CGVector(dx: app.frame.width * 0.9, dy: 380))
+            if weight.frame.minY < web.frame.minY { high.press(forDuration: 0.05, thenDragTo: low) }
+            else { low.press(forDuration: 0.05, thenDragTo: high) }
+        }
+        XCTAssertTrue(weight.isHittable)
+        weight.tap(); weight.typeText("75")
+        let save = web.buttons["Ajouter la mesure"]
+        reveal(save, in: app)
+        XCTAssertTrue(save.isHittable)
+        let keyboardProof = XCTAttachment(screenshot: app.screenshot())
+        keyboardProof.name = "Mesures — saisie et bouton sur petit écran"
+        keyboardProof.lifetime = .keepAlways; add(keyboardProof)
+        save.tap()
+        let history = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "75 kg")).firstMatch
+        XCTAssertTrue(history.waitForExistence(timeout: 20))
+        app.terminate(); app.launch()
+        openMeasures()
+        XCTAssertTrue(history.waitForExistence(timeout: 20))
+        reveal(history, in: app)
+        let persisted = XCTAttachment(screenshot: app.screenshot())
+        persisted.name = "Mesure conservée après relance"
+        persisted.lifetime = .keepAlways; add(persisted)
+    }
+
+    /// Read-only live catalogue check; does not start a workout or send any data.
+    @MainActor
+    func testPhysicalCatalogueExcludesMismatchedRowing() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let explore = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explore.waitForExistence(timeout: 15)); explore.tap()
+        let catalogue = app.buttons["explore-/programme/exercices"]
+        reveal(catalogue, in: app); catalogue.tap()
+        let web = app.webViews.firstMatch
+        let search = web.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 30))
+        reveal(search, in: app); search.tap(); search.typeText("Rowing haltère unilatéral\n")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Catalogue réel — contrôle du rowing incohérent"
+        proof.lifetime = .keepAlways; add(proof)
+        XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "0 exercice correspondant.")).firstMatch.waitForExistence(timeout: 10))
+        let clear = web.buttons["Effacer la recherche"]
+        reveal(clear, in: app); clear.tap()
+        reveal(search, in: app); search.tap(); search.typeText("Gainage planche\n")
+        XCTAssertTrue(web.staticTexts["Gainage planche"].waitForExistence(timeout: 10))
+        XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "1 exercice correspondant.")).firstMatch.exists)
+        app.buttons["native-tab-Séance"].tap()
+    }
+
     /// Requires the disposable local fixture with --pending-pillars --without-checkin.
     @MainActor
     func testLocalPendingPillarsOfferUsefulDestinations() throws {
