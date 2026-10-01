@@ -698,7 +698,7 @@ export function SeanceRunner({
   const consigne = step.type === "set" ? substitutions[step.nom]?.consigne ?? (typeof step.exercice.charge === "string" ? step.exercice.charge : null) : null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-abysse" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
+    <div className="fixed inset-0 z-[100] flex flex-col bg-abysse [@media(max-height:500px)]:overflow-y-auto [@media(max-height:500px)]:[&>div]:shrink-0" role="dialog" aria-modal="true" aria-label={`Séance guidée : ${nomSeance}`}>
       {premiereSeanceId && <TrackConversion name="first_workout_completed" onceKey={premiereSeanceId} />}
       {!termine && erreurBrouillon && (
         <p role="alert" className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">
@@ -774,7 +774,7 @@ export function SeanceRunner({
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-6 py-8 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-6 py-8 text-center [@media(max-height:500px)]:flex-none [@media(max-height:500px)]:overflow-visible">
             {(step.type === "echauffement" || step.type === "calme") && (() => {
               const etapes = enEtapes(step.texte);
               const prefixe = step.type === "echauffement" ? "ech" : "calme";

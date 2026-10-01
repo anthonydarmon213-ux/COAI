@@ -2,6 +2,18 @@
 
 ## État courant — 1er octobre 2026
 
+À 18 h 28 : lecteur de séance rendu défilable lorsque la fenêtre mesure au
+plus 500 px de haut. Sur simulateur iPhone SE, « C'est fait » était inaccessible
+en paysage (deux échecs avant correction, dont attente de stabilisation).
+Le parcours portrait → paysage → portrait réussit désormais, avec défilement
+dans la zone web, contrôle des bornes du bouton, retour à Fermer, ouverture
+d'Ajuster puis persistance après relance. Preuve locale :
+`/tmp/coai-reader-rotation-scroll-1001.xcresult`. Le pilote de défilement a aussi
+été corrigé pour ne plus balayer hors de la WebView en paysage. Build, types,
+lint (six avertissements existants) et tests sauvegarde/brouillons réussis.
+Base vérifiée indépendamment : trois piliers version 1, aucun doublon ; compte
+fictif nettoyé. Pas encore validé en production ni sur iPhone physique.
+
 À 18 h 05 : création de programme robuste aux confirmations incomplètes.
 Le composant acceptait un succès HTTP avec `{ echecs: 0 }` sans aucun pilier ;
 le nouveau test échouait avant correction. Il exige désormais trois piliers

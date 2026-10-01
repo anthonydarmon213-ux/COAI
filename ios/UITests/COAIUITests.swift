@@ -7,6 +7,13 @@ final class COAIUITests: XCTestCase {
         try localFirstProgrammeCreation(unconfirmedResponse: false)
     }
 
+    @MainActor
+    func testLocalWorkoutReaderRotation() throws {
+        XCUIDevice.shared.orientation = .portrait
+        defer { XCUIDevice.shared.orientation = .portrait }
+        try localFirstProgrammeCreation(unconfirmedResponse: false, rotateReader: true)
+    }
+
     /// Start ios-programme-confirmation-proxy.cjs before this test.
     @MainActor
     func testLocalFirstProgrammeUnconfirmedResponseCanRetry() throws {
@@ -19,7 +26,7 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func localFirstProgrammeCreation(unconfirmedResponse: Bool, checkInsteadOfRetry: Bool = false) throws {
+    private func localFirstProgrammeCreation(unconfirmedResponse: Bool, checkInsteadOfRetry: Bool = false, rotateReader: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -60,6 +67,35 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(start.waitForExistence(timeout: 15))
         revealWebControl(start, in: app); start.tap()
         XCTAssertTrue(web.buttons["Fermer"].waitForExistence(timeout: 10))
+        if rotateReader {
+            for orientation in [UIDeviceOrientation.landscapeLeft, .portrait] {
+                XCUIDevice.shared.orientation = orientation
+                let rotated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                    let frame = web.frame
+                    return orientation == .landscapeLeft ? frame.width > frame.height : frame.height > frame.width
+                }, object: nil)
+                XCTAssertEqual(XCTWaiter.wait(for: [rotated], timeout: 10), .completed)
+                let settled = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                    let frame = app.frame
+                    return orientation == .landscapeLeft ? frame.width > frame.height : frame.height > frame.width
+                }, object: nil)
+                XCTAssertEqual(XCTWaiter.wait(for: [settled], timeout: 10), .completed)
+                let shot = XCTAttachment(screenshot: app.screenshot())
+                shot.name = "Lecteur séance — orientation \(orientation.rawValue)"
+                shot.lifetime = .keepAlways; add(shot)
+                let close = web.buttons["Fermer"]
+                XCTAssertTrue(close.isHittable)
+                XCTAssertTrue(web.frame.contains(close.frame), "Fermer doit rester dans la zone visible")
+                let next = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "fait")).firstMatch
+                XCTAssertTrue(next.exists, "La commande pour avancer doit être disponible")
+                revealWebControl(next, in: app)
+                let reachable = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: next)
+                XCTAssertEqual(XCTWaiter.wait(for: [reachable], timeout: 10), .completed)
+                XCTAssertTrue(web.frame.contains(next.frame), "La commande pour avancer doit rester visible")
+                revealWebControl(close, in: app)
+                XCTAssertTrue(close.isHittable)
+            }
+        }
         let adjust = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ajuster")).firstMatch
         XCTAssertTrue(adjust.waitForExistence(timeout: 5))
         XCTAssertTrue(adjust.isHittable)
@@ -2632,8 +2668,10 @@ final class COAIUITests: XCTestCase {
         for _ in 0..<15 {
             if element.isHittable { return }
             let origin = app.coordinate(withNormalizedOffset: .zero)
-            let bottom = app.keyboards.firstMatch.exists ? min(380, app.keyboards.firstMatch.frame.minY - 110) : 380
-            let top = max(100, bottom - 140)
+            let webFrame = app.webViews.firstMatch.frame
+            let visibleBottom = min(380, webFrame.maxY - 20)
+            let bottom = app.keyboards.firstMatch.exists ? min(visibleBottom, app.keyboards.firstMatch.frame.minY - 110) : visibleBottom
+            let top = max(webFrame.minY + 20, bottom - 140)
             let high = origin.withOffset(CGVector(dx: app.frame.width * 0.9, dy: top))
             let low = origin.withOffset(CGVector(dx: app.frame.width * 0.9, dy: bottom))
             if element.frame.minY < app.webViews.firstMatch.frame.minY + 20 {
