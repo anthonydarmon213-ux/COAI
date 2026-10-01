@@ -92,8 +92,24 @@ final class COAIUITests: XCTestCase {
                 let reachable = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: next)
                 XCTAssertEqual(XCTWaiter.wait(for: [reachable], timeout: 10), .completed)
                 XCTAssertTrue(web.frame.contains(next.frame), "La commande pour avancer doit rester visible")
+                if orientation == .landscapeLeft { next.tap() }
                 revealWebControl(close, in: app)
                 XCTAssertTrue(close.isHittable)
+                let adjustment = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ajuster")).firstMatch
+                revealWebControl(adjustment, in: app); adjustment.tap()
+                let explanation = web.staticTexts["Valable pour aujourd'hui seulement — ton programme n'est pas modifié."]
+                XCTAssertTrue(explanation.waitForExistence(timeout: 5))
+                revealWebControl(explanation, in: app)
+                XCTAssertTrue(web.frame.contains(explanation.frame), "Les conditions de l'ajustement doivent rester lisibles")
+                let dismiss = web.buttons.matching(NSPredicate(format: "label == %@", "Fermer")).element(boundBy: 1)
+                for _ in 0..<8 {
+                    if dismiss.isHittable { break }
+                    let low = web.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8))
+                    let high = web.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
+                    low.press(forDuration: 0.05, thenDragTo: high)
+                }
+                XCTAssertTrue(dismiss.isHittable); dismiss.tap()
+                XCTAssertTrue(explanation.waitForNonExistence(timeout: 5))
             }
         }
         let adjust = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ajuster")).firstMatch

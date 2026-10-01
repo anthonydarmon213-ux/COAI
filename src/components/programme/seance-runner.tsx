@@ -1022,7 +1022,7 @@ export function SeanceRunner({
 
           {ajustementOuvert && (
             <div className="fixed inset-0 z-10 flex items-end justify-center bg-black/70 p-4 sm:items-center" onClick={() => setAjustementOuvert(false)}>
-              <div className="w-full max-w-sm rounded-2xl border border-laiton-400/25 bg-[#16181b] p-5 text-left" onClick={(e) => e.stopPropagation()}>
+              <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-2xl border border-laiton-400/25 bg-[#16181b] p-5 text-left" onClick={(e) => e.stopPropagation()}>
                 <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">⚡️ Ajuster la séance</p>
                 <p className="mt-2 text-xs leading-5 text-graphite-400">
                   Valable pour aujourd&apos;hui seulement — ton programme n&apos;est pas modifié.
@@ -1095,7 +1095,7 @@ export function SeanceRunner({
 
           {consigneOuverte && consigne && (
             <div className="fixed inset-0 z-10 flex items-end justify-center bg-black/70 p-4 sm:items-center" onClick={() => setConsigneOuverte(false)}>
-              <div className="w-full max-w-sm rounded-2xl border border-laiton-400/25 bg-[#16181b] p-5 text-left" onClick={(e) => e.stopPropagation()}>
+              <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-2xl border border-laiton-400/25 bg-[#16181b] p-5 text-left" onClick={(e) => e.stopPropagation()}>
                 <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-laiton-300">💡 Consigne du coach</p>
                 <p className="mt-3 text-sm leading-6 text-graphite-100">{consigne}</p>
                 <button type="button" onClick={() => setConsigneOuverte(false)} className="mt-4 w-full rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white">

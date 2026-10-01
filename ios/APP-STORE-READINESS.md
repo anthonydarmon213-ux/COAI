@@ -2,6 +2,16 @@
 
 ## État courant — 1er octobre 2026
 
+À 18 h 36 : ajustements pendant un exercice contrôlés en paysage sur SE.
+Le texte des conditions débordait de la fenêtre (échec natif
+`/tmp/coai-reader-modal-exercise-1001.xcresult`). Hauteur des panneaux Ajuster
+et Consigne bornée au conteneur, contenu défilable. Test natif réussi après
+correction : `/tmp/coai-reader-modal-fixed-1001.xcresult`, conditions entièrement
+dans la WebView, fermeture après défilement interne, retour portrait, relance.
+Le panneau Consigne partage la correction CSS mais son ouverture n'est pas
+couverte par ce test. Build, types, lint et séances condensées passent.
+Validation locale seulement ; aucune publication.
+
 À 18 h 28 : lecteur de séance rendu défilable lorsque la fenêtre mesure au
 plus 500 px de haut. Sur simulateur iPhone SE, « C'est fait » était inaccessible
 en paysage (deux échecs avant correction, dont attente de stabilisation).
