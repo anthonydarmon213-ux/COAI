@@ -4,6 +4,17 @@ final class COAIUITests: XCTestCase {
     /// Disposable registered local account only; never writes to production.
     @MainActor
     func testLocalMeasurementPersistsAfterRelaunch() throws {
+        try runLocalMeasurementPersistence(lostResponse: false)
+    }
+
+    /// Local proxy drops the first measurement response AFTER the server saves it.
+    @MainActor
+    func testLocalMeasurementRetriesLostResponseWithoutDuplicate() throws {
+        try runLocalMeasurementPersistence(lostResponse: true)
+    }
+
+    @MainActor
+    private func runLocalMeasurementPersistence(lostResponse: Bool) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -46,6 +57,15 @@ final class COAIUITests: XCTestCase {
         keyboardProof.name = "Mesures — saisie et bouton sur petit écran"
         keyboardProof.lifetime = .keepAlways; add(keyboardProof)
         save.tap()
+        if lostResponse {
+            let failure = web.staticTexts["Connexion interrompue. Tes valeurs sont conservées : réessaie dans un instant."]
+            XCTAssertTrue(failure.waitForExistence(timeout: 20))
+            XCTAssertEqual(weight.value as? String, "75")
+            let failedProof = XCTAttachment(screenshot: app.screenshot())
+            failedProof.name = "Confirmation perdue — saisie conservée"
+            failedProof.lifetime = .keepAlways; add(failedProof)
+            reveal(save, in: app); save.tap()
+        }
         let history = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "75 kg")).firstMatch
         XCTAssertTrue(history.waitForExistence(timeout: 20))
         app.terminate(); app.launch()

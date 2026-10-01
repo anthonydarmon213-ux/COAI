@@ -2,6 +2,18 @@
 
 ## État courant — 1er octobre 2026
 
+À 11 h 39 : reprise après confirmation perdue vérifiée dans l’app sur SE
+simulé. Proxy local coupe la connexion APRÈS réponse serveur 201, sans
+modifier le réseau du Mac ou un service distant. Message de reprise présent,
+valeur 75 conservée, geste explicite de nouvelle tentative → réponse 200,
+puis relance et historique accessible. Résultat 1 réussi, 0 échec en 58,847 s
+dans `/tmp/coai-measures-loss-1001.xcresult`. Captures erreur et historique
+examinées dans `/tmp/coai-measures-loss-proof/`. Contrôle PostgreSQL séparé :
+exactement une mesure. Scénario reproductible : serveur local compilé sur
+3051, `node scripts/ios-measure-loss-proxy.cjs` sur 3050, compte jetable
+`ui-create --registered`, test `testLocalMeasurementRetriesLostResponseWithoutDuplicate`.
+Ce n’est pas un test hors ligne prolongé, photo, production ou iPhone physique.
+
 À 11 h 32 : `testLocalMeasurementPersistsAfterRelaunch` passe sur iPhone SE
 simulé / iOS 26.5, app SwiftUI + WebKit et services Auth/PostgreSQL locaux.
 Saisie fictive 75 kg, bouton accessible clavier ouvert, enregistrement,
