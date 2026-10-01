@@ -4,6 +4,22 @@ final class COAIUITests: XCTestCase {
     /// Local eligible profile and synthetic access, no pre-created programme.
     @MainActor
     func testLocalFirstProgrammeCreationSurvivesRelaunch() throws {
+        try localFirstProgrammeCreation(unconfirmedResponse: false)
+    }
+
+    /// Start ios-programme-confirmation-proxy.cjs before this test.
+    @MainActor
+    func testLocalFirstProgrammeUnconfirmedResponseCanRetry() throws {
+        try localFirstProgrammeCreation(unconfirmedResponse: true)
+    }
+
+    @MainActor
+    func testLocalFirstProgrammeUnconfirmedResponseCanBeChecked() throws {
+        try localFirstProgrammeCreation(unconfirmedResponse: true, checkInsteadOfRetry: true)
+    }
+
+    @MainActor
+    private func localFirstProgrammeCreation(unconfirmedResponse: Bool, checkInsteadOfRetry: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -26,6 +42,18 @@ final class COAIUITests: XCTestCase {
         before.name = "Premier programme — accès à la création"
         before.lifetime = .keepAlways; add(before)
         create.tap()
+        if unconfirmedResponse {
+            let error = web.staticTexts["La création n’a pas pu être confirmée. Consulte ton programme avant de réessayer."]
+            XCTAssertTrue(error.waitForExistence(timeout: 25))
+            XCTAssertTrue(create.isEnabled)
+            XCTAssertFalse(web.links["Accéder à ma séance →"].exists)
+            revealWebControl(error, in: app)
+            let failure = XCTAttachment(screenshot: app.screenshot())
+            failure.name = "Premier programme — confirmation perdue, reprise disponible"
+            failure.lifetime = .keepAlways; add(failure)
+            let recovery = checkInsteadOfRetry ? web.buttons["Vérifier mon programme"] : create
+            revealWebControl(recovery, in: app); recovery.tap()
+        }
         XCTAssertTrue(create.waitForNonExistence(timeout: 30))
         XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Ta première séance")).firstMatch.waitForExistence(timeout: 20))
         let start = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Démarrer la séance")).firstMatch

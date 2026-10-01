@@ -1,36 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CoachReviewLink } from "@/components/programme/coach-review-link";
+import { withRequestDeadline } from "@/lib/suivi/request-deadline";
 
 export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState(false);
+  const requestPending = useRef(false);
 
   async function handleClick() {
+    if (requestPending.current) return;
     if (hasExisting && !confirmation) {
       setConfirmation(true);
       return;
     }
+    requestPending.current = true;
     setLoading(true);
     setError(null);
     try {
       // First creation is resumable: a lost response must not create another version.
-      const res = await fetch(hasExisting ? "/api/programmes/generate" : "/api/programmes/generate?mode=onboarding", { method: "POST" });
-      const data = await res.json();
+      const { res, data } = await withRequestDeadline(async signal => {
+        const res = await fetch(hasExisting ? "/api/programmes/generate" : "/api/programmes/generate?mode=onboarding", { method: "POST", signal });
+        return { res, data: await res.json() };
+      });
       if (!res.ok) {
         // Le détail technique renvoyé par l'API était concaténé au message
         // affiché (23/08/2026) : un abonné a vu l'erreur brute du
         // fournisseur IA, avec les identifiants de requête. L'API ne
         // renvoie plus ce détail, et le bouton n'affiche que le message
         // destiné à l'utilisateur.
-        throw new Error(typeof data?.error === "string" ? data.error : "La génération n'a pas abouti.");
+        setError(typeof data?.error === "string" ? data.error : "La préparation n'a pas abouti. Réessaie dans un instant.");
+        return;
       }
-      if (data?.echecs > 0) throw new Error("Une partie du programme n’a pas pu être enregistrée. Retrouve les piliers déjà disponibles dans ton espace.");
+      if (data?.echecs > 0) {
+        setError("Une partie du programme n’a pas pu être enregistrée. Retrouve les piliers déjà disponibles dans ton espace.");
+        return;
+      }
+      const programmes = data?.programmes;
+      if (data?.echecs !== 0 || !Array.isArray(programmes) || programmes.length !== 3 ||
+          !["ENTRAINEMENT", "NUTRITION", "RECUPERATION"].every(pilier => programmes.filter(
+            p => p && p.pilier === pilier && typeof p.id === "string" && p.id.length > 0 &&
+              ["GENERE_IA", "VALIDE", "EN_ATTENTE"].includes(p.statut)
+          ).length === 1) || new Set(programmes.map(p => p.id)).size !== 3) {
+        setError("La création n’a pas pu être confirmée. Consulte ton programme avant de réessayer.");
+        return;
+      }
       setConfirmation(false);
       if (!hasExisting) {
         // Explicitly show session one, even when today is a rest day. This does
@@ -39,8 +58,11 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
       }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+      setError(err instanceof Error && err.name === "AbortError"
+        ? "La réponse met trop de temps. Ton programme peut déjà être enregistré. Consulte ton espace avant de réessayer."
+        : "La connexion a été interrompue ou la réponse est illisible. Consulte ton programme avant de réessayer.");
     } finally {
+      requestPending.current = false;
       setLoading(false);
     }
   }
@@ -74,7 +96,17 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
           </p>
         </div>
       )}
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && (
+        <>
+          <p role="alert" className="text-sm text-red-400">{error}</p>
+          <button type="button" onClick={() => {
+            router.replace("/programme/entrainement?onboarding=1#seance-du-jour");
+            router.refresh();
+          }} className="min-h-11 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-graphite-200">
+            Vérifier mon programme
+          </button>
+        </>
+      )}
       <CoachReviewLink />
     </div>
   );

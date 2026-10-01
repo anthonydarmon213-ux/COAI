@@ -2,6 +2,25 @@
 
 ## État courant — 1er octobre 2026
 
+À 18 h 05 : création de programme robuste aux confirmations incomplètes.
+Le composant acceptait un succès HTTP avec `{ echecs: 0 }` sans aucun pilier ;
+le nouveau test échouait avant correction. Il exige désormais trois piliers
+distincts, identifiés et de statut reconnu, limite l'attente réseau à 20 secondes
+(en-têtes et corps), bloque les doubles appuis et n'affiche pas d'erreur technique
+brute. L'action « Vérifier mon programme » consulte le serveur sans recréer.
+Deux parcours natifs avec Auth/PostgreSQL locaux et confirmation remplacée après
+commit réel réussis : reprise manuelle sans doublon
+`/tmp/coai-first-programme-unconfirmed-retry-1001.xcresult` (18 h 00), puis
+consultation sans seconde requête de création
+`/tmp/coai-first-programme-check-after-loss-1001.xcresult` (18 h 05).
+Chacun ouvre ensuite le lecteur et retrouve le programme après relance.
+Contrôle indépendant : trois piliers, version 1, aucun doublon. Captures d'erreur
+inspectées. Tests simulés complémentaires : réponses malformées, timeout en-têtes
+et corps, double appui, nouvelle tentative, confirmation de recréation conservée.
+TypeScript, lint, build 132 pages, tests ciblés et 356 médias réussis.
+Fixtures nettoyées, proxy de panne arrêté et serveur normal rétabli sur 3050.
+Ces preuves ne valident pas la perte de connexion physique ni la production.
+
 À 17 h 49 : débordement du bouton Ajuster du lecteur corrigé sur petit iPhone.
 Avant : bord droit mesuré à 379 points pour un écran de 375, test en échec
 `/tmp/coai-runner-header-before-1001.xcresult`. Après : titre sur sa propre ligne
