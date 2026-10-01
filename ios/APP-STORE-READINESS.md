@@ -2,6 +2,14 @@
 
 ## État courant — 1er octobre 2026
 
+À 09 h 09, téléchargement PDF depuis la session persistante existante sur
+iPhone 17 Pro / iOS 26.1 : 1 réussi, 0 échec, 0 ignoré dans
+`/tmp/coai-device-pdf-1001.xcresult`. Capture examinée dans
+`/tmp/coai-device-pdf-proof-1001/` : partage iOS présentant un document PDF
+de 640 ko, puis fermeture et retour à la séance. Aucun envoi, achat ou
+changement du programme. Cette preuve valide l'ouverture du partage, pas
+le contenu intégral du PDF ni son enregistrement dans Fichiers.
+
 À 08 h 59, deux autres tests physiques anonymes réussissent sur iPhone 17 Pro :
 navigation mot de passe oublié → retour → inscription, puis saisie fictive des
 champs, masquage/affichage du mot de passe, champ au-dessus du clavier et bouton

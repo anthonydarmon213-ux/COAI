@@ -624,6 +624,34 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testPhysicalExistingSessionProgrammePDFShares() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let sessionTab = app.buttons["native-tab-Séance"]
+        XCTAssertTrue(sessionTab.waitForExistence(timeout: 15))
+        sessionTab.tap()
+        let download = app.webViews.firstMatch.links["Télécharger ma fiche (PDF)"]
+        // Requires an existing signed-in session. Never creates an account or submits credentials.
+        XCTAssertTrue(download.waitForExistence(timeout: 30))
+        reveal(download, in: app)
+        download.tap()
+        let caption = app.otherElements["LP.CaptionBar.BottomCaption"]
+        XCTAssertTrue(caption.waitForExistence(timeout: 30))
+        XCTAssertTrue(caption.label.contains("PDF"))
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "PDF session existante — ouverture du partage uniquement"
+        proof.lifetime = .keepAlways
+        add(proof)
+        let close = app.buttons.matching(NSPredicate(format: "label IN %@", ["Fermer", "Close"])).firstMatch
+        XCTAssertTrue(close.exists)
+        close.tap()
+        XCTAssertTrue(download.waitForExistence(timeout: 10))
+        XCTAssertTrue(sessionTab.exists)
+    }
+
+    @MainActor
     func testLocalConnectedProgrammePDFShares() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
