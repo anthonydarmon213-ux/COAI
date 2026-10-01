@@ -2,6 +2,18 @@
 
 ## État courant — 1er octobre 2026
 
+À 14 h 13 : réponse d’export malformée maintenant vérifiée dans l’app native
+sur simulateur SE, et non seulement dans le test de composant. Le proxy local
+`scripts/ios-export-failure-proxy.cjs` remplace une première réponse authentifiée
+200 par un objet JSON sans identité. Erreur attendue affichée, aucun partage
+proposé, bouton réutilisable, puis vraie réponse 200 et sauvegarde dans Fichiers :
+`/tmp/coai-export-invalid-1001.xcresult` réussi. Le JSON sauvegardé de 5 171 octets
+a été lu séparément : identité fictive exacte, profil et programme présents.
+Capture de destination locale inspectée ; aucun destinataire ni cloud choisi.
+Compte fictif révoqué/supprimé et absence vérifiée, proxy arrêté, serveur local
+normal rétabli. Tests de composant RGPD et lint ciblé réussis. Aucun changement
+produit, déploiement ou validation physique/production dans ce lot.
+
 À 14 h 05 : parcours natif de correction d’un mot de passe vérifié sur le
 simulateur SE dédié, avec Auth/PostgreSQL locaux réels. Rejet du mauvais mot de
 passe, email conservé, bouton réutilisable, affichage/masquage, correction,

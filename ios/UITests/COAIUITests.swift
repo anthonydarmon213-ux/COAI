@@ -841,6 +841,17 @@ final class COAIUITests: XCTestCase {
 
     @MainActor
     func testLocalConnectedAccountExportShares() throws {
+        try runLocalAccountExport(invalidFirstResponse: false)
+    }
+
+    /// Requires ios-export-failure-proxy.cjs and the disposable local account.
+    @MainActor
+    func testLocalInvalidAccountExportCanBeRetried() throws {
+        try runLocalAccountExport(invalidFirstResponse: true)
+    }
+
+    @MainActor
+    private func runLocalAccountExport(invalidFirstResponse: Bool) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -867,6 +878,15 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(export.waitForExistence(timeout: 30))
         reveal(export, in: app)
         export.tap()
+        if invalidFirstResponse {
+            let failure = web.staticTexts["L’export n’a pas abouti. Aucun fichier de données n’a pu être confirmé. Réessaie."]
+            XCTAssertTrue(failure.waitForExistence(timeout: 15))
+            XCTAssertFalse(app.cells["Enregistrer dans Fichiers"].exists)
+            XCTAssertFalse(app.otherElements["LP.CaptionBar.TopCaption"].exists)
+            XCTAssertTrue(export.isEnabled)
+            reveal(export, in: app)
+            export.tap()
+        }
         let file = app.otherElements["LP.CaptionBar.TopCaption"]
         XCTAssertTrue(file.waitForExistence(timeout: 30))
         XCTAssertTrue(file.label.lowercased().contains("coai"))
