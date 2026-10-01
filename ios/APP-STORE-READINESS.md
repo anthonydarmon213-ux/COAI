@@ -2,6 +2,24 @@
 
 ## État courant — 1er octobre 2026
 
+Complément après les contrôles de 20 h 07 : navigation journal immédiatement
+après connexion réussie dans `/tmp/coai-journal-immediate-login-1001.xcresult`
+(24 s), sans attente de la destination finale. Le conflit de redirection
+supposé plus bas n'est pas reproduit avec un ciblage précis du menu natif ;
+aucune modification de l'authentification sur cette seule hypothèse.
+Contrôle indépendant des mesures PostgreSQL réussi et compte fictif nettoyé.
+`check-ios.sh --device-release` réussit : 51 tests Swift, 65 contrôles directs,
+validation des manifests et compilation Release iPhone arm64 non signée.
+Ce résultat n'est ni une archive distribuable ni une validation App Store.
+Tests de retour email iOS et de fin de session réussis.
+Le test des pages légales avait conservé la date du 28 septembre pour les deux
+pages : il vérifie désormais séparément les CGV et la confidentialité mise à
+jour le 1er octobre, ainsi que les exclusions explicites de l'export (photos
+et données séparées des prestataires). Rendu réel testé hors ligne : réussi.
+Tests hors ligne du chargement check-in (dont réseau/JSON invalide), du score
+de progression (données absentes et historiques malformés) et du Club réussis.
+Ils ne remplacent pas les parcours en production. Aucun changement publié.
+
 À 19 h 57 : journal chronométré vérifié dans l'app simulée sur SE :
 `/tmp/coai-journal-timed-scroll-1001.xcresult` (26 s). Navigation Explorer →
 Historique des séances → Voir mon historique ; affichages `45 s de maintien`

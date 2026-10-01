@@ -252,6 +252,16 @@ final class COAIUITests: XCTestCase {
 
     @MainActor
     func testLocalJournalPreservesTimedExerciseMetric() throws {
+        try localJournal(waitForLoginDestination: true)
+    }
+
+    @MainActor
+    func testLocalJournalImmediatelyAfterLogin() throws {
+        try localJournal(waitForLoginDestination: false)
+    }
+
+    @MainActor
+    private func localJournal(waitForLoginDestination: Bool) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -265,8 +275,10 @@ final class COAIUITests: XCTestCase {
         let login = web.buttons["Se connecter"]
         reveal(login, in: app); login.tap()
         XCTAssertTrue(login.waitForNonExistence(timeout: 30))
-        XCTAssertTrue(web.links["Accéder à ma séance →"].waitForExistence(timeout: 30),
-                      "Attendre la destination de connexion avant la navigation vers le journal")
+        if waitForLoginDestination {
+            XCTAssertTrue(web.links["Accéder à ma séance →"].waitForExistence(timeout: 30),
+                          "Attendre la destination de connexion avant la navigation vers le journal")
+        }
         app.buttons["native-tab-Explorer"].tap()
         let journal = app.buttons["explore-/suivi/seances"]
         XCTAssertTrue(app.navigationBars["Explorer"].waitForExistence(timeout: 5))

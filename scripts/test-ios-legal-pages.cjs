@@ -43,9 +43,13 @@ assert.ok(!/Coaching Hybride|99€\/mois|200 € la séance|VIP à l&#x27;unité
 for (const phrase of ['Stripe', 'Apple', 'références de transaction', 'restauration', 'ne reçoit pas les numéros de carte bancaire']) {
   assert.ok(privacy.includes(phrase), `Missing privacy explanation: ${phrase}`);
 }
+assert.ok(terms.includes('28 septembre 2026'), 'Missing terms revision date');
+assert.ok(privacy.includes('1er octobre 2026'), 'Missing privacy revision date');
+for (const phrase of ['export des données de ton compte au format JSON', 'Il ne contient pas les fichiers photo', 'ni les données conservées séparément par les prestataires']) {
+  assert.ok(privacy.includes(phrase), `Missing export scope explanation: ${phrase}`);
+}
 for (const html of [terms, privacy]) {
   assert.ok(html.includes('<main'));
-  assert.ok(html.includes('28 septembre 2026'));
   assert.ok(!html.includes('<script'));
 }
 console.log('PASS — rendered iOS legal pages: offers, Apple/Stripe, trial eligibility, management link, purchase data. Not a legal or production certification.');
