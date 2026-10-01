@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
-import { clearDeletedAvatarRetirements, closePhotoWrites, confirmAvatarRetirement, confirmPhotoWrite, pendingAvatarRetirements, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
+import { claimAvatarRetirements, clearDeletedAvatarRetirements, closePhotoWrites, confirmAvatarRetirement, confirmPhotoWrite, isValidAvatarRetirement, pendingAvatarRetirements, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
 
 // Nom exact du bucket privé existant dans Supabase.
 export const PROGRESS_PHOTOS_BUCKET = "progress photos";
@@ -75,20 +75,43 @@ export async function purgeRetiredAvatars(userId: string): Promise<void> {
   if (!pending.length) return;
   const bucket = createSupabaseAdminClient().storage.from(PROGRESS_PHOTOS_BUCKET);
   for (const { id, name } of pending) {
-    // These exact, previously published paths cannot be published again. Never
-    // sweep by age or by "not currently referenced": an upload may be in flight.
-    const { error } = await bucket.remove([`${userId}/${name}`]);
-    if (error) throw new Error("avatar_retirement_failed");
-    const listed = await bucket.list(userId, { limit: 100, search: name });
-    if (listed.error || !listed.data || listed.data.length >= 100 || listed.data.some(file => file.name === name)) {
-      throw new Error("avatar_retirement_unconfirmed");
-    }
-    // An interrupted response/DB update leaves the task pending for retry.
-    await confirmAvatarRetirement(userId, id, name);
+    await removeRetiredAvatar(bucket, userId, id, name);
   }
 }
 
 type PhotoBucket = ReturnType<ReturnType<typeof createSupabaseAdminClient>["storage"]["from"]>;
+
+async function removeRetiredAvatar(bucket: PhotoBucket, userId: string, id: string, name: string): Promise<void> {
+  // Only previously published, durably retired paths; never sweep by age or
+  // "not currently referenced", since an upload can be awaiting publication.
+  const { error } = await bucket.remove([`${userId}/${name}`]);
+  if (error) throw new Error("avatar_retirement_failed");
+  const listed = await bucket.list(userId, { limit: 100, search: name });
+  if (listed.error || !listed.data || listed.data.length >= 100 || listed.data.some(file => file.name === name)) {
+    throw new Error("avatar_retirement_unconfirmed");
+  }
+  await confirmAvatarRetirement(userId, id, name);
+}
+
+export async function purgeRetiredAvatarBatch(): Promise<{ attempted: number; removed: number; deferred: number }> {
+  const tasks = await claimAvatarRetirements();
+  const result = { attempted: tasks.length, removed: 0, deferred: 0 };
+  if (!tasks.length) return result;
+  const bucket = createSupabaseAdminClient().storage.from(PROGRESS_PHOTOS_BUCKET);
+  for (const task of tasks) {
+    try {
+      // The routing ID is temporary server-only data. Check it against the
+      // hashed owner before using the privileged Storage client.
+      if (!isValidAvatarRetirement(task)) throw new Error("invalid_retirement_owner");
+      await removeRetiredAvatar(bucket, task.userId, task.id, task.name);
+      result.removed++;
+    } catch {
+      // Keep the persistent task; continue other users without leaking paths.
+      result.deferred++;
+    }
+  }
+  return result;
+}
 
 async function listPhotoPaths(userId: string, bucket: PhotoBucket): Promise<string[]> {
   const paths = new Set<string>();

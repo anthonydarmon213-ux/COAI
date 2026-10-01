@@ -6,10 +6,35 @@ Le registre réserve un envoi avant le stockage. La suppression ferme durablemen
 les admissions et refuse de poursuivre tant qu'un envoi reste non confirmé.
 La fermeture est validée dans une transaction avant de renvoyer l'erreur ; une
 nouvelle tentative ne peut donc pas rouvrir les envois. Les transactions ne
-contiennent aucun appel au stockage. Aucun identifiant client en clair, photo,
-adresse email ou donnée de santé dans les deux tables.
+contiennent aucun appel au stockage. Aucune photo, adresse email ou donnée de
+santé dans les deux tables. Une tâche de retrait conserve temporairement
+l'identifiant technique Auth nécessaire pour retrouver le fichier ; il est
+effacé avec le nom du fichier et la date de reprise dès le nettoyage confirmé.
+Les admissions fermées restent représentées par une empreinte, pas cet identifiant.
 
 ## Vérifié
+
+- 1er octobre — reprise autonome préparée : route privée
+  `/api/cron/photos-retirees`, refus sans secret, désactivée par défaut
+  (`PHOTO_RETIREMENT_CRON_ENABLED`), aucune planification ajoutée à `vercel.json`.
+  Chaque exécution prend au maximum 20 tâches déjà retirées du profil ; deux
+  traitements concurrents prennent des lots distincts. Une prise abandonnée
+  peut être reprise après cinq minutes (pas une expiration des envois incertains).
+  La réponse ne contient que des compteurs et renvoie 503 en cas d'échec partiel.
+  Test HTTP sur serveur recompilé + PostgreSQL/Storage locaux réels : secret
+  absent/incorrect refusé ; 25 retraits traités en lots 20/5 ; SIGKILL après prise
+  d'un lot, reprise ultérieure ; panne d'un fichier isolée ; propriétaire falsifié
+  refusé avant Storage ; réponse perdue après suppression réelle puis nouvelle
+  tentative réussie. Avatar actuel et fichier non publié préservés. Identifiants
+  temporaires de routage effacés, fixtures supprimées.
+  `test-avatar-retirement-local.cjs --worker-http` et
+  `test-avatar-retirement-cron.cjs` réussis. Remplacement HTTP et suppression de
+  compte avec 101 fichiers restent réussis. Build Next, schéma Prisma, TypeScript,
+  lint ciblé et conseiller sécurité local réussis. Index partiel de file contrôlé
+  par EXPLAIN : utilisable sans tri supplémentaire (ce n'est pas un test de charge).
+  Migration `20261001083325_avatar_retirement_worker` appliquée seulement en local.
+  LIMITES : planification réelle, quotas/coûts d'hébergement et supervision restent
+  à valider avant activation autorisée. Aucun cron distant exécuté ou activé.
 
 - 1er octobre — nettoyage des avatars remplacés, vérifié localement : le
   nouveau chemin et la tâche de suppression du précédent sont enregistrés dans
@@ -29,8 +54,8 @@ adresse email ou donnée de santé dans les deux tables.
   deux suppressions simultanées réussies. Les huit cas de processus interrompu
   et cinq cas de réponse perdue restent réussis. Schéma Prisma, TypeScript,
   lint ciblé et conseiller sécurité local sans erreur.
-  LIMITES : le retry est déclenché par un autre remplacement ou la suppression
-  du compte, pas par un traitement périodique autonome. Les anciens orphelins
+  À cette étape, le retry était déclenché par un autre remplacement ou la suppression
+  du compte ; le traitement autonome suivant est préparé ci-dessus. Les anciens orphelins
   sans tâche et les envois jamais publiés ne sont pas purgés sur simple absence
   de référence. La reprise automatique de ces cas reste à finaliser.
   Pas de validation en production ni de sélection de photo sur appareil physique.
@@ -133,7 +158,8 @@ adresse email ou donnée de santé dans les deux tables.
    garantir l'absence d'envoi tardif. Ne pas publier ce code sans les tables.
 4. Définir la conservation minimale des empreintes de blocage et la purge des
    opérations confirmées, sans rouvrir les demandes anciennes.
-5. Finaliser la reprise autonome des tâches d'avatar et la gestion des fichiers
+5. Activer et superviser la reprise autonome des tâches d'avatar après validation
+   de l'hébergement et autorisation explicite. Finaliser la gestion des fichiers
    jamais publiés / antérieurs. Ne pas supprimer un fichier uniquement parce
    qu'il n'est pas le chemin actuel : une publication peut être en cours.
 

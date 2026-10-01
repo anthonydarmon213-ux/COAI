@@ -1121,6 +1121,10 @@ model PhotoUpload {
   settled Boolean @default(false)
   avatarCommitted Boolean @default(false)
   retiredAvatarName String?
+  // Temporary routing data, cleared as soon as retirement is confirmed.
+  retiredAvatarOwner String?
+  retirementRetryAt DateTime? @db.Timestamptz(6)
+  // Partial retry index is managed in the SQL migration (pending rows only).
   owner PhotoOwnerGate @relation(fields: [ownerKey], references: [ownerKey], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([ownerKey, settled], map: "photo_uploads_owner_pending_idx")

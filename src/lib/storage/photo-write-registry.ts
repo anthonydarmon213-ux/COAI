@@ -62,7 +62,7 @@ export async function commitAvatarPhoto(userId: string, profileId: string, path:
       const oldName = old.startsWith(`${userId}/`) ? old.slice(userId.length + 1) : "";
       // Never turn a malformed / foreign DB value into a privileged deletion.
       if (!RETIRABLE_AVATAR_NAME.test(oldName)) throw new Error("invalid_previous_avatar_path");
-      await tx.$executeRaw`UPDATE photo_uploads SET "retiredAvatarName"=${oldName}
+      await tx.$executeRaw`UPDATE photo_uploads SET "retiredAvatarName"=${oldName}, "retiredAvatarOwner"=${userId}
         WHERE id=${operation} AND "ownerKey"=${key}`;
     }
   }, { maxWait: 5000, timeout: 5000 });
@@ -78,7 +78,7 @@ export async function pendingAvatarRetirements(userId: string): Promise<{ id: st
 
 export async function confirmAvatarRetirement(userId: string, operation: string, name: string): Promise<void> {
   const key = ownerKey(userId);
-  await prisma.$executeRaw`UPDATE photo_uploads SET "retiredAvatarName"=NULL
+  await prisma.$executeRaw`UPDATE photo_uploads SET "retiredAvatarName"=NULL, "retiredAvatarOwner"=NULL, "retirementRetryAt"=NULL
     WHERE id=${operation} AND "ownerKey"=${key} AND "retiredAvatarName"=${name}`;
 }
 
@@ -86,8 +86,34 @@ export async function clearDeletedAvatarRetirements(userId: string): Promise<voi
   const key = ownerKey(userId);
   await prisma.$transaction(async tx => {
     if (!(await lock(tx, key)).closed) throw new Error("photo_owner_not_closed");
-    await tx.$executeRaw`UPDATE photo_uploads SET "retiredAvatarName"=NULL WHERE "ownerKey"=${key}`;
+    await tx.$executeRaw`UPDATE photo_uploads SET "retiredAvatarName"=NULL, "retiredAvatarOwner"=NULL, "retirementRetryAt"=NULL WHERE "ownerKey"=${key}`;
   }, { maxWait: 5000, timeout: 5000 });
+}
+
+export type AvatarRetirementTask = { id: string; ownerKey: string; userId: string; name: string };
+
+export function isValidAvatarRetirement(task: AvatarRetirementTask): boolean {
+  try {
+    return ownerKey(task.userId) === task.ownerKey && RETIRABLE_AVATAR_NAME.test(task.name);
+  } catch {
+    return false;
+  }
+}
+
+export async function claimAvatarRetirements(): Promise<AvatarRetirementTask[]> {
+  // A short claim on ALREADY retired paths, not an expiry of unresolved writes.
+  // If this worker dies, another may retry after five minutes. Retired paths
+  // cannot be republished, so duplicate removal after claim expiry is safe.
+  // SKIP LOCKED distributes simultaneous workers; never hold DB locks over I/O.
+  return prisma.$queryRaw<AvatarRetirementTask[]>`WITH candidates AS (
+    SELECT id FROM photo_uploads
+    WHERE "retiredAvatarName" IS NOT NULL
+      AND ("retirementRetryAt" IS NULL OR "retirementRetryAt" <= NOW())
+    ORDER BY "retirementRetryAt" ASC NULLS FIRST, id
+    LIMIT 20 FOR UPDATE SKIP LOCKED
+  ) UPDATE photo_uploads p SET "retirementRetryAt"=NOW() + INTERVAL '5 minutes'
+    FROM candidates c WHERE p.id=c.id
+    RETURNING p.id, p."ownerKey", p."retiredAvatarOwner" AS "userId", p."retiredAvatarName" AS name`;
 }
 
 export class UnresolvedPhotoWritesError extends Error {
