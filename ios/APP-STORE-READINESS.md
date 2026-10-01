@@ -2,6 +2,17 @@
 
 ## État courant — 1er octobre 2026
 
+À 14 h 58 : Explorer et l’indisponibilité des abonnements vérifiés sur
+iPhone 17 Pro/iOS 26.1, test
+`testNativeExplorerReplacesWebSidebarWithoutHidingContent` réussi dans
+`/tmp/coai-physical-explorer-subscription-1001.xcresult` (1 test, 0 échec).
+Les destinations natives restent accessibles, les anciennes navigations web
+sont masquées sans cacher celle du contenu, et les feuilles se ferment.
+Aucun bouton d’achat affiché ; restauration désactivée en état indisponible.
+Les deux captures ont été inspectées. Le contenu web est une fixture Debug :
+ce résultat ne valide ni les destinations connectées ni un paiement réel,
+ni la cause distante de l’indisponibilité. Aucun achat ou changement de compte.
+
 À 14 h 47 : App Store Connect recontrôlé dans le navigateur, redirection vers
 `/login?targetUrl=%2Fapps&authResult=FAILED`, formulaire Apple visible. Connexion
 demandée à Anthony ; aucun identifiant saisi, contrat accepté ou achat réalisé.
@@ -978,11 +989,11 @@ pas encore une expérience native complète validée.
 
 | Parcours | État réel | Preuve / travail restant avant validation |
 | --- | --- | --- |
-| 1. Installation et ouverture | En cours | Binaire actuel signé installé puis lancé sur iPhone 17 Pro après déverrouillage ; processus présent une minute après. Contenu de l'écran et parcours connecté non vérifiés. Archive de distribution et TestFlight non validés. |
-| 2. Compte et connexion | En cours | Connexion publique, annulation Google, retour de récupération et saisie d'inscription contrôlés dans l'app simulée. Connexion persistante réelle, confirmation/récupération email et option Apple encore à valider/compléter. |
+| 1. Installation et ouverture | Validé partiellement sur appareil | Debug signé installé sur iPhone 17 Pro ; navigation connectée, partage PDF et persistance du minuteur vérifiés le 1er octobre. Navigation native en gros texte et rotation vérifiée avec fixture web. Archive de distribution, installation propre et TestFlight non validés. |
+| 2. Compte et connexion | Validé partiellement en local | Compte fictif : confirmation email, mauvais mot de passe puis correction et session après relance vérifiés dans l’app simulée. Session existante utilisée sur iPhone, sans refaire une connexion. Récupération complète, connexion Apple et parcours d’authentification en production restent à valider/compléter. |
 | 3. Diagnostic et score COAI | Validé partiellement en local | Nouveau compte, email de confirmation, diagnostic, reprise, contrôle des réponses sauvegardées et raccourci d'enregistrement testés dans l'app simulée le 28 septembre. Validation physique et production restantes. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
-| 5. Entraînement, nutrition, récupération | En cours | Routes existantes et minuteur natif. Vérifier droits, médias, fiches et navigation sur petits écrans avec données réelles de test. |
+| 5. Entraînement, nutrition, récupération | Validé partiellement sur appareil | Navigation Nutrition/Récupération/Recettes/Coach/Séance et partage PDF vérifiés en ligne sur iPhone le 1er octobre ; minuteur persistant vérifié. Programmes nutrition/récupération EN_ATTENTE : contenu complet non validé. Catalogue physique en échec (clavier et rowing encore présent en ligne), corrections locales non publiées. Droits, cohérence de tous les médias et petits écrans restent à compléter. |
 | 6. Séances, performances et progrès | Validé partiellement en local | Séance terminée et retour d’effort sauvegardés ; mesures et photo après relance vérifiées avec compte fictif connecté, contrôle PostgreSQL et fichier Storage réel local. Export du compte enregistré dans Fichiers le 1er octobre, JSON contrôlé. Cela ne valide pas tous les parcours RepCount ni l’ensemble en production et sur appareil physique. |
 | 7. Check-ins, adaptations et mémoire | Validé partiellement en local | Check-in et séance terminée puis relance vérifiés dans l'app simulée le 28 septembre avec contrôle PostgreSQL. Cela ne valide ni toutes les adaptations ni la mémoire IA réelle ; restent ces parcours, isolation complète et production. |
 | 8. Abonnements Apple | Validé partiellement en local + intervention humaine | Écran natif raccordé au service ; huit scénarios StoreKit Xcode réussis avec serveur simulé, dont reprise, compte différent, remboursement, expiration et restauration vide. Tarifs approuvés le 23 septembre : 19,99 €/mois, 119 €/an, essai de sept jours si éligible. Catalogue distant, activation, migration distante, signatures/notifications Apple réelles et parcours Sandbox de bout en bout restent à valider ; aucun achat réel effectué. |
