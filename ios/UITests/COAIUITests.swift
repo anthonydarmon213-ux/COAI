@@ -32,9 +32,18 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(start.waitForExistence(timeout: 15))
         revealWebControl(start, in: app); start.tap()
         XCTAssertTrue(web.buttons["Fermer"].waitForExistence(timeout: 10))
+        let adjust = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ajuster")).firstMatch
+        XCTAssertTrue(adjust.waitForExistence(timeout: 5))
+        XCTAssertTrue(adjust.isHittable)
+        XCTAssertGreaterThanOrEqual(adjust.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(adjust.frame.minX, web.frame.minX + 8)
+        XCTAssertLessThanOrEqual(adjust.frame.maxX, web.frame.maxX - 8,
+                                 "Workout controls must not overflow the small iPhone screen")
         let player = XCTAttachment(screenshot: app.screenshot())
         player.name = "Premier programme — lecteur de séance ouvert"
         player.lifetime = .keepAlways; add(player)
+        adjust.tap()
+        XCTAssertTrue(web.staticTexts["Valable pour aujourd'hui seulement — ton programme n'est pas modifié."].waitForExistence(timeout: 5))
         let session = web.links["Accéder à ma séance →"]
         app.terminate(); app.launch()
         XCTAssertTrue(app.buttons["native-tab-Séance"].waitForExistence(timeout: 15))

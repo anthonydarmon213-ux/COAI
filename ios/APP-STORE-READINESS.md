@@ -2,6 +2,18 @@
 
 ## État courant — 1er octobre 2026
 
+À 17 h 49 : débordement du bouton Ajuster du lecteur corrigé sur petit iPhone.
+Avant : bord droit mesuré à 379 points pour un écran de 375, test en échec
+`/tmp/coai-runner-header-before-1001.xcresult`. Après : titre sur sa propre ligne
+sur mobile et commandes pouvant revenir à la ligne. Même parcours réussi dans
+`/tmp/coai-runner-header-fixed-1001.xcresult` : bouton entièrement contenu avec
+marge, hauteur au moins 44 points, clic ouvrant réellement les ajustements,
+programme retrouvé après relance. Capture inspectée. Cinq tests de non-régression
+du lecteur (brouillons, séries effectuées, voix simulée, condensation et sauvegarde),
+TypeScript, lint et build réussis ; 356 médias présents. Aucune donnée personnelle
+utilisée, fixture nettoyée. Correction locale non publiée ; gros texte, paysage
+du lecteur et validation physique restent à vérifier.
+
 À 17 h 42 : premier programme corrigé et testé sur simulateur SE/iOS 26.5.
 Le bouton de création, auparavant enfoui dans les ajustements avancés, est
 visible avant les menus secondaires pour un compte autorisé sans programme.
@@ -1090,7 +1102,7 @@ pas encore une expérience native complète validée.
 | 1. Installation et ouverture | Validé partiellement sur appareil | Debug signé installé sur iPhone 17 Pro ; navigation connectée, partage PDF et persistance du minuteur vérifiés le 1er octobre. Navigation native en gros texte et rotation vérifiée avec fixture web. Archive de distribution, installation propre et TestFlight non validés. |
 | 2. Compte et connexion | Validé partiellement en local | Compte fictif : confirmation email, mauvais mot de passe puis correction et session après relance vérifiés dans l’app simulée. Récupération app → email local → Safari → reconnexion persistante dans l’app, ancien mot de passe refusé et lien déjà utilisé refusé vérifiés le 1er octobre. Session existante utilisée sur iPhone, sans refaire une connexion. Récupération physique/distante, connexion Apple et parcours d’authentification en production restent à valider/compléter. |
 | 3. Diagnostic et score COAI | Validé partiellement en local | Nouveau compte, email de confirmation, diagnostic, reprise, contrôle des réponses sauvegardées et raccourci d'enregistrement testés dans l'app simulée le 28 septembre. Validation physique et production restantes. |
-| 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
+| 4. Programme personnalisé | Validé partiellement en local | Premier programme depuis un profil éligible prérempli et droits fictifs : création dans l'app, première séance ouverte même un jour de repos, relance et trois piliers sans doublon contrôlés le 1er octobre. Refus d'accès et profils exclus vérifiés par HTTP local. Enchaînement complet depuis le diagnostic et l'abonnement réel, diversité des profils, appareil physique et production restent à valider. |
 | 5. Entraînement, nutrition, récupération | Validé partiellement sur appareil | Navigation Nutrition/Récupération/Recettes/Coach/Séance et partage PDF vérifiés en ligne sur iPhone le 1er octobre ; minuteur persistant vérifié. Programmes nutrition/récupération EN_ATTENTE : contenu complet non validé. Catalogue physique en échec (clavier et rowing encore présent en ligne), corrections locales non publiées. Droits, cohérence de tous les médias et petits écrans restent à compléter. |
 | 6. Séances, performances et progrès | Validé partiellement en local | Séance terminée et retour d’effort sauvegardés ; mesures et photo après relance vérifiées avec compte fictif connecté, contrôle PostgreSQL et fichier Storage réel local. Export du compte enregistré dans Fichiers le 1er octobre, JSON contrôlé. RepCount : deux mouvements, charge décimale française, reprise du brouillon et historique après relance vérifiés dans l’app simulée le 1er octobre ; trois séries exactes dans une seule séance confirmées indépendamment dans PostgreSQL. Cela ne valide pas tous les parcours RepCount ni l’ensemble en production et sur appareil physique. |
 | 7. Check-ins, adaptations et mémoire | Validé partiellement en local | Check-in et séance terminée puis relance vérifiés dans l'app simulée le 28 septembre avec contrôle PostgreSQL. Cela ne valide ni toutes les adaptations ni la mémoire IA réelle ; restent ces parcours, isolation complète et production. |

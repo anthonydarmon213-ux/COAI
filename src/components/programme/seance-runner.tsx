@@ -729,9 +729,9 @@ export function SeanceRunner({
               ✕
             </button>
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-3">
-                <p className="truncate text-sm font-semibold text-white">{nomSeance}</p>
-                <span className="flex items-center gap-2">
+              <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <p className="w-full min-w-0 truncate text-sm font-semibold text-white sm:w-auto sm:flex-1">{nomSeance}</p>
+                <span className="flex min-w-0 flex-wrap items-center gap-2">
                   <span className="flex-none font-mono text-[11px] tabular-nums text-laiton-300">{formatChrono(chronoGlobal)}</span>
                   {voixSupportee && (
                     <button
