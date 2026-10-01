@@ -2,6 +2,14 @@
 
 ## État courant — 1er octobre 2026
 
+Export du compte : défaut reproduit dans le gestionnaire réel avec réponse API
+simulée (`null` téléchargé comme fichier). Correction locale : rejet des réponses
+null/tableau/non-objet ou sans identifiant de compte textuel non vide avant création
+du fichier ; message existant et nouvelle tentative conservés. Tests
+`test-rgpd-actions.cjs` et `test-account-export.cjs`, TypeScript et ESLint ciblé
+réussis. Cette garde ne prouve pas l’exhaustivité du contenu exporté. Validation
+native du correctif et production restent à faire ; aucun déploiement effectué.
+
 À 13 h 12 : huit scénarios StoreKit locaux réussis, zéro échec dans
 `/tmp/coai-storekit-restore-auth-1001.xcresult`. Deux régressions ajoutées :
 restauration d’un historique vide sans ancienne confirmation ni nouvel achat ;

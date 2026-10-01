@@ -20,7 +20,11 @@ export function RgpdActions() {
     try {
       const res = await fetch("/api/compte/export");
       if (!res.ok) throw new Error(res.status === 401 ? "session" : "export");
-      const data = await res.json();
+      const data: unknown = await res.json();
+      if (!data || typeof data !== "object" || Array.isArray(data)
+        || !("id" in data) || typeof data.id !== "string" || !data.id.trim()) {
+        throw new Error("export_unconfirmed");
+      }
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

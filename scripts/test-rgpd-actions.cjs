@@ -5,7 +5,7 @@ const ts = require('typescript');
 const path = require('node:path');
 const api = {}, states = [], refs = [];
 let si=0, ri=0, status=500, confirmed=false, calls=0, downloads=0, pushes=0, hold;
-let responseBody={profile:{}}, badJson=false, networkFailure=false, confirmationText='', nativeCleanups=0;
+let responseBody={id:'local-export-user',profile:{}}, badJson=false, networkFailure=false, confirmationText='', nativeCleanups=0;
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/components/compte/rgpd-actions.tsx'),'utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}
 }).outputText, {exports:api, Error, Blob, setTimeout:fn=>fn(),
@@ -39,6 +39,15 @@ function button(text){return nodes(render()).find(x=>x.type==='button'&&label(x)
   assert.equal(downloads,0); assert.ok(nodes(render()).some(x=>x.props?.role==='alert'));
   status=401; await button('Exporter mes données').props.onClick();
   assert.ok(label(render()).includes('Reconnecte-toi'));assert.equal(downloads,0);
+  status=200;
+  for (const value of [null, [], {}, {error:'unavailable'}, {id:''}, {id:42}]) {
+    responseBody=value;
+    await button('Exporter mes données').props.onClick();
+    assert.equal(downloads,0,'An invalid export must never become a downloaded file');
+    assert.ok(label(render()).includes('L’export n’a pas abouti'));
+    assert.equal(button('Exporter mes données').props.disabled,false);
+  }
+  responseBody={id:'local-export-user',profile:{}};
   const before=calls; await button('Supprimer mon compte').props.onClick();
   assert.equal(calls,before,'Cancellation must not send deletion');
   assert.match(confirmationText,/facturation continuera/);
