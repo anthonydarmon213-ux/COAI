@@ -2,6 +2,22 @@
 
 ## État courant — 1er octobre 2026
 
+À 12 h 33 : contrôle de confidentialité photo depuis la photothèque iOS locale.
+PNG synthétique magenta 3200 × 2400, marqueur Artist/ImageDescription fictif
+et répertoire GPS vérifiés avant import ; test natif complet réussi dans
+`/tmp/coai-photo-privacy-magenta-1001.xcresult`, puis vérification indépendante
+des pixels magenta, d’une seule mesure et d’un seul fichier 1600 × 1200 PNG.
+Le fichier téléchargé ne contient ni le marqueur injecté ni le répertoire GPS.
+Des EXIF techniques subsistent : ce résultat ne prouve pas « zéro métadonnée ».
+Capture après relance examinée dans `/tmp/coai-photo-privacy-magenta-proof/`.
+Scénario : générateur `--private-metadata`, puis vérificateur du harnais
+`ui-measures-verify --with-photo --private-metadata`. Le lecteur EXIF de test
+est couvert sur les deux ordres d’octets, préfixe, GPS/non-GPS et entrées tronquées.
+Compte, photo et registre locaux nettoyés ; absence compte/Auth vérifiée.
+Cela valide ce parcours PNG sur SE simulé, pas les autres formats, l’import
+iCloud ou un envoi API direct. Aucun changement du code produit ni publication.
+L’iPhone physique reste `unavailable` lors du contrôle du 1er octobre à 12 h 32.
+
 À 12 h 19 : envoi réel depuis Photothèque dans l’app SE simulé/iOS 26.5,
 confirmation système, sauvegarde de 75 kg avec image, relance et historique
 avec vignette turquoise observé. `testLocalProgressPhotoPersistsAfterRelaunch` :
