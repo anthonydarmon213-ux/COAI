@@ -2,6 +2,21 @@
 
 ## État courant — 1er octobre 2026
 
+À 13 h 40 : défaut natif HTTP reproduit puis corrigé. Après une réponse 503,
+l’annulation WebKit remplaçait le message serveur par « Vérifie ta connexion ».
+Le gestionnaire conserve désormais le message déjà classifié ; une nouvelle
+navigation le réinitialise comme auparavant. Nouveau proxy local
+`scripts/ios-page-failure-proxy.cjs` : premier GET entraînement 503, puis vrai
+Next sur 3051. Test natif réussi dans `/tmp/coai-http503-fixed-1001.xcresult` :
+message temporaire, minuteur accessible, reprise sans relance, connexion réelle
+(journal proxy : 307 puis sign-in 200). Capture après reprise examinée.
+Test réseau coupé également réussi : `/tmp/coai-network-regression-1001.xcresult`.
+Premier test avant correction échoué dans `/tmp/coai-http503-retry-1001.xcresult`,
+message erroné observé dans sa vidéo. 51 XCTest, 65 contrôles cœur et build Release
+arm64 non signé réussis. Proxy et serveur intermédiaire arrêtés, serveur normal
+rétabli. Aucun compte créé, aucune publication ; vérification production et
+physique du correctif restantes.
+
 Contrôle distribution du 1er octobre : `devicectl list devices` indique toujours
 l’iPhone 17 Pro indisponible ; `security find-identity -v -p codesigning` trouve
 une seule identité Apple Development, aucune Apple Distribution. Cela ne prouve

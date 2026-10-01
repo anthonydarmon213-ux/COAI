@@ -1611,6 +1611,31 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(tabs[2].isHittable)
     }
 
+    // Requires ios-page-failure-proxy.cjs and real local Next on port 3051.
+    @MainActor
+    func testLocalHTTPServerFailureRetriesRealLogin() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Page indisponible"].waitForExistence(timeout: 30))
+        XCTAssertTrue(app.staticTexts["COAI rencontre un problème temporaire. Réessaie dans un instant. Le minuteur reste accessible."].exists)
+        XCTAssertFalse(app.webViews.staticTexts["LOCAL_SYNTHETIC_503"].exists)
+        XCTAssertTrue(app.buttons["Réessayer"].isHittable)
+        app.buttons["Repos"].tap()
+        XCTAssertTrue(app.staticTexts["Ton temps de récupération"].waitForExistence(timeout: 5))
+        app.buttons["Fermer"].tap()
+        app.buttons["Réessayer"].tap()
+        XCTAssertTrue(app.webViews.textFields["EMAIL"].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        XCTAssertTrue(app.webViews.buttons["Continuer avec Google"].exists)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "HTTP 503 — connexion réelle après reprise sans relance"
+        proof.lifetime = .keepAlways
+        add(proof)
+    }
+
     // Start with loopback stopped, then restore it while this bounded test retries.
     // No injected network state, authentication, or replacement HTML.
     @MainActor

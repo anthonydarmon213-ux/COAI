@@ -632,6 +632,10 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
         isLoading = false
         guard (error as NSError).code != NSURLErrorCancelled else { return }
         guard !DownloadPolicy.isNavigationHandoff(error as NSError, downloadActive: downloads.isBusy) else { return }
+        // Cancelling a classified HTTP response can trigger a second WebKit
+        // failure. Preserve the actionable server/auth message already shown.
+        // A new navigation clears it in load()/didStartProvisionalNavigation.
+        guard errorMessage == nil else { return }
         errorMessage = "Impossible de charger COAI. Vérifie ta connexion, puis réessaie. Le minuteur reste accessible."
     }
 }
