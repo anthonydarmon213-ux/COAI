@@ -17,7 +17,8 @@ async function scenario(type, failure) {
     upload: async (name, body, options) => {
       calls.push('upload');
       assert.equal(options.contentType, type);
-      assert.equal(options.upsert, true);
+      assert.equal(options.upsert, false);
+      assert.notEqual(name, 'owner/avatar.jpg');
       if (failure === 'throw') throw new Error('offline');
       if (failure) return { error: { message: 'offline' } };
       files.set(name, 'new'); return { error: null };
@@ -42,7 +43,7 @@ async function scenario(type, failure) {
     assert.equal(result.error, 'offline');
   } else {
     assert.equal(files.get(result.path), 'new');
-    if (type !== 'image/jpeg') assert.equal(files.get('owner/avatar.jpg'), 'old');
+    assert.equal(files.get('owner/avatar.jpg'), 'old');
   }
 }
 (async () => {
@@ -58,7 +59,7 @@ async function scenario(type, failure) {
         return { error: { message: 'lost-response' } };
       },
       info: async requested => {
-        assert.equal(requested, 'owner/avatar.png');
+        assert.equal(requested, 'owner/current-operation.png');
         if (proof === 'info-throws') throw Error('offline');
         if (proof === 'info-error') return { data: null, error: Error('offline') };
         return { error: null, data: {

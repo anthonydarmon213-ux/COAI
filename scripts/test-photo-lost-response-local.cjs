@@ -30,6 +30,28 @@ function load(file, imports) {
 const registry = load('photo-write-registry.ts', { 'node:crypto': crypto, '@/lib/db/client': { prisma } });
 (async () => {
   try {
+    // Two same-format avatars: an unconfirmed first upload must keep its proof
+    // even if a second replacement completes before deletion is requested.
+    {
+      const id = 'avatar-replacement-' + crypto.randomUUID(); owners.push(id);
+      let interrupted = false;
+      const api = load('progress-photos.ts', {
+        './photo-write-registry': { ...registry, confirmPhotoWrite: async (...args) => {
+          if (!interrupted) { interrupted = true; throw Error('Local interruption before confirmation'); }
+          return registry.confirmPhotoWrite(...args);
+        } },
+        '@/lib/auth/admin': { createSupabaseAdminClient: () => admin },
+      });
+      const file = { type: 'image/png', arrayBuffer: async () => png };
+      await assert.rejects(api.uploadAvatar(id, file), /Local interruption/);
+      const second = await api.uploadAvatar(id, file); assert.ok('path' in second);
+      const before = await bucket.list(id); assert.equal(before.error, null);
+      assert.equal(before.data.length, 2, 'Each avatar operation retains its own file');
+      await api.deleteAllProgressPhotos(id);
+      assert.equal((await bucket.list(id)).data.length, 0);
+      await assert.rejects(registry.reservePhotoWrite(id), /photo_owner_deleting/);
+      console.log('PASS avatar replacement: interrupted first confirmation, second upload, both immutable proofs recovered and files removed.');
+    }
     for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
      for (const outage of [false, true]) {
       const id = 'lost-response-' + crypto.randomUUID(); owners.push(id);

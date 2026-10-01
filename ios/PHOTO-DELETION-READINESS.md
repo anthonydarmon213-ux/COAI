@@ -11,6 +11,25 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Vérifié
 
+- 1er octobre : les nouveaux avatars utilisent maintenant un chemin UUID par
+  opération et `upsert: false`, comme les photos de suivi. Un remplacement ne
+  détruit plus la preuve d'un envoi précédent, ni l'ancien avatar du même format
+  avant persistance du nouveau chemin. Test PostgreSQL/Storage réels locaux :
+  première confirmation interrompue, second avatar enregistré, deux fichiers
+  distincts retrouvés puis supprimés ; admissions toujours fermées ensuite.
+  Les cinq scénarios de `test-photo-lost-response-local.cjs` et les huit scénarios
+  d'arrêt/concurrence passent. Tests avatar simulés et TypeScript réussis.
+  Après recompilation Next complète, test HTTP de la route réussi avec
+  Auth/PostgreSQL/Storage locaux réels : 401 sans session, chemin UUID persisté,
+  image relue à l'identique, refus des formulaires incomplets et images vides,
+  nouvel envoi avec chemin distinct et ancienne image encore disponible.
+  Compte, fichiers et lignes du registre de cette fixture supprimés après test.
+  Production et parcours de sélection de photo sur iPhone restent non vérifiés.
+  Les anciens chemins `avatar.jpg/png/webp` restent compatibles avec la suppression.
+  ATTENTION : les anciens avatars restent conservés jusqu'à suppression du compte ;
+  prévoir une purge sûre des versions inutilisées avant publication pour éviter
+  une accumulation. Ce correctif ne résout pas un arrêt avant l'envoi au stockage.
+
 - 1er octobre : réponse d'envoi perdue puis lecture des métadonnées indisponible,
   pour avatar et suivi. Aucun succès d'envoi ni de suppression sans preuve ;
   après rétablissement des lectures, suppression réussie et admissions toujours

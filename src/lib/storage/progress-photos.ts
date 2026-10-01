@@ -6,12 +6,12 @@ export const PROGRESS_PHOTOS_BUCKET = "progress photos";
 
 const SIGNED_URL_TTL_SECONDS = 3600;
 
-async function storeRegisteredPhoto(userId: string, file: File, avatar: boolean): Promise<{ path: string } | { error: string }> {
+async function storeRegisteredPhoto(userId: string, file: File): Promise<{ path: string } | { error: string }> {
   const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
   const admin = createSupabaseAdminClient();
   const body = await file.arrayBuffer();
   const operation = await reservePhotoWrite(userId);
-  const path = `${userId}/${avatar ? "avatar" : operation}.${ext}`;
+  const path = `${userId}/${operation}.${ext}`;
   const bucket = admin.storage.from(PROGRESS_PHOTOS_BUCKET);
 
   // A lost response is recoverable only with positive evidence for THIS write,
@@ -28,7 +28,7 @@ async function storeRegisteredPhoto(userId: string, file: File, avatar: boolean)
 
   try {
     const { error } = await bucket.upload(path, body, {
-      contentType: file.type, upsert: avatar,
+      contentType: file.type, upsert: false,
       metadata: { coaiUploadOperation: operation },
     });
     if (error && !await storedOperationMatches()) return { error: error.message };
@@ -41,7 +41,7 @@ async function storeRegisteredPhoto(userId: string, file: File, avatar: boolean)
 }
 
 export async function uploadProgressPhoto(userId: string, file: File): Promise<{ path: string } | { error: string }> {
-  return storeRegisteredPhoto(userId, file, false);
+  return storeRegisteredPhoto(userId, file);
 }
 
 export function isOwnedProgressPhotoPath(userId: string, path: string): boolean {
@@ -64,10 +64,11 @@ export async function uploadAvatar(
   file: File
 ): Promise<{ path: string } | { error: string }> {
   // Do not delete the current avatar before the replacement is stored and its
-  // path saved by the caller. Keep the other format variants (at most three
-  // fixed paths) so a failed upload/database write cannot break the old path.
-  // Account deletion removes all variants through deleteAllProgressPhotos.
-  return storeRegisteredPhoto(userId, file, true);
+  // path saved by the caller. Each operation has an immutable path: concurrent
+  // replacements cannot erase each other's recovery proof or the old avatar.
+  // Account deletion removes old and new paths through deleteAllProgressPhotos.
+  // Old avatars currently remain until then; retention must be reviewed before release.
+  return storeRegisteredPhoto(userId, file);
 }
 
 type PhotoBucket = ReturnType<ReturnType<typeof createSupabaseAdminClient>["storage"]["from"]>;

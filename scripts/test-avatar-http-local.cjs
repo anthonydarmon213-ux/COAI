@@ -1,6 +1,6 @@
 // Disposable loopback Auth/PostgreSQL/Storage integration; no production calls.
 const assert = require('node:assert/strict');
-const { randomUUID } = require('node:crypto');
+const { randomUUID, createHash } = require('node:crypto');
 const { createClient } = require('@supabase/supabase-js');
 const { PrismaClient } = require('@prisma/client');
 assert.equal(process.env.NEXT_PUBLIC_SUPABASE_URL, 'http://127.0.0.1:54321');
@@ -30,8 +30,9 @@ async function main() {
   assert(['localhost', '127.0.0.1'].includes(signedURL.hostname));
   assert.equal(signedURL.port, '54321'); assert.equal(signedURL.protocol, 'http:');
   assert.deepEqual(Buffer.from(await (await fetch(result.url)).arrayBuffer()), png);
-  const expectedPath = `${identity.id}/avatar.png`;
-  assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, expectedPath);
+  const expectedPath = (await db.user.findUnique({ where: { id: user.id } })).avatarPath;
+  assert.ok(expectedPath.startsWith(`${identity.id}/`));
+  assert.match(expectedPath.slice(identity.id.length + 1), /^[0-9a-f-]{36}\.png$/);
   const malformed = await fetch(endpoint, { method: 'POST', headers: { ...headers, 'Content-Type': 'multipart/form-data; boundary=missing' }, body: 'truncated' });
   assert.equal(malformed.status, 400); assert.match((await malformed.json()).error, /Envoi incomplet/);
   const empty = new FormData(); empty.set('file', new Blob([], { type: 'image/png' }), 'empty.png');
@@ -42,12 +43,23 @@ async function main() {
   assert.deepEqual(Buffer.from(await stored.data.arrayBuffer()), png);
   const retry = await fetch(endpoint, { method: 'POST', headers, body: form() });
   assert.equal(retry.status, 201); assert((await retry.json()).url);
+  const replacement = (await db.user.findUnique({ where: { id: user.id } })).avatarPath;
+  assert.notEqual(replacement, expectedPath);
+  assert.equal((await bucket.download(expectedPath)).error, null, 'Previous avatar remains available after replacement');
   console.log('PASS real local avatar HTTP: authenticated upload, persisted path and exact stored image, malformed/empty rejection, existing avatar preserved and retry succeeds');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   try {
     if (session) assert.equal((await auth.auth.signOut({ scope: 'global' })).error, null);
-    if (identity) assert.equal((await bucket.remove([`${identity.id}/avatar.png`])).error, null);
+    if (identity) {
+      const listed = await bucket.list(identity.id); assert.equal(listed.error, null);
+      const paths = listed.data.map(file => `${identity.id}/${file.name}`);
+      if (paths.length) assert.equal((await bucket.remove(paths)).error, null);
+      assert.equal((await bucket.list(identity.id)).data.length, 0);
+      const key = createHash('sha256').update('coai-photo-owner-v1:' + identity.id).digest('hex');
+      await db.$executeRaw`DELETE FROM photo_uploads WHERE "ownerKey"=${key}`;
+      await db.$executeRaw`DELETE FROM photo_owner_gates WHERE "ownerKey"=${key}`;
+    }
     if (user) await db.user.deleteMany({ where: { id: user.id } });
     if (identity) assert.equal((await admin.auth.admin.deleteUser(identity.id)).error, null);
     console.log('Disposable local avatar and account removed');
