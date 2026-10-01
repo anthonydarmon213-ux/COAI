@@ -2,6 +2,38 @@
 
 ## État courant — 1er octobre 2026
 
+À 19 h 57 : journal chronométré vérifié dans l'app simulée sur SE :
+`/tmp/coai-journal-timed-scroll-1001.xcresult` (26 s). Navigation Explorer →
+Historique des séances → Voir mon historique ; affichages `45 s de maintien`
+et `10 × 20 kg` visibles, capture inspectée. PostgreSQL confirme que les deux
+mesures sont inchangées, une seule séance ; compte fictif supprimé. Types,
+lint, build 132 pages, test de rendu et audit 356 médias passent.
+Essais intermédiaires non concluants : navigation avant fin de connexion,
+session précédente encore active, puis défilement XCTest dépassant la ligne
+native. Le dernier test attend la destination et défile par petits gestes.
+Le conflit potentiel navigation rapide/redirection de connexion reste à
+reproduire séparément ; ce test stabilisé ne prouve pas son absence.
+Validations locales uniquement, aucune publication ni validation production.
+
+À 19 h 43 : parcours natif complet réussi après correction du clavier :
+`/tmp/coai-guided-keyboard-visible-fixed-1001.xcresult` (150 s). Champ de
+répétitions entièrement visible au-dessus du clavier sur SE, saisie de dix
+répétitions, bilan accessible du titre au bouton Terminer, puis cinq exercices
+retrouvés dans l'historique RepCount après relance. Quatre captures inspectées
+dans `/tmp/coai-keyboard-final-proof-1001` : clavier, haut/bas du bilan,
+historique. Débordement horizontal décoratif absent sur ces captures.
+PostgreSQL confirme indépendamment une seule séance de cinq exercices,
+quinze séries validées et dix répétitions saisies ; compte fictif nettoyé.
+Correction et tests enregistrés dans `82f5dfa`, sans publication.
+
+Journal : erreur de présentation confirmée par test en échec avant correction :
+un maintien de 45 s était rendu `0×0kg`. Le rendu distingue maintenant secondes
+et répétitions/charge ; test de rendu corrigé (`workoutHistory` simulé) réussi
+avec contrôle des deux types. Vérification native du journal chronométré encore
+à effectuer ; ceci n'est pas une validation production. Les guides React/Next.js
+ont été appliqués pour limiter le correctif clavier au lecteur et nettoyer ses
+écouteurs/tâches différées à la fermeture.
+
 À 19 h 14 : bilan de séance corrigé sur petit écran (centrage vertical sûr,
 noms d'exercices non tronqués, absence de charge distinguée du poids du corps).
 Test natif `/tmp/coai-guided-summary-fixed-1001.xcresult` réussi (137 s), puis

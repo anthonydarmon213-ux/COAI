@@ -250,6 +250,52 @@ final class COAIUITests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testLocalJournalPreservesTimedExerciseMetric() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let login = web.buttons["Se connecter"]
+        reveal(login, in: app); login.tap()
+        XCTAssertTrue(login.waitForNonExistence(timeout: 30))
+        XCTAssertTrue(web.links["Accéder à ma séance →"].waitForExistence(timeout: 30),
+                      "Attendre la destination de connexion avant la navigation vers le journal")
+        app.buttons["native-tab-Explorer"].tap()
+        let journal = app.buttons["explore-/suivi/seances"]
+        XCTAssertTrue(app.navigationBars["Explorer"].waitForExistence(timeout: 5))
+        for _ in 0..<20 {
+            if journal.exists && journal.isHittable { break }
+            let origin = app.coordinate(withNormalizedOffset: .zero)
+            let high = origin.withOffset(CGVector(dx: app.frame.midX, dy: 250))
+            let low = origin.withOffset(CGVector(dx: app.frame.midX, dy: 370))
+            if journal.exists && journal.frame.minY < 150 {
+                high.press(forDuration: 0.05, thenDragTo: low)
+            } else {
+                low.press(forDuration: 0.05, thenDragTo: high)
+            }
+        }
+        XCTAssertTrue(journal.isHittable); journal.tap()
+        let history = web.links["Voir mon historique"]
+        XCTAssertTrue(history.waitForExistence(timeout: 20))
+        revealWebControl(history, in: app); history.tap()
+        for label in ["45 s de maintien", "10 × 20 kg"] {
+            let metric = web.staticTexts[label]
+            XCTAssertTrue(metric.waitForExistence(timeout: 10))
+            revealWebControl(metric, in: app)
+            XCTAssertTrue(web.frame.contains(metric.frame))
+        }
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "Journal — maintien et répétitions distincts"
+        capture.lifetime = .keepAlways; add(capture)
+    }
+
     /// Real local login, two exercises, durable draft, one persisted workout.
     @MainActor
     func testLocalRepCountDraftAndSavedWorkoutSurviveRelaunch() throws {

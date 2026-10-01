@@ -13,7 +13,7 @@ const DOULEUR_LABEL: Record<string, string> = {
   IMPORTANTE: "Douleur importante",
 };
 
-type SetDetail = { set?: number; reps?: number; charge?: number };
+type SetDetail = { set?: number; reps?: number; charge?: number; dureeSecondes?: number };
 type ExerciceData = {
   nom?: string;
   series?: number;
@@ -118,7 +118,9 @@ export default async function SeancesPage() {
                               key={j}
                               className="rounded-md border border-white/[0.08] bg-black/30 px-2 py-1 font-mono text-[11px] text-graphite-300"
                             >
-                              {set.reps}×{set.charge}kg
+                              {typeof set.dureeSecondes === "number" && set.dureeSecondes > 0
+                                ? `${set.dureeSecondes} s de maintien`
+                                : `${set.reps ?? "—"} × ${set.charge ?? "—"} kg`}
                             </span>
                           ))}
                         </div>
