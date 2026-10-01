@@ -1,6 +1,43 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Physical device, existing session: no photo selection, upload or measurement save.
+    @MainActor
+    func testPhysicalPhotoPickerCancellationKeepsFormUsable() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let explore = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explore.waitForExistence(timeout: 15)); explore.tap()
+        let measures = app.buttons["explore-/suivi/mesures"]
+        reveal(measures, in: app); measures.tap()
+        let web = app.webViews.firstMatch
+        XCTAssertTrue(web.staticTexts["Mesures corporelles."].waitForExistence(timeout: 30))
+        let weight = web.textFields.matching(NSPredicate(format: "label ==[c] %@", "Poids (kg)")).firstMatch
+        XCTAssertTrue(weight.waitForExistence(timeout: 10))
+        let originalWeight = weight.value as? String
+        let details = web.buttons["Ajouter une analyse complète ou une photo"]
+        revealWebControl(details, in: app); details.tap()
+        let file = web.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "photo de progression")).firstMatch
+        XCTAssertTrue(file.waitForExistence(timeout: 10))
+        revealWebControl(file, in: app); file.tap()
+        let library = app.buttons["Photothèque"]
+        XCTAssertTrue(library.waitForExistence(timeout: 10)); library.tap()
+        // Do not inspect or attach screenshots of the personal photo library.
+        let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
+        XCTAssertTrue(cancel.waitForExistence(timeout: 10)); cancel.tap()
+        XCTAssertTrue(cancel.waitForNonExistence(timeout: 10))
+        XCTAssertEqual(weight.value as? String, originalWeight)
+        XCTAssertFalse(web.staticTexts["La photo sera optimisée automatiquement avant l’envoi."].exists)
+        let save = web.buttons["Ajouter la mesure"]
+        revealWebControl(save, in: app)
+        XCTAssertTrue(save.isEnabled && save.isHittable)
+        // Deliberately do NOT submit the form.
+        app.buttons["native-tab-Séance"].tap()
+        XCTAssertTrue(explore.isHittable)
+    }
+
     /// Real local Auth rejection followed by correction; disposable account only.
     @MainActor
     func testLocalIncorrectPasswordCanBeCorrectedWithoutRestart() throws {

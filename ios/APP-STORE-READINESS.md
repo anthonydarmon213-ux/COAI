@@ -2,6 +2,16 @@
 
 ## État courant — 1er octobre 2026
 
+À 15 h 47 : annulation du sélecteur photo vérifiée sur iPhone 17 Pro/iOS 26.1,
+avec la page Mesures en ligne et la session existante. Test
+`testPhysicalPhotoPickerCancellationKeepsFormUsable` réussi (1 test, 0 échec),
+preuve `/tmp/coai-physical-photo-cancel-1001.xcresult` : ouverture Photothèque,
+annulation, valeur du poids inchangée, bouton d'enregistrement accessible,
+retour à Séance. Aucune photo sélectionnée ni mesure soumise. Ce contrôle
+ne valide pas l'envoi, HEIC/iCloud, la suppression ou les correctifs serveur
+locaux non déployés. Build iPhone signé, TypeScript, lint (six avertissements
+préexistants), build Next 132 pages et 356 chemins média contrôlés.
+
 Contrôle Apple après reconnexion d’Anthony : App Store Connect reconnaît le
 compte, mais les vues Apps et Utilisateurs ne présentent aucune liste exploitable.
 Le portail authentifié `https://developer.apple.com/account` du même compte
