@@ -11,10 +11,11 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUP
 const auth = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, options);
 const db = new PrismaClient();
 const bucket = admin.storage.from('progress photos');
-const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64');
+let png;
 let identity, user, session;
 const endpoint = 'http://127.0.0.1:3050/api/profil/avatar';
 async function main() {
+  png = await require('sharp')({ create: { width: 16, height: 16, channels: 3, background: '#abcdef' } }).png().toBuffer();
   const email = `avatar-http-${randomUUID()}@example.test`, password = randomUUID() + 'Aa1!';
   const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
   assert.equal(created.error, null); identity = created.data.user;
@@ -39,6 +40,12 @@ async function main() {
   const rejected = await fetch(endpoint, { method: 'POST', headers, body: empty });
   assert.equal(rejected.status, 400); assert.match((await rejected.json()).error, /vide/);
   assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, expectedPath);
+  for (const bytes of [Buffer.from('not an image'), png.subarray(0, 40)]) {
+    const invalid = new FormData(); invalid.set('file', new Blob([bytes], { type: 'image/png' }), 'broken.png');
+    const response = await fetch(endpoint, { method: 'POST', headers, body: invalid });
+    assert.equal(response.status, 400, 'Unreadable image must be rejected before replacing a valid avatar');
+    assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, expectedPath);
+  }
   const stored = await bucket.download(expectedPath); assert.equal(stored.error, null);
   assert.deepEqual(Buffer.from(await stored.data.arrayBuffer()), png);
   const retry = await fetch(endpoint, { method: 'POST', headers, body: form() });

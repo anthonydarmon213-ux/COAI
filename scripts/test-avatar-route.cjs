@@ -11,6 +11,7 @@ const source = ts.transpileModule(fs.readFileSync(path.join(__dirname,
 async function scenario(failure, file = new File(['image'], 'avatar.png', { type: 'image/png' })) {
   const calls = [], api = {};
   const modules = {
+    '@/lib/storage/avatar-image': { isReadableAvatar: async () => failure !== 'unreadable' },
     'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
     '@/lib/auth/server': { getCurrentAppUser: async () => failure === 'anonymous' ? null : { id: 'profile', supabaseAuthId: 'owner' } },
     '@/lib/storage/photo-write-registry': { commitAvatarPhoto: async (owner, profile, path) => {
@@ -48,7 +49,7 @@ async function scenario(failure, file = new File(['image'], 'avatar.png', { type
   assert.equal((await scenario('anonymous')).status, 401);
   assert.deepEqual((await scenario('anonymous')).calls, []);
   for (const [failure, file] of [
-    ['multipart', undefined], [null, null], [null, new File([], 'empty.png', { type: 'image/png' })],
+    ['multipart', undefined], ['unreadable', undefined], [null, null], [null, new File([], 'empty.png', { type: 'image/png' })],
     [null, new File(['x'], 'script.html', { type: 'text/html' })],
     [null, new File([new Uint8Array(2 * 1024 * 1024 + 1)], 'large.png', { type: 'image/png' })],
   ]) {

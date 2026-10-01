@@ -171,3 +171,15 @@ de migration ; ne pas confondre cette expérimentation et une migration appliqu�
 
 Commande : `node scripts/test-photo-write-registry-local.cjs --local`.
 Ce test nettoie uniquement ses propres lignes aléatoires ; aucune production.
+# Contrôle du contenu des avatars — 1 octobre 2026
+
+Le serveur décode désormais réellement les JPEG/PNG/WebP avant toute écriture.
+Un fichier illisible, tronqué, dont le format ne correspond pas au type déclaré,
+ou dépassant 16 millions de pixels est refusé sans modifier l’avatar existant.
+La limite de 2 Mo reste applicable. Les images multipages sont refusées.
+
+Preuves locales : `test-avatar-image.cjs`, `test-avatar-route.cjs` et
+`test-avatar-http-local.cjs` passent ; le test HTTP a d’abord reproduit un
+faux fichier accepté (201), puis confirmé son refus (400) après correction,
+avec conservation de la photo précédente. Compilation Next, TypeScript et
+ESLint ciblé passent. Aucun déploiement ni test iPhone de ce correctif effectué.
