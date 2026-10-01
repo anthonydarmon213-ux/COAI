@@ -2,6 +2,17 @@
 
 ## État courant — 1er octobre 2026
 
+Contrôle Apple après reconnexion d’Anthony : App Store Connect reconnaît le
+compte, mais les vues Apps et Utilisateurs ne présentent aucune liste exploitable.
+Le portail authentifié `https://developer.apple.com/account` du même compte
+affiche explicitement « Rejoindre l’Apple Developer Program » et « S’inscrire
+dès aujourd’hui », avec les seuls outils gratuits. L’accès de distribution
+n’est donc pas activé dans le compte observé ; ce n’est plus une simple
+déduction à partir du certificat local. Aucun formulaire d’adhésion ouvert,
+contrat accepté ou paiement effectué. Inscription/activation à traiter par
+Anthony ; ne pas réessayer la création d’app tant que cet état reste inchangé.
+Ce contrôle ne lève aucun autre blocage produit, média ou de production.
+
 À 14 h 58 : Explorer et l’indisponibilité des abonnements vérifiés sur
 iPhone 17 Pro/iOS 26.1, test
 `testNativeExplorerReplacesWebSidebarWithoutHidingContent` réussi dans
