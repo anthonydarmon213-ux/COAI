@@ -45,8 +45,14 @@ async function main() {
   assert.equal(retry.status, 201); assert((await retry.json()).url);
   const replacement = (await db.user.findUnique({ where: { id: user.id } })).avatarPath;
   assert.notEqual(replacement, expectedPath);
-  assert.equal((await bucket.download(expectedPath)).error, null, 'Previous avatar remains available after replacement');
-  console.log('PASS real local avatar HTTP: authenticated upload, persisted path and exact stored image, malformed/empty rejection, existing avatar preserved and retry succeeds');
+  assert((await bucket.download(expectedPath)).error, 'Replaced avatar must be removed after the new path is committed');
+  assert.equal((await bucket.download(replacement)).error, null, 'Current avatar must remain available');
+  const remaining = await bucket.list(identity.id); assert.equal(remaining.error, null);
+  assert.deepEqual(remaining.data.map(file => file.name), [replacement.split('/')[1]]);
+  const key = createHash('sha256').update('coai-photo-owner-v1:' + identity.id).digest('hex');
+  const pending = await db.$queryRaw`SELECT id FROM photo_uploads WHERE "ownerKey"=${key} AND "retiredAvatarName" IS NOT NULL`;
+  assert.equal(pending.length, 0);
+  console.log('PASS real local avatar HTTP: authenticated upload, persisted exact image, malformed/empty rejection preserves current avatar, replacement deletes predecessor and clears durable cleanup task');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   try {

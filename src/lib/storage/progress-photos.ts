@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
-import { closePhotoWrites, confirmPhotoWrite, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
+import { clearDeletedAvatarRetirements, closePhotoWrites, confirmAvatarRetirement, confirmPhotoWrite, pendingAvatarRetirements, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
 
 // Nom exact du bucket privé existant dans Supabase.
 export const PROGRESS_PHOTOS_BUCKET = "progress photos";
@@ -66,9 +66,26 @@ export async function uploadAvatar(
   // Do not delete the current avatar before the replacement is stored and its
   // path saved by the caller. Each operation has an immutable path: concurrent
   // replacements cannot erase each other's recovery proof or the old avatar.
-  // Account deletion removes old and new paths through deleteAllProgressPhotos.
-  // Old avatars currently remain until then; retention must be reviewed before release.
+  // The caller commits the new path and its predecessor's retirement together.
   return storeRegisteredPhoto(userId, file);
+}
+
+export async function purgeRetiredAvatars(userId: string): Promise<void> {
+  const pending = await pendingAvatarRetirements(userId);
+  if (!pending.length) return;
+  const bucket = createSupabaseAdminClient().storage.from(PROGRESS_PHOTOS_BUCKET);
+  for (const { id, name } of pending) {
+    // These exact, previously published paths cannot be published again. Never
+    // sweep by age or by "not currently referenced": an upload may be in flight.
+    const { error } = await bucket.remove([`${userId}/${name}`]);
+    if (error) throw new Error("avatar_retirement_failed");
+    const listed = await bucket.list(userId, { limit: 100, search: name });
+    if (listed.error || !listed.data || listed.data.length >= 100 || listed.data.some(file => file.name === name)) {
+      throw new Error("avatar_retirement_unconfirmed");
+    }
+    // An interrupted response/DB update leaves the task pending for retry.
+    await confirmAvatarRetirement(userId, id, name);
+  }
 }
 
 type PhotoBucket = ReturnType<ReturnType<typeof createSupabaseAdminClient>["storage"]["from"]>;
@@ -136,4 +153,5 @@ export async function deleteAllProgressPhotos(userId: string): Promise<void> {
   // racing the cleanup. Do not delete the profile when objects still remain.
   const { data: remaining, error } = await bucket.list(userId, { limit: 1, offset: 0 });
   if (error || !remaining || remaining.length > 0) throw new Error("photo_cleanup_unconfirmed");
+  await clearDeletedAvatarRetirements(userId);
 }

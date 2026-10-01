@@ -1119,6 +1119,8 @@ model PhotoUpload {
   id String @id
   ownerKey String
   settled Boolean @default(false)
+  avatarCommitted Boolean @default(false)
+  retiredAvatarName String?
   owner PhotoOwnerGate @relation(fields: [ownerKey], references: [ownerKey], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([ownerKey, settled], map: "photo_uploads_owner_pending_idx")

@@ -62,9 +62,9 @@ async function main() {
     console.log('PASS concurrent local deletion: no false service failure, profile/Auth/photos absent');
     return;
   }
-  const a = await fixture(99), b = await fixture(1);
-  // Include both immutable avatar versions created through the real route,
-  // not only synthetic files inserted directly into Storage.
+  const a = await fixture(100), b = await fixture(1);
+  // Replace an avatar through the real route. Only its final version should
+  // remain, plus 100 synthetic objects to retain the pagination boundary.
   for (let index = 0; index < 2; index++) {
     const form = new FormData();
     form.set('file', new Blob([png], { type: 'image/png' }), 'avatar.png');
@@ -78,6 +78,7 @@ async function main() {
     assert.ok(!a.paths.includes(stored), 'Replacement must not overwrite an earlier avatar');
     a.paths.push(stored);
   }
+  assert((await bucket.download(a.paths[a.paths.length - 2])).error, 'Predecessor removed by replacement');
   assert.equal((await exportAccount(a)).status, 200);
   assert.equal((await exportAccount(b)).status, 200);
   const before = await bucket.list(a.id, { limit: 200 });
@@ -130,7 +131,7 @@ async function main() {
   const preserved = await bucket.download(b.paths[0]);
   assert.equal(preserved.error, null);
   assert.deepEqual(Buffer.from(await preserved.data.arrayBuffer()), png);
-  console.log('PASS real local HTTP deletion: 101 files including two real avatar versions removed across pagination, user/profile removed, both old sessions and password denied; forged owner ignored, other account/file preserved');
+  console.log('PASS real local HTTP deletion: replaced avatar already removed; 101 remaining files removed across pagination, user/profile removed, both old sessions and password denied; forged owner ignored, other account/file preserved');
   console.log('PASS old sessions cannot upload avatars/progress photos; previous signed photo URL no longer serves the removed object; no photos recreated');
   console.log('LIMIT: local services only; no native UI, production, paid subscriptions or Apple cancellation verified');
 }

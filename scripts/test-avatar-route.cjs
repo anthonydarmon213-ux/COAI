@@ -13,11 +13,15 @@ async function scenario(failure, file = new File(['image'], 'avatar.png', { type
   const modules = {
     'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
     '@/lib/auth/server': { getCurrentAppUser: async () => failure === 'anonymous' ? null : { id: 'profile', supabaseAuthId: 'owner' } },
-    '@/lib/db/client': { prisma: { user: { update: async ({ where, data }) => {
-      assert.equal(where.id, 'profile'); assert.equal(data.avatarPath, 'owner/avatar.png');
+    '@/lib/storage/photo-write-registry': { commitAvatarPhoto: async (owner, profile, path) => {
+      assert.equal(owner, 'owner'); assert.equal(profile, 'profile'); assert.equal(path, 'owner/avatar.png');
       calls.push('persist'); if (failure === 'database') throw new Error('private database detail');
-    } } } },
+    } },
     '@/lib/storage/progress-photos': {
+      purgeRetiredAvatars: async owner => {
+        assert.equal(owner, 'owner'); calls.push('purge');
+        if (failure === 'cleanup') throw new Error('private cleanup detail');
+      },
       uploadAvatar: async owner => {
         assert.equal(owner, 'owner'); calls.push('upload');
         if (failure === 'upload-throw') throw new Error('private storage detail');
@@ -30,7 +34,7 @@ async function scenario(failure, file = new File(['image'], 'avatar.png', { type
       },
     },
   };
-  vm.runInNewContext(source, { exports: api, File, require: name => {
+  vm.runInNewContext(source, { exports: api, File, console: { warn: message => assert.equal(message, 'avatar_retirement_pending') }, require: name => {
     assert(name in modules, name); return modules[name];
   } });
   const response = await api.POST({ formData: async () => {
@@ -59,6 +63,8 @@ async function scenario(failure, file = new File(['image'], 'avatar.png', { type
   }
   const success = await scenario(); assert.equal(success.status, 201);
   assert.equal(success.body.url, 'https://example.test/signed-avatar');
-  assert.deepEqual(success.calls, ['parse', 'upload', 'persist', 'sign']);
+  assert.deepEqual(success.calls, ['parse', 'upload', 'persist', 'purge', 'sign']);
+  const pending = await scenario('cleanup'); assert.equal(pending.status, 201);
+  assert.equal(pending.body.url, success.body.url, 'Cleanup outage must not report the committed avatar as failed');
   console.log('PASS avatar route: malformed/empty/oversize/unsupported input, private error redaction, upload/DB/signing failures and retryable response; mocked services');
 })().catch(error => { console.error(error); process.exitCode = 1; });

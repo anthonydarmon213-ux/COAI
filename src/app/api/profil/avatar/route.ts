@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentAppUser } from "@/lib/auth/server";
-import { prisma } from "@/lib/db/client";
-import { getSignedProgressPhotoUrl, uploadAvatar } from "@/lib/storage/progress-photos";
+import { commitAvatarPhoto } from "@/lib/storage/photo-write-registry";
+import { getSignedProgressPhotoUrl, purgeRetiredAvatars, uploadAvatar } from "@/lib/storage/progress-photos";
 
 const MAX_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -26,7 +26,12 @@ export async function POST(request: Request) {
     const uploaded = await uploadAvatar(user.supabaseAuthId, file);
     if ("error" in uploaded) throw new Error("avatar_upload_unconfirmed");
 
-    await prisma.user.update({ where: { id: user.id }, data: { avatarPath: uploaded.path } });
+    await commitAvatarPhoto(user.supabaseAuthId, user.id, uploaded.path);
+    // Cleanup failure must not pretend the successfully saved avatar failed.
+    // The durable retirement task is retried on replacement/account deletion.
+    await purgeRetiredAvatars(user.supabaseAuthId).catch(() => {
+      console.warn("avatar_retirement_pending");
+    });
     const url = await getSignedProgressPhotoUrl(user.supabaseAuthId, uploaded.path);
     if (!url) throw new Error("avatar_preview_unconfirmed");
     return NextResponse.json({ url }, { status: 201 });

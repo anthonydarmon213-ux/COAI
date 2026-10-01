@@ -11,6 +11,30 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Vérifié
 
+- 1er octobre — nettoyage des avatars remplacés, vérifié localement : le
+  nouveau chemin et la tâche de suppression du précédent sont enregistrés dans
+  une même transaction, sous le verrou du propriétaire. Un avatar déjà publié
+  ne peut pas être réintroduit par une ancienne opération. Le stockage est
+  nettoyé hors transaction ; la tâche reste persistante si l'effacement ou sa
+  vérification échoue. La suppression du compte efface aussi les tâches restantes.
+  Migration préparée `20261001081238_avatar_retirement`, exécutée uniquement
+  dans la base locale, pas dans une base distante. Aucun nouvel accès client.
+  `test-avatar-retirement-local.cjs` : PostgreSQL/Storage réels, arrêt SIGKILL
+  après commit puis reprise, panne de suppression injectée, trois remplacements
+  concurrents, fichier encore non publié préservé, ancien format `avatar.png`,
+  liste tronquée refusée comme preuve, chemin étranger refusé et rollback,
+  fermeture des admissions et nettoyage du compte. Fixtures supprimées.
+  Après build Next complet : `test-avatar-http-local.cjs` réussi, ancien avatar
+  absent et nouveau accessible ; suppression HTTP de 101 objets restants et
+  deux suppressions simultanées réussies. Les huit cas de processus interrompu
+  et cinq cas de réponse perdue restent réussis. Schéma Prisma, TypeScript,
+  lint ciblé et conseiller sécurité local sans erreur.
+  LIMITES : le retry est déclenché par un autre remplacement ou la suppression
+  du compte, pas par un traitement périodique autonome. Les anciens orphelins
+  sans tâche et les envois jamais publiés ne sont pas purgés sur simple absence
+  de référence. La reprise automatique de ces cas reste à finaliser.
+  Pas de validation en production ni de sélection de photo sur appareil physique.
+
 - 1er octobre, après changement des chemins d'avatar : parcours HTTP de
   suppression réussi avec 99 fichiers fictifs et deux avatars successifs
   créés par `/api/profil/avatar` (101 objets, donc pagination réelle).
@@ -36,9 +60,10 @@ adresse email ou donnée de santé dans les deux tables.
   Compte, fichiers et lignes du registre de cette fixture supprimés après test.
   Production et parcours de sélection de photo sur iPhone restent non vérifiés.
   Les anciens chemins `avatar.jpg/png/webp` restent compatibles avec la suppression.
-  ATTENTION : les anciens avatars restent conservés jusqu'à suppression du compte ;
-  prévoir une purge sûre des versions inutilisées avant publication pour éviter
-  une accumulation. Ce correctif ne résout pas un arrêt avant l'envoi au stockage.
+  À ce stade historique, les anciens avatars restaient conservés jusqu'à la
+  suppression du compte ; le correctif suivant ci-dessus couvre les nouveaux
+  remplacements publiés, pas les orphelins antérieurs. Aucun des deux correctifs
+  ne résout un arrêt avant l'envoi au stockage.
 
 - 1er octobre : réponse d'envoi perdue puis lecture des métadonnées indisponible,
   pour avatar et suivi. Aucun succès d'envoi ni de suppression sans preuve ;
@@ -108,6 +133,9 @@ adresse email ou donnée de santé dans les deux tables.
    garantir l'absence d'envoi tardif. Ne pas publier ce code sans les tables.
 4. Définir la conservation minimale des empreintes de blocage et la purge des
    opérations confirmées, sans rouvrir les demandes anciennes.
+5. Finaliser la reprise autonome des tâches d'avatar et la gestion des fichiers
+   jamais publiés / antérieurs. Ne pas supprimer un fichier uniquement parce
+   qu'il n'est pas le chemin actuel : une publication peut être en cours.
 
 La CLI Supabase a attribué le timestamp 20260928074218. `db pull --local`
 refuse le décalage avec son historique indépendant ; aucun repair forcé. Le
