@@ -11,6 +11,14 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Vérifié
 
+- 1er octobre : réponse d'envoi perdue puis lecture des métadonnées indisponible,
+  pour avatar et suivi. Aucun succès d'envoi ni de suppression sans preuve ;
+  après rétablissement des lectures, suppression réussie et admissions toujours
+  fermées. `test-photo-lost-response-local.cjs` passe ses quatre scénarios.
+  PostgreSQL et fichiers Storage réels locaux ; réponses 503 injectées dans
+  le transport du client de test, pas une panne réelle de l'infrastructure.
+  Fixtures aléatoires nettoyées à la fin. Aucun compte réel ou service distant.
+
 - 1er octobre : deux courses envoi/suppression supplémentaires passent avec
   PostgreSQL et Storage locaux réels (avatar et suivi). Le test retient la
   requête HTTP avant son départ, après réservation en base : suppression refusée,

@@ -31,13 +31,21 @@ const registry = load('photo-write-registry.ts', { 'node:crypto': crypto, '@/lib
 (async () => {
   try {
     for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
+     for (const outage of [false, true]) {
       const id = 'lost-response-' + crypto.randomUUID(); owners.push(id);
       let lost = false;
+      let metadataUnavailable = outage, rejectedMetadataReads = 0;
       const unreliable = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
         auth: { persistSession: false, autoRefreshToken: false },
         global: { fetch: async (input, init) => {
           const target = new URL(typeof input === 'string' ? input : input.url);
           assert.equal(target.hostname, '127.0.0.1'); assert.equal(target.port, '54321');
+          if (metadataUnavailable && target.pathname.includes('/object/info/')) {
+            rejectedMetadataReads++;
+            return new Response(JSON.stringify({ message: 'Local test metadata unavailable' }), {
+              status: 503, headers: { 'content-type': 'application/json' },
+            });
+          }
           const response = await fetch(input, init);
           if (!lost && init?.method === 'POST' && target.pathname.startsWith('/storage/v1/object/progress%20photos/')) {
             assert(response.ok, 'The local fixture upload must really succeed before losing its response');
@@ -50,12 +58,22 @@ const registry = load('photo-write-registry.ts', { 'node:crypto': crypto, '@/lib
       const api = load('progress-photos.ts', { './photo-write-registry': registry,
         '@/lib/auth/admin': { createSupabaseAdminClient: () => unreliable } });
       const result = await api[method](id, { type: 'image/png', arrayBuffer: async () => png });
-      assert.equal(lost, true); assert('path' in result, 'Positive operation proof must recover the lost response');
+      assert.equal(lost, true);
+      if (outage) {
+        assert('error' in result, 'No upload success without metadata proof after a lost response');
+        await assert.rejects(api.deleteAllProgressPhotos(id), /photo_writes_unresolved/);
+        assert(rejectedMetadataReads >= 2, 'Both upload recovery and deletion must attempt proof reads');
+        await assert.rejects(registry.reservePhotoWrite(id), /photo_owner_deleting/);
+        metadataUnavailable = false;
+      } else {
+        assert('path' in result, 'Positive operation proof must recover the lost response');
+      }
       const before = await bucket.list(id); assert.equal(before.error, null); assert.equal(before.data.length, 1);
       await api.deleteAllProgressPhotos(id);
       await assert.rejects(registry.reservePhotoWrite(id), /photo_owner_deleting/);
       const after = await bucket.list(id); assert.equal(after.data.length, 0);
-      console.log(`PASS ${method}: real file stored, response lost, exact operation proof recovered, deletion completed, gate remains closed.`);
+      console.log(`PASS ${method}/${outage ? 'metadata-outage-and-retry' : 'lost-response'}: real file stored, response lost, exact operation proof recovered, deletion completed, gate remains closed.`);
+     }
     }
   } finally {
     for (const id of owners) {
