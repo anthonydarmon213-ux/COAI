@@ -839,7 +839,14 @@ final class COAIUITests: XCTestCase {
         let picker = XCUIApplication(bundleIdentifier: "com.apple.DocumentManagerUICore.SaveToFiles")
         let filename = picker.textFields["DOCPicker.filenameTextField"]
         XCTAssertTrue(filename.waitForExistence(timeout: 30))
+        XCTAssertTrue(picker.staticTexts["Sur mon iPhone"].exists, "Never save the fixture to a cloud destination")
         filename.tap()
+        // The Files sheet can still be settling after the first tap on SE.
+        // Wait for the keyboard before sending text to the external process.
+        if !picker.keyboards.firstMatch.waitForExistence(timeout: 5) {
+            filename.tap()
+        }
+        XCTAssertTrue(picker.keyboards.firstMatch.waitForExistence(timeout: 5))
         filename.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "COAI-document".count))
         let savedName = "COAI-connected-export-" + UUID().uuidString
         filename.typeText(savedName)

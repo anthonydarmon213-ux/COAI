@@ -2,6 +2,20 @@
 
 ## État courant — 1er octobre 2026
 
+À 13 h 27 : export natif après correction revalidé sur SE simulé iOS 26.5.
+`testLocalConnectedAccountExportShares` réussi, zéro échec dans
+`/tmp/coai-export-fresh-1001.xcresult` : partage, fermeture, second export,
+renommage et sauvegarde dans « Sur mon iPhone ». JSON réellement enregistré
+`COAI-connected-export-D5872EBA-D1A0-4283-AEEF-02A85BE7EDFA.json`, 5 171 octets :
+identité fictive, profil, programme et séance contrôlés indépendamment.
+Capture de destination examinée dans `/tmp/coai-export-fresh-proof-1001/`.
+Deux tentatives précédentes échouées, non comptées : clavier Fichiers non actif,
+puis session du compte de test conservée. Attente bornée du clavier et garde
+destination locale ajoutées au test ; compte recréé avant le dernier essai.
+Compte local nettoyé et absence Auth/DB vérifiée. Le fichier synthétique reste
+dans Fichiers du simulateur comme preuve. Pas de validation production ou iPhone
+physique ; la réponse API malformée reste couverte par le test de composant.
+
 Export du compte : défaut reproduit dans le gestionnaire réel avec réponse API
 simulée (`null` téléchargé comme fichier). Correction locale : rejet des réponses
 null/tableau/non-objet ou sans identifiant de compte textuel non vide avant création
