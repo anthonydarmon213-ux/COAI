@@ -14,6 +14,11 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testLocalMeasurementRetriesUnreadableConfirmation() throws {
+        try runLocalMeasurementPersistence(lostResponse: true, htmlFailure: true)
+    }
+
+    @MainActor
     func testLocalPhotoPickerCancellationPreservesMeasurement() throws {
         try runLocalMeasurementPersistence(lostResponse: false, cancelPhoto: true)
     }
@@ -25,7 +30,7 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false, selectPhoto: Bool = false) throws {
+    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false, selectPhoto: Bool = false, htmlFailure: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -104,7 +109,10 @@ final class COAIUITests: XCTestCase {
         keyboardProof.lifetime = .keepAlways; add(keyboardProof)
         save.tap()
         if lostResponse {
-            let failure = web.staticTexts["Connexion interrompue. Tes valeurs sont conservées : réessaie dans un instant."]
+            let message = htmlFailure
+                ? "L’enregistrement n’a pas pu être confirmé. Tes valeurs sont conservées : réessaie dans un instant."
+                : "Connexion interrompue. Tes valeurs sont conservées : réessaie dans un instant."
+            let failure = web.staticTexts[message]
             XCTAssertTrue(failure.waitForExistence(timeout: 20))
             XCTAssertEqual(weight.value as? String, "75")
             let failedProof = XCTAttachment(screenshot: app.screenshot())

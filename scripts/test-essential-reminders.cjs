@@ -80,9 +80,9 @@ function cron(helper, kind, state) {
     }}},
     '@/lib/email/send-diagnostic-reminder': {},
   };
-  const module = load('src/app/api/cron/relance-inactifs/route.ts', imports,
+  const loadedRoute = load('src/app/api/cron/relance-inactifs/route.ts', imports,
     '\nexport {relancerEssaisNonActives, relancerPaiementsEnRetard, rappelerFinEssai};');
-  return () => module[kind === 'trial-activation' ? 'relancerEssaisNonActives' :
+  return () => loadedRoute[kind === 'trial-activation' ? 'relancerEssaisNonActives' :
     kind === 'trial-ending' ? 'rappelerFinEssai' : 'relancerPaiementsEnRetard']('http://localhost:3050');
 }
 (async () => {

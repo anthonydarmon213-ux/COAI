@@ -3,6 +3,7 @@
 const http = require('node:http');
 const assert = require('node:assert/strict');
 let dropped = false;
+const htmlFailure = process.argv.includes('--html');
 const server = http.createServer((req, res) => {
   const path = new URL(req.url, 'http://localhost:3050').pathname;
   const isMeasure = req.method === 'POST' && path === '/api/mesures';
@@ -13,8 +14,11 @@ const server = http.createServer((req, res) => {
       dropped = true;
       reply.resume();
       reply.on('end', () => {
-        console.log('TEST: first measure committed (201); response connection deliberately closed');
-        res.destroy();
+        console.log('TEST: first measure committed (201); injecting', htmlFailure ? 'HTML 502' : 'connection loss');
+        if (htmlFailure) {
+          res.writeHead(502, { 'Content-Type': 'text/html' });
+          res.end('<html>Local synthetic gateway failure</html>');
+        } else res.destroy();
       });
       return;
     }

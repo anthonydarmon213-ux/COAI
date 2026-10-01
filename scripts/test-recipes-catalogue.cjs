@@ -10,16 +10,16 @@ const cache = new Map();
 function load(filename) {
   filename = path.resolve(filename);
   if (cache.has(filename)) return cache.get(filename).exports;
-  const module = {exports:{}}; cache.set(filename,module);
+  const loadedModule = {exports:{}}; cache.set(filename,loadedModule);
   const code = ts.transpileModule(fs.readFileSync(filename,'utf8'), {compilerOptions:{
     module:ts.ModuleKind.CommonJS, jsx:ts.JsxEmit.ReactJSX, target:ts.ScriptTarget.ES2022,
   }}).outputText;
-  vm.runInNewContext(code,{exports:module.exports,module,require(name){
+  vm.runInNewContext(code,{exports:loadedModule.exports,module:loadedModule,require(name){
     if (!name.startsWith('.') && !name.startsWith('@/')) return require(name);
     const base = name.startsWith('@/') ? path.resolve('src',name.slice(2)) : path.resolve(path.dirname(filename),name);
     return load(['.ts','.tsx'].map(ext=>base+ext).find(file=>fs.existsSync(file)));
   }});
-  return module.exports;
+  return loadedModule.exports;
 }
 const {RECETTES,filtrerRecettes,TYPE_REPAS_LABEL,OBJECTIF_RECETTE_LABEL,REGIME_LABEL}=load('src/lib/nutrition/recettes.ts');
 const {RecetteCard}=load('src/components/nutrition/recette-card.tsx');

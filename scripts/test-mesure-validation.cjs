@@ -48,9 +48,12 @@ const form = load('src/components/suivi/mesure-form.tsx', {
   fetch: async (url, init) => {
     calls.push({ url, body: init.body, headers: init.headers });
     if (failure === 'network') throw new TypeError('offline');
+    if (failure === 'html') return { ok: false, json: async () => { throw new SyntaxError('Unexpected token < PRIVATE SERVER TRACE'); } };
+    if (failure === 'empty-success') return { ok: true, json: async () => ({}) };
+    if (failure === 'null') return { ok: true, json: async () => null };
     if (failure === 'missing-photo-path' && url === '/api/mesures/photo') return { ok: true, json: async () => ({}) };
     if (failure === url) return { ok: false, json: async () => ({ error: 'Service indisponible' }) };
-    return { ok: true, json: async () => ({ path: 'owned/photo.jpg' }) };
+    return { ok: true, json: async () => ({ id: 'saved-measure', path: 'owned/photo.jpg' }) };
   },
 });
 function find(n, predicate) {
@@ -84,6 +87,25 @@ function submit() { return find(render(), n => n.type === 'form').props.onSubmit
   assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '-1');
   assert.equal(find(render(), n => n.props?.name === 'poidsKg').props['aria-invalid'], true);
   reset(); change('poidsKg', '80'); await submit(); assert.equal(calls.length, 1); assert.equal(refreshes, 1);
+  for (const mode of ['html', 'empty-success', 'null']) {
+    reset(); change('poidsKg', '80'); failure = mode; await submit();
+    assert.equal(refreshes, 0);
+    assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '80');
+    const message = find(render(), n => n.props?.role === 'alert').props.children;
+    assert.match(message, /confirmation|confirmé/i);
+    assert(!message.includes('PRIVATE SERVER TRACE'));
+    assert.equal(find(render(), n => n.props?.type === 'submit').props.disabled, false);
+    failure = null; await submit(); assert.equal(refreshes, 1);
+    assert.equal(calls[0].headers['x-coai-request-id'], calls[1].headers['x-coai-request-id']);
+  }
+  for (const mode of ['html', 'null']) {
+    reset(); photo(); change('poidsKg', '80'); failure = mode; await submit();
+    assert.equal(calls.length, 1, 'No measurement after unreadable photo response');
+    assert.equal(refreshes, 0);
+    assert.equal(find(render(), n => n.props?.name === 'poidsKg').props.value, '80');
+    assert.match(find(render(), n => n.props?.role === 'alert').props.children, /confirmé/);
+    failure = null; await submit(); assert.equal(refreshes, 1);
+  }
   reset(); photo(); await Promise.all([submit(), submit()]);
   assert.equal(compressions, 1); assert.equal(calls.length, 2);
   assert.equal(JSON.parse(calls[1].body).photoPath, 'owned/photo.jpg');
@@ -113,5 +135,5 @@ function submit() { return find(render(), n => n.type === 'form').props.onSubmit
   assert.equal(refreshes, 0);
   failure = null; await submit();
   assert.equal(calls.filter(c => c.url === '/api/mesures/photo').length, 2, 'Unconfirmed upload is not cached');
-  console.log('PASS: empty/invalid/valid measures, photo alone, ownership/auth, pre-upload validation, preserved draft, duplicate-submit guard. No real writes.');
+  console.log('PASS: validation, ownership/auth, photo upload reuse, preserved draft on HTML/null/incomplete confirmations, retry key reuse, duplicate-submit guard. No real writes.');
 })().catch(e => { console.error(e); process.exitCode = 1; });

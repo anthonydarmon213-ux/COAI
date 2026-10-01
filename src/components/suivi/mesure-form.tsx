@@ -11,6 +11,26 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { compressProgressPhoto } from "@/lib/images/compress-progress-photo";
 import { mesureBodySchema, mesureValidationErrors, type MesureFieldErrors } from "@/lib/suivi/mesure-validation";
 
+const unconfirmedMessage = "L’enregistrement n’a pas pu être confirmé. Tes valeurs sont conservées : réessaie dans un instant.";
+
+async function readResponseObject(response: Response): Promise<Record<string, unknown>> {
+  let data: unknown;
+  try { data = await response.json(); }
+  catch { throw new Error(unconfirmedMessage); }
+  if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error(unconfirmedMessage);
+  return data as Record<string, unknown>;
+}
+
+function readFieldErrors(value: unknown): MesureFieldErrors {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const fields: MesureFieldErrors = {};
+  for (const key of ["date", "poidsKg", "tourTailleCm", "masseGrassePourcent", "masseMusculaireKg", "frequenceCardiaqueReposBpm"] as const) {
+    const message = (value as Record<string, unknown>)[key];
+    if (typeof message === "string") fields[key] = message;
+  }
+  return fields;
+}
+
 export function MesureForm() {
   const router = useRouter();
   const [date, setDate] = useLocalDateInput();
@@ -74,8 +94,8 @@ export function MesureForm() {
         const formData = new FormData();
         formData.append("file", optimized.file);
         const photoRes = await fetch("/api/mesures/photo", { method: "POST", body: formData });
-        const photoData = await photoRes.json();
-        if (!photoRes.ok) throw new Error(photoData.error ?? "Échec de l'envoi de la photo.");
+        const photoData = await readResponseObject(photoRes);
+        if (!photoRes.ok) throw new Error(typeof photoData.error === "string" ? photoData.error : "Échec de l'envoi de la photo.");
         if (typeof photoData.path !== "string" || !photoData.path.trim()) {
           throw new Error("L’envoi de la photo n’a pas pu être confirmé. Réessaie.");
         }
@@ -92,11 +112,12 @@ export function MesureForm() {
         headers: { "Content-Type": "application/json", "x-coai-request-id": pendingRequest.current.id },
         body,
       });
-      const data = await res.json();
+      const data = await readResponseObject(res);
       if (!res.ok) {
-        showErrors(form, data.fieldErrors ?? {}, typeof data.error === "string" ? data.error : "Impossible d’enregistrer. Réessaie dans un instant.");
+        showErrors(form, readFieldErrors(data.fieldErrors), typeof data.error === "string" ? data.error : "Impossible d’enregistrer. Réessaie dans un instant.");
         return;
       }
+      if (typeof data.id !== "string" || !data.id.trim()) throw new Error(unconfirmedMessage);
       setPoidsKg("");
       pendingRequest.current = null;
       setTourTailleCm("");

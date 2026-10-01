@@ -2,6 +2,26 @@
 
 ## État courant — 1er octobre 2026
 
+À 12 h 54 : correction locale du formulaire mesures : une réponse HTML/null
+ou un succès sans identifiant ne vide plus la saisie ; message de confirmation
+manquante lisible, bouton réutilisable, même identifiant de tentative conservé.
+Les erreurs de champs reçues sont filtrées avant rendu. Tests du vrai gestionnaire
+avec réseau simulé couvrent aussi les réponses photo illisibles et succès incomplets.
+Test natif `testLocalMeasurementRetriesUnreadableConfirmation` réussi après
+redémarrage du simulateur : proxy `--html` transforme la première réponse 201
+en HTML 502 APRÈS sauvegarde, nouvelle tentative 200, historique après relance.
+Résultat `/tmp/coai-measure-html-reboot-1001.xcresult`, capture erreur examinée
+dans `/tmp/coai-measure-html-proof/`, PostgreSQL indépendant : exactement une
+mesure de 75 kg. Compte fictif nettoyé, absence DB/Auth vérifiée.
+Premier essai interrompu (143), non compté comme réussite : échantillon de pile
+`/tmp/coai-ui-runner-sample-1001.txt` montre XCTest bloqué dans
+`waitForQuiescence` au toucher du champ mot de passe, avant sauvegarde.
+Compilation Next locale 132 pages, TypeScript, tests mesures/retry, audit 356
+chemins médias réussis. ESLint global : 0 erreur, 7 avertissements ; deux noms
+de variables dans les scripts rappels/recettes corrigés et scripts retestés
+(registre PostgreSQL local, fournisseur email simulé ; 189 recettes/120 filtres).
+Ce correctif n’est PAS déployé ni validé en production ou sur iPhone physique.
+
 À 12 h 33 : contrôle de confidentialité photo depuis la photothèque iOS locale.
 PNG synthétique magenta 3200 × 2400, marqueur Artist/ImageDescription fictif
 et répertoire GPS vérifiés avant import ; test natif complet réussi dans
