@@ -1,6 +1,55 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Real local Auth rejection followed by correction; disposable account only.
+    @MainActor
+    func testLocalIncorrectPasswordCanBeCorrectedWithoutRestart() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        let incorrect = "Wrong-local-password-only!"
+        reveal(password, in: app); password.tap(); password.typeText(incorrect)
+        let login = web.buttons["Se connecter"]
+        reveal(login, in: app); login.tap()
+        let error = web.staticTexts["Connexion impossible. Vérifie ton email et ton mot de passe, puis réessaie."]
+        XCTAssertTrue(error.waitForExistence(timeout: 20))
+        XCTAssertEqual(email.value as? String, "coai-ui-20260924-http@example.test")
+        XCTAssertTrue(login.isEnabled)
+        let show = web.switches["Afficher le mot de passe"]
+        reveal(show, in: app); show.tap()
+        let visiblePassword = web.textFields["MOT DE PASSE"]
+        XCTAssertEqual(visiblePassword.value as? String, incorrect)
+        reveal(visiblePassword, in: app)
+        // Tap after the visible text: a centre tap can place the caret mid-password.
+        visiblePassword.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap()
+        visiblePassword.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: incorrect.count))
+        XCTAssertEqual(visiblePassword.value as? String, "")
+        visiblePassword.typeText("Coai-local-UI-0924-only!")
+        XCTAssertEqual(visiblePassword.value as? String, "Coai-local-UI-0924-only!")
+        let hide = web.switches["Masquer le mot de passe"]
+        reveal(hide, in: app); hide.tap()
+        reveal(login, in: app); login.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Explorer"].tap()
+        let settings = app.buttons["explore-/compte/parametres"]
+        reveal(settings, in: app, upward: false); settings.tap()
+        XCTAssertTrue(web.buttons["Exporter mes données"].waitForExistence(timeout: 30))
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 15))
+        app.buttons["native-tab-Explorer"].tap()
+        reveal(settings, in: app, upward: false); settings.tap()
+        XCTAssertTrue(app.webViews.buttons["Exporter mes données"].waitForExistence(timeout: 30))
+        // Account settings also contain an EMAIL field; reject the login form instead.
+        XCTAssertFalse(app.webViews.buttons["Se connecter"].exists)
+    }
+
     /// Disposable registered local account only; never writes to production.
     @MainActor
     func testLocalMeasurementPersistsAfterRelaunch() throws {

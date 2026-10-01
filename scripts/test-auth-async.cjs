@@ -44,17 +44,23 @@ function load(file, dependencies) {
   user = null;
   assert.equal(await server.getCurrentAppUser(), null);
   assert.equal(queries, 1);
+  let appUser = { id: 'app-user', consentRgpdAt: new Date(), consentSanteAt: new Date() };
   const callback = load('src/app/auth/callback/route.ts', {
     '@/lib/auth/server': { createSupabaseServerClient: async () => ({ auth: {
       exchangeCodeForSession: async code => ({ data: { user: code === 'valid' ? { id: 'test-user' } : null }, error: null }),
     } }) },
-    '@/lib/db/client': { prisma: { user: { findUnique: async () => ({ id: 'app-user' }) } } },
+    '@/lib/db/client': { prisma: { user: { findUnique: async () => appUser } } },
     '@/lib/auth/safe-redirect': { sanitizeReturnTo: () => null },
     '@/lib/auth/confirmation': { authFailureDestination: origin => new URL('/sign-in', origin) },
   });
   for (const [code, destination] of [['valid', '/dashboard'], ['invalid', '/sign-in'], ['', '/sign-in']]) {
     const response = await callback.GET(new Request('https://coai.fr/auth/callback?code=' + code));
     assert.equal(new URL(response.headers.get('location')).pathname, destination);
+  }
+  for (const incomplete of [null, {id:'app-user'}, {id:'app-user',consentRgpdAt:new Date()}, {id:'app-user',consentSanteAt:new Date()}]) {
+    appUser = incomplete;
+    const response = await callback.GET(new Request('https://coai.fr/auth/callback?code=valid'));
+    assert.equal(new URL(response.headers.get('location')).pathname, '/completer-inscription');
   }
   console.log('PASS: async cookies/headers, bearer/cookie auth, app-user lookup and OAuth callback (mocked services).');
 })().catch(error => { console.error(error); process.exitCode = 1; });

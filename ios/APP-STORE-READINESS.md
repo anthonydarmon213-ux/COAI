@@ -2,6 +2,21 @@
 
 ## État courant — 1er octobre 2026
 
+À 14 h 05 : parcours natif de correction d’un mot de passe vérifié sur le
+simulateur SE dédié, avec Auth/PostgreSQL locaux réels. Rejet du mauvais mot de
+passe, email conservé, bouton réutilisable, affichage/masquage, correction,
+accès aux réglages puis maintien de session après fermeture/relance : test
+`testLocalIncorrectPasswordCanBeCorrectedWithoutRestart` réussi dans
+`/tmp/coai-login-correction-final-1001.xcresult`. Les essais initiaux ont révélé
+des erreurs du pilote (curseur au milieu du mot de passe, contrôle exposé comme
+interrupteur et confusion avec le champ EMAIL des réglages), pas un défaut
+d’authentification démontré. Compte fictif révoqué et supprimé ; vérificateur
+indépendant confirmant son absence et le refus de l’ancien mot de passe réussi.
+Test OAuth simulé actualisé : profil absent ou consentement manquant redirigé
+vers la finalisation, deux consentements présents autorisant la destination.
+Tests auth async/confirmation, TypeScript et lint ciblé réussis. Aucune
+modification produit dans ce lot ; validation physique et production restantes.
+
 À 13 h 40 : défaut natif HTTP reproduit puis corrigé. Après une réponse 503,
 l’annulation WebKit remplaçait le message serveur par « Vérifie ta connexion ».
 Le gestionnaire conserve désormais le message déjà classifié ; une nouvelle
