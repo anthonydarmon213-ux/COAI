@@ -10,7 +10,7 @@ export default function ConfidentialitePage() {
     <LegalPage
       label="RGPD"
       titre="Politique de confidentialité"
-      majLe="28 septembre 2026"
+      majLe="1er octobre 2026"
     >
       <section>
         <h2>1. Responsable de traitement</h2>
@@ -92,9 +92,15 @@ export default function ConfidentialitePage() {
           Conformément au RGPD, tu disposes d&apos;un droit d&apos;accès, de rectification,
           d&apos;effacement, de portabilité et de retrait de ton consentement sur tes données. Tu
           peux exercer ces droits directement et à tout moment depuis ton espace{" "}
-          <a href="/compte/parametres">Paramètres</a> : export de toutes tes données au format JSON,
+          <a href="/compte/parametres">Paramètres</a> : export des données de ton compte au format JSON,
           ou suppression définitive de ton compte. Tu disposes aussi du droit d&apos;introduire une
           réclamation auprès de la CNIL (cnil.fr).
+        </p>
+        <p>
+          Cet export contient les informations enregistrées dans ton compte COAI, notamment
+          ton profil, tes programmes et ton suivi. Il ne contient pas les fichiers photo
+          ni les données conservées séparément par les prestataires. Pour une demande
+          complémentaire concernant tes données, utilise le contact indiqué en début de page.
         </p>
       </section>
 

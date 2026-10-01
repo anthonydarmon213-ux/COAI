@@ -1,6 +1,48 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Local fixture only. Never submits a message or contacts an AI provider.
+    @MainActor
+    func testLocalCoachConsentCanBeWithdrawnWithoutBlockingSession() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app); submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Coach"].tap()
+        let draft = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Adapter ma semaine")).firstMatch
+        XCTAssertTrue(draft.waitForExistence(timeout: 25))
+        reveal(draft, in: app); draft.tap()
+        let consent = web.switches["J’autorise le partage de ma question et de ce contexte avec Anthropic."]
+        XCTAssertTrue(consent.waitForExistence(timeout: 25))
+        reveal(consent, in: app)
+        XCTAssertEqual(consent.value as? String, "0")
+        let send = web.buttons["Envoyer"]
+        XCTAssertTrue(send.exists)
+        XCTAssertFalse(send.isEnabled)
+        consent.tap()
+        XCTAssertEqual(consent.value as? String, "1")
+        XCTAssertTrue(send.isEnabled)
+        consent.tap()
+        XCTAssertEqual(consent.value as? String, "0")
+        XCTAssertFalse(send.isEnabled)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Coach local — accord facultatif retiré sans envoi"
+        proof.lifetime = .keepAlways; add(proof)
+        app.buttons["native-tab-Séance"].tap()
+        XCTAssertTrue(consent.waitForNonExistence(timeout: 20))
+        XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+        XCTAssertTrue(app.buttons["native-tab-Séance"].isSelected)
+    }
+
     /// Requires local SMTP preflight and cleanup; does not confirm email or grant access.
     @MainActor
     func testLocalSignupReachesEmailConfirmation() throws {

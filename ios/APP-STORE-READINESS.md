@@ -2,6 +2,27 @@
 
 ## État courant — 1er octobre 2026
 
+Recontrôle natif à 08 h 44 : `bash scripts/check-ios.sh --device-release`
+réussit (51 XCTest, 65 contrôles cœur, règles WebKit compilées, configuration
+de confidentialité et cinq cas négatifs). Release iPhone arm64 non signée
+compilée ; manifeste inclus et absence des ressources/marqueurs de test vérifiée.
+Ce résultat n'est ni une archive de distribution, ni un test physique ou StoreKit
+Sandbox, ni une validation App Store. Le test connecté du consentement coach
+sur simulateur est décrit dans `PRIVACY-AUDIT.md` (08 h 41, 20,189 s).
+
+Accès Apple recontrôlé : l'ouverture de `https://appstoreconnect.apple.com/apps`
+dans le navigateur Codex redirige vers `/login?targetUrl=%2Fapps&authResult=FAILED`.
+Pas de session utilisable pour vérifier l'adhésion, le catalogue ou la fiche app.
+Reconnexion demandée ; aucun achat, formulaire ni soumission effectué.
+
+Audit catalogue réexécuté : 4 variantes sur 90 ont toutes leurs références
+photo/vidéo, 86 sont incomplètes (388 occurrences, sept mouvements).
+Ce résultat ne constitue pas une validation pédagogique des quatre variantes.
+Les tests de correspondance, de lecteur et d'absence de repli stock passent
+(59 exercices référencés avec les deux médias), sans combler ce manque.
+Décision demandée pour l'abduction : conserver avec sa vidéo COAI ou revoir
+explicitement le bloc ; aucune substitution non équivalente appliquée.
+
 Vidéos : 90 MP4 du répertoire `public/videos/exercices` vérifiés H.264
 8 bits 4:2:0, puis intégralement décodés avec `ffmpeg -v error -xerror`
 (sortie null, aucune modification de fichier) : zéro échec. Cela ne prouve
@@ -12,9 +33,13 @@ Deux tests physiques relancés sur l'iPhone 17 Pro redevenu accessible :
 navigation XXXL/rotation et minuteur après relance. Premier lancement arrêté
 avant tests car l'équipe manquait pour la cible UI ; second lancement avec
 `DEVELOPMENT_TEAM=33L78928V3` (équipe existante), compilation/signature réussies.
-Xcode attend le déverrouillage, processus toujours actif lors du dernier
-contrôle : `/tmp/coai-device-recheck-team-1001.xcresult` n'est PAS une preuve
-de réussite. Seule identité Apple Development détectée, aucune Distribution.
+À 08 h 27, le second lancement s'est terminé avec le code 65 avant exécution
+des scénarios : initialisation UI refusée par LocalAuthentication, code -2,
+« Authentification annulée / Canceled by user ». Le processus n'est plus actif.
+`/tmp/coai-device-recheck-team-1001.xcresult` n'est PAS une preuve de réussite
+ni un échec fonctionnel des deux scénarios. Une nouvelle tentative nécessite
+l'authentification locale sur l'iPhone ; ne pas contourner cette protection.
+Seule identité Apple Development détectée, aucune Distribution.
 
 ## État courant — 28 septembre 2026
 

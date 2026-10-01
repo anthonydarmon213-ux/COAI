@@ -5,6 +5,34 @@ Store Connect ; il ne constitue ni une déclaration soumise, ni une validation
 juridique, ni la preuve de la configuration des services de production.
 Les écrans web intégrés à WKWebView font partie du périmètre de l'app.
 
+## Précision sur l'export — 1er octobre 2026, locale
+
+### Consentement coach dans l'app simulée — 08 h 41
+
+`testLocalCoachConsentCanBeWithdrawnWithoutBlockingSession` réussit en
+20,189 s sur iPhone SE simulé, connecté aux services Auth/PostgreSQL locaux :
+connexion, onglet Coach, brouillon par raccourci, accord initialement décoché,
+activation puis retrait, bouton Envoyer désactivé/activé/désactivé, retour à
+Séance avec sélection native correcte. Aucun envoi, appel IA ni microphone.
+Résultat : `/tmp/coai-coach-consent-1001.xcresult`. Capture examinée dans
+`/tmp/coai-coach-consent-proof-1001/B1AA1E30-C0D8-4B05-BA72-3B47E3770936.png`.
+Compte fictif supprimé et sessions révoquées ; vérificateur indépendant confirme
+absence Auth/profil et refus de l'ancien mot de passe. Cela ne valide pas les
+réponses du fournisseur, la dictée, tous les points d'entrée, l'appareil physique
+ou la production. Le test utilise le serveur local compilé existant, pas les
+modifications ultérieures de texte sur la page confidentialité.
+
+### Texte d'export
+
+La page confidentialité n'annonce plus un export de « toutes tes données » :
+elle précise désormais l'absence des fichiers photo et des données conservées
+séparément par les prestataires, avec renvoi au contact déjà indiqué. Aucun
+destinataire ni donnée supplémentaire ajouté. Rendu serveur de la vraie page
+vérifié (conteneur LegalPage simulé), lien Paramètres conservé ; test de route
+`test-account-export.cjs` réussi avec Auth/base simulées. Cette précision ne
+complète pas l'export et ne valide pas la politique entière. Non publiée ;
+validation visuelle et en production encore requises.
+
 ## Contrôle natif du 27 septembre
 
 Recontrôle à 23 h 20 : 51 XCTest, 65 contrôles cœur, compilation des règles
