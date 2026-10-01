@@ -5,6 +5,7 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const directory = path.resolve(__dirname, '../public/videos/exercices');
 const files = fs.readdirSync(directory).filter(file => file.endsWith('.mp4'));
+if (!files.length) throw new Error('No exercise videos found; compatibility cannot be validated');
 let failures = 0;
 for (const file of files) {
   const { streams } = JSON.parse(execFileSync('ffprobe', [
