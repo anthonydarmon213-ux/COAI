@@ -2,6 +2,19 @@
 
 ## État courant — 1er octobre 2026
 
+À 18 h 57 : parcours lecteur étendu réussi sur SE : ajustements et consigne
+ouverts/fermés en paysage puis portrait, saisie de 10 répétitions, clavier
+fermé, relance et programme disponible. Preuve :
+`/tmp/coai-reader-content-bounds-1001.xcresult` (81 s). Contenu central avec
+centrage sûr et enfants non rétrécis pour préserver le défilement des grands
+visuels. Les essais intermédiaires ont également révélé des faux ciblages
+XCTest : homonymes hors lecteur et éléments signalés hittable sous le pied fixe.
+Le test cible le dialogue et contrôle la zone visible avant l'appui. Ne pas
+présenter ces faux appuis automatisés comme une preuve de clic traversant lors
+d'un geste humain. Build/types/lint et tests brouillons/sauvegarde passent ;
+compte fictif nettoyé. Saisie vérifiée à l'écran, pas encore son enregistrement
+dans une séance guidée complète. Non publié, non validé en production.
+
 À 18 h 36 : ajustements pendant un exercice contrôlés en paysage sur SE.
 Le texte des conditions débordait de la fenêtre (échec natif
 `/tmp/coai-reader-modal-exercise-1001.xcresult`). Hauteur des panneaux Ajuster

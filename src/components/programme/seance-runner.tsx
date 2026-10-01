@@ -774,7 +774,7 @@ export function SeanceRunner({
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-6 py-8 text-center [@media(max-height:500px)]:flex-none [@media(max-height:500px)]:overflow-visible">
+          <div className="flex min-h-0 flex-1 flex-col items-center gap-6 overflow-y-auto px-6 py-8 text-center [justify-content:safe_center] [&>*]:shrink-0 [@media(max-height:500px)]:flex-none [@media(max-height:500px)]:overflow-visible">
             {(step.type === "echauffement" || step.type === "calme") && (() => {
               const etapes = enEtapes(step.texte);
               const prefixe = step.type === "echauffement" ? "ech" : "calme";

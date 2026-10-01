@@ -110,6 +110,42 @@ final class COAIUITests: XCTestCase {
                 }
                 XCTAssertTrue(dismiss.isHittable); dismiss.tap()
                 XCTAssertTrue(explanation.waitForNonExistence(timeout: 5))
+                let reader = web.otherElements.matching(NSPredicate(format: "label BEGINSWITH %@", "Séance guidée :")).firstMatch
+                let advice = reader.buttons["💡 Consigne du coach"]
+                XCTAssertTrue(advice.waitForExistence(timeout: 5))
+                if orientation == .portrait {
+                    // WebKit may call a clipped child hittable behind the fixed footer.
+                    // Scroll inside the reader's content, not on the fixed actions.
+                    let footer = reader.buttons["🎙️ Poser une question au coach"]
+                    for _ in 0..<12 {
+                        let bottom = footer.frame.minY - 24
+                        if advice.frame.minY > web.frame.minY + 145 && advice.frame.maxY < bottom { break }
+                        let origin = app.coordinate(withNormalizedOffset: .zero)
+                        let low = origin.withOffset(CGVector(dx: web.frame.maxX - 32, dy: bottom - 8))
+                        let high = origin.withOffset(CGVector(dx: web.frame.maxX - 32, dy: web.frame.minY + 155))
+                        low.press(forDuration: 0.05, thenDragTo: high)
+                    }
+                    XCTAssertLessThan(advice.frame.maxY, footer.frame.minY - 24)
+                } else { revealWebControl(advice, in: app) }
+                advice.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+                let understood = web.buttons["Compris"]
+                XCTAssertTrue(understood.waitForExistence(timeout: 5))
+                XCTAssertTrue(understood.isHittable)
+                XCTAssertTrue(web.frame.contains(understood.frame))
+                understood.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+                XCTAssertTrue(understood.waitForNonExistence(timeout: 5))
+                let afterAdvice = XCTAttachment(screenshot: app.screenshot())
+                afterAdvice.name = "Après fermeture de la consigne — \(orientation.rawValue)"
+                afterAdvice.lifetime = .keepAlways; add(afterAdvice)
+                if orientation == .portrait {
+                    let repetitions = web.textFields.matching(NSPredicate(format: "label ==[c] %@", "Reps faites")).firstMatch
+                    revealWebControl(repetitions, in: app)
+                    repetitions.tap(); repetitions.typeText("10")
+                    let done = app.toolbars.buttons["OK"]
+                    XCTAssertTrue(done.waitForExistence(timeout: 5)); done.tap()
+                    XCTAssertEqual(repetitions.value as? String, "10")
+                }
+                revealWebControl(close, in: app)
             }
         }
         let adjust = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ajuster")).firstMatch
