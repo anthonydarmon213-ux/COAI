@@ -34,6 +34,14 @@ const mixte = historiquePourExercice([log('2026-09-10',[{reps:10,charge:20},{rep
 assert.equal(historiqueParMesure(mixte,true)[0].volume,0);
 assert.equal(historiqueParMesure(mixte,false)[0].meilleureSerie.reps,10);
 assert.equal(historiqueParMesure(mixte,true)[0].meilleureSerie.dureeSecondes,30);
+const overflow = historiquePourExercice([log('2026-09-10',[
+  {reps:2,charge:1e308}, {reps:10,charge:20},
+])], 'Gainage planche');
+assert.equal(overflow[0].volume,200,'Overflowing legacy sets must not poison the curve');
+assert.equal(overflow[0].sets.length,1);
+assert.ok(Number.isFinite(historiquePourExercice([log('2026-09-10',[
+  {reps:1,charge:1e308}, {reps:1,charge:1e308},
+])], 'Gainage planche')[0].volume),'Aggregate volume must remain finite');
 // Rendu serveur du composant réel avec données fictives injectées dans ses
 // états. Complète les tests purs, sans prétendre tester les clics navigateur.
 const React = require('react');

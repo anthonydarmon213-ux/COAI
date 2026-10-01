@@ -42,6 +42,7 @@ export function historiquePourExercice(seances: SeanceBrute[], nom: string): Per
       const ex = brut as { nom?: unknown; sets?: unknown };
       if (typeof ex.nom !== "string" || normaliser(ex.nom) !== cible) continue;
 
+      let volume = 0;
       const sets: SetSaisi[] = (Array.isArray(ex.sets) ? ex.sets : [])
         .map((s) => {
           const v = (s && typeof s === "object" ? s : {}) as { reps?: unknown; charge?: unknown; dureeSecondes?: unknown };
@@ -53,10 +54,17 @@ export function historiquePourExercice(seances: SeanceBrute[], nom: string): Per
             charge: typeof v.charge === "number" && Number.isFinite(v.charge) && v.charge >= 0 ? v.charge : 0,
           };
         })
-        .filter((s) => s.reps > 0 || (s.dureeSecondes ?? 0) > 0);
+        .filter((s) => {
+          if (!(s.reps > 0 || (s.dureeSecondes ?? 0) > 0)) return false;
+          const nextVolume = volume + s.reps * s.charge;
+          // Finite operands can still overflow. Keep malformed historical
+          // values out of SVG scales and comparisons, without changing logs.
+          if (!Number.isFinite(nextVolume)) return false;
+          volume = nextVolume;
+          return true;
+        });
       if (sets.length === 0) continue;
 
-      const volume = sets.reduce((total, s) => total + s.reps * s.charge, 0);
       const meilleureSerie = sets.reduce<SetSaisi | null>(
         (best, s) => (!best || (s.dureeSecondes ?? s.charge * s.reps) > (best.dureeSecondes ?? best.charge * best.reps) ? s : best),
         null

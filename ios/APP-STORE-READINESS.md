@@ -2,6 +2,15 @@
 
 ## État courant — 1er octobre 2026
 
+Après 20 h 55 : débordement numérique RepCount reproduit avec une ancienne
+série `2 × 1e308` : volume `Infinity`, malgré des opérandes finis. Le calcul
+filtre désormais une série dont le produit ou la somme déborde, sans modifier
+les logs stockés. Test avant/après : série valide `10 × 20` conservée à 200,
+et addition de deux volumes extrêmes maintenue finie. Tests maintien/rendu,
+TypeScript, lint (six avertissements), build 132 pages et audit 356 médias
+réussis. Vérification de ce cas dans l'interface native/production encore
+à faire ; ce contrôle ne valide pas toutes les échelles des graphiques.
+
 À 20 h 55 : journal avec historique malformé vérifié dans l'app simulée SE :
 `/tmp/coai-journal-malformed-1001.xcresult`, un test réussi, zéro échec.
 Les deux captures de `/tmp/coai-journal-malformed-proof-1001` ont été inspectées :
