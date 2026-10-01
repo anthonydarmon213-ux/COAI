@@ -1633,7 +1633,7 @@ final class COAIUITests: XCTestCase {
     func testSignupFieldsAndPasswordVisibilityWithKeyboard() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIAnonymousUITest"]
         app.launch()
         let web = app.webViews.firstMatch
         XCTAssertTrue(web.buttons["Continuer avec Google"].waitForExistence(timeout: 30))
@@ -1708,7 +1708,7 @@ final class COAIUITests: XCTestCase {
     func testRegistrationAndPasswordRecoveryPagesAreReachable() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAIAnonymousUITest"]
         app.launch()
         let web = app.webViews.firstMatch
         XCTAssertTrue(web.buttons["Continuer avec Google"].waitForExistence(timeout: 30))

@@ -2,6 +2,16 @@
 
 ## État courant — 1er octobre 2026
 
+À 08 h 59, deux autres tests physiques anonymes réussissent sur iPhone 17 Pro :
+navigation mot de passe oublié → retour → inscription, puis saisie fictive des
+champs, masquage/affichage du mot de passe, champ au-dessus du clavier et bouton
+d'inscription accessible. `/tmp/coai-device-registration-1001.xcresult` :
+2 réussis, 0 échec, 0 ignoré. Captures examinées dans
+`/tmp/coai-device-registration-proof-1001/`. Stockage éphémère Debug ; aucun
+formulaire soumis, compte créé, email envoyé ni modification des cookies personnels.
+Ces preuves concernent l'interface publique servie à l'appareil, pas la livraison
+des emails ni la création/connexion complète d'un compte distant.
+
 À 08 h 47, après déverrouillage confirmé, les deux tests physiques passent
 sur iPhone 17 Pro / iOS 26.1 : navigation XXXL avec rotations et minuteur
 conservé après fermeture/relance. Résumé Xcode : 2 réussis, 0 échec, 0 ignoré,
