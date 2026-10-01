@@ -2,6 +2,17 @@
 
 ## État courant — 1er octobre 2026
 
+Contrôle complémentaire de l'échelle RepCount : le rendu réel du composant
+ChandeliersCharges produisait neuf coordonnées SVG `NaN` et une graduation
+`Infinity` pour une charge historique finie égale à `Number.MAX_VALUE`.
+La marge de 10 % de l'échelle est maintenant bornée à la capacité numérique,
+sans modifier les valeurs enregistrées. Nouveau test
+`scripts/test-chandeliers-scale.cjs` réussi pour zéro, décimales et valeurs
+extrêmes : coordonnées finies dans le cadre SVG, charge originale conservée.
+Types, lint (six avertissements existants), build 132 pages et audit 356 médias
+réussis. Preuve limitée au rendu serveur du composant ; contrôle interactif,
+iPhone et production toujours à faire. Aucun déploiement.
+
 Après 20 h 55 : débordement numérique RepCount reproduit avec une ancienne
 série `2 × 1e308` : volume `Infinity`, malgré des opérandes finis. Le calcul
 filtre désormais une série dont le produit ou la somme déborde, sans modifier

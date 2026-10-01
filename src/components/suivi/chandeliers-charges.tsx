@@ -15,7 +15,8 @@ export function ChandeliersCharges({ historique }: { historique: PerfExercice[] 
   });
   if (!points.length) return null;
   const actif = points.find(p => p.id === selection) ?? points[points.length - 1]!;
-  const max = Math.max(1, ...points.map(p => p.high)) * 1.1;
+  // Padding must not turn a finite historical charge into an infinite scale.
+  const max = Math.min(Number.MAX_VALUE, Math.max(1, ...points.map(p => p.high)) * 1.1);
   const y = (charge: number) => 170 - charge / max * 140;
   const date = (d: Date) => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
   return <section className="rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-950/30 to-black p-4">
