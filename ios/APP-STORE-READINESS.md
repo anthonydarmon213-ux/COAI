@@ -1,5 +1,21 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
+## État courant — 1er octobre 2026
+
+Vidéos : 90 MP4 du répertoire `public/videos/exercices` vérifiés H.264
+8 bits 4:2:0, puis intégralement décodés avec `ffmpeg -v error -xerror`
+(sortie null, aucune modification de fichier) : zéro échec. Cela ne prouve
+ni la correspondance pédagogique de chaque mouvement, ni la lecture réseau
+sur iPhone. Les médias/remplacements non validés restent bloquants.
+
+Deux tests physiques relancés sur l'iPhone 17 Pro redevenu accessible :
+navigation XXXL/rotation et minuteur après relance. Premier lancement arrêté
+avant tests car l'équipe manquait pour la cible UI ; second lancement avec
+`DEVELOPMENT_TEAM=33L78928V3` (équipe existante), compilation/signature réussies.
+Xcode attend le déverrouillage, processus toujours actif lors du dernier
+contrôle : `/tmp/coai-device-recheck-team-1001.xcresult` n'est PAS une preuve
+de réussite. Seule identité Apple Development détectée, aucune Distribution.
+
 ## État courant — 28 septembre 2026
 
 Rappels/session, 14 h 50 : brouillon fictif conservé après relance puis effacé
