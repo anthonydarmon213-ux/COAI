@@ -115,8 +115,14 @@ final class COAIUITests: XCTestCase {
         try runLocalMeasurementPersistence(lostResponse: false, selectPhoto: true)
     }
 
+    /// Synthetic-cobalt HEIC must be seeded in the QA simulator's local Files provider.
     @MainActor
-    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false, selectPhoto: Bool = false, htmlFailure: Bool = false) throws {
+    func testLocalHEICFilePersistsAfterRelaunch() throws {
+        try runLocalMeasurementPersistence(lostResponse: false, selectHEICFile: true)
+    }
+
+    @MainActor
+    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false, selectPhoto: Bool = false, htmlFailure: Bool = false, selectHEICFile: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -152,7 +158,7 @@ final class COAIUITests: XCTestCase {
         }
         XCTAssertTrue(weight.isHittable)
         weight.tap(); weight.typeText("75")
-        if cancelPhoto || selectPhoto {
+        if cancelPhoto || selectPhoto || selectHEICFile {
             // SE screenshot confirms WebKit's keyboard accessory checkmark here.
             // Dismiss the keyboard as a user would before opening the photo menu.
             let keyboard = app.keyboards.firstMatch
@@ -165,25 +171,39 @@ final class COAIUITests: XCTestCase {
             let file = web.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "photo de progression")).firstMatch
             XCTAssertTrue(file.waitForExistence(timeout: 10))
             revealWebControl(file, in: app); file.tap()
-            let library = app.buttons["Photothèque"]
-            XCTAssertTrue(library.waitForExistence(timeout: 10)); library.tap()
-            let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
-            XCTAssertTrue(cancel.waitForExistence(timeout: 10))
-            let pickerProof = XCTAttachment(screenshot: app.screenshot())
-            pickerProof.name = "Sélecteur photo système"
-            pickerProof.lifetime = .keepAlways; add(pickerProof)
-            if selectPhoto {
-                let photo = app.images.matching(identifier: "PXGGridLayout-Info").firstMatch
-                XCTAssertTrue(photo.waitForExistence(timeout: 10))
-                // Photos exposes the visible thumbnail as non-hittable on iOS 26.5.
-                // Use its observed frame, not a guessed screen coordinate.
-                app.coordinate(withNormalizedOffset: .zero)
-                    .withOffset(CGVector(dx: photo.frame.midX, dy: photo.frame.midY)).tap()
-                let done = app.buttons["PUOneUpBarButtonItemIdentifierAssetExplorerReviewScreenDone"]
-                XCTAssertTrue(done.waitForExistence(timeout: 10)); done.tap()
-                XCTAssertTrue(done.waitForNonExistence(timeout: 10))
+            if selectHEICFile {
+                let chooseFile = app.buttons["Choisir le fichier"]
+                XCTAssertTrue(chooseFile.waitForExistence(timeout: 10)); chooseFile.tap()
+                let browse = app.tabBars.buttons["Explorer"]
+                XCTAssertTrue(browse.waitForExistence(timeout: 10)); browse.tap()
+                let localFiles = app.staticTexts["Sur mon iPhone"]
+                XCTAssertTrue(localFiles.waitForExistence(timeout: 10)); localFiles.tap()
+                let fixture = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", "synthetic-cobalt")).firstMatch
+                XCTAssertTrue(fixture.waitForExistence(timeout: 15))
+                XCTAssertTrue(fixture.isEnabled && fixture.isHittable)
+                fixture.tap()
+                XCTAssertTrue(web.staticTexts["La photo sera optimisée automatiquement avant l’envoi."].waitForExistence(timeout: 10))
             } else {
-                cancel.tap()
+                let library = app.buttons["Photothèque"]
+                XCTAssertTrue(library.waitForExistence(timeout: 10)); library.tap()
+                let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
+                XCTAssertTrue(cancel.waitForExistence(timeout: 10))
+                let pickerProof = XCTAttachment(screenshot: app.screenshot())
+                pickerProof.name = "Sélecteur photo système"
+                pickerProof.lifetime = .keepAlways; add(pickerProof)
+                if selectPhoto {
+                    let photo = app.images.matching(identifier: "PXGGridLayout-Info").firstMatch
+                    XCTAssertTrue(photo.waitForExistence(timeout: 10))
+                    // Photos exposes the visible thumbnail as non-hittable on iOS 26.5.
+                    // Use its observed frame, not a guessed screen coordinate.
+                    app.coordinate(withNormalizedOffset: .zero)
+                        .withOffset(CGVector(dx: photo.frame.midX, dy: photo.frame.midY)).tap()
+                    let done = app.buttons["PUOneUpBarButtonItemIdentifierAssetExplorerReviewScreenDone"]
+                    XCTAssertTrue(done.waitForExistence(timeout: 10)); done.tap()
+                    XCTAssertTrue(done.waitForNonExistence(timeout: 10))
+                } else {
+                    cancel.tap()
+                }
             }
             XCTAssertEqual(weight.value as? String, "75")
         }

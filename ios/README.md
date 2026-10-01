@@ -252,6 +252,19 @@ session existante. Ne pas lancer les fixtures locales ou les tests d’achat
 sur le compte personnel. Aucun profil de distribution ni achat d’adhésion
 n’est créé par ces instructions.
 
+HEIC local : `testLocalHEICFilePersistsAfterRelaunch` est réservé au simulateur
+QA petit écran et au backend fictif local. Préparer une session neuve du compte
+`coai-ui-20260924-http@example.test` (révoquer/nettoyer la précédente avant une
+nouvelle exécution). Générer la source avec
+`node scripts/create-native-photo-fixture.cjs --heic`, puis copier seulement
+`synthetic-cobalt.heic` dans le fournisseur **Sur mon iPhone** du simulateur QA.
+Ne jamais écraser un fichier existant ni importer une photo personnelle.
+Le test choisit Explorer → Sur mon iPhone, pas Récents ; il enregistre une
+mesure fictive puis relance l'app. Vérifier ensuite avec
+`verify-native-progress-photo.cjs` via le harness local (`--with-photo --heic`),
+puis révoquer et nettoyer le compte/Storage. Réussi le 1er octobre ; ne vaut
+pas validation physique, iCloud ou production.
+
 Réception d'alerte (17 septembre) : test ci-dessus réussi seul sur le simulateur
 QA alertes iPhone SE / iOS 26.5, permission vierge ou acceptée. Il démarre
 30 secondes, revient à l'accueil iOS, vérifie titre visible et corps de la

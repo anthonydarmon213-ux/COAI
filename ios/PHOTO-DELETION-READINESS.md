@@ -14,6 +14,22 @@ Les admissions fermées restent représentées par une empreinte, pas cet identi
 
 ## Vérifié
 
+- 1er octobre, 16 h 11 — HEIC via Fichiers vérifié dans l'app sur simulateur
+  SE/iOS 26.5, services Auth/PostgreSQL/Storage locaux réels. Scénario
+  `testLocalHEICFilePersistsAfterRelaunch`, preuve
+  `/tmp/coai-heic-files-local-1001.xcresult` : sélection explicite de
+  `synthetic-cobalt.heic` dans Explorer → Sur mon iPhone, préparation,
+  enregistrement puis relance. Captures avant/après inspectées. Vérification
+  indépendante : une seule mesure, couleur cobalt exacte à la tolérance
+  d'encodage, PNG 1600×1200 de 38 433 octets. La source est un vrai conteneur
+  HEIF/HEVC généré localement par sips, pas un PNG renommé. Ce test ne prouve
+  pas le retrait GPS d'une source HEIC géolocalisée (fixture sans GPS), ni le
+  comportement iCloud/Photos ou sur appareil physique. Les premiers essais
+  ont corrigé le pilote : libellé « Choisir le fichier », session de fixture
+  à recréer, navigation hors de Récents. Aucun défaut produit supplémentaire
+  démontré. Compte, sessions et photo enregistrée nettoyés et absence vérifiée.
+  Le petit fichier HEIC source reste dans Fichiers du simulateur QA pour reprise.
+
 - 1er octobre — suivi : le champ photo accepte maintenant les types HEIC/HEIF
   et leurs extensions, déjà pris en charge par le compresseur. Le test du
   formulaire reproduit l'ancien filtre incomplet puis passe après correction.

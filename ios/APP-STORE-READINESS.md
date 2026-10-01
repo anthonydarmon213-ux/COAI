@@ -2,6 +2,13 @@
 
 ## État courant — 1er octobre 2026
 
+À 16 h 11 : parcours HEIC par Fichiers réussi sur simulateur SE/iOS 26.5
+avec backend local réel (`/tmp/coai-heic-files-local-1001.xcresult`). Sélection,
+sauvegarde, relance et affichage de la miniature vérifiés ; une seule mesure
+et pixels du fichier relus indépendamment dans Storage. Données de compte
+fictives nettoyées. Validation sur iPhone physique, iCloud et production encore
+ouverte ; ce succès ne résout pas les envois incertains lors d'une suppression.
+
 Photos de suivi : filtre HEIC/HEIF corrigé localement ; test du formulaire
 échoué avant correction, réussi après. Décodage d'un vrai HEIC synthétique et
 réencodage validés dans WebKit macOS (pixels/dimensions contrôlés), sans réseau
