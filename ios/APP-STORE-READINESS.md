@@ -2,6 +2,19 @@
 
 ## État courant — 1er octobre 2026
 
+À 20 h 55 : journal avec historique malformé vérifié dans l'app simulée SE :
+`/tmp/coai-journal-malformed-1001.xcresult`, un test réussi, zéro échec.
+Les deux captures de `/tmp/coai-journal-malformed-proof-1001` ont été inspectées :
+avertissement lisible, maintien 45 s et série 10 × 20 kg visibles au-dessus de
+la barre native. L'exécution a duré 1 281 s car XCTest attendait 60 s entre
+gestes pour les animations ; ce n'est pas une mesure de latence utilisateur.
+Contrôle PostgreSQL indépendant réussi : une seule séance et JSON strictement
+inchangé, y compris les entrées invalides. Compte fictif et sessions nettoyés.
+Le navigateur local compilé montre aussi le journal sans erreur de console.
+Les tests de cache privé, réponses d'historique concurrentes, profil appris,
+garde d'adaptation et maintien RepCount passent avec dépendances simulées.
+Correctif local `7bb96e5` ; aucune validation production ni publication.
+
 À 20 h 33 : nouveau plantage du journal reproduit hors ligne avec un historique
 contenant un exercice null : `Cannot read properties of null (reading 'sets')`.
 Correction locale : filtrage des détails JSON illisibles, conservation des
