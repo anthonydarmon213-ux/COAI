@@ -2,6 +2,25 @@
 
 ## État courant — 1er octobre 2026
 
+À 17 h 42 : premier programme corrigé et testé sur simulateur SE/iOS 26.5.
+Le bouton de création, auparavant enfoui dans les ajustements avancés, est
+visible avant les menus secondaires pour un compte autorisé sans programme.
+La première création utilise le mode de reprise sans doublon et ouvre la
+première séance explicitement, même un jour de repos, sans modifier le planning.
+Test réel `testLocalFirstProgrammeCreationSurvivesRelaunch` réussi : connexion,
+création, lecteur ouvert, redémarrage et programme toujours disponible.
+Preuve : `/tmp/coai-first-programme-player-1001.xcresult`, 1 réussite, 0 échec.
+Contrôle PostgreSQL indépendant : exactement trois piliers SOCLE_COAI, version 1,
+statut conservé GENERE_IA, aucune validation humaine inventée. Compte fictif nettoyé.
+Tests de placement/droits/relecture et de navigation ajoutés ; test HTTP local
+des profils exclus, accès et créations concurrentes réussi. TypeScript, lint
+(six avertissements préexistants), build 132 pages et 356 médias contrôlés.
+Trois captures inspectées. Le pilote initial attendait un démarrage sur un jour
+de repos ; le second cherchait un titre sensible à la casse. La dernière preuve
+valide le lecteur ouvert, pas une séance terminée ni une mise en production.
+La capture révèle encore un bouton Ajuster trop proche du bord droit du lecteur
+sur petit écran : prochaine correction. Aucun déploiement ni soumission.
+
 À 17 h 19 : parcours RepCount natif connecté validé sur simulateur SE/iOS 26.5
 avec backend local réel. Deux mouvements sélectionnés dans la liste native,
 deux séries à 20 kg puis une à 12,5 kg saisie avec virgule française, notes,

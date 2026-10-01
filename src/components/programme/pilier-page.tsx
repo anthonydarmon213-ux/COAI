@@ -100,6 +100,7 @@ export async function PilierPage({
   if (access.appleUnavailable && !access.programme) throw Error('Accès temporairement indisponible. Réessaie.');
   const plan = access.plan;
   const peutGenerer = access.programme;
+  const aUnProgramme = derniers.some(Boolean) || valides.some(Boolean);
   const indexPilierActif = PILIERS.indexOf(pilierActif);
   const dernierActif = derniers[indexPilierActif];
   const aUnContenu = Boolean(valides[indexPilierActif] || dernierActif?.statut === "GENERE_IA" || (pilierActif === "ENTRAINEMENT" && accessibleTraining(null, dernierActif ?? null)));
@@ -206,6 +207,16 @@ export async function PilierPage({
               <Link href={`#pilier-${pilierActif.toLowerCase()}`} className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 py-3 text-sm font-semibold">
                 Faire le point sur mon programme
               </Link>
+            </div>
+          )}
+
+          {peutGenerer && !aUnProgramme && (
+            <div className="rounded-2xl border border-laiton-400/25 bg-laiton-400/[0.06] p-4">
+              <h2 className="text-lg font-semibold text-white">Ton premier programme commence ici.</h2>
+              <p className="mb-4 mt-2 text-sm leading-6 text-graphite-300">
+                COAI sélectionne ton entraînement, ta nutrition et ta récupération dans sa bibliothèque, à partir de ton profil.
+              </p>
+              <RegenerateButton hasExisting={false} />
             </div>
           )}
 
@@ -432,7 +443,7 @@ export async function PilierPage({
         );
       })}
 
-      {peutGenerer && (
+      {peutGenerer && aUnProgramme && (
         <details className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 text-sm">
           <summary className="cursor-pointer font-semibold text-graphite-300">Ajustements avancés du programme</summary>
           <div className="mt-3 flex flex-col items-start gap-3 border-t border-white/[0.07] pt-3">
@@ -451,7 +462,7 @@ export async function PilierPage({
                 ) : null;
               })}
             </div>
-            <RegenerateButton hasExisting={Boolean(derniers.some(Boolean))} />
+            <RegenerateButton hasExisting />
           </div>
         </details>
       )}

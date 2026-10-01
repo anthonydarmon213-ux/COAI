@@ -1,6 +1,53 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Local eligible profile and synthetic access, no pre-created programme.
+    @MainActor
+    func testLocalFirstProgrammeCreationSurvivesRelaunch() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let login = web.buttons["Se connecter"]
+        reveal(login, in: app); login.tap()
+        XCTAssertTrue(login.waitForNonExistence(timeout: 30))
+        app.buttons["native-tab-Séance"].tap()
+        let create = web.buttons["Créer mon programme complet"]
+        XCTAssertTrue(create.waitForExistence(timeout: 20))
+        XCTAssertFalse(web.buttons["Ajustements avancés du programme"].exists)
+        revealWebControl(create, in: app)
+        let before = XCTAttachment(screenshot: app.screenshot())
+        before.name = "Premier programme — accès à la création"
+        before.lifetime = .keepAlways; add(before)
+        create.tap()
+        XCTAssertTrue(create.waitForNonExistence(timeout: 30))
+        XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Ta première séance")).firstMatch.waitForExistence(timeout: 20))
+        let start = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Démarrer la séance")).firstMatch
+        XCTAssertTrue(start.waitForExistence(timeout: 15))
+        revealWebControl(start, in: app); start.tap()
+        XCTAssertTrue(web.buttons["Fermer"].waitForExistence(timeout: 10))
+        let player = XCTAttachment(screenshot: app.screenshot())
+        player.name = "Premier programme — lecteur de séance ouvert"
+        player.lifetime = .keepAlways; add(player)
+        let session = web.links["Accéder à ma séance →"]
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.buttons["native-tab-Séance"].waitForExistence(timeout: 15))
+        app.buttons["native-tab-Séance"].tap()
+        XCTAssertTrue(session.waitForExistence(timeout: 30))
+        XCTAssertFalse(create.exists)
+        revealWebControl(session, in: app)
+        XCTAssertTrue(session.isHittable)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Premier programme — séance accessible après relance"
+        proof.lifetime = .keepAlways; add(proof)
+    }
+
     /// Real local login, two exercises, durable draft, one persisted workout.
     @MainActor
     func testLocalRepCountDraftAndSavedWorkoutSurviveRelaunch() throws {

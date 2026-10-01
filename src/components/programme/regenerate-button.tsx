@@ -19,7 +19,8 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/programmes/generate", { method: "POST" });
+      // First creation is resumable: a lost response must not create another version.
+      const res = await fetch(hasExisting ? "/api/programmes/generate" : "/api/programmes/generate?mode=onboarding", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
         // Le détail technique renvoyé par l'API était concaténé au message
@@ -31,6 +32,11 @@ export function RegenerateButton({ hasExisting = true }: { hasExisting?: boolean
       }
       if (data?.echecs > 0) throw new Error("Une partie du programme n’a pas pu être enregistrée. Retrouve les piliers déjà disponibles dans ton espace.");
       setConfirmation(false);
+      if (!hasExisting) {
+        // Explicitly show session one, even when today is a rest day. This does
+        // not alter the user's weekly schedule or imply a completed workout.
+        router.replace("/programme/entrainement?onboarding=1#seance-du-jour");
+      }
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
