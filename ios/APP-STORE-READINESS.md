@@ -585,7 +585,7 @@ Version installée sans désinstallation sur l'iPhone 17 Pro d'Anthony à 19:59,
 lancement confirmé à 20:00. Rendu physique après cette mise à jour encore à
 confirmer ; pas de publication web, TestFlight ou App Store.
 
-## Checklist globale persistante — 17 septembre 2026
+## Checklist globale persistante — actualisée le 1er octobre 2026
 
 « Testé localement » ne signifie ni testé en production ni prêt à publier.
 Aucun des dix parcours n'est encore déclaré terminé de bout en bout sur iPhone.
@@ -596,20 +596,20 @@ pas encore une expérience native complète validée.
 | --- | --- | --- |
 | 1. Installation et ouverture | En cours | Binaire actuel signé installé puis lancé sur iPhone 17 Pro après déverrouillage ; processus présent une minute après. Contenu de l'écran et parcours connecté non vérifiés. Archive de distribution et TestFlight non validés. |
 | 2. Compte et connexion | En cours | Connexion publique, annulation Google, retour de récupération et saisie d'inscription contrôlés dans l'app simulée. Connexion persistante réelle, confirmation/récupération email et option Apple encore à valider/compléter. |
-| 3. Diagnostic et score COAI | Restant : validation iOS | Écrans web existants ; tester nouveau compte, questionnaire complet, calcul, sauvegarde et reprise interrompue dans l'app. |
+| 3. Diagnostic et score COAI | Validé partiellement en local | Nouveau compte, email de confirmation, diagnostic, reprise, contrôle des réponses sauvegardées et raccourci d'enregistrement testés dans l'app simulée le 28 septembre. Validation physique et production restantes. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
 | 5. Entraînement, nutrition, récupération | En cours | Routes existantes et minuteur natif. Vérifier droits, médias, fiches et navigation sur petits écrans avec données réelles de test. |
 | 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux. Partage natif PNG/PDF vérifié avec fichiers fictifs dans le simulateur ; vraie fiche connectée, séance complète, historique et appareil physique restent à vérifier. |
-| 7. Check-ins, adaptations et mémoire | Restant : validation iOS | Moteur et routes existants. Vérifier persistance, isolation des comptes, confirmations, cohérence des adaptations et absence d'appel payant. |
+| 7. Check-ins, adaptations et mémoire | Validé partiellement en local | Check-in et séance terminée puis relance vérifiés dans l'app simulée le 28 septembre avec contrôle PostgreSQL. Cela ne valide ni toutes les adaptations ni la mémoire IA réelle ; restent ces parcours, isolation complète et production. |
 | 8. Abonnements Apple | En cours + intervention humaine | Service StoreKit préparé mais non raccordé. Catalogue, droits serveur, achat, essai, restauration, expiration et résiliation restent à réaliser et tester. Tarifs/migration à valider. |
 | 9. Notifications et réengagement | En cours | Concurrence, refus de permission et réception visible en arrière-plan testés sur simulateur. Appareil physique, écran verrouillé et réengagement consenti restent à vérifier/implémenter. |
-| 10. Suppression sécurisée | En cours | Résiliation Stripe, erreurs Auth/Storage et reprise après profil supprimé couvertes par tests avec doublures. Restent concurrence, révocation de sessions et test intégral sur compte jetable autorisé. |
+| 10. Suppression sécurisée | En cours, blocage photos | Compte jetable supprimé depuis l'app simulée, absence Auth/profil et refus de l'ancien mot de passe vérifiés indépendamment le 28 septembre. Concurrence et reprise de photos testées avec stockage local réel et pannes injectées. Arrêt avant envoi sans preuve, conservation opérationnelle, facturation réelle et production restent non validés ; voir PHOTO-DELETION-READINESS.md. |
 
 Terminé et testé **au niveau technique local seulement** : règles de navigation,
 horloge/pause persistante, séquencement des livraisons d'achats et des alertes
 (24 XCTest), compilation simulateur et Release iPhone sans signature.
 
-Blocages humains identifiés : adhésion Apple Developer (coût non autorisé),
+Blocages humains identifiés : statut d'adhésion Apple Developer à confirmer (aucun achat autorisé),
 contrats/validation Apple, catalogue et conditions commerciales iOS, autorisation
 d'une éventuelle migration de production. Ces blocages n'empêchent pas les autres
 travaux de développement et de test sans frais.
