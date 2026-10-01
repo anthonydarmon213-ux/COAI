@@ -255,6 +255,13 @@ final class COAIWebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUI
     private static func makeWebView() -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
+        #if DEBUG
+        // Anonymous UI checks must never sign out or erase the device owner's
+        // persistent session. This isolated store exists only for this launch.
+        if ProcessInfo.processInfo.arguments.contains("-COAIAnonymousUITest") {
+            configuration.websiteDataStore = .nonPersistent()
+        }
+        #endif
         // Non-identifying capability marker, never an authentication signal.
         configuration.applicationNameForUserAgent = "COAIiOS/1"
         configuration.allowsInlineMediaPlayback = true

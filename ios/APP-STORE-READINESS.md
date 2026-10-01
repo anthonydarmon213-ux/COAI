@@ -2,6 +2,32 @@
 
 ## État courant — 1er octobre 2026
 
+À 08 h 47, après déverrouillage confirmé, les deux tests physiques passent
+sur iPhone 17 Pro / iOS 26.1 : navigation XXXL avec rotations et minuteur
+conservé après fermeture/relance. Résumé Xcode : 2 réussis, 0 échec, 0 ignoré,
+`/tmp/coai-device-unlocked-1001.xcresult`. Captures portrait/paysage et repos
+examinées dans `/tmp/coai-device-unlocked-proof-1001/`. Navigation avec contenu
+Debug fictif ; pas de parcours connecté, achat ni validation globale du site
+de production. L'ancien échec d'authentification ci-dessous est historique.
+
+À 08 h 50, deux scénarios anonymes de connexion échouent avant interaction :
+le bouton Google attendu n'existe pas car la session persistante de l'appareil
+ouvre déjà « Ton entraînement ». Hiérarchie Xcode examinée, aucun formulaire
+envoyé et aucune déconnexion forcée. Résultat
+`/tmp/coai-device-login-1001.xcresult` : 0 réussi, 2 échecs. Cela ne valide ni le
+clavier ni l'annulation Google sur cet appareil ; isoler une session de test
+anonyme sans toucher aux cookies personnels avant nouvelle tentative.
+
+À 08 h 54, reprise réussie des deux tests avec `-COAIAnonymousUITest` :
+stockage WebKit non persistant réservé au Debug, aucun effacement du stockage
+personnel. Résultat `/tmp/coai-device-anonymous-login-1001.xcresult` : 2 réussis,
+0 échec, 0 ignoré sur iPhone 17 Pro. Clavier visible, champ email accessible,
+onglets masqués ; annulation de la boîte système Google puis bouton utilisable.
+Capture clavier examinée dans `/tmp/coai-device-anonymous-login-proof-1001/`.
+Aucun identifiant saisi ni formulaire soumis ; connexion Google complète non
+testée. Release arm64 non signée recontrôlée avec 51 XCTest/65 contrôles cœur ;
+le nouveau marqueur Debug est absent du binaire selon `check-ios.sh`.
+
 Recontrôle natif à 08 h 44 : `bash scripts/check-ios.sh --device-release`
 réussit (51 XCTest, 65 contrôles cœur, règles WebKit compilées, configuration
 de confidentialité et cinq cas négatifs). Release iPhone arm64 non signée
