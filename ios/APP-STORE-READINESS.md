@@ -2,6 +2,15 @@
 
 ## État courant — 1er octobre 2026
 
+À 16 h 27 : échec réel de suppression dû à une photo non confirmée vérifié
+dans l'app sur simulateur SE, backend local. Message lisible, nouvelle tentative
+possible, session conservée après relance et export disponible. État de la base
+contrôlé indépendamment, fixture nettoyée. Preuve :
+`/tmp/coai-photo-delete-unresolved-retry-1001.xcresult`.
+La reprise automatique de l'envoi reste NON RÉSOLUE. L'étude du stockage local
+v1.72.1 écarte une simple révocation RLS comme barrière aux envois déjà admis ;
+voir `PHOTO-DELETION-READINESS.md`. Aucun code applicatif ni service distant modifié.
+
 À 16 h 11 : parcours HEIC par Fichiers réussi sur simulateur SE/iOS 26.5
 avec backend local réel (`/tmp/coai-heic-files-local-1001.xcresult`). Sélection,
 sauvegarde, relance et affichage de la miniature vérifiés ; une seule mesure

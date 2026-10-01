@@ -833,9 +833,20 @@ final class COAIUITests: XCTestCase {
         proof.lifetime = .keepAlways; add(proof)
     }
 
-    /// Real authenticated PDF endpoint; never publish or choose a share recipient.
+    /// Disposable loopback account only, never a personal or production account.
     @MainActor
     func testLocalConnectedAccountDeletionPersists() throws {
+        try runLocalAccountDeletion(unresolvedPhoto: false)
+    }
+
+    /// Requires seed-native-unresolved-photo.cjs --seed before launch.
+    @MainActor
+    func testLocalUnresolvedPhotoDeletionKeepsAccountUsable() throws {
+        try runLocalAccountDeletion(unresolvedPhoto: true)
+    }
+
+    @MainActor
+    private func runLocalAccountDeletion(unresolvedPhoto: Bool) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -889,6 +900,34 @@ final class COAIUITests: XCTestCase {
         proof.lifetime = .keepAlways
         add(proof)
         confirmation.buttons["Confirmer"].tap()
+        if unresolvedPhoto {
+            let failure = web.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "La suppression de tes photos reste à confirmer.")).firstMatch
+            XCTAssertTrue(failure.waitForExistence(timeout: 30))
+            revealWebControl(failure, in: app)
+            XCTAssertTrue(failure.isHittable)
+            XCTAssertFalse(web.buttons["Se connecter"].exists)
+            XCTAssertTrue(delete.isEnabled)
+            let failureProof = XCTAttachment(screenshot: app.screenshot())
+            failureProof.name = "Suppression non confirmée — compte conservé, message lisible"
+            failureProof.lifetime = .keepAlways; add(failureProof)
+            // Retry the actual failed request. No mocked response or forced settlement.
+            reveal(delete, in: app); delete.tap()
+            XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+            confirmation.buttons["Confirmer"].tap()
+            XCTAssertTrue(failure.waitForExistence(timeout: 30))
+            XCTAssertTrue(delete.isEnabled)
+            app.terminate(); app.launch()
+            XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 10))
+            app.buttons["native-tab-Explorer"].tap()
+            let reopenedSettings = app.buttons["explore-/compte/parametres"]
+            reveal(reopenedSettings, in: app, upward: false); reopenedSettings.tap()
+            XCTAssertTrue(delete.waitForExistence(timeout: 30))
+            XCTAssertFalse(web.buttons["Se connecter"].exists)
+            revealWebControl(export, in: app); export.tap()
+            XCTAssertTrue(app.otherElements["LP.CaptionBar.TopCaption"].waitForExistence(timeout: 20))
+            app.buttons.matching(NSPredicate(format: "label IN %@", ["Fermer", "Close"])).firstMatch.tap()
+            return
+        }
         XCTAssertTrue(email.waitForExistence(timeout: 30))
         app.terminate()
         app.launch()

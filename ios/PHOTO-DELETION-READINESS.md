@@ -14,6 +14,23 @@ Les admissions fermées restent représentées par une empreinte, pas cet identi
 
 ## Vérifié
 
+- 1er octobre, 16 h 27 — erreur de suppression testée dans l'app sur simulateur
+  SE/iOS 26.5 avec une vraie réservation locale non confirmée, sans faux HTTP.
+  `testLocalUnresolvedPhotoDeletionKeepsAccountUsable` réussi, preuve
+  `/tmp/coai-photo-delete-unresolved-retry-1001.xcresult` : annulation initiale,
+  export, deux confirmations refusées, explication lisible (capture inspectée),
+  boutons réutilisables, compte toujours connecté après relance et export encore
+  accessible. Vérification PostgreSQL indépendante : profil présent, admissions
+  fermées, opération toujours non confirmée. Le premier essai a corrigé le test
+  qui confondait le champ email des paramètres avec la page de connexion.
+  Fixture et registre nettoyés, ancien mot de passe refusé. Pas de correction
+  du blocage lui-même, pas de production ou d'iPhone physique pour ce scénario.
+  Régression de suppression normale également réussie à 16 h 30 :
+  `/tmp/coai-photo-delete-normal-regression-1001.xcresult`, compte/profil Auth
+  absents et mot de passe refusé par contrôle indépendant. TypeScript, lint
+  (six avertissements préexistants), build Next 132 pages et 356 chemins média
+  réussis. Aucun code produit modifié dans ce lot de tests.
+
 - 1er octobre, 16 h 11 — HEIC via Fichiers vérifié dans l'app sur simulateur
   SE/iOS 26.5, services Auth/PostgreSQL/Storage locaux réels. Scénario
   `testLocalHEICFilePersistsAfterRelaunch`, preuve
@@ -185,6 +202,22 @@ Les admissions fermées restent représentées par une empreinte, pas cet identi
   proxy de panne du service. Aucun test en production.
 
 ## Obligatoire avant publication
+
+### Vérification de la piste RLS — 1er octobre
+
+Version du conteneur local relevée : `storage-api:v1.72.1` (pas une preuve
+de version distante). Son [code d'envoi officiel épinglé](https://github.com/supabase/storage/blob/v1.72.1/src/storage/uploader.ts)
+contrôle les permissions avant le transfert, puis finalise les métadonnées
+avec `asSuperUser()`. Une révocation RLS après admission ne garantit donc pas
+le rejet d'un envoi déjà engagé. Une simple migration RLS ne résout pas la course.
+La [documentation du schéma Storage](https://supabase.com/docs/guides/storage/schema/design)
+distingue métadonnées et objets ; effacer une ligne SQL ne prouve pas
+l'effacement du fichier. Aucun trigger ni modification des tables Storage ajouté.
+
+La prochaine solution doit apporter une barrière d'écriture vérifiable côté
+stockage, ou un protocole de traitement durable avec preuve de fin ; ni délai,
+ni absence ponctuelle, ni révocation des seules permissions ne suffisent.
+Cette recherche écarte une correction dangereuse ; elle ne résout pas le défaut.
 
 1. Compléter la reprise opérationnelle des envois incertains. Un timeout
    ne prouve pas que le stockage a refusé le fichier : NE PAS supprimer la
