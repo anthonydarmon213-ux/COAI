@@ -1,6 +1,80 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Requires the disposable local fixture with --pending-pillars --without-checkin.
+    @MainActor
+    func testLocalPendingPillarsOfferUsefulDestinations() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app); submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        for (tab, action, heading) in [
+            ("Nutrition", "Explorer les recettes →", "Recettes."),
+            ("Récupération", "Faire mon bilan sommeil et forme →", "Comment te sens-tu aujourd’hui ?")
+        ] {
+            app.buttons["native-tab-" + tab].tap()
+            let link = web.links[action]
+            XCTAssertTrue(link.waitForExistence(timeout: 20))
+            reveal(link, in: app)
+            XCTAssertTrue(link.isHittable)
+            XCTAssertFalse(web.staticTexts["CONTENU_NON_RELU_TEST"].exists)
+            XCTAssertFalse(web.links["Télécharger ma fiche (PDF)"].exists)
+            let proof = XCTAttachment(screenshot: app.screenshot())
+            proof.name = "Programme en attente — raccourci " + tab
+            proof.lifetime = .keepAlways; add(proof)
+            link.tap()
+            XCTAssertTrue(web.staticTexts[heading].waitForExistence(timeout: 20))
+        }
+    }
+
+    /// Read-only check of the existing physical-device session. No AI request or programme mutation.
+    @MainActor
+    func testPhysicalExistingSessionWellnessDestinations() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        for (tab, heading) in [("Nutrition", "Ton alimentation."), ("Récupération", "Ta récupération.")] {
+            let destination = app.buttons["native-tab-" + tab]
+            XCTAssertTrue(destination.waitForExistence(timeout: 15))
+            destination.tap()
+            XCTAssertTrue(web.staticTexts[heading].waitForExistence(timeout: 30))
+            XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+            let proof = XCTAttachment(screenshot: app.screenshot())
+            proof.name = "Session réelle — " + tab
+            proof.lifetime = .keepAlways
+            add(proof)
+        }
+        app.buttons["native-tab-Explorer"].tap()
+        let recipes = app.buttons["explore-/programme/recettes"]
+        reveal(recipes, in: app)
+        recipes.tap()
+        XCTAssertTrue(web.staticTexts["Recettes."].waitForExistence(timeout: 30))
+        let recipe = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Voir la recette →")).firstMatch
+        reveal(recipe, in: app)
+        XCTAssertTrue(recipe.isHittable)
+        app.buttons["native-tab-Coach"].tap()
+        let draft = web.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Adapter ma semaine")).firstMatch
+        XCTAssertTrue(draft.waitForExistence(timeout: 30))
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Session réelle — Coach sans envoi"
+        proof.lifetime = .keepAlways
+        add(proof)
+        app.buttons["native-tab-Séance"].tap()
+        XCTAssertTrue(web.staticTexts["Ton entraînement."].waitForExistence(timeout: 30))
+    }
+
     /// Local fixture only. Never submits a message or contacts an AI provider.
     @MainActor
     func testLocalCoachConsentCanBeWithdrawnWithoutBlockingSession() throws {

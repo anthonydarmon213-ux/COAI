@@ -172,7 +172,7 @@ export async function PilierPage({
               </div>
               <h1 className="font-editorial text-4xl font-normal tracking-tight sm:text-5xl">{heroParPilier[pilierActif].titre}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite-300 sm:text-base">
-                {enValidation ? `Ton programme ${LABELS[pilierActif].toLowerCase()} attend une relecture par ton coach. Les autres rubriques restent accessibles selon tes droits.` : heroParPilier[pilierActif].texte}
+                {enValidation ? `Ton programme ${LABELS[pilierActif].toLowerCase()} est en attente de relecture. En attendant, retrouve les contenus disponibles ci-dessous.` : heroParPilier[pilierActif].texte}
               </p>
             </div>
             {/* La carte Story a laisse place au telechargement de la fiche
@@ -194,6 +194,20 @@ export async function PilierPage({
               </a>
             </div>}
           </div>
+
+          {enValidation && (
+            <div className="flex flex-wrap gap-2" aria-label="Disponible pendant la relecture">
+              <Link
+                href={pilierActif === "NUTRITION" ? "/programme/recettes" : pilierActif === "RECUPERATION" ? "/dashboard#check-in-du-jour" : "/programme/exercices"}
+                className="coai-pillar-primary inline-flex min-h-11 items-center justify-center rounded-full px-5 py-3 text-sm font-bold"
+              >
+                {pilierActif === "NUTRITION" ? "Explorer les recettes →" : pilierActif === "RECUPERATION" ? "Faire mon bilan sommeil et forme →" : "Voir les exercices et leurs vidéos →"}
+              </Link>
+              <Link href={`#pilier-${pilierActif.toLowerCase()}`} className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 py-3 text-sm font-semibold">
+                Faire le point sur mon programme
+              </Link>
+            </div>
+          )}
 
           <nav aria-label="Choisir un pilier" className="coai-pillar-switcher">
             {PILIERS.map((pilier) => (

@@ -2,6 +2,35 @@
 
 ## État courant — 1er octobre 2026
 
+À 09 h 43, les raccourcis des piliers EN_ATTENTE sont vérifiés dans l'app
+sur simulateur iPhone SE (3e génération), iOS 26.5, avec serveur compilé
+et Auth/base locaux : Nutrition → Recettes, Récupération → bilan du jour.
+`/tmp/coai-pending-pillars-1001.xcresult` : 1 réussi, 0 échec, 0 ignoré.
+Deux captures examinées dans `/tmp/coai-pending-pillars-proof-1001/` :
+boutons lisibles et accessibles avant la carte. Aucun contenu non relu ni
+lien PDF disponible pour ces programmes. Build Next complet et tests de
+rendu/régression réussis. Compte jetable supprimé, identité Auth absente et
+ancien mot de passe refusé par contrôle indépendant. Aucun appel IA.
+Précondition reproductible du test : harness local `ui-create --registered
+--pending-pillars --without-checkin`. Production et appareil physique avec
+ce correctif restent à vérifier ; aucune publication effectuée.
+
+À 09 h 17, parcours physique en session existante : Nutrition, Récupération,
+Recettes (bouton de détail accessible), Coach (sans envoi) puis retour Séance.
+`/tmp/coai-device-wellness-1001.xcresult` : 1 réussi, 0 échec, 0 ignoré.
+Trois captures examinées dans `/tmp/coai-device-wellness-proof-1001/`.
+IMPORTANT : Nutrition et Récupération affichent EN_ATTENTE sur ce compte ;
+ce test valide la navigation, PAS la disponibilité des programmes personnalisés.
+Correctif local : raccourcis recettes / bilan sommeil-forme / exercices avant
+la carte d'attente. Relecture et accès aux PDF inchangés. Test de rendu isolé
+`node scripts/test-pillar-pending-actions.cjs` et TypeScript sans émission réussis.
+Rendu iPhone du correctif et production NON vérifiés ; aucune publication.
+La relecture réelle des programmes reste à effectuer, pas à contourner.
+
+À 09 h 14, lecture du conteneur de l'app sur l'iPhone après fermeture du
+partage PDF : `tmp/COAIExports` contient zéro fichier. Nettoyage temporaire
+confirmé pour ce parcours ; aucune suppression manuelle effectuée.
+
 À 09 h 09, téléchargement PDF depuis la session persistante existante sur
 iPhone 17 Pro / iOS 26.1 : 1 réussi, 0 échec, 0 ignoré dans
 `/tmp/coai-device-pdf-1001.xcresult`. Capture examinée dans
