@@ -2,6 +2,14 @@
 
 ## État courant — 1er octobre 2026
 
+Contrôle distribution du 1er octobre : `devicectl list devices` indique toujours
+l’iPhone 17 Pro indisponible ; `security find-identity -v -p codesigning` trouve
+une seule identité Apple Development, aucune Apple Distribution. Cela ne prouve
+pas le statut d’adhésion du compte Apple distant. Aucun certificat créé, achat,
+changement de compte, publication ou soumission effectué. Le tableau de parcours
+ci-dessous est corrigé pour ne plus présenter les tarifs approuvés et le
+raccordement local StoreKit comme des décisions ou développements manquants.
+
 À 13 h 27 : export natif après correction revalidé sur SE simulé iOS 26.5.
 `testLocalConnectedAccountExportShares` réussi, zéro échec dans
 `/tmp/coai-export-fresh-1001.xcresult` : partage, fermeture, second export,
@@ -885,9 +893,9 @@ pas encore une expérience native complète validée.
 | 3. Diagnostic et score COAI | Validé partiellement en local | Nouveau compte, email de confirmation, diagnostic, reprise, contrôle des réponses sauvegardées et raccourci d'enregistrement testés dans l'app simulée le 28 septembre. Validation physique et production restantes. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
 | 5. Entraînement, nutrition, récupération | En cours | Routes existantes et minuteur natif. Vérifier droits, médias, fiches et navigation sur petits écrans avec données réelles de test. |
-| 6. Séances, performances et progrès | En cours | Correctifs RepCount couverts par tests locaux. Partage natif PNG/PDF vérifié avec fichiers fictifs dans le simulateur ; vraie fiche connectée, séance complète, historique et appareil physique restent à vérifier. |
+| 6. Séances, performances et progrès | Validé partiellement en local | Séance terminée et retour d’effort sauvegardés ; mesures et photo après relance vérifiées avec compte fictif connecté, contrôle PostgreSQL et fichier Storage réel local. Export du compte enregistré dans Fichiers le 1er octobre, JSON contrôlé. Cela ne valide pas tous les parcours RepCount ni l’ensemble en production et sur appareil physique. |
 | 7. Check-ins, adaptations et mémoire | Validé partiellement en local | Check-in et séance terminée puis relance vérifiés dans l'app simulée le 28 septembre avec contrôle PostgreSQL. Cela ne valide ni toutes les adaptations ni la mémoire IA réelle ; restent ces parcours, isolation complète et production. |
-| 8. Abonnements Apple | En cours + intervention humaine | Service StoreKit préparé mais non raccordé. Catalogue, droits serveur, achat, essai, restauration, expiration et résiliation restent à réaliser et tester. Tarifs/migration à valider. |
+| 8. Abonnements Apple | Validé partiellement en local + intervention humaine | Écran natif raccordé au service ; huit scénarios StoreKit Xcode réussis avec serveur simulé, dont reprise, compte différent, remboursement, expiration et restauration vide. Tarifs approuvés le 23 septembre : 19,99 €/mois, 119 €/an, essai de sept jours si éligible. Catalogue distant, activation, migration distante, signatures/notifications Apple réelles et parcours Sandbox de bout en bout restent à valider ; aucun achat réel effectué. |
 | 9. Notifications et réengagement | En cours | Concurrence, refus de permission et réception visible en arrière-plan testés sur simulateur. Appareil physique, écran verrouillé et réengagement consenti restent à vérifier/implémenter. |
 | 10. Suppression sécurisée | En cours, blocage photos | Compte jetable supprimé depuis l'app simulée, absence Auth/profil et refus de l'ancien mot de passe vérifiés indépendamment le 28 septembre. Concurrence et reprise de photos testées avec stockage local réel et pannes injectées. Arrêt avant envoi sans preuve, conservation opérationnelle, facturation réelle et production restent non validés ; voir PHOTO-DELETION-READINESS.md. |
 
@@ -896,7 +904,7 @@ horloge/pause persistante, séquencement des livraisons d'achats et des alertes
 (24 XCTest), compilation simulateur et Release iPhone sans signature.
 
 Blocages humains identifiés : statut d'adhésion Apple Developer à confirmer (aucun achat autorisé),
-contrats/validation Apple, catalogue et conditions commerciales iOS, autorisation
+contrats/validation Apple, configuration du catalogue distant et validation juridique, autorisation
 d'une éventuelle migration de production. Ces blocages n'empêchent pas les autres
 travaux de développement et de test sans frais.
 

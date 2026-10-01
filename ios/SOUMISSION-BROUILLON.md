@@ -1,6 +1,6 @@
 # COAI — dossier de soumission (brouillon, non publié)
 
-Mise à jour : 28 septembre 2026. Préparation sans frais autorisée par Anthony.
+Mise à jour : 1er octobre 2026. Préparation sans frais autorisée par Anthony.
 Ce document ne constitue ni une validation fonctionnelle ni une soumission Apple.
 
 ## Métadonnées proposées
@@ -71,6 +71,18 @@ Contrôle suivant du 28 septembre : CoreDevice indique désormais l'iPhone 17 Pr
 - Non publié. Ces vérifications ne valident ni le catalogue Apple distant, ni l'ensemble des clauses juridiques, ni les pages actuellement en production.
 
 ## Conditions de sortie avant soumission
+
+Point de contrôle du 1er octobre : iPhone 17 Pro toujours indisponible et une
+seule identité locale Apple Development détectée, sans Apple Distribution.
+L’adhésion distante n’a pas été vérifiée : l’absence de certificat local ne
+permet pas de conclure que le compte Apple n’est pas inscrit. Le build Release
+arm64 0.1.0 (1) a été compilé sans signature ; il n’est pas distribuable tel quel.
+Les huit tests StoreKit Xcode ont réussi avec serveur simulé, pas dans Sandbox
+Apple. Les tarifs ont déjà été approuvés ; ne pas redemander cette décision.
+L’export connecté a été revalidé le 1er octobre dans l’app simulée jusque dans
+Fichiers, avec contrôle du JSON. Ces éléments ne cochent pas les portes de sortie
+ci-dessous : la version distribuée, les services distants et l’appareil restent
+à valider. Preuves détaillées dans `APP-STORE-READINESS.md`.
 
 - [ ] Adhésion et accès de distribution actifs ; contrats traités par Anthony.
 - [ ] Catalogue, essai et droits Apple approuvés ; achat et restauration réellement testés.
