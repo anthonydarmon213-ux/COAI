@@ -2,6 +2,30 @@
 
 ## État courant — 1er octobre 2026
 
+À 14 h 30 : iPhone 17 Pro de nouveau disponible, appairé et déverrouillé
+(iOS 26.1). Build Debug signé installé et tests physiques exécutés avec
+`DEVELOPMENT_TEAM=33L78928V3`. Sans ce paramètre, la cible UI échouait avant
+compilation ; consigne ajoutée au README. Une identité Apple Development
+observée, pas de Distribution ; aucune conclusion sur l’adhésion distante.
+
+- `/tmp/coai-physical-wellness-1001.xcresult` réussi : navigation Nutrition,
+  Récupération, Recettes, Coach puis Séance sur les pages en ligne et session
+  existante. Captures inspectées. Nutrition/récupération affichent EN_ATTENTE :
+  ceci ne valide pas leurs programmes complets ni une réponse IA (aucun envoi).
+- `/tmp/coai-physical-pdf-1001.xcresult` réussi : lien PDF du programme réel,
+  présentation du partage iOS identifié PDF, fermeture et retour utilisable.
+  Aucun destinataire choisi, aucun envoi. Pas une relecture du contenu PDF.
+- `/tmp/coai-physical-catalogue-team-1001.xcresult` échoué : clavier toujours
+  ouvert après Entrée. Hiérarchie et vidéo montrent aussi le rowing unilatéral
+  encore présent en ligne. Le code local possède déjà le formulaire qui ferme
+  le clavier et l’exclusion média : publication des corrections non prouvée.
+  Ne pas transformer cet échec en succès en supprimant les assertions.
+
+Autorisation explicite du déploiement Vercel demandée, en attente. Aucun
+déploiement, achat, migration distante ou envoi App Store effectué. L’ancienne
+mention « iPhone indisponible » ci-dessous est désormais historique, pas un
+blocage actuel pour les contrôles en lecture seule.
+
 À 14 h 13 : réponse d’export malformée maintenant vérifiée dans l’app native
 sur simulateur SE, et non seulement dans le test de composant. Le proxy local
 `scripts/ios-export-failure-proxy.cjs` remplace une première réponse authentifiée

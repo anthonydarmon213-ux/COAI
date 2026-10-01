@@ -242,6 +242,16 @@ xcodebuild -project ios/COAI.xcodeproj -scheme COAI -configuration Debug \
   CODE_SIGNING_ALLOWED=NO test
 ```
 
+Sur un iPhone physique déjà appairé et autorisé, fournir aussi
+`DEVELOPMENT_TEAM=33L78928V3` à `xcodebuild` : la cible UI n’hérite pas de
+l’équipe définie uniquement sur la cible de l’application. Remplacer la
+destination par `platform=iOS,id=IDENTIFIANT_IPHONE` et ne pas passer
+`CODE_SIGNING_ALLOWED=NO`. Ne sélectionner que les tests `testPhysical…`
+dont les prérequis sont satisfaits ; ils utilisent les pages en ligne et la
+session existante. Ne pas lancer les fixtures locales ou les tests d’achat
+sur le compte personnel. Aucun profil de distribution ni achat d’adhésion
+n’est créé par ces instructions.
+
 Réception d'alerte (17 septembre) : test ci-dessus réussi seul sur le simulateur
 QA alertes iPhone SE / iOS 26.5, permission vierge ou acceptée. Il démarre
 30 secondes, revient à l'accueil iOS, vérifie titre visible et corps de la
