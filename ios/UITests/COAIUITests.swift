@@ -1,6 +1,97 @@
 import XCTest
 
 final class COAIUITests: XCTestCase {
+    /// Real local login, two exercises, durable draft, one persisted workout.
+    @MainActor
+    func testLocalRepCountDraftAndSavedWorkoutSurviveRelaunch() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap(); email.typeText("coai-ui-20260924-http@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app); password.tap(); password.typeText("Coai-local-UI-0924-only!")
+        let login = web.buttons["Se connecter"]
+        reveal(login, in: app); login.tap()
+        XCTAssertTrue(login.waitForNonExistence(timeout: 30))
+        func openRepCount() {
+            XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 10))
+            app.buttons["native-tab-Explorer"].tap()
+            let target = app.buttons["explore-/suivi/repcount"]
+            reveal(target, in: app); target.tap()
+            XCTAssertTrue(web.staticTexts["Note ta série."].waitForExistence(timeout: 20))
+        }
+        openRepCount()
+        let exercise = web.textFields.matching(NSPredicate(format: "label ==[c] %@", "Exercice")).firstMatch
+        XCTAssertTrue(exercise.waitForExistence(timeout: 10))
+        func chooseExercise(_ name: String) {
+            revealWebControl(exercise, in: app); exercise.tap()
+            let suggestion = app.buttons[name]
+            XCTAssertTrue(suggestion.waitForExistence(timeout: 5))
+            for _ in 0..<12 {
+                if suggestion.isHittable { break }
+                // UIKit reports the full list height, including its clipped part.
+                // Scroll inside the visible popover, not through the keyboard.
+                let list = app.collectionViews.firstMatch
+                let origin = list.coordinate(withNormalizedOffset: .zero)
+                let high = origin.withOffset(CGVector(dx: 100, dy: 70))
+                let low = origin.withOffset(CGVector(dx: 100, dy: 170))
+                if suggestion.exists && suggestion.frame.midY < list.frame.minY + 70 {
+                    high.press(forDuration: 0.05, thenDragTo: low)
+                } else {
+                    low.press(forDuration: 0.05, thenDragTo: high)
+                }
+            }
+            XCTAssertTrue(suggestion.isHittable); suggestion.tap()
+            let done = app.toolbars.buttons["OK"]
+            if done.waitForExistence(timeout: 3) { done.tap() }
+            XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
+            XCTAssertEqual(exercise.value as? String, name)
+        }
+        chooseExercise("Développé couché (barre)")
+        let validate = web.buttons["Valider la série"]
+        revealWebControl(validate, in: app); validate.tap()
+        let duplicate = web.buttons["Valider une série identique à la dernière"]
+        revealWebControl(duplicate, in: app); duplicate.tap()
+        let next = web.buttons["Ajouter un autre exercice →"]
+        revealWebControl(next, in: app); next.tap()
+        XCTAssertTrue(exercise.isEnabled)
+        chooseExercise("Développé couché haltères")
+        let charge = web.textFields["CHARGE"]
+        revealWebControl(charge, in: app); charge.tap(); charge.typeText("12,5")
+        let chargeDone = app.toolbars.buttons["OK"]
+        XCTAssertTrue(chargeDone.waitForExistence(timeout: 3)); chargeDone.tap()
+        XCTAssertEqual(charge.value as? String, "12.5")
+        revealWebControl(validate, in: app); validate.tap()
+        let notes = web.textViews["Notes de séance (facultatif)"]
+        revealWebControl(notes, in: app); notes.tap(); notes.typeText("Test local RepCount : deux mouvements")
+        let done = app.toolbars.buttons["OK"]
+        XCTAssertTrue(done.waitForExistence(timeout: 3)); done.tap()
+        // Navigate away first: do not confuse a still-alive DOM with persisted data.
+        let finish = web.buttons["Terminer et enregistrer la séance"]
+        revealWebControl(finish, in: app)
+        app.terminate(); app.launch(); openRepCount()
+        XCTAssertTrue(web.staticTexts["Développé couché (barre)"].waitForExistence(timeout: 15))
+        XCTAssertEqual(exercise.value as? String, "Développé couché haltères")
+        XCTAssertEqual(notes.value as? String, "Test local RepCount : deux mouvements")
+        revealWebControl(finish, in: app); finish.tap()
+        XCTAssertTrue(web.staticTexts["Séance enregistrée ✓"].waitForExistence(timeout: 20))
+        XCTAssertFalse(finish.exists)
+        app.terminate(); app.launch(); openRepCount()
+        XCTAssertFalse(finish.exists)
+        let history = web.buttons["Reprendre une séance passée"]
+        XCTAssertTrue(history.waitForExistence(timeout: 15))
+        revealWebControl(history, in: app); history.tap()
+        let routine = web.buttons["Reprendre ces exercices"].firstMatch
+        XCTAssertTrue(routine.waitForExistence(timeout: 15))
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "RepCount local — séance retrouvée après relance"
+        proof.lifetime = .keepAlways; add(proof)
+    }
+
     /// Local Auth + local SMTP only. The recovery email is opened in Safari,
     /// a different cookie store from the app that requested it.
     @MainActor

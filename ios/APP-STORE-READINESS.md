@@ -2,6 +2,24 @@
 
 ## État courant — 1er octobre 2026
 
+À 17 h 19 : parcours RepCount natif connecté validé sur simulateur SE/iOS 26.5
+avec backend local réel. Deux mouvements sélectionnés dans la liste native,
+deux séries à 20 kg puis une à 12,5 kg saisie avec virgule française, notes,
+fermeture complète, reprise du brouillon, enregistrement, nouvelle relance et
+ouverture de l'historique. Résultat :
+`/tmp/coai-repcount-draft-history-1001.xcresult`, 1 test réussi, 0 échec.
+`scripts/verify-native-repcount.cjs` relit PostgreSQL : exactement une séance
+REPCOUNT, deux exercices, trois séries de 10 répétitions aux charges attendues
+et notes exactes. Compte jetable nettoyé après contrôle. Capture inspectée.
+Les échecs de pilotage précédents concernaient la liste native (saisie derrière
+le sélecteur, défilement trop large) et un historique non déplié. L'hypothèse
+d'un correctif clavier a été abandonnée : aucune modification produit retenue.
+Sept tests ciblés RepCount, TypeScript, lint (six avertissements préexistants),
+build Next 132 pages et 356 chemins média vérifiés. Restent la saisie libre hors
+suggestions, les coupures réseau natives, les corrections/retraits de séries,
+l'isométrique natif, le physique et la production ; pas de validation générale
+de tous les parcours RepCount.
+
 À 16 h 57 : récupération de mot de passe complète réussie sur simulateur SE
 iOS 26.5, Auth et SMTP exclusivement locaux. Demande dans l'app, ouverture du
 lien reçu dans Safari (stockage de session distinct), saisie du nouveau mot de
@@ -1055,7 +1073,7 @@ pas encore une expérience native complète validée.
 | 3. Diagnostic et score COAI | Validé partiellement en local | Nouveau compte, email de confirmation, diagnostic, reprise, contrôle des réponses sauvegardées et raccourci d'enregistrement testés dans l'app simulée le 28 septembre. Validation physique et production restantes. |
 | 4. Programme personnalisé | Restant : validation iOS | Bibliothèque prioritaire, pas d'appel IA payant automatique. Vérifier sélection, profils exclus, sauvegarde et absence de doublon sur compte de test. |
 | 5. Entraînement, nutrition, récupération | Validé partiellement sur appareil | Navigation Nutrition/Récupération/Recettes/Coach/Séance et partage PDF vérifiés en ligne sur iPhone le 1er octobre ; minuteur persistant vérifié. Programmes nutrition/récupération EN_ATTENTE : contenu complet non validé. Catalogue physique en échec (clavier et rowing encore présent en ligne), corrections locales non publiées. Droits, cohérence de tous les médias et petits écrans restent à compléter. |
-| 6. Séances, performances et progrès | Validé partiellement en local | Séance terminée et retour d’effort sauvegardés ; mesures et photo après relance vérifiées avec compte fictif connecté, contrôle PostgreSQL et fichier Storage réel local. Export du compte enregistré dans Fichiers le 1er octobre, JSON contrôlé. Cela ne valide pas tous les parcours RepCount ni l’ensemble en production et sur appareil physique. |
+| 6. Séances, performances et progrès | Validé partiellement en local | Séance terminée et retour d’effort sauvegardés ; mesures et photo après relance vérifiées avec compte fictif connecté, contrôle PostgreSQL et fichier Storage réel local. Export du compte enregistré dans Fichiers le 1er octobre, JSON contrôlé. RepCount : deux mouvements, charge décimale française, reprise du brouillon et historique après relance vérifiés dans l’app simulée le 1er octobre ; trois séries exactes dans une seule séance confirmées indépendamment dans PostgreSQL. Cela ne valide pas tous les parcours RepCount ni l’ensemble en production et sur appareil physique. |
 | 7. Check-ins, adaptations et mémoire | Validé partiellement en local | Check-in et séance terminée puis relance vérifiés dans l'app simulée le 28 septembre avec contrôle PostgreSQL. Cela ne valide ni toutes les adaptations ni la mémoire IA réelle ; restent ces parcours, isolation complète et production. |
 | 8. Abonnements Apple | Validé partiellement en local + intervention humaine | Écran natif raccordé au service ; huit scénarios StoreKit Xcode réussis avec serveur simulé, dont reprise, compte différent, remboursement, expiration et restauration vide. Tarifs approuvés le 23 septembre : 19,99 €/mois, 119 €/an, essai de sept jours si éligible. Catalogue distant, activation, migration distante, signatures/notifications Apple réelles et parcours Sandbox de bout en bout restent à valider ; aucun achat réel effectué. |
 | 9. Notifications et réengagement | En cours | Concurrence, refus de permission et réception visible en arrière-plan testés sur simulateur. Appareil physique, écran verrouillé et réengagement consenti restent à vérifier/implémenter. |
