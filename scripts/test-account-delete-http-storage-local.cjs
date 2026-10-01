@@ -1,6 +1,6 @@
 // Real local HTTP/Auth/Postgres/Storage only. No Stripe, Apple or production calls.
 const assert = require('node:assert/strict');
-const { randomUUID } = require('node:crypto');
+const { randomUUID, createHash } = require('node:crypto');
 const { createClient } = require('@supabase/supabase-js');
 const { PrismaClient } = require('@prisma/client');
 assert.equal(process.env.NEXT_PUBLIC_SUPABASE_URL, 'http://127.0.0.1:54321');
@@ -88,6 +88,30 @@ async function main() {
   const signedPhoto = await bucket.createSignedUrl(a.paths[0], 3600);
   assert.equal(signedPhoto.error, null);
   assert.equal((await fetch(signedPhoto.data.signedUrl)).status, 200);
+  // Model an admitted write whose process has not yet stored its file. Never
+  // settle it based on age/absence: the HTTP route must report the precise gate.
+  const ownerKey = createHash('sha256').update('coai-photo-owner-v1:' + a.id).digest('hex');
+  const operation = randomUUID();
+  await db.$executeRaw`INSERT INTO photo_uploads (id, "ownerKey") VALUES (${operation}, ${ownerKey})`;
+  const blocked = await fetch('http://127.0.0.1:3050/api/compte/delete', {
+    method: 'POST', headers: { ...headers(a), 'x-coai-delete-confirmation': '1' },
+  });
+  assert.equal(blocked.status, 503);
+  const blockedBody = await blocked.json();
+  assert.equal(blockedBody.code, 'PHOTO_DELETION_UNCONFIRMED');
+  assert.equal(blockedBody.success, undefined);
+  assert.ok(!JSON.stringify(blockedBody).includes(operation));
+  assert.equal(await db.user.count({ where: { id: a.user.id } }), 1);
+  assert.equal((await admin.auth.admin.getUserById(a.id)).data.user.id, a.id);
+  assert.equal((await bucket.list(a.id, { limit: 200 })).data.length, 101);
+  assert.equal((await db.$queryRaw`SELECT closed FROM photo_owner_gates WHERE "ownerKey"=${ownerKey}`)[0].closed, true);
+  // Let the admitted operation actually finish, with its exact recovery proof.
+  // The normal delete route must recover it, not a test-side settled update.
+  const latePath = `${a.id}/${operation}.png`;
+  a.paths.push(latePath);
+  assert.equal((await bucket.upload(latePath, png, {
+    contentType: 'image/png', upsert: false, metadata: { coaiUploadOperation: operation },
+  })).error, null);
   const response = await fetch('http://127.0.0.1:3050/api/compte/delete', {
     method: 'POST',
     headers: { ...headers(a), 'x-coai-delete-confirmation': '1', 'Content-Type': 'application/json' },
@@ -132,7 +156,7 @@ async function main() {
   const preserved = await bucket.download(b.paths[0]);
   assert.equal(preserved.error, null);
   assert.deepEqual(Buffer.from(await preserved.data.arrayBuffer()), png);
-  console.log('PASS real local HTTP deletion: replaced avatar already removed; 101 remaining files removed across pagination, user/profile removed, both old sessions and password denied; forged owner ignored, other account/file preserved');
+  console.log('PASS real local HTTP deletion: unresolved write returns specific 503 without deleting profile/Auth/photos; late exact proof recovered on retry, 102 files removed across pagination, both old sessions/password denied; forged owner ignored, other account preserved');
   console.log('PASS old sessions cannot upload avatars/progress photos; previous signed photo URL no longer serves the removed object; no photos recreated');
   console.log('LIMIT: local services only; no native UI, production, paid subscriptions or Apple cancellation verified');
 }
@@ -145,6 +169,9 @@ main().catch(error => { console.error(error); process.exitCode = 1; }).finally(a
       const found = await admin.auth.admin.getUserById(f.id);
       if (found.data.user) assert.equal((await admin.auth.admin.deleteUser(f.id)).error, null);
       else assert.equal(found.error?.status, 404);
+      const key = createHash('sha256').update('coai-photo-owner-v1:' + f.id).digest('hex');
+      await db.$executeRaw`DELETE FROM photo_uploads WHERE "ownerKey"=${key}`;
+      await db.$executeRaw`DELETE FROM photo_owner_gates WHERE "ownerKey"=${key}`;
     } catch (error) { errors.push(error); }
   }
   await db.$disconnect();

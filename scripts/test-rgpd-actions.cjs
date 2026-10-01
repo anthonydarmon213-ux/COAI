@@ -54,6 +54,21 @@ function button(text){return nodes(render()).find(x=>x.type==='button'&&label(x)
   confirmed=true;status=500;await button('Supprimer mon compte').props.onClick();
   assert.equal(pushes,0);assert.ok(label(render()).includes('suppression n’a pas pu être confirmée'));
   assert.equal(button('Supprimer mon compte').props.disabled,false);
+  status=503;responseBody={code:'PHOTO_DELETION_UNCONFIRMED',error:'PRIVATE_PROVIDER_DETAIL'};
+  await button('Supprimer mon compte').props.onClick();
+  assert.ok(label(render()).includes('nouveaux envois bloqués par sécurité'));
+  assert.ok(label(render()).includes('Ton compte n’est pas supprimé'));
+  assert.ok(!label(render()).includes('PRIVATE_PROVIDER_DETAIL'));
+  assert.equal(pushes,0);assert.equal(nativeCleanups,0);
+  assert.equal(button('Supprimer mon compte').props.disabled,false);
+  for (const body of [null, [], {}, {code:'unknown',error:'PRIVATE_PROVIDER_DETAIL'}]) {
+    responseBody=body;await button('Supprimer mon compte').props.onClick();
+    assert.ok(label(render()).includes('suppression n’a pas pu être confirmée'));
+    assert.ok(!label(render()).includes('PRIVATE_PROVIDER_DETAIL'));
+  }
+  badJson=true;await button('Supprimer mon compte').props.onClick();badJson=false;
+  assert.ok(label(render()).includes('suppression n’a pas pu être confirmée'));
+  responseBody={id:'local-export-user',profile:{}};
   status=200; let release;hold=new Promise(resolve=>release=resolve);
   const save=button('Exporter mes données').props.onClick();const count=calls;
   await button('Supprimer mon compte').props.onClick();assert.equal(calls,count,'No overlapping operation');

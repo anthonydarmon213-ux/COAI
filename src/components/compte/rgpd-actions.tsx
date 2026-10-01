@@ -58,7 +58,17 @@ export function RgpdActions() {
         method: "POST",
         headers: { "X-COAI-Delete-Confirmation": "1" },
       });
-      if (!res.ok) throw new Error(res.status === 401 ? "session" : "delete");
+      if (!res.ok) {
+        if (res.status === 401) throw new Error("session");
+        // Only recognize a stable server code, never render provider messages.
+        const failure: unknown = await res.json().catch(() => null);
+        if (res.status === 503 && failure && typeof failure === "object"
+          && !Array.isArray(failure) && "code" in failure
+          && failure.code === "PHOTO_DELETION_UNCONFIRMED") {
+          throw new Error("photos");
+        }
+        throw new Error("delete");
+      }
       const result: unknown = await res.json();
       if (!result || typeof result !== "object" || !("success" in result) || result.success !== true) {
         throw new Error("delete_unconfirmed");
@@ -69,6 +79,8 @@ export function RgpdActions() {
     } catch (cause) {
       setError(cause instanceof Error && cause.message === "session"
         ? "Ta connexion a expiré. Reconnecte-toi avant de demander la suppression."
+        : cause instanceof Error && cause.message === "photos"
+        ? "La suppression de tes photos reste à confirmer. Ton compte n’est pas supprimé ; certaines photos peuvent déjà être effacées et les nouveaux envois bloqués par sécurité. Réessaie la suppression ou contacte l’assistance si cela persiste."
         : "La suppression n’a pas pu être confirmée. Réessaie ou contacte l’assistance si le problème persiste.");
       pending.current = false;
       setDeleting(false);

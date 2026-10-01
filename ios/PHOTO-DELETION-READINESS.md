@@ -14,6 +14,21 @@ Les admissions fermées restent représentées par une empreinte, pas cet identi
 
 ## Vérifié
 
+- 1er octobre — erreur de suppression identifiable : la route renvoie le code
+  stable `PHOTO_DELETION_UNCONFIRMED` et le compte affiche une explication dédiée
+  (suppression non terminée, photos éventuellement déjà effacées, nouveaux envois
+  éventuellement bloqués). Aucun détail fournisseur ou identifiant d’opération
+  n’est affiché ; session et boutons restent utilisables après échec.
+  Tests de composant et de route réussis, y compris JSON invalide/code inconnu.
+  Test HTTP recompilé avec Auth/PostgreSQL/Storage locaux réels : réservation
+  sans fichier → 503 avec code, profil/identité/101 fichiers conservés et
+  admissions fermées ; arrivée ultérieure du fichier avec preuve exacte →
+  nouvelle tentative réussie, 102 fichiers supprimés, anciennes sessions
+  refusées, compte voisin préservé. Fixtures et leurs registres nettoyés.
+  Build Next (132 pages), TypeScript, lint ciblé et 356 chemins média vérifiés.
+  Ce correctif explique le blocage ; il NE résout PAS l’arrêt définitif avant
+  envoi et n’est ni publié ni vérifié dans l’interface iPhone.
+
 - 1er octobre — reprise autonome préparée : route privée
   `/api/cron/photos-retirees`, refus sans secret, désactivée par défaut
   (`PHOTO_RETIREMENT_CRON_ENABLED`), aucune planification ajoutée à `vercel.json`.

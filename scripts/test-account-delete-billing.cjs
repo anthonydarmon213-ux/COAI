@@ -65,6 +65,8 @@ async function scenario({status='active',customer='cus_owner',retrieveError=fals
   assert.equal(failedPhotos.response.status,503);
   assert.deepEqual(failedPhotos.events,['retrieve','cancel','photos']);
   assert.match(failedPhotos.response.body.error,/Certaines photos/);
+  assert.equal(failedPhotos.response.body.code,'PHOTO_DELETION_UNCONFIRMED');
+  assert.equal(failedPhotos.response.body.success,undefined);
   for(const options of [{identityError:true},{identityThrows:true},{identityId:null},{identityId:'another_user'}]){
     const result=await scenario(options);
     assert.equal(result.response.status,503,'No false success after Auth failure');
