@@ -11,6 +11,16 @@ adresse email ou donnée de santé dans les deux tables.
 
 ## Vérifié
 
+- 1er octobre : deux courses envoi/suppression supplémentaires passent avec
+  PostgreSQL et Storage locaux réels (avatar et suivi). Le test retient la
+  requête HTTP avant son départ, après réservation en base : suppression refusée,
+  admissions fermées, puis vrai envoi libéré et fichier effectivement présent.
+  La nouvelle tentative supprime ce fichier et les admissions restent fermées.
+  Le processus d'envoi est attendu avant nettoyage, même si une assertion échoue.
+  `test-photo-process-crash-local.cjs` couvre désormais huit cas au total.
+  Ce retard contrôlé dans le transport client n'est pas une panne du serveur
+  Storage ni une preuve de récupération d'un processus mort avant l'envoi.
+
 - Reprise d'une réponse d'envoi perdue, même avec Storage local réel : chaque
   envoi porte un UUID serveur dans les métadonnées. Après erreur seulement,
   l'app consulte `info` et exige UUID + chemin + bucket exacts avant confirmation.
@@ -40,8 +50,9 @@ adresse email ou donnée de santé dans les deux tables.
   stocké et relu à l'identique, entrées invalides refusées, nouvelle tentative
   réussie ; suppression de 101 fichiers paginés, anciennes sessions refusées,
   autre compte et fichier conservés, deux suppressions simultanées réussies.
-  La course envoi/suppression reste testée avec stockage simulé (pas de proxy
-  de panne sur le vrai service). Aucun test en production.
+  La course envoi/suppression est également testée avec un départ HTTP retardé
+  vers le stockage réel local (voir contrôle du 1er octobre ci-dessus), sans
+  proxy de panne du service. Aucun test en production.
 
 ## Obligatoire avant publication
 

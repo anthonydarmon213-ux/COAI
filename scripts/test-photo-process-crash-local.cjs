@@ -54,6 +54,46 @@ if (process.argv[2] === '--writer') {
   const owners = [];
   (async () => {
     try {
+      // Hold the real HTTP write before dispatch, after the real DB admission.
+      // Deletion must remain incomplete until that admitted writer has finished.
+      for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
+        const id = 'crash-test-' + crypto.randomUUID(); owners.push(id);
+        let signalStarted, release;
+        const started = new Promise(resolve => { signalStarted = resolve; });
+        const held = new Promise(resolve => { release = resolve; });
+        const delayed = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+          ...options, global: { fetch: async (input, init) => {
+            const target = new URL(typeof input === 'string' ? input : input.url);
+            assert.equal(target.origin, 'http://127.0.0.1:54321');
+            assert.equal(init.method, 'POST');
+            assert(target.pathname.startsWith('/storage/v1/object/progress%20photos/'));
+            signalStarted();
+            await held;
+            return fetch(input, init);
+          } },
+        });
+        const writing = api(delayed)[method](id, { type: 'image/png', arrayBuffer: async () => png });
+        // Observe an early rejection rather than waiting forever for dispatch.
+        try {
+          await Promise.race([started, writing.then(() => { throw Error('Write completed before release'); })]);
+          await assert.rejects(api(admin).deleteAllProgressPhotos(id), /photo_writes_unresolved/);
+          await assert.rejects(registry.reservePhotoWrite(id), /photo_owner_deleting/);
+          const before = await bucket.list(id);
+          assert.equal(before.error, null); assert.equal(before.data.length, 0);
+        } finally {
+          release();
+          // No writer may outlive fixture cleanup, even on assertion failure.
+          const result = await writing;
+          assert(result.path, 'The admitted late HTTP upload must actually finish');
+        }
+        const after = await bucket.list(id);
+        assert.equal(after.error, null); assert.equal(after.data.length, 1);
+        await api(admin).deleteAllProgressPhotos(id);
+        const removed = await bucket.list(id);
+        assert.equal(removed.error, null); assert.equal(removed.data.length, 0);
+        await assert.rejects(registry.reservePhotoWrite(id), /photo_owner_deleting/);
+        console.log(`PASS ${method}/late-http-write: deletion refused during admitted upload, retry removed real late file, gate stayed closed`);
+      }
       for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
         for (const mode of ['after-upload', 'before-upload', 'wrong-proof']) {
           const id = 'crash-test-' + crypto.randomUUID(); owners.push(id);
