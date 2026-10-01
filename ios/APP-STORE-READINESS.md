@@ -2,6 +2,20 @@
 
 ## État courant — 1er octobre 2026
 
+À 14 h 47 : App Store Connect recontrôlé dans le navigateur, redirection vers
+`/login?targetUrl=%2Fapps&authResult=FAILED`, formulaire Apple visible. Connexion
+demandée à Anthony ; aucun identifiant saisi, contrat accepté ou achat réalisé.
+L’accès de distribution distant reste inconnu (ne pas déduire une non-adhésion).
+
+Contrôle Release renforcé dans `scripts/check-ios.sh` : ajout des marqueurs
+`COAIDownloadFixture`, `native-download-fixture` et `coai-ui-storage-fixture`
+aux exclusions du binaire livré. Contrôle positif : marqueurs détectés dans
+le dylib Debug réellement installé ; absents du binaire Release arm64.
+`bash scripts/check-ios.sh --device-release` réussi : 51 XCTest, 65 contrôles
+cœur, compilation des règles WebKit, manifeste et compilation Release non
+signée. Syntaxe shell et diff vérifiés. Aucun défaut produit nouvellement
+démontré ; garde de non-régression élargie. Pas d’archive distribuable ni dépôt.
+
 À 14 h 37 : deux reprises physiques réussies sur iPhone 17 Pro/iOS 26.1,
 `/tmp/coai-physical-navigation-rest-1001.xcresult`. Navigation native très gros
 texte en portrait/paysage/portrait : cibles >=44 points, sans chevauchement,

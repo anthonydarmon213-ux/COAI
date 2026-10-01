@@ -40,8 +40,8 @@ if [[ "${1:-}" == "--simulator" || "${1:-}" == "--device-release" ]]; then
         cmp ios/COAI/PrivacyInfo.xcprivacy "$task_app/PrivacyInfo.xcprivacy"
         test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleSupportedPlatforms:0' "$task_app/Info.plist")" = "iPhoneOS"
         xcrun lipo "$task_app/COAI" -verify_arch arm64
-        if rg -a -q 'COAILocalIntegration|COAIAnonymousUITest|http://localhost:3050' "$task_app/COAI"; then
-            echo "FAIL: local simulator mode leaked into Release" >&2
+        if rg -a -q 'COAILocalIntegration|COAIAnonymousUITest|COAIDownloadFixture|native-download-fixture|coai-ui-storage-fixture|http://localhost:3050' "$task_app/COAI"; then
+            echo "FAIL: local UI fixture or simulator mode leaked into Release" >&2
             exit 1
         fi
         if rg --files "$task_app" | rg -q '(\.storekit$|StoreKitTests|LocalTesting\.entitlements$)'; then
