@@ -36,4 +36,20 @@ const db = new PrismaClient();
     assert.equal(p.contenu._source, 'SOCLE_COAI');
   }
   console.log('PASS native first programme: three catalogue pillars, version 1, no duplicate or invented human validation.');
+  if (process.argv.includes('--completed-workout')) {
+    const workouts = await db.seanceLog.findMany({ where: { userId: user.id } });
+    assert.equal(workouts.length, 1, 'One guided workout, no duplicate');
+    const workout = workouts[0];
+    assert.equal(workout.source, 'PROGRAMME');
+    assert.equal(workout.notes, 'Séance guidée : Full Body — les fondamentaux');
+    assert.equal(workout.exercices.length, 5);
+    assert.equal(workout.exercices[0].nom, 'Squat barre');
+    assert.equal(workout.exercices[0].sets[0].reps, 10);
+    assert.equal(workout.exercices.reduce((n, e) => n + e.series, 0), 15);
+    assert.equal(workout.exercices.reduce((n, e) => n + e.sets.length, 0), 1,
+      'Only the explicitly entered set has detailed repetitions');
+    assert.equal(workout.exercices.flatMap(e => e.sets).reduce((n, s) => n + s.reps, 0), 10,
+      'Unentered repetitions must not be fabricated');
+    console.log('PASS native guided workout: exactly one persisted workout, five exercises, fifteen sets, ten entered repetitions.');
+  }
 })().catch(error => { console.error(error.message); process.exitCode = 1; }).finally(() => db.$disconnect());

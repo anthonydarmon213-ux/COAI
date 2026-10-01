@@ -2,6 +2,16 @@
 
 ## État courant — 1er octobre 2026
 
+À 19 h 04 : séance guidée parcourue jusqu'au bilan puis app relancée :
+`/tmp/coai-guided-save-1001.xcresult` (134 s). Vérification PostgreSQL locale
+indépendante réussie avec `verify-native-first-programme.cjs --completed-workout` :
+une séance PROGRAMME, cinq exercices, quinze séries validées, une série détaillée
+avec les dix répétitions saisies ; pas de répétitions inventées pour les autres.
+La capture finale révèle toutefois deux points à corriger : titre du bilan coupé
+en haut sur SE, et « poids du corps » affiché quand aucune charge n'a été saisie.
+Ce parcours ne prouve pas encore l'affichage de la séance dans l'historique après
+relance (il vérifie le retour au programme et la persistance en base).
+
 À 18 h 57 : parcours lecteur étendu réussi sur SE : ajustements et consigne
 ouverts/fermés en paysage puis portrait, saisie de 10 répétitions, clavier
 fermé, relance et programme disponible. Preuve :

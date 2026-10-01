@@ -14,6 +14,13 @@ final class COAIUITests: XCTestCase {
         try localFirstProgrammeCreation(unconfirmedResponse: false, rotateReader: true)
     }
 
+    @MainActor
+    func testLocalGuidedWorkoutSavedAfterRotation() throws {
+        XCUIDevice.shared.orientation = .portrait
+        defer { XCUIDevice.shared.orientation = .portrait }
+        try localFirstProgrammeCreation(unconfirmedResponse: false, rotateReader: true, completeWorkout: true)
+    }
+
     /// Start ios-programme-confirmation-proxy.cjs before this test.
     @MainActor
     func testLocalFirstProgrammeUnconfirmedResponseCanRetry() throws {
@@ -26,7 +33,7 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func localFirstProgrammeCreation(unconfirmedResponse: Bool, checkInsteadOfRetry: Bool = false, rotateReader: Bool = false) throws {
+    private func localFirstProgrammeCreation(unconfirmedResponse: Bool, checkInsteadOfRetry: Bool = false, rotateReader: Bool = false, completeWorkout: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -160,6 +167,24 @@ final class COAIUITests: XCTestCase {
         player.lifetime = .keepAlways; add(player)
         adjust.tap()
         XCTAssertTrue(web.staticTexts["Valable pour aujourd'hui seulement — ton programme n'est pas modifié."].waitForExistence(timeout: 5))
+        if completeWorkout {
+            web.buttons.matching(NSPredicate(format: "label == %@", "Fermer")).element(boundBy: 1).tap()
+            for _ in 0..<40 {
+                let finish = web.buttons["Terminer la séance ✓"]
+                if finish.exists {
+                    revealWebControl(finish, in: app); finish.tap()
+                    break
+                }
+                let advance = web.buttons.matching(NSPredicate(format: "label IN %@", ["C'est fait ✓", "Passer le repos →"])).firstMatch
+                XCTAssertTrue(advance.waitForExistence(timeout: 5))
+                revealWebControl(advance, in: app); advance.tap()
+            }
+            XCTAssertTrue(web.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Séance terminée")).firstMatch.waitForExistence(timeout: 20))
+            XCTAssertFalse(web.buttons["Réessayer l'enregistrement"].exists)
+            let saved = XCTAttachment(screenshot: app.screenshot())
+            saved.name = "Séance guidée — bilan après enregistrement"
+            saved.lifetime = .keepAlways; add(saved)
+        }
         let session = web.links["Accéder à ma séance →"]
         app.terminate(); app.launch()
         XCTAssertTrue(app.buttons["native-tab-Séance"].waitForExistence(timeout: 15))
