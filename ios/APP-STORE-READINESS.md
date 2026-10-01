@@ -2,6 +2,20 @@
 
 ## État courant — 1er octobre 2026
 
+À 11 h 56 : sélecteur photo système ouvert puis annulé dans l’app sur SE
+simulé/iOS 26.5. Valeur fictive 75 kg conservée, sauvegarde possible ensuite,
+historique retrouvé après relance. `testLocalPhotoPickerCancellationPreservesMeasurement`
+réussi en 63,191 s (1/0) dans `/tmp/coai-photo-library-cancel-1001.xcresult`.
+Captures photothèque et historique examinées dans
+`/tmp/coai-photo-library-cancel-proof/`. Contrôle PostgreSQL indépendant :
+une mesure 75 kg, `photoPath` nul. Compte de test nettoyé et absence vérifiée.
+Le sélecteur affiche l’accès privé aux seuls éléments choisis ; aucune photo
+n’a été sélectionnée, envoyée ou supprimée. Cela ne valide PAS encore l’envoi
+d’une photo depuis la photothèque, HEIC/iCloud, ni l’appareil physique.
+Les essais précédents ont échoué dans l’automatisation (défilement clavier,
+puis menu intermédiaire) et ne sont pas comptés comme succès. Le test ferme
+le clavier par sa coche sur SE avant d’ouvrir Photothèque → Cancel.
+
 À 11 h 39 : reprise après confirmation perdue vérifiée dans l’app sur SE
 simulé. Proxy local coupe la connexion APRÈS réponse serveur 201, sans
 modifier le réseau du Mac ou un service distant. Message de reprise présent,

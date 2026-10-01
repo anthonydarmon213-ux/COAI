@@ -14,7 +14,12 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func runLocalMeasurementPersistence(lostResponse: Bool) throws {
+    func testLocalPhotoPickerCancellationPreservesMeasurement() throws {
+        try runLocalMeasurementPersistence(lostResponse: false, cancelPhoto: true)
+    }
+
+    @MainActor
+    private func runLocalMeasurementPersistence(lostResponse: Bool, cancelPhoto: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -50,6 +55,29 @@ final class COAIUITests: XCTestCase {
         }
         XCTAssertTrue(weight.isHittable)
         weight.tap(); weight.typeText("75")
+        if cancelPhoto {
+            // SE screenshot confirms WebKit's keyboard accessory checkmark here.
+            // Dismiss the keyboard as a user would before opening the photo menu.
+            let keyboard = app.keyboards.firstMatch
+            XCTAssertTrue(keyboard.exists)
+            app.coordinate(withNormalizedOffset: .zero)
+                .withOffset(CGVector(dx: app.frame.width * 0.89, dy: keyboard.frame.minY - 50)).tap()
+            XCTAssertTrue(keyboard.waitForNonExistence(timeout: 5))
+            let details = web.buttons["Ajouter une analyse complète ou une photo"]
+            revealWebControl(details, in: app); details.tap()
+            let file = web.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "photo de progression")).firstMatch
+            XCTAssertTrue(file.waitForExistence(timeout: 10))
+            revealWebControl(file, in: app); file.tap()
+            let library = app.buttons["Photothèque"]
+            XCTAssertTrue(library.waitForExistence(timeout: 10)); library.tap()
+            let cancel = app.buttons.matching(NSPredicate(format: "label IN %@", ["Annuler", "Cancel"])).firstMatch
+            XCTAssertTrue(cancel.waitForExistence(timeout: 10))
+            let pickerProof = XCTAttachment(screenshot: app.screenshot())
+            pickerProof.name = "Sélecteur photo système — avant annulation"
+            pickerProof.lifetime = .keepAlways; add(pickerProof)
+            cancel.tap()
+            XCTAssertEqual(weight.value as? String, "75")
+        }
         let save = web.buttons["Ajouter la mesure"]
         reveal(save, in: app)
         XCTAssertTrue(save.isHittable)
@@ -2081,6 +2109,24 @@ final class COAIUITests: XCTestCase {
         capture.name = "Durées de repos texte XXXL"
         capture.lifetime = .keepAlways
         add(capture)
+    }
+
+    @MainActor
+    private func revealWebControl(_ element: XCUIElement, in app: XCUIApplication) {
+        for _ in 0..<15 {
+            if element.isHittable { return }
+            let origin = app.coordinate(withNormalizedOffset: .zero)
+            let bottom = app.keyboards.firstMatch.exists ? min(380, app.keyboards.firstMatch.frame.minY - 110) : 380
+            let top = max(100, bottom - 140)
+            let high = origin.withOffset(CGVector(dx: app.frame.width * 0.9, dy: top))
+            let low = origin.withOffset(CGVector(dx: app.frame.width * 0.9, dy: bottom))
+            if element.frame.minY < app.webViews.firstMatch.frame.minY + 20 {
+                high.press(forDuration: 0.05, thenDragTo: low)
+            } else {
+                low.press(forDuration: 0.05, thenDragTo: high)
+            }
+        }
+        XCTAssertTrue(element.isHittable)
     }
 
     @MainActor
