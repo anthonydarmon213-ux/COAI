@@ -34,6 +34,10 @@ ne sélectionne aucun catalogue local.
 - Arrêt du renouvellement : accès conservé pendant la période payée ; expiration
   forcée locale : reçu expiré vérifié puis droits inactifs via le serveur simulé.
 - Chargement des produits en échec : anciennes offres invalidées, achat refusé.
+- Restauration sans transaction : aucune ancienne confirmation conservée,
+  aucun nouvel achat ; absence de confirmation ne signifie pas révocation serveur.
+- Autorisation COAI interrompue : aucune livraison, puis restauration possible
+  après rétablissement, avec les mêmes identifiants de transaction, sans rachat.
 
 Chaque scénario nettoie les transactions fictives. Les opérations sur la boutique
 ne démarrent qu’après création de la session de test et chargement du catalogue.

@@ -229,6 +229,69 @@ final class COAIStoreKitLocalTests: XCTestCase {
     }
 
     @MainActor
+    func testLocalRestoreWithoutEntitlementsClearsPreviousConfirmation() async throws {
+        let session = try localSession()
+        defer { session.clearTransactions() }
+        let token = UUID()
+        var deliveries = 0
+        let service = ApplePurchaseService(productIDs: Set(periods.keys), accountToken: token,
+            authorizeAccount: {}, deliver: { jws in
+                let payload = try self.localPayload(jws)
+                deliveries += 1
+                return PurchaseAcknowledgement(transactionID: try XCTUnwrap(payload["transactionId"] as? String),
+                    accountToken: token, persisted: true,
+                    access: .init(subscribed: true, programme: true, sources: .init(stripe: false, apple: true)))
+            })
+        _ = try await service.loadOffers(expectedPeriods: periods)
+        let outcome = try await service.purchase(productID: monthly)
+        XCTAssertEqual(outcome, .delivered)
+        XCTAssertEqual(service.latestAccess?.subscribed, true)
+
+        // Simulates an empty local Apple purchase history, not a real account
+        // switch or server-side revocation. No new purchase should be started.
+        session.clearTransactions()
+        let restored = try await service.restorePurchases()
+        XCTAssertEqual(restored, 0)
+        XCTAssertNil(service.latestAccess, "An old confirmation must not describe an empty restoration")
+        XCTAssertEqual(deliveries, 1)
+        XCTAssertTrue(session.allTransactions().isEmpty)
+    }
+
+    @MainActor
+    func testLocalRestoreRetriesAfterAccountAuthorizationFailureWithoutRepurchase() async throws {
+        let session = try localSession()
+        defer { session.clearTransactions() }
+        let token = UUID()
+        var authorized = true
+        var deliveries = 0
+        let service = ApplePurchaseService(productIDs: Set(periods.keys), accountToken: token,
+            authorizeAccount: { if !authorized { throw TestFailure.offline } }, deliver: { jws in
+                let payload = try self.localPayload(jws)
+                deliveries += 1
+                return PurchaseAcknowledgement(transactionID: try XCTUnwrap(payload["transactionId"] as? String),
+                    accountToken: token, persisted: true,
+                    access: .init(subscribed: true, programme: true, sources: .init(stripe: false, apple: true)))
+            })
+        _ = try await service.loadOffers(expectedPeriods: periods)
+        let outcome = try await service.purchase(productID: monthly)
+        XCTAssertEqual(outcome, .delivered)
+        let initialIDs = session.allTransactions().map(\.identifier)
+        XCTAssertEqual(initialIDs.count, 1)
+        authorized = false
+        do { _ = try await service.restorePurchases(); XCTFail("Account authorization must precede restoration") }
+        catch TestFailure.offline {}
+        XCTAssertEqual(deliveries, 1, "Failed authorization must not deliver a receipt")
+        XCTAssertEqual(session.allTransactions().map(\.identifier), initialIDs)
+
+        authorized = true
+        let restored = try await service.restorePurchases()
+        XCTAssertEqual(restored, 1, "A failed attempt must release the busy state")
+        XCTAssertEqual(service.latestAccess?.subscribed, true)
+        XCTAssertEqual(deliveries, 2)
+        XCTAssertEqual(session.allTransactions().map(\.identifier), initialIDs, "Restoration must not purchase again")
+    }
+
+    @MainActor
     func testLocalProductFetchFailureInvalidatesPreviouslyLoadedOffers() async throws {
         let session = try localSession()
         defer { session.clearTransactions(); session.resetToDefaultState() }

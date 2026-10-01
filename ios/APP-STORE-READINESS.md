@@ -2,6 +2,15 @@
 
 ## État courant — 1er octobre 2026
 
+À 13 h 12 : huit scénarios StoreKit locaux réussis, zéro échec dans
+`/tmp/coai-storekit-restore-auth-1001.xcresult`. Deux régressions ajoutées :
+restauration d’un historique vide sans ancienne confirmation ni nouvel achat ;
+autorisation COAI échouée sans livraison, puis restauration réussie avec les
+mêmes transactions après rétablissement. Aucun correctif produit nécessaire :
+l’écran efface déjà sa confirmation avant chaque opération. Ces tests portent
+sur le service réel, la boutique Xcode et un serveur simulé, pas sur un véritable
+changement de compte Apple, une révocation serveur ni une validation production.
+
 À 13 h 03 : suite StoreKit Xcode étendue à l’arrêt de renouvellement puis
 expiration. Achat fictif livré, arrêt du renouvellement sans perte anticipée
 de la période payée, expiration forcée et réconciliation des droits inactifs.
