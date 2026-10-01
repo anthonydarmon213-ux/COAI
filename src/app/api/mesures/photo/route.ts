@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isReadablePhoto } from "@/lib/storage/photo-image";
 import { getCurrentUser } from "@/lib/auth/server";
 import { uploadProgressPhoto } from "@/lib/storage/progress-photos";
 
@@ -30,6 +31,10 @@ export async function POST(request: Request) {
   }
   if (file.size > MAX_SIZE_BYTES) {
     return NextResponse.json({ error: "Image trop volumineuse après optimisation (2 Mo max)" }, { status: 400 });
+  }
+
+  if (!(await isReadablePhoto(file))) {
+    return NextResponse.json({ error: "Cette image est illisible ou non prise en charge. Choisis une photo JPG, PNG ou WebP de 16 mégapixels maximum." }, { status: 400 });
   }
 
   try {

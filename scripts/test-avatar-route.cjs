@@ -11,7 +11,7 @@ const source = ts.transpileModule(fs.readFileSync(path.join(__dirname,
 async function scenario(failure, file = new File(['image'], 'avatar.png', { type: 'image/png' })) {
   const calls = [], api = {};
   const modules = {
-    '@/lib/storage/avatar-image': { isReadableAvatar: async () => failure !== 'unreadable' },
+    '@/lib/storage/photo-image': { isReadablePhoto: async () => failure !== 'unreadable' },
     'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
     '@/lib/auth/server': { getCurrentAppUser: async () => failure === 'anonymous' ? null : { id: 'profile', supabaseAuthId: 'owner' } },
     '@/lib/storage/photo-write-registry': { commitAvatarPhoto: async (owner, profile, path) => {

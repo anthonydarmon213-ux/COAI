@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isReadableAvatar } from "@/lib/storage/avatar-image";
+import { isReadablePhoto } from "@/lib/storage/photo-image";
 import { getCurrentAppUser } from "@/lib/auth/server";
 import { commitAvatarPhoto } from "@/lib/storage/photo-write-registry";
 import { getSignedProgressPhotoUrl, purgeRetiredAvatars, uploadAvatar } from "@/lib/storage/progress-photos";
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   if (file.size === 0) return NextResponse.json({ error: "L’image est vide. Sélectionne une autre photo." }, { status: 400 });
   if (!ALLOWED_TYPES.has(file.type)) return NextResponse.json({ error: "Formats acceptés : JPG, PNG ou WebP" }, { status: 400 });
   if (file.size > MAX_SIZE_BYTES) return NextResponse.json({ error: "Photo trop volumineuse (2 Mo max)" }, { status: 400 });
-  if (!(await isReadableAvatar(file))) return NextResponse.json({ error: "Cette image est illisible ou non prise en charge. Choisis une photo JPG, PNG ou WebP de 16 mégapixels maximum." }, { status: 400 });
+  if (!(await isReadablePhoto(file))) return NextResponse.json({ error: "Cette image est illisible ou non prise en charge. Choisis une photo JPG, PNG ou WebP de 16 mégapixels maximum." }, { status: 400 });
 
   try {
     const uploaded = await uploadAvatar(user.supabaseAuthId, file);

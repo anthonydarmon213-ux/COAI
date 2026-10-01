@@ -173,6 +173,17 @@ Commande : `node scripts/test-photo-write-registry-local.cjs --local`.
 Ce test nettoie uniquement ses propres lignes aléatoires ; aucune production.
 # Contrôle du contenu des avatars — 1 octobre 2026
 
+Extension aux photos de progression : même décodage serveur avant écriture.
+`test-avatar-http-local.cjs` vérifie maintenant les deux endpoints, puis
+l’association photo → mesure → historique et la répétition idempotente de
+l’enregistrement (201 puis 200, une seule mesure). Régression confirmée :
+suppression de 101 fichiers et deux suppressions concurrentes réussies.
+L’ancienne fixture PNG du test de suppression était illisible ; elle est
+remplacée par une vraie image créée en mémoire avec Sharp. Comptes/fichiers
+jetables nettoyés. Build Next complet, TypeScript, ESLint ciblé et tests des
+deux routes réussis. Recontrôle physique : iPhone toujours `unavailable`.
+Ces preuves restent locales ; aucune publication ni validation iPhone.
+
 Le serveur décode désormais réellement les JPEG/PNG/WebP avant toute écriture.
 Un fichier illisible, tronqué, dont le format ne correspond pas au type déclaré,
 ou dépassant 16 millions de pixels est refusé sans modifier l’avatar existant.

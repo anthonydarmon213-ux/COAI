@@ -3,7 +3,7 @@ import sharp from "sharp";
 const FORMATS: Record<string, string> = { "image/jpeg": "jpeg", "image/png": "png", "image/webp": "webp" };
 
 /** Decode before any storage write. Never trust a client-provided MIME type. */
-export async function isReadableAvatar(file: File): Promise<boolean> {
+export async function isReadablePhoto(file: File): Promise<boolean> {
   if (!FORMATS[file.type] || !file.size || file.size > 2 * 1024 * 1024) return false;
   try {
     const image = sharp(Buffer.from(await file.arrayBuffer()), {

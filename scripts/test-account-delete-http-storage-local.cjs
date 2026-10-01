@@ -13,7 +13,7 @@ const client = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.
 const db = new PrismaClient();
 const fixtures = [];
 const bucket = admin.storage.from('progress photos');
-const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64');
+let png;
 async function fixture(count) {
   const email = `delete-http-${randomUUID()}@example.test`, password = randomUUID() + 'Aa1!';
   const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
@@ -37,6 +37,7 @@ async function fixture(count) {
 const headers = f => ({ Authorization: `Bearer ${f.sessions[0].access_token}` });
 const exportAccount = f => fetch('http://127.0.0.1:3050/api/compte/export', { headers: headers(f) });
 async function main() {
+  png = await require('sharp')({ create: { width: 16, height: 16, channels: 3, background: '#abcdef' } }).png().toBuffer();
   const buckets = await admin.storage.listBuckets();
   assert.equal(buckets.error, null);
   const existing = buckets.data.find(b => b.name === 'progress photos');

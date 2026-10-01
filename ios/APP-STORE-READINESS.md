@@ -2,6 +2,35 @@
 
 ## État courant — 1er octobre 2026
 
+TERMINÉ LOCAL : contenu réel des avatars et photos de progression décodé
+avant stockage ; fichier illisible refusé. Parcours HTTP photo → mesure →
+historique et nouvel essai sans doublon réussi. Suppression de 101 fichiers
+et suppressions concurrentes revalidées après ce changement. Build/tests
+réussis ; validation native/production toujours À FAIRE. Voir
+`PHOTO-DELETION-READINESS.md`. L’iPhone est encore `unavailable` au recontrôle.
+
+Photos de profil : remplacement et tâche de nettoyage désormais atomiques ;
+reprise locale après SIGKILL vérifiée avec PostgreSQL/Storage réels. Tests HTTP
+du remplacement et de suppression de 101 fichiers réussis, ainsi que les deux
+suppressions simultanées. Détails et limites dans `PHOTO-DELETION-READINESS.md`.
+TERMINÉ LOCAL : nettoyage des nouveaux avatars remplacés et régressions.
+TERMINÉ LOCAL : traitement privé de reprise par lots, validé via HTTP avec
+PostgreSQL/Storage réels, arrêt brutal et reprise. Désactivé par défaut et non
+planifié en production ; détails et preuves dans le même document.
+EN COURS : activation autorisée, anciens fichiers orphelins, envois incertains.
+BLOQUÉ POUR VALIDATION FINALE : iPhone indisponible, migration/déploiement non
+autorisés. Cela ne valide ni la production ni la préparation globale App Store.
+
+Contrôle supplémentaire du catalogue réel préparé :
+`testPhysicalCatalogueExcludesMismatchedRowing` recherche le rowing exclu puis
+un exercice disponible. Exécution physique NON démarrée : Xcode termine avec
+code 70, destination absente ; `devicectl list devices` confirme l'iPhone
+`unavailable`. `/tmp/coai-device-catalogue-1001.xcresult` ne constitue donc
+aucune preuve de test réussi. Lecture HTTP anonyme du catalogue : redirection
+vers `/sign-in?redirect_to=%2Fprogramme%2Fexercices`, impossible de contrôler
+ses résultats sans connexion. Ne pas assimiler ce contrôle au test local
+précédent. Reconnexion de l'appareil demandée ; aucun compte déconnecté.
+
 À 09 h 43, les raccourcis des piliers EN_ATTENTE sont vérifiés dans l'app
 sur simulateur iPhone SE (3e génération), iOS 26.5, avec serveur compilé
 et Auth/base locaux : Nutrition → Recettes, Récupération → bilan du jour.

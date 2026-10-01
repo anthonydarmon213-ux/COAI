@@ -1,9 +1,10 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),ts=require('typescript');
 const source=ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/app/api/mesures/photo/route.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
-async function run({signedIn=true,malformed=false,type='image/jpeg',size=1,missing=false,storage='ok'}={}) {
+async function run({signedIn=true,malformed=false,type='image/jpeg',size=1,missing=false,storage='ok',readable=true}={}) {
  const api={},calls=[];
  vm.runInNewContext(source,{exports:api,File,require:n=>{
   if(n==='next/server')return require('next/server');
+  if(n==='@/lib/storage/photo-image')return {isReadablePhoto:async()=>readable};
   if(n==='@/lib/auth/server')return {getCurrentUser:async()=>signedIn?{id:'owner'}:null};
   if(n==='@/lib/storage/progress-photos')return {uploadProgressPhoto:async(id,file)=>{calls.push(id);assert.equal(id,'owner');assert.equal(file.type,type);if(storage==='throw')throw Error('private-internal-detail');return storage==='error'?{error:'private-internal-detail'}:{path:'owner/image.jpg'};}};
   throw Error(n);
@@ -13,7 +14,7 @@ async function run({signedIn=true,malformed=false,type='image/jpeg',size=1,missi
  const res=await api.POST(request);return {status:res.status,body:await res.json(),calls};
 }
 (async()=>{
- for(const options of [{malformed:true},{missing:true},{type:'text/plain'},{size:0},{size:2097153}]){
+ for(const options of [{readable:false},{malformed:true},{missing:true},{type:'text/plain'},{size:0},{size:2097153}]){
   const r=await run(options);assert.equal(r.status,400);assert.equal(r.calls.length,0);
  }
  assert.equal((await run({signedIn:false,malformed:true})).status,401);

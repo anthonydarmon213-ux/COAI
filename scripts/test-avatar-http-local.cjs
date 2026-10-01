@@ -41,10 +41,12 @@ async function main() {
   assert.equal(rejected.status, 400); assert.match((await rejected.json()).error, /vide/);
   assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, expectedPath);
   for (const bytes of [Buffer.from('not an image'), png.subarray(0, 40)]) {
-    const invalid = new FormData(); invalid.set('file', new Blob([bytes], { type: 'image/png' }), 'broken.png');
-    const response = await fetch(endpoint, { method: 'POST', headers, body: invalid });
-    assert.equal(response.status, 400, 'Unreadable image must be rejected before replacing a valid avatar');
-    assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, expectedPath);
+    for (const target of [endpoint, 'http://127.0.0.1:3050/api/mesures/photo']) {
+      const invalid = new FormData(); invalid.set('file', new Blob([bytes], { type: 'image/png' }), 'broken.png');
+      const response = await fetch(target, { method: 'POST', headers, body: invalid });
+      assert.equal(response.status, 400, `${target}: unreadable image must be rejected`);
+      assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, expectedPath);
+    }
   }
   const stored = await bucket.download(expectedPath); assert.equal(stored.error, null);
   assert.deepEqual(Buffer.from(await stored.data.arrayBuffer()), png);
@@ -56,10 +58,33 @@ async function main() {
   assert.equal((await bucket.download(replacement)).error, null, 'Current avatar must remain available');
   const remaining = await bucket.list(identity.id); assert.equal(remaining.error, null);
   assert.deepEqual(remaining.data.map(file => file.name), [replacement.split('/')[1]]);
+  const progress = await fetch('http://127.0.0.1:3050/api/mesures/photo', { method: 'POST', headers, body: form() });
+  assert.equal(progress.status, 201);
+  const progressPath = (await progress.json()).path;
+  assert(progressPath.startsWith(`${identity.id}/`));
+  const progressFile = await bucket.download(progressPath); assert.equal(progressFile.error, null);
+  assert.deepEqual(Buffer.from(await progressFile.data.arrayBuffer()), png);
+  assert.equal((await db.user.findUnique({ where: { id: user.id } })).avatarPath, replacement);
+  const measureHeaders = { ...headers, 'Content-Type': 'application/json', 'x-coai-request-id': randomUUID() };
+  const measureBody = JSON.stringify({ date: new Date().toISOString().slice(0, 10), poidsKg: 75, photoPath: progressPath });
+  let measureId;
+  for (const status of [201, 200]) {
+    const saved = await fetch('http://127.0.0.1:3050/api/mesures', { method: 'POST', headers: measureHeaders, body: measureBody });
+    assert.equal(saved.status, status);
+    const measure = await saved.json();
+    assert.equal(measure.photoPath, progressPath);
+    if (measureId) assert.equal(measure.id, measureId);
+    measureId = measure.id;
+  }
+  const history = await fetch('http://127.0.0.1:3050/api/mesures', { headers });
+  assert.equal(history.status, 200);
+  const measures = await history.json();
+  assert.equal(measures.length, 1); assert.equal(measures[0].id, measureId);
+  assert.equal(measures[0].photoPath, progressPath);
   const key = createHash('sha256').update('coai-photo-owner-v1:' + identity.id).digest('hex');
   const pending = await db.$queryRaw`SELECT id FROM photo_uploads WHERE "ownerKey"=${key} AND "retiredAvatarName" IS NOT NULL`;
   assert.equal(pending.length, 0);
-  console.log('PASS real local avatar HTTP: authenticated upload, persisted exact image, malformed/empty rejection preserves current avatar, replacement deletes predecessor and clears durable cleanup task');
+  console.log('PASS real local photo HTTP: valid avatar/progress, corrupt input refused, previous avatar preserved; progress photo saved in measure/history, retry creates no duplicate');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   try {
