@@ -11,6 +11,9 @@ const db = new PrismaClient();
     {nom:'Gainage planche',series:1,sets:[{reps:0,charge:0,dureeSecondes:45}]},
     {nom:'Squat barre',series:1,sets:[{reps:10,charge:20}]},
   ];
+  if (process.argv.includes('--malformed')) {
+    exercises.push(null, {nom:42}, {nom:'Anciennes séries',sets:[null,{reps:-5,charge:20}]});
+  }
   if (process.argv.includes('--prepare')) {
     assert.equal(await db.seanceLog.count({where:{userId:user.id}}), 0);
     await db.seanceLog.create({data:{userId:user.id,date:new Date(),source:'PROGRAMME',notes:'Journal natif fictif',exercices:exercises}});

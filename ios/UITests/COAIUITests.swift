@@ -261,7 +261,12 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func localJournal(waitForLoginDestination: Bool) throws {
+    func testLocalJournalMalformedHistoryRemainsReadable() throws {
+        try localJournal(waitForLoginDestination: true, expectIncomplete: true)
+    }
+
+    @MainActor
+    private func localJournal(waitForLoginDestination: Bool, expectIncomplete: Bool = false) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -297,6 +302,14 @@ final class COAIUITests: XCTestCase {
         let history = web.links["Voir mon historique"]
         XCTAssertTrue(history.waitForExistence(timeout: 20))
         revealWebControl(history, in: app); history.tap()
+        if expectIncomplete {
+            let warning = web.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Certains détails de cette séance sont incomplets")).firstMatch
+            XCTAssertTrue(warning.waitForExistence(timeout: 10))
+            revealWebControl(warning, in: app)
+            let proof = XCTAttachment(screenshot: app.screenshot())
+            proof.name = "Journal — données anciennes incomplètes signalées"
+            proof.lifetime = .keepAlways; add(proof)
+        }
         for label in ["45 s de maintien", "10 × 20 kg"] {
             let metric = web.staticTexts[label]
             XCTAssertTrue(metric.waitForExistence(timeout: 10))

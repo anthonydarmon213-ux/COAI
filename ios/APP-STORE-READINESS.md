@@ -2,6 +2,20 @@
 
 ## État courant — 1er octobre 2026
 
+À 20 h 33 : nouveau plantage du journal reproduit hors ligne avec un historique
+contenant un exercice null : `Cannot read properties of null (reading 'sets')`.
+Correction locale : filtrage des détails JSON illisibles, conservation des
+mesures valides et des anciennes séries, exclusion des nombres négatifs/non
+finis et totaux débordants, avertissement explicite si détails incomplets.
+Aucune modification des séances stockées. Le test réel de rendu passe ensuite
+avec maintien 45 s, séries 10 × 20 kg et ancien format ; total valide 440 kg.
+Types, lint (six avertissements existants), build 132 pages, progression et
+356 médias passent. Test natif lancé dans
+`/tmp/coai-journal-malformed-1001.xcresult` : en cours, ralentissement XCTest
+attendant la fin d'animations ; ne pas compter ce parcours comme validé.
+Fixture locale dédiée à nettoyer après vérification indépendante. Aucune
+validation en production, aucun déploiement.
+
 Complément après les contrôles de 20 h 07 : navigation journal immédiatement
 après connexion réussie dans `/tmp/coai-journal-immediate-login-1001.xcresult`
 (24 s), sans attente de la destination finale. Le conflit de redirection

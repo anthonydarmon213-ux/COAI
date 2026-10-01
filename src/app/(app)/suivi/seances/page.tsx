@@ -22,6 +22,51 @@ type ExerciceData = {
   sets?: SetDetail[];
 };
 
+// Historical JSON predates today's input validation. Do not let one damaged
+// entry hide the entire journal, and never rewrite the stored workout here.
+function journalDetails(value: unknown) {
+  let incomplete = false;
+  const record = (item: unknown): item is Record<string, unknown> =>
+    item !== null && typeof item === "object" && !Array.isArray(item);
+  function metric(item: unknown): number | undefined {
+    if (item == null) return undefined;
+    if (typeof item === "number" && Number.isFinite(item) && item >= 0) return item;
+    incomplete = true;
+    return undefined;
+  }
+  const exercices: ExerciceData[] = [];
+  if (!Array.isArray(value)) return { exercices, incomplete: value != null, tonnage: 0 };
+  for (const item of value) {
+    if (!record(item) || typeof item.nom !== "string" || !item.nom.trim()) {
+      incomplete = true;
+      continue;
+    }
+    const ex: ExerciceData = { nom: item.nom, series: metric(item.series),
+      repetitions: metric(item.repetitions), chargeKg: metric(item.chargeKg) };
+    if (item.sets != null && !Array.isArray(item.sets)) incomplete = true;
+    if (Array.isArray(item.sets)) {
+      ex.sets = [];
+      for (const raw of item.sets) {
+        if (!record(raw)) { incomplete = true; continue; }
+        const set = { reps: metric(raw.reps), charge: metric(raw.charge), dureeSecondes: metric(raw.dureeSecondes) };
+        if (!Number.isFinite((set.reps ?? 0) * (set.charge ?? 0))) {
+          incomplete = true;
+          continue;
+        }
+        ex.sets.push(set);
+      }
+    }
+    exercices.push(ex);
+  }
+  let tonnage = 0;
+  for (const ex of exercices) {
+    const amount = tonnageExercice(ex);
+    if (Number.isFinite(amount) && Number.isFinite(tonnage + amount)) tonnage += amount;
+    else incomplete = true;
+  }
+  return { exercices, incomplete, tonnage };
+}
+
 function tonnageExercice(ex: ExerciceData): number {
   if (ex.sets && ex.sets.length > 0) {
     return ex.sets.reduce((sum, s) => sum + (s.reps ?? 0) * (s.charge ?? 0), 0);
@@ -62,13 +107,11 @@ export default async function SeancesPage() {
         <h2 id="historique-seances" tabIndex={-1} className="scroll-mt-24 text-xl font-semibold">Mon historique</h2>
         <p className="text-sm text-graphite-400">Tes 30 dernières séances enregistrées, de la plus récente à la plus ancienne.</p>
         {seances.map((s) => {
-          const exercices = Array.isArray(s.exercices)
-            ? (s.exercices as ExerciceData[])
-            : [];
-          const tonnageTotal = exercices.reduce((sum, ex) => sum + tonnageExercice(ex), 0);
+          const { exercices, incomplete, tonnage: tonnageTotal } = journalDetails(s.exercices);
 
           return (
             <Card key={s.id} className="coai-history-row flex flex-col gap-3 p-4">
+              {incomplete && <p className="text-sm text-graphite-300">Certains détails de cette séance sont incomplets. Les mesures lisibles restent affichées ; le total peut être partiel.</p>}
               {s.dailySessionId && <div>
                 <p className="text-sm font-semibold text-graphite-50">{s.dailyTitle}</p>
                 <p className="mt-1 text-xs text-graphite-400">Séance quotidienne terminée · charges, répétitions et durée réalisées non renseignées.</p>

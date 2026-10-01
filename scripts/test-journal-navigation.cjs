@@ -37,6 +37,22 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/app/(app)/suivi/seanc
   assert.ok(!rendered.includes('0×0kg'), 'A timed hold must not be presented as zero repetitions at zero weight');
   assert.ok(!rendered.includes('0 × 0 kg'));
   assert.ok(rendered.includes('10 × 20 kg'), 'Dynamic exercise metrics are unchanged');
+  assert.ok(!rendered.includes('Certains détails'), 'Valid workouts must not be flagged as damaged');
+  modules['@/lib/suivi/workout-history'].workoutHistory = async () => [{
+    id:'legacy',date:new Date('2026-10-01T10:00:00Z'),exercices:[
+      null, {nom:42}, {nom:'Squat valide',sets:[null,{reps:10,charge:20},{reps:-5,charge:20}]},
+      {nom:'Maintien valide',sets:[{dureeSecondes:45}]},
+      {nom:'Ancien exercice',series:3,repetitions:8,chargeKg:10},
+      {nom:'Séries illisibles',sets:'invalid'},
+      {nom:'Dépassement',sets:[{reps:1e308,charge:1e308}]},
+    ],
+  }];
+  const legacy = content(await sandbox.exports.default());
+  assert.ok(legacy.includes('Squat valide'));
+  assert.ok(legacy.includes('45 s de maintien'));
+  assert.ok(legacy.includes('440 kg'), 'Preserve valid current and legacy tonnage only');
+  assert.ok(legacy.includes('Certains détails de cette séance sont incomplets'));
+  assert.ok(!legacy.includes('Infinity') && !legacy.includes('NaN') && !legacy.includes('-5 ×'));
   const progress=fs.readFileSync('src/app/(app)/suivi/progression/page.tsx','utf8');
   assert.ok(progress.includes('href="/suivi/mesures"'));
   assert.ok(progress.includes('href="/suivi/seances#historique-seances"'));
