@@ -89,6 +89,35 @@ let authId, userId;
     const programmes = await db.programmeGenerated.findMany({ where: { userId } });
     assert.equal(programmes.length, 3); assert(programmes.every(p => p.statut === 'GENERE_IA'));
     assert.deepEqual(programmes.map(p => p.pilier).sort(), ['ENTRAINEMENT', 'NUTRITION', 'RECUPERATION']);
+    // A successful page response is not proof of usable persisted content.
+    const text = value => typeof value === 'string' && value.trim().length > 0;
+    const training = programmes.find(p => p.pilier === 'ENTRAINEMENT').contenu;
+    assert(text(training.titre)); assert.equal(training.seances.length, 3);
+    for (const session of training.seances) {
+      assert(text(session.nom)); assert(text(session.echauffement)); assert(text(session.retourAuCalme));
+      assert(session.exercices.length > 0);
+      for (const exercise of session.exercices) {
+        assert(text(exercise.nom)); assert(Number(exercise.series) > 0);
+        assert(text(exercise.repetitions)); assert(text(exercise.repos));
+      }
+    }
+    const nutrition = programmes.find(p => p.pilier === 'NUTRITION').contenu;
+    assert(text(nutrition.titre)); assert.equal(nutrition.jours.length, 14);
+    for (const day of nutrition.jours) {
+      assert(text(day.jour)); assert(day.repas.length > 0);
+      for (const meal of day.repas) { assert(text(meal.nom)); assert(text(meal.quantite)); }
+    }
+    const recovery = programmes.find(p => p.pilier === 'RECUPERATION').contenu;
+    assert(text(recovery.titre)); assert.equal(recovery.jours.length, 14);
+    assert(recovery.protocoles.length > 0);
+    for (const routine of recovery.protocoles) {
+      assert(text(routine.nom)); assert(text(routine.duree)); assert(text(routine.conseil));
+    }
+    for (const day of recovery.jours) {
+      assert(text(day.jour)); assert(text(day.mobiliteEtirements));
+      assert(text(day.sommeil)); assert(text(day.gestionFatigue));
+    }
+    console.log('PASS persisted content: three non-empty training sessions with prescriptions, 14 nutrition days with portions, 14 recovery days and usable routine descriptions. Structural check only, not editorial approval.');
     for (const path of ['/programme/entrainement', '/programme/alimentation', '/programme/recuperation']) {
       const response = await fetch(origin + path, { headers: cookie(), redirect: 'manual' });
       assert.equal(response.status, 200, path);

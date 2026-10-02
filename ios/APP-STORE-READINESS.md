@@ -6,7 +6,32 @@ Correction des bornes de série désormais compilée localement : test de
 composant avant/après, brouillons, échelle du graphique, TypeScript, lint
 (six avertissements existants), build 132 pages et audit 356 médias réussis.
 Serveur local redémarré avec ce correctif après fin du test natif précédent.
-Contrôle interactif de cette correction et production encore non validés.
+Contrôle interactif local du correctif d123a89 réussi le 2 octobre : les
+corrections charge/répétitions à 10001 laissent la série à 10 × 20 kg ; une
+correction valide à 8 × 12,5 kg est conservée après rechargement, avec le message
+« Brouillon retrouvé ». Enregistrement puis second rechargement : séance
+retrouvée dans « Reprendre une séance passée », repère exact 8 × 12,5 kg,
+volume 100 kg et champs préremplis correctement, sans recopier les séries
+comme déjà réalisées. Aucune erreur console capturée. Compte fictif local
+uniquement ; validation sur iPhone physique et en production encore à faire.
+Vérification PostgreSQL indépendante : exactement une séance REPCOUNT, un
+exercice et une série 8 × 12,5 kg. Compte fictif et sessions ensuite nettoyés.
+
+Recontrôle iOS du 2 octobre à 12 h 28 : `bash scripts/check-ios.sh --device-release`
+réussi (51 XCTest Swift, 65 contrôles directs, compilation réelle des règles
+WebKit macOS hors réseau, configuration de confidentialité et cinq cas négatifs).
+Release arm64 iPhone compilée sans signature ; aucune installation, archive,
+publication ou validation App Store déduite de ce résultat.
+
+Contrôle profil → bibliothèque relancé avec Auth/HTTP/PostgreSQL locaux réels :
+les requêtes concurrentes conservent les trois mêmes programmes, les profils
+hors cadre sont orientés vers la relecture et la révocation d'accès est respectée.
+Test renforcé pour inspecter le contenu persisté, pas seulement les statuts HTTP :
+trois séances avec exercices et prescriptions, quatorze jours de repas avec
+portions, quatorze jours de récupération et protocoles renseignés. Réussi ;
+ce contrôle structurel ne vaut ni approbation éditoriale ni vérification des médias.
+Fixtures nettoyées. TypeScript, lint (six avertissements), build 132 pages et
+audit 356 chemins média réussis. iPhone physique toujours `unavailable` à 12 h 30.
 
 Test de reprise RepCount terminé avec succès à 03 h 01 :
 `/tmp/coai-repcount-relaunch-1001-2120.xcresult`, 1 test, zéro échec.
