@@ -168,5 +168,19 @@ function input(id){return all(render()).find(n=>n.props?.id===id);}
     assert.deepEqual(requests.at(-1),previous,'Ambiguous response retry keeps identity');
     assert.ok(text(render()).includes('Séance enregistrée ✓'));
   }
-  console.log('PASS RepCount workflow: timed-out save and first-use shortcut preserve series and identical retry; restore, account isolation, sequence reuse');
+  // Editing a completed series must respect the same bounds as entry/drafts.
+  states.length=0; refs.length=0; storage.clear(); onboarding=false;
+  input('repcount-exercice').props.onChange({target:{value:'Presse à cuisses'}});
+  button('Valider la série').props.onClick();
+  for (const field of ['charge','reps']) {
+    const edit = all(render()).find(n=>n.props?.['aria-label']===`Série 1 ${field}`);
+    const previous = states[5][0][field];
+    edit.props.onChange({target:{value:'10001'}});
+    assert.equal(states[5][0][field],previous,'Oversized correction must not invalidate the entire draft');
+    edit.props.onChange({target:{value:'10000'}});
+    assert.equal(states[5][0][field],10000,'Existing upper bound remains accepted');
+  }
+  render(); effects[0](); render(); effects[1]();
+  assert.ok(draft.parseDraft(storage.get(draft.draftKey('test-user'))),'Corrected series survives draft validation');
+  console.log('PASS RepCount workflow: timed-out save and first-use shortcut preserve series and identical retry; restore, account isolation, sequence reuse, correction bounds');
 })().catch(error=>{console.error(error);process.exitCode=1;});

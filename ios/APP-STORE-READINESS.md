@@ -1,6 +1,49 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
-## État courant — 1er octobre 2026
+## État courant — 2 octobre 2026
+
+Correction des bornes de série désormais compilée localement : test de
+composant avant/après, brouillons, échelle du graphique, TypeScript, lint
+(six avertissements existants), build 132 pages et audit 356 médias réussis.
+Serveur local redémarré avec ce correctif après fin du test natif précédent.
+Contrôle interactif de cette correction et production encore non validés.
+
+Test de reprise RepCount terminé avec succès à 03 h 01 :
+`/tmp/coai-repcount-relaunch-1001-2120.xcresult`, 1 test, zéro échec.
+Saisie de deux exercices et notes, fermeture/reprise du brouillon, sauvegarde,
+seconde relance et présence de l'historique vérifiées par XCTest. Contrôle
+indépendant PostgreSQL réussi : une seule séance REPCOUNT, deux exercices,
+trois séries exactes (10 × 20 kg deux fois, 10 × 12,5 kg une fois), notes exactes.
+Compte fictif et sessions nettoyés. Capture extraite dans
+`/tmp/coai-repcount-relaunch-proof-1002` inspectée : navigation lisible mais détail
+de l'historique sous le pli ; elle ne prouve pas seule la lisibilité des séries.
+Durée XCTest 20 415 s, incluant les longues attentes d'animations signalées ;
+ne pas interpréter cette durée comme une latence du parcours utilisateur.
+Ce test porte sur le build précédent, pas sur les bornes de correction ajoutées
+pendant son exécution. Aucune validation production ou appareil physique.
+
+## Historique — 1er octobre 2026
+
+À 21 h 20 : test natif RepCount reprise de brouillon puis historique après
+relance lancé sur le simulateur petit écran, résultat attendu dans
+`/tmp/coai-repcount-relaunch-1001-2120.xcresult`. Compte fictif local créé ;
+à vérifier indépendamment avec `repcount-native-verify`, puis nettoyer avec
+`ui-cleanup`. Exécution encore en cours, attentes XCTest d'animations de 60 s.
+Ne pas reconstruire le serveur pendant ce parcours et ne pas le compter réussi.
+Contrôle HTTP/Auth/PostgreSQL réalisé pendant l'attente sur deux autres comptes
+fictifs : trois POST concurrents produisent une seule séance (201/200/200),
+lecture par jeton réussie, autre compte isolé, jeton invalide refusé, JSON
+malformé refusé sans altérer la séance. Fixtures nettoyées. Premier essai 401
+causé par le harness utilisant 127.0.0.1 pour Auth alors que le build utilise
+localhost ; variante `verify-native` du harness local ajoutée pour aligner
+les cookies, puis contrôle réussi. Aucun changement d'authentification produit.
+
+Pendant cette exécution, défaut distinct reproduit par le test de composant :
+la correction d'une série acceptait 10001, alors que le brouillon refuse les
+charges/répétitions supérieures à 10000. Correction des bornes de saisie pour
+préserver la reprise ; test avant/après réussi, types et lint réussis.
+Cette modification source n'est pas dans le serveur compilé testé actuellement.
+Build, contrôle interactif et validation production de ce correctif à faire.
 
 Contrôle complémentaire de l'échelle RepCount : le rendu réel du composant
 ChandeliersCharges produisait neuf coordonnées SVG `NaN` et une graduation

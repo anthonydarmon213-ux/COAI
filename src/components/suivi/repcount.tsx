@@ -828,9 +828,9 @@ export function RepCount({
                   <summary className="min-h-11 cursor-pointer py-3 text-xs text-cyan-200">Corriger</summary>
                   {(s.dureeSecondes != null ? ["dureeSecondes"] as const : ["reps", "charge"] as const).map(champ => <label key={champ} className="block text-xs">
                     {champ === "reps" ? "Répétitions" : champ === "charge" ? "Charge (kg)" : "Maintien (s)"}
-                    <input type="number" aria-label={`Série ${i + 1} ${champ}`} disabled={enregistrementEnCours} value={s[champ] ?? 0} min={champ === "charge" ? 0 : 1} step={champ === "charge" ? 0.5 : 1} className="mb-2 min-h-11 w-24 rounded border border-white/20 bg-slate-950 px-2" onChange={e => {
+                    <input type="number" aria-label={`Série ${i + 1} ${champ}`} disabled={enregistrementEnCours} value={s[champ] ?? 0} min={champ === "charge" ? 0 : 1} max={champ === "dureeSecondes" ? 3600 : 10000} step={champ === "charge" ? 0.5 : 1} className="mb-2 min-h-11 w-24 rounded border border-white/20 bg-slate-950 px-2" onChange={e => {
                       const valeur = Number(e.target.value);
-                      if (!Number.isFinite(valeur) || valeur < (champ === "charge" ? 0 : 1) || (champ !== "charge" && !Number.isInteger(valeur)) || (champ === "dureeSecondes" && valeur > 3600)) return;
+                      if (!Number.isFinite(valeur) || valeur < (champ === "charge" ? 0 : 1) || (champ !== "charge" && !Number.isInteger(valeur)) || valeur > (champ === "dureeSecondes" ? 3600 : 10000)) return;
                       setSets(liste => liste.map((serie, j) => j === i ? { ...serie, [champ]: valeur } : serie));
                     }} />
                   </label>)}
