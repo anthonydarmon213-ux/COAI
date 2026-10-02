@@ -46,6 +46,16 @@ for (const invalid of ['{broken', 'null', '[]', '12', 'true', '"niveau"']) {
   assert.equal(api.diagnosticProgressStep(), null);
 }
 data.set(key, '{"step":42}'); assert.equal(api.diagnosticProgressStep(), null);
+api.saveDiagnosticProgress({step: 'result', ownerId: 'owner-a', expiresAt: Date.now() + 86400000, age: '35'});
+assert.equal(api.diagnosticProgressStep(), null);
+assert.equal(api.diagnosticProgressStep('owner-b'), null);
+assert.equal(api.diagnosticProgressStep('owner-a'), 'result');
+assert.equal(api.readDiagnosticProgress('owner-a').age, '35');
+api.saveDiagnosticProgress({step: 'result', ownerId: 'owner-a', expiresAt: Date.now() - 1});
+assert.equal(api.diagnosticProgressStep('owner-a'), null);
+assert.equal(data.has(key), false, 'Expired result removed on access by its owner');
+api.saveDiagnosticProgress({step: 'result', ownerId: 'owner-a'});
+assert.equal(api.diagnosticProgressStep('owner-a'), null);
 window.localStorage = new Proxy({}, {get() {throw new Error('Storage unavailable');}});
 assert.equal(api.diagnosticProgressStep(), null);
 assert.doesNotThrow(() => api.saveDiagnosticProgress({step: 'niveau'}));

@@ -81,7 +81,7 @@ export default async function DiagnosticPage(
         </Card>
       )}
       <div className="relative z-10 w-full">
-        <DiagnosticQuiz connecte={!!user} accesProgrammeActif={access?.programme ?? false} verificationAccesIndisponible={Boolean(access?.appleUnavailable && !access.programme)} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
+        <DiagnosticQuiz connecte={!!user} diagnosticOwnerId={user?.id ?? null} accesProgrammeActif={access?.programme ?? false} verificationAccesIndisponible={Boolean(access?.appleUnavailable && !access.programme)} aDejaUnProgramme={dejaUnProgramme} pilierPhotos={PILIER_PHOTOS} />
       </div>
     </main>
   );

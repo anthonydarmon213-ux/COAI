@@ -601,11 +601,12 @@ const PILIER_PHOTOS_VIDE: PilierPhotos = {
 
 export function DiagnosticQuiz({
   connecte = false,
+  diagnosticOwnerId = null,
   accesProgrammeActif = false,
   verificationAccesIndisponible = false,
   aDejaUnProgramme = false,
   pilierPhotos = PILIER_PHOTOS_VIDE,
-}: { connecte?: boolean; accesProgrammeActif?: boolean; verificationAccesIndisponible?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
+}: { connecte?: boolean; diagnosticOwnerId?: string | null; accesProgrammeActif?: boolean; verificationAccesIndisponible?: boolean; aDejaUnProgramme?: boolean; pilierPhotos?: PilierPhotos } = {}) {
   const [step, setStep] = useState<Step>("intro");
   const [analyseIndex, setAnalyseIndex] = useState(0);
   const [analyseProgress, setAnalyseProgress] = useState(0);
@@ -720,8 +721,8 @@ export function DiagnosticQuiz({
   const [applyErrorMessage, setApplyErrorMessage] = useState<string | null>(null);
   const [applyNeedsFormule, setApplyNeedsFormule] = useState(false);
   const [applyNeedsReview, setApplyNeedsReview] = useState(false);
-  const savedStep = useSyncExternalStore(subscribeDiagnosticProgress, diagnosticProgressStep, serverDiagnosticProgressStep);
-  const resumable = savedStep !== null && questionSteps.includes(savedStep as Step);
+  const savedStep = useSyncExternalStore(subscribeDiagnosticProgress, () => diagnosticProgressStep(diagnosticOwnerId), serverDiagnosticProgressStep);
+  const resumable = savedStep !== null && (questionSteps.includes(savedStep as Step) || (connecte && savedStep === "result"));
 
   const stepIndex = questionSteps.indexOf(step);
   const progressPct = stepIndex >= 0 ? Math.round((stepIndex / questionSteps.length) * 100) : 0;
@@ -838,13 +839,13 @@ export function DiagnosticQuiz({
     goNext();
   }
 
-  // Sauvegarde la progression à chaque étape de question (jamais pendant
-  // "intro"/"analyse"/"reveal"/"result"/"respire1"/"respire2" — rien à
-  // reprendre une fois le résultat atteint, ce n'est plus un abandon).
+  // Le résultat connecté reste un brouillon tant que le profil n'a pas
+  // confirmé son enregistrement. Une interruption ne doit pas perdre le bilan.
   useEffect(() => {
-    if (step === "intro" || step === "analyse" || step === "reveal" || step === "result" || step === "respire1" || step === "respire2") return;
+    if (step === "intro" || step === "analyse" || step === "reveal" || (step === "result" && !connecte) || step === "respire1" || step === "respire2") return;
     saveDiagnosticProgress({
       step,
+      ...(step === "result" ? { ownerId: diagnosticOwnerId, expiresAt: Date.now() + 24 * 60 * 60 * 1000 } : {}),
       persona,
       personaAutreTexte,
       activiteQuotidienne,
@@ -907,6 +908,8 @@ export function DiagnosticQuiz({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     step,
+    connecte,
+    diagnosticOwnerId,
     persona,
     personaAutreTexte,
     activiteQuotidienne,
@@ -1046,7 +1049,7 @@ export function DiagnosticQuiz({
   }
 
   function resumeDiagnostic() {
-    const saved = readDiagnosticProgress<Record<string, unknown>>();
+    const saved = readDiagnosticProgress<Record<string, unknown>>(diagnosticOwnerId);
     if (!saved) {
       startDiagnostic();
       return;
@@ -1054,7 +1057,7 @@ export function DiagnosticQuiz({
     applySavedProgress(saved);
     trackFunnelEvent("diagnostic_started", { resumed: true });
     const savedStep = saved.step as Step;
-    setStep(questionSteps.includes(savedStep) ? savedStep : questionSteps[0] ?? "persona");
+    setStep(questionSteps.includes(savedStep) || (connecte && savedStep === "result") ? savedStep : questionSteps[0] ?? "persona");
   }
 
   function restartDiagnostic() {
@@ -1091,17 +1094,18 @@ export function DiagnosticQuiz({
     };
   }, [step]);
 
-  // Résultat atteint : plus rien à reprendre (efface la progression
-  // sauvegardée) + événements funnel (section 15) — l'aperçu programme est
+  // Pour un compte connecté, afficher le résultat n'est pas une sauvegarde.
+  // Le visiteur anonyme conserve son pont pré-inscription distinct.
+  // Événements funnel (section 15) — l'aperçu programme est
   // sur le même écran que le résultat, mais reste un événement distinct
   // pour pouvoir mesurer les deux séparément plus tard.
   useEffect(() => {
     if (step !== "result") return;
-    clearDiagnosticProgress();
+    if (!connecte) clearDiagnosticProgress();
     trackFunnelEvent("diagnostic_result_viewed");
     trackFunnelEvent("programme_preview_viewed");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
+  }, [step, connecte]);
 
   const canContinue = useMemo(() => {
     if (step === "quotidien") return Boolean(activiteQuotidienne);
@@ -1383,6 +1387,7 @@ export function DiagnosticQuiz({
       });
       if (!res.ok) throw new Error();
       profilApplique = true;
+      clearDiagnosticProgress();
       if (aDejaUnProgramme) {
         setApplyStatus("done");
         return;

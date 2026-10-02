@@ -2,6 +2,20 @@
 
 ## État courant — 2 octobre 2026
 
+Diagnostic connecté : perte du brouillon reproduite au niveau des effets réels
+du composant (résultat affiché → effacement avant sauvegarde). Correctif local :
+résultat reprenable directement avec ses réponses ; effacement seulement après
+réponse positive de sauvegarde du profil, même si l'accès programme est ensuite
+refusé. Échec réseau/HTTP de sauvegarde : brouillon conservé. Le nouveau résultat
+reprenable est lié au compte et expire après 24 h d'inactivité ; il n'est pas
+lisible par le lecteur anonyme ou un autre compte. Cela ne constitue pas un
+audit complet des anciens brouillons de questions ou du pont pré-inscription.
+Tests des effets/gestionnaire avant-après, stockage, navigation, saisies physiques,
+TypeScript, lint (six avertissements) et build 132 pages réussis. Aucun test
+interactif de ce nouveau correctif ni validation production à cette étape.
+Prochaine preuve nécessaire : résultat → fermeture/reprise → sauvegarde dans
+le profil, avec compte fictif, puis contrôle indépendant des réponses en base.
+
 Correction des bornes de série désormais compilée localement : test de
 composant avant/après, brouillons, échelle du graphique, TypeScript, lint
 (six avertissements existants), build 132 pages et audit 356 médias réussis.

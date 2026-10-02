@@ -12,7 +12,7 @@ function visit(node) {
 visit(ast);
 assert(handler);
 async function scenario(responses, existing = false) {
-  const state = {}, calls = [];
+  const state = { cleared: 0 }, calls = [];
   const box = {
     aDejaUnProgramme: existing,
     reponsesEnProfil: () => ({ age: 35 }),
@@ -21,6 +21,7 @@ async function scenario(responses, existing = false) {
     setApplyNeedsFormule: value => { state.offer = value; },
     setApplyNeedsReview: value => { state.review = value; },
     trackFunnelEvent: () => {},
+    clearDiagnosticProgress: () => { state.cleared++; },
     fetch: async (url) => {
       calls.push(url);
       const response = responses.shift();
@@ -39,14 +40,17 @@ async function scenario(responses, existing = false) {
   for (const response of [new Error('offline'), { status: 503 }, { status: 400 }]) {
     const { state, calls } = await scenario([response]);
     assert.equal(state.status, 'idle', 'Keep the save action available');
+    assert.equal(state.cleared, 0, 'Failed saves must retain the resumable result');
     assert(state.message, 'A failed profile save must not silently reset the button');
     assert.deepEqual(calls, ['/api/profil']);
   }
   const existing = await scenario([{ status: 200 }], true);
   assert.equal(existing.state.status, 'done');
+  assert.equal(existing.state.cleared, 1);
   assert.equal(existing.calls.length, 1, 'Do not regenerate an existing programme');
   const free = await scenario([{ status: 200 }, { status: 403, body: { error: 'Choisir une offre' } }]);
   assert.equal(free.state.offer, true);
+  assert.equal(free.state.cleared, 1, 'Profile persisted even when programme access is denied');
   assert.equal(free.state.status, 'erreur');
   assert.equal(free.state.message, 'Choisir une offre');
   assert.match(source, /role="alert">\{applyErrorMessage\}/);
