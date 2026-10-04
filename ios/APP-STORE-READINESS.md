@@ -10,11 +10,15 @@ Migration locale préparée, non déployée. Voir `PHOTO-DELETION-READINESS.md`.
 Régressions HTTP photo/suppression, réponses perdues et retraits d'avatars,
 build Next 132 pages, types/lint et 356 médias réussis.
 
-**Nouveau point sécurité local à traiter :** audit du 4 octobre révèle 17 tables
+**Point sécurité local corrigé, distant non vérifié :** audit du 4 octobre révèle 17 tables
 anciennes sans RLS avec des droits anon/authenticated dans la base de test.
-Les deux tables du registre photo restent privées avec RLS. Aucun constat de
-configuration distante n'est déduit de ce test local. Vérification des accès
-réels et durcissement à préparer avant toute publication.
+Lecture HTTP anonyme indûment autorisée reproduite, puis migration locale
+`20261004104308_secure_legacy_server_tables` : RLS + révocation des droits clients.
+Lectures directes refusées pour les deux rôles sur les 17 tables, CRUD `users`
+refusé, export serveur authentifié et régressions HTTP photo/suppression réussis.
+Conseiller sécurité local sans warning/error après correction. Aucun constat de
+configuration distante n'est déduit de ce test local ; migration non déployée.
+Voir `DATA-ACCESS-READINESS.md` pour le périmètre et les limites.
 
 **Retour réseau sans relance : PASS à 12 h 17**, iPhone 17 Pro simulé.
 `testLocalNetworkRestorationLoadsLoginWithoutRelaunch` : serveur 3050 arrêté,
