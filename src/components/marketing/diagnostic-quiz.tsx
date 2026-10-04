@@ -2749,7 +2749,8 @@ export function DiagnosticQuiz({
                   aucun accès direct aux tarifs à cet endroit — le seul lien
                   "Comparer les 3 formules" vit dans FormuleRecommandeeCard,
                   plus haut sur l'écran. Ajouté ici aussi, à la vraie sortie. */}
-              {connecte && !accesProgrammeActif && !verificationAccesIndisponible ? (
+              {connecte && !accesProgrammeActif && !verificationAccesIndisponible
+                && !(applyStatus === "erreur" && applyNeedsFormule && !applyNeedsReview) ? (
                 <Link href="/pricing" className="text-sm font-semibold text-laiton-300 underline decoration-laiton-300/40 underline-offset-4 hover:text-laiton-200">
                   Voir les accompagnements →
                 </Link>

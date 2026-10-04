@@ -2,6 +2,16 @@
 
 ## État courant — 4 octobre 2026
 
+Fin du diagnostic : doublon de liens vers les offres supprimé localement quand
+le résultat de sauvegarde propose déjà « Choisir mon accompagnement ».
+La sortie demandée en bas de page reste présente avant sauvegarde et lorsque
+le premier lien n'est pas affiché. Aucun changement de prix ou de droits.
+`test-diagnostic-offer-exit.cjs` exécute la condition réelle de rendu dans les
+différents états ; `test-diagnostic-profile-save.cjs` conserve les scénarios
+d'échec/reprise et refus d'accès. PASS, types/lint sans erreur, build QA réussi.
+Validation visuelle du correctif dans l'app et déploiement encore À FAIRE ;
+le serveur iOS 3050 conserve intentionnellement son build précédent.
+
 **Contrôles natifs SE à 13 h 21 / 13 h 25 : quatre tests, zéro échec.**
 `/tmp/coai-keyboard-regression-1004-current.xcresult` : connexion publique,
 email non couvert par le clavier, cinq onglets masqués pendant la saisie ;
