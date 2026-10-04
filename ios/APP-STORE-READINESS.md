@@ -2,6 +2,32 @@
 
 ## État courant — 4 octobre 2026
 
+**Retour réseau sans relance : PASS à 12 h 17**, iPhone 17 Pro simulé.
+`testLocalNetworkRestorationLoadsLoginWithoutRelaunch` : serveur 3050 arrêté,
+erreur réelle affichée, puis serveur rétabli pendant les tentatives explicites.
+La page de connexion et son champ email reviennent, le panneau d'erreur disparaît,
+sans relancer COAI. Un test, zéro échec (69,425 s, incluant l'attente volontaire
+du serveur), `/tmp/coai-network-restoration-1004-1215.xcresult`.
+Cela couvre la reprise anonyme locale, pas une session expirée en production.
+Compilation Release iphoneos arm64 actuelle également réussie, sans signature,
+dans `/tmp/coai-release-1004-current` ; ce n'est pas une archive distribuable.
+
+**Rotation SE rétablie et vérifiée à 12 h 06.** Après redémarrage du seul
+simulateur QA SE, sans effacement ni changement produit, le même test
+`testNativeNavigationWithLargeTextAndRotation` passe (17,230 s).
+Rapport `/tmp/coai-se-rotation-after-reboot-1004-1205.xcresult` : un test,
+zéro échec. Portrait → paysage → portrait en XXXL, cinq onglets sans
+chevauchement, cibles de 44 points minimum et accès aux réglages vérifiés.
+Capture paysage inspectée. Ce résultat remplace le statut rotation non validée
+ci-dessous ; il ne couvre ni tous les écrans ni un appareil physique.
+
+**Réseau indisponible vérifié à 12 h 07.** Serveur local 3050 réellement arrêté :
+`testUnavailableNetworkKeepsRecoveryControlsAccessible` passe (9,929 s),
+rapport `/tmp/coai-offline-recovery-1004-1207.xcresult` : un test, zéro échec.
+Message d'erreur, bouton Réessayer et minuteur natif restent utilisables.
+Le serveur a ensuite été relancé. Ce test ne valide pas encore le retour du
+réseau sans relancer l'application. Aucun paiement ni publication effectué.
+
 Comparaison à 12 h 01 : le même `testNativeNavigationWithLargeTextAndRotation`
 **passe sur iPhone 17 Pro simulé**, 17,7 s, même binaire, aucun correctif produit.
 Portrait → paysage gauche → portrait, cinq onglets accessibles sans chevauchement,
