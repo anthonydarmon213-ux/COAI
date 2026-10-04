@@ -913,7 +913,7 @@ final class COAIUITests: XCTestCase {
     /// Requires local SMTP preflight and cleanup; does not confirm email or grant access.
     @MainActor
     func testLocalSignupReachesEmailConfirmation() async throws {
-        try await localSignup(waitForReturn: false)
+        try await localSignup(waitForReturn: false, isolatedWebStore: true)
     }
 
     @MainActor
@@ -985,10 +985,11 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
-    private func localSignup(waitForReturn: Bool, finalize: Bool = false, diagnostic: Bool = false) async throws {
+    private func localSignup(waitForReturn: Bool, finalize: Bool = false, diagnostic: Bool = false, isolatedWebStore: Bool = false) async throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        if isolatedWebStore { app.launchArguments.append("-COAIAnonymousUITest") }
         app.launch()
         XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
         let web = app.webViews.firstMatch

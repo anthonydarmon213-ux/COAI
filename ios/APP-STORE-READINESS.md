@@ -29,6 +29,10 @@ production ; iPhone physique et achats Apple réels restent à valider.
 `/tmp/coai-signup-keyboard-1004.xcresult` : le formulaire d’inscription complet
 sur le simulateur iPhone 17 passe (1 test, 0 échec), confirmation email locale
 reçue ; compte et message de test supprimés après vérification.
+`/tmp/coai-signup-small-1004.xcresult` : même parcours sur le plus petit
+simulateur iPhone SE (3e génération), avec magasin WebKit isolé : 1 test,
+0 échec en 14,3 s. Le test ne dépend plus d’une ancienne connexion conservée.
+Compte et email locaux de ce second essai supprimés.
 
 **Contrôle distant en lecture seule, 14 h 50.** Les 29 tables publiques COAI
 ont RLS activée ; les rôles clients gardent néanmoins TRUNCATE sur 22 tables.
