@@ -2,6 +2,17 @@
 
 ## État courant — 4 octobre 2026
 
+**Vérification appareil / accès Apple, 19 h 08 Paris.** `devicectl` voit
+l’iPhone 17 Pro appairé, disponible et déverrouillé (`unlockedSinceBoot: true`).
+L’application présente dessus reste `COAI test` 0.1.0 (build 1) avec son
+runner UI : ce n’est pas la build locale corrigée. `security find-identity`
+ne trouve aucune identité de signature valide ; aucun test de la nouvelle build
+physique ni archive distribuable ne peut donc être lancé depuis cet état.
+App Store Connect affiche encore la connexion Apple après `authResult=FAILED`.
+Aucun identifiant saisi, achat, upload, changement de compte ou soumission.
+Reprendre une fois l’identité Apple Development/distribution et l’accès ASC
+disponibles ; entre-temps, poursuivre les contrôles locaux/simulateur.
+
 **Séance quotidienne : confirmation de sauvegarde durcie localement.**
 Le composant acceptait un corps 200 vide/invalide comme nouvel état quotidien,
 avec risque de réinitialisation ou de crash sur une date invalide. Il exige
