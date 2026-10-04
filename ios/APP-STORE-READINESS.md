@@ -18,6 +18,11 @@ identité de signature ; ce n'est donc pas un livrable distribuable. Le
 `PrivacyInfo.xcprivacy` est valide, embarqué, identique au source (SHA-256
 vérifié). L'icône compilée part d'un PNG valide de 1024 × 1024 sans alpha.
 `Info.plist` et le manifeste source passent `plutil -lint`.
+`bash scripts/check-ios.sh` passe après accès autorisé au cache Swift : 51 tests
+Swift, 65 contrôles du noyau iOS, règles de navigation exécutées dans WebKit
+macOS et test du manifeste avec cinq cas négatifs. TypeScript passe, lint sans
+erreur (six avertissements connus) et audit des références média : aucun fichier
+manquant. Ces contrôles locaux ne remplacent pas les parcours UI sur iPhone.
 
 Une relance de la suite StoreKit locale a été interrompue : la confirmation
 affichée dans le simulateur était explicitement Xcode/test sans prélèvement,
@@ -1904,7 +1909,7 @@ Version installée sans désinstallation sur l'iPhone 17 Pro d'Anthony à 19:59,
 lancement confirmé à 20:00. Rendu physique après cette mise à jour encore à
 confirmer ; pas de publication web, TestFlight ou App Store.
 
-## Checklist globale persistante — actualisée le 1er octobre 2026
+## Checklist globale persistante — actualisée le 4 octobre 2026
 
 « Testé localement » ne signifie ni testé en production ni prêt à publier.
 Aucun des dix parcours n'est encore déclaré terminé de bout en bout sur iPhone.
@@ -1920,13 +1925,15 @@ pas encore une expérience native complète validée.
 | 5. Entraînement, nutrition, récupération | Validé partiellement sur appareil | Navigation Nutrition/Récupération/Recettes/Coach/Séance et partage PDF vérifiés en ligne sur iPhone le 1er octobre ; minuteur persistant vérifié. Programmes nutrition/récupération EN_ATTENTE : contenu complet non validé. Catalogue physique en échec (clavier et rowing encore présent en ligne), corrections locales non publiées. Droits, cohérence de tous les médias et petits écrans restent à compléter. |
 | 6. Séances, performances et progrès | Validé partiellement en local | Séance terminée et retour d’effort sauvegardés ; mesures et photo après relance vérifiées avec compte fictif connecté, contrôle PostgreSQL et fichier Storage réel local. Export du compte enregistré dans Fichiers le 1er octobre, JSON contrôlé. RepCount : deux mouvements, charge décimale française, reprise du brouillon et historique après relance vérifiés dans l’app simulée le 1er octobre ; trois séries exactes dans une seule séance confirmées indépendamment dans PostgreSQL. Cela ne valide pas tous les parcours RepCount ni l’ensemble en production et sur appareil physique. |
 | 7. Check-ins, adaptations et mémoire | Validé partiellement en local | Check-in et séance terminée puis relance vérifiés dans l'app simulée le 28 septembre avec contrôle PostgreSQL. Cela ne valide ni toutes les adaptations ni la mémoire IA réelle ; restent ces parcours, isolation complète et production. |
-| 8. Abonnements Apple | Validé partiellement en local + intervention humaine | Écran natif raccordé au service ; huit scénarios StoreKit Xcode réussis avec serveur simulé, dont reprise, compte différent, remboursement, expiration et restauration vide. Tarifs approuvés le 23 septembre : 19,99 €/mois, 119 €/an, essai de sept jours si éligible. Catalogue distant, activation, migration distante, signatures/notifications Apple réelles et parcours Sandbox de bout en bout restent à valider ; aucun achat réel effectué. |
+| 8. Abonnements Apple | Validé partiellement en local + intervention humaine | Écran natif raccordé au service ; une précédente exécution des huit scénarios StoreKit Xcode est documentée comme réussie avec serveur simulé. La relance du 4 octobre a été interrompue et ne constitue pas une validation (détails ci-dessus). Tarifs approuvés le 23 septembre : 19,99 €/mois, 119 €/an, essai de sept jours si éligible. Catalogue distant, activation, migration distante, signatures/notifications Apple réelles et parcours Sandbox de bout en bout restent à valider ; aucun achat réel effectué. |
 | 9. Notifications et réengagement | En cours | Concurrence, refus de permission et réception visible en arrière-plan testés sur simulateur. Appareil physique, écran verrouillé et réengagement consenti restent à vérifier/implémenter. |
 | 10. Suppression sécurisée | En cours, blocage photos | Compte jetable supprimé depuis l'app simulée, absence Auth/profil et refus de l'ancien mot de passe vérifiés indépendamment le 28 septembre. Concurrence et reprise de photos testées avec stockage local réel et pannes injectées. Arrêt avant envoi sans preuve, conservation opérationnelle, facturation réelle et production restent non validés ; voir PHOTO-DELETION-READINESS.md. |
 
 Terminé et testé **au niveau technique local seulement** : règles de navigation,
 horloge/pause persistante, séquencement des livraisons d'achats et des alertes
-(24 XCTest), compilation simulateur et Release iPhone sans signature.
+(51 tests Swift + 65 contrôles noyau), build et archive Release iPhone arm64 non
+signée. Aucun de ces éléments n'est une preuve de distribution ou d'acceptation
+App Store.
 
 Blocages humains identifiés : statut d'adhésion Apple Developer à confirmer (aucun achat autorisé),
 contrats/validation Apple, configuration du catalogue distant et validation juridique, autorisation
