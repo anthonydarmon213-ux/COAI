@@ -34,6 +34,14 @@ pas les achats Sandbox/App Store Connect. Aucun achat réel, upload ou soumissio
 
 ## État courant — 4 octobre 2026
 
+**StoreKit local — 22 h 39.** Nouvelle exécution isolée sur iPhone 17 Pro
+simulé / iOS 26.5 via `scripts/check-ios-storekit-local.sh` : 8 tests, 0 échec.
+Annulation/attente, reçu non terminé après panne puis reprise, autre compte,
+remboursement, expiration, catalogue indisponible et restauration sans droits
+confirmés. Rapport `/tmp/coai-storekit-local.ak0FmN/Logs/Test/Test-COAIStoreKitLocal-2026.10.04_22-39-07-+0200.xcresult`.
+StoreKit Testing Xcode uniquement, compte et serveur simulés : cela ne valide
+ni Sandbox/App Store Connect, ni les signatures réelles, ni la facturation.
+
 **Recontrôle Release et navigation — 22 h 00 (Paris).** Build Release iPhone
 arm64 fraîche réussie dans `/tmp/coai-release-verify-20261004` depuis l'arbre
 courant, sans signature ni écriture dans le dépôt. Bundle vérifié :

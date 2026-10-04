@@ -2,6 +2,26 @@
 
 ## État : correctif ciblé appliqué en production, durcissement global encore ouvert
 
+### Recontrôle distant en lecture seule — 4 octobre, 22 h 15
+
+Le projet actif `fczkfddfgooocqqkqsqw` est toujours `ACTIVE_HEALTHY`, PostgreSQL
+17.6.1.155. L’inventaire Supabase recense 29 tables publiques, toutes avec RLS.
+Le conseiller sécurité signale 28 tables sans politique ; `pg_policies` confirme
+que l’unique politique est l’INSERT « Public can submit founder waitlist ».
+Les vues/fonctions du schéma `public` ne renvoient aucun objet dans le contrôle.
+
+`information_schema.table_privileges` montre encore pour `anon` et
+`authenticated` les droits SQL SELECT, INSERT, UPDATE, DELETE, REFERENCES et
+TRIGGER sur 22 tables ; l’INSERT sur `founder_waitlist_entries` porte le total
+à 23 pour cette commande. Aucun droit TRUNCATE restant sur ces 22 tables.
+Combiné aux 28 tables sans politique RLS, ceci ne prouve pas une lecture directe
+des lignes ; c’est néanmoins une exposition de privilèges inutile à réduire.
+La politique d’inscription à la liste d’attente doit être préservée ou migrée
+vers la route serveur avant tout retrait de ses droits. L’avertissement Auth
+« leaked password protection disabled » est toujours présent. Métadonnées et
+conseiller uniquement : aucune ligne d’utilisateur consultée, aucune écriture,
+aucune modification de droits.
+
 Le conseiller de sécurité puis une lecture des permissions PostgreSQL ont
 identifié 17 anciennes tables sans RLS et avec droits `anon` / `authenticated`
 dans la base locale de test. Une requête HTTP HEAD anonyme a reproduit un 200
