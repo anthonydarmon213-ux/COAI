@@ -2,6 +2,25 @@
 
 ## État courant — 4 octobre 2026
 
+**Contrôles natifs SE à 13 h 21 / 13 h 25 : quatre tests, zéro échec.**
+`/tmp/coai-keyboard-regression-1004-current.xcresult` : connexion publique,
+email non couvert par le clavier, cinq onglets masqués pendant la saisie ;
+inscription, saisie fictive sans envoi, mot de passe affiché/masqué et bouton
+accessible. Deux captures extraites et inspectées. Ces tests anonymes utilisent
+`coai.fr` dans le conteneur natif de développement, pas le serveur local ; aucun
+compte créé, session personnelle modifiée ou achat envoyé.
+`/tmp/coai-subscription-accessibility-1004-current.xcresult` : écran natif
+d'abonnement indisponible en XXXL, liens empilés et cibles de 44 points, fermeture
+possible ; retour au compte depuis l'offre indisponible. Fixture de navigation
+interne, pas validation d'un achat StoreKit ni de prix en production.
+Ce sont des simulateurs SE/iOS 26.5, pas un iPhone physique ni un binaire distribué.
+
+Rapport antérieur d'inscription/diagnostic recontrôlé :
+`/tmp/coai-native-diagnostic-after-rls-1004-1258.xcresult`, un test réellement
+exécuté et réussi, zéro échec ou test ignoré. Le parcours local inclut création
+du compte, consentements, diagnostic, relance et sauvegarde ; ne pas le confondre
+avec les quatre contrôles anonymes ci-dessus.
+
 Complément de régression local : restrictions directes confirmées sur 24 tables,
 export serveur toujours utilisable. Suite HTTP complète réussie, y compris
 historique quotidien, PDF, programme concurrent et panne Storage lors d'une
