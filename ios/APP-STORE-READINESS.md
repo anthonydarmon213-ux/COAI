@@ -2,6 +2,21 @@
 
 ## État courant — 4 octobre 2026
 
+**Nutrition / récupération / Club, 13 h 56 : parcours connecté local réussi.**
+`/tmp/coai-nutrition-recovery-club-1004.xcresult` : un test SE/iOS 26.5,
+zéro échec, 68,688 s. Connexion de la fixture préexistante (non écrasée), filtre
+petit-déjeuner, ouverture de recette avec ingrédients/préparation, catalogue
+récupération et ouverture/fermeture des filtres, puis Club avec accès à la
+préparation de question. Captures récupération et Club extraites et inspectées.
+Aucun message WhatsApp, réservation, choix de programme ni achat déclenché.
+Le compte fictif préexistant est conservé pour les autres contrôles locaux.
+Tests catalogue : 189 recettes, 189 images locales déclarées présentes,
+120 combinaisons de filtres, rendus avec/sans image, intégrité des listes : PASS.
+Rendus cibles nutritionnelles, listes nutrition/récupération incomplètes et
+Club : PASS. Ces preuves ne valident pas la justesse nutritionnelle/allergènes,
+la correspondance visuelle de chaque plat, l'activation d'un programme de
+récupération, la date du direct ou le comportement en production.
+
 **Distribution, contrôle frais à 13 h 49.**
 `bash scripts/check-ios.sh --device-release` termine avec succès : 51 tests
 Swift, 65 contrôles core, compilation effective des règles WebKit macOS sans
