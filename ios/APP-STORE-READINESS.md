@@ -37,15 +37,19 @@ pas les achats Sandbox/App Store Connect. Aucun achat réel, upload ou soumissio
 **Catalogue sur iPhone simulé — 21 h 07 (Paris).** Le contrôle de la route
 hébergée lancé sans session (`testPhysicalCatalogueExcludesMismatchedRowing`)
 ne trouve pas le champ de recherche : l'application reste à l'écran de connexion.
-Ce résultat ne démontre pas un défaut du catalogue ni une réussite du parcours
-connecté en production ; il confirme que ce test exige une session valide.
+La hiérarchie d'accessibilité extraite du rapport confirme le formulaire de
+connexion (champs e-mail et mot de passe). Ce résultat ne démontre pas un défaut
+du catalogue ni une réussite du parcours connecté en production ; il confirme
+que ce test exige une session valide.
 Le parcours local authentifié prévu à cet effet,
 `testLocalExerciseCatalogueRejectsMismatchedRowing`, passe sur iPhone SE
 (3e génération) simulé / iOS 26.5 : recherche « Rowing haltère unilatéral »
 → zéro résultat, clavier fermé ; recherche « Gainage planche » → un résultat.
 Rapport `/tmp/coai-catalogue-isolated-1004.xcresult` : 1 réussi, 0 échec.
 Les deux captures ont été extraites et inspectées dans
-`/tmp/coai-catalogue-isolated-proof-1004/`. Test via serveur et compte de
+`/tmp/coai-catalogue-isolated-proof-1004/`. Rapport hébergé et hiérarchie dans
+`/tmp/coai-catalogue-live-1004.xcresult` et
+`/tmp/coai-catalogue-live-proof-1004/`. Test via serveur et compte de
 fixture locaux : il ne valide pas le catalogue en production ni sur iPhone
 physique. Le dernier inventaire antérieur (19 h 08) indiquait l'iPhone réel
 disponible et déverrouillé ; lors de cette reprise, `devicectl` n'a toutefois
