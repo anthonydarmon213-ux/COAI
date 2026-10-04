@@ -2,6 +2,20 @@
 
 ## État courant — 4 octobre 2026
 
+**Diagnostic, lien unique : vérifié dans l'app à 13 h 39.**
+Serveur natif local recompilé et relancé, tests iOS recompilés.
+`/tmp/coai-diagnostic-single-offer-1004.xcresult` : inscription, confirmation
+email via services locaux, consentements, diagnostic complet, relance, reprise
+et sauvegarde ; un test, zéro échec, 146,600 s. L'assertion vérifie explicitement
+l'absence de « Voir les accompagnements » quand « Choisir mon accompagnement »
+est présent. Capture finale extraite et inspectée : un seul lien.
+Contrôle indépendant des réponses exactes et des deux consentements en base,
+puis suppression de cette seule fixture Auth/profil/email : PASS.
+Build Next 132 pages, build-for-testing, types, lint sans erreur (six warnings
+existants), deux tests diagnostic et 356 références médias présents : PASS.
+La validation locale visuelle demandée ci-dessous est donc effectuée ; restent
+la validation sur appareil physique et la publication autorisée en production.
+
 Fin du diagnostic : doublon de liens vers les offres supprimé localement quand
 le résultat de sauvegarde propose déjà « Choisir mon accompagnement ».
 La sortie demandée en bas de page reste présente avant sauvegarde et lorsque

@@ -1223,6 +1223,8 @@ final class COAIUITests: XCTestCase {
                     await fulfillment(of: [saveReady], timeout: 10)
                     tap(web.buttons["Enregistrer et continuer"])
                     XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
+                    XCTAssertFalse(web.links["Voir les accompagnements →"].exists,
+                                   "Keep one offer exit after saving, not adjacent duplicate links")
                     XCTAssertTrue(web.staticTexts["Choisis ton accompagnement COAI pour accéder à ton programme."].exists)
                     XCTAssertFalse(web.links["Programme musculation IA"].exists,
                                    "Marketing footer must not distract from the diagnostic next step")
