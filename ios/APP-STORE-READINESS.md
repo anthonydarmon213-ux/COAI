@@ -2,6 +2,17 @@
 
 ## État courant — 4 octobre 2026
 
+Contrôle indépendant rotation à 11 h 57 : Safari reste lui aussi en portrait
+sur le même SE, après demande LandscapeLeft. Capture inspectée, sans dialogue
+système bloquant visible. `testSimulatorSafariRotationControl` échoue réellement
+(1 test), rapport `/tmp/coai-safari-rotation-enumerated-1004-1156.xcresult`.
+La première invocation avait exécuté zéro test et n'est pas une preuve ; la
+découverte Xcode puis l'identifiant exact avec parenthèses ont permis l'exécution.
+Ce constat oriente vers l'environnement/simulateur, sans prouver l'absence de
+défaut COAI. Contrôle sur autre simulateur/appareil requis. Aucun verrouillage
+portrait ajouté au produit, assertion paysage conservée. Build de tests, types,
+lint sans erreur et 356 références médias présentes vérifiés.
+
 **Rotation grand texte : NON VALIDÉE au 4 octobre 11 h 47.**
 `testNativeExplorerReplacesWebSidebarWithoutHidingContent` passe, mais
 `testNativeNavigationWithLargeTextAndRotation` échoue au passage paysage :

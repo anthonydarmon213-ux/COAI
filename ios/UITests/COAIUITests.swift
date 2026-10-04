@@ -2292,6 +2292,29 @@ final class COAIUITests: XCTestCase {
     }
 
     @MainActor
+    func testSimulatorSafariRotationControl() throws {
+        // Diagnostic control only: no URL, credentials or purchases submitted.
+        // A failure here is not evidence that COAI itself prevents rotation.
+        continueAfterFailure = false
+        XCUIApplication().terminate()
+        let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
+        XCUIDevice.shared.orientation = .portrait
+        defer { XCUIDevice.shared.orientation = .portrait }
+        safari.activate()
+        XCTAssertTrue(safari.windows.firstMatch.waitForExistence(timeout: 15))
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let rotated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let frame = safari.windows.firstMatch.frame
+            return frame.width > frame.height
+        }, object: nil)
+        let result = XCTWaiter.wait(for: [rotated], timeout: 10)
+        let proof = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        proof.name = "Contrôle rotation indépendant — Safari"
+        proof.lifetime = .keepAlways; add(proof)
+        XCTAssertEqual(result, .completed, "Safari must rotate before attributing the simulator failure to COAI")
+    }
+
+    @MainActor
     func testNativeNavigationWithLargeTextAndRotation() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
