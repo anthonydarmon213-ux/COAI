@@ -15,6 +15,15 @@ liens d'accompagnement redondants restent visibles à la fin (polish à traiter)
 Ce PASS remplace l'échec de navigation du précédent scénario, pas les autres
 gates : achats Apple réels, appareil physique et production non validés.
 
+Régression abonnement native le 4 octobre à 11 h 36 : deux tests réussis
+(`testWebOfferLinkOpensNativeSubscription`, `testSubscriptionSmallScreenLargeText`),
+rapport `/tmp/coai-subscription-navigation-1004-1134.xcresult`.
+Lien web de fixture → écran natif → fermeture, et SE en texte accessibilité XXXL :
+Réessayer/Conditions/Confidentialité accessibles, zones de 44 points minimum,
+liens légaux empilés et fermeture utilisable. Capture inspectée. Ces tests
+utilisent une fixture et l'état d'indisponibilité, pas un achat ni un catalogue
+Apple réel ; ils ne prouvent pas le paiement en Sandbox ou en production.
+
 Reprise native du diagnostic : accès permanent « Mon bilan COAI » ajouté à
 Explorer. Le précédent scénario complet a échoué après relance parce qu'il
 cherchait le bouton de bienvenue sur la page entraînement, point d'entrée réel
