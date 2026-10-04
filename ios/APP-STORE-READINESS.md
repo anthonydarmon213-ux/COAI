@@ -2,6 +2,25 @@
 
 ## État courant — 4 octobre 2026
 
+**Distribution, contrôle frais à 13 h 49.**
+`bash scripts/check-ios.sh --device-release` termine avec succès : 51 tests
+Swift, 65 contrôles core, compilation effective des règles WebKit macOS sans
+chargement réseau, syntaxe/plists/schéma, cinq cas négatifs de confidentialité,
+puis build Release iphoneos arm64 sans signature. Manifeste inclus à l'identique,
+nom COAI, plateforme iPhoneOS ; marqueurs de fixtures, localhost et ressources
+StoreKit de test absents selon les gardes du script.
+Binaire : `ios/DerivedDataDevice/Build/Products/Release-iphoneos/COAI.app`.
+Ce n'est ni une archive signée, ni une installation physique, ni une validation
+App Store. Les contrôles de chaînes ne constituent pas un audit de sécurité total.
+
+App Store Connect : l'onglet ancien affichait « Utilisateurs et accès » mais
+la navigation réelle vers `/apps` redirige vers
+`/login?targetUrl=%2Fapps&authResult=FAILED` et le formulaire de connexion Apple.
+Session expirée/inutilisable constatée ; reconnexion demandée, sans saisir de
+secret ni modifier le compte. Catalogue, adhésion et accords restent non vérifiés.
+Mac verrouillé constaté par l'inventaire des applications ; le navigateur intégré
+et les compilations locales restent utilisables. Aucun achat/upload/soumission.
+
 **Diagnostic, lien unique : vérifié dans l'app à 13 h 39.**
 Serveur natif local recompilé et relancé, tests iOS recompilés.
 `/tmp/coai-diagnostic-single-offer-1004.xcresult` : inscription, confirmation
