@@ -1301,10 +1301,12 @@ final class COAIUITests: XCTestCase {
         revealFilter(closeFilters); closeFilters.tap()
         XCTAssertTrue(sleep.isHittable)
         sleep.tap()
-        let programmeChoice = web.staticTexts["Choisis ton programme offert"]
+        let programmeChoice = web.links["Voir mon abonnement iOS"]
         XCTAssertTrue(programmeChoice.waitForExistence(timeout: 10), "La couverture doit ouvrir la section du programme, pas rester sans effet")
         reveal(programmeChoice, in: app)
         XCTAssertTrue(programmeChoice.isHittable)
+        XCTAssertFalse(web.staticTexts["Choisis ton programme offert"].exists)
+        XCTAssertFalse(web.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Acheter ce programme")).firstMatch.exists)
         XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
         let proof = XCTAttachment(screenshot: app.screenshot())
         proof.name = "Découverte récupération après lecture recette — local connecté"

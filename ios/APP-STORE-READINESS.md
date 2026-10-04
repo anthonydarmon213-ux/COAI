@@ -2,6 +2,22 @@
 
 ## État courant — 4 octobre 2026
 
+**Catalogue natif, 14 h 32 : présentation d'achat corrigée localement.**
+`ProgrammePurchaseButton` distingue le marqueur natif (présentation seulement,
+jamais un droit d'accès) : lien `/compte/abonnement` sans prix web ni formulaire
+Stripe dans l'app ; offre web inchangée dans le navigateur. Avant hydratation,
+état d'attente sans formulaire ; garde supplémentaire avant tout fetch Stripe.
+Tests des rendus web/natif/SSR et de la garde réelle PASS, types/lint PASS
+(six avertissements existants), build 132 pages, build iOS tests, 356 médias
+présents. `/tmp/coai-native-catalogue-offer-1004.xcresult` : parcours connecté
+SE, un test PASS en 73,114 s, absence du formulaire web et présence du lien
+vérifiées ; capture inspectée. `/tmp/coai-offer-routing-1004.xcresult` : lien
+de fixture `/pricing` ouvrant puis fermant l'écran natif PASS en 10,173 s.
+Le parcours connecté local ne touche pas le lien d'abonnement : le mode local
+conserve volontairement son blocage d'achat. Ces tests ne prouvent ni achat
+réel Apple, ni produit disponible, ni déploiement en production. Droits serveur
+et tarifs Stripe non modifiés. Aucun paiement ni publication.
+
 **Couvertures programmes, 14 h 19 : correction locale vérifiée sur SE.**
 Le bouton de couverture ciblait un élément dans une section `details` fermée.
 Il ouvre désormais la cible et ses sections parentes avant de défiler, sans
@@ -16,7 +32,7 @@ WebKit éphémère sans supprimer la session persistante. Non publié/non vérif
 en production. L'ouverture de la cible déverrouillée reste testée unitairement,
 pas encore dans le simulateur.
 
-**À traiter : offre web dans le catalogue natif.** La capture du parcours
+**Constat initial, corrigé localement ci-dessus : offre web dans le catalogue natif.** La capture du parcours
 précédent montre « Acheter ce programme · 19 € » et le choix d'un programme
 offert dans l'app. Ce n'est pas une preuve de paiement Apple fonctionnel.
 Vérifier le routage natif et la présentation des droits avant toute distribution,

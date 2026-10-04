@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { OFFRE_RENTREE_LABEL, PROGRAMME_UNITAIRE_PRIX_LABEL } from "@/lib/programmes-prets/offre";
+import { isNativeIOSApp } from "@/lib/analytics/consent";
+
+const subscribeEnvironment = () => () => {};
+const serverEnvironment = (): boolean | null => null;
 
 type ChoixProgramme = { slug: string; nom: string };
 
@@ -18,8 +22,12 @@ export function ProgrammePurchaseButton({
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [consentement, setConsentement] = useState(false);
+  const nativeIOS = useSyncExternalStore(subscribeEnvironment, isNativeIOSApp, serverEnvironment);
 
   async function acheter() {
+    // Presentation only: server entitlement checks remain authoritative.
+    // Never dispatch a Stripe request from the native app, even on a stale UI.
+    if (isNativeIOSApp()) return;
     if (!connecte) {
       window.location.href = `/sign-in?redirect_to=${encodeURIComponent("/boutique")}`;
       return;
@@ -46,6 +54,16 @@ export function ProgrammePurchaseButton({
       setChargement(false);
     }
   }
+
+  if (nativeIOS === null) return <p role="status" className="p-3 text-sm text-graphite-300">Chargement des options d’accès…</p>;
+
+  if (nativeIOS) return (
+    <div className="rounded-xl border border-laiton-300/30 bg-laiton-400/[0.07] p-4">
+      <p className="text-sm font-semibold text-laiton-200">Le catalogue avec COAI Essentiel</p>
+      <p className="mt-2 text-sm leading-6 text-graphite-300">Consulte les options de ton abonnement iOS ou restaure un achat Apple existant.</p>
+      <a href="/compte/abonnement" className="mt-3 flex min-h-11 items-center justify-center rounded-full bg-laiton-300 px-4 py-3 text-sm font-bold text-[#101214]">Voir mon abonnement iOS</a>
+    </div>
+  );
 
   return (
     <div className="rounded-xl border border-laiton-300/30 bg-laiton-400/[0.07] p-3">
