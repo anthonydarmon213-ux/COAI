@@ -2,6 +2,20 @@
 
 ## État courant — 4 octobre 2026
 
+**Contrôle distant en lecture seule, 14 h 50.** Les 29 tables publiques COAI
+ont RLS activée ; les rôles clients gardent néanmoins TRUNCATE sur 22 tables.
+Aucune exploitation HTTP démontrée ni action destructive tentée. Les migrations
+locales de retrait des droits restent non appliquées à distance. Aucune vue ni
+fonction publique ; une politique INSERT de liste d'attente. Conseiller : 28
+informations de refus RLS sans politique et un avertissement sur la protection
+des mots de passe compromis. Détails dans `DATA-ACCESS-READINESS.md`.
+Registres photos et tables Apple toujours absents de la liste distante.
+`devicectl list devices` confirme l'iPhone antho 17 pro `unavailable` ;
+la première tentative sandbox n'avait pas accès au service CoreDevice, la
+lecture autorisée a fourni cet état. Aucun test physique, changement distant,
+abonnement ou soumission dans ce contrôle. Le problème des envois photos admis
+mais non confirmés reste ouvert, sans relâcher la preuve de suppression.
+
 **Catalogue et persistance, 14 h 43 : contrôles locaux renouvelés.**
 `/tmp/coai-exercise-catalogue-1004.xcresult` : SE, recherche du rowing exclu
 (zéro résultat), recherche gainage (un résultat), clavier fermé, filtre Dos,

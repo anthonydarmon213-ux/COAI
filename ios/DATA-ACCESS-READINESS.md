@@ -51,8 +51,25 @@ en service du seul conteneur Storage local confirmés.
 
 ## Avant production
 
-- Inspecter en lecture seule les droits/politiques réellement distants : ce
-  constat local ne prouve ni exposition ni protection des données en production.
+- Inspection distante en lecture seule effectuée le 4 octobre à 14 h 50,
+  projet COAI `fczkfddfgooocqqkqsqw`, région eu-west-1, PostgreSQL 17.6.1.155 :
+  29 tables publiques, toutes avec RLS ; 28 sans politique (refus par défaut
+  pour les rôles non privilégiés). Une politique INSERT `WITH CHECK (true)`
+  sur `founder_waitlist_entries`, pour anon/authenticated. Aucun contenu
+  utilisateur extrait, aucune écriture ni tentative destructive.
+- Les deux rôles ont encore TRUNCATE sur 22 tables. Ce droit superflu doit être
+  retiré par les migrations préparées après autorisation ; il n'est PAS une
+  preuve qu'un client HTTP peut exécuter TRUNCATE. Aucun essai de destruction
+  n'a été réalisé. Les rôles anon/authenticated ne sont ni superuser ni bypassrls.
+- Aucune vue, vue matérialisée ni fonction dans le schéma public à cet instant.
+  Cela ne couvre pas les autres schémas, les routes applicatives ou les secrets.
+  Les tables Apple et registres photos locaux sont absents de cette liste
+  distante : leurs migrations ne sont donc pas considérées appliquées.
+- Conseiller distant : 28 informations « RLS Enabled No Policy », attendues
+  pour des tables serveur, et un avertissement de protection contre les mots
+  de passe compromis désactivée. Ne pas annoncer un audit entièrement vert.
+  [Documentation de cette protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+  Aucun réglage changé ; disponibilité/coût à vérifier avant activation.
 - Confirmer le rôle PostgreSQL utilisé par l'application et toute intégration
   externe qui pourrait dépendre d'un accès direct à ces tables.
 - Autorisation explicite pour appliquer la migration distante, puis tests de
