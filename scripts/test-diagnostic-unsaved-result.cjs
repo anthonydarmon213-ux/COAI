@@ -94,3 +94,27 @@ for (const blocked of [false, true]) {
   assert.deepEqual(writes, blocked ? [] : [['coai_dashboard_intro_pending', '1']]);
 }
 console.log('PASS actual account creation handler: optional storage failure tolerated; diagnostic transfer still attempted.');
+const dashboardHandlers = [];
+function findDashboardHandlers(node) {
+  if (ts.isJsxAttribute(node) && node.name.text === 'onClick' &&
+      node.initializer && ts.isJsxExpression(node.initializer) &&
+      node.initializer.expression?.getText(ast).includes('coai_dashboard_intro_pending')) {
+    dashboardHandlers.push(node.initializer.expression);
+  }
+  ts.forEachChild(node, findDashboardHandlers);
+}
+findDashboardHandlers(ast);
+assert.equal(dashboardHandlers.length, 1);
+for (const blocked of [false, true]) {
+  let written = false;
+  assert.doesNotThrow(() => run(`(${dashboardHandlers[0].getText(ast)})()`, {
+    window: {localStorage: {setItem(key, value) {
+      assert.equal(key, 'coai_dashboard_intro_pending');
+      assert.equal(value, '1');
+      if (blocked) throw new Error('Storage denied');
+      written = true;
+    }}},
+  }), 'Dashboard navigation must tolerate denied optional storage');
+  assert.equal(written, !blocked);
+}
+console.log('PASS dashboard return handler with available and denied storage.');

@@ -2,6 +2,12 @@
 
 ## État courant — 4 octobre 2026
 
+Même protection ajoutée au clic « Retour au tableau de bord » après bilan
+enregistré : test du véritable gestionnaire JSX en stockage refusé, échec avant
+et réussite après. Types, lint sans erreur (six avertissements existants) et
+build QA 132 pages réussis. Les deux seuls accès directs au stockage dans ce
+composant sont désormais protégés. Vérification simulée, pas Safari physique.
+
 Clic de création de compte après diagnostic : exception reproduite lorsque
 `localStorage.setItem` refuse le marqueur facultatif d'introduction. Ce seul
 marqueur est maintenant protégé ; aucun changement de navigation ou de droits.

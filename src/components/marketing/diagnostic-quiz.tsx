@@ -2680,7 +2680,13 @@ export function DiagnosticQuiz({
                       </p>
                       <Link
                         href="/dashboard"
-                        onClick={() => window.localStorage.setItem("coai_dashboard_intro_pending", "1")}
+                        onClick={() => {
+                          try {
+                            window.localStorage.setItem("coai_dashboard_intro_pending", "1");
+                          } catch {
+                            // Le retour reste possible sans cette préférence facultative.
+                          }
+                        }}
                       >
                         <Button className="px-8 py-3">Retour au tableau de bord</Button>
                       </Link>
