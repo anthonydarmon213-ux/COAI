@@ -2,6 +2,16 @@
 
 ## État courant — 4 octobre 2026
 
+Comparaison à 12 h 01 : le même `testNativeNavigationWithLargeTextAndRotation`
+**passe sur iPhone 17 Pro simulé**, 17,7 s, même binaire, aucun correctif produit.
+Portrait → paysage gauche → portrait, cinq onglets accessibles sans chevauchement,
+44 points minimum, réglages et fermeture Explorer accessibles.
+Rapport `/tmp/coai-rotation-iphone17-control-1004-1200.xcresult`.
+Avec l'échec indépendant de Safari sur SE, cela pointe vers l'état de ce
+simulateur SE, sans valider pour autant le paysage petit écran. Ce dernier
+contrôle reste à refaire après diagnostic de l'environnement ; pas d'iPhone
+physique couvert par cette preuve.
+
 Contrôle indépendant rotation à 11 h 57 : Safari reste lui aussi en portrait
 sur le même SE, après demande LandscapeLeft. Capture inspectée, sans dialogue
 système bloquant visible. `testSimulatorSafariRotationControl` échoue réellement
