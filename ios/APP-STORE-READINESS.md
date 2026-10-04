@@ -1269,6 +1269,19 @@ Seule identité Apple Development détectée, aucune Distribution.
 
 ## État courant — 28 septembre 2026
 
+## Contrôle UI iPhone Simulator — 4 octobre 2026
+
+Parcours quotidien connecté rejoué après reconstruction du serveur QA avec le
+code source courant : `testLocalConnectedDailyWorkoutPersists` passe (0 échec),
+et la persistance de la séance terminée ainsi que le ressenti sans douleur sont
+confirmés indépendamment dans PostgreSQL local. La capture
+`/tmp/coai-workout-layout-attachments-final-1004/AAC461DD-DAD8-4487-AE38-BA29D55085F4.png`
+a été inspectée : les étapes ne se chevauchent plus sur petit écran, le compteur
+affiche « 1 exercice » et les intitulés de sections ne sautent plus de 02 à 04
+quand le bloc abdos est absent. TypeScript, build QA et `git diff --check`
+passent. Fixture locale supprimée après vérification. Validation Simulator
+uniquement, pas un test sur iPhone physique ou une validation de production.
+
 Rappels/session, 14 h 50 : brouillon fictif conservé après relance puis effacé
 après signal de déconnexion confirmé, test réussi (19,023 s) dans
 `/tmp/coai-session-cleanup-0928-current.xcresult`. Ce résultat contient aussi

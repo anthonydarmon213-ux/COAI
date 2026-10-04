@@ -1809,6 +1809,10 @@ final class COAIUITests: XCTestCase {
         confirm.tap()
         let start = web.buttons["Commencer ma séance"]
         XCTAssertTrue(start.waitForExistence(timeout: 20))
+        let workoutLayout = XCTAttachment(screenshot: app.screenshot())
+        workoutLayout.name = "Séance iPhone — progression lisible et libellé français"
+        workoutLayout.lifetime = .keepAlways
+        add(workoutLayout)
         shortReveal(start)
         start.tap()
         let finish = web.buttons["Terminer ma séance"]

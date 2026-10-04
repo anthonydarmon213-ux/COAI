@@ -405,34 +405,39 @@ export function DailyExperience({
                   <span className="font-editorial text-3xl text-laiton-200">{progress}%</span>
                 </div>
                 <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-laiton-500 to-laiton-200 transition-all duration-500" style={{ width: `${progress}%` }} /></div>
-                <div className="mt-3 grid grid-cols-4 gap-1.5 text-center font-mono text-[8px] uppercase tracking-wide text-graphite-500"><span>Échauffement</span><span>Renforcement</span><span>Abdos</span><span>Retour au calme</span></div>
+                <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-center font-mono text-[10px] leading-tight uppercase tracking-[0.08em] text-graphite-500 sm:grid-cols-4 sm:gap-1.5 sm:text-[9px] sm:tracking-wide">
+                  {activeSession.echauffement && <span className="min-w-0 break-words">Échauffement</span>}
+                  {mainExercises.length > 0 && <span className="min-w-0 break-words">Renforcement</span>}
+                  {coreExercises.length > 0 && <span className="min-w-0 break-words">Abdos</span>}
+                  {activeSession.retourAuCalme && <span className="min-w-0 break-words">Retour au calme</span>}
+                </div>
               </div>}
 
               {activeSession.echauffement && (
                 <details className="group rounded-2xl border border-amber-400/20 bg-amber-400/[0.04]" open={started}>
                   <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none">
                     <span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("warmup") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-amber-400/30 text-amber-200"}`}>{completedSteps.has("warmup") ? "✓" : "↗"}</span>
-                    <div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-amber-200">01 · Échauffement</p><p className="mt-0.5 text-xs text-graphite-400">Prépare ton corps avant les séries de travail</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span>
+                    <div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-amber-200">Échauffement</p><p className="mt-0.5 text-xs text-graphite-400">Prépare ton corps avant les séries de travail</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span>
                   </summary>
                   <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.echauffement}</p>{!daily?.completedAt && <button type="button" aria-pressed={completedSteps.has("warmup")} onClick={() => toggleStep("warmup")} className="mt-3 min-h-11 rounded-full border border-amber-400/25 px-4 py-2 text-xs text-amber-100">{completedSteps.has("warmup") ? "Échauffement terminé ✓" : "Échauffement terminé"}</button>}</div>
                 </details>
               )}
 
               <div className="flex flex-col gap-2.5">
-                <div className="flex items-center justify-between"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-laiton-300">02 · Renforcement principal</p><span className="text-[10px] text-graphite-500">{mainExercises.length} exercices</span></div>
+                <div className="flex items-center justify-between"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-laiton-300">Renforcement principal</p><span className="text-[10px] text-graphite-500">{mainExercises.length} exercice{mainExercises.length > 1 ? "s" : ""}</span></div>
                 {mainExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core={false} readOnly={Boolean(daily?.completedAt)} active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}
               </div>
 
               {coreExercises.length > 0 && (
                 <div className="rounded-2xl border border-violet-400/20 bg-violet-400/[0.035] p-3 sm:p-4">
-                  <div className="mb-3 flex items-center justify-between"><div><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-violet-200">03 · Finisher abdos & gainage</p><p className="mt-1 text-xs text-graphite-400">Le dernier bloc de ta séance</p></div><span className="text-xl">◉</span></div>
+                  <div className="mb-3 flex items-center justify-between"><div><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-violet-200">Finisher abdos & gainage</p><p className="mt-1 text-xs text-graphite-400">Le dernier bloc de ta séance</p></div><span className="text-xl">◉</span></div>
                   <div className="flex flex-col gap-2.5">{coreExercises.map(({ exercise, index }) => <Exercise key={index} data={exercise} index={index} core readOnly={Boolean(daily?.completedAt)} active={activeExercise === index} done={completedSteps.has(`exercise-${index}`)} onOpen={() => setActiveExercise(activeExercise === index ? null : index)} onDone={() => completeExercise(index)} />)}</div>
                 </div>
               )}
 
               {activeSession.retourAuCalme && (
                 <details className="group rounded-2xl border border-sky-400/20 bg-sky-400/[0.035]" open={progress >= 70}>
-                  <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none"><span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("cooldown") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-sky-400/30 text-sky-200"}`}>{completedSteps.has("cooldown") ? "✓" : "↓"}</span><div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-sky-200">04 · Retour au calme</p><p className="mt-0.5 text-xs text-graphite-400">5 à 8 minutes pour faire redescendre le rythme</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span></summary>
+                  <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none"><span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${completedSteps.has("cooldown") ? "border-emerald-400 bg-emerald-400 text-graphite-950" : "border-sky-400/30 text-sky-200"}`}>{completedSteps.has("cooldown") ? "✓" : "↓"}</span><div className="flex-1"><p className="font-mono text-[9px] uppercase tracking-[0.16em] text-sky-200">Retour au calme</p><p className="mt-0.5 text-xs text-graphite-400">5 à 8 minutes pour faire redescendre le rythme</p></div><span className="text-graphite-500 transition group-open:rotate-180">⌄</span></summary>
                   <div className="border-t border-white/[0.06] px-4 pb-4 pt-3"><p className="text-xs leading-6 text-graphite-200">{activeSession.retourAuCalme}</p>{!daily?.completedAt && <button type="button" aria-pressed={completedSteps.has("cooldown")} onClick={() => toggleStep("cooldown")} className="mt-3 min-h-11 rounded-full border border-sky-400/25 px-4 py-2 text-xs text-sky-100">{completedSteps.has("cooldown") ? "Retour au calme terminé ✓" : "Retour au calme terminé"}</button>}</div>
                 </details>
               )}
