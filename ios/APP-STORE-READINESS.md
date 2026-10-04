@@ -17,6 +17,15 @@ ni le scénario complet corrigé, ni l'appareil physique, ni la production.
 L'inspection manuelle du simulateur est bloquée par le verrouillage du Mac ;
 XCTest reste exécutable. Aucune publication effectuée.
 
+Vérification suivante : **PASS** sur `testLocalExistingDiagnosticResultCanBeSaved`
+(13,7 s), même compte fictif et même vrai brouillon. Relance → Explorer → bilan →
+reprise → raccourci d'enregistrement → confirmation « Choisir mon accompagnement ».
+Aucun accès fictif à la première séance accordé au compte sans abonnement.
+Rapport : `/tmp/coai-existing-diagnostic-save-1004-1119.xcresult`.
+Le brouillon est désormais consommé : ces deux tests ciblés nécessitent un nouveau
+scénario préparatoire pour être rejoués. Lecture indépendante du profil en base
+et parcours complet corrigé restent à faire ; pas de validation en production.
+
 Présentation des exercices : écart observé dans le navigateur QA entre les
 77 annoncés dans la découverte et les 59 réellement proposés par le catalogue
 filtré. Le chiffre historique a été retiré du descriptif, qui renvoie maintenant

@@ -935,6 +935,16 @@ final class COAIUITests: XCTestCase {
     /// left by the local signup scenario. Does not seed or alter web storage.
     @MainActor
     func testLocalExistingDiagnosticResultViaExplorer() throws {
+        try existingDiagnosticResultViaExplorer(save: false)
+    }
+
+    @MainActor
+    func testLocalExistingDiagnosticResultCanBeSaved() throws {
+        try existingDiagnosticResultViaExplorer(save: true)
+    }
+
+    @MainActor
+    private func existingDiagnosticResultViaExplorer(save: Bool) throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -957,6 +967,21 @@ final class COAIUITests: XCTestCase {
         let proof = XCTAttachment(screenshot: app.screenshot())
         proof.name = "Bilan réel conservé — retour par Explorer"
         proof.lifetime = .keepAlways; add(proof)
+        if save {
+            let shortcut = web.links["Passer à l’enregistrement de mon bilan →"]
+            XCTAssertTrue(shortcut.waitForExistence(timeout: 10))
+            XCTAssertTrue(shortcut.isHittable)
+            shortcut.tap()
+            let submit = web.buttons["Enregistrer et continuer"]
+            reveal(submit, in: app)
+            XCTAssertTrue(submit.isHittable)
+            submit.tap()
+            XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
+            XCTAssertFalse(web.buttons["Commencer ma première séance"].exists)
+            let saved = XCTAttachment(screenshot: app.screenshot())
+            saved.name = "Bilan repris puis enregistré — compte local sans abonnement"
+            saved.lifetime = .keepAlways; add(saved)
+        }
     }
 
     @MainActor
