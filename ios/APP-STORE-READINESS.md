@@ -58,6 +58,16 @@ production comme validé. À résoudre puis retester sur l’URL réelle avant l
 distribution iOS ; aucune connexion, donnée personnelle ni achat n’a été
 utilisé.
 
+**Cause vérifiée dans Vercel, 22 h 15.** Le projet `lab-coach` associe bien
+`coai.fr` à son dernier déploiement ciblé `production`, état `READY`, créé le
+17 septembre à 22 h 24 (Paris), depuis `claude/lab-coach-mvp-structure-5ij0tz`,
+commit `566541f5` (« fix(media): remove stock fallbacks… »). L’arbre iOS testé
+est au commit `69f916f` du 4 octobre et contient la correction locale. Le code
+testé n’est donc pas celui qui alimente le site de production, ce qui explique
+l’absence du bandeau sans incriminer le garde local. Aucun déploiement ou
+changement de domaine effectué. Il faudra livrer la version web appropriée sur
+`coai.fr`, puis refaire le test UI avant de déclarer ce contrôle conforme.
+
 **Catalogue sur iPhone simulé — 21 h 07 (Paris).** Le contrôle de la route
 hébergée lancé sans session (`testPhysicalCatalogueExcludesMismatchedRowing`)
 ne trouve pas le champ de recherche : l'application reste à l'écran de connexion.
