@@ -2,6 +2,19 @@
 
 ## État courant — 4 octobre 2026
 
+**Parcours natif complet corrigé : PASS le 4 octobre à 11 h 31**, 147,2 s,
+`testLocalNewAccountDiagnosticReachesResult` sur SE/iOS 26.5, serveur 3050
+reconstruit avec les corrections actuelles. Inscription fictive neuve,
+confirmation SMTP locale, consentements, questionnaire, résultat non enregistré,
+fermeture/relance, Explorer → Mon bilan COAI, reprise du résultat puis sauvegarde.
+Rapport `/tmp/coai-full-diagnostic-explorer-1004-1126.xcresult`.
+Contrôle indépendant en lecture seule : huit valeurs attendues et les deux
+consentements présents en base locale. Captures du raccourci d'enregistrement
+et de la fin inspectées : contenu lisible, navigation basse distincte ; deux
+liens d'accompagnement redondants restent visibles à la fin (polish à traiter).
+Ce PASS remplace l'échec de navigation du précédent scénario, pas les autres
+gates : achats Apple réels, appareil physique et production non validés.
+
 Reprise native du diagnostic : accès permanent « Mon bilan COAI » ajouté à
 Explorer. Le précédent scénario complet a échoué après relance parce qu'il
 cherchait le bouton de bienvenue sur la page entraînement, point d'entrée réel
