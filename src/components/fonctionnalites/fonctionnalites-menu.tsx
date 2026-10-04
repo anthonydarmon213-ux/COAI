@@ -25,7 +25,7 @@ const GRATUITES: Fonction[] = [
   { titre: "Tonnage et volume", description: "Le poids total soulevé par séance et le volume par exercice, calculés automatiquement.", href: "/suivi/progression", icon: BarChart3 },
   { titre: "Records et tests maxi", description: "Garde la trace de tes maxima et vois tes records tomber.", href: "/suivi/tests-maxi", icon: Trophy },
   { titre: "Mesures corporelles", description: "Poids, tours de taille et de hanches, suivis dans le temps.", href: "/suivi/mesures", icon: Ruler },
-  { titre: "Bibliothèque d’exercices", description: "77 exercices avec photos et vidéos de démonstration filmées par COAI.", href: "/programme/exercices", icon: BookOpen },
+  { titre: "Bibliothèque d’exercices", description: "Retrouve les exercices disponibles, avec photos et vidéos de démonstration COAI. Le catalogue affiche le nombre à jour.", href: "/programme/exercices", icon: BookOpen },
   { titre: "3 recettes offertes", description: "Découvre trois recettes avec macros, étapes et visuels. Le catalogue complet est accessible avec l’abonnement.", href: "/programme/recettes", icon: Salad },
   { titre: "Suivi des macros", description: "Journal de repas et repères nutritionnels du jour.", href: "/suivi/alimentation", icon: Apple },
   { titre: "Plan de récupération", description: "Mobilité, étirements, respiration et sommeil pour encaisser la charge.", href: "/programme/recuperation", icon: Moon },

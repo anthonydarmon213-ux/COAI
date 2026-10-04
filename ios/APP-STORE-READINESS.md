@@ -2,6 +2,13 @@
 
 ## État courant — 4 octobre 2026
 
+Présentation des exercices : écart observé dans le navigateur QA entre les
+77 annoncés dans la découverte et les 59 réellement proposés par le catalogue
+filtré. Le chiffre historique a été retiré du descriptif, qui renvoie maintenant
+au nombre à jour du catalogue. Aucun exercice ni filtre média modifié.
+Build QA, types et lint sans erreur ; texte corrigé vérifié dans le navigateur
+connecté sur 3051. Pas de publication ni validation en production.
+
 Même protection ajoutée au clic « Retour au tableau de bord » après bilan
 enregistré : test du véritable gestionnaire JSX en stockage refusé, échec avant
 et réussite après. Types, lint sans erreur (six avertissements existants) et
