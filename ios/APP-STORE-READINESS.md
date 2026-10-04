@@ -34,6 +34,30 @@ pas les achats Sandbox/App Store Connect. Aucun achat réel, upload ou soumissio
 
 ## État courant — 4 octobre 2026
 
+**Recontrôle Release et navigation — 22 h 00 (Paris).** Build Release iPhone
+arm64 fraîche réussie dans `/tmp/coai-release-verify-20261004` depuis l'arbre
+courant, sans signature ni écriture dans le dépôt. Bundle vérifié :
+`fr.coai.mobile`, version `0.1.0` (build `1`), manifeste de confidentialité
+identique à la source. Les 51 tests Swift passent avec un scratch isolé dans
+`/tmp/coai-swift-tests-20261004`. Sur iPhone SE (3e génération) simulé / iOS
+26.5, `testNativeNavigationAlignmentAndActualPageSelection` passe : cinq
+onglets de même largeur et position, zones tactiles ≥ 44 points, état sélectionné
+cohérent et accès au minuteur (`/tmp/coai-nav-ui-20261004.xcresult`).
+
+**Écart de confidentialité en production — à résoudre avant diffusion.** Le
+test UI `testNativePrivacyKeepsOptionalTrackingOff` échoue sur la page publique
+servie à l’app : le bandeau attendu « Les outils publicitaires et de mesure
+d’audience facultatifs sont désactivés dans cette version iPhone » n’est pas
+trouvé (`/tmp/coai-privacy-ui-20261004.xcresult`, 0/1). Le contrôle du code local
+`node scripts/test-privacy-consent.cjs` passe, et le composant local contient
+bien le texte. Une lecture HTTP publique envoie le marqueur iOS sans compte ; le
+texte n’a pas été retrouvé dans les bundles layout/partagé examinés. Cela suggère
+un écart entre le code local et le site servi, sans encore établir la cause
+exacte. Aucun déploiement effectué : ne pas considérer le garde-fou visible en
+production comme validé. À résoudre puis retester sur l’URL réelle avant la
+distribution iOS ; aucune connexion, donnée personnelle ni achat n’a été
+utilisé.
+
 **Catalogue sur iPhone simulé — 21 h 07 (Paris).** Le contrôle de la route
 hébergée lancé sans session (`testPhysicalCatalogueExcludesMismatchedRowing`)
 ne trouve pas le champ de recherche : l'application reste à l'écran de connexion.
