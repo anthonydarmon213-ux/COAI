@@ -8,6 +8,25 @@ distante : zéro attribution restante). Le contrôle santé de la base répond
 larges restent en attente et la sécurité globale n'est pas déclarée terminée.
 Pas de changement de données, de coût, de build iOS ou de soumission Apple.
 
+**Préflight Release/Archive — 4 octobre 2026, 20 h (Paris).** Après échec du
+premier lancement restreint (CoreSimulator inaccessible), le build autorisé
+`xcodebuild ... -configuration Release -destination generic/platform=iOS
+CODE_SIGNING_ALLOWED=NO build` et l'archive non signée ont réussi. Archive de
+diagnostic : `/tmp/COAI-Release-unsigned-20261004.xcarchive`. Son Info.plist
+confirme `fr.coai.mobile`, arm64, version `0.1.0` (build `1`), sans équipe ni
+identité de signature ; ce n'est donc pas un livrable distribuable. Le
+`PrivacyInfo.xcprivacy` est valide, embarqué, identique au source (SHA-256
+vérifié). L'icône compilée part d'un PNG valide de 1024 × 1024 sans alpha.
+`Info.plist` et le manifeste source passent `plutil -lint`.
+
+Une relance de la suite StoreKit locale a été interrompue : la confirmation
+affichée dans le simulateur était explicitement Xcode/test sans prélèvement,
+mais son interaction a invalidé le scénario d'annulation ; les 5 tests rapportés
+dans `/tmp/coai-storekit-local-1004-continuation.xcresult` sont donc **à ne pas
+considérer comme validation** (0 réussi, 5 échoués/interrompus). Cela ne remplace
+pas la précédente exécution locale documentée plus bas, et ne valide toujours
+pas les achats Sandbox/App Store Connect. Aucun achat réel, upload ou soumission.
+
 ## État courant — 4 octobre 2026
 
 **Vérification appareil / accès Apple, 19 h 08 Paris.** `devicectl` voit
