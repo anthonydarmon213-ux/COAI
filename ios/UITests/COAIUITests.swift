@@ -1834,6 +1834,63 @@ final class COAIUITests: XCTestCase {
         XCTAssertFalse(web.buttons["Commencer ma séance"].exists)
     }
 
+    /// Injecte un accusé HTTP 200 invalide après écriture réelle, puis vérifie le retry.
+    @MainActor
+    func testLocalDailyCheckinKeepsAnswersAfterInvalidConfirmation() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
+        let web = app.webViews.firstMatch
+        let email = web.textFields["EMAIL"]
+        XCTAssertTrue(email.waitForExistence(timeout: 30))
+        email.tap()
+        email.typeText("coai-ui-dailyprobe-20261004@example.test")
+        let password = web.secureTextFields["MOT DE PASSE"]
+        reveal(password, in: app)
+        password.tap()
+        password.typeText("Coai-local-Daily-1004-only!")
+        let submit = web.buttons["Se connecter"]
+        reveal(submit, in: app)
+        submit.tap()
+        XCTAssertTrue(email.waitForNonExistence(timeout: 30))
+        func revealForDaily(_ element: XCUIElement) {
+            for _ in 0..<25 {
+                if element.isHittable { break }
+                let above = element.frame.midY < app.frame.midY
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.45 : 0.65))
+                    .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: above ? 0.65 : 0.45)))
+            }
+            XCTAssertTrue(element.isHittable)
+        }
+        app.buttons["native-tab-Explorer"].tap()
+        app.buttons["explore-/dashboard"].tap()
+        for label in ["Normale", "Bon", "Non", "40 min", "Salle de sport complète"] {
+            let choice = web.switches[label].firstMatch
+            XCTAssertTrue(choice.waitForExistence(timeout: 20))
+            revealForDaily(choice)
+            if choice.value as? String != "1" { choice.tap() }
+        }
+        let preview = web.buttons["Voir les ajustements →"]
+        revealForDaily(preview)
+        preview.tap()
+        let confirm = web.buttons["Confirmer ma séance du jour"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 15))
+        revealForDaily(confirm)
+        confirm.tap()
+        let error = web.staticTexts["L’enregistrement n’a pas pu être confirmé. Ta séance reste affichée ; réessaie pour vérifier sa sauvegarde."]
+        XCTAssertTrue(error.waitForExistence(timeout: 15))
+        XCTAssertTrue(confirm.exists, "La confirmation doit rester disponible après l'accusé invalide.")
+        revealForDaily(confirm)
+        confirm.tap()
+        XCTAssertTrue(web.buttons["Commencer ma séance"].waitForExistence(timeout: 20))
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Check-in conservé après accusé invalide puis retry"
+        proof.lifetime = .keepAlways
+        add(proof)
+    }
+
     /// Requires the isolated loopback server and disposable local fixture.
     /// Real password login/cookies; no HTML fixture or injected authentication.
     @MainActor

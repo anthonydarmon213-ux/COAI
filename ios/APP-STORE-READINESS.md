@@ -13,6 +13,13 @@ null/tableau/objet vide, dates invalides, repères invalides, JSON illisible,
 hors ligne, erreur serveur, confirmation valide et ressenti valide : PASS.
 Ressenti douleur explicite : PASS. Types, lint (six avertissements existants),
 build QA séparé 132 pages, audit 356 médias : PASS.
+`/tmp/coai-daily-confirmation-retry-1004.xcresult` : test UI iPhone 17 :
+la vraie route locale persiste le check-in, puis le proxy remplace son premier
+accusé 200 par un objet invalide ; l’écran garde l’erreur et le bouton, le
+nouvel essai reçoit un accusé valide et rétablit l’accès à la séance (1 test,
+0 échec). Vérification indépendante dans PostgreSQL local : réponses exactes
+sauvegardées, séance non terminée. Fixture jetable supprimée. Le proxy injecte
+uniquement sur loopback ; aucune donnée de production ni aucun achat.
 Le test UI de connexion sur simulateur iPhone 17 vierge a révélé que le clavier
 pouvait masquer le champ mot de passe sur les petits écrans. Tous les écrans
 d’accès mobile commencent maintenant en haut du viewport, et les champs gardent
@@ -23,9 +30,10 @@ ouvert, se connecte, navigue vers Nutrition, Récupération et Recettes, puis
 vérifie la déconnexion après relance : 1 test, 0 échec. Le premier essai était
 pollué par une session déjà ouverte et un relais qui injectait volontairement
 une erreur 503 ; ces deux causes sont corrigées dans les conditions du test.
-Le correctif de sauvegarde quotidienne, lui, n’a pas encore été exercé par un
-parcours UI iPhone avec réponse défectueuse. Aucun déploiement ni test en
-production ; iPhone physique et achats Apple réels restent à valider.
+Le correctif de sauvegarde quotidienne a maintenant été exercé par un parcours
+UI iPhone avec réponse défectueuse comme décrit ci-dessus. Aucun déploiement ni
+test en production ; iPhone physique et achats Apple réels restent à valider.
+`/tmp/coai-storekit-local.UHBccN/Logs/Test/Test-COAIStoreKitLocal-2026.10.04_17-01-21-+0200.xcresult` : nouvelle exécution des 8 scénarios StoreKit Testing dans Xcode, 0 échec (prix/essai simulés, annulation, attente, reprise après panne, compte différent, remboursement, expiration, restauration vide et autorisation interrompue). Boutique et serveur entièrement simulés ; aucun achat, appel payant ou test Sandbox/App Store Connect.
 `/tmp/coai-signup-keyboard-1004.xcresult` : le formulaire d’inscription complet
 sur le simulateur iPhone 17 passe (1 test, 0 échec), confirmation email locale
 reçue ; compte et message de test supprimés après vérification.
