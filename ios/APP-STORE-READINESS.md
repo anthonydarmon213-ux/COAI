@@ -13,7 +13,7 @@ null/tableau/objet vide, dates invalides, repères invalides, JSON illisible,
 hors ligne, erreur serveur, confirmation valide et ressenti valide : PASS.
 Ressenti douleur explicite : PASS. Types, lint (six avertissements existants),
 build QA séparé 132 pages, audit 356 médias : PASS.
-`/tmp/coai-daily-confirmation-retry-1004.xcresult` : test UI iPhone 17 :
+`/tmp/coai-daily-confirmation-isolated-1004.xcresult` : test UI iPhone 17 :
 la vraie route locale persiste le check-in, puis le proxy remplace son premier
 accusé 200 par un objet invalide ; l’écran garde l’erreur et le bouton, le
 nouvel essai reçoit un accusé valide et rétablit l’accès à la séance (1 test,
@@ -34,7 +34,7 @@ Le correctif de sauvegarde quotidienne a maintenant été exercé par un parcour
 UI iPhone avec réponse défectueuse comme décrit ci-dessus. Aucun déploiement ni
 test en production ; iPhone physique et achats Apple réels restent à valider.
 `/tmp/coai-storekit-local.UHBccN/Logs/Test/Test-COAIStoreKitLocal-2026.10.04_17-01-21-+0200.xcresult` : nouvelle exécution des 8 scénarios StoreKit Testing dans Xcode, 0 échec (prix/essai simulés, annulation, attente, reprise après panne, compte différent, remboursement, expiration, restauration vide et autorisation interrompue). Boutique et serveur entièrement simulés ; aucun achat, appel payant ou test Sandbox/App Store Connect.
-`/tmp/coai-first-workout-1004.xcresult` : parcours UI connecté iPhone 17, du check-in à l’aperçu, démarrage, fin, ressenti explicite sans douleur, puis relance de l’app et lecture de « Séance accomplie. » : 1 test, 0 échec. La base PostgreSQL locale a confirmé une séance terminée et le ressenti attendu ; compte de test supprimé. Test local seulement, pas un appareil physique ni une session de production.
+`/tmp/coai-first-workout-isolated-1004.xcresult` : parcours UI connecté iPhone 17, avec stockage WebKit éphémère et sans réutiliser la session personnelle ; check-in, aperçu, démarrage, fin, ressenti explicite sans douleur, fermeture, relance puis nouvelle connexion et lecture de « Séance accomplie. » : 1 test, 0 échec. La base PostgreSQL locale a confirmé une séance terminée et le ressenti attendu ; compte de test supprimé. Test local seulement, pas un appareil physique ni une session de production.
 `/tmp/coai-signup-keyboard-1004.xcresult` : le formulaire d’inscription complet
 sur le simulateur iPhone 17 passe (1 test, 0 échec), confirmation email locale
 reçue ; compte et message de test supprimés après vérification.

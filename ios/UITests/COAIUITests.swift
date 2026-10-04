@@ -1764,7 +1764,7 @@ final class COAIUITests: XCTestCase {
     func testLocalConnectedDailyWorkoutPersists() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration", "-COAIAnonymousUITest"]
         app.launch()
         XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
         let web = app.webViews.firstMatch
@@ -1827,6 +1827,21 @@ final class COAIUITests: XCTestCase {
         XCTAssertTrue(web.staticTexts["Séance accomplie."].waitForExistence(timeout: 15))
         app.terminate()
         app.launch()
+        // The isolated WebKit store deliberately drops its cookie on relaunch.
+        // Sign in again to prove the server-side workout survives independently.
+        let relaunchEmail = web.textFields["EMAIL"]
+        if relaunchEmail.waitForExistence(timeout: 5) {
+            relaunchEmail.tap()
+            relaunchEmail.typeText("coai-ui-workoutprobe-20261004@example.test")
+            let relaunchPassword = web.secureTextFields["MOT DE PASSE"]
+            reveal(relaunchPassword, in: app)
+            relaunchPassword.tap()
+            relaunchPassword.typeText("Coai-local-Workout-1004-only!")
+            let relaunchSubmit = web.buttons["Se connecter"]
+            reveal(relaunchSubmit, in: app)
+            relaunchSubmit.tap()
+            XCTAssertTrue(relaunchEmail.waitForNonExistence(timeout: 30))
+        }
         XCTAssertTrue(app.buttons["native-tab-Explorer"].waitForExistence(timeout: 15))
         app.buttons["native-tab-Explorer"].tap()
         app.buttons["explore-/dashboard"].tap()
@@ -1839,7 +1854,7 @@ final class COAIUITests: XCTestCase {
     func testLocalDailyCheckinKeepsAnswersAfterInvalidConfirmation() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration", "-COAIAnonymousUITest"]
         app.launch()
         XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
         let web = app.webViews.firstMatch

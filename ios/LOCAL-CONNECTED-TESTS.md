@@ -292,21 +292,34 @@ interrompue en cours d'envoi ni une synchronisation hors ligne.
   déconnexion. Deux passages réussis : résultats 05-33-30 et 05-36-43.
 - `testLocalConnectedDailyWorkoutPersists` : bilan initial réellement saisi,
   aperçu puis confirmation, démarrage/fin de séance, ressenti sans douleur,
-  relance et état accompli conservé. Résultat 06-08-29.
+  relance et état accompli conservé. Utilise un magasin WebKit éphémère,
+  puis se reconnecte après relance pour vérifier la persistance serveur sans
+  modifier le magasin de session de l’utilisateur.
 
 Ces résultats sont dans `/tmp/coai-native-connected-0925/Logs/Test/` avec le
 préfixe `Test-COAI-2026.09.25_` et le suffixe `-+0200.xcresult`.
 
 ### Fixtures distinctes obligatoires
 
-Le test de connexion utilise `ui-create`. Le test quotidien utilise
-`ui-create --without-checkin` : ne pas préenregistrer sa DailySession, car cela
-contournerait précisément le formulaire à vérifier. Après chaque test, contrôler
-respectivement `ui-verify` ou `ui-workout-verify --checkin`, puis `ui-cleanup`.
-Recréer le compte avant le test suivant, même après un échec : les cookies du
-test précédent peuvent persister. Ne pas exécuter ces deux tests en parallèle
-avec le même compte. Toutes ces commandes visent uniquement le helper local
-et la pile jetable décrits ci-dessous, jamais les comptes réels.
+Le test de connexion utilise sa fixture documentée `ui-create`. Le parcours
+quotidien utilise un compte distinct et neuf :
+`ui-create --registered --without-checkin --workout-probe`. L’identifiant et le
+mot de passe de cette fixture dédiée sont codés dans le test ; ne jamais réutiliser
+le compte préexistant `coai-ui-20260924-http@example.test` ni préenregistrer une
+DailySession, car cela contournerait le formulaire à vérifier. Après le test,
+contrôler `ui-workout-verify --workout-probe --checkin`, puis `ui-cleanup
+--workout-probe`. Recréer le compte avant un nouveau passage, même après un
+échec : les cookies du test précédent peuvent persister. Ne pas exécuter les
+tests en parallèle avec le même compte. Ces commandes visent uniquement le
+helper local et la pile jetable décrits ci-dessous, jamais des comptes réels.
+
+Le test `testLocalDailyCheckinKeepsAnswersAfterInvalidConfirmation` exige la
+fixture distincte `ui-create --registered --without-checkin --daily-probe` et
+le proxy local `node scripts/ios-daily-confirmation-proxy.cjs` sur 3050 devant
+le serveur de test sur 3051. Le proxy remplace une seule confirmation, après
+écriture réelle. Vérifier `ui-workout-verify --daily-probe --checkin
+--checkin-only`, puis nettoyer avec `ui-cleanup --daily-probe`. Redémarrer le
+proxy pour réarmer l’injection avant chaque exécution.
 
 Le contrôle quotidien en base exige une seule séance, les cinq valeurs saisies
 (NORMALE, BON, false, 40 minutes, salle complète), completedAt et BIEN_DOSEE,
