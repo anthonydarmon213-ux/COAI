@@ -1119,6 +1119,8 @@ model PhotoUpload {
   id String @id
   ownerKey String
   settled Boolean @default(false)
+  // True for legacy writers; only the new reservation path explicitly uses false.
+  dispatchStarted Boolean @default(true)
   avatarCommitted Boolean @default(false)
   retiredAvatarName String?
   // Temporary routing data, cleared as soon as retirement is confirmed.
