@@ -2,6 +2,18 @@
 
 ## État courant — 4 octobre 2026
 
+**Rotation grand texte : NON VALIDÉE au 4 octobre 11 h 47.**
+`testNativeExplorerReplacesWebSidebarWithoutHidingContent` passe, mais
+`testNativeNavigationWithLargeTextAndRotation` échoue au passage paysage :
+la zone WebView reste en portrait. Reproduit dans le lot
+`/tmp/coai-native-navigation-rotation-1004-1139.xcresult` puis en test isolé
+`/tmp/coai-rotation-isolated-1004-1145.xcresult` (pas seulement l'effet de la
+feuille d'abonnement précédente). Vidéo inspectée : écran effectivement portrait.
+Le plist compilé autorise Portrait/LandscapeLeft/LandscapeRight ; aucune correction
+produit déduite de ce seul constat. Les cinq onglets restent accessibles et
+dans l'écran en portrait XXXL. Cause application/simulateur à distinguer par
+un contrôle d'orientation indépendant ; ne pas supprimer l'assertion paysage.
+
 **Parcours natif complet corrigé : PASS le 4 octobre à 11 h 31**, 147,2 s,
 `testLocalNewAccountDiagnosticReachesResult` sur SE/iOS 26.5, serveur 3050
 reconstruit avec les corrections actuelles. Inscription fictive neuve,
