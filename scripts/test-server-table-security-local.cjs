@@ -16,6 +16,8 @@ const tables = ['_prisma_migrations', 'activite_journaliere', 'avis', 'diagnosti
   'founder_waitlist_entries', 'mesures', 'profiles', 'programme_adaptations',
   'programmes_generated', 'repas_log', 'seances_log', 'subscriptions', 'tests_maxi',
   'users', 'videos', 'weekly_checkins', 'whatsapp_events'];
+tables.push('ai_usage_events', 'billing_events', 'churn_feedback', 'coach_notes',
+  'daily_sessions', 'recuperations_musculaires', 'stripe_webhook_events');
 let authId, profileId;
 (async () => {
   try {
@@ -59,7 +61,7 @@ let authId, profileId;
       headers: { Authorization: `Bearer ${signed.data.session.access_token}` },
     });
     assert.equal(response.status, 200, 'Authenticated server route must remain usable through Prisma');
-    console.log('PASS 17 legacy tables: anonymous/member HTTP reads denied, all table privileges revoked, RLS enabled; users CRUD denied, server export remains usable');
+    console.log(`PASS ${tables.length} server tables: anonymous/member HTTP reads denied, all table privileges revoked, RLS enabled; users CRUD denied, server export remains usable`);
   } finally {
     if (profileId) await db.user.deleteMany({ where: { id: profileId } });
     if (authId) {

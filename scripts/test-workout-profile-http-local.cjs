@@ -9,6 +9,10 @@ const databaseURL = new URL(process.env.DATABASE_URL);
 assert.equal(databaseURL.hostname, '127.0.0.1');
 assert.equal(databaseURL.port, '54322');
 const origin = 'http://127.0.0.1:3050';
+// Native QA redirects use localhost; SSR cookie names must match the build's
+// Auth hostname. This explicit mode changes only fixture cookie construction.
+const cookieAuthURL = process.argv.includes('--native-origin')
+  ? 'http://localhost:54321' : process.env.NEXT_PUBLIC_SUPABASE_URL;
 const db = new PrismaClient();
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
   auth: {persistSession: false, autoRefreshToken: false},
@@ -27,7 +31,7 @@ async function fixture() {
   const owned = {authId: data.user.id}; fixtures.push(owned);
   owned.user = await db.user.create({data: {email, supabaseAuthId: data.user.id}});
   const jar = new Map();
-  owned.client = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
+  owned.client = createServerClient(cookieAuthURL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {getAll: () => [...jar].map(([name, value]) => ({name, value})),
       setAll: updates => updates.forEach(({name, value}) => jar.set(name, value))},
   });
@@ -35,6 +39,15 @@ async function fixture() {
   assert.equal(signed.error, null);
   owned.bearer = {Authorization: `Bearer ${signed.data.session.access_token}`};
   owned.cookie = {Cookie: [...jar].map(([name, value]) => `${name}=${value}`).join('; ')};
+  // Complete registration through the application, not by bypassing its
+  // consent gate in SQL. These acknowledgements belong only to this fixture.
+  const registration = await fetch(origin + '/api/compte/register', {
+    method: 'POST', headers: {...owned.cookie, 'Content-Type': 'application/json'},
+    body: JSON.stringify({consentRgpd: true, consentSante: true}),
+  });
+  assert.equal(registration.status, 201);
+  owned.user = await db.user.findUniqueOrThrow({where: {id: owned.user.id}});
+  assert(owned.user.consentRgpdAt && owned.user.consentSanteAt);
   return owned;
 }
 async function main() {
@@ -46,7 +59,7 @@ async function main() {
   const anonymousExport = await fetch(exportURL);
   assert.equal(anonymousExport.status, 401); assertPrivateHistory(anonymousExport);
   const emptyExport = await fetch(exportURL, {headers: a.cookie});
-  assert.equal(emptyExport.status, 200);
+  assert.equal(emptyExport.status, 200, 'SSR cookie export: match --native-origin to the server Auth host');
   const emptyData = await emptyExport.json();
   assert.equal(emptyData.applePurchaseAccount, null);
   assert.deepEqual(emptyData.aiUsageEvents, []);
@@ -312,7 +325,7 @@ async function main() {
   assert.equal((await postDaily({action: 'complete'})).status, 409, 'A rest check-in is not a completed workout');
   const trainingContent = {...legacyContent, seances: [{...legacyContent.seances[0], jour: dayName}]};
   await db.programmeGenerated.update({where: {id: training.id}, data: {contenu: trainingContent}});
-  const changedDashboard = await fetch(origin + '/dashboard', {headers: a.cookie});
+  const changedDashboard = await fetch(origin + '/dashboard', {headers: a.cookie, redirect: 'manual'});
   assert.equal(changedDashboard.status, 200);
   assert((await changedDashboard.text()).includes('Confirme ton bilan pour adapter cette nouvelle séance.'));
   assert.equal((await postDaily(checkin)).status, 200);

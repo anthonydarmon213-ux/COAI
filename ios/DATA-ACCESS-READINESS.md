@@ -22,8 +22,24 @@ Le propriétaire serveur conserve son accès ; RLS n'est pas forcée sur celui-c
 
 ## Preuves
 
+Complément local du 4 octobre : `20261004110044_revoke_remaining_server_table_grants`
+retire les droits clients sur sept tables déjà protégées par RLS :
+`ai_usage_events`, `billing_events`, `churn_feedback`, `coach_notes`,
+`daily_sessions`, `recuperations_musculaires`, `stripe_webhook_events`.
+Le test couvre désormais 24 tables et réussit. Aucun changement distant.
+
+Régression HTTP complète rejouée après ce complément : export, séances,
+mesures, bilan hebdomadaire, profil, médias historiques et deux PDF,
+cycle quotidien et carte mensuelle PNG, activation concurrente du programme,
+trois pages piliers, échec de suppression pendant une panne Storage : PASS.
+Les fixtures terminent maintenant leur inscription via `/api/compte/register`
+avec consentements explicites fictifs ; le tableau de bord est vérifié sans
+suivre silencieusement une redirection. Mode `--native-origin` pour les cookies
+du serveur QA compilé avec Auth localhost. Nettoyage des fixtures et remise
+en service du seul conteneur Storage local confirmés.
+
 - `scripts/test-server-table-security-local.cjs` : Auth et PostgREST locaux réels,
-  un compte jetable. Pour les deux rôles, lectures HTTP des 17 tables refusées,
+  un compte jetable. Pour les deux rôles, lectures HTTP des 24 tables refusées,
   sept privilèges de table contrôlés et absence de droits par colonne vérifiée.
 - Sur `users`, SELECT / INSERT / UPDATE / DELETE directs refusés avec `42501`.
   L'export du même compte par la route serveur authentifiée reste HTTP 200.

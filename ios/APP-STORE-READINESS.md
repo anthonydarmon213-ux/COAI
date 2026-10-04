@@ -2,6 +2,17 @@
 
 ## État courant — 4 octobre 2026
 
+Complément de régression local : restrictions directes confirmées sur 24 tables,
+export serveur toujours utilisable. Suite HTTP complète réussie, y compris
+historique quotidien, PDF, programme concurrent et panne Storage lors d'une
+suppression (aucun faux succès ni perte du compte). Fixtures corrigées pour
+terminer réellement l'inscription avec consentements, cookies adaptés au serveur
+natif localhost, tableau de bord testé sans redirection masquée.
+Types OK ; `npm run lint` : zéro erreur, six avertissements existants.
+Build QA séparé : 132 pages ; 356 références médias, aucun fichier manquant.
+`next lint` n'existe plus dans Next 16 : utiliser la commande ESLint du projet.
+Aucune migration distante, publication ou validation sur appareil physique.
+
 Photos : une réservation abandonnée AVANT admission au stockage ne bloque plus
 la suppression. Admission atomique unique, fermeture durable et refus du vieil
 appelant testés avec PostgreSQL/Storage locaux réels, dont processus interrompu.
