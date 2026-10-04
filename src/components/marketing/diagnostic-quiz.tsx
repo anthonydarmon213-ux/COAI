@@ -1363,7 +1363,12 @@ export function DiagnosticQuiz({
 
   function handleCreerCompte() {
     storeDiagnosticAnswers(reponsesEnProfil(), email);
-    window.localStorage.setItem("coai_dashboard_intro_pending", "1");
+    try {
+      window.localStorage.setItem("coai_dashboard_intro_pending", "1");
+    } catch {
+      // L'introduction est facultative : un stockage refusé ne doit pas
+      // interrompre le clic vers l'inscription.
+    }
   }
 
   // Parcours D (Phase 5B, 11/08/2026) : un visiteur déjà connecté qui refait

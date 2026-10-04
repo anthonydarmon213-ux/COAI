@@ -2,6 +2,14 @@
 
 ## État courant — 4 octobre 2026
 
+Clic de création de compte après diagnostic : exception reproduite lorsque
+`localStorage.setItem` refuse le marqueur facultatif d'introduction. Ce seul
+marqueur est maintenant protégé ; aucun changement de navigation ou de droits.
+Test exécutant le véritable gestionnaire extrait du composant : échec avant,
+réussite après, stockage normal et refusé, transfert des réponses toujours
+tenté. Build QA complet réussi (132 pages), types et lint vérifiés. Ce test
+simule le refus de stockage ; pas encore de preuve sur appareil ou en production.
+
 Contrôle interactif connecté complété sur 3051 : les onze questions ont été
 remplies via l'interface avec le compte fictif distinct du XCTest. Résultat
 complet affiché, page rechargée avant enregistrement, puis « Continuer mon

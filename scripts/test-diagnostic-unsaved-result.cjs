@@ -20,10 +20,11 @@ const keys = [null, {id: 'owner-a'}, {id: 'owner-b'}].map(user => vm.runInNewCon
 assert.equal(new Set(keys).size, 3, 'Anonymous, A and B must never share quiz state');
 const source = fs.readFileSync('src/components/marketing/diagnostic-quiz.tsx', 'utf8');
 const ast = ts.createSourceFile('quiz.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-const effects = []; let resume;
+const effects = []; let resume; let createAccount;
 function visit(node) {
   if (ts.isCallExpression(node) && node.expression.getText(ast) === 'useEffect') effects.push(node.arguments[0]);
   if (ts.isFunctionDeclaration(node) && node.name?.text === 'resumeDiagnostic') resume = node;
+  if (ts.isFunctionDeclaration(node) && node.name?.text === 'handleCreerCompte') createAccount = node;
   ts.forEachChild(node, visit);
 }
 visit(ast);
@@ -72,3 +73,24 @@ run(resume.getText(ast) + '\nresumeDiagnostic();', resumeBox);
 assert.equal(restored.age, '35'); assert.equal(destination, 'result');
 assert.match(source, /connecte && savedStep === "result"/);
 console.log('PASS actual diagnostic effects: connected result retained, anonymous flow unchanged, answers restored directly to result. Storage/browser simulated.');
+assert(createAccount, 'Account creation handler must exist');
+for (const blocked of [false, true]) {
+  let transferred = 0;
+  const writes = [];
+  assert.doesNotThrow(() => run(createAccount.getText(ast) + '\nhandleCreerCompte();', {
+    email: 'fixture@example.test',
+    reponsesEnProfil: () => ({age: 39}),
+    storeDiagnosticAnswers: (answers, email) => {
+      assert.equal(answers.age, 39);
+      assert.equal(email, 'fixture@example.test');
+      transferred++;
+    },
+    window: {localStorage: {setItem(key, value) {
+      if (blocked) throw new Error('Storage denied');
+      writes.push([key, value]);
+    }}},
+  }), 'Optional dashboard marker must never interrupt account creation');
+  assert.equal(transferred, 1);
+  assert.deepEqual(writes, blocked ? [] : [['coai_dashboard_intro_pending', '1']]);
+}
+console.log('PASS actual account creation handler: optional storage failure tolerated; diagnostic transfer still attempted.');
