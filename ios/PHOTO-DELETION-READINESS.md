@@ -14,6 +14,33 @@ Les admissions fermées restent représentées par une empreinte, pas cet identi
 
 ## Vérifié
 
+- 4 octobre — distinction réservation / départ vers Storage. Les nouveaux envois
+  réservent avec `dispatchStarted=false`, puis doivent obtenir une admission
+  unique sous le même verrou que la suppression avant tout appel Storage.
+  La fermeture annule seulement les réservations non admises ; leur ancien
+  appelant ne peut plus démarrer, confirmer ou publier un avatar. Les anciennes
+  lignes et anciens écrivains gardent `dispatchStarted=true` par défaut, donc
+  aucun envoi historique incertain n'est annulé par supposition.
+  Migration `20261004102810_photo_dispatch_admission` préparée pour Prisma,
+  colonne appliquée uniquement à PostgreSQL local (CLI db query, sans historique
+  de migration distant). L'ancien code a d'abord reproduit le refus de suppression
+  après simple réservation ; le nouveau passe ce cas après reconnexion.
+  `test-photo-process-crash-local.cjs` passe 12 scénarios avec Storage réel :
+  appelant suspendu après réservation repris après suppression (zéro appel HTTP),
+  processus mort après réservation, envoi tardif déjà admis, arrêt après upload,
+  arrêt après admission mais avant HTTP, preuve incorrecte — avatar et suivi.
+  Les deux derniers restent volontairement bloquants sans preuve ; ce correctif
+  ne résout PAS toute la fenêtre d'incertitude après admission.
+  Claim concurrent unique, autre propriétaire, confirmation sans départ et
+  défaut des anciennes réservations testés avec PostgreSQL réel.
+  Réponses perdues (5 cas), retrait d'avatars, HTTP avatar/suivi et suppression
+  HTTP paginée (102 fichiers avec reprise) restent réussis. Build Next 132 pages,
+  TypeScript, lint (six avertissements existants), 356 médias présents vérifiés.
+  Aucun déploiement, migration distante ou test iPhone de cette correction.
+  Audit sécurité : registres photo privés/RLS confirmés, mais 17 autres tables
+  locales sans RLS avec droits clients détectées, à traiter séparément ; ne pas
+  présenter le conseiller global comme réussi.
+
 - 1er octobre, 16 h 27 — erreur de suppression testée dans l'app sur simulateur
   SE/iOS 26.5 avec une vraie réservation locale non confirmée, sans faux HTTP.
   `testLocalUnresolvedPhotoDeletionKeepsAccountUsable` réussi, preuve
@@ -223,7 +250,8 @@ Cette recherche écarte une correction dangereuse ; elle ne résout pas le défa
    ne prouve pas que le stockage a refusé le fichier : NE PAS supprimer la
    réservation sur délai, NE PAS marquer settled sans preuve. La réponse perdue
    et l'arrêt après enregistrement sont récupérés si la preuve exacte existe.
-   Un arrêt avant envoi, un écrasement de la preuve ou un stockage indisponible
+   Une réservation sans admission est désormais annulable de manière sûre.
+   Un arrêt après admission (même avant le départ HTTP), un écrasement de la preuve ou un stockage indisponible
    restent sans résolution automatique. Cette limite
    empêche de considérer la suppression prête pour production.
 2. Compléter le parcours HTTP local réussi par les scénarios de panne et de

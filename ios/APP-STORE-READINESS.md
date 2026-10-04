@@ -2,6 +2,20 @@
 
 ## État courant — 4 octobre 2026
 
+Photos : une réservation abandonnée AVANT admission au stockage ne bloque plus
+la suppression. Admission atomique unique, fermeture durable et refus du vieil
+appelant testés avec PostgreSQL/Storage locaux réels, dont processus interrompu.
+Douze scénarios passent ; les cas incertains APRÈS admission restent bloquants.
+Migration locale préparée, non déployée. Voir `PHOTO-DELETION-READINESS.md`.
+Régressions HTTP photo/suppression, réponses perdues et retraits d'avatars,
+build Next 132 pages, types/lint et 356 médias réussis.
+
+**Nouveau point sécurité local à traiter :** audit du 4 octobre révèle 17 tables
+anciennes sans RLS avec des droits anon/authenticated dans la base de test.
+Les deux tables du registre photo restent privées avec RLS. Aucun constat de
+configuration distante n'est déduit de ce test local. Vérification des accès
+réels et durcissement à préparer avant toute publication.
+
 **Retour réseau sans relance : PASS à 12 h 17**, iPhone 17 Pro simulé.
 `testLocalNetworkRestorationLoadsLoginWithoutRelaunch` : serveur 3050 arrêté,
 erreur réelle affichée, puis serveur rétabli pendant les tentatives explicites.

@@ -28,8 +28,8 @@ function load(file, imports) {
   return exports;
 }
 const registry = load('photo-write-registry.ts', { 'node:crypto': crypto, '@/lib/db/client': { prisma } });
-function api(client) { return load('progress-photos.ts', {
-  './photo-write-registry': registry, '@/lib/auth/admin': { createSupabaseAdminClient: () => client },
+function api(client, coordination = registry) { return load('progress-photos.ts', {
+  './photo-write-registry': coordination, '@/lib/auth/admin': { createSupabaseAdminClient: () => client },
 }); }
 if (process.argv[2] === '--writer') {
   const [id, method, mode] = process.argv.slice(3);
@@ -48,12 +48,44 @@ if (process.argv[2] === '--writer') {
       process.exit(73);
     } },
   });
-  api(crashing)[method](id, { type: 'image/png', arrayBuffer: async () => png })
+  const coordination = mode === 'after-reservation' ? { ...registry,
+    reservePhotoWrite: async owner => {
+      await registry.reservePhotoWrite(owner);
+      process.exit(75); // No dispatch claim and no HTTP request yet.
+    },
+  } : registry;
+  api(crashing, coordination)[method](id, { type: 'image/png', arrayBuffer: async () => png })
     .then(() => { throw Error('Writer should have exited'); }).catch(e => { console.error(e); process.exitCode = 1; });
 } else {
   const owners = [];
   (async () => {
     try {
+      // A suspended caller cannot start Storage after deletion cancels its
+      // unclaimed reservation. Exercise the real app wrapper, not a manual gate.
+      for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
+        const id = 'crash-test-' + crypto.randomUUID(); owners.push(id);
+        let entered, release, httpCalls = 0;
+        const ready = new Promise(resolve => { entered = resolve; });
+        const held = new Promise(resolve => { release = resolve; });
+        const guardedClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+          ...options, global: { fetch: async () => { httpCalls++; throw Error('No HTTP allowed after reservation cancellation'); } },
+        });
+        const writing = api(guardedClient, { ...registry, reservePhotoWrite: async owner => {
+          const operation = await registry.reservePhotoWrite(owner);
+          entered(); await held; return operation;
+        } })[method](id, { type: 'image/png', arrayBuffer: async () => png });
+        // Install rejection observation before releasing the suspended caller.
+        const outcome = writing.then(value => ({ value }), error => ({ error }));
+        try {
+          await Promise.race([ready, outcome.then(() => { throw Error('Writer ended before reservation hold'); })]);
+          await api(admin).deleteAllProgressPhotos(id);
+        } finally { release(); await outcome; }
+        const result = await outcome;
+        assert.match(result.error?.message ?? '', /photo_owner_deleting/);
+        assert.equal(httpCalls, 0);
+        assert.equal((await bucket.list(id)).data.length, 0);
+        console.log(`PASS ${method}/cancel-before-dispatch: deletion completed, suspended caller refused, zero upload HTTP calls`);
+      }
       // Hold the real HTTP write before dispatch, after the real DB admission.
       // Deletion must remain incomplete until that admitted writer has finished.
       for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
@@ -95,27 +127,27 @@ if (process.argv[2] === '--writer') {
         console.log(`PASS ${method}/late-http-write: deletion refused during admitted upload, retry removed real late file, gate stayed closed`);
       }
       for (const method of ['uploadAvatar', 'uploadProgressPhoto']) {
-        for (const mode of ['after-upload', 'before-upload', 'wrong-proof']) {
+        for (const mode of ['after-reservation', 'after-upload', 'before-upload', 'wrong-proof']) {
           const id = 'crash-test-' + crypto.randomUUID(); owners.push(id);
           const child = spawnSync(process.execPath, [__filename, '--writer', id, method, mode], {
             env: process.env, stdio: 'pipe', timeout: 20000,
           });
-          assert.equal(child.status, mode === 'before-upload' ? 74 : 73, child.stderr?.toString());
+          assert.equal(child.status, mode === 'after-reservation' ? 75 : mode === 'before-upload' ? 74 : 73, child.stderr?.toString());
           let stored = await bucket.list(id); assert.equal(stored.error, null);
-          assert.equal(stored.data.length, mode === 'before-upload' ? 0 : 1);
+          assert.equal(stored.data.length, ['before-upload', 'after-reservation'].includes(mode) ? 0 : 1);
           if (mode === 'wrong-proof') {
             const filePath = `${id}/${stored.data[0].name}`;
             assert.equal((await bucket.upload(filePath, png, { upsert: true, contentType: 'image/png',
               metadata: { coaiUploadOperation: crypto.randomUUID() } })).error, null);
           }
-          if (mode === 'after-upload') {
+          if (mode === 'after-upload' || mode === 'after-reservation') {
             await api(admin).deleteAllProgressPhotos(id);
             stored = await bucket.list(id); assert.equal(stored.data.length, 0);
           } else {
             await assert.rejects(api(admin).deleteAllProgressPhotos(id), /photo_writes_unresolved/);
           }
           await assert.rejects(registry.reservePhotoWrite(id), /photo_owner_deleting/);
-          console.log(`PASS ${method}/${mode}: ${mode === 'after-upload' ? 'new process recovered exact proof and removed file' : 'no false completion without proof'}`);
+          console.log(`PASS ${method}/${mode}: ${mode === 'after-reservation' ? 'new process cancelled never-dispatched reservation' : mode === 'after-upload' ? 'new process recovered exact proof and removed file' : 'no false completion without proof'}`);
         }
       }
     } finally {

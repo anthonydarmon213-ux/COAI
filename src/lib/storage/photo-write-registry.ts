@@ -22,16 +22,29 @@ export async function reservePhotoWrite(userId: string): Promise<string> {
   const key = ownerKey(userId), operation = randomUUID();
   await prisma.$transaction(async tx => {
     if ((await lock(tx, key)).closed) throw new Error("photo_owner_deleting");
-    await tx.$executeRaw`INSERT INTO photo_uploads (id, "ownerKey") VALUES (${operation}, ${key})`;
+    await tx.$executeRaw`INSERT INTO photo_uploads (id, "ownerKey", "dispatchStarted") VALUES (${operation}, ${key}, false)`;
   }, { maxWait: 5000, timeout: 5000 });
   return operation;
+}
+
+// One-way dispatch admission, serialized with deletion. A reservation can be
+// cancelled safely ONLY while this claim has not committed. After admission,
+// including process death before the HTTP call, absence/time is never evidence.
+export async function beginPhotoWrite(userId: string, operation: string): Promise<void> {
+  const key = ownerKey(userId);
+  await prisma.$transaction(async tx => {
+    if ((await lock(tx, key)).closed) throw new Error("photo_owner_deleting");
+    const count = await tx.$executeRaw`UPDATE photo_uploads SET "dispatchStarted"=true
+      WHERE id=${operation} AND "ownerKey"=${key} AND NOT "dispatchStarted" AND NOT settled`;
+    if (count !== 1) throw new Error("photo_dispatch_not_available");
+  }, { maxWait: 5000, timeout: 5000 });
 }
 
 export async function confirmPhotoWrite(userId: string, operation: string): Promise<void> {
   const key = ownerKey(userId);
   await prisma.$transaction(async tx => {
     await lock(tx, key);
-    const count = await tx.$executeRaw`UPDATE photo_uploads SET settled=true WHERE id=${operation} AND "ownerKey"=${key}`;
+    const count = await tx.$executeRaw`UPDATE photo_uploads SET settled=true WHERE id=${operation} AND "ownerKey"=${key} AND "dispatchStarted"`;
     if (count !== 1) throw new Error("photo_reservation_missing");
   }, { maxWait: 5000, timeout: 5000 });
 }
@@ -50,7 +63,7 @@ export async function commitAvatarPhoto(userId: string, profileId: string, path:
   await prisma.$transaction(async tx => {
     if ((await lock(tx, key)).closed) throw new Error("photo_owner_deleting");
     const claimed = await tx.$executeRaw`UPDATE photo_uploads SET "avatarCommitted"=true
-      WHERE id=${operation} AND "ownerKey"=${key} AND settled AND NOT "avatarCommitted"`;
+      WHERE id=${operation} AND "ownerKey"=${key} AND settled AND "dispatchStarted" AND NOT "avatarCommitted"`;
     if (claimed !== 1) throw new Error("avatar_write_not_publishable");
     const profile = await tx.user.findFirst({
       where: { id: profileId, supabaseAuthId: userId }, select: { avatarPath: true },
@@ -128,6 +141,11 @@ export async function closePhotoWrites(userId: string): Promise<void> {
   const pending = await prisma.$transaction(async tx => {
     await lock(tx, key);
     await tx.$executeRaw`UPDATE photo_owner_gates SET closed=true WHERE "ownerKey"=${key}`;
+    // Closed gate + unclaimed dispatch is positive proof that this operation
+    // cannot write. A stale caller must pass beginPhotoWrite, which now refuses.
+    // The migration defaults legacy rows to true: never infer old writes absent.
+    await tx.$executeRaw`UPDATE photo_uploads SET settled=true
+      WHERE "ownerKey"=${key} AND NOT "dispatchStarted" AND NOT settled`;
     return tx.$queryRaw<{ id: string }[]>`SELECT id FROM photo_uploads
       WHERE "ownerKey"=${key} AND NOT settled ORDER BY id LIMIT 1001`;
   }, { maxWait: 5000, timeout: 5000 });

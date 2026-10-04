@@ -26,7 +26,7 @@ async function scenario(type, failure) {
   };
   vm.runInNewContext(source, { exports: api, require: name => {
     if (name === './photo-write-registry') return {
-      reservePhotoWrite: async () => 'test-operation', confirmPhotoWrite: async () => {},
+      reservePhotoWrite: async () => 'test-operation', beginPhotoWrite: async () => {}, confirmPhotoWrite: async () => {},
     };
     assert.equal(name, '@/lib/auth/admin');
     return { createSupabaseAdminClient: () => ({ storage: { from: name => {
@@ -73,7 +73,7 @@ async function scenario(type, failure) {
     };
     vm.runInNewContext(source, { exports: api, require: name => {
       if (name === './photo-write-registry') return {
-        reservePhotoWrite: async () => 'current-operation', confirmPhotoWrite: async () => { confirmed++; },
+        reservePhotoWrite: async () => 'current-operation', beginPhotoWrite: async () => {}, confirmPhotoWrite: async () => { confirmed++; },
       };
       assert.equal(name, '@/lib/auth/admin');
       return { createSupabaseAdminClient: () => ({ storage: { from: () => bucket } }) };

@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/auth/admin";
-import { claimAvatarRetirements, clearDeletedAvatarRetirements, closePhotoWrites, confirmAvatarRetirement, confirmPhotoWrite, isValidAvatarRetirement, pendingAvatarRetirements, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
+import { beginPhotoWrite, claimAvatarRetirements, clearDeletedAvatarRetirements, closePhotoWrites, confirmAvatarRetirement, confirmPhotoWrite, isValidAvatarRetirement, pendingAvatarRetirements, reservePhotoWrite, UnresolvedPhotoWritesError } from "./photo-write-registry";
 
 // Nom exact du bucket privé existant dans Supabase.
 export const PROGRESS_PHOTOS_BUCKET = "progress photos";
@@ -26,6 +26,9 @@ async function storeRegisteredPhoto(userId: string, file: File): Promise<{ path:
     }
   }
 
+  // Do not hand any request to Storage until durable dispatch admission. A
+  // deletion that wins this race cancels the reservation and forbids this send.
+  await beginPhotoWrite(userId, operation);
   try {
     const { error } = await bucket.upload(path, body, {
       contentType: file.type, upsert: false,
