@@ -34,6 +34,24 @@ pas les achats Sandbox/App Store Connect. Aucun achat réel, upload ou soumissio
 
 ## État courant — 4 octobre 2026
 
+**Catalogue sur iPhone simulé — 21 h 07 (Paris).** Le contrôle de la route
+hébergée lancé sans session (`testPhysicalCatalogueExcludesMismatchedRowing`)
+ne trouve pas le champ de recherche : l'application reste à l'écran de connexion.
+Ce résultat ne démontre pas un défaut du catalogue ni une réussite du parcours
+connecté en production ; il confirme que ce test exige une session valide.
+Le parcours local authentifié prévu à cet effet,
+`testLocalExerciseCatalogueRejectsMismatchedRowing`, passe sur iPhone SE
+(3e génération) simulé / iOS 26.5 : recherche « Rowing haltère unilatéral »
+→ zéro résultat, clavier fermé ; recherche « Gainage planche » → un résultat.
+Rapport `/tmp/coai-catalogue-isolated-1004.xcresult` : 1 réussi, 0 échec.
+Les deux captures ont été extraites et inspectées dans
+`/tmp/coai-catalogue-isolated-proof-1004/`. Test via serveur et compte de
+fixture locaux : il ne valide pas le catalogue en production ni sur iPhone
+physique. Le dernier inventaire antérieur (19 h 08) indiquait l'iPhone réel
+disponible et déverrouillé ; lors de cette reprise, `devicectl` n'a toutefois
+pas pu joindre CoreDevice. Signature et connexion App Store restent des
+prérequis externes à la distribution.
+
 **Vérification appareil / accès Apple, 19 h 08 Paris.** `devicectl` voit
 l’iPhone 17 Pro appairé, disponible et déverrouillé (`unlockedSinceBoot: true`).
 L’application présente dessus reste `COAI test` 0.1.0 (build 1) avec son
