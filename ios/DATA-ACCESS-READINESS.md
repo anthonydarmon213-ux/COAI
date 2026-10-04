@@ -1,6 +1,6 @@
 # Accès directs aux données — 4 octobre 2026
 
-## Corrigé et testé localement, non déployé
+## État : correctif ciblé appliqué en production, durcissement global encore ouvert
 
 Le conseiller de sécurité puis une lecture des permissions PostgreSQL ont
 identifié 17 anciennes tables sans RLS et avec droits `anon` / `authenticated`
@@ -57,10 +57,17 @@ en service du seul conteneur Storage local confirmés.
   pour les rôles non privilégiés). Une politique INSERT `WITH CHECK (true)`
   sur `founder_waitlist_entries`, pour anon/authenticated. Aucun contenu
   utilisateur extrait, aucune écriture ni tentative destructive.
-- Les deux rôles ont encore TRUNCATE sur 22 tables. Ce droit superflu doit être
-  retiré par les migrations préparées après autorisation ; il n'est PAS une
-  preuve qu'un client HTTP peut exécuter TRUNCATE. Aucun essai de destruction
-  n'a été réalisé. Les rôles anon/authenticated ne sont ni superuser ni bypassrls.
+- **Correction appliquée le 4 octobre** : la migration distante
+  `20261004173456_revoke_client_truncate` retire uniquement le privilège
+  `TRUNCATE` à `anon` et `authenticated` sur les 22 tables vérifiées. Contrôle
+  distant après application : 0 attribution restante pour ces rôles sur les
+  22 tables ; `/api/health/database` répond `status: ok`. Le test local a
+  également confirmé que les 264 autres combinaisons de privilèges contrôlées
+  n'ont pas changé. Aucun contenu de table modifié ni essai destructif.
+  Les migrations plus larges `secure_legacy_server_tables` et
+  `revoke_remaining_server_table_grants` restent non appliquées à distance :
+  ne pas présenter le durcissement complet comme terminé. Les rôles
+  anon/authenticated ne sont ni superuser ni bypassrls.
 - Aucune vue, vue matérialisée ni fonction dans le schéma public à cet instant.
   Cela ne couvre pas les autres schémas, les routes applicatives ou les secrets.
   Les tables Apple et registres photos locaux sont absents de cette liste
@@ -72,7 +79,8 @@ en service du seul conteneur Storage local confirmés.
   Aucun réglage changé ; disponibilité/coût à vérifier avant activation.
 - Confirmer le rôle PostgreSQL utilisé par l'application et toute intégration
   externe qui pourrait dépendre d'un accès direct à ces tables.
-- Autorisation explicite pour appliquer la migration distante, puis tests de
-  régression des parcours réels. Aucun déploiement effectué ici.
+- Continuer à vérifier les parcours réels et les droits restants après le
+  correctif ciblé ; toute migration distante plus large nécessitera une
+  vérification précise de son impact avant application.
 - Cet audit ciblé ne couvre pas toutes les vues, fonctions privilégiées, buckets,
   sauvegardes ou politiques de conservation ; la sécurité globale reste ouverte.

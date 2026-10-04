@@ -1,5 +1,13 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
+**Mise à jour sécurité production — 4 octobre 2026.** Le correctif ciblé
+`20261004173456_revoke_client_truncate` a été appliqué : `anon` et
+`authenticated` n'ont plus `TRUNCATE` sur les 22 tables contrôlées (vérification
+distante : zéro attribution restante). Le contrôle santé de la base répond
+`ok`. Seul ce privilège a été retiré ; les migrations de restriction plus
+larges restent en attente et la sécurité globale n'est pas déclarée terminée.
+Pas de changement de données, de coût, de build iOS ou de soumission Apple.
+
 ## État courant — 4 octobre 2026
 
 **Vérification appareil / accès Apple, 19 h 08 Paris.** `devicectl` voit
@@ -54,13 +62,14 @@ simulateur iPhone SE (3e génération), avec magasin WebKit isolé : 1 test,
 0 échec en 14,3 s. Le test ne dépend plus d’une ancienne connexion conservée.
 Compte et email locaux de ce second essai supprimés.
 
-**Contrôle distant en lecture seule, 14 h 50.** Les 29 tables publiques COAI
-ont RLS activée ; les rôles clients gardent néanmoins TRUNCATE sur 22 tables.
-Aucune exploitation HTTP démontrée ni action destructive tentée. Les migrations
-locales de retrait des droits restent non appliquées à distance. Aucune vue ni
-fonction publique ; une politique INSERT de liste d'attente. Conseiller : 28
-informations de refus RLS sans politique et un avertissement sur la protection
-des mots de passe compromis. Détails dans `DATA-ACCESS-READINESS.md`.
+**Contrôle distant en lecture seule, 14 h 50 (avant correction ciblée).** Les
+29 tables publiques COAI avaient RLS activée ; le contrôle avait relevé
+TRUNCATE client sur 22 tables. Ce privilège a depuis été retiré et vérifié
+comme indiqué en tête de ce document. Aucune exploitation HTTP démontrée ni
+action destructive tentée. Aucune vue ni fonction publique ; une politique
+INSERT de liste d'attente. Conseiller : 28 informations de refus RLS sans
+politique et un avertissement sur la protection des mots de passe compromis.
+Détails et limites dans `DATA-ACCESS-READINESS.md`.
 Registres photos et tables Apple toujours absents de la liste distante.
 `devicectl list devices` confirme l'iPhone antho 17 pro `unavailable` ;
 la première tentative sandbox n'avait pas accès au service CoreDevice, la
