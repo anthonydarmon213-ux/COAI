@@ -11,7 +11,7 @@ function load(file) {
 }
 const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
-const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
+const { videoCoaiPourNom, urlVideoCoai, urlPosterVideoCoai } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
 const { filtrerExercicesAvecMedias, programmeAvecMediasCoai } = load('src/lib/exercices/media-coai.ts');
 const stored = { seances: [{ nom: 'Séance conservée', exercices: [
@@ -76,7 +76,12 @@ for (const ex of EXERCICES) {
 const visibles = EXERCICES.filter(ex => photoCoaiPourNom(ex.nom) && videoCoaiPourNom(ex.nom));
 assert(visibles.length > 0);
 for (const ex of visibles) {
-  assert(fs.existsSync('public' + photoCoaiPourNom(ex.nom)), ex.nom);
+  const video = videoCoaiPourNom(ex.nom);
+  for (const url of [photoCoaiPourNom(ex.nom), urlVideoCoai(video.fichier), urlPosterVideoCoai(video.fichier)]) {
+    const file = 'public' + url;
+    assert(fs.existsSync(file), `${ex.nom}: fichier manquant ${url}`);
+    assert(fs.statSync(file).isFile() && fs.statSync(file).size > 0, `${ex.nom}: fichier vide ou invalide ${url}`);
+  }
 }
 assert(fs.readFileSync('src/components/exercices/exercice-catalogue.tsx', 'utf8').includes('if (!photoCoaiPourNom(ex.nom) || !videoCoaiPourNom(ex.nom)) return false;'));
-console.log(`PASS: hip thrust absent du catalogue et des variantes ; ${visibles.length} exercices avec photo et vidéo référencées.`);
+console.log(`PASS: hip thrust absent du catalogue et des variantes ; ${visibles.length} exercices avec photo, vidéo et poster locaux non vides. Ne prouve pas la correspondance visuelle de chaque mouvement.`);

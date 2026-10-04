@@ -2,6 +2,26 @@
 
 ## État courant — 4 octobre 2026
 
+**Catalogue et persistance, 14 h 43 : contrôles locaux renouvelés.**
+`/tmp/coai-exercise-catalogue-1004.xcresult` : SE, recherche du rowing exclu
+(zéro résultat), recherche gainage (un résultat), clavier fermé, filtre Dos,
+compteur et remise à zéro ; un test PASS, 31,593 s. Capture gainage inspectée.
+Le test média est renforcé : les 59 exercices visibles exigent chacun une
+photo, une vidéo et un poster locaux non vides, avec les URL du module réel.
+`check-video-compatibility.cjs` : 90 fichiers H.264/yuv420p PASS (sonde de
+format, pas décodage intégral ni validation du mouvement). Filtres/recherche,
+absence des replis stock et composant vidéo : PASS. Pas de lecture intégrale
+de toutes les vidéos dans l'app ni de validation éditoriale nouvelle.
+
+Adaptations : test moteur avec PostgreSQL local réel PASS pour confirmations
+concurrentes, rejet concurrent, rollback, versions et isolation propriétaire.
+Premier essai refusé par l'accès réseau sandbox ; reprise autorisée réussie.
+Fournisseur IA simulé, aucune génération payante ; fixtures aléatoires nettoyées.
+Tests isolés du ressenti douleur explicite, historique d'adaptation, séries
+effectuées, brouillons isolés par compte/prescription et cycle du repos PASS.
+Ces tests ne remplacent pas le parcours complet de séance sur appareil physique.
+Types et lint : zéro erreur, six avertissements existants. Aucune publication.
+
 **Catalogue natif, 14 h 32 : présentation d'achat corrigée localement.**
 `ProgrammePurchaseButton` distingue le marqueur natif (présentation seulement,
 jamais un droit d'accès) : lien `/compte/abonnement` sans prix web ni formulaire
