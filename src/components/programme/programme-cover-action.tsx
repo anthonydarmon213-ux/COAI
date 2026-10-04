@@ -15,7 +15,11 @@ export function ProgrammeCoverAction({
     const cible = document.getElementById(targetId);
     if (!cible) return;
 
-    if (cible instanceof HTMLDetailsElement) cible.open = true;
+    // Both the purchase block and the programme itself live inside the
+    // collapsed cover disclosure. Open its ancestors before scrolling.
+    for (let element: HTMLElement | null = cible; element; element = element.parentElement) {
+      if (element instanceof HTMLDetailsElement) element.open = true;
+    }
     cible.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 

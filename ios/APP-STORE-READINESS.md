@@ -2,6 +2,26 @@
 
 ## État courant — 4 octobre 2026
 
+**Couvertures programmes, 14 h 19 : correction locale vérifiée sur SE.**
+Le bouton de couverture ciblait un élément dans une section `details` fermée.
+Il ouvre désormais la cible et ses sections parentes avant de défiler, sans
+déclencher d'achat. Test du gestionnaire réel : cibles verrouillée/déverrouillée
+et cible absente PASS. Build web 132 pages, build-for-testing, TypeScript,
+lint (zéro erreur, six avertissements préexistants), 356 médias présents : PASS.
+`/tmp/coai-cover-action-isolated-1004.xcresult` : un test, zéro échec,
+73,296 s ; recette, filtres récupération, toucher couverture, contenu visible,
+Club. Capture extraite et inspectée. Le premier essai attendait une connexion
+alors que la session locale persistait ; ce test utilise maintenant un magasin
+WebKit éphémère sans supprimer la session persistante. Non publié/non vérifié
+en production. L'ouverture de la cible déverrouillée reste testée unitairement,
+pas encore dans le simulateur.
+
+**À traiter : offre web dans le catalogue natif.** La capture du parcours
+précédent montre « Acheter ce programme · 19 € » et le choix d'un programme
+offert dans l'app. Ce n'est pas une preuve de paiement Apple fonctionnel.
+Vérifier le routage natif et la présentation des droits avant toute distribution,
+sans modifier les tarifs Stripe ni inventer de produit Apple. Aucun achat effectué.
+
 **Nutrition / récupération / Club, 13 h 56 : parcours connecté local réussi.**
 `/tmp/coai-nutrition-recovery-club-1004.xcresult` : un test SE/iOS 26.5,
 zéro échec, 68,688 s. Connexion de la fixture préexistante (non écrasée), filtre

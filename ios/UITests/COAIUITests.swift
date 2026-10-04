@@ -1243,7 +1243,7 @@ final class COAIUITests: XCTestCase {
     func testLocalConnectedRecipesAndRecoveryDiscovery() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration", "-COAIAnonymousUITest"]
         app.launch()
         XCTAssertTrue(app.navigationBars["COAI · test local"].waitForExistence(timeout: 10))
         let web = app.webViews.firstMatch
@@ -1300,6 +1300,11 @@ final class COAIUITests: XCTestCase {
         let closeFilters = web.buttons["Fermer les filtres"]
         revealFilter(closeFilters); closeFilters.tap()
         XCTAssertTrue(sleep.isHittable)
+        sleep.tap()
+        let programmeChoice = web.staticTexts["Choisis ton programme offert"]
+        XCTAssertTrue(programmeChoice.waitForExistence(timeout: 10), "La couverture doit ouvrir la section du programme, pas rester sans effet")
+        reveal(programmeChoice, in: app)
+        XCTAssertTrue(programmeChoice.isHittable)
         XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
         let proof = XCTAttachment(screenshot: app.screenshot())
         proof.name = "Découverte récupération après lecture recette — local connecté"
