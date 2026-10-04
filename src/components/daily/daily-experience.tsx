@@ -66,6 +66,19 @@ const TIMES = [[15, "15 min"], [20, "20 min"], [25, "25 min"], [40, "40 min"], [
 const FEEDBACK = [["TROP_FACILE", "Trop facile"], ["BIEN_DOSEE", "Bien dosée"], ["TROP_DURE", "Trop dure"]] as const;
 const AREAS = ["Dos", "Épaule", "Genou", "Cheville", "Poignet", "Hanche", "Cou", "Autre"];
 
+function isDailyConfirmation(value: unknown): value is NonNullable<Daily> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const row = value as Record<string, unknown>;
+  const validDate = (date: unknown) => typeof date === "string" && Number.isFinite(Date.parse(date));
+  return typeof row.id === "string" && row.id.length > 0 && validDate(row.updatedAt)
+    && (row.completedAt === null || validDate(row.completedAt))
+    && typeof row.sleep === "string" && SLEEP.some(([key]) => key === row.sleep)
+    && typeof row.energy === "string" && ENERGY.some(([key]) => key === row.energy)
+    && typeof row.pain === "boolean"
+    && (row.workoutRating === null || FEEDBACK.some(([key]) => key === row.workoutRating))
+    && Boolean(row.adaptedSession && typeof row.adaptedSession === "object" && !Array.isArray(row.adaptedSession));
+}
+
 function Chip({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
     <button type="button" aria-pressed={active} onClick={onClick} className={`coai-daily-chip min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition ${active ? "border-[#b98b43] bg-[#27241f] shadow-sm" : "border-white/10 bg-white/[0.04] text-graphite-200 hover:border-laiton-400/40 hover:bg-white/[0.08]"}`}>
@@ -253,8 +266,12 @@ export function DailyExperience({
     setError("");
     try {
       const res = await fetch("/api/daily", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      const data = await res.json();
-      if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "Une erreur est survenue.");
+      const data: unknown = await res.json().catch(() => null);
+      if (!res.ok) {
+        const message = data && typeof data === "object" && "error" in data && typeof data.error === "string" ? data.error : "L’enregistrement n’a pas pu être confirmé. Réessaie.";
+        throw new Error(message);
+      }
+      if (!isDailyConfirmation(data)) throw new Error("L’enregistrement n’a pas pu être confirmé. Ta séance reste affichée ; réessaie pour vérifier sa sauvegarde.");
       setDaily(data);
       return true;
     } catch (err) {

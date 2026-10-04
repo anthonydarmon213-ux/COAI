@@ -2,6 +2,21 @@
 
 ## État courant — 4 octobre 2026
 
+**Séance quotidienne : confirmation de sauvegarde durcie localement.**
+Le composant acceptait un corps 200 vide/invalide comme nouvel état quotidien,
+avec risque de réinitialisation ou de crash sur une date invalide. Il exige
+maintenant identité, date valide, repères reconnus et séance structurée avant
+de remplacer l'état. Les erreurs gardent le snapshot affiché et libèrent le
+bouton ; le message dit « non confirmé », pas « non enregistré ».
+`test-daily-confirmation.cjs` teste le vrai gestionnaire avec transport simulé :
+null/tableau/objet vide, dates invalides, repères invalides, JSON illisible,
+hors ligne, erreur serveur, confirmation valide et ressenti valide : PASS.
+Ressenti douleur explicite : PASS. Types, lint (six avertissements existants),
+build QA séparé 132 pages, audit 356 médias : PASS.
+**EN COURS :** test UI avec réponse défectueuse et confirmation serveur réelle ;
+le serveur iPhone 3050 conserve encore la compilation précédente. Aucun
+déploiement, preuve en production ou validation iPhone de ce changement.
+
 **Contrôle distant en lecture seule, 14 h 50.** Les 29 tables publiques COAI
 ont RLS activée ; les rôles clients gardent néanmoins TRUNCATE sur 22 tables.
 Aucune exploitation HTTP démontrée ni action destructive tentée. Les migrations
