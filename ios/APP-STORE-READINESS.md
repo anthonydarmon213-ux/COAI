@@ -26,6 +26,16 @@ Le brouillon est désormais consommé : ces deux tests ciblés nécessitent un n
 scénario préparatoire pour être rejoués. Lecture indépendante du profil en base
 et parcours complet corrigé restent à faire ; pas de validation en production.
 
+Lecture indépendante locale effectuée après ce test : âge 35, taille 178,
+poids 75, sexe Homme, 45 minutes, 3 séances/semaine, salle de sport et objectif
+prise de muscle / journée mixte correspondent aux saisies du scénario natif.
+Les deux consentements du compte sont présents. Contrôle en lecture seule
+réussi, puis vérification identité Auth/profil/consentements par le nettoyeur
+local. Compte fictif `coai-ui-signup-20260927@example.test` et son seul courriel
+SMTP local supprimés ; précontrôle d'adresse disponible réussi. Aucun compte
+réel concerné. Le serveur natif local 3050 a été arrêté explicitement après la
+fin des tests pour reconstruire les corrections courantes avant le nouvel E2E.
+
 Présentation des exercices : écart observé dans le navigateur QA entre les
 77 annoncés dans la découverte et les 59 réellement proposés par le catalogue
 filtré. Le chiffre historique a été retiré du descriptif, qui renvoie maintenant
