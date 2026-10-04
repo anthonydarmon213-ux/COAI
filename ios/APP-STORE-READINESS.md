@@ -2,6 +2,21 @@
 
 ## État courant — 4 octobre 2026
 
+Reprise native du diagnostic : accès permanent « Mon bilan COAI » ajouté à
+Explorer. Le précédent scénario complet a échoué après relance parce qu'il
+cherchait le bouton de bienvenue sur la page entraînement, point d'entrée réel
+du processus. Le scénario suit maintenant le menu natif et s'arrête explicitement
+si la reprise manque. Test ciblé sur le brouillon réellement laissé par ce
+scénario : **PASS**, résultat complet restauré, bouton d'enregistrement présent,
+pas de retour à la question âge, sans injection de stockage ni nouvelle saisie.
+Rapport : `/tmp/coai-existing-diagnostic-explorer-1004-1115.xcresult` (10,2 s).
+Build-for-testing réussi ; 51 tests Swift, 65 contrôles directs, règles WebKit,
+types et lint (six avertissements existants) passent ; 356 médias référencés,
+aucun fichier manquant. Cela ne valide ni la sauvegarde finale du bilan natif,
+ni le scénario complet corrigé, ni l'appareil physique, ni la production.
+L'inspection manuelle du simulateur est bloquée par le verrouillage du Mac ;
+XCTest reste exécutable. Aucune publication effectuée.
+
 Présentation des exercices : écart observé dans le navigateur QA entre les
 77 annoncés dans la découverte et les 59 réellement proposés par le catalogue
 filtré. Le chiffre historique a été retiré du descriptif, qui renvoie maintenant

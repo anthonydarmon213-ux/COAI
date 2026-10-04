@@ -324,6 +324,7 @@ private struct COAIExplorerView: View {
         NavigationStack {
             List {
                 Section("Mon compte") {
+                    entry("Mon bilan COAI", "list.clipboard", "/diagnostic")
                     entry("Mon profil", "person", "/compte/profil")
                     entry("Réglages et déconnexion", "gearshape", "/compte/parametres")
                     entry("Abonnement", "creditcard", "native:subscription")

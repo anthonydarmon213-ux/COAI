@@ -931,6 +931,34 @@ final class COAIUITests: XCTestCase {
         try await localSignup(waitForReturn: true, finalize: true, diagnostic: true)
     }
 
+    /// Targeted recovery probe: requires the real unsaved result and session
+    /// left by the local signup scenario. Does not seed or alter web storage.
+    @MainActor
+    func testLocalExistingDiagnosticResultViaExplorer() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
+        app.launch()
+        let explorer = app.buttons["native-tab-Explorer"]
+        XCTAssertTrue(explorer.waitForExistence(timeout: 15))
+        explorer.tap()
+        let bilan = app.buttons["explore-/diagnostic"]
+        XCTAssertTrue(bilan.waitForExistence(timeout: 10))
+        XCTAssertGreaterThanOrEqual(bilan.frame.height, 44)
+        bilan.tap()
+        let web = app.webViews.firstMatch
+        let resume = web.buttons["Continuer mon diagnostic"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 30), "Requires the actual unsaved diagnostic fixture")
+        reveal(resume, in: app)
+        resume.tap()
+        XCTAssertTrue(web.staticTexts["Tes réponses analysées"].waitForExistence(timeout: 15))
+        XCTAssertTrue(web.buttons["Enregistrer et continuer"].exists)
+        XCTAssertFalse(web.textFields["ÂGE"].exists)
+        let proof = XCTAttachment(screenshot: app.screenshot())
+        proof.name = "Bilan réel conservé — retour par Explorer"
+        proof.lifetime = .keepAlways; add(proof)
+    }
+
     @MainActor
     private func localSignup(waitForReturn: Bool, finalize: Bool = false, diagnostic: Bool = false) async throws {
         continueAfterFailure = false
@@ -1129,7 +1157,27 @@ final class COAIUITests: XCTestCase {
                     // The result is not saved yet. A process relaunch must not
                     // discard all answers or silently submit them to the profile.
                     app.terminate(); app.launch()
-                    tap(diagnosticEntry)
+                    // A cold launch opens Séance, not the one-time welcome page.
+                    // Return through the same persistent menu available to members.
+                    let explorer = app.buttons["native-tab-Explorer"]
+                    guard explorer.waitForExistence(timeout: 15) else {
+                        XCTFail("Native navigation missing after relaunch")
+                        return
+                    }
+                    explorer.tap()
+                    let bilan = app.buttons["explore-/diagnostic"]
+                    guard bilan.waitForExistence(timeout: 10) else {
+                        XCTFail("The saved diagnostic must remain reachable from Explorer")
+                        return
+                    }
+                    bilan.tap()
+                    guard web.buttons["Continuer mon diagnostic"].waitForExistence(timeout: 15) else {
+                        let proof = XCTAttachment(screenshot: app.screenshot())
+                        proof.name = "Reprise bilan absente après relance"
+                        proof.lifetime = .keepAlways; add(proof)
+                        XCTFail("Saved diagnostic missing after relaunch and explicit navigation")
+                        return
+                    }
                     tap(web.buttons["Continuer mon diagnostic"])
                     XCTAssertTrue(web.staticTexts["Tes réponses analysées"].waitForExistence(timeout: 15))
                     XCTAssertTrue(web.buttons["Enregistrer et continuer"].exists)
