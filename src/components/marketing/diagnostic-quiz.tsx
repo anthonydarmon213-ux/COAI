@@ -845,7 +845,8 @@ export function DiagnosticQuiz({
     if (step === "intro" || step === "analyse" || step === "reveal" || (step === "result" && !connecte) || step === "respire1" || step === "respire2") return;
     saveDiagnosticProgress({
       step,
-      ...(step === "result" ? { ownerId: diagnosticOwnerId, expiresAt: Date.now() + 24 * 60 * 60 * 1000 } : {}),
+      ownerId: diagnosticOwnerId,
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000,
       persona,
       personaAutreTexte,
       activiteQuotidienne,

@@ -59,10 +59,14 @@ async function sleep(ms: number) {
 export function ActivationFlow({
   coachValidationRequise,
   profilInitial,
+  diagnosticOwnerId,
+  diagnosticEmail,
   declencherGenerationAuto = true,
 }: {
   coachValidationRequise: boolean;
   profilInitial: ProfilLike | null;
+  diagnosticOwnerId: string;
+  diagnosticEmail: string | null;
   // Faux pour un accès libre (16/08/2026, demande Anthony — "pas directement
   // sur payer, générer le programme alors qu'on n'a même pas visité
   // l'interface") : les réponses du diagnostic sont quand même appliquées au
@@ -77,6 +81,7 @@ export function ActivationFlow({
   const [completion, setCompletion] = useState<CompletionProfil | null>(null);
   const [repriseOffre, setRepriseOffre] = useState<{ href: string; label: string } | null>(null);
   const [validationRequise, setValidationRequise] = useState(coachValidationRequise);
+  const [transfertAutreCompte, setTransfertAutreCompte] = useState(false);
 
   useEffect(() => {
     let annule = false;
@@ -134,7 +139,9 @@ export function ActivationFlow({
 
     (async () => {
       try {
-        const reponses = readDiagnosticAnswers();
+        const reponses = readDiagnosticAnswers(diagnosticEmail, () => {
+          if (!annule) setTransfertAutreCompte(true);
+        });
         let profilCourant: ProfilLike | null = profilInitial;
 
         if (reponses) {
@@ -194,7 +201,7 @@ export function ActivationFlow({
           return;
         }
 
-        const progression = readDiagnosticProgress<Record<string, unknown>>();
+        const progression = readDiagnosticProgress<Record<string, unknown>>(diagnosticOwnerId);
         setEtat(progression ? "reprise_possible" : "sans_diagnostic");
       } catch {
         if (!annule) setEtat("erreur");
@@ -377,6 +384,13 @@ export function ActivationFlow({
       <p className="max-w-sm text-sm leading-6 text-graphite-400">
         Quelques questions rapides pour que ton programme te ressemble vraiment.
       </p>
+      {transfertAutreCompte && (
+        <p role="status" className="max-w-sm text-sm leading-6 text-graphite-300">
+          Un diagnostic a été préparé avec une autre adresse sur cet appareil.
+          Il n’a pas été ajouté à ton profil. Pour le retrouver, reconnecte-toi avec
+          l’adresse utilisée au départ ; sinon, commence ton propre diagnostic ci-dessous.
+        </p>
+      )}
       <Link href="/diagnostic">
         <Button className="px-8 py-3">
           {etat === "reprise_possible" ? "Continuer mon diagnostic" : "Faire mon diagnostic"}

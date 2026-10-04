@@ -2,6 +2,22 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
+// The server boundary must remount the quiz when the authenticated identity
+// changes, otherwise its in-memory answers could be saved under the new owner.
+const page = fs.readFileSync('src/app/(marketing)/diagnostic/page.tsx', 'utf8');
+const pageAst = ts.createSourceFile('page.tsx', page, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+let quizKey;
+function visitPage(node) {
+  if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(pageAst) === 'DiagnosticQuiz') {
+    quizKey = node.attributes.properties.find(prop => ts.isJsxAttribute(prop) && prop.name.text === 'key');
+  }
+  ts.forEachChild(node, visitPage);
+}
+visitPage(pageAst);
+assert(quizKey && ts.isJsxExpression(quizKey.initializer), 'Quiz needs an authenticated-identity key');
+const keyExpression = quizKey.initializer.expression.getText(pageAst);
+const keys = [null, {id: 'owner-a'}, {id: 'owner-b'}].map(user => vm.runInNewContext(keyExpression, {user}));
+assert.equal(new Set(keys).size, 3, 'Anonymous, A and B must never share quiz state');
 const source = fs.readFileSync('src/components/marketing/diagnostic-quiz.tsx', 'utf8');
 const ast = ts.createSourceFile('quiz.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 const effects = []; let resume;
@@ -34,6 +50,17 @@ collect(saveEffect);
 box.age = '35'; box.niveau = 'Débutant';
 run(`(${saveEffect.getText(ast)})()`, box);
 assert.equal(saved?.step, 'result'); assert.equal(saved.age, '35');
+assert.equal(saved.ownerId, 'fixture-owner');
+assert(saved.expiresAt > Date.now());
+for (const step of ['profilPhysique', 'niveau', 'sante']) {
+  run(`(${saveEffect.getText(ast)})()`, {...box, step});
+  assert.equal(saved.step, step);
+  assert.equal(saved.ownerId, 'fixture-owner', 'Intermediate answers belong to the same account');
+  assert(saved.expiresAt > Date.now());
+}
+run(`(${saveEffect.getText(ast)})()`, {...box, step: 'niveau', connecte: false, diagnosticOwnerId: null});
+assert.equal(saved.ownerId, null, 'Anonymous answers remain explicitly anonymous');
+run(`(${saveEffect.getText(ast)})()`, box);
 let restored, destination;
 const resumeBox = {
   diagnosticOwnerId: 'fixture-owner',

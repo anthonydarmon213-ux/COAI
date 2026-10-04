@@ -148,6 +148,9 @@ export default async function BienvenuePage(
             effective du bilan. Une seule action principale, sans risque que
             l'utilisateur arrive sur le dashboard avant son profil. */}
         <ActivationFlow
+          key={user.id}
+          diagnosticOwnerId={user.id}
+          diagnosticEmail={user.email}
           coachValidationRequise={coachValidationRequise}
           profilInitial={user.profile ?? null}
           declencherGenerationAuto={false}
@@ -289,6 +292,9 @@ export default async function BienvenuePage(
       </div>
 
       <ActivationFlow
+        key={user.id}
+        diagnosticOwnerId={user.id}
+        diagnosticEmail={user.email}
         coachValidationRequise={coachValidationRequise}
         profilInitial={user.profile ?? null}
       />

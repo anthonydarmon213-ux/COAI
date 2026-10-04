@@ -1,6 +1,139 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
-## État courant — 2 octobre 2026
+## État courant — 4 octobre 2026
+
+Contrôle interactif connecté complété sur 3051 : les onze questions ont été
+remplies via l'interface avec le compte fictif distinct du XCTest. Résultat
+complet affiché, page rechargée avant enregistrement, puis « Continuer mon
+diagnostic » : le résultat complet et l'action d'application sont restaurés,
+sans refaire le questionnaire. Application du bilan : confirmation « Profil
+mis à jour », retour au tableau de bord puis lecture de `/compte/profil`.
+Le profil rechargé affiche bien 39 ans, 180 cm, 78 kg, intermédiaire, prise de
+muscle, journée mixte, 3 séances de 45 minutes, salle de sport, repas structurés
+et bon sommeil. Preuve interactive locale de persistance via le profil ; pas
+une validation de production ni du transfert pré-inscription inter-comptes.
+Le compte fictif reste disponible pour la suite des vérifications.
+
+Build web des corrections de diagnostic réussi le 4 octobre dans `.next-qa`
+(132 pages générées), sans remplacer `.next` du parcours XCTest actif.
+Option locale `COAI_LOCAL_QA_BUILD=1`, limitée à `http://localhost:3051` et
+refusée sous Vercel ; configuration normale inchangée lorsque l'option est absente.
+Tests de configuration : défaut inchangé, sortie isolée correcte, origine distante
+et environnement Vercel refusés. `tsconfig.qa.json` isole les types générés.
+Services Auth/PostgreSQL locaux uniquement. Vérification interactive toujours
+requise ; ce build ne constitue ni déploiement ni validation de production.
+Premier contrôle interactif de `.next-qa` réussi dans le navigateur intégré,
+port 3051 : visiteur anonyme, valeurs fictives 38 ans / 179 cm / 77 kg,
+passage à la question 2, rechargement, proposition de reprise, retour à la
+question 2 puis retour à la question 1 avec les trois valeurs intactes.
+Cela vérifie le vrai stockage navigateur anonyme, pas encore la reprise connectée,
+la séparation entre deux sessions ni le transfert pré-inscription complet.
+Contrôle connecté sur le même navigateur et la même origine 3051 : connexion
+au compte fictif distinct `coai-ui-20260924-http@example.test`. L'ancien brouillon
+anonyme n'est pas proposé ; les champs du nouveau diagnostic sont vides.
+Saisie 39 ans / 180 cm / 78 kg, étape 2, rechargement et reprise : étape 2
+retrouvée puis valeurs intactes à l'étape 1. Compte fictif conservé provisoirement
+pour poursuivre jusqu'au résultat/enregistrement ; aucune réponse nouvelle
+enregistrée dans le profil à ce stade. Le compte XCTest d'inscription reste distinct.
+
+Compilation iOS Release du 4 octobre à 09 h 40 réussie, destination générique
+iPhoneOS, signature désactivée, sortie isolée `/tmp/coai-release-check-20261004`.
+Paquet inspecté : `COAI`, `fr.coai.mobile`, 0.1.0 (1), arm64, iOS minimum 16.0,
+famille iPhone, icône référencée et quatre descriptions de permissions présentes.
+PrivacyInfo.xcprivacy embarqué et syntaxiquement valide. Recherche de chaînes
+`localhost:3050`, `COAILocalIntegration`, `COAI · test local` dans le binaire :
+aucune correspondance. Taille locale du paquet 2,1 Mo, hors contenu web distant.
+Cette preuve couvre la compilation native, pas les nouvelles modifications web,
+ni l'exhaustivité des déclarations de collecte, la signature, l'installation,
+une archive distribuable ou l'approbation Apple. Aucune soumission effectuée.
+
+Confidentialité des questions intermédiaires : défaut reproduit par test de
+stockage (le compte B pouvait lire le brouillon de A avant le résultat).
+Correctif en cours : propriétaire explicite à chaque étape, brouillon anonyme
+distinct du contexte connecté, expiration 24 h pour toutes les étapes ; anciens
+brouillons sans propriétaire retirés à la lecture plutôt qu'attribués arbitrairement.
+Cela impose de recommencer ces anciens brouillons non enregistrés, sans toucher
+aux profils sauvegardés. Tests de stockage et effets réels réussis avant/après,
+TypeScript et lint réussis (six avertissements existants). Build et vérification
+interactive du nouveau correctif restent à faire : le serveur utilisé par le
+test natif en cours reste volontairement sur 97b125d. Le pont pré-inscription
+est distinct et n'est pas couvert par cette correction de progression.
+Le lecteur de `/bienvenue` a également été adapté : identifiant du compte
+transmis depuis le serveur dans les deux branches de l'accueil, composant
+remonté si le compte change. Test du composant : A retrouve sa reprise, B
+ne la reçoit pas, aucun PUT profil ni génération déclenché pour cette reprise.
+Les scénarios d'erreur de bilan et de génération restent réussis ; TypeScript
+et lint repassés après ces changements. Revue React : identifiant primitif,
+pas d'objet utilisateur complet ajouté aux props, stockage indisponible toléré.
+La page diagnostic utilise maintenant elle aussi une clé liée à l'identité :
+un changement de compte remonte le questionnaire au lieu de conserver ses
+réponses en mémoire sous le nouveau propriétaire. Test de structure exécutant
+l'expression de clé : échec avant correction, identités anonyme/A/B distinctes
+après correction. Cela ne remplace pas un test interactif de changement de compte.
+
+Pont pré-inscription : enveloppe versionnée et expiration 24 h ajoutées localement.
+Les anciens transferts sans date fiable, le JSON cassé et les enveloppes invalides
+sont retirés à la lecture ; les profils déjà sauvegardés ne sont pas modifiés.
+Test de stockage en échec avant changement, réussi après ; tests ActivationFlow
+et typage réussis. Enveloppe portée à v2 : adresse destinataire normalisée,
+comparée à l'adresse du compte fournie par la page serveur avant toute lecture.
+Une autre adresse ou un lecteur sans adresse ne reçoit aucune réponse ; le
+transfert valide est conservé pour son destinataire. Test combinant le vrai lecteur
+et le vrai composant : B n'émet aucun PUT et A conserve ses réponses. Cette
+association locale évite la réattribution accidentelle ; elle n'est pas un mécanisme
+d'autorisation serveur. Si Google utilise une autre adresse, aucun transfert
+automatique : l'accueil sans diagnostic explique la différence, propose de se
+reconnecter avec l'adresse d'origine ou de commencer son propre diagnostic.
+Test du rendu du composant réussi : message et CTA présents, aucune adresse
+destinataire ni réponse étrangère affichée, aucun PUT émis. Rendu interactif
+dans l'application encore à vérifier.
+Préremplissage email : un nouveau brouillon sans adresse conservait celle du
+précédent dans sessionStorage. Régression reproduite, puis corrigée : une adresse
+absente ou invalide efface uniquement cette ancienne suggestion. Tests de stockage
+et d'activation réussis ; pas de modification des adresses des comptes en base.
+Build et test interactif de ce changement restent à faire après le test natif actif.
+
+À 09 h 05 le 4 octobre, contrôle physique en lecture seule : iPhone 17 Pro
+`available (paired)` ; `COAI test`, identifiant `fr.coai.mobile`, version 0.1.0,
+build 1 toujours installé. Cela remplace le constat d'indisponibilité du 2 octobre,
+mais ne prouve pas sa signature encore valide ni les correctifs locaux installés.
+Aucune signature renouvelée, installation ou interaction avec un compte réel.
+Lecture du profil embarqué dans `ios/DerivedDataDevice/Build/Products/Debug-iphoneos/COAI.app`
+: expiration le 19 septembre 2026 à 21:22:02 UTC. Ce dossier de compilation
+est donc périmé ; cette lecture ne permet pas de dater le profil de l'application
+actuellement installée sur l'iPhone, ni de conclure au statut de l'adhésion Apple.
+
+Le test natif du 2 octobre n'a pas validé le diagnostic : le retour Safari
+est resté sur « Ouvrir dans COAI test ? ». L'email avait bien été confirmé,
+mais le test cherchait le bouton dans `alerts` alors qu'iOS le présente comme
+une feuille. Constat visuel confirmé le 4 octobre ; compte jetable et email
+nettoyés après révocation. Harness corrigé : lecture du seul email local
+attendu, validation de son URL locale, ouverture Safari et bouton `Ouvrir`
+indépendant du type de fenêtre, attente asynchrone bornée et retour immédiat
+si la session ne revient pas. Compilation des tests réussie. Nouvelle exécution
+en cours : `/tmp/coai-diagnostic-safari-sheet-1004-0845.xcresult`.
+Ne pas compter ce parcours réussi avant son résultat et le contrôle en base.
+À 08 h 51, le journal confirme le clic sur la feuille Safari et l'arrivée sur
+« Finalise ton compte » avec l'adresse jetable attendue : retour dans la session
+d'origine réussi. Le test continue ensuite ; nombreuses attentes XCTest de
+60 s sur les animations, qui ne prouvent pas une latence utilisateur équivalente.
+Contrôles indépendants du 4 octobre : 51 XCTest unitaires Swift, 65 contrôles
+directs, règles WebKit compilées, configuration de confidentialité et cinq cas
+négatifs réussis. Navigation/cadence/saisies/stockage pré-inscription restent
+réussis ; audit fichiers média : 356 références, zéro manquante (pas une preuve
+de correspondance visuelle). Pas de publication ni de validation physique.
+
+## Preuves précédentes — 2 octobre 2026
+
+Contrôle interactif navigateur local du correctif diagnostic 97b125d réussi :
+onze étapes avec compte fictif existant, résultat non sauvegardé, rechargement,
+reprise directe du même bilan puis enregistrement. PostgreSQL confirme les
+valeurs distinctes du profil initial : 37 ans, 181 cm, 79 kg, 30 minutes,
+trois séances/semaine et objectif exact. Un seul programme préexistant conservé,
+aucune régénération. Nouveau rechargement : plus de proposition de reprise.
+Aucune erreur console capturée. Compte fictif et sessions nettoyés.
+Test iOS du diagnostic enrichi avec fermeture/relance avant sauvegarde ; son
+exécution et la validation physique/production restent à réaliser.
 
 Diagnostic connecté : perte du brouillon reproduite au niveau des effets réels
 du composant (résultat affiché → effacement avant sauvegarde). Correctif local :

@@ -912,27 +912,27 @@ final class COAIUITests: XCTestCase {
 
     /// Requires local SMTP preflight and cleanup; does not confirm email or grant access.
     @MainActor
-    func testLocalSignupReachesEmailConfirmation() throws {
-        try localSignup(waitForReturn: false)
+    func testLocalSignupReachesEmailConfirmation() async throws {
+        try await localSignup(waitForReturn: false)
     }
 
     @MainActor
-    func testLocalEmailLinkReturnsToOriginalSession() throws {
-        try localSignup(waitForReturn: true)
+    func testLocalEmailLinkReturnsToOriginalSession() async throws {
+        try await localSignup(waitForReturn: true)
     }
 
     @MainActor
-    func testLocalSignupConsentCreatesAccount() throws {
-        try localSignup(waitForReturn: true, finalize: true)
+    func testLocalSignupConsentCreatesAccount() async throws {
+        try await localSignup(waitForReturn: true, finalize: true)
     }
 
     @MainActor
-    func testLocalNewAccountDiagnosticReachesResult() throws {
-        try localSignup(waitForReturn: true, finalize: true, diagnostic: true)
+    func testLocalNewAccountDiagnosticReachesResult() async throws {
+        try await localSignup(waitForReturn: true, finalize: true, diagnostic: true)
     }
 
     @MainActor
-    private func localSignup(waitForReturn: Bool, finalize: Bool = false, diagnostic: Bool = false) throws {
+    private func localSignup(waitForReturn: Bool, finalize: Bool = false, diagnostic: Bool = false) async throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR", "-COAILocalIntegration"]
@@ -970,16 +970,61 @@ final class COAIUITests: XCTestCase {
         capture.lifetime = .keepAlways
         add(capture)
         if waitForReturn {
+            guard #available(iOS 16.4, *) else {
+                throw XCTSkip("Opening the actual confirmation email in Safari requires iOS 16.4")
+            }
             print("COAI_EMAIL_RETURN_READY")
+            // Follow the actual local email in Safari; never bypass confirmation
+            // or move the originating WebKit store's PKCE verifier into Safari.
+            let (listData, _) = try await URLSession.shared.data(from: URL(string: "http://127.0.0.1:54324/api/v1/messages")!)
+            let list = try XCTUnwrap(JSONSerialization.jsonObject(with: listData) as? [String: Any])
+            let messages = try XCTUnwrap(list["messages"] as? [[String: Any]])
+            let matching = messages.filter { item in
+                (item["To"] as? [[String: Any]])?.contains { $0["Address"] as? String == "coai-ui-signup-20260927@example.test" } == true
+            }
+            XCTAssertEqual(matching.count, 1)
+            let identifier = try XCTUnwrap(matching.first?["ID"] as? String)
+            XCTAssertNotNil(identifier.range(of: "^[A-Za-z0-9_-]{1,100}$", options: .regularExpression))
+            let (mailData, _) = try await URLSession.shared.data(from: URL(string: "http://127.0.0.1:54324/api/v1/message/" + identifier)!)
+            let mail = try XCTUnwrap(JSONSerialization.jsonObject(with: mailData) as? [String: Any])
+            let html = try XCTUnwrap(mail["HTML"] as? String)
+            let expression = try NSRegularExpression(pattern: "href=\"([^\"]+)\"")
+            let links = expression.matches(in: html, range: NSRange(html.startIndex..., in: html)).compactMap { match -> URL? in
+                guard let range = Range(match.range(at: 1), in: html) else { return nil }
+                return URL(string: String(html[range]).replacingOccurrences(of: "&amp;", with: "&"))
+            }
+            let confirmation = try XCTUnwrap(links.first { $0.path == "/auth/v1/verify" })
+            XCTAssertEqual(confirmation.scheme, "http")
+            XCTAssertTrue(["localhost", "127.0.0.1"].contains(confirmation.host ?? ""))
+            XCTAssertEqual(confirmation.port, 54321)
+            let query = URLComponents(url: confirmation, resolvingAgainstBaseURL: false)?.queryItems
+            XCTAssertEqual(query?.first { $0.name == "type" }?.value, "signup")
+            XCTAssertEqual(query?.first { $0.name == "redirect_to" }?.value, "http://localhost:3050/auth/ios-confirmation")
+            let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
+            safari.open(confirmation)
+            safari.activate()
+            let returnLink = safari.webViews.links["Ouvrir COAI"]
+            XCTAssertTrue(returnLink.waitForExistence(timeout: 30))
+            returnLink.tap()
+            // Safari exposes this confirmation as a sheet on recent iOS,
+            // not necessarily as an XCUIElementTypeAlert.
+            let safariOpen = safari.buttons["Ouvrir"]
+            if safariOpen.waitForExistence(timeout: 10) { safariOpen.tap() }
             let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
             let open = springboard.alerts.buttons["Ouvrir"]
             let returnReady = XCTNSPredicateExpectation(
                 predicate: NSPredicate { _, _ in
                     open.exists || web.staticTexts["Finalise ton compte"].exists
                 }, object: nil)
-            XCTAssertEqual(XCTWaiter.wait(for: [returnReady], timeout: 90), .completed)
+            guard await XCTWaiter.fulfillment(of: [returnReady], timeout: 30) == .completed else {
+                XCTFail("The email confirmation did not return from Safari to COAI")
+                return
+            }
             if open.exists { open.tap() }
-            XCTAssertTrue(web.staticTexts["Finalise ton compte"].waitForExistence(timeout: 90))
+            guard web.staticTexts["Finalise ton compte"].waitForExistence(timeout: 30) else {
+                XCTFail("The originating session did not reach account finalization")
+                return
+            }
             XCTAssertTrue(web.staticTexts["coai-ui-signup-20260927@example.test"].exists)
             XCTAssertFalse(web.buttons["Se connecter"].exists)
             let returned = XCTAttachment(screenshot: app.screenshot())
@@ -1081,6 +1126,14 @@ final class COAIUITests: XCTestCase {
                     XCTAssertTrue(web.staticTexts["Tes réponses analysées"].exists)
                     XCTAssertFalse(web.staticTexts["4 capacités physiques évaluées"].exists)
                     XCTAssertFalse(app.staticTexts["Page indisponible"].exists)
+                    // The result is not saved yet. A process relaunch must not
+                    // discard all answers or silently submit them to the profile.
+                    app.terminate(); app.launch()
+                    tap(diagnosticEntry)
+                    tap(web.buttons["Continuer mon diagnostic"])
+                    XCTAssertTrue(web.staticTexts["Tes réponses analysées"].waitForExistence(timeout: 15))
+                    XCTAssertTrue(web.buttons["Enregistrer et continuer"].exists)
+                    XCTAssertFalse(web.textFields["ÂGE"].exists, "Resume the result, not the first question")
                     let saveShortcut = web.links["Passer à l’enregistrement de mon bilan →"]
                     XCTAssertTrue(saveShortcut.waitForExistence(timeout: 10))
                     XCTAssertTrue(saveShortcut.isHittable, "Saving must be reachable without scrolling through the result")
@@ -1093,8 +1146,8 @@ final class COAIUITests: XCTestCase {
                     let saveVisible = NSPredicate { _, _ in
                         web.buttons["Enregistrer et continuer"].isHittable
                     }
-                    expectation(for: saveVisible, evaluatedWith: nil)
-                    waitForExpectations(timeout: 10)
+                    let saveReady = expectation(for: saveVisible, evaluatedWith: nil)
+                    await fulfillment(of: [saveReady], timeout: 10)
                     tap(web.buttons["Enregistrer et continuer"])
                     XCTAssertTrue(web.links["Choisir mon accompagnement →"].waitForExistence(timeout: 30))
                     XCTAssertTrue(web.staticTexts["Choisis ton accompagnement COAI pour accéder à ton programme."].exists)

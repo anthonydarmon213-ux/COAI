@@ -15,11 +15,12 @@ const box = {exports: {}, window, Event};
 vm.runInNewContext(code, box);
 const api = box.exports;
 const key = 'coai_diagnostic_progress';
+const draft = value => ({ownerId: null, expiresAt: Date.now() + 86400000, ...value});
 assert.equal(api.serverDiagnosticProgressStep(), null);
 assert.equal(api.diagnosticProgressStep(), null);
 let changes = 0;
 const unsubscribe = api.subscribeDiagnosticProgress(() => changes++);
-api.saveDiagnosticProgress({step: 'niveau', prenom: 'Test', equipement: ['Banc']});
+api.saveDiagnosticProgress(draft({step: 'niveau', prenom: 'Test', equipement: ['Banc']}));
 assert.equal(changes, 1);
 assert.equal(api.diagnosticProgressStep(), 'niveau');
 assert.equal(api.diagnosticProgressStep(), api.diagnosticProgressStep());
@@ -37,7 +38,7 @@ window.dispatchEvent(new Event('pageshow')); assert.equal(changes, 4);
 api.clearDiagnosticProgress(); assert.equal(changes, 5);
 assert.equal(api.diagnosticProgressStep(), null);
 unsubscribe();
-api.saveDiagnosticProgress({step: 'objectif'});
+api.saveDiagnosticProgress(draft({step: 'objectif'}));
 storageEvent(key); window.dispatchEvent(new Event('pageshow'));
 assert.equal(changes, 5, 'Every subscription must be removed');
 for (const invalid of ['{broken', 'null', '[]', '12', 'true', '"niveau"']) {
@@ -46,6 +47,21 @@ for (const invalid of ['{broken', 'null', '[]', '12', 'true', '"niveau"']) {
   assert.equal(api.diagnosticProgressStep(), null);
 }
 data.set(key, '{"step":42}'); assert.equal(api.diagnosticProgressStep(), null);
+for (const step of ['profilPhysique', 'niveau', 'sante', 'result']) {
+  api.saveDiagnosticProgress(draft({step, ownerId: 'owner-a', age: '35'}));
+  assert.equal(api.readDiagnosticProgress('owner-a').age, '35');
+  assert.equal(api.diagnosticProgressStep('owner-b'), null, 'Never show another account’s intermediate answers');
+  assert.equal(api.diagnosticProgressStep(), null, 'Signed-out readers cannot recover connected answers');
+}
+api.saveDiagnosticProgress(draft({step: 'sante', contraintes: ['fixture']}));
+assert.equal(api.diagnosticProgressStep(), 'sante');
+assert.equal(api.diagnosticProgressStep('owner-a'), null, 'Do not silently import an anonymous draft into an account');
+api.saveDiagnosticProgress({step: 'niveau', age: '35'});
+assert.equal(api.diagnosticProgressStep(), null, 'Legacy unscoped answers have no verifiable owner');
+assert.equal(data.has(key), false, 'Remove the legacy draft rather than retaining unattributable health answers');
+api.saveDiagnosticProgress(draft({step: 'sante', expiresAt: Date.now() - 1}));
+assert.equal(api.diagnosticProgressStep(), null);
+assert.equal(data.has(key), false, 'Expired intermediate answers are removed');
 api.saveDiagnosticProgress({step: 'result', ownerId: 'owner-a', expiresAt: Date.now() + 86400000, age: '35'});
 assert.equal(api.diagnosticProgressStep(), null);
 assert.equal(api.diagnosticProgressStep('owner-b'), null);

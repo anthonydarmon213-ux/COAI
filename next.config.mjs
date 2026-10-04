@@ -1,5 +1,12 @@
+// A second local build must not replace the bundle used by a running iOS test.
+// Fixed paths and loopback-only origin; never enable this on a deployment.
+const localQA = process.env.COAI_LOCAL_QA_BUILD === "1";
+if (localQA && (process.env.VERCEL || process.env.NEXT_PUBLIC_APP_URL !== "http://localhost:3051")) {
+  throw new Error("COAI_LOCAL_QA_BUILD requires the isolated localhost:3051 environment");
+}
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(localQA ? { distDir: ".next-qa", typescript: { tsconfigPath: "tsconfig.qa.json" } } : {}),
   reactStrictMode: true,
   images: {
     remotePatterns: [

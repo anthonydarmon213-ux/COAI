@@ -2,8 +2,8 @@
 // — distinct du pont pré-inscription (storage.ts, écrit une seule fois au
 // clic "Créer mon compte") : celui-ci sauvegarde la progression EN COURS à
 // chaque étape, pour proposer "Continuer mon diagnostic" si la personne
-// revient avant d'avoir terminé. Le résultat connecté non enregistré est
-// réservé au même compte et expire après 24 h ; effacé après sauvegarde.
+// revient avant d'avoir terminé. Chaque brouillon est réservé à son contexte
+// (compte ou visiteur) et expire après 24 h ; effacé après sauvegarde.
 const STORAGE_KEY = "coai_diagnostic_progress";
 const PROGRESS_EVENT = "coai:diagnostic-progress";
 
@@ -43,13 +43,18 @@ export function readDiagnosticProgress<T = Record<string, unknown>>(ownerId?: st
     const raw = window.localStorage.getItem(STORAGE_KEY);
     const saved: unknown = raw ? JSON.parse(raw) : null;
     if (!saved || typeof saved !== "object" || Array.isArray(saved)) return null;
-    if ("step" in saved && saved.step === "result") {
-      const result = saved as Record<string, unknown>;
-      if (!ownerId || result.ownerId !== ownerId) return null;
-      if (typeof result.expiresAt !== "number" || !Number.isFinite(result.expiresAt) || result.expiresAt <= Date.now()) {
-        window.localStorage.removeItem(STORAGE_KEY);
-        return null;
-      }
+    const progress = saved as Record<string, unknown>;
+    // Legacy unscoped drafts cannot be attributed safely. Do not infer that
+    // the next person to connect owns their health or physical answers.
+    if (!("ownerId" in progress)) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    if (progress.ownerId !== (ownerId ?? null)) return null;
+    if (progress.step === "result" && !ownerId) return null;
+    if (typeof progress.expiresAt !== "number" || !Number.isFinite(progress.expiresAt) || progress.expiresAt <= Date.now()) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return null;
     }
     return saved as T;
   } catch {
