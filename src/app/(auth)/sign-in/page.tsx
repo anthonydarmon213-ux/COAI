@@ -80,7 +80,7 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="coai-access-page flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-8">
+    <main className="coai-access-page flex min-h-[100dvh] flex-col items-center justify-start gap-6 px-6 py-6 sm:justify-center sm:py-8">
       <Link
         href="/"
         className="font-mono text-xs uppercase tracking-widest text-graphite-400 transition hover:text-white"
@@ -108,6 +108,7 @@ export default function SignInPage() {
           <Field label="Email">
             <Input
               type="email"
+              onFocus={(event) => event.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
               autoComplete="email"
               autoCapitalize="none"
               spellCheck={false}
@@ -119,6 +120,7 @@ export default function SignInPage() {
           <Field label="Mot de passe">
             <Input
               type={showPassword ? "text" : "password"}
+              onFocus={(event) => event.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
               autoComplete="current-password"
               required
               value={password}

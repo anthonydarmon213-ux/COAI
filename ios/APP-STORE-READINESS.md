@@ -13,9 +13,22 @@ null/tableau/objet vide, dates invalides, repères invalides, JSON illisible,
 hors ligne, erreur serveur, confirmation valide et ressenti valide : PASS.
 Ressenti douleur explicite : PASS. Types, lint (six avertissements existants),
 build QA séparé 132 pages, audit 356 médias : PASS.
-**EN COURS :** test UI avec réponse défectueuse et confirmation serveur réelle ;
-le serveur iPhone 3050 conserve encore la compilation précédente. Aucun
-déploiement, preuve en production ou validation iPhone de ce changement.
+Le test UI de connexion sur simulateur iPhone 17 vierge a révélé que le clavier
+pouvait masquer le champ mot de passe sur les petits écrans. Tous les écrans
+d’accès mobile commencent maintenant en haut du viewport, et les champs gardent
+une marge de défilement sous le clavier ; les champs de connexion se centrent
+également lors du focus. `build-for-testing` passe. `/tmp/coai-login-clean-1004.xcresult` : le
+test réel ouvre l’écran de connexion, saisit email et mot de passe clavier
+ouvert, se connecte, navigue vers Nutrition, Récupération et Recettes, puis
+vérifie la déconnexion après relance : 1 test, 0 échec. Le premier essai était
+pollué par une session déjà ouverte et un relais qui injectait volontairement
+une erreur 503 ; ces deux causes sont corrigées dans les conditions du test.
+Le correctif de sauvegarde quotidienne, lui, n’a pas encore été exercé par un
+parcours UI iPhone avec réponse défectueuse. Aucun déploiement ni test en
+production ; iPhone physique et achats Apple réels restent à valider.
+`/tmp/coai-signup-keyboard-1004.xcresult` : le formulaire d’inscription complet
+sur le simulateur iPhone 17 passe (1 test, 0 échec), confirmation email locale
+reçue ; compte et message de test supprimés après vérification.
 
 **Contrôle distant en lecture seule, 14 h 50.** Les 29 tables publiques COAI
 ont RLS activée ; les rôles clients gardent néanmoins TRUNCATE sur 22 tables.

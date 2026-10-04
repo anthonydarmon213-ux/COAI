@@ -450,6 +450,17 @@ body {
     #0d0e10;
 }
 
+/* Les formulaires d’accès restent parcourables quand le clavier iOS réduit
+   fortement le viewport, notamment sur les petits iPhone. */
+@media (max-width: 639px) {
+  .coai-access-page {
+    min-height: 100dvh;
+    justify-content: flex-start;
+    padding-block: 1.5rem;
+    scroll-padding-block: 1.5rem;
+  }
+}
+
 .coai-access-shell {
   border: 1px solid rgba(255, 255, 255, .09);
   background: rgba(255,255,255,.04);
@@ -470,6 +481,7 @@ body {
 
 .coai-access-card .coai-access-input {
   min-height: 3.5rem;
+  scroll-margin-block: 35vh;
   border: 1.5px solid rgba(255,255,255,.14) !important;
   background: rgba(255,255,255,.05) !important;
   color: #fffdf8 !important;
