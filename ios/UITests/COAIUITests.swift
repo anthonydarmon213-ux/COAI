@@ -1771,11 +1771,11 @@ final class COAIUITests: XCTestCase {
         let email = web.textFields["EMAIL"]
         XCTAssertTrue(email.waitForExistence(timeout: 30))
         email.tap()
-        email.typeText("coai-ui-20260924-http@example.test")
+        email.typeText("coai-ui-workoutprobe-20261004@example.test")
         let password = web.secureTextFields["MOT DE PASSE"]
         reveal(password, in: app)
         password.tap()
-        password.typeText("Coai-local-UI-0924-only!")
+        password.typeText("Coai-local-Workout-1004-only!")
         let submit = web.buttons["Se connecter"]
         reveal(submit, in: app)
         submit.tap()
