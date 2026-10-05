@@ -1,5 +1,21 @@
 # Priorité COAI : prêt à soumettre à l'App Store
 
+## Reprise de validation — 5 octobre 2026
+
+Exécution fraîche depuis l’arbre courant : les 51 tests Swift passent
+(`swift test --package-path ios --scratch-path /tmp/coai-swift-tests-20261005`).
+Deux tests UI sur simulateurs iOS 26.5 passent également :
+`testNativeNavigationAlignmentAndActualPageSelection` sur iPhone 17 Pro
+(5 onglets alignés, sélection réelle, exploration et minuteur) et
+`testNativeNavigationWithLargeTextAndRotation` sur le simulateur petit écran
+(texte d’accessibilité XXXL, zones tactiles et rotation portrait/paysage).
+Le Release arm64 iPhone a été reconstruit avec succès, sans signature, dans
+`/tmp/coai-release-final-20261005`. Ces tests UI emploient le contenu de fixture
+COAI ; ils ne valident ni le site de production, ni une installation sur iPhone
+physique. Aucun code fonctionnel, compte, achat ou état distant n’a été modifié.
+L’archive signée, le test physique, l’écart de confidentialité en production,
+les permissions Supabase restantes et la validation App Store demeurent ouverts.
+
 **Mise à jour sécurité production — 4 octobre 2026.** Le correctif ciblé
 `20261004173456_revoke_client_truncate` a été appliqué : `anon` et
 `authenticated` n'ont plus `TRUNCATE` sur les 22 tables contrôlées (vérification
