@@ -13,8 +13,15 @@ Le Release arm64 iPhone a été reconstruit avec succès, sans signature, dans
 `/tmp/coai-release-final-20261005`. Ces tests UI emploient le contenu de fixture
 COAI ; ils ne valident ni le site de production, ni une installation sur iPhone
 physique. Aucun code fonctionnel, compte, achat ou état distant n’a été modifié.
-L’archive signée, le test physique, l’écart de confidentialité en production,
-les permissions Supabase restantes et la validation App Store demeurent ouverts.
+Le contrôle d’appareil voit l’iPhone 17 Pro appairé et déverrouillé ;
+`fr.coai.mobile` y est déjà installé (COAI test, 0.1.0 (1)). Une identité locale
+Apple Development valide jusqu’au 12 septembre 2027 est présente, mais cela ne
+prouve pas l’adhésion ni l’accès de distribution. Tentative d’archive Release
+signée isolée : échec, aucun profil de développement pour `fr.coai.mobile` ;
+aucune mise à jour du portail n’a été autorisée ou tentée. Ne pas remplacer
+l’application déjà installée : préserver ses données. L’archive signée,
+l’écart de confidentialité en production, les permissions Supabase restantes
+et la validation App Store demeurent ouverts.
 
 Revue StoreKit et confidentialité : sept scripts actuels passent
 (`test-privacy-consent`, `test-ios-privacy-config`, catalogue, politique de
