@@ -16,6 +16,19 @@ physique. Aucun code fonctionnel, compte, achat ou état distant n’a été mod
 L’archive signée, le test physique, l’écart de confidentialité en production,
 les permissions Supabase restantes et la validation App Store demeurent ouverts.
 
+Revue StoreKit et confidentialité : sept scripts actuels passent
+(`test-privacy-consent`, `test-ios-privacy-config`, catalogue, politique de
+transaction, livraison, notifications et route de transaction Apple). Ils
+valident des règles et des dépendances simulées, pas les signatures cryptographiques
+Apple, App Store Connect ou un achat Sandbox. Correction de l’état documentaire :
+les routes serveur Apple (compte, catalogue, transactions et notifications),
+vérification JWS, registre et calcul d’accès existent désormais dans le code ;
+la section historique « Préparation StoreKit » plus bas décrit un état antérieur
+pour le raccordement, pas une absence actuelle d’adaptateur. La fonctionnalité
+reste fermée par configuration tant que les tables de production, le catalogue
+App Store Connect, les certificats/configurations Apple et les essais Sandbox
+ne sont pas validés. Rien n’a été activé à distance.
+
 **Mise à jour sécurité production — 4 octobre 2026.** Le correctif ciblé
 `20261004173456_revoke_client_truncate` a été appliqué : `anon` et
 `authenticated` n'ont plus `TRUNCATE` sur les 22 tables contrôlées (vérification
