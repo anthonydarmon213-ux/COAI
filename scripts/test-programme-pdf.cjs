@@ -68,17 +68,24 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
   if (process.argv[2]) {
     const renderer = await import('@react-pdf/renderer');
     const pdf = load('src/lib/pdf/programme-pdf.tsx', { 'react/jsx-runtime': jsx, '@react-pdf/renderer': renderer });
+    const generatedAt = new Date('2026-09-17T12:00:00Z');
     const document = jsx.jsx(pdf.ProgrammeCompletPdf, { prenom: 'Test local', entrees: [{
-      pilier: 'ENTRAINEMENT', reviewPending: true, generatedAt: new Date('2026-09-17T12:00:00Z'),
-      data: { titre: 'Contrôle export - données fictives', seances: [{
+      pilier: 'ENTRAINEMENT', reviewPending: true, generatedAt,
+      data: { titre: 'Contrôle export - données fictives', seances: [null, {
         nom: 'Séance fictive de contrôle', echauffement: 'Texte de préparation fictif pour vérifier la mise en page.',
         exercices: Array.from({ length: 6 }, (_, i) => ({ nom: `Exercice fictif ${i + 1}`, series: 3, repetitions: '8-12', repos: '90 s', methode: 'Séries classiques' })),
         retourAuCalme: 'Texte de retour au calme fictif pour vérifier la mise en page.',
       }] },
+    }, {
+      pilier: 'NUTRITION', generatedAt,
+      data: { titre: 'Alimentation fictive', jours: [null, { jour: 'Jour de contrôle', repas: [null, { repas: 'Déjeuner', plat: 'Repas fictif' }] }] },
+    }, {
+      pilier: 'RECUPERATION', generatedAt,
+      data: { titre: 'Récupération fictive', jours: [null, { jour: 'Jour de contrôle', type: 'Repos', conseil: 'Conseil fictif' }] },
     }] });
     const buffer = await renderer.renderToBuffer(document);
     assert.equal(buffer.subarray(0, 5).toString(), '%PDF-');
     fs.writeFileSync(process.argv[2], buffer);
-    console.log('PASS: real PDF rendered locally for visual review, without network images.');
+    console.log('PASS: real three-pillar PDF rendered despite malformed day/session rows, locally without network images.');
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
