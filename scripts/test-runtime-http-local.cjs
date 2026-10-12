@@ -55,8 +55,9 @@ async function main() {
   await db.subscription.create({ data: { userId: first.user.id,
     stripeCustomerId: `qa-runtime-${randomUUID()}`, status: 'ACTIVE' } });
   const name = 'Séance fictive QA transport';
+  const today = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }).format(new Date());
   await db.programmeGenerated.create({ data: { userId: first.user.id, pilier: 'ENTRAINEMENT',
-    statut: 'VALIDE', contenu: { titre: name, seances: [{ nom: name, jour: 'MAR',
+    statut: 'VALIDE', contenu: { titre: name, seances: [{ nom: name, jour: today.slice(0, 3).toUpperCase(),
       echauffement: 'Mobilité de préparation QA', retourAuCalme: 'Retour au calme QA',
       exercices: [{ nom: 'Développé couché (barre)', series: '2', repetitions: '8', repos: '60 s' }] }] } } });
   await db.seanceLog.create({ data: { userId: first.user.id,
@@ -85,6 +86,9 @@ async function main() {
   assert.equal(workout.status, 200); const session = await workout.json();
   assert.equal(session.name, name); assert.equal(session.exercises.length, 1);
   assert(session.exercises[0].photo && session.exercises[0].video);
+  const todayWorkout = await get('/api/ios/workout/today', first);
+  assert.equal(todayWorkout.status, 200, 'An abbreviated Paris weekday must appear as today’s workout');
+  assert.equal((await todayWorkout.json()).name, name);
   assert.equal((await get('/api/ios/workout/today?seance=0', second)).status, 404);
   for (const path of ['/api/programmes/fiche-complete', '/api/programmes/entrainement/pdf']) {
     const response = await get(path, first);

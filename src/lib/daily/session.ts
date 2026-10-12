@@ -1,3 +1,5 @@
+import { parisWeekday } from "@/lib/daily/calendar";
+
 export type WorkoutSession = Record<string, unknown> & {
   jour?: string;
   nom?: string;
@@ -30,7 +32,11 @@ export type AdaptationSummary = {
   adaptedExerciseCount: number;
 };
 
-const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+const JOURS: Record<string, readonly string[]> = {
+  dimanche: ["dimanche", "dim"], lundi: ["lundi", "lun"], mardi: ["mardi", "mar"],
+  mercredi: ["mercredi", "mer"], jeudi: ["jeudi", "jeu"], vendredi: ["vendredi", "ven"],
+  samedi: ["samedi", "sam"],
+};
 
 function normalise(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -75,14 +81,17 @@ export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSessi
 }
 
 export function getWorkoutForDate(contenu: unknown, date: Date): WorkoutSession | null {
+  if (!Number.isFinite(date.getTime())) return null;
   if (!contenu || typeof contenu !== "object" || Array.isArray(contenu)) return null;
   const seances = (contenu as { seances?: unknown }).seances;
   if (!Array.isArray(seances)) return null;
-  const jour = JOURS[date.getDay()] ?? "";
+  const aliases = JOURS[normalise(parisWeekday(date))] ?? [];
   return (seances.find((seance) => {
     if (!seance || typeof seance !== "object" || Array.isArray(seance)) return false;
-    const valeur = String((seance as { jour?: unknown }).jour ?? "");
-    return normalise(valeur).includes(normalise(jour));
+    const valeur = (seance as { jour?: unknown }).jour;
+    if (typeof valeur !== "string") return false;
+    const tokens = normalise(valeur).split(/[^a-z]+/).filter(Boolean);
+    return aliases.some(alias => tokens.includes(alias));
   }) ?? null) as WorkoutSession | null;
 }
 

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { adaptWorkout, getSessionDuration, getWorkoutForDate } from "@/lib/daily/session";
+import { parisCalendarDate } from "@/lib/daily/calendar";
 import type { Prisma } from "@prisma/client";
 
 function asJson(value: unknown): Prisma.InputJsonValue {
@@ -11,8 +12,7 @@ function asJson(value: unknown): Prisma.InputJsonValue {
 }
 
 function today() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return parisCalendarDate();
 }
 
 async function currentAppUser() {

@@ -2,10 +2,10 @@ import { ImageResponse } from "next/og";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
+import { parisCalendarDate } from "@/lib/daily/calendar";
 
 function today() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return parisCalendarDate();
 }
 
 export async function GET() {
