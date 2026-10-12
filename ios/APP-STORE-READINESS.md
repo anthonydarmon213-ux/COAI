@@ -8,6 +8,18 @@ Developer. Ne pas confondre connexion au portail et capacité de distribution.
 La préparation locale continue ; TestFlight et la soumission restent à débloquer.
 L'acceptation finale appartient à Apple et ne peut être garantie.
 
+### Contrôle du 12 octobre 2026 — fiche PDF
+
+Une journée `null` dans le programme nutrition faisait échouer l'export complet
+avec HTTP 503. Le correctif de cette branche ignore les entrées invalides sans
+inventer de données, signale les journées non détaillées et permet plusieurs
+pages par pilier au lieu de tronquer la fiche. Les trois pages d'un programme
+fictif ont été générées et inspectées ; le partage iOS de la fiche depuis un
+compte local jetable passe sur simulateur iPhone SE (1/1). Les 36 contrôles
+d'accès/erreur PDF, le typage et le lint passent. Ce correctif n'est **pas en
+production** et ne doit pas être déclaré terminé avant test sur `coai.fr` après
+une publication explicitement autorisée.
+
 ## Checklist globale persistante — 17 septembre 2026
 
 « Testé localement » ne signifie ni testé en production ni prêt à publier.
