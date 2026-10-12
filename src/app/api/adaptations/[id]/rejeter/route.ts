@@ -5,7 +5,8 @@ import { rejeterAdaptation } from "@/lib/adaptation/engine";
 // "Garder mon programme actuel" — l'utilisateur refuse l'adaptation
 // proposée par COAI. Aucune version créée, l'adaptation reste consultable
 // (statut REJETEE) dans l'historique.
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(_request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const user = await getCurrentAppUser();
   if (!user) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });

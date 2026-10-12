@@ -3,8 +3,8 @@ import { cookies, headers } from "next/headers";
 import { prisma } from "@/lib/db/client";
 
 // Client Supabase Auth pour les Server Components / Route Handlers.
-export function createSupabaseServerClient() {
-  const cookieStore = cookies();
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,14 +36,14 @@ export function createSupabaseServerClient() {
 }
 
 export async function getCurrentUser() {
-  const supabase = createSupabaseServerClient();
-
   // L'app mobile (React Native, sans cookies navigateur) s'authentifie via
   // un header "Authorization: Bearer <access_token>" au lieu de la session
   // cookie utilisée par le site web — on vérifie ce token en priorité s'il
   // est présent, sans toucher au flux cookie existant.
-  const authHeader = headers().get("authorization");
-  if (authHeader?.startsWith("Bearer ")) {
+  const authHeader = (await headers()).get("authorization");
+  if (authHeader !== null && !/^Bearer \S+$/.test(authHeader)) return null;
+  const supabase = await createSupabaseServerClient();
+  if (authHeader !== null) {
     const {
       data: { user },
       error,

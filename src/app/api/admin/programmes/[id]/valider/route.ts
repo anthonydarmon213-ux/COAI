@@ -9,7 +9,8 @@ const bodySchema = z.object({
   note: z.string().max(1000).optional(),
 });
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getCurrentUser();
   if (!authUser) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
