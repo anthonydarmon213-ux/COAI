@@ -1,6 +1,8 @@
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { getWorkoutForDate, getSessionDuration } from "@/lib/daily/session";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
+import Link from "next/link";
 
 // Séance du jour mise en avant (22/08/2026, demande Anthony : "le bouton
 // Démarrer la séance doit immédiatement lancer le Player"). Jusqu'ici le
@@ -46,7 +48,19 @@ export function SeanceDuJourHero({
   }
 
   const nom = typeof seance.nom === "string" ? seance.nom : "Ta séance du jour";
-  const exercices = Array.isArray(seance.exercices) ? seance.exercices : [];
+  const exercicesBruts = Array.isArray(seance.exercices) ? seance.exercices : [];
+  const exercices = filtrerExercicesAvecMedias(exercicesBruts);
+  if (!exercices.length || exercices.length < exercicesBruts.length) return (
+    <section id="seance-du-jour" role="status" className="scroll-mt-24 rounded-2xl border border-amber-200/20 bg-amber-200/[0.04] p-5">
+      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200">Séance à actualiser</p>
+      <h2 className="mt-1 text-lg font-semibold text-white">Cette séance ne peut pas encore être lancée.</h2>
+      <p className="mt-2 text-sm leading-6 text-graphite-300">{exercicesBruts.length === 0 ? "Aucun mouvement n’est renseigné." : `${exercicesBruts.length - exercices.length} démonstration${exercicesBruts.length - exercices.length > 1 ? "s manquent" : " manque"}.`} Nous ne retirons pas de mouvements de ton programme sans validation.</p>
+      <div className="mt-3 flex flex-wrap gap-4 text-sm">
+        <Link href="/programme/exercices" className="inline-flex min-h-11 items-center text-laiton-200 underline">Voir les exercices filmés COAI</Link>
+        <Link href="/coach" className="inline-flex min-h-11 items-center text-laiton-200 underline">Demander de l’aide</Link>
+      </div>
+    </section>
+  );
   const echauffement = typeof seance.echauffement === "string" ? seance.echauffement : undefined;
   const retourAuCalme = typeof seance.retourAuCalme === "string" ? seance.retourAuCalme : undefined;
   void photosParExercice;

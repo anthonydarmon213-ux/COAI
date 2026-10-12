@@ -6,6 +6,7 @@ import { ProgrammePdf } from "@/lib/pdf/programme-pdf";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import type { Pilier } from "@prisma/client";
 import { accessibleProgrammePdf } from "@/lib/programmes/access";
+import { compterExercicesSansMediasCoai, programmeAvecMediasCoai } from "@/lib/exercices/media-coai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -55,6 +56,15 @@ async function buildPdf(request: Request, slug: string) {
   if (!affiche) {
     return NextResponse.json({ error: "Aucun programme accessible à exporter." }, { status: 404, headers: privateHeaders });
   }
+  if (pilier === "ENTRAINEMENT") {
+    const missingMediaCount = compterExercicesSansMediasCoai(affiche.contenu);
+    if (missingMediaCount > 0) return NextResponse.json({
+      code: "WORKOUT_MEDIA_INCOMPLETE",
+      error: "La fiche d’entraînement doit être actualisée : certaines démonstrations COAI manquent. Ton programme enregistré n’a pas été modifié.",
+      missingMediaCount,
+    }, { status: 409, headers: privateHeaders });
+  }
+  const contenu = pilier === "ENTRAINEMENT" ? programmeAvecMediasCoai(affiche.contenu) : affiche.contenu;
 
   const heroPath: Record<Pilier, string> = {
     ENTRAINEMENT: "/exercices/back-squat-barre.jpg",
@@ -66,11 +76,10 @@ async function buildPdf(request: Request, slug: string) {
   const heroUrl = new URL(heroPath[pilier], request.url).toString();
 
   const exerciseImages: Record<string, string> = {};
-  if (pilier === "ENTRAINEMENT" && isRecord(affiche.contenu)) {
-    const seances = Array.isArray(affiche.contenu.seances) ? affiche.contenu.seances : [];
-    const premiereSeance = isRecord(seances[0]) ? seances[0] : null;
-    const exercices = premiereSeance && Array.isArray(premiereSeance.exercices) ? premiereSeance.exercices : [];
-    for (const exercice of exercices.slice(0, 6)) {
+  if (pilier === "ENTRAINEMENT" && isRecord(contenu)) {
+    const seances = Array.isArray(contenu.seances) ? contenu.seances : [];
+    const exercices = seances.flatMap(seance => isRecord(seance) && Array.isArray(seance.exercices) ? seance.exercices : []);
+    for (const exercice of exercices) {
       if (!isRecord(exercice) || typeof exercice.nom !== "string") continue;
       const photo = photoCoaiPourNom(exercice.nom);
       if (photo) exerciseImages[exercice.nom] = new URL(photo, request.url).toString();
@@ -78,7 +87,7 @@ async function buildPdf(request: Request, slug: string) {
   }
 
   const buffer = await renderToBuffer(
-    <ProgrammePdf pilier={pilier} data={affiche.contenu} prenom={user.prenom} generatedAt={affiche.generatedAt} heroUrl={heroUrl} exerciseImages={exerciseImages} reviewPending={affiche.statut === "EN_ATTENTE"} />
+    <ProgrammePdf pilier={pilier} data={contenu} prenom={user.prenom} generatedAt={affiche.generatedAt} heroUrl={heroUrl} exerciseImages={exerciseImages} reviewPending={affiche.statut === "EN_ATTENTE"} />
   );
 
   return new NextResponse(new Uint8Array(buffer), {

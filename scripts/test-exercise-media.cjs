@@ -11,7 +11,7 @@ function load(file) {
 }
 const { EXERCICES } = load('src/lib/exercices/catalogue.ts');
 const { photoCoaiPourNom } = load('src/lib/exercices/photos-coai.ts');
-const { videoCoaiPourNom } = load('src/lib/exercices/videos-coai.ts');
+const { videoCoaiPourNom, urlVideoCoai } = load('src/lib/exercices/videos-coai.ts');
 const { variantesPourExercice } = load('src/lib/exercices/variantes.ts');
 for (const nom of ['Goblet squat', 'Squat gobelet (kettlebell)', 'Rowing élastique', 'Rowing à l’élastique', 'Développé militaire haltères', 'Dumbbell shoulder press']) {
   assert.equal(videoCoaiPourNom(nom), null, `Média non conforme : ${nom}`);
@@ -33,6 +33,8 @@ const visibles = EXERCICES.filter(ex => photoCoaiPourNom(ex.nom) && videoCoaiPou
 assert(visibles.length > 0);
 for (const ex of visibles) {
   assert(fs.existsSync('public' + photoCoaiPourNom(ex.nom)), ex.nom);
+  assert(fs.existsSync('public' + urlVideoCoai(videoCoaiPourNom(ex.nom).fichier)),
+    `Vidéo COAI absente : ${ex.nom}`);
 }
 assert(fs.readFileSync('src/components/exercices/exercice-catalogue.tsx', 'utf8').includes('if (!photoCoaiPourNom(ex.nom) || !videoCoaiPourNom(ex.nom)) return false;'));
-console.log(`PASS: hip thrust absent du catalogue et des variantes ; ${visibles.length} exercices avec photo et vidéo référencées.`);
+console.log(`PASS: hip thrust absent du catalogue et des variantes ; ${visibles.length} exercices avec photo et fichier vidéo présents.`);

@@ -6,6 +6,7 @@ import { ProgrammeCompletPdf, type PilierPdfEntree } from "@/lib/pdf/programme-p
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
 import type { Pilier } from "@prisma/client";
 import { accessibleProgrammePdf } from "@/lib/programmes/access";
+import { compterExercicesSansMediasCoai, programmeAvecMediasCoai } from "@/lib/exercices/media-coai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,13 +55,21 @@ async function buildPdf(request: Request) {
     ]);
     const affiche = accessibleProgrammePdf(pilier, valide, dernier);
     if (!affiche) continue;
+    if (pilier === "ENTRAINEMENT") {
+      const missingMediaCount = compterExercicesSansMediasCoai(affiche.contenu);
+      if (missingMediaCount > 0) return NextResponse.json({
+        code: "WORKOUT_MEDIA_INCOMPLETE",
+        error: "La fiche d’entraînement doit être actualisée : certaines démonstrations COAI manquent. Ton programme enregistré n’a pas été modifié.",
+        missingMediaCount,
+      }, { status: 409, headers: privateHeaders });
+    }
+    const contenu = pilier === "ENTRAINEMENT" ? programmeAvecMediasCoai(affiche.contenu) : affiche.contenu;
 
     const exerciseImages: Record<string, string> = {};
-    if (pilier === "ENTRAINEMENT" && isRecord(affiche.contenu)) {
-      const seances = Array.isArray(affiche.contenu.seances) ? affiche.contenu.seances : [];
-      const premiere = isRecord(seances[0]) ? seances[0] : null;
-      const exercices = premiere && Array.isArray(premiere.exercices) ? premiere.exercices : [];
-      for (const exercice of exercices.slice(0, 6)) {
+    if (pilier === "ENTRAINEMENT" && isRecord(contenu)) {
+      const seances = Array.isArray(contenu.seances) ? contenu.seances : [];
+      const exercices = seances.flatMap(seance => isRecord(seance) && Array.isArray(seance.exercices) ? seance.exercices : []);
+      for (const exercice of exercices) {
         if (!isRecord(exercice) || typeof exercice.nom !== "string") continue;
         const photo = photoCoaiPourNom(exercice.nom);
         if (photo) exerciseImages[exercice.nom] = new URL(photo, request.url).toString();
@@ -70,7 +79,7 @@ async function buildPdf(request: Request) {
     entrees.push({
       pilier,
       reviewPending: affiche.statut === "EN_ATTENTE",
-      data: affiche.contenu,
+      data: contenu,
       generatedAt: affiche.generatedAt,
       heroUrl: new URL(heroPath[pilier], request.url).toString(),
       exerciseImages,

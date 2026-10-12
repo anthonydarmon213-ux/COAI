@@ -5,6 +5,7 @@ import { ContreIndications } from "@/components/programme/contre-indications";
 import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-button";
 import { SeanceDuJourHero } from "@/components/programme/seance-du-jour-hero";
 import { photoCoaiPourNom } from "@/lib/exercices/photos-coai";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
 import Link from "next/link";
 
 // Vue dédiée au pilier ENTRAÎNEMENT : met en avant la vue d'ensemble de la
@@ -74,7 +75,7 @@ export function EntrainementView({
           typeof seance.nom === "string" ? seance.nom : `Séance ${i + 1}`
         }
         renderContenu={(seance) => {
-          const { echauffement, exercices, retourAuCalme, jour, nom, photoQuerySeance, ...detailSeance } = seance as {
+          const { echauffement, exercices: exercicesBruts, retourAuCalme, jour, nom, photoQuerySeance, ...detailSeance } = seance as {
             echauffement?: string;
             exercices?: unknown[];
             retourAuCalme?: string;
@@ -83,6 +84,18 @@ export function EntrainementView({
             photoQuerySeance?: string;
             [key: string]: unknown;
           };
+          const listeBrute = Array.isArray(exercicesBruts) ? exercicesBruts : [];
+          const exercices = filtrerExercicesAvecMedias(listeBrute);
+          if (!exercices.length || exercices.length < listeBrute.length) return (
+            <div role="status" className="rounded-xl border border-amber-200/20 bg-amber-200/[0.04] p-4 text-sm text-graphite-200">
+              <strong className="block text-amber-100">Séance à actualiser · démarrage désactivé</strong>
+              <span className="mt-1 block">{listeBrute.length === 0 ? "Aucun mouvement n’est renseigné." : `${listeBrute.length - exercices.length} démonstration${listeBrute.length - exercices.length > 1 ? "s manquent" : " manque"}.`} Les autres mouvements ne seront pas lancés seuls.</span>
+              <div className="mt-3 flex flex-wrap gap-4">
+                <Link href="/programme/exercices" className="inline-flex min-h-11 items-center text-laiton-200 underline">Voir les exercices filmés COAI</Link>
+                <Link href="/coach" className="inline-flex min-h-11 items-center text-laiton-200 underline">Demander de l’aide</Link>
+              </div>
+            </div>
+          );
           const premierExercice = Array.isArray(exercices) && isPlainObject(exercices[0])
             ? exercices[0]
             : null;

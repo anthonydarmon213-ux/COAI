@@ -23,6 +23,7 @@ import { hasProgrammeAccess, getEffectivePlan } from "@/lib/subscription/plan";
 import { calculerScoreSommeil } from "@/lib/insight/score-sommeil";
 import { ScoreSommeilCard } from "@/components/programme/score-sommeil-card";
 import { ProgrammePdfButton } from "@/components/programme/programme-pdf-button";
+import { compterExercicesSansMediasCoai } from "@/lib/exercices/media-coai";
 import { getStockPhotos } from "@/lib/media/pexels";
 import type { Pilier, ProgrammeGenerated } from "@prisma/client";
 import type { CSSProperties } from "react";
@@ -151,6 +152,7 @@ export async function PilierPage({
     valides[index]?.contenu ??
     (PILIERS[index] === "ENTRAINEMENT" ? accessibleTraining(null, derniers[index] ?? null)?.contenu : derniers[index]?.statut === "GENERE_IA" ? derniers[index]?.contenu : null)
   );
+  const ficheEntrainementIncomplete = contenusAffiches[0] != null && compterExercicesSansMediasCoai(contenusAffiches[0]) > 0;
   const photosParPilier = await Promise.all(
     contenusAffiches.map((contenu, index) =>
       PILIERS[index] !== "ENTRAINEMENT" && index === indexPilierActif && contenu && !estSocleCoai(contenu)
@@ -221,12 +223,18 @@ export async function PilierPage({
                   Accéder à ma séance →
                 </a>
               )}
-              <a
-                href="/api/programmes/fiche-complete"
-                className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-semibold transition"
-              >
-                Télécharger ma fiche (PDF)
-              </a>
+              {ficheEntrainementIncomplete ? (
+                <p role="status" className="max-w-sm rounded-xl border border-amber-200/20 bg-amber-200/[0.04] px-4 py-3 text-sm leading-5 text-amber-100">
+                  Fiche d’entraînement à actualiser : une ou plusieurs vidéos COAI manquent. L’export reste indisponible sans modifier ton programme.
+                </p>
+              ) : (
+                <a
+                  href="/api/programmes/fiche-complete"
+                  className="coai-pillar-secondary inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-semibold transition"
+                >
+                  Télécharger ma fiche (PDF)
+                </a>
+              )}
             </div>}
           </div>
 
@@ -355,7 +363,7 @@ export async function PilierPage({
                 <SectionLabel>{LABELS[pilier]}</SectionLabel>
               </div>
               <div className="flex items-center gap-2">
-                {affiche && (
+                {affiche && !(pilier === "ENTRAINEMENT" && ficheEntrainementIncomplete) && (
                   <ProgrammePdfButton slug={PDF_SLUG[pilier]} label="Aperçu 1 page" />
                 )}
               </div>

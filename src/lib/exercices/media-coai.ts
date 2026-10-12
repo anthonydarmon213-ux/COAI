@@ -63,3 +63,35 @@ export function filtrerExercicesAvecMedias(exercices: unknown[]): Record<string,
     return [{ ...donnees, nom: canonique.nom }];
   });
 }
+
+/**
+ * Un ancien programme n'est pas modifié automatiquement : un mouvement sans
+ * photo ET vidéo COAI rend la séance incomplète, même si les autres mouvements
+ * sont prêts. Cela évite de proposer un entraînement tronqué comme s'il était
+ * celui validé pour ce membre.
+ */
+export function compterExercicesSansMediasCoai(value: unknown): number {
+  const data = value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown> : {};
+  const seances = Array.isArray(data.seances) ? data.seances : [];
+  if (seances.length === 0) return 1;
+  return seances.reduce((total, seance) => {
+    if (!seance || typeof seance !== "object" || Array.isArray(seance)) return total + 1;
+    const exercices = Array.isArray((seance as Record<string, unknown>).exercices)
+      ? (seance as Record<string, unknown>).exercices as unknown[] : [];
+    if (exercices.length === 0) return total + 1;
+    return total + exercices.length - filtrerExercicesAvecMedias(exercices).length;
+  }, 0);
+}
+
+/** Canonicalise uniquement les alias du même mouvement, pour les médias PDF. */
+export function programmeAvecMediasCoai(value: unknown): Record<string, unknown> {
+  const data = value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown> : {};
+  const seances = Array.isArray(data.seances) ? data.seances : [];
+  return { ...data, seances: seances.flatMap(seance => {
+    if (!seance || typeof seance !== "object" || Array.isArray(seance)) return [];
+    const row = seance as Record<string, unknown>;
+    return [{ ...row, exercices: filtrerExercicesAvecMedias(Array.isArray(row.exercices) ? row.exercices : []) }];
+  }) };
+}

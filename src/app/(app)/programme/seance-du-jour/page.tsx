@@ -10,6 +10,7 @@ import { DemarrerSeanceButton } from "@/components/programme/demarrer-seance-but
 import { storySeance } from "@/lib/programmes/story-seance";
 import { accessibleTraining } from "@/lib/programmes/access";
 import { illustrerStory } from "@/lib/programmes/story-photos";
+import { filtrerExercicesAvecMedias } from "@/lib/exercices/media-coai";
 
 // Fiche de séance imprimable et partageable (23/08/2026, format validé
 // par Anthony) — page dédiée plutôt qu'un bloc de plus sur
@@ -73,7 +74,18 @@ export default async function SeanceDuJourPage({ searchParams }: { searchParams?
 
   const s = seance as Record<string, unknown>;
   const nom = texte(s.nom) ?? "Séance du jour";
-  const exercices = Array.isArray(s.exercices) ? s.exercices : [];
+  const exercicesBruts = Array.isArray(s.exercices) ? s.exercices : [];
+  const exercices = filtrerExercicesAvecMedias(exercicesBruts);
+  if (!exercices.length || exercices.length < exercicesBruts.length) return (
+    <div className="flex flex-col gap-4">
+      {choix}
+      <h1 className="text-2xl font-semibold text-white">Cette séance doit être actualisée.</h1>
+      <p className="text-sm text-graphite-300">{exercicesBruts.length === 0 ? "Aucun mouvement n’est renseigné." : `${exercicesBruts.length - exercices.length} démonstration${exercicesBruts.length - exercices.length > 1 ? "s manquent" : " manque"}.`} La fiche et le lancement sont désactivés : ton programme enregistré n’a pas été modifié.</p>
+      <Link href="/programme/exercices" className="inline-flex min-h-11 items-center text-laiton-300 underline">Voir les exercices filmés COAI</Link>
+      <Link href="/coach" className="inline-flex min-h-11 items-center text-laiton-300 underline">Demander de l’aide</Link>
+      <Link href="/programme/entrainement" className="inline-flex min-h-11 items-center text-sm underline">Retour à mon programme</Link>
+    </div>
+  );
   const story = illustrerStory(storySeance(exercices, s.echauffement, s.retourAuCalme), genre);
 
   return (

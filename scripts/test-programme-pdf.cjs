@@ -16,9 +16,19 @@ function load(file, dependencies) {
   return exports;
 }
 const access = load('src/lib/programmes/access.ts', {});
-async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', signedIn = true, validated = false, failure = false } = {}) {
+const media = load('src/lib/exercices/media-coai.ts', {
+  '@/lib/exercices/catalogue': { EXERCICES: [{ nom: 'Squat barre' }] },
+  '@/lib/exercices/photos-coai': { photoCoaiPourNom: nom => nom === 'Squat barre' ? '/exercices/squat-barre.jpg' : null },
+  '@/lib/exercices/videos-coai': { videoCoaiPourNom: nom => nom === 'Squat barre' ? { fichier: 'squat-barre' } : null },
+});
+assert.equal(media.compterExercicesSansMediasCoai({ seances: [] }), 1);
+assert.equal(media.compterExercicesSansMediasCoai({ seances: [{ exercices: [{ nom: 'Squat barre' }, { nom: 'Hip thrust barre' }] }] }), 1);
+assert.equal(media.compterExercicesSansMediasCoai({ seances: [{ exercices: [{ nom: 'Squat barre' }] }] }), 0);
+async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', signedIn = true, validated = false, failure = false, missingMedia = false } = {}) {
   let queries = 0, rendered;
-  const latest = { statut: status, contenu: { titre: 'Test local', seances: [] }, generatedAt: new Date('2026-09-17T12:00:00Z') };
+  const latest = { statut: status, contenu: { titre: 'Test local', seances: [{ exercices: missingMedia
+    ? [{ nom: 'Squat barre' }, { nom: 'Hip thrust barre' }]
+    : [{ nom: 'Squat barre' }] }] }, generatedAt: new Date('2026-09-17T12:00:00Z') };
   const api = load(file, {
     'react/jsx-runtime': jsx, 'next/server': { NextResponse },
     '@/lib/programmes/access': access,
@@ -31,6 +41,7 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
       return where.statut === 'VALIDE' ? (validated || status === 'VALIDE' ? { ...latest, statut: 'VALIDE' } : null) : latest;
     }}}},
     '@/lib/exercices/photos-coai': { photoCoaiPourNom: () => null },
+    '@/lib/exercices/media-coai': media,
     '@/lib/pdf/programme-pdf': { ProgrammePdf: () => null, ProgrammeCompletPdf: () => null },
     '@react-pdf/renderer': { renderToBuffer: async element => { rendered = element.props; return Buffer.from('%PDF-fixture'); } },
   });
@@ -39,7 +50,8 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
   assert.equal(response.headers.get('cache-control'), 'private, no-store');
   assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
   assert.equal(latest.statut, status, 'Never change review status');
-  const expected = !signedIn ? 401 : failure ? 503 : validated || status === 'GENERE_IA' || status === 'VALIDE' || (pilier === 'ENTRAINEMENT' && status === 'EN_ATTENTE') ? 200 : 404;
+  const accessible = validated || status === 'GENERE_IA' || status === 'VALIDE' || (pilier === 'ENTRAINEMENT' && status === 'EN_ATTENTE');
+  const expected = !signedIn ? 401 : failure ? 503 : !accessible ? 404 : pilier === 'ENTRAINEMENT' && missingMedia ? 409 : 200;
   assert.equal(response.status, expected);
   if (!signedIn) assert.equal(queries, 0);
   if (expected === 200) {
@@ -49,7 +61,13 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
     assert.equal(entry.reviewPending, !validated && status === 'EN_ATTENTE');
   } else {
     assert.equal(rendered, undefined);
-    assert.ok(!(await response.text()).includes('PRIVATE_DATABASE_DETAIL'));
+    const bodyText = await response.text();
+    if (expected === 409) {
+      const body = JSON.parse(bodyText);
+      assert.equal(body.code, 'WORKOUT_MEDIA_INCOMPLETE');
+      assert.equal(body.missingMediaCount, 1);
+    }
+    assert.ok(!bodyText.includes('PRIVATE_DATABASE_DETAIL'));
   }
 }
 (async () => {
@@ -60,7 +78,7 @@ async function scenario(file, { status = 'EN_ATTENTE', pilier = 'ENTRAINEMENT', 
         await scenario(file, { pilier, status }); count++;
       }
     }
-    for (const options of [{ signedIn: false }, { failure: true }, { validated: true, status: 'REJETE' }]) {
+    for (const options of [{ signedIn: false }, { failure: true }, { validated: true, status: 'REJETE' }, { missingMedia: true }]) {
       await scenario(file, options); count++;
     }
   }
