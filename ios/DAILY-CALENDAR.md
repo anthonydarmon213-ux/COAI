@@ -49,3 +49,15 @@ l'enregistrement puis la relecture des adaptations sans matériel et avec salle
 complète. Compilation et TypeScript passent ; comptes jetables supprimés.
 Validation visuelle iOS et validation de production restent à effectuer.
 
+## Cohérence du suivi
+
+Une requête JSON illisible reçoit maintenant une erreur 400 compréhensible,
+sans modifier le suivi enregistré. Quand le planning devient un jour de repos
+après un premier check-in, les anciennes séances source/adaptée et leur résumé
+sont effacés du suivi courant ; le programme référencé est mis à jour.
+L'historique des séances terminées n'est pas supprimé.
+
+Le test HTTP/Auth/PostgreSQL QA vérifie ces deux transitions, la relecture et
+l'absence de duplication du suivi. Compilation réussie, lint sans erreur avec
+50 avertissements existants. Ce correctif reste local, non validé en production.
+

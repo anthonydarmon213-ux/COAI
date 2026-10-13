@@ -111,6 +111,25 @@ async function main() {
     const reloaded = await (await get('/api/daily', first)).json();
     assert.deepEqual(reloaded.adaptedSession, daily.adaptedSession, 'Equipment adaptation persists across requests');
   }
+  const beforeMalformed = await (await get('/api/daily', first)).json();
+  const malformed = await fetch(`${base}/api/daily`, { method: 'POST',
+    headers: { Authorization: first.bearer, 'Content-Type': 'application/json' }, body: '{broken' });
+  assert.equal(malformed.status, 400);
+  assert.match((await malformed.json()).error, /Réessaie/);
+  assert.deepEqual(await (await get('/api/daily', first)).json(), beforeMalformed,
+    'Malformed payload must not modify the saved check-in');
+  // Simulate an owned programme being corrected to a rest day, after an earlier check-in.
+  await db.programmeGenerated.updateMany({ where: { userId: first.user.id, pilier: 'ENTRAINEMENT' },
+    data: { contenu: { titre: name, seances: [] } } });
+  const rest = await fetch(`${base}/api/daily`, { method: 'POST',
+    headers: { Authorization: first.bearer, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'checkin', sleep: 'BON', energy: 'NORMALE', pain: false }) });
+  assert.equal(rest.status, 200);
+  const restDay = await rest.json();
+  for (const key of ['sourceSession', 'adaptedSession', 'adaptation']) assert.equal(restDay[key], null);
+  const restoredRest = await (await get('/api/daily', first)).json();
+  assert.equal(restoredRest.adaptedSession, null, 'A rest day must not revive the old adapted workout');
+  assert.equal(restoredRest.id, beforeMalformed.id, 'The daily check-in is updated, not duplicated');
   const optimized = await get('/_next/image?url=%2Fexercices%2Fback-squat-barre.jpg&w=640&q=95');
   assert.equal(optimized.status, 200);
   assert.match(optimized.headers.get('content-type'), /image\//);

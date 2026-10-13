@@ -79,7 +79,7 @@ async function routes() {
         count: async () => 0,
       },
     };
-    const dependencies = { 'next/server': { NextResponse }, zod: require('zod'),
+    const dependencies = { 'next/server': { NextResponse }, zod: require('zod'), '@prisma/client': require('@prisma/client'),
       '@/lib/auth/server': { getCurrentUser: async () => ({ id: 'qa-auth' }) },
       '@/lib/db/client': { prisma: database }, '@/lib/daily/session': session,
       '@/lib/programmes/access': { accessibleTraining: (_validated, latest) => latest },

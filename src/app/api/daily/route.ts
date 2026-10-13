@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/db/client";
 import { adaptWorkout, getSessionDuration, getWorkoutForDate } from "@/lib/daily/session";
 import { parisCalendarDate } from "@/lib/daily/calendar";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 function asJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -78,7 +78,13 @@ export async function POST(request: Request) {
   const user = await currentAppUser();
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
-  const parsed = requestSchema.safeParse(await request.json());
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Les réponses n'ont pas pu être lues. Réessaie d'envoyer ton suivi." }, { status: 400 });
+  }
+  const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -105,10 +111,18 @@ export async function POST(request: Request) {
     };
 
     if (!source) {
+      const restDay = {
+        ...checkinCommun,
+        programmeSourceId: programme.id,
+        programmeVersion: programme.version,
+        sourceSession: Prisma.DbNull,
+        adaptedSession: Prisma.DbNull,
+        adaptation: Prisma.DbNull,
+      };
       const daily = await prisma.dailySession.upsert({
         where: { userId_date: { userId: user.id, date } },
-        create: { userId: user.id, date, programmeSourceId: programme.id, programmeVersion: programme.version, ...checkinCommun },
-        update: checkinCommun,
+        create: { userId: user.id, date, ...restDay },
+        update: restDay,
       });
       return NextResponse.json(daily);
     }
