@@ -36,6 +36,19 @@ for (const [instant, day, name] of cases) {
   assert.equal(session.getWorkoutForDate(shortened, now)?.nom, name, 'French abbreviated weekdays are accepted');
 }
 assert.equal(session.getWorkoutForDate(program, new Date('invalid')), null);
+const original = program.seances[0];
+const snapshot = JSON.stringify(original);
+for (const overrides of [{}, { energy: 'BASSE' }, { availableMinutes: 15 },
+  { pain: true }, { chargeMentale: 'SATUREE' }]) {
+  const result = session.adaptWorkout(original, {
+    sleep: 'BON', energy: 'NORMALE', pain: false, availableMinutes: 40, ...overrides,
+  }, 40);
+  assert(result.session.exercices.every(exercise => original.exercices.some(source => source.nom === exercise.nom)),
+    'Adaptation must never invent an exercise without approved media');
+  assert.equal(result.summary.originalExerciseCount, original.exercices.length);
+  assert.equal(JSON.stringify(original), snapshot, 'Source programme must remain intact');
+}
+assert.equal(session.ensureWorkoutCompleteness(original).exercices.length, 1);
 assert.equal(session.getWorkoutForDate({ seances: [{ jour: 'lunettes', nom: 'wrong' }] }, new Date('2026-10-12T12:00:00Z')), null);
 async function routes() {
   for (const [instant, day, name] of cases) {

@@ -27,3 +27,12 @@ correction ne résout pas encore un formulaire gardé ouvert pendant le passage
 à minuit : la protection contre l'envoi d'un ancien jour reste à intégrer avec
 les clients web/iOS compatibles. Les anciennes adaptations qui contiennent un
 mouvement ajouté automatiquement sans média COAI restent également à traiter.
+# Exercices du programme uniquement
+
+La normalisation quotidienne n'ajoute plus de « dead bug » automatiquement.
+Tests : adaptation normale, faible énergie, durée courte, douleur et charge
+mentale saturée ; aucun mouvement inventé et programme source inchangé.
+TypeScript et compilation passent. La régression HTTP locale avec Auth et
+base de test passe aussi ; les comptes jetables ont été supprimés.
+Ce changement n'est pas déployé ni validé en production.
+
