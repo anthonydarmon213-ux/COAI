@@ -98,6 +98,19 @@ async function main() {
     assert.equal(pdf.subarray(0, 5).toString(), '%PDF-'); assert(pdf.length > 1000);
     assert.equal((await get(path, second)).status, 404, 'No other member programme is exported');
   }
+  for (const equipment of ['Sans matériel', 'Salle de sport complète']) {
+    const response = await fetch(`${base}/api/daily`, {
+      method: 'POST', headers: { Authorization: first.bearer, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'checkin', sleep: 'BON', energy: 'NORMALE', pain: false,
+        availableMinutes: 60, equipementDuJour: equipment }),
+    });
+    assert.equal(response.status, 200);
+    const daily = await response.json();
+    assert.equal(daily.sourceSession.exercices.length, 1);
+    assert.equal(daily.adaptedSession.exercices.length, equipment === 'Sans matériel' ? 0 : 1);
+    const reloaded = await (await get('/api/daily', first)).json();
+    assert.deepEqual(reloaded.adaptedSession, daily.adaptedSession, 'Equipment adaptation persists across requests');
+  }
   const optimized = await get('/_next/image?url=%2Fexercices%2Fback-squat-barre.jpg&w=640&q=95');
   assert.equal(optimized.status, 200);
   assert.match(optimized.headers.get('content-type'), /image\//);

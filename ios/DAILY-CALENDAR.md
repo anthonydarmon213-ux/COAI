@@ -36,3 +36,16 @@ TypeScript et compilation passent. La régression HTTP locale avec Auth et
 base de test passe aussi ; les comptes jetables ont été supprimés.
 Ce changement n'est pas déployé ni validé en production.
 
+## Matériel indisponible
+
+Une adaptation sans aucun mouvement compatible ne conserve plus les exercices
+nécessitant le matériel absent. Elle propose de modifier le matériel ou de
+choisir une autre séance, sans inventer de remplacements. Les séances partiellement
+compatibles conservent leurs seuls exercices compatibles.
+
+Tests ciblés réussis : aucun matériel, salle complète, compatibilité partielle,
+programme source intact. Le test HTTP avec Auth/PostgreSQL QA confirme aussi
+l'enregistrement puis la relecture des adaptations sans matériel et avec salle
+complète. Compilation et TypeScript passent ; comptes jetables supprimés.
+Validation visuelle iOS et validation de production restent à effectuer.
+

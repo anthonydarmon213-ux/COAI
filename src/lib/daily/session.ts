@@ -181,11 +181,30 @@ export function adaptWorkout(
     const compatibles = adaptedExercises.filter((exercice) =>
       exerciceCompatibleAvecMateriel(exercice, checkin.equipementDuJour ?? "")
     );
-    if (compatibles.length > 0 && compatibles.length < adaptedExercises.length) {
+    if (compatibles.length < adaptedExercises.length) {
       const retires = adaptedExercises.length - compatibles.length;
       adaptedExercises = compatibles;
       materielAjuste = true;
       changes.push(`${retires} exercice${retires > 1 ? "s" : ""} retiré${retires > 1 ? "s" : ""} car le matériel n'est pas disponible aujourd'hui`);
+    }
+    if (exercices.length > 0 && compatibles.length === 0) {
+      return {
+        session: {
+          ...completeSource,
+          nom: "Matériel à adapter",
+          exercices: [],
+          echauffement: undefined,
+          retourAuCalme: "Aucun exercice de cette séance ne correspond au matériel indiqué. Modifie ton matériel disponible ou choisis une autre séance adaptée avant de commencer.",
+        },
+        summary: {
+          adapted: true,
+          title: "Choisis une séance adaptée à ton matériel",
+          reason: "Le matériel nécessaire n'est pas disponible aujourd'hui. Ton programme reste intact : aucun mouvement de remplacement n'a été inventé.",
+          changes,
+          originalExerciseCount: exercices.length,
+          adaptedExerciseCount: 0,
+        },
+      };
     }
   }
 

@@ -49,6 +49,16 @@ for (const overrides of [{}, { energy: 'BASSE' }, { availableMinutes: 15 },
   assert.equal(JSON.stringify(original), snapshot, 'Source programme must remain intact');
 }
 assert.equal(session.ensureWorkoutCompleteness(original).exercices.length, 1);
+const checkin = { sleep: 'BON', energy: 'NORMALE', pain: false, availableMinutes: 40 };
+const unavailable = session.adaptWorkout(original, { ...checkin, equipementDuJour: 'Sans matériel' }, 40);
+assert.equal(unavailable.session.exercices.length, 0, 'No equipment must not retain a barbell exercise');
+assert.equal(unavailable.summary.adapted, true);
+assert.equal(unavailable.summary.originalExerciseCount, 1);
+assert.match(unavailable.session.retourAuCalme, /Modifie ton matériel/);
+assert.equal(JSON.stringify(original), snapshot);
+assert.equal(session.adaptWorkout(original, { ...checkin, equipementDuJour: 'Salle de sport complète' }, 40).session.exercices.length, 1);
+const mixed = { exercices: [...original.exercices, { nom: 'Pompes', series: '3' }] };
+assert.deepEqual(Array.from(session.adaptWorkout(mixed, { ...checkin, equipementDuJour: 'Sans matériel' }, 40).session.exercices, ex => ex.nom), ['Pompes']);
 assert.equal(session.getWorkoutForDate({ seances: [{ jour: 'lunettes', nom: 'wrong' }] }, new Date('2026-10-12T12:00:00Z')), null);
 async function routes() {
   for (const [instant, day, name] of cases) {
