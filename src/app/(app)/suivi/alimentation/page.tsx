@@ -15,7 +15,8 @@ const STATUT_LABELS: Record<StatutRepas, { label: string; tone: "success" | "war
   GROS_ECART: { label: "Gros écart", tone: "danger" },
 };
 
-export default async function AlimentationSuiviPage({ searchParams }: { searchParams: { jour?: string | string[] } }) {
+export default async function AlimentationSuiviPage(props: { searchParams: Promise<{ jour?: string | string[] }> }) {
+  const searchParams = await props.searchParams;
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 

@@ -33,7 +33,8 @@ function texte(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
-export default async function SeanceDuJourPage({ searchParams }: { searchParams?: { seance?: string; visuels?: string } }) {
+export default async function SeanceDuJourPage(props: { searchParams?: Promise<{ seance?: string; visuels?: string }> }) {
+  const searchParams = await props.searchParams;
   const user = await getCurrentAppUser();
   if (!user) return <AccessRecovery />;
 

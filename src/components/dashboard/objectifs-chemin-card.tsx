@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactElement } from "react";
 
 type ProfileData = {
   objectifs?: string | null;
@@ -76,7 +77,7 @@ function extractMotivation(raw: string | null | undefined): string | null {
   return null;
 }
 
-const SVG_ICONS: Record<string, JSX.Element> = {
+const SVG_ICONS: Record<string, ReactElement> = {
   flame: <path d="M12 22c-4.97 0-7-3.58-7-7a8 8 0 0 1 3-6c0 2.5 2 3 2 3s-1-2 1-4c2.5 2.5 4 4.5 4 7 0 1-.5 2-1 3 1-1 2-2.5 2-4.5C18 17 16.97 22 12 22Z" />,
   dumbbell: <><path d="M6.5 6.5h11v11h-11z" fill="none" /><path d="M17.5 4.5a1 1 0 0 1 1 1v13a1 1 0 0 1-2 0v-13a1 1 0 0 1 1-1Zm-11 0a1 1 0 0 1 1 1v13a1 1 0 0 1-2 0v-13a1 1 0 0 1 1-1ZM21 8a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1ZM3 8a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1Zm5 4h8" /></>,
   heart: <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />,

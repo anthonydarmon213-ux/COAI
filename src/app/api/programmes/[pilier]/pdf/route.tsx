@@ -23,7 +23,8 @@ const SLUG_TO_PILIER: Record<string, Pilier> = {
   recuperation: "RECUPERATION",
 };
 
-export async function GET(request: Request, { params }: { params: { pilier: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ pilier: string }> }) {
+  const params = await props.params;
   try { return await buildPdf(request, params.pilier); }
   catch { return NextResponse.json({ error: "La fiche n’a pas pu être préparée. Réessaie dans un instant." }, { status: 503, headers: privateHeaders }); }
 }

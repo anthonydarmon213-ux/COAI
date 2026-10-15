@@ -6,7 +6,8 @@ import { LABEL_PAR_EXERCICE } from "@/lib/tests-maxi/labels";
 
 // Carte de partage façon Strava — visuel carré téléchargeable, généré à la
 // demande (pas stocké), pour partager un résultat sans présumer d'un record.
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getCurrentUser();
   if (!authUser) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
