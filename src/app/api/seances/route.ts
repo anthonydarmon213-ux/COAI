@@ -68,6 +68,14 @@ export async function POST(request: Request) {
   }
 
   const source = parsed.data.source ?? "LIBRE";
+  // A native draft belongs to the member who opened it, even if the shared
+  // authentication session changed before saving. Legacy web clients omit it.
+  const expectedOwner = request.headers.get("X-COAI-Expected-Owner");
+  if (expectedOwner !== null && expectedOwner !== user.id) {
+    return NextResponse.json({
+      error: "Le compte COAI a changé. Reconnecte-toi avec le compte de cette séance pour l’enregistrer.",
+    }, { status: 409, headers: { "Cache-Control": "private, no-store" } });
+  }
   // Une nouvelle tentative après une coupure réseau réutilise exactement la
   // même date ISO. Si la première écriture avait réussi mais que sa réponse
   // s'était perdue, on renvoie la séance existante au lieu de créer un
