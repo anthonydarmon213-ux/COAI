@@ -117,6 +117,7 @@ model User {
   programmeUnlockedAt DateTime?
 
   subscription             Subscription?
+  applePurchaseAccount     ApplePurchaseAccount?
   profile                  Profile?
   programmes               ProgrammeGenerated[]
   seances                  SeanceLog[]
@@ -294,6 +295,38 @@ enum BillingInterval {
   // remise laissait un ecart trop grand avec le mensuel.
   QUARTERLY
   ANNUAL
+}
+
+// Server-assigned StoreKit account binding, separate from Stripe billing.
+model ApplePurchaseAccount {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountToken String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt    DateTime @default(now())
+  transactions AppleTransaction[]
+
+  @@map("apple_purchase_accounts")
+}
+
+// Verified transaction snapshots. Never store an unverified client receipt here.
+model AppleTransaction {
+  environment           String
+  transactionId         String
+  originalTransactionId String
+  userId                String
+  account               ApplePurchaseAccount @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  productId             String
+  purchasedAt           DateTime
+  expiresAt             DateTime
+  signedAt              DateTime
+  revokedAt             DateTime?
+  upgraded              Boolean @default(false)
+  receivedAt            DateTime @default(now())
+
+  @@id([environment, transactionId])
+  @@index([environment, originalTransactionId])
+  @@index([userId, environment, expiresAt])
+  @@map("apple_transactions")
 }
 
 model Subscription {
