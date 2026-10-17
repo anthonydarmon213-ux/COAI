@@ -10,6 +10,7 @@ import { computeProfilCompletion } from "@/lib/profil/completion";
 import { hasProgrammeAccess, hasPaidSubscription } from "@/lib/subscription/plan";
 import { OffresCard } from "@/components/dashboard/offres-card";
 import { getSessionDuration, getWorkoutForDate, type WorkoutSession } from "@/lib/daily/session";
+import { parisCalendarDate } from "@/lib/daily/calendar";
 import { recommanderServiceDepuisProfil } from "@/lib/dashboard/besoins-identifies";
 import { DashboardAvatar } from "@/components/dashboard/dashboard-avatar";
 import { DashboardIntroVideo } from "@/components/dashboard/dashboard-intro-video";
@@ -38,8 +39,7 @@ function nomSeanceCourt(nom: string) {
 }
 
 function today() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return parisCalendarDate();
 }
 
 export default async function DashboardPage() {

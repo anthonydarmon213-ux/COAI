@@ -7,7 +7,8 @@ const TRENTE_JOURS = 60 * 60 * 24 * 30;
 // valeur de COAI via le diagnostic gratuit. Le code reste disponible jusqu'à
 // l'inscription (email ou Google) sans apparaître dans toutes les URLs du
 // tunnel.
-export function GET(request: Request, { params }: { params: { code: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ code: string }> }) {
+  const params = await props.params;
   const code = params.code.toUpperCase();
   const invitation = new URL(request.url);
   const destination = new URL("/diagnostic", request.url);

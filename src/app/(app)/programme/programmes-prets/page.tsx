@@ -10,11 +10,12 @@ import { PROGRAMME_DECOUVERTE_GRATUIT_SLUG } from "@/lib/programmes-prets/experi
 // même gabarit que /programme/exercices et /programme/recettes : une
 // bibliothèque indépendante du programme généré par l'IA, jamais bloquante
 // ni en remplacement. Les cartes utilisent uniquement la photothèque COAI.
-export default async function ProgrammesPretsPage({
-  searchParams,
-}: {
-  searchParams?: { achat?: string };
-}) {
+export default async function ProgrammesPretsPage(
+  props: {
+    searchParams?: Promise<{ achat?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const user = await getCurrentAppUser();
   const achats = user
     ? await prisma.programmePurchase.findMany({

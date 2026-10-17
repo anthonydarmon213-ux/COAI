@@ -1,3 +1,5 @@
+import { parisWeekday } from "@/lib/daily/calendar";
+
 export type WorkoutSession = Record<string, unknown> & {
   jour?: string;
   nom?: string;
@@ -30,7 +32,11 @@ export type AdaptationSummary = {
   adaptedExerciseCount: number;
 };
 
-const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+const JOURS: Record<string, readonly string[]> = {
+  dimanche: ["dimanche", "dim"], lundi: ["lundi", "lun"], mardi: ["mardi", "mar"],
+  mercredi: ["mercredi", "mer"], jeudi: ["jeudi", "jeu"], vendredi: ["vendredi", "ven"],
+  samedi: ["samedi", "sam"],
+};
 
 function normalise(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -42,32 +48,15 @@ export function isCoreExercise(exercise: Record<string, unknown>) {
   return CORE_PATTERN.test(String(exercise.nom ?? ""));
 }
 
-// Les toutes premières V1 ont parfois été générées avant que le prompt
-// n'impose un finisher gainage et un retour au calme. Cette normalisation
-// complète uniquement la séance du jour : elle ne modifie jamais le programme
-// source. Le mouvement proposé est volontairement simple, sans charge, et
-// demande explicitement d'arrêter au moindre inconfort.
+// Complète le texte de retour au calme, sans inventer de mouvement :
+// tout exercice doit provenir du programme et disposer de ses médias validés.
 export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSession {
   const exercises = Array.isArray(session.exercices) ? session.exercices : [];
   if (exercises.length === 0) return session;
 
-  const completedExercises = exercises.some(isCoreExercise)
-    ? exercises
-    : [
-        ...exercises,
-        {
-          nom: "Dead bug contrôlé — gainage profond",
-          series: "2",
-          repetitions: "6 à 8 répétitions lentes par côté",
-          repos: "45 sec",
-          charge: "Poids du corps — garde le bas du dos stable et arrête au moindre inconfort",
-          methode: "Série classique",
-        },
-      ];
-
   return {
     ...session,
-    exercices: completedExercises,
+    exercices: exercises,
     retourAuCalme:
       session.retourAuCalme ??
       "5 à 8 minutes : marche ou pédalage très léger, respiration calme, puis mobilité douce des zones travaillées. Aucun étirement ne doit provoquer de douleur.",
@@ -75,14 +64,17 @@ export function ensureWorkoutCompleteness(session: WorkoutSession): WorkoutSessi
 }
 
 export function getWorkoutForDate(contenu: unknown, date: Date): WorkoutSession | null {
+  if (!Number.isFinite(date.getTime())) return null;
   if (!contenu || typeof contenu !== "object" || Array.isArray(contenu)) return null;
   const seances = (contenu as { seances?: unknown }).seances;
   if (!Array.isArray(seances)) return null;
-  const jour = JOURS[date.getDay()] ?? "";
+  const aliases = JOURS[normalise(parisWeekday(date))] ?? [];
   return (seances.find((seance) => {
     if (!seance || typeof seance !== "object" || Array.isArray(seance)) return false;
-    const valeur = String((seance as { jour?: unknown }).jour ?? "");
-    return normalise(valeur).includes(normalise(jour));
+    const valeur = (seance as { jour?: unknown }).jour;
+    if (typeof valeur !== "string") return false;
+    const tokens = normalise(valeur).split(/[^a-z]+/).filter(Boolean);
+    return aliases.some(alias => tokens.includes(alias));
   }) ?? null) as WorkoutSession | null;
 }
 
@@ -189,11 +181,30 @@ export function adaptWorkout(
     const compatibles = adaptedExercises.filter((exercice) =>
       exerciceCompatibleAvecMateriel(exercice, checkin.equipementDuJour ?? "")
     );
-    if (compatibles.length > 0 && compatibles.length < adaptedExercises.length) {
+    if (compatibles.length < adaptedExercises.length) {
       const retires = adaptedExercises.length - compatibles.length;
       adaptedExercises = compatibles;
       materielAjuste = true;
       changes.push(`${retires} exercice${retires > 1 ? "s" : ""} retiré${retires > 1 ? "s" : ""} car le matériel n'est pas disponible aujourd'hui`);
+    }
+    if (exercices.length > 0 && compatibles.length === 0) {
+      return {
+        session: {
+          ...completeSource,
+          nom: "Matériel à adapter",
+          exercices: [],
+          echauffement: undefined,
+          retourAuCalme: "Aucun exercice de cette séance ne correspond au matériel indiqué. Modifie ton matériel disponible ou choisis une autre séance adaptée avant de commencer.",
+        },
+        summary: {
+          adapted: true,
+          title: "Choisis une séance adaptée à ton matériel",
+          reason: "Le matériel nécessaire n'est pas disponible aujourd'hui. Ton programme reste intact : aucun mouvement de remplacement n'a été inventé.",
+          changes,
+          originalExerciseCount: exercices.length,
+          adaptedExerciseCount: 0,
+        },
+      };
     }
   }
 

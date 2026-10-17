@@ -15,11 +15,12 @@ import { sanitizeReturnTo } from "@/lib/auth/safe-redirect";
 // le point d'entrée. Nouveau modèle d'accès libre (13/08/2026) : plus de
 // plan à connaître ici, l'inscription est gratuite quel que soit le point
 // d'entrée.
-export default async function CompleterInscriptionPage({
-  searchParams,
-}: {
-  searchParams: { redirect_to?: string };
-}) {
+export default async function CompleterInscriptionPage(
+  props: {
+    searchParams: Promise<{ redirect_to?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const authUser = await getCurrentUser();
   if (!authUser || !authUser.email) {
     redirect("/sign-in");
