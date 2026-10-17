@@ -1,5 +1,30 @@
 # Intégration locale des PR 126, 127 et 128 — 15 octobre 2026
 
+## Réconciliation avec la production du 17 octobre
+
+Base distante actualisée : a402ace (PR 127/128 déjà fusionnées et déployées).
+PR 126 toujours ouverte/brouillon et CONFLICTING ; ses endpoints compte et
+catalogue renvoient encore 404 en production. Aucun accord de fusion de 126.
+
+Fusion locale de cette base dans la branche d'intégration : trois conflits
+résolus (verrou npm, contrôle HTTP propriétaire et ligne vide de calendrier).
+Conserver les dépendances Apple et le test 409 propriétaire ; semver reste une
+dépendance runtime du SDK Apple, pas seulement devOptional. Le contenu final
+du code et du verrou est identique au HEAD local précédemment validé 130b891 :
+cette opération réconcilie l'ascendance Git avec les squashes de production.
+
+Nouvelle installation npm ci hors ligne réussie, puis runner combiné complet :
+unitaires Apple/propriétaire/calendrier, build Next et HTTP/Auth/PostgreSQL.
+Concurrence de liaison Apple, sessions cookie/bearer et isolation passent ;
+transaction non signée refusée. Fixtures supprimées. Typage/lint contrôlés.
+Achats, accès et notifications Apple désactivés ; aucune migration exécutée.
+Le contrôle lint ciblé CJS a ensuite révélé un défaut de configuration : règles
+react-hooks globales alors que le plugin Next ne s'applique pas aux fichiers
+CJS. Portée alignée sur les fichiers JS/TS concernés, sans désactiver leurs
+règles React. Ce correctif de configuration est distinct de la fusion à contenu
+identique décrite plus haut. Résultat local uniquement : pas de push, mise à jour
+de PR ou déploiement.
+
 Branche locale : `codex/release-pr-integration`, worktree réutilisé
 `/private/tmp/coai-owner-fix-20261015`. La branche publique propriétaire et
 la branche d'intégration native principale restent inchangées.
