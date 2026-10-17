@@ -51,6 +51,13 @@ async function main() {
   assert.match(invitation.headers.get('set-cookie'), /ABCD234/);
   assert.equal((await get('/auth/callback?error_code=access_denied')).status, 307);
   const first = await fixture(), second = await fixture();
+  const wrongOwner = await fetch(base + '/api/seances', {method:'POST',headers:{
+    Cookie:first.cookie,'Content-Type':'application/json','X-COAI-Expected-Owner':second.user.id},
+    body:JSON.stringify({date:new Date().toISOString(),exercices:[],source:'PROGRAMME'})});
+  assert.equal(wrongOwner.status,409,'Combined runtime must preserve native owner protection');
+  assert.match(wrongOwner.headers.get('cache-control'),/private.*no-store/);
+  assert.equal(await db.seanceLog.count({where:{userId:{in:[first.user.id,second.user.id]}}}),0,
+    'A mismatched owner must create no workout for either member');
   await db.profile.create({ data: { userId: first.user.id, sexe: 'homme' } });
   await db.subscription.create({ data: { userId: first.user.id,
     stripeCustomerId: `qa-runtime-${randomUUID()}`, status: 'ACTIVE' } });

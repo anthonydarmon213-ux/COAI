@@ -60,4 +60,3 @@ L'historique des séances terminées n'est pas supprimé.
 Le test HTTP/Auth/PostgreSQL QA vérifie ces deux transitions, la relecture et
 l'absence de duplication du suivi. Compilation réussie, lint sans erreur avec
 50 avertissements existants. Ce correctif reste local, non validé en production.
-
